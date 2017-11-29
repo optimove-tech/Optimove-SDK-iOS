@@ -10,7 +10,7 @@ import UIKit
 
 struct URLPaths
 {
-    static let base = "https://appcontrollerproject-developer.firebaseapp.com"
+    static let base = "https://sdk-cdn.optimove.net/mobilesdkconfig"
 }
 
 struct Keys
