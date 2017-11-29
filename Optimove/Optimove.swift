@@ -44,6 +44,10 @@ public final class Optimove : OptimoveStateDelegate
         notificationHandler = OptimoveNotificationHandler()
         monitor = MonitorOptimoveState()
         monitor.register(stateDelegate: self)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(dispatchNow),
+                                               name: NSNotification.Name.UIApplicationDidEnterBackground,
+                                               object: nil)
     }
     
     /// Validate and send the event to Optitrack component
@@ -251,7 +255,7 @@ public final class Optimove : OptimoveStateDelegate
     /// - Parameter deviceToken: A token that was received in the appDelegate callback
     public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data)
     {
-            optiPush?.application(didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+        optiPush?.application(didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
     }
     
     //MARK: - Private Methods
@@ -318,7 +322,7 @@ public final class Optimove : OptimoveStateDelegate
         
     }
     
-   private func evaluateUserAgent() -> UserAgent
+    private func evaluateUserAgent() -> UserAgent
     {
         let webView = UIWebView(frame: .zero)
         return webView.stringByEvaluatingJavaScript(from: "navigator.userAgent") ?? ""
