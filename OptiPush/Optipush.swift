@@ -85,12 +85,16 @@ final class Optipush:NSObject
     private func reportNotificationDelivered(_ campaignDetails: CampaignDetails)
     {
         Optimove.sharedInstance.report(event: NotificationDelivered(campaignDetails: campaignDetails))
-        Optimove.sharedInstance.dispatchNow()
+        { (error) in
+            Optimove.sharedInstance.dispatchNow()
+        }
     }
     private func reportNotificationDismissed(_ campaignDetails: CampaignDetails)
     {
         Optimove.sharedInstance.report(event:NotificationDismissed(campaignDetails: campaignDetails))
-        Optimove.sharedInstance.dispatchNow()
+        { (error) in
+            Optimove.sharedInstance.dispatchNow()
+        }
     }
     
     func handleNotification(userInfo:[AnyHashable : Any],

@@ -15,7 +15,7 @@ protocol ConversionProcol
 }
 protocol TrackProtocol
 {
-    func report(event: OptimoveEvent,withConfigs config: EventConfig)
+    func report(event: OptimoveEvent,withConfigs config: EventConfig, didComplete: @escaping ResultBlock )
     func set(userID: String)
 }
 
@@ -81,7 +81,7 @@ final class OptiTrack
 
 extension OptiTrack: TrackProtocol
 {
-    func report(event: OptimoveEvent,withConfigs config: EventConfig)
+    func report(event: OptimoveEvent,withConfigs config: EventConfig,didComplete: @escaping ResultBlock)
     {
         guard config.supportedComponents[.optiTrack] == true,
             let tracker = PiwikTracker.shared else
@@ -120,6 +120,7 @@ extension OptiTrack: TrackProtocol
                     tracker.remove(dimensionAtIndex: index)
                 }
             }
+            didComplete()
         }
     }
     

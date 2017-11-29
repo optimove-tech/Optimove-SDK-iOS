@@ -67,9 +67,11 @@ public final class Optimove : OptimoveStateDelegate
             {
                 guard let eventConfig = eventValidator.eventsConfigs[event.name] else { return }
                 self?.optitrack?.report(event: event,withConfigs: eventConfig)
-                if completionHandler != nil
                 {
-                    completionHandler!(nil)
+                    if completionHandler != nil
+                    {
+                        completionHandler!(nil)
+                    }
                 }
             }
             else
