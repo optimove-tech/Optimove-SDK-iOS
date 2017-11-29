@@ -144,4 +144,9 @@ extension OptiTrack: TrackProtocol
         }
     }
     
+    func dispatchNow()
+    {
+        PiwikTracker.shared?.dispatch()
+    }
+    
 }

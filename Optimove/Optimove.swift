@@ -99,6 +99,10 @@ public final class Optimove : OptimoveStateDelegate
                      completionHandler: completionHandler)
     }
     
+    func dispatchNow()
+    {
+        optitrack?.dispatchNow()
+    }
     
     // MARK: - Public API
     

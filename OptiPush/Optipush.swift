@@ -82,6 +82,17 @@ final class Optipush:NSObject
         firebaseInteractor.handleRegistration(token:deviceToken)
     }
     
+    private func reportNotificationDelivered(_ campaignDetails: CampaignDetails)
+    {
+        Optimove.sharedInstance.report(event: NotificationDelivered(campaignDetails: campaignDetails))
+        Optimove.sharedInstance.dispatchNow()
+    }
+    private func reportNotificationDismissed(_ campaignDetails: CampaignDetails)
+    {
+        Optimove.sharedInstance.report(event:NotificationDismissed(campaignDetails: campaignDetails))
+        Optimove.sharedInstance.dispatchNow()
+    }
+    
     func handleNotification(userInfo:[AnyHashable : Any],
                             completionHandler:(UIBackgroundFetchResult) -> Void)
     {
@@ -94,7 +105,7 @@ final class Optipush:NSObject
         let collapseId = userInfo[Keys.Notification.collapseId.rawValue] as? String ?? "OptipushDefaultCollapseID"
         if let campaignDetails = generateCampaignDetails(from: userInfo)
         {
-            Optimove.sharedInstance.report(event: NotificationDelivered(campaignDetails: campaignDetails)) { (error) in }
+            reportNotificationDelivered(campaignDetails)
             
             injectCampaignDetails(from: campaignDetails, to: content)
         }
@@ -226,10 +237,7 @@ extension Optipush: MessageHandleProtocol
             switch response.actionIdentifier
             {
             case UNNotificationDismissActionIdentifier:
-                Optimove.sharedInstance.report(event:NotificationDismissed(campaignDetails: campaignDetails),
-                                               completionHandler: { (error) in
-                                                LogManager.reportSuccessToConsole("report notification dismiss")
-                })
+                reportNotificationDismissed(campaignDetails)
             case UNNotificationDefaultActionIdentifier:
                 Optimove.sharedInstance.report(event: NotificationOpened(campaignDetails:campaignDetails),
                                                completionHandler: { (error) in
