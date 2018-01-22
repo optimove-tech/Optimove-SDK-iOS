@@ -1,0 +1,15 @@
+# Uncomment the next line to define a global platform for your project
+ platform :ios, '10.0'
+
+target 'ObjcDemoApp' do
+  # Uncomment the next line if you're using Swift or would like to use dynamic frameworks
+   use_frameworks!
+
+  # Pods for ObjcDemoApp
+ pod 'Firebase','~> 4.8.0'
+ pod 'FirebaseMessaging', '~> 2.0.8'
+ pod 'FirebaseDynamicLinks', '~> 2.3.1'
+ pod 'XCGLogger', '~> 6.0.2'
+ pod 'OptimovePiwikTracker'
+
+end
