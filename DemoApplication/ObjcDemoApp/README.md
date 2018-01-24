@@ -45,7 +45,7 @@ perform the following steps.
 4.  *Optional:* Enable push notifications and remote notification
     capabilities in your project.
 
-<img src="./media/image1.png" width="417" height="395" />
+[![apple_dashboared.png](https://s9.postimg.org/9ln5sfxe7/apple_dashboared.png)](https://postimg.org/image/itfe954gb/)
 
 Installing the SDK
 ------------------
@@ -264,7 +264,7 @@ To support deep linking, enable Associated Domains. To do so: In your
 project capabilities, add the deep link domain (provided by Optimove
 CSM) with the applinks: prefix and without any https:// prefix.
 
-<img src="./media/image2.png" width="494" height="142" />
+[![associated_domain.png](https://s9.postimg.org/hqrw4eqm7/associated_domain.png)](https://postimg.org/image/3x3jfcy0r/)
 
 Any ViewController should receive a DeepLink data callback, and should
 implement didReceive(deepLink:), thus conforming to the DeepLinkCallback
