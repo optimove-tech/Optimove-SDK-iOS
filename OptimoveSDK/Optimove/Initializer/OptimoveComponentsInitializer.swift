@@ -77,7 +77,7 @@ class OptimoveComponentsInitializer
                     }
                     
                     Optimove.sharedInstance.logger.debug("Configuration Parsing succeeded")
-                    UserInSession.shared.siteID = Parser.extractSiteIdFrom(json: json)
+
                     if OptimoveComponentsInitializer.atomicBool.compareAndSet(expected: false, value: true) {
                         self.setupOptimoveComponents(from: json)
                     }

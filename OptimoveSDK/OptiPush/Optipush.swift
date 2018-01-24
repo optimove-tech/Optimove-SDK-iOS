@@ -105,8 +105,8 @@ final class Optipush
         }
         else
         {
-            Optimove.sharedInstance.logger.debugExec {"Notification unauthorized by user"}
-            print("😕Notification unauthorized by user")
+            Optimove.sharedInstance.logger.debug("Notification unauthorized by user")
+            
             guard let isOptIn = UserInSession.shared.isOptIn
                 else
             {
@@ -114,11 +114,11 @@ final class Optipush
                 guard UserInSession.shared.fcmToken != nil
                     else
                 {
-                    print("😕fcm not stored yet ")
+                    
                     UserInSession.shared.isOptIn = false
                     return
                 }
-                print("😕 fcm stored already, make opt request")
+                
                 if UserInSession.shared.isRegistrationSuccess
                 {
                     Optimove.sharedInstance.logger.debug("SDK make opt OUT request")
@@ -159,8 +159,6 @@ extension Optipush: MessageHandleProtocol
             else
         {
             Optimove.sharedInstance.logger.debug("Client receive a token for the first time")
-            
-            print("internal fcm updated")
             UserInSession.shared.fcmToken = token
             registrar.register()
             return
