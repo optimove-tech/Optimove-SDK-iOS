@@ -13,4 +13,11 @@
     NSString* name = [self.userIdTextField text];
     [Optimove.sharedInstance setWithUserID:name];
 }
+
+-(void) viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    
+    [Optimove.sharedInstance setScreenEventWithViewControllersIdetifiers:@[@"main_screen",@"set user id"] url:nil];
+}
 @end

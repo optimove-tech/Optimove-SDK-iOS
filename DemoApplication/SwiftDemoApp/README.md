@@ -14,12 +14,17 @@ Please follow these instructions carefully to ensure that you’ll have an easy 
 
 ### Prerequisites
 
+Before you can begin using Optimove SDK for iOS, you will need to
+perform the following steps.</br>
+
 * A *tenant_information_suite* provided during the initial integration with Optimove and contains the following:
         `end-point url` - The URL where the **_tenant configurations_** reside
         `token` - The actual token, unique per tenant
         `config name` - The name of the desired configuration
 * Tenant has a paid development account, and valid certificates for remote notifications or APN Auth key.
-* The APN Auth key (preferred) or APN Certificates was delivered to Optimove CSM.
+* Deliver The APN Auth key (preferred) or APN Certificates was delivered to Optimove CSM.
+* Deliver the Team ID
+* Deliver the Appstore ID of the application
 * Enable push notification and remote notification capabilities in your project
 
 [![apple_dashboared.png](https://s9.postimg.org/9ln5sfxe7/apple_dashboared.png)](https://postimg.org/image/itfe954gb/)
@@ -27,16 +32,12 @@ Please follow these instructions carefully to ensure that you’ll have an easy 
 
 ## Installation
 
-There are two options to setup the SDK:<br>
- **Manually**:<br>
 The SDK is provided as a group of files, sitting inside a Folder name “Optimove”.
 
 Drag the folder inside your project.
 
 Verify that all the files inside the folder members of the target application, if not add them.
 
-**Git Submodule**:<br>
-The SDK is provided through GitHub repository and should be added as submodule to your project, for any release updates in the submodule, that will be tagged, you need to pull it and add the updated files to the project.
 
 ## SDK Setup:<br>
 In your AppDelegate class, inside method
@@ -239,4 +240,4 @@ Therefor, it is highly recommended to match the application's **_Firebase SDK ve
 
 | Optimove SDK Version | Firebase Version | Firebase Messaging Version | FirebaseDynamicLinks |   
 | --- | --- | --- | --- | 
-| 1.0.0                | 4.8.0            | 2.0.8                      | 2.3.1                |
+| 1.0.2                | 4.8.0            | 2.0.8                      | 2.3.1                |

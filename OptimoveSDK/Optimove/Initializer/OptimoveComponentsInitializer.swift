@@ -39,7 +39,7 @@ class OptimoveComponentsInitializer
         Optimove.sharedInstance.logger.debug("Finish OptimoveComponentInitializer initialization")
     }
     
-    func start()
+    func startFromServer()
     {
         Optimove.sharedInstance.logger.error("Start Optimove component initialization")
         guard isInternetAvailable()

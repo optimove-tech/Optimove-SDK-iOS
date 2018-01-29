@@ -22,7 +22,7 @@ import Foundation
         )
     {
         self.hasFirebase = hasFirebase
-        self.url = url
+        self.url = url + "/mobilesdkconfig"
         self.token = token
         self.version = version
     }

@@ -24,7 +24,6 @@ struct JSONComposer
             switch state
             {
             case .optIn:
-                
                 Optimove.sharedInstance.logger.debug("Visitor opt in")
                 requestJsonData = [Keys.Registration.optIn.rawValue : requestJsonData]
             case .optOut:

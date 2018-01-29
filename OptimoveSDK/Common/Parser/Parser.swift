@@ -108,6 +108,38 @@ struct Parser
         return nil
     }
     
+    static func extractCampaignDetails(from userInfo: [AnyHashable : Any] ) -> CampaignDetails?
+    {
+        guard let campaignId   = (userInfo[Keys.Notification.campaignId.rawValue]   as? String),
+            let actionSerial = (userInfo[Keys.Notification.actionSerial.rawValue]   as? String),
+            let templateId   = (userInfo[Keys.Notification.templateId.rawValue]     as? String),
+            let engagementId = (userInfo[Keys.Notification.engagementId.rawValue]   as? String),
+            let campaignType = (userInfo[Keys.Notification.campaignType.rawValue]   as? String)
+            else
+        {
+            return nil
+        }
+        
+        return CampaignDetails(campaignId: campaignId,
+                               actionSerial: actionSerial,
+                               templateId: templateId,
+                               engagementId: engagementId,
+                               campaignType: campaignType)
+    }
+    
+    static func extractDeepLink(from userInfo:  [AnyHashable : Any]) -> URL?
+    {
+        if let dl           = userInfo[Keys.Notification.dynamicLinks.rawValue] as? String ,
+            let data        = dl.data(using: .utf8),
+            let json        = try? JSONSerialization.jsonObject(with: data, options:[.allowFragments]) as? [String:Any],
+            let ios         = json?[Keys.Notification.ios.rawValue] as? [String:Any],
+            let deepLink =  ios[Bundle.main.bundleIdentifier?.setAsMongoKey() ?? "" ] as? String
+        {
+            return URL(string: deepLink)
+        }
+        return nil
+    }
+    
     static func extractOptimoveComponentsPermissions(from json:[String:Any]) -> (isOptipushEnabled: Bool,isOptitrackEnabled: Bool) //TODO: refactor
     {
         let isOptipushEnabled = json[Keys.Configuration.enableOptipush.rawValue] as? Bool ?? false

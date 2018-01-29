@@ -40,8 +40,25 @@ import XCGLogger
     //MARK: - Initializers
     
     fileprivate func initializeLogger() {
-        // Create a file log destination
+        
+        func manuallyManageLog(_ logUrl:URL) {
+            var fileSize:UInt64
+            do {
+                let attr = try FileManager.default.attributesOfItem(atPath: logUrl.path)
+                fileSize = attr[FileAttributeKey.size] as? UInt64 ?? 0
+            }
+            catch {
+                fileSize = 0
+            }
+            if fileSize > 3000*1024
+            {
+                _ = try? FileManager.default.removeItem(at: logUrl)
+            }
+        }
+        
         let logsUrl: URL = OptimoveFileManager.shared.optimoveSDKDirectory.appendingPathComponent("Logs")
+        
+        // Create a file log destination
         if !FileManager.default.fileExists(atPath: logsUrl.path)
         {
             do {
@@ -52,6 +69,28 @@ import XCGLogger
             }
         }
         let logUrl: URL = logsUrl.appendingPathComponent("Optimove_logger.txt")
+        manuallyManageLog(logUrl)
+        
+        
+        let fileDestination = FileDestination(owner: logger, writeToFile: logUrl, identifier: "advancedLogger.fileDestination", shouldAppend: true, appendMarker: "-- Relauched App --")
+        // Optionally set some configuration options
+        fileDestination.outputLevel = .debug
+        fileDestination.showLogIdentifier = false
+        fileDestination.showFunctionName = true
+        fileDestination.showThreadName = true
+        fileDestination.showLevel = true
+        fileDestination.showFileName = true
+        fileDestination.showLineNumber = true
+        fileDestination.showDate = true
+        
+        fileDestination.logQueue = XCGLogger.logQueue
+        
+        // Add the destination to the logger
+        logger.add(destination: fileDestination)
+        
+        
+        
+        
         
         let  autoRotatingFileDestination = AutoRotatingFileDestination(owner: nil,
                                                                        writeToFile: logUrl,
@@ -59,7 +98,7 @@ import XCGLogger
                                                                        shouldAppend: true,
                                                                        appendMarker: "**********************************",
                                                                        attributes: [:],
-                                                                       maxFileSize: 1024 * 3000,
+                                                                       maxFileSize: 1024 * 5,
                                                                        maxTimeInterval: 600,
                                                                        archiveSuffixDateFormatter: nil)
         
@@ -84,7 +123,7 @@ import XCGLogger
         autoRotatingFileDestination.formatters = [ansiColorLogFormatter]
         
         // Add the destination to the logger
-        logger.add(destination: autoRotatingFileDestination)
+//        logger.add(destination: autoRotatingFileDestination)
         
         // Add basic app info, version info etc, to the start of the logs
         logger.logAppDetails()

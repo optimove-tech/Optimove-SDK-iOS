@@ -1,7 +1,7 @@
-Optimove SDK for iOS
+# Optimove SDK for iOS
 ====================
 
-Introduction
+###Introduction
 ------------
 
 Marketers use Optimove to automate the execution of highly-personalized
@@ -21,7 +21,7 @@ The primary audience of this document is the technical staff who will
 implement the SDK in the company’s apps, while marketing/business
 executives may also find it informative.
 
-Prerequisites
+### Prerequisites
 -------------
 
 Before you can begin using Optimove SDK for iOS, you will need to
@@ -30,71 +30,54 @@ perform the following steps.
 1.  Acquire a *tenant\_information\_suite* from the Optimove
     Integration Team. This contains:
 
-    1.  end-point url – The URL where the tenant configurations reside
+    1.  _`end-point url`_ – The URL where the tenant configurations reside
 
-    2.  token – The actual token, unique per tenant
+    2.  _`token`_ – The actual token, unique per tenant
 
-    3.  config name – The version of the desired configuration
+    3.  _`config name`_ – The version of the desired configuration
 
 2.  Acquire a paid development account and valid certificates for remote
     notifications or APN Auth key.
 
-3.  Deliver the APN Auth key (preferred) or APN Certificates to your
-    Optimove Customer Success Manager (CSM).
+3.  Deliver the following information to your Optimove Customer Success Manager (CSM):</br>
+        * APN Auth key (preferred) or APN Certificate.
+        * Team ID
+        * App Store ID 
 
-4.  *Optional:* Enable push notifications and remote notification
-    capabilities in your project.
+4.  Enable push notifications and remote notification capabilities in your project (this step is required only for sending push notifications using Optipush).
 
 [![apple_dashboared.png](https://s9.postimg.org/9ln5sfxe7/apple_dashboared.png)](https://postimg.org/image/itfe954gb/)
 
-Installing the SDK
+Setting Up the SDK
 ------------------
 
-1.  The SDK is provided as a group of files with a folder
-    named, OptimoveSDK.
+Optimove SDK for iOS is provided as a group of files within a folder named _`OptimoveSDK`_. This folder can be found in [this GitHub repository](https://github.com/optimoveintegrationmobile/ios-sdk/tree/master/DemoApplication/ObjcDemoApp).</br>
+To install the SDK, drag this folder into your project. If not all files inside the folder are members of the target application, add them.< /br>
 
-2.  Drag the folder into your project.
+In order to work with the Optimove SDK, you also need to download some modules from CocoaPods. In your Podfile, add the following: </br>
 
-3.  If not all files inside the folder are members of the target
-    application add them.
+pod 'Firebase','~> 4.8.0' </br>
+pod 'FirebaseMessaging', '~> 2.0.8' </br>
+pod 'FirebaseDynamicLinks', '~> 2.3.1' </br>
+pod 'XCGLogger', '~> 6.0.2' </br>
+pod 'OptimovePiwikTracker' </br>
+**Important**: For any Header file that uses the Optimove SDK, add an import with your module name followed by '-Swift.h', such as
+````smalltalk
+#import "HelloWorld-Swift.h" </br>
+````
+In your AppDelegate class, inside the application (_: didFinishLaunchingWithOptions:) method, create a new OptimoveTenantInfo object. This object should contain: </br>
 
-4.  
-
-SDK Setup
----------
-
-In order to work with Optimove SDK, you’ll need to download firebase
-relevant modules from cocoapods, Optimove tracking module and a logger
-in you Podfile pleaseadd the following lines
-
-pod 'Firebase','~&gt; 4.8.0'
-
-pod 'FirebaseMessaging', '~&gt; 2.0.8'
-
-pod 'FirebaseDynamicLinks', '~&gt; 2.3.1'
-
-pod 'XCGLogger', '~&gt; 6.0.2'
-
-pod 'OptimovePiwikTracker'
-
-On Any Header file that uses the **Optimove SDK,** add an import with
-your module name followed by ‘-Swift.h’
-
-In your AppDelegate class, inside the application :
-didFinishLaunchingWithOptions: method, create a new OptimoveTenantInfo
-object. This object should contain:
-
-1.  Unique Optimove token
-
-2.  The configuration key provided by your CSM
-
-3.  Indication for existing Firebase module inside your application
-
-Use this object as an argument for the SDK function,  
-\[Optimove.sharedInstance configureWithInfo:info\];
-
+1. The end-point URL
+2. Unique Optimove token
+3. The configuration key provided by your CSM
+4. Indication for existing Firebase module inside your application
+Use this object as an argument for the SDK function:
+````smalltalk
+[Optimove.sharedInstance configureWithInfo:info];
+````
 This call initializes the OptimoveSDK singleton. For example:
 
+````smalltalk
 - (BOOL)application:(UIApplication \*)application
 didFinishLaunchingWithOptions:(NSDictionary \*)launchOptions {
 
@@ -105,6 +88,7 @@ initWithUrl:@"https://appcontrollerproject-developer.firebaseapp.com"
 token:@"demo\_apps" version:@"1.0.0" hasFirebase:NO\];
 
 \[Optimove.sharedInstance configureWithInfo:info\];
+````smalltalk
 
 The initialization must be called *as soon as possible*, unless the
 tenant has its own Firebase SDK. In this case, start the initialization
@@ -120,7 +104,7 @@ Firebase SDK version to Optimove’s Firebase SDK:
 
 | **Optimove SDK Version ** | **Firebase Core Version ** | **Firebase Messaging Version ** | **FirebaseDynamicLinks** |
 |---------------------------|----------------------------|---------------------------------|--------------------------|
-| 1.0.0                     | 4.8.0                      | 2.0.8                           | 2.3.1                    |
+| 1.0.2                     | 4.8.0                      | 2.0.8                           | 2.3.1                    |
 
 Reporting User Activities and Events 
 -------------------------------------
@@ -184,14 +168,12 @@ This protocol defines two properties:
 Then, send that event through the reportEvent(event:) method of the
 Optimove singleton:
 
-> override func viewDidAppear(\_ animated: Bool) {
->
-> super.viewDidAppear(animated)
->
-> \[Optimove.sharedInstance reportEventWithEvent:\[\[MyEvent
-> alloc\]init\] completionHandler:nil\];
->
-> }
+- (IBAction)userPressOnSend:(UIButton *)sender {
+    NSString* stringInput = _stringTextField.text;
+    NSNumber* numberInput = @([_numberTextField.text intValue]);
+    CombinedEvent* event = [[CombinedEvent alloc] initWithStringInput:stringInput andNumberInput:numberInput];
+    [Optimove.sharedInstance reportEventWithEvent:event completionHandler:nil];
+}
 
 Notes:
 
@@ -222,17 +204,27 @@ iOS app, Optimove SDK for iOS must receive an APN token from your app.
 This is accomplished by the following two steps:
 
 1.  Inside the application’s AppDelegate class
-    application:didRegisterForRemoteNotificationsWithDeviceToken:,  
-    call \[Optimove.sharedInstance
-    applicationWithdidRegisterForRemoteNotificationsWithDeviceToken:\]
+```smalltalk
+    application:didRegisterForRemoteNotificationsWithDeviceToken:
+    ````smalltalk,  
+    call 
+    ````smalltalk
+    [Optimove.sharedInstance applicationWithdidRegisterForRemoteNotificationsWithDeviceToken:];
+    ````smalltalk
 
 2.  In
-    application(\_:didReceiveRemoteNotification:fetchCompletionHandler:),
-    call \[Optimove.sharedInstance
-    handleRemoteNotificationArrived:fetchCompletionHandler\]
+````smalltalk
+    application(\_:didReceiveRemoteNotification:fetchCompletionHandler:)
+    ````smalltalk
+    
+    call 
+    ````smalltalk
+    [Optimove.sharedInstance
+    handleRemoteNotificationArrived:fetchCompletionHandler];
+    ````smalltalk
 
 For example:
-
+````smalltalk
 - (void) application:(UIApplication \*)application
 didReceiveRemoteNotification:(NSDictionary \*)userInfo
 fetchCompletionHandler:(void
@@ -252,6 +244,7 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData \*)deviceToken
 applicationWithDidRegisterForRemoteNotificationsWithDeviceToken:deviceToken\];
 
 }
+````smalltalk
 
 ### Deep Linking Notifications to a Particular App Screen
 

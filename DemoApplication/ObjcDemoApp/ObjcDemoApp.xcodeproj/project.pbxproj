@@ -7,106 +7,106 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		15AA922956D3DB65C847F36A /* Pods_ObjcDemoApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCE5E0F201DB793106E12A61 /* Pods_ObjcDemoApp.framework */; };
+		1AD6FBA34EC2EAB4BCA63826 /* Pods_ObjcDemoApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBE791E8E9C8F8ED7343CD30 /* Pods_ObjcDemoApp.framework */; };
 		672DDE5C200F358000193051 /* SetUserIdViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 672DDE5B200F358000193051 /* SetUserIdViewController.m */; };
 		672DDE6220107C6400193051 /* ReportEventViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 672DDE6120107C6400193051 /* ReportEventViewController.m */; };
+		673A4ECD2017880D00AE6060 /* OptimoveComponentsInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4E9A2017880D00AE6060 /* OptimoveComponentsInitializer.swift */; };
+		673A4ECE2017880D00AE6060 /* AtomicBool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4E9B2017880D00AE6060 /* AtomicBool.swift */; };
+		673A4ECF2017880D00AE6060 /* Optimove.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4E9C2017880D00AE6060 /* Optimove.swift */; };
+		673A4ED02017880D00AE6060 /* OptimoveNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4E9E2017880D00AE6060 /* OptimoveNotificationHandler.swift */; };
+		673A4ED12017880D00AE6060 /* EventValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4E9F2017880D00AE6060 /* EventValidator.swift */; };
+		673A4ED22017880D00AE6060 /* OptimoveTenantInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EA02017880D00AE6060 /* OptimoveTenantInfo.swift */; };
+		673A4ED32017880D00AE6060 /* MonitorOptimoveState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EA22017880D00AE6060 /* MonitorOptimoveState.swift */; };
+		673A4ED42017880D00AE6060 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EA32017880D00AE6060 /* State.swift */; };
+		673A4ED52017880D00AE6060 /* OptimoveDeepLinkResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EA52017880D00AE6060 /* OptimoveDeepLinkResponder.swift */; };
+		673A4ED62017880D00AE6060 /* OptiTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EA82017880D00AE6060 /* OptiTrack.swift */; };
+		673A4ED72017880D00AE6060 /* OptitrackMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EA92017880D00AE6060 /* OptitrackMetaData.swift */; };
+		673A4ED82017880D00AE6060 /* OptimoveFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EAD2017880D00AE6060 /* OptimoveFileManager.swift */; };
+		673A4ED92017880D00AE6060 /* Synchronizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EAE2017880D00AE6060 /* Synchronizable.swift */; };
+		673A4EDA2017880D00AE6060 /* UserInSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EAF2017880D00AE6060 /* UserInSession.swift */; };
+		673A4EDB2017880D00AE6060 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EB12017880D00AE6060 /* Constants.swift */; };
+		673A4EDC2017880D00AE6060 /* ComponentsConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EB22017880D00AE6060 /* ComponentsConstants.swift */; };
+		673A4EDD2017880D00AE6060 /* OptimovePredefinedEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EB32017880D00AE6060 /* OptimovePredefinedEvents.swift */; };
+		673A4EDE2017880D00AE6060 /* ConfigurationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EB52017880D00AE6060 /* ConfigurationProvider.swift */; };
+		673A4EDF2017880D00AE6060 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EB72017880D00AE6060 /* NetworkManager.swift */; };
+		673A4EE02017880D00AE6060 /* NetworkAPIPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EB82017880D00AE6060 /* NetworkAPIPaths.swift */; };
+		673A4EE12017880D00AE6060 /* JSONComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EBA2017880D00AE6060 /* JSONComposer.swift */; };
+		673A4EE22017880D00AE6060 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EBB2017880D00AE6060 /* Parser.swift */; };
+		673A4EE32017880D00AE6060 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EBD2017880D00AE6060 /* Extensions.swift */; };
+		673A4EE42017880D00AE6060 /* CampaignDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EBF2017880D00AE6060 /* CampaignDetails.swift */; };
+		673A4EE52017880D00AE6060 /* OptimoveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EC12017880D00AE6060 /* OptimoveError.swift */; };
+		673A4EE62017880D00AE6060 /* EventConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EC32017880D00AE6060 /* EventConfig.swift */; };
+		673A4EE72017880D00AE6060 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EC42017880D00AE6060 /* Event.swift */; };
+		673A4EE82017880D00AE6060 /* OptipushMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EC62017880D00AE6060 /* OptipushMetaData.swift */; };
+		673A4EE92017880D00AE6060 /* Optipush.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EC72017880D00AE6060 /* Optipush.swift */; };
+		673A4EEA2017880D00AE6060 /* Registrar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4EC82017880D00AE6060 /* Registrar.swift */; };
+		673A4EEB2017880D00AE6060 /* FirebaseInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4ECA2017880D00AE6060 /* FirebaseInteractor.swift */; };
+		673A4EEC2017880D00AE6060 /* FirebaseMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A4ECB2017880D00AE6060 /* FirebaseMetaData.swift */; };
+		673A4EED2017880D00AE6060 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 673A4ECC2017880D00AE6060 /* Info.plist */; };
 		674DF0EB200BA1AC00518998 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 674DF0EA200BA1AC00518998 /* AppDelegate.m */; };
-		674DF0EE200BA1AC00518998 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 674DF0ED200BA1AC00518998 /* ViewController.m */; };
+		674DF0EE200BA1AC00518998 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 674DF0ED200BA1AC00518998 /* MainViewController.m */; };
 		674DF0F1200BA1AC00518998 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 674DF0EF200BA1AC00518998 /* Main.storyboard */; };
 		674DF0F3200BA1AC00518998 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 674DF0F2200BA1AC00518998 /* Assets.xcassets */; };
 		674DF0F6200BA1AC00518998 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 674DF0F4200BA1AC00518998 /* LaunchScreen.storyboard */; };
 		674DF0F9200BA1AC00518998 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 674DF0F8200BA1AC00518998 /* main.m */; };
-		674DF135200BA26D00518998 /* OptimoveComponentsInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF102200BA26D00518998 /* OptimoveComponentsInitializer.swift */; };
-		674DF136200BA26D00518998 /* AtomicBool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF103200BA26D00518998 /* AtomicBool.swift */; };
-		674DF137200BA26D00518998 /* Optimove.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF104200BA26D00518998 /* Optimove.swift */; };
-		674DF138200BA26D00518998 /* OptimoveNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF106200BA26D00518998 /* OptimoveNotificationHandler.swift */; };
-		674DF139200BA26D00518998 /* EventValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF107200BA26D00518998 /* EventValidator.swift */; };
-		674DF13A200BA26D00518998 /* OptimoveTenantInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF108200BA26D00518998 /* OptimoveTenantInfo.swift */; };
-		674DF13B200BA26D00518998 /* MonitorOptimoveState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF10A200BA26D00518998 /* MonitorOptimoveState.swift */; };
-		674DF13C200BA26D00518998 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF10B200BA26D00518998 /* State.swift */; };
-		674DF13D200BA26D00518998 /* OptimoveDeepLinkResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF10D200BA26D00518998 /* OptimoveDeepLinkResponder.swift */; };
-		674DF13E200BA26D00518998 /* OptiTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF110200BA26D00518998 /* OptiTrack.swift */; };
-		674DF13F200BA26D00518998 /* OptitrackMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF111200BA26D00518998 /* OptitrackMetaData.swift */; };
-		674DF140200BA26D00518998 /* OptimoveFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF115200BA26D00518998 /* OptimoveFileManager.swift */; };
-		674DF141200BA26D00518998 /* Synchronizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF116200BA26D00518998 /* Synchronizable.swift */; };
-		674DF142200BA26D00518998 /* UserInSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF117200BA26D00518998 /* UserInSession.swift */; };
-		674DF143200BA26D00518998 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF119200BA26D00518998 /* Constants.swift */; };
-		674DF144200BA26D00518998 /* ComponentsConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF11A200BA26D00518998 /* ComponentsConstants.swift */; };
-		674DF145200BA26D00518998 /* OptimovePredefinedEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF11B200BA26D00518998 /* OptimovePredefinedEvents.swift */; };
-		674DF146200BA26D00518998 /* ConfigurationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF11D200BA26D00518998 /* ConfigurationProvider.swift */; };
-		674DF147200BA26D00518998 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF11F200BA26D00518998 /* NetworkManager.swift */; };
-		674DF148200BA26D00518998 /* NetworkAPIPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF120200BA26D00518998 /* NetworkAPIPaths.swift */; };
-		674DF149200BA26D00518998 /* JSONComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF122200BA26D00518998 /* JSONComposer.swift */; };
-		674DF14A200BA26D00518998 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF123200BA26D00518998 /* Parser.swift */; };
-		674DF14B200BA26D00518998 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF125200BA26D00518998 /* Extensions.swift */; };
-		674DF14C200BA26D00518998 /* CampaignDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF127200BA26D00518998 /* CampaignDetails.swift */; };
-		674DF14D200BA26D00518998 /* OptimoveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF129200BA26D00518998 /* OptimoveError.swift */; };
-		674DF14E200BA26D00518998 /* EventConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF12B200BA26D00518998 /* EventConfig.swift */; };
-		674DF14F200BA26D00518998 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF12C200BA26D00518998 /* Event.swift */; };
-		674DF150200BA26D00518998 /* OptipushMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF12E200BA26D00518998 /* OptipushMetaData.swift */; };
-		674DF151200BA26D00518998 /* Optipush.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF12F200BA26D00518998 /* Optipush.swift */; };
-		674DF152200BA26D00518998 /* Registrar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF130200BA26D00518998 /* Registrar.swift */; };
-		674DF153200BA26D00518998 /* FirebaseInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF132200BA26D00518998 /* FirebaseInteractor.swift */; };
-		674DF154200BA26D00518998 /* FirebaseMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674DF133200BA26D00518998 /* FirebaseMetaData.swift */; };
-		674DF155200BA26D00518998 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 674DF134200BA26D00518998 /* Info.plist */; };
 		677AF63B2014A467002CBA4F /* CombinedEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 677AF63A2014A467002CBA4F /* CombinedEvent.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		242DFC7E0596C37D7D250204 /* Pods-ObjcDemoApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjcDemoApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ObjcDemoApp/Pods-ObjcDemoApp.debug.xcconfig"; sourceTree = "<group>"; };
-		34406A13068626D268F23114 /* Pods-ObjcDemoApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjcDemoApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-ObjcDemoApp/Pods-ObjcDemoApp.release.xcconfig"; sourceTree = "<group>"; };
 		672DDE5A200F358000193051 /* SetUserIdViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SetUserIdViewController.h; sourceTree = "<group>"; };
 		672DDE5B200F358000193051 /* SetUserIdViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SetUserIdViewController.m; sourceTree = "<group>"; };
 		672DDE6020107C6400193051 /* ReportEventViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReportEventViewController.h; sourceTree = "<group>"; };
 		672DDE6120107C6400193051 /* ReportEventViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReportEventViewController.m; sourceTree = "<group>"; };
+		673A4E9A2017880D00AE6060 /* OptimoveComponentsInitializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveComponentsInitializer.swift; sourceTree = "<group>"; };
+		673A4E9B2017880D00AE6060 /* AtomicBool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AtomicBool.swift; sourceTree = "<group>"; };
+		673A4E9C2017880D00AE6060 /* Optimove.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Optimove.swift; sourceTree = "<group>"; };
+		673A4E9E2017880D00AE6060 /* OptimoveNotificationHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationHandler.swift; sourceTree = "<group>"; };
+		673A4E9F2017880D00AE6060 /* EventValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventValidator.swift; sourceTree = "<group>"; };
+		673A4EA02017880D00AE6060 /* OptimoveTenantInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveTenantInfo.swift; sourceTree = "<group>"; };
+		673A4EA22017880D00AE6060 /* MonitorOptimoveState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonitorOptimoveState.swift; sourceTree = "<group>"; };
+		673A4EA32017880D00AE6060 /* State.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
+		673A4EA52017880D00AE6060 /* OptimoveDeepLinkResponder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveDeepLinkResponder.swift; sourceTree = "<group>"; };
+		673A4EA62017880D00AE6060 /* OptimoveSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OptimoveSDK.h; sourceTree = "<group>"; };
+		673A4EA82017880D00AE6060 /* OptiTrack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptiTrack.swift; sourceTree = "<group>"; };
+		673A4EA92017880D00AE6060 /* OptitrackMetaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptitrackMetaData.swift; sourceTree = "<group>"; };
+		673A4EAD2017880D00AE6060 /* OptimoveFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveFileManager.swift; sourceTree = "<group>"; };
+		673A4EAE2017880D00AE6060 /* Synchronizable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Synchronizable.swift; sourceTree = "<group>"; };
+		673A4EAF2017880D00AE6060 /* UserInSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInSession.swift; sourceTree = "<group>"; };
+		673A4EB12017880D00AE6060 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		673A4EB22017880D00AE6060 /* ComponentsConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComponentsConstants.swift; sourceTree = "<group>"; };
+		673A4EB32017880D00AE6060 /* OptimovePredefinedEvents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimovePredefinedEvents.swift; sourceTree = "<group>"; };
+		673A4EB52017880D00AE6060 /* ConfigurationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationProvider.swift; sourceTree = "<group>"; };
+		673A4EB72017880D00AE6060 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		673A4EB82017880D00AE6060 /* NetworkAPIPaths.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkAPIPaths.swift; sourceTree = "<group>"; };
+		673A4EBA2017880D00AE6060 /* JSONComposer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONComposer.swift; sourceTree = "<group>"; };
+		673A4EBB2017880D00AE6060 /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
+		673A4EBD2017880D00AE6060 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		673A4EBF2017880D00AE6060 /* CampaignDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignDetails.swift; sourceTree = "<group>"; };
+		673A4EC12017880D00AE6060 /* OptimoveError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveError.swift; sourceTree = "<group>"; };
+		673A4EC32017880D00AE6060 /* EventConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventConfig.swift; sourceTree = "<group>"; };
+		673A4EC42017880D00AE6060 /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		673A4EC62017880D00AE6060 /* OptipushMetaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptipushMetaData.swift; sourceTree = "<group>"; };
+		673A4EC72017880D00AE6060 /* Optipush.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Optipush.swift; sourceTree = "<group>"; };
+		673A4EC82017880D00AE6060 /* Registrar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Registrar.swift; sourceTree = "<group>"; };
+		673A4ECA2017880D00AE6060 /* FirebaseInteractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseInteractor.swift; sourceTree = "<group>"; };
+		673A4ECB2017880D00AE6060 /* FirebaseMetaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseMetaData.swift; sourceTree = "<group>"; };
+		673A4ECC2017880D00AE6060 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		674DF0E6200BA1AC00518998 /* ObjcDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ObjcDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		674DF0E9200BA1AC00518998 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		674DF0EA200BA1AC00518998 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		674DF0EC200BA1AC00518998 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		674DF0ED200BA1AC00518998 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		674DF0EC200BA1AC00518998 /* MainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		674DF0ED200BA1AC00518998 /* MainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
 		674DF0F0200BA1AC00518998 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		674DF0F2200BA1AC00518998 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		674DF0F5200BA1AC00518998 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		674DF0F7200BA1AC00518998 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		674DF0F8200BA1AC00518998 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		674DF102200BA26D00518998 /* OptimoveComponentsInitializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveComponentsInitializer.swift; sourceTree = "<group>"; };
-		674DF103200BA26D00518998 /* AtomicBool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AtomicBool.swift; sourceTree = "<group>"; };
-		674DF104200BA26D00518998 /* Optimove.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Optimove.swift; sourceTree = "<group>"; };
-		674DF106200BA26D00518998 /* OptimoveNotificationHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationHandler.swift; sourceTree = "<group>"; };
-		674DF107200BA26D00518998 /* EventValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventValidator.swift; sourceTree = "<group>"; };
-		674DF108200BA26D00518998 /* OptimoveTenantInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveTenantInfo.swift; sourceTree = "<group>"; };
-		674DF10A200BA26D00518998 /* MonitorOptimoveState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonitorOptimoveState.swift; sourceTree = "<group>"; };
-		674DF10B200BA26D00518998 /* State.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
-		674DF10D200BA26D00518998 /* OptimoveDeepLinkResponder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveDeepLinkResponder.swift; sourceTree = "<group>"; };
-		674DF10E200BA26D00518998 /* OptimoveSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OptimoveSDK.h; sourceTree = "<group>"; };
-		674DF110200BA26D00518998 /* OptiTrack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptiTrack.swift; sourceTree = "<group>"; };
-		674DF111200BA26D00518998 /* OptitrackMetaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptitrackMetaData.swift; sourceTree = "<group>"; };
-		674DF115200BA26D00518998 /* OptimoveFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveFileManager.swift; sourceTree = "<group>"; };
-		674DF116200BA26D00518998 /* Synchronizable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Synchronizable.swift; sourceTree = "<group>"; };
-		674DF117200BA26D00518998 /* UserInSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserInSession.swift; sourceTree = "<group>"; };
-		674DF119200BA26D00518998 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		674DF11A200BA26D00518998 /* ComponentsConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComponentsConstants.swift; sourceTree = "<group>"; };
-		674DF11B200BA26D00518998 /* OptimovePredefinedEvents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimovePredefinedEvents.swift; sourceTree = "<group>"; };
-		674DF11D200BA26D00518998 /* ConfigurationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationProvider.swift; sourceTree = "<group>"; };
-		674DF11F200BA26D00518998 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
-		674DF120200BA26D00518998 /* NetworkAPIPaths.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkAPIPaths.swift; sourceTree = "<group>"; };
-		674DF122200BA26D00518998 /* JSONComposer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONComposer.swift; sourceTree = "<group>"; };
-		674DF123200BA26D00518998 /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
-		674DF125200BA26D00518998 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		674DF127200BA26D00518998 /* CampaignDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignDetails.swift; sourceTree = "<group>"; };
-		674DF129200BA26D00518998 /* OptimoveError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveError.swift; sourceTree = "<group>"; };
-		674DF12B200BA26D00518998 /* EventConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventConfig.swift; sourceTree = "<group>"; };
-		674DF12C200BA26D00518998 /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
-		674DF12E200BA26D00518998 /* OptipushMetaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptipushMetaData.swift; sourceTree = "<group>"; };
-		674DF12F200BA26D00518998 /* Optipush.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Optipush.swift; sourceTree = "<group>"; };
-		674DF130200BA26D00518998 /* Registrar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Registrar.swift; sourceTree = "<group>"; };
-		674DF132200BA26D00518998 /* FirebaseInteractor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseInteractor.swift; sourceTree = "<group>"; };
-		674DF133200BA26D00518998 /* FirebaseMetaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FirebaseMetaData.swift; sourceTree = "<group>"; };
-		674DF134200BA26D00518998 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		677AF6382014A426002CBA4F /* ObjcDemoApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ObjcDemoApp.entitlements; sourceTree = "<group>"; };
 		677AF6392014A467002CBA4F /* CombinedEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CombinedEvent.h; sourceTree = "<group>"; };
 		677AF63A2014A467002CBA4F /* CombinedEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CombinedEvent.m; sourceTree = "<group>"; };
-		BCE5E0F201DB793106E12A61 /* Pods_ObjcDemoApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ObjcDemoApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0ABE924B863B643A8117B2B /* Pods-ObjcDemoApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjcDemoApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ObjcDemoApp/Pods-ObjcDemoApp.debug.xcconfig"; sourceTree = "<group>"; };
+		B5684BA2A2EFCFBE8B68AD1F /* Pods-ObjcDemoApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjcDemoApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-ObjcDemoApp/Pods-ObjcDemoApp.release.xcconfig"; sourceTree = "<group>"; };
+		EBE791E8E9C8F8ED7343CD30 /* Pods_ObjcDemoApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ObjcDemoApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,39 +114,215 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				15AA922956D3DB65C847F36A /* Pods_ObjcDemoApp.framework in Frameworks */,
+				1AD6FBA34EC2EAB4BCA63826 /* Pods_ObjcDemoApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2EE014701F5CB632C146D214 /* Pods */ = {
+		673A4E972017880D00AE6060 /* OptimoveSDK */ = {
 			isa = PBXGroup;
 			children = (
-				242DFC7E0596C37D7D250204 /* Pods-ObjcDemoApp.debug.xcconfig */,
-				34406A13068626D268F23114 /* Pods-ObjcDemoApp.release.xcconfig */,
+				673A4E982017880D00AE6060 /* Optimove */,
+				673A4EA62017880D00AE6060 /* OptimoveSDK.h */,
+				673A4EA72017880D00AE6060 /* OptiTrack */,
+				673A4EAA2017880D00AE6060 /* Common */,
+				673A4EC52017880D00AE6060 /* OptiPush */,
+				673A4ECC2017880D00AE6060 /* Info.plist */,
 			);
-			name = Pods;
+			path = OptimoveSDK;
 			sourceTree = "<group>";
 		};
-		524B5937F611FE427929D417 /* Frameworks */ = {
+		673A4E982017880D00AE6060 /* Optimove */ = {
 			isa = PBXGroup;
 			children = (
-				BCE5E0F201DB793106E12A61 /* Pods_ObjcDemoApp.framework */,
+				673A4E992017880D00AE6060 /* Initializer */,
+				673A4E9C2017880D00AE6060 /* Optimove.swift */,
+				673A4E9D2017880D00AE6060 /* NotificationResponder */,
+				673A4E9F2017880D00AE6060 /* EventValidator.swift */,
+				673A4EA02017880D00AE6060 /* OptimoveTenantInfo.swift */,
+				673A4EA12017880D00AE6060 /* StateMonitor */,
+				673A4EA42017880D00AE6060 /* DeepLink */,
 			);
-			name = Frameworks;
+			path = Optimove;
+			sourceTree = "<group>";
+		};
+		673A4E992017880D00AE6060 /* Initializer */ = {
+			isa = PBXGroup;
+			children = (
+				673A4E9A2017880D00AE6060 /* OptimoveComponentsInitializer.swift */,
+				673A4E9B2017880D00AE6060 /* AtomicBool.swift */,
+			);
+			path = Initializer;
+			sourceTree = "<group>";
+		};
+		673A4E9D2017880D00AE6060 /* NotificationResponder */ = {
+			isa = PBXGroup;
+			children = (
+				673A4E9E2017880D00AE6060 /* OptimoveNotificationHandler.swift */,
+			);
+			path = NotificationResponder;
+			sourceTree = "<group>";
+		};
+		673A4EA12017880D00AE6060 /* StateMonitor */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EA22017880D00AE6060 /* MonitorOptimoveState.swift */,
+				673A4EA32017880D00AE6060 /* State.swift */,
+			);
+			path = StateMonitor;
+			sourceTree = "<group>";
+		};
+		673A4EA42017880D00AE6060 /* DeepLink */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EA52017880D00AE6060 /* OptimoveDeepLinkResponder.swift */,
+			);
+			path = DeepLink;
+			sourceTree = "<group>";
+		};
+		673A4EA72017880D00AE6060 /* OptiTrack */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EA82017880D00AE6060 /* OptiTrack.swift */,
+				673A4EA92017880D00AE6060 /* OptitrackMetaData.swift */,
+			);
+			path = OptiTrack;
+			sourceTree = "<group>";
+		};
+		673A4EAA2017880D00AE6060 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EAB2017880D00AE6060 /* Singletons */,
+				673A4EB02017880D00AE6060 /* Comstants */,
+				673A4EB42017880D00AE6060 /* Providers */,
+				673A4EB62017880D00AE6060 /* Network */,
+				673A4EB92017880D00AE6060 /* Parser */,
+				673A4EBC2017880D00AE6060 /* Extensions */,
+				673A4EBE2017880D00AE6060 /* Campaign */,
+				673A4EC02017880D00AE6060 /* Error */,
+				673A4EC22017880D00AE6060 /* Event */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		673A4EAB2017880D00AE6060 /* Singletons */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EAC2017880D00AE6060 /* Storage */,
+				673A4EAE2017880D00AE6060 /* Synchronizable.swift */,
+				673A4EAF2017880D00AE6060 /* UserInSession.swift */,
+			);
+			path = Singletons;
+			sourceTree = "<group>";
+		};
+		673A4EAC2017880D00AE6060 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EAD2017880D00AE6060 /* OptimoveFileManager.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		673A4EB02017880D00AE6060 /* Comstants */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EB12017880D00AE6060 /* Constants.swift */,
+				673A4EB22017880D00AE6060 /* ComponentsConstants.swift */,
+				673A4EB32017880D00AE6060 /* OptimovePredefinedEvents.swift */,
+			);
+			path = Comstants;
+			sourceTree = "<group>";
+		};
+		673A4EB42017880D00AE6060 /* Providers */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EB52017880D00AE6060 /* ConfigurationProvider.swift */,
+			);
+			path = Providers;
+			sourceTree = "<group>";
+		};
+		673A4EB62017880D00AE6060 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EB72017880D00AE6060 /* NetworkManager.swift */,
+				673A4EB82017880D00AE6060 /* NetworkAPIPaths.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		673A4EB92017880D00AE6060 /* Parser */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EBA2017880D00AE6060 /* JSONComposer.swift */,
+				673A4EBB2017880D00AE6060 /* Parser.swift */,
+			);
+			path = Parser;
+			sourceTree = "<group>";
+		};
+		673A4EBC2017880D00AE6060 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EBD2017880D00AE6060 /* Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		673A4EBE2017880D00AE6060 /* Campaign */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EBF2017880D00AE6060 /* CampaignDetails.swift */,
+			);
+			path = Campaign;
+			sourceTree = "<group>";
+		};
+		673A4EC02017880D00AE6060 /* Error */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EC12017880D00AE6060 /* OptimoveError.swift */,
+			);
+			path = Error;
+			sourceTree = "<group>";
+		};
+		673A4EC22017880D00AE6060 /* Event */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EC32017880D00AE6060 /* EventConfig.swift */,
+				673A4EC42017880D00AE6060 /* Event.swift */,
+			);
+			path = Event;
+			sourceTree = "<group>";
+		};
+		673A4EC52017880D00AE6060 /* OptiPush */ = {
+			isa = PBXGroup;
+			children = (
+				673A4EC62017880D00AE6060 /* OptipushMetaData.swift */,
+				673A4EC72017880D00AE6060 /* Optipush.swift */,
+				673A4EC82017880D00AE6060 /* Registrar.swift */,
+				673A4EC92017880D00AE6060 /* Firebase */,
+			);
+			path = OptiPush;
+			sourceTree = "<group>";
+		};
+		673A4EC92017880D00AE6060 /* Firebase */ = {
+			isa = PBXGroup;
+			children = (
+				673A4ECA2017880D00AE6060 /* FirebaseInteractor.swift */,
+				673A4ECB2017880D00AE6060 /* FirebaseMetaData.swift */,
+			);
+			path = Firebase;
 			sourceTree = "<group>";
 		};
 		674DF0DD200BA1AC00518998 = {
 			isa = PBXGroup;
 			children = (
+				673A4E972017880D00AE6060 /* OptimoveSDK */,
 				677AF6382014A426002CBA4F /* ObjcDemoApp.entitlements */,
-				674DF0FF200BA26D00518998 /* OptimoveSDK */,
 				674DF0E8200BA1AC00518998 /* ObjcDemoApp */,
 				674DF0E7200BA1AC00518998 /* Products */,
-				2EE014701F5CB632C146D214 /* Pods */,
-				524B5937F611FE427929D417 /* Frameworks */,
+				81228D6CCAAA3C1D18AEA67C /* Pods */,
+				C287B2C57C61FC06E223B101 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -163,8 +339,8 @@
 			children = (
 				674DF0E9200BA1AC00518998 /* AppDelegate.h */,
 				674DF0EA200BA1AC00518998 /* AppDelegate.m */,
-				674DF0EC200BA1AC00518998 /* ViewController.h */,
-				674DF0ED200BA1AC00518998 /* ViewController.m */,
+				674DF0EC200BA1AC00518998 /* MainViewController.h */,
+				674DF0ED200BA1AC00518998 /* MainViewController.m */,
 				674DF0EF200BA1AC00518998 /* Main.storyboard */,
 				674DF0F2200BA1AC00518998 /* Assets.xcassets */,
 				674DF0F4200BA1AC00518998 /* LaunchScreen.storyboard */,
@@ -180,197 +356,21 @@
 			path = ObjcDemoApp;
 			sourceTree = "<group>";
 		};
-		674DF0FF200BA26D00518998 /* OptimoveSDK */ = {
+		81228D6CCAAA3C1D18AEA67C /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				674DF100200BA26D00518998 /* Optimove */,
-				674DF10E200BA26D00518998 /* OptimoveSDK.h */,
-				674DF10F200BA26D00518998 /* OptiTrack */,
-				674DF112200BA26D00518998 /* Common */,
-				674DF12D200BA26D00518998 /* OptiPush */,
-				674DF134200BA26D00518998 /* Info.plist */,
+				A0ABE924B863B643A8117B2B /* Pods-ObjcDemoApp.debug.xcconfig */,
+				B5684BA2A2EFCFBE8B68AD1F /* Pods-ObjcDemoApp.release.xcconfig */,
 			);
-			path = OptimoveSDK;
+			name = Pods;
 			sourceTree = "<group>";
 		};
-		674DF100200BA26D00518998 /* Optimove */ = {
+		C287B2C57C61FC06E223B101 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				674DF101200BA26D00518998 /* Initializer */,
-				674DF104200BA26D00518998 /* Optimove.swift */,
-				674DF105200BA26D00518998 /* NotificationResponder */,
-				674DF107200BA26D00518998 /* EventValidator.swift */,
-				674DF108200BA26D00518998 /* OptimoveTenantInfo.swift */,
-				674DF109200BA26D00518998 /* StateMonitor */,
-				674DF10C200BA26D00518998 /* DeepLink */,
+				EBE791E8E9C8F8ED7343CD30 /* Pods_ObjcDemoApp.framework */,
 			);
-			path = Optimove;
-			sourceTree = "<group>";
-		};
-		674DF101200BA26D00518998 /* Initializer */ = {
-			isa = PBXGroup;
-			children = (
-				674DF102200BA26D00518998 /* OptimoveComponentsInitializer.swift */,
-				674DF103200BA26D00518998 /* AtomicBool.swift */,
-			);
-			path = Initializer;
-			sourceTree = "<group>";
-		};
-		674DF105200BA26D00518998 /* NotificationResponder */ = {
-			isa = PBXGroup;
-			children = (
-				674DF106200BA26D00518998 /* OptimoveNotificationHandler.swift */,
-			);
-			path = NotificationResponder;
-			sourceTree = "<group>";
-		};
-		674DF109200BA26D00518998 /* StateMonitor */ = {
-			isa = PBXGroup;
-			children = (
-				674DF10A200BA26D00518998 /* MonitorOptimoveState.swift */,
-				674DF10B200BA26D00518998 /* State.swift */,
-			);
-			path = StateMonitor;
-			sourceTree = "<group>";
-		};
-		674DF10C200BA26D00518998 /* DeepLink */ = {
-			isa = PBXGroup;
-			children = (
-				674DF10D200BA26D00518998 /* OptimoveDeepLinkResponder.swift */,
-			);
-			path = DeepLink;
-			sourceTree = "<group>";
-		};
-		674DF10F200BA26D00518998 /* OptiTrack */ = {
-			isa = PBXGroup;
-			children = (
-				674DF110200BA26D00518998 /* OptiTrack.swift */,
-				674DF111200BA26D00518998 /* OptitrackMetaData.swift */,
-			);
-			path = OptiTrack;
-			sourceTree = "<group>";
-		};
-		674DF112200BA26D00518998 /* Common */ = {
-			isa = PBXGroup;
-			children = (
-				674DF113200BA26D00518998 /* Singletons */,
-				674DF118200BA26D00518998 /* Comstants */,
-				674DF11C200BA26D00518998 /* Providers */,
-				674DF11E200BA26D00518998 /* Network */,
-				674DF121200BA26D00518998 /* Parser */,
-				674DF124200BA26D00518998 /* Extensions */,
-				674DF126200BA26D00518998 /* Campaign */,
-				674DF128200BA26D00518998 /* Error */,
-				674DF12A200BA26D00518998 /* Event */,
-			);
-			path = Common;
-			sourceTree = "<group>";
-		};
-		674DF113200BA26D00518998 /* Singletons */ = {
-			isa = PBXGroup;
-			children = (
-				674DF114200BA26D00518998 /* Storage */,
-				674DF116200BA26D00518998 /* Synchronizable.swift */,
-				674DF117200BA26D00518998 /* UserInSession.swift */,
-			);
-			path = Singletons;
-			sourceTree = "<group>";
-		};
-		674DF114200BA26D00518998 /* Storage */ = {
-			isa = PBXGroup;
-			children = (
-				674DF115200BA26D00518998 /* OptimoveFileManager.swift */,
-			);
-			path = Storage;
-			sourceTree = "<group>";
-		};
-		674DF118200BA26D00518998 /* Comstants */ = {
-			isa = PBXGroup;
-			children = (
-				674DF119200BA26D00518998 /* Constants.swift */,
-				674DF11A200BA26D00518998 /* ComponentsConstants.swift */,
-				674DF11B200BA26D00518998 /* OptimovePredefinedEvents.swift */,
-			);
-			path = Comstants;
-			sourceTree = "<group>";
-		};
-		674DF11C200BA26D00518998 /* Providers */ = {
-			isa = PBXGroup;
-			children = (
-				674DF11D200BA26D00518998 /* ConfigurationProvider.swift */,
-			);
-			path = Providers;
-			sourceTree = "<group>";
-		};
-		674DF11E200BA26D00518998 /* Network */ = {
-			isa = PBXGroup;
-			children = (
-				674DF11F200BA26D00518998 /* NetworkManager.swift */,
-				674DF120200BA26D00518998 /* NetworkAPIPaths.swift */,
-			);
-			path = Network;
-			sourceTree = "<group>";
-		};
-		674DF121200BA26D00518998 /* Parser */ = {
-			isa = PBXGroup;
-			children = (
-				674DF122200BA26D00518998 /* JSONComposer.swift */,
-				674DF123200BA26D00518998 /* Parser.swift */,
-			);
-			path = Parser;
-			sourceTree = "<group>";
-		};
-		674DF124200BA26D00518998 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				674DF125200BA26D00518998 /* Extensions.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		674DF126200BA26D00518998 /* Campaign */ = {
-			isa = PBXGroup;
-			children = (
-				674DF127200BA26D00518998 /* CampaignDetails.swift */,
-			);
-			path = Campaign;
-			sourceTree = "<group>";
-		};
-		674DF128200BA26D00518998 /* Error */ = {
-			isa = PBXGroup;
-			children = (
-				674DF129200BA26D00518998 /* OptimoveError.swift */,
-			);
-			path = Error;
-			sourceTree = "<group>";
-		};
-		674DF12A200BA26D00518998 /* Event */ = {
-			isa = PBXGroup;
-			children = (
-				674DF12B200BA26D00518998 /* EventConfig.swift */,
-				674DF12C200BA26D00518998 /* Event.swift */,
-			);
-			path = Event;
-			sourceTree = "<group>";
-		};
-		674DF12D200BA26D00518998 /* OptiPush */ = {
-			isa = PBXGroup;
-			children = (
-				674DF12E200BA26D00518998 /* OptipushMetaData.swift */,
-				674DF12F200BA26D00518998 /* Optipush.swift */,
-				674DF130200BA26D00518998 /* Registrar.swift */,
-				674DF131200BA26D00518998 /* Firebase */,
-			);
-			path = OptiPush;
-			sourceTree = "<group>";
-		};
-		674DF131200BA26D00518998 /* Firebase */ = {
-			isa = PBXGroup;
-			children = (
-				674DF132200BA26D00518998 /* FirebaseInteractor.swift */,
-				674DF133200BA26D00518998 /* FirebaseMetaData.swift */,
-			);
-			path = Firebase;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -380,12 +380,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 674DF0FC200BA1AC00518998 /* Build configuration list for PBXNativeTarget "ObjcDemoApp" */;
 			buildPhases = (
-				D9D1C6B437FF66E044B3016D /* [CP] Check Pods Manifest.lock */,
+				37E8A033A6DA1A4B261B7D20 /* [CP] Check Pods Manifest.lock */,
 				674DF0E2200BA1AC00518998 /* Sources */,
 				674DF0E3200BA1AC00518998 /* Frameworks */,
 				674DF0E4200BA1AC00518998 /* Resources */,
-				32C0EFBB6247947FBFFF682B /* [CP] Embed Pods Frameworks */,
-				2B83D768FFBC4250DF6CF613 /* [CP] Copy Pods Resources */,
+				A1E6CB7246A9D2FCD1264602 /* [CP] Embed Pods Frameworks */,
+				C3940C13881EFEE9AC8DC1DA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -415,6 +415,9 @@
 							com.apple.Push = {
 								enabled = 1;
 							};
+							com.apple.SafariKeychain = {
+								enabled = 1;
+							};
 						};
 					};
 				};
@@ -442,7 +445,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				674DF155200BA26D00518998 /* Info.plist in Resources */,
+				673A4EED2017880D00AE6060 /* Info.plist in Resources */,
 				674DF0F6200BA1AC00518998 /* LaunchScreen.storyboard in Resources */,
 				674DF0F3200BA1AC00518998 /* Assets.xcassets in Resources */,
 				674DF0F1200BA1AC00518998 /* Main.storyboard in Resources */,
@@ -452,22 +455,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2B83D768FFBC4250DF6CF613 /* [CP] Copy Pods Resources */ = {
+		37E8A033A6DA1A4B261B7D20 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ObjcDemoApp-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ObjcDemoApp/Pods-ObjcDemoApp-resources.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		32C0EFBB6247947FBFFF682B /* [CP] Embed Pods Frameworks */ = {
+		A1E6CB7246A9D2FCD1264602 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -495,22 +501,19 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ObjcDemoApp/Pods-ObjcDemoApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D9D1C6B437FF66E044B3016D /* [CP] Check Pods Manifest.lock */ = {
+		C3940C13881EFEE9AC8DC1DA /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
 			);
-			name = "[CP] Check Pods Manifest.lock";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ObjcDemoApp-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ObjcDemoApp/Pods-ObjcDemoApp-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -520,44 +523,44 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				674DF150200BA26D00518998 /* OptipushMetaData.swift in Sources */,
-				674DF153200BA26D00518998 /* FirebaseInteractor.swift in Sources */,
-				674DF13F200BA26D00518998 /* OptitrackMetaData.swift in Sources */,
-				674DF154200BA26D00518998 /* FirebaseMetaData.swift in Sources */,
+				673A4ED22017880D00AE6060 /* OptimoveTenantInfo.swift in Sources */,
+				673A4EE72017880D00AE6060 /* Event.swift in Sources */,
 				672DDE6220107C6400193051 /* ReportEventViewController.m in Sources */,
-				674DF0EE200BA1AC00518998 /* ViewController.m in Sources */,
-				674DF146200BA26D00518998 /* ConfigurationProvider.swift in Sources */,
-				674DF14D200BA26D00518998 /* OptimoveError.swift in Sources */,
-				674DF151200BA26D00518998 /* Optipush.swift in Sources */,
+				673A4ED72017880D00AE6060 /* OptitrackMetaData.swift in Sources */,
+				674DF0EE200BA1AC00518998 /* MainViewController.m in Sources */,
+				673A4EE62017880D00AE6060 /* EventConfig.swift in Sources */,
+				673A4EE42017880D00AE6060 /* CampaignDetails.swift in Sources */,
+				673A4ECF2017880D00AE6060 /* Optimove.swift in Sources */,
+				673A4ED12017880D00AE6060 /* EventValidator.swift in Sources */,
+				673A4ED42017880D00AE6060 /* State.swift in Sources */,
+				673A4EE32017880D00AE6060 /* Extensions.swift in Sources */,
 				677AF63B2014A467002CBA4F /* CombinedEvent.m in Sources */,
-				674DF14F200BA26D00518998 /* Event.swift in Sources */,
-				674DF148200BA26D00518998 /* NetworkAPIPaths.swift in Sources */,
-				674DF138200BA26D00518998 /* OptimoveNotificationHandler.swift in Sources */,
-				674DF147200BA26D00518998 /* NetworkManager.swift in Sources */,
+				673A4EE02017880D00AE6060 /* NetworkAPIPaths.swift in Sources */,
+				673A4EEB2017880D00AE6060 /* FirebaseInteractor.swift in Sources */,
+				673A4EEA2017880D00AE6060 /* Registrar.swift in Sources */,
+				673A4EDA2017880D00AE6060 /* UserInSession.swift in Sources */,
 				674DF0F9200BA1AC00518998 /* main.m in Sources */,
-				674DF13D200BA26D00518998 /* OptimoveDeepLinkResponder.swift in Sources */,
-				674DF140200BA26D00518998 /* OptimoveFileManager.swift in Sources */,
-				674DF142200BA26D00518998 /* UserInSession.swift in Sources */,
-				674DF13E200BA26D00518998 /* OptiTrack.swift in Sources */,
-				674DF13C200BA26D00518998 /* State.swift in Sources */,
-				674DF13A200BA26D00518998 /* OptimoveTenantInfo.swift in Sources */,
-				674DF137200BA26D00518998 /* Optimove.swift in Sources */,
-				674DF141200BA26D00518998 /* Synchronizable.swift in Sources */,
+				673A4ECE2017880D00AE6060 /* AtomicBool.swift in Sources */,
+				673A4EDB2017880D00AE6060 /* Constants.swift in Sources */,
+				673A4ED02017880D00AE6060 /* OptimoveNotificationHandler.swift in Sources */,
+				673A4EE82017880D00AE6060 /* OptipushMetaData.swift in Sources */,
+				673A4EDD2017880D00AE6060 /* OptimovePredefinedEvents.swift in Sources */,
+				673A4ECD2017880D00AE6060 /* OptimoveComponentsInitializer.swift in Sources */,
+				673A4ED62017880D00AE6060 /* OptiTrack.swift in Sources */,
+				673A4EE12017880D00AE6060 /* JSONComposer.swift in Sources */,
+				673A4EDC2017880D00AE6060 /* ComponentsConstants.swift in Sources */,
+				673A4EDE2017880D00AE6060 /* ConfigurationProvider.swift in Sources */,
+				673A4EE52017880D00AE6060 /* OptimoveError.swift in Sources */,
+				673A4EE22017880D00AE6060 /* Parser.swift in Sources */,
+				673A4ED32017880D00AE6060 /* MonitorOptimoveState.swift in Sources */,
+				673A4ED82017880D00AE6060 /* OptimoveFileManager.swift in Sources */,
+				673A4ED52017880D00AE6060 /* OptimoveDeepLinkResponder.swift in Sources */,
 				674DF0EB200BA1AC00518998 /* AppDelegate.m in Sources */,
-				674DF14C200BA26D00518998 /* CampaignDetails.swift in Sources */,
-				674DF136200BA26D00518998 /* AtomicBool.swift in Sources */,
-				674DF14A200BA26D00518998 /* Parser.swift in Sources */,
-				674DF14E200BA26D00518998 /* EventConfig.swift in Sources */,
-				674DF13B200BA26D00518998 /* MonitorOptimoveState.swift in Sources */,
-				674DF135200BA26D00518998 /* OptimoveComponentsInitializer.swift in Sources */,
+				673A4EEC2017880D00AE6060 /* FirebaseMetaData.swift in Sources */,
+				673A4EDF2017880D00AE6060 /* NetworkManager.swift in Sources */,
 				672DDE5C200F358000193051 /* SetUserIdViewController.m in Sources */,
-				674DF139200BA26D00518998 /* EventValidator.swift in Sources */,
-				674DF14B200BA26D00518998 /* Extensions.swift in Sources */,
-				674DF144200BA26D00518998 /* ComponentsConstants.swift in Sources */,
-				674DF143200BA26D00518998 /* Constants.swift in Sources */,
-				674DF145200BA26D00518998 /* OptimovePredefinedEvents.swift in Sources */,
-				674DF152200BA26D00518998 /* Registrar.swift in Sources */,
-				674DF149200BA26D00518998 /* JSONComposer.swift in Sources */,
+				673A4ED92017880D00AE6060 /* Synchronizable.swift in Sources */,
+				673A4EE92017880D00AE6060 /* Optipush.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -690,7 +693,7 @@
 		};
 		674DF0FD200BA1AC00518998 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 242DFC7E0596C37D7D250204 /* Pods-ObjcDemoApp.debug.xcconfig */;
+			baseConfigurationReference = A0ABE924B863B643A8117B2B /* Pods-ObjcDemoApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ObjcDemoApp.entitlements;
@@ -707,7 +710,7 @@
 		};
 		674DF0FE200BA1AC00518998 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 34406A13068626D268F23114 /* Pods-ObjcDemoApp.release.xcconfig */;
+			baseConfigurationReference = B5684BA2A2EFCFBE8B68AD1F /* Pods-ObjcDemoApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ObjcDemoApp.entitlements;

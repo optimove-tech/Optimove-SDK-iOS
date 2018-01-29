@@ -10,10 +10,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Main View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="ObjcDemoApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="MainViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -38,7 +38,7 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="32"/>
                                         <state key="normal" title="Report Event"/>
                                         <connections>
-                                            <segue destination="mw4-aV-65y" kind="show" id="ALB-Ib-r9l"/>
+                                            <segue destination="mw4-aV-65y" kind="show" identifier="report event" id="ALB-Ib-r9l"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MkT-0W-Uhi">
@@ -46,7 +46,7 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="32"/>
                                         <state key="normal" title="Subscribe to test"/>
                                         <connections>
-                                            <action selector="subscribrToTest:" destination="BYZ-38-t0r" eventType="touchUpInside" id="UlT-Jl-QqT"/>
+                                            <action selector="subscribeTotestMode:" destination="BYZ-38-t0r" eventType="touchUpInside" id="kjf-QW-dEw"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uQC-pG-OhS">
@@ -54,7 +54,7 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="32"/>
                                         <state key="normal" title="unsubscribe From Test"/>
                                         <connections>
-                                            <action selector="unsubsribeFromTest:" destination="BYZ-38-t0r" eventType="touchUpInside" id="rhL-5R-KZO"/>
+                                            <action selector="unsubscribeToTestMode:" destination="BYZ-38-t0r" eventType="touchUpInside" id="w7X-Dt-5dw"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -77,7 +77,7 @@
         <!--Report Event View Controller-->
         <scene sceneID="JeZ-Jj-msL">
             <objects>
-                <viewController id="mw4-aV-65y" customClass="ReportEventViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="reportEvent" useStoryboardIdentifierAsRestorationIdentifier="YES" id="mw4-aV-65y" customClass="ReportEventViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="UsN-KZ-3S2"/>
                         <viewControllerLayoutGuide type="bottom" id="wgG-5m-Rfx"/>

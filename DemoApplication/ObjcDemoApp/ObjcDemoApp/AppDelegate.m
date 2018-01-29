@@ -18,7 +18,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    OptimoveTenantInfo *info = [[OptimoveTenantInfo alloc] initWithUrl:@"https://appcontrollerproject-developer.firebaseapp.com" token:@"demo_apps" version:@"1.0.0" hasFirebase:NO];
+    OptimoveTenantInfo *info = [[OptimoveTenantInfo alloc] initWithUrl:@"https://appcontrollerproject-developer.firebaseapp.com"
+                                                                 token:@"demo_apps"
+                                                               version:@"1.0.0"
+                                                           hasFirebase:NO];
     [Optimove.sharedInstance configureWithInfo:info];
     [Optimove.sharedInstance registerWithStateDelegate:self];
     

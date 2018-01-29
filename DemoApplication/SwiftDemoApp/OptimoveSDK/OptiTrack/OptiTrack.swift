@@ -40,6 +40,7 @@ final class OptiTrack
             return nil
         }
         self.metaData = optitrackMetaData
+        UserInSession.shared.siteID = metaData.siteId
         if let url = URL.init(string: metaData.optitrackEndpoint)
         {
             PiwikTracker.configureSharedInstance(withSiteID: String(metaData.siteId), baseURL: url)

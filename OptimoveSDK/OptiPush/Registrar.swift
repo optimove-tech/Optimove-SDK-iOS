@@ -215,7 +215,6 @@ struct Registrar
                 return
             }
             OptimoveFileManager.shared.writeRegistrationFile(fileName:actionFile, withData: json)
-           
         }
         
         

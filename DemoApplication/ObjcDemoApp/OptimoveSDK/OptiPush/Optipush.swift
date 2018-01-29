@@ -74,11 +74,11 @@ final class Optipush
             DispatchQueue.main.async
             {
                 Optimove.sharedInstance.logger.debug("register for remote  notifications")
-                UIApplication.shared.registerForRemoteNotifications()
                 Optimove.sharedInstance.logger.debug("notification authorization response: \(granted)")
                 self.handlenNotificationAuthorizationResponse(granted: granted,error: error)
             }
         }
+        UIApplication.shared.registerForRemoteNotifications()
     }
     
     private func handlenNotificationAuthorizationResponse(granted: Bool, error: Error?)
@@ -107,16 +107,18 @@ final class Optipush
         {
             Optimove.sharedInstance.logger.debug("Notification unauthorized by user")
             
-            guard let isOptIn = UserInSession.shared.isOptIn else
+            guard let isOptIn = UserInSession.shared.isOptIn
+                else
             {
                 Optimove.sharedInstance.logger.debug("User Opt for first time")
-                
                 guard UserInSession.shared.fcmToken != nil
                     else
                 {
+                    
                     UserInSession.shared.isOptIn = false
                     return
                 }
+                
                 if UserInSession.shared.isRegistrationSuccess
                 {
                     Optimove.sharedInstance.logger.debug("SDK make opt OUT request")
@@ -135,6 +137,12 @@ final class Optipush
                     self.registrar.optOut()
                 }
             }
+            else {
+                if !UserInSession.shared.isOptRequestSuccess {
+                    self.registrar.optOut()
+                }
+            }
+            
         }
     }
 }
@@ -144,14 +152,12 @@ extension Optipush: MessageHandleProtocol
     //MARK: - Protocol conformance
     func handleRegistrationTokenRefresh(token:String)
     {
-        print("fcmToken:\(token)")
         Optimove.sharedInstance.logger.debug("fcmToken:\(token)")
        
         guard let oldFCMToken = UserInSession.shared.fcmToken
             else
         {
             Optimove.sharedInstance.logger.debug("Client receive a token for the first time")
-            
             UserInSession.shared.fcmToken = token
             registrar.register()
             return
