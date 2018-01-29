@@ -130,6 +130,7 @@ struct Keys
         case campaignType       = "campaign_type"
         case isOptipush         = "is_optipush"
         case collapseId         = "collapse_Key"
+        case dynamikLink        = "dynamic_link"
     }
 }
 

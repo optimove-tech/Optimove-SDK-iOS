@@ -152,7 +152,6 @@ extension Optipush: MessageHandleProtocol
     //MARK: - Protocol conformance
     func handleRegistrationTokenRefresh(token:String)
     {
-        print("fcmToken:\(token)")
         Optimove.sharedInstance.logger.debug("fcmToken:\(token)")
        
         guard let oldFCMToken = UserInSession.shared.fcmToken

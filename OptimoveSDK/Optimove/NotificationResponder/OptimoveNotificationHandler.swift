@@ -17,10 +17,10 @@ class OptimoveNotificationHandler: NSObject
         super.init()
         UNUserNotificationCenter.current().delegate = self
         
-        configureUserNotifications()
+        configureUserNotificationsDismissCategory()
     }
     
-    func buildPushNotification(userInfo:[AnyHashable : Any],
+    func handleNotification(userInfo:[AnyHashable : Any],
                             completionHandler:@escaping (UIBackgroundFetchResult) -> Void)
     {
         guard userInfo[Keys.Notification.isOptipush.rawValue] as? String == "true"  else
@@ -28,24 +28,25 @@ class OptimoveNotificationHandler: NSObject
             completionHandler(.noData)
             return
         }
-        
-        let content = UNMutableNotificationContent()
-        if let campaignDetails = extractCampaignDetails(from: userInfo)
+        guard let campaignDetails = extractCampaignDetails(from: userInfo) else
         {
-            reportNotification(.delivered,campaignDetails:campaignDetails)
-            
-            injectCampaignDetails(from: campaignDetails, to: content)
+            completionHandler(.noData)
+            return
         }
+        
+        reportNotification(.delivered,campaignDetails:campaignDetails)
+        
         guard UserInSession.shared.isOptIn == true else
         {
             completionHandler(.noData)
             return
         }
         
+        let content = UNMutableNotificationContent()
         content.title = userInfo[Keys.Notification.title.rawValue] as? String ?? Bundle.main.infoDictionary![kCFBundleNameKey as String] as! String
         content.body = userInfo[Keys.Notification.body.rawValue] as? String ?? ""
         content.categoryIdentifier = NotificationCategoryIdentifiers.dismiss
-//        content.threadIdentifier = Bundle.main.bundleIdentifier!
+        injectCampaignDetails(from: campaignDetails, to: content)
         
         injectDeepLink(from:userInfo, to: content)
         {
@@ -132,11 +133,11 @@ class OptimoveNotificationHandler: NSObject
                 { (deepLink, error) in
                     if error != nil
                     {
-                        Optimove.sharedInstance.logger.severe("Deep link could not be extracted. error: \(error!)")
+                        Optimove.sharedInstance.logger.severe("Deep link could not be extracted. error: \(error!.localizedDescription)")
                     }
                     else
                     {
-                        content.userInfo["dynamic_link"] = deepLink?.url?.absoluteString
+                        content.userInfo[Keys.Notification.dynamikLink.rawValue] = deepLink?.url?.absoluteString
                     }
                     completionHandler()
                 }
@@ -213,7 +214,7 @@ class OptimoveNotificationHandler: NSObject
         }
     }
     
-    private func configureUserNotifications()
+    private func configureUserNotificationsDismissCategory()
     {
         let category = UNNotificationCategory(identifier: NotificationCategoryIdentifiers.dismiss,
                                               actions: [],
