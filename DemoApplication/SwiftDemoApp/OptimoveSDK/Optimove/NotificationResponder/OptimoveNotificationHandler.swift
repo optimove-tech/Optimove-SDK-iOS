@@ -10,44 +10,31 @@ import UIKit
 import Firebase
 import UserNotifications
 
+enum NotificationState
+{
+    case opened
+    case delivered
+    case dismissed
+}
 class OptimoveNotificationHandler: NSObject
 {
+    //MARK: - Initializer
    override init()
     {
         super.init()
         UNUserNotificationCenter.current().delegate = self
-        
-        configureUserNotifications()
+        configureUserNotificationsDismissCategory()
     }
     
-    func buildPushNotification(userInfo:[AnyHashable : Any],
-                            completionHandler:@escaping (UIBackgroundFetchResult) -> Void)
-    {
-        guard userInfo[Keys.Notification.isOptipush.rawValue] as? String == "true"  else
-        {
-            completionHandler(.noData)
-            return
-        }
-        
+    //MARK: - API
+    fileprivate func buildNotificationContent(_ userInfo: [AnyHashable : Any], _ campaignDetails: CampaignDetails?, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let content = UNMutableNotificationContent()
-        if let campaignDetails = extractCampaignDetails(from: userInfo)
-        {
-            reportNotification(.delivered,campaignDetails:campaignDetails)
-            
-            injectCampaignDetails(from: campaignDetails, to: content)
-        }
-        guard UserInSession.shared.isOptIn == true else
-        {
-            completionHandler(.noData)
-            return
-        }
-        
         content.title = userInfo[Keys.Notification.title.rawValue] as? String ?? Bundle.main.infoDictionary![kCFBundleNameKey as String] as! String
         content.body = userInfo[Keys.Notification.body.rawValue] as? String ?? ""
         content.categoryIdentifier = NotificationCategoryIdentifiers.dismiss
-//        content.threadIdentifier = Bundle.main.bundleIdentifier!
+        insertCampaignDetails(from: campaignDetails, to: content)
         
-        injectDeepLink(from:userInfo, to: content)
+        insertLongDeepLinkUrl(from:userInfo, to: content)
         {
             let collapseId = (Bundle.main.bundleIdentifier ?? "") + "_" + (userInfo[Keys.Notification.collapseId.rawValue] as? String ?? "OptipushDefaultCollapseID")
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.6, repeats: false)
@@ -59,14 +46,52 @@ class OptimoveNotificationHandler: NSObject
         }
     }
     
-
-    enum NotificationState
+    func handleNotification(userInfo:[AnyHashable : Any],
+                            completionHandler:@escaping (UIBackgroundFetchResult) -> Void)
     {
-        case opened
-        case delivered
-        case dismissed
+        guard userInfo[Keys.Notification.isOptipush.rawValue] as? String == "true"  else
+        {
+            completionHandler(.noData)
+            return
+        }
+        var campaignDetails:CampaignDetails? = nil
+        if let pushCampaignDetails = CampaignDetails.extractCampaignDetails(from: userInfo) {
+            campaignDetails = pushCampaignDetails
+        reportNotification(.delivered,campaignDetails:pushCampaignDetails)
+        }
+        
+        guard UserInSession.shared.isOptIn == true else
+        {
+            completionHandler(.noData)
+            return
+        }
+        
+        buildNotificationContent(userInfo, campaignDetails, completionHandler)
+        
     }
+
+    //MARK: - Private Methods
     
+    private func reportNotification(response: UNNotificationResponse)
+    {
+        Optimove.sharedInstance.logger.debug("User react to notification")
+        Optimove.sharedInstance.logger.debug("Action = \(response.actionIdentifier)")
+        
+        let notificationDetails = response.notification.request.content.userInfo
+        
+        if let campaignDetails = CampaignDetails.extractCampaignDetails(from: notificationDetails)
+        {
+            switch response.actionIdentifier
+            {
+            case UNNotificationDismissActionIdentifier:
+                reportNotification(.dismissed, campaignDetails: campaignDetails)
+            case UNNotificationDefaultActionIdentifier:
+                reportNotification(.opened,campaignDetails: campaignDetails)
+            default: break
+            }
+        }
+    }
+
     private func reportNotification(_ type: NotificationState, campaignDetails: CampaignDetails)
     {
         let taskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
@@ -103,7 +128,7 @@ class OptimoveNotificationHandler: NSObject
         }
     }
     
-    func save(_ event:NotificationEvent) -> (index:Int,newSize:Int)
+    private func save(_ event:NotificationEvent) -> (index:Int,newSize:Int)
     {
         var startIndex  = 0
         var newCount = 0
@@ -118,28 +143,21 @@ class OptimoveNotificationHandler: NSObject
         return (startIndex,newCount)
     }
     
-    private func injectDeepLink(from userInfo: [AnyHashable : Any], to content: UNMutableNotificationContent, withCompletionHandler completionHandler: @escaping ResultBlock)
+    private func insertLongDeepLinkUrl(from userInfo: [AnyHashable : Any], to content: UNMutableNotificationContent, withCompletionHandler completionHandler: @escaping ResultBlock)
     {
-        if let dl           = userInfo[Keys.Notification.dynamicLinks.rawValue] as? String ,
-            let data        = dl.data(using: .utf8),
-            let json        = try? JSONSerialization.jsonObject(with: data, options:[.allowFragments]) as? [String:Any],
-            let ios         = json?[Keys.Notification.ios.rawValue] as? [String:Any],
-            let deepLink =  ios[Bundle.main.bundleIdentifier?.setAsMongoKey() ?? "" ] as? String
+        if let url = extractDeepLink(from: userInfo)
         {
-            if let url = URL(string:deepLink)
-            {
-                DynamicLinks.dynamicLinks()?.handleUniversalLink(url)
-                { (deepLink, error) in
-                    if error != nil
-                    {
-                        Optimove.sharedInstance.logger.severe("Deep link could not be extracted. error: \(error!)")
-                    }
-                    else
-                    {
-                        content.userInfo["dynamic_link"] = deepLink?.url?.absoluteString
-                    }
-                    completionHandler()
+            DynamicLinks.dynamicLinks()?.handleUniversalLink(url)
+            { (longUrl, error) in
+                if error != nil
+                {
+                    Optimove.sharedInstance.logger.severe("Deep link could not be extracted. error: \(error!.localizedDescription)")
                 }
+                else
+                {
+                    content.userInfo[Keys.Notification.dynamikLink.rawValue] = longUrl?.url?.absoluteString
+                }
+                completionHandler()
             }
         }
         else
@@ -148,8 +166,9 @@ class OptimoveNotificationHandler: NSObject
         }
     }
     
-    private func injectCampaignDetails(from campaignDetails: CampaignDetails,  to content: UNMutableNotificationContent)
+    private func insertCampaignDetails(from campaignDetails: CampaignDetails?,  to content: UNMutableNotificationContent)
     {
+        guard let campaignDetails = campaignDetails else {return}
         content.userInfo[Keys.Notification.campaignId.rawValue]     = campaignDetails.campaignId
         content.userInfo[Keys.Notification.actionSerial.rawValue]   = campaignDetails.actionSerial
         content.userInfo[Keys.Notification.templateId.rawValue]     = campaignDetails.templateId
@@ -157,30 +176,8 @@ class OptimoveNotificationHandler: NSObject
         content.userInfo[Keys.Notification.campaignType.rawValue]   = campaignDetails.campaignType
     }
     
-    private func extractCampaignDetails(from userInfo: [AnyHashable : Any] ) -> CampaignDetails?
-    {
-        guard let campaignId   = (userInfo[Keys.Notification.campaignId.rawValue]   as? String),
-            let actionSerial = (userInfo[Keys.Notification.actionSerial.rawValue]   as? String),
-            let templateId   = (userInfo[Keys.Notification.templateId.rawValue]     as? String),
-            let engagementId = (userInfo[Keys.Notification.engagementId.rawValue]   as? String),
-            let campaignType = (userInfo[Keys.Notification.campaignType.rawValue]   as? String)
-            else
-        {
-            return nil
-        }
-        
-        return CampaignDetails(campaignId: campaignId,
-                               actionSerial: actionSerial,
-                               templateId: templateId,
-                               engagementId: engagementId,
-                               campaignType: campaignType)
-    }
-    
-    func handleUserNotificationResponse(response:UNNotificationResponse)
-    {
-        reportNotification(response: response)
-        guard response.actionIdentifier == UNNotificationDefaultActionIdentifier else {return}
-        if let dynamicLink =  response.notification.request.content.userInfo["dynamic_link"] as? String
+    private func handleDeepLinkDelegation(_ response: UNNotificationResponse) {
+        if let dynamicLink =  response.notification.request.content.userInfo[Keys.Notification.dynamikLink.rawValue] as? String
         {
             if let absoluteUrl = URL(string: dynamicLink)
             {
@@ -193,27 +190,22 @@ class OptimoveNotificationHandler: NSObject
         }
     }
     
-    private func reportNotification(response: UNNotificationResponse)
+    private func isNotificationOpened(response:UNNotificationResponse) -> Bool
     {
-        Optimove.sharedInstance.logger.debug("User react to notification")
-        Optimove.sharedInstance.logger.debug("Action = \(response.actionIdentifier)")
+        return response.actionIdentifier == UNNotificationDefaultActionIdentifier
+    }
+    
+    private func handleUserNotificationResponse(response:UNNotificationResponse)
+    {
+        reportNotification(response: response)
         
-        let notificationDetails = response.notification.request.content.userInfo
-        
-        if let campaignDetails = extractCampaignDetails(from: notificationDetails)
+        if isNotificationOpened(response: response)
         {
-            switch response.actionIdentifier
-            {
-            case UNNotificationDismissActionIdentifier:
-               reportNotification(.dismissed, campaignDetails: campaignDetails)
-            case UNNotificationDefaultActionIdentifier:
-                reportNotification(.opened,campaignDetails: campaignDetails)
-            default: break
-            }
+            handleDeepLinkDelegation(response)
         }
     }
     
-    private func configureUserNotifications()
+    private func configureUserNotificationsDismissCategory()
     {
         let category = UNNotificationCategory(identifier: NotificationCategoryIdentifiers.dismiss,
                                               actions: [],
@@ -221,17 +213,37 @@ class OptimoveNotificationHandler: NSObject
                                               options: [.customDismissAction])
         UNUserNotificationCenter.current().setNotificationCategories([category])
     }
+    
+    private func extractDeepLink(from userInfo:  [AnyHashable : Any]) -> URL?
+    {
+        if let dl           = userInfo[Keys.Notification.dynamicLinks.rawValue] as? String ,
+            let data        = dl.data(using: .utf8),
+            let json        = try? JSONSerialization.jsonObject(with: data, options:[.allowFragments]) as? [String:Any],
+            let ios         = json?[Keys.Notification.ios.rawValue] as? [String:Any],
+            let deepLink =  ios[Bundle.main.bundleIdentifier?.setAsMongoKey() ?? "" ] as? String
+        {
+            return URL(string: deepLink)
+        }
+        return nil
+    }
 }
+
+//MARK: - UNUserNotificationCenterDelegate implementation
 
 extension OptimoveNotificationHandler: UNUserNotificationCenterDelegate
 {
+    fileprivate func initializeOptimoveComponentsFromLocalStorage()
+    {
+        Optimove.sharedInstance.logger.debug("start local init of optimove")
+        OptimoveComponentsInitializer.init(isClientFirebaseExist: UserInSession.shared.userHasFirebase).startFromLocalConfigs()
+        Optimove.sharedInstance.logger.debug("finish local init of optimove")
+    }
+    
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void)
     {
-            Optimove.sharedInstance.logger.debug("start local init of optimove")
-            OptimoveComponentsInitializer.init(isClientFirebaseExist: UserInSession.shared.userHasFirebase).startFromLocalConfigs()
-            Optimove.sharedInstance.logger.debug("finish local init of optimove")
+        initializeOptimoveComponentsFromLocalStorage()
         handleUserNotificationResponse(response: response)
         completionHandler()
     }

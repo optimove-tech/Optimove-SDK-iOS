@@ -30,7 +30,7 @@ final class OptiTrack
         Optimove.sharedInstance.logger.debug("Initialize OptiTrack")
         
         
-        guard let optitrackMetaData = Parser.parseOptitrackMetadata(from: json)
+        guard let optitrackMetaData = OptitrackMetaData.parseOptitrackMetadata(from: json)
             else
         {
             Optimove.sharedInstance.logger.debug("Failed to parse optitrack metadata")

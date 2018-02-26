@@ -15,4 +15,16 @@ struct OptipushMetaData
     var registrationServiceOtherEndPoint        : String
 }
 
-
+extension OptipushMetaData
+{
+    static func parseOptipushMetaData(from json:[String:Any]) -> OptipushMetaData?
+    {
+        guard let optipushRegistrationEndpoint                          = json[Keys.Configuration.registrationServiceRegistrationEndPoint.rawValue] as? String,
+            let   optipushGeneralEndPoint                               = json[Keys.Configuration.registrationServiceOtherEndPoint.rawValue] as? String
+            else {return nil}
+        
+        return OptipushMetaData(registrationServiceRegistrationEndPoint: optipushRegistrationEndpoint,
+                                registrationServiceOtherEndPoint: optipushGeneralEndPoint)
+        
+    }
+}

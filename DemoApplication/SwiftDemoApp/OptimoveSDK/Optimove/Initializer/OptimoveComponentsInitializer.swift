@@ -39,15 +39,48 @@ class OptimoveComponentsInitializer
         Optimove.sharedInstance.logger.debug("Finish OptimoveComponentInitializer initialization")
     }
     
-    func start()
+    private func handleConfigurationArrived(withData data: Data) {
+        Optimove.sharedInstance.logger.error("Parsing Configuration Meta Data")
+        let parsedResponse = Data.extractJSONFrom(data: data)
+        if let error = parsedResponse.error
+        {
+            Optimove.sharedInstance.logger.severe("Configuration Parsing failed")
+            self.finishSdkInit(with: [error])
+            return
+        }
+        if let json = parsedResponse.json
+        {
+            if let data = try? JSONSerialization.data(withJSONObject: json, options:.prettyPrinted)
+            {
+                self.saveConfigurationToFile(data:data)
+            }
+            
+            Optimove.sharedInstance.logger.debug("Configuration Parsing succeeded")
+            
+            if OptimoveComponentsInitializer.atomicBool.compareAndSet(expected: false, value: true)
+            {
+                self.setupOptimoveComponents(from: json)
+            }
+            else
+            {
+                Optimove.sharedInstance.logger.debug("skipping remote initialization since already initialized")
+            }
+        }
+    }
+    
+    func startFromServer()
     {
         Optimove.sharedInstance.logger.error("Start Optimove component initialization")
         guard isInternetAvailable()
             else
         {
             Optimove.sharedInstance.logger.error("No Internet connection")
-            
+            if UserInSession.shared.hasConfigurationFile == true {
+            startFromLocalConfigs()
+            }
+            else {
             finishSdkInit(with: [.noNetwork])
+            }
             return
         }
         if let tenantToken = UserInSession.shared.tenantToken, let version = Verison
@@ -61,30 +94,7 @@ class OptimoveComponentsInitializer
                         return
                     }
                 
-                Optimove.sharedInstance.logger.error("Parsing Configuration Meta Data")
-                let parsedResponse = Parser.extractJSONFrom(data: data)
-                if let error = parsedResponse.error
-                {
-                    Optimove.sharedInstance.logger.severe("Configuration Parsing failed")
-                    self.finishSdkInit(with: [error])
-                    return
-                }
-                if let json = parsedResponse.json
-                {
-                    if let data = try? JSONSerialization.data(withJSONObject: json, options:.prettyPrinted)
-                    {
-                        self.saveConfigurationToFile(data:data)
-                    }
-                    
-                    Optimove.sharedInstance.logger.debug("Configuration Parsing succeeded")
-
-                    if OptimoveComponentsInitializer.atomicBool.compareAndSet(expected: false, value: true) {
-                        self.setupOptimoveComponents(from: json)
-                    }
-                    else {
-                        Optimove.sharedInstance.logger.debug("skipping remote initialization since already initialized")
-                    }
-                }
+                self.handleConfigurationArrived(withData: data)
             }
         }
     }
@@ -97,7 +107,7 @@ class OptimoveComponentsInitializer
         do
         {
             let configData  = try? Data.init(contentsOf: actionURL)
-            if let json = Parser.extractJSONFrom(data: configData).json
+            if let json = Data.extractJSONFrom(data: configData).json
             {
                 Optimove.sharedInstance.logger.severe("Try to configure from disk")
                 if OptimoveComponentsInitializer.atomicBool.compareAndSet(expected: false, value: true) {
@@ -120,7 +130,7 @@ class OptimoveComponentsInitializer
             return
         }
         Optimove.sharedInstance.monitor.setup(from: json)
-        Optimove.sharedInstance.eventValidator = EventValidator(from: json)
+        Optimove.sharedInstance.eventValidator = OptimoveEventValidator(from: json)
         if Optimove.sharedInstance.eventValidator != nil
         {
             Optimove.sharedInstance.monitor.update(component: .validator, state: .active)
@@ -159,6 +169,7 @@ class OptimoveComponentsInitializer
             try FileManager.default.createDirectory(at: OptimoveFileManager.shared.optimoveSDKDirectory, withIntermediateDirectories: true)
             let fileURL = OptimoveFileManager.shared.optimoveSDKDirectory.appendingPathComponent(actionFile)
             let success = FileManager.default.createFile(atPath: fileURL.path, contents: data, attributes: nil)
+            UserInSession.shared.hasConfigurationFile = true
             
             Optimove.sharedInstance.logger.debug("Storing status is \(success.description)\n location:\(OptimoveFileManager.shared.optimoveSDKDirectory.path)")
         }

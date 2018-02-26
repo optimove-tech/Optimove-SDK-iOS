@@ -45,3 +45,24 @@ extension URL
         return parameters
     }
 }
+
+extension Data
+{
+    static func extractJSONFrom(data:Data?) -> (json:[String:Any]?,error:OptimoveError?)
+    {
+        if let data = data
+        {
+            let json:[String:Any]!
+            do
+            {
+                json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String:Any]
+            }
+            catch
+            {
+                return (nil, .canNotParseData)
+            }
+            return (json, nil)
+        }
+        return (nil,.emptyData)
+    }
+}

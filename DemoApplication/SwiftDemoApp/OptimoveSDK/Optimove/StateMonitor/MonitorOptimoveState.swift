@@ -58,11 +58,22 @@ class MonitorOptimoveState
         self.stateDalegates = stateDalegates
     }
     
+    //MARK: - API
+    
     func setup(from json:[String:Any])
     {
-        let monitorData = Parser.extractOptimoveComponentsPermissions(from:json)
+        let monitorData = extractOptimoveComponentsPermissions(from:json)
         update(component: .optiPush, state: monitorData.isOptipushEnabled ? .permitted : .denied)
         update(component: .optiTrack, state: monitorData.isOptitrackEnabled ? .permitted : .denied)
+    }
+    
+    //MARK: - Private Methods
+    
+    private func extractOptimoveComponentsPermissions(from json:[String:Any]) -> (isOptipushEnabled: Bool,isOptitrackEnabled: Bool) //TODO: refactor
+    {
+        let isOptipushEnabled = json[Keys.Configuration.enableOptipush.rawValue] as? Bool ?? false
+        let isOptitrackEnabled = json[Keys.Configuration.enableOptitrack.rawValue] as? Bool ?? false
+        return (isOptipushEnabled,isOptitrackEnabled)
     }
     
     

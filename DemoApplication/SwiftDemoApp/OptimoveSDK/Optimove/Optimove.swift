@@ -23,7 +23,7 @@ import XCGLogger
     var optiPush        : Optipush?
     var optiTrack       : OptiTrack?
     var monitor         : MonitorOptimoveState
-    var eventValidator  : EventValidator?
+    var eventValidator  : OptimoveEventValidator?
     var notificationHandler: OptimoveNotificationHandler
     let evetReportingQueue: DispatchQueue
     let notificationEventQueue: DispatchQueue
@@ -161,23 +161,11 @@ import XCGLogger
         UserInSession.shared.version = info.version
         UserInSession.shared.configurationEndPoint = info.url
         UserInSession.shared.userHasFirebase = info.hasFirebase
-        OptimoveComponentsInitializer(isClientFirebaseExist: info.hasFirebase).start()
+        OptimoveComponentsInitializer(isClientFirebaseExist: info.hasFirebase).startFromServer()
         observeEnterToBackgroundMode()
     }
     
-    /// Validate and send the event to Optitrack component
-    ///
-    /// - Parameters:
-    ///   - event: optimove event object
-    ///   - completionHandler: A block object to be executed when the report sequence ends. This block has no return value and takes a single Error argument that indicates whether or not the report actually finished before the completion handler was called. This parameter may be NULL.
-    private func handleReport(event:OptimoveEvent, completionHandler: ((OptimoveError?) -> Void)? = nil)
-    {
-        evetReportingQueue.async
-            {
-                self.report(event:event, completionHandler:completionHandler)
-        }
-    }
-    
+    //MARK: - Internal API
     func reportSync(event:OptimoveEvent, completionHandler: ResultBlockWithError? = nil)
     {
         evetReportingQueue.sync
@@ -219,7 +207,7 @@ import XCGLogger
         }
         
     }
-    //MARK: - Internal API
+   
     
     /// validate the state of the sdk and if available internally sends the report to the apropriate handler
     ///
@@ -347,7 +335,10 @@ import XCGLogger
             }
         }
     }
-   @objc public func register(deepLinkResponder responder : OptimoveDeepLinkResponder)
+    
+    // MARK: - Public API
+    
+    @objc public func register(deepLinkResponder responder : OptimoveDeepLinkResponder)
     {
         if let dlc = self.deepLinkComponents
         {
@@ -359,15 +350,13 @@ import XCGLogger
         }
     }
     
-   @objc public func unregister(deepLinkResponder responder : OptimoveDeepLinkResponder)
+    @objc public func unregister(deepLinkResponder responder : OptimoveDeepLinkResponder)
     {
         if let index = self.deepLinkResponders.index(of: responder)
         {
             deepLinkResponders.remove(at: index)
         }
     }
-    
-    // MARK: - Public API
     
    @objc public func setScreenEvent(viewControllersIdetifiers:[String],url: URL?)
     {
@@ -398,23 +387,7 @@ import XCGLogger
                      completionHandler: completionHandler)
     }
     
-   private func registerIfNeeded()
-   {
-        if monitor.isComponentInternallyAvailable(.optiPush) && UserInSession.shared.fcmToken != nil &&  UserInSession.shared.isRegistrationSuccess == false
-        {
-            optiPush?.registrar.register()
-        }
-    }
-    
-    private func reportSetUserIdIfNeeded()
-    {
-        if monitor.isComponentInternallyAvailable(.optiTrack) && UserInSession.shared.isSetUserIdSucceed == false
-        {
-            guard let userID = UserInSession.shared.customerID else {return}
-            optiTrack?.set(userID: userID)
-        }
-    }
-    
+   
     /// validate the permissions of the client to use optitrack component and if permit validate the userID content and sends:
     /// - conversion request to the DB
     /// - new customer registraion to the registration end point
@@ -456,7 +429,7 @@ import XCGLogger
             OptimoveComponentsInitializer.init(isClientFirebaseExist: UserInSession.shared.userHasFirebase).startFromLocalConfigs()
             logger.error("finish local init of optimove: \(Date.init().timeIntervalSince1970)")
         }
-        notificationHandler.buildPushNotification(userInfo: userInfo,
+        notificationHandler.handleNotification(userInfo: userInfo,
                                                   completionHandler: completionHandler)
         
         
@@ -519,6 +492,37 @@ import XCGLogger
     {
         let webView = UIWebView(frame: .zero)
         return webView.stringByEvaluatingJavaScript(from: "navigator.userAgent") ?? ""
+    }
+    
+    private func registerIfNeeded()
+    {
+        if monitor.isComponentInternallyAvailable(.optiPush) && UserInSession.shared.fcmToken != nil &&  UserInSession.shared.isRegistrationSuccess == false
+        {
+            optiPush?.registrar.register()
+        }
+    }
+    
+    private func reportSetUserIdIfNeeded()
+    {
+        if monitor.isComponentInternallyAvailable(.optiTrack) && UserInSession.shared.isSetUserIdSucceed == false
+        {
+            guard let userID = UserInSession.shared.customerID else {return}
+            optiTrack?.set(userID: userID)
+        }
+    }
+    
+    
+    /// Validate and send the event to Optitrack component
+    ///
+    /// - Parameters:
+    ///   - event: optimove event object
+    ///   - completionHandler: A block object to be executed when the report sequence ends. This block has no return value and takes a single Error argument that indicates whether or not the report actually finished before the completion handler was called. This parameter may be NULL.
+    private func handleReport(event:OptimoveEvent, completionHandler: ((OptimoveError?) -> Void)? = nil)
+    {
+        evetReportingQueue.async
+            {
+                self.report(event:event, completionHandler:completionHandler)
+        }
     }
     
     @objc func dispatchNow()

@@ -35,43 +35,43 @@ struct Keys
     enum Configuration: String
     {
         //MARK: General configuration
-        case enableOptitrack                            = "enable_optitrack"
-        case enableOptipush                             = "enable_optipush"
-        case enableVisitors                             = "enable_visitors"
-        case enableRealtime                             = "enable_realtime"
-        case tenantId                                   = "tenant_id"
+        case enableOptitrack                            = "enableOptitrack"
+        case enableOptipush                             = "enableOptipush"
+        case enableVisitors                             = "enableVisitors"
+        case enableRealtime                             = "enableRealtime"
+//        case tenantId                                   = "tenant_id"
         
         //MARK: - optitrack configurations
-        case optitrackMetaData                          = "optitrack_metadata"
-        case sendUserAgentHeader                        = "send_user_agent_header"
-        case enableAdvertisingIdReport                  = "enable_advertising_id_report"
-        case enableHeartBeatTimer                       = "enable_heart_beat_timer"
-        case heartBeatTimer                             = "heart_beat_timer"
-        case eventCategoryName                          = "event_category_name"
-        case eventIdCustomDimensionId                   = "event_id_custom_dimension_id"
-        case eventNameCustomDimensionId                 = "event_name_custom_dimension_id"
-        case visitCustomDimensionsStartId               = "visit_custom_dimensions_start_id"
-        case maxVisitCustomDimensions                   = "max_visit_custom_dimensions"
-        case actionCustomDimensionsStartId              = "action_custom_dimensions_start_id"
-        case maxActionCustomDimensions                  = "max_action_custom_dimensions"
-        case optitrackEndpoint                          = "optitrack_endpoint"
-        case siteId                                     = "site_id"
+        case optitrackMetaData                          = "optitrackMetaData"
+        case sendUserAgentHeader                        = "sendUserAgentHeader"
+        case enableAdvertisingIdReport                  = "enableAdvertisingIdReport"
+        case enableHeartBeatTimer                       = "enableHeartBeatTimer"
+        case heartBeatTimer                             = "heartBeatTimer"
+        case eventCategoryName                          = "eventCategoryName"
+        case eventIdCustomDimensionId                   = "eventIdCustomDimensionId"
+        case eventNameCustomDimensionId                 = "eventNameCustomDimensionId"
+        case visitCustomDimensionsStartId               = "visitCustomDimensionsStartId"
+        case maxVisitCustomDimensions                   = "maxVisitCustomDimensions"
+        case actionCustomDimensionsStartId              = "actionCustomDimensionsStartId"
+        case maxActionCustomDimensions                  = "maxActionCustomDimensions"
+        case optitrackEndpoint                          = "optitrackEndpoint"
+        case siteId                                     = "siteId"
         
         //MARK: - optipush configuration
         case mobile                                     = "mobile"
-        case optipushMetaData                           = "optipush_metadata"
-        case registrationServiceOtherEndPoint           = "other_registration_service_endpoint"
-        case registrationServiceRegistrationEndPoint    = "only_registration_service_endpoint"
-        case firebaseProjectKeys                        = "firebase_project_keys"
-        case clientServiceProjectKeys                   = "clients_service_project_keys"
-        case appIds                                     = "app_ids"
-        case appId                                      = "app_id"
+        case optipushMetaData                           = "optipushMetaData"
+        case registrationServiceOtherEndPoint           = "otherRegistrationServiceEndpoint"
+        case registrationServiceRegistrationEndPoint    = "onlyRegistrationServiceEndpoint"
+        case firebaseProjectKeys                        = "firebaseProjectKeys"
+        case clientServiceProjectKeys                   = "clientsServiceProjectKeys"
+        case appIds                                     = "appIds"
+        case appId                                      = "appId"
         case ios                                        = "ios"
-        case webApiKey                                  = "web_api_key"
-        case dbUrl                                      = "db_url"
-        case senderId                                   = "sender_id"
-        case storageBucket                              = "storage_bucket"
-        case projectId                                  = "project_id"
+        case webApiKey                                  = "webApiKey"
+        case dbUrl                                      = "dbUrl"
+        case senderId                                   = "senderId"
+        case storageBucket                              = "storageBucket"
+        case projectId                                  = "projectId"
         case clientServiceAppNs                         = "ios.master.app"
         
         //MARK:  - events configurations
@@ -79,15 +79,15 @@ struct Keys
         case events                                     = "events"
         case setAdvertisingId                           = "set_advertising_id"
         case id                                         = "id"
-        case supportedOnOptitrack                       = "supported_on_optitrack"
-        case supportedOnRealTime                        = "supported_on_realtime"
+        case supportedOnOptitrack                       = "supportedOnOptitrack"
+        case supportedOnRealTime                        = "supportedOnRealTime"
         case parameters                                 = "parameters"
-        case advertisingId                              = "advertising_id"
+        case advertisingId                              = "advertisingId"
         case optional                                   = "optional"
         case name                                       = "name"
         case type                                       = "type"
-        case optiTrackDimensionId                       = "optitrack_dimension_id"
-        case deviceId                                   = "device_id"
+        case optiTrackDimensionId                       = "optiTrackDimensionId"
+        case deviceId                                   = "deviceId"
         case appNs                                      = "app_ns"
         
         case stitchEvent                                = "stitch_event"
@@ -130,6 +130,13 @@ struct Keys
         case campaignType       = "campaign_type"
         case isOptipush         = "is_optipush"
         case collapseId         = "collapse_Key"
+        case dynamikLink        = "dynamic_link"
+    }
+    
+    enum Topics:String
+    {
+        case fcmToken   = "fcmToken"
+        case topics     = "topics"
     }
 }
 
@@ -162,24 +169,28 @@ enum MediaType: String
 
 var TenantID : Int?
 {
-    get {
+    get
+    {
         return UserInSession.shared.siteID
     }
 }
 var Verison :String?
 {
-    get {
+    get
+    {
         return UserInSession.shared.version
     }
 }
 var CustomerID :String? {
-    get {
+    get
+    {
         return UserInSession.shared.customerID
     }
 }
 var VisitorID :String?
 {
-    get {
+    get
+    {
         return UserInSession.shared.visitorID
     }
 }
@@ -196,15 +207,6 @@ var OSVersion : String
     {
         return UIDevice.current.systemVersion
     }
-}
-
-var ShouldLogToConsole : Bool
-{
-    #if DEBUG
-        return true
-    #else
-        return false
-    #endif
 }
 
 typealias UserAgent = String

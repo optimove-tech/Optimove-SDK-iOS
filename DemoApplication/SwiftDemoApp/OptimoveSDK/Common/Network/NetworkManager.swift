@@ -1,4 +1,4 @@
-//
+ //
 //  NetworkManager.swift
 //  iOS-SDK
 //
@@ -31,6 +31,73 @@ class NetworkManager
                                                       version: version)
         { (data, error) in
             didComplete(data, error)
+        }
+    }
+    static func generateRequest(toUrl url:URL,json:Data) -> URLRequest
+    {
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 60
+        request.httpMethod = HttpMethod.post.rawValue
+        request.httpBody = json
+        request.setValue(MediaType.json.rawValue,
+                         forHTTPHeaderField: HttpHeader.contentType.rawValue)
+        return request
+    }
+    
+    fileprivate static func composeTopicRegistrationRequest(_ fcmToken: String, _ topics: [String]) -> Data {
+        var requestJsonData = [String: Any]()
+        requestJsonData[Keys.Topics.fcmToken.rawValue] = fcmToken
+        requestJsonData[Keys.Topics.topics.rawValue] = topics
+        return try! JSONSerialization.data(withJSONObject: requestJsonData, options: .prettyPrinted)
+    }
+    
+    static func register(fcmToken:String, toTopics topics: [String])
+    {
+        func generateRegistrationSessionDataTask(fromRequest request:URLRequest) -> URLSessionDataTask
+        {
+            let task = URLSession.shared.dataTask(with: request)
+            { (data, response, error) in
+                
+            }
+            return task
+        }
+        
+        var endPoint = ""
+        if let ep = Optimove.sharedInstance.optiPush?.registrar.reportEndPoint {
+         endPoint = ep + "registerClientToTopics"
+        }
+        
+        if let url  = URL(string: endPoint)
+        {
+            let json = composeTopicRegistrationRequest(fcmToken, topics)
+            let request = NetworkManager.generateRequest(toUrl: url,json: json )
+            let task = generateRegistrationSessionDataTask(fromRequest: request)
+            task.resume()
+        }
+    }
+    
+    static func unregister(fcmToken:String, fromTopics topics: [String])
+    {
+        func generateRegistrationSessionDataTask(fromRequest request:URLRequest) -> URLSessionDataTask
+        {
+            let task = URLSession.shared.dataTask(with: request)
+            { (data, response, error) in
+                
+            }
+            return task
+        }
+        
+        var endPoint = ""
+        if let ep = Optimove.sharedInstance.optiPush?.registrar.reportEndPoint {
+            endPoint = ep + "unregisterClientFromTopics"
+        }
+        
+        if let url  = URL(string: endPoint)
+        {
+            let json = composeTopicRegistrationRequest(fcmToken, topics)
+            let request = NetworkManager.generateRequest(toUrl: url,json: json )
+            let task = generateRegistrationSessionDataTask(fromRequest: request)
+            task.resume()
         }
     }
     

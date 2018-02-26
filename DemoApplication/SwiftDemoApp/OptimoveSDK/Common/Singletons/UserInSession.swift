@@ -13,27 +13,28 @@ class UserInSession: Synchronizable
     let lock:NSLock
     enum UserDefaultsKeys: String
     {
-        case configurationEndPoint  = "configurationEndPoint"
-        case isOptIn                = "isOptIn"
-        case isFirstConversion      = "isFirstConversion"
-        case tenantToken            = "tenantToken"
-        case siteID                 = "siteID"
-        case version                = "version"
-        case customerID             = "customerID"
-        case visitorID              = "visitorID"
-        case deviceToken            = "deviceToken"
-        case fcmToken               = "fcmToken"
-        case isFirstLaunch          = "isFirstLaunch"
-        case hasOptInOutJsonFile    = "hasOptInOutJsonFile"
-        case hasRegisterJsonFile    = "hasRegisterJsonFile"
-        case hasUnregisterJsonFile  = "hasUnregisterJsonFile"
-        case userAgentHeader        = "userAgentHeader"
-        case registrationSuccess    = "registrationSuccess"
-        case optSuccess             = "optSuccess"
-        case isSetUserIdSucceed     = "isSetUserIdSucceed"
-        case userHasFirebase        = "userHasFirebase"
-        case apnsToken               = "apnsToken"
-        case backupNotificationEvents = "backupNotificationEvents"
+        case configurationEndPoint      = "configurationEndPoint"
+        case isOptIn                    = "isOptIn"
+        case isFirstConversion          = "isFirstConversion"
+        case tenantToken                = "tenantToken"
+        case siteID                     = "siteID"
+        case version                    = "version"
+        case customerID                 = "customerID"
+        case visitorID                  = "visitorID"
+        case deviceToken                = "deviceToken"
+        case fcmToken                   = "fcmToken"
+        case isFirstLaunch              = "isFirstLaunch"
+        case hasOptInOutJsonFile        = "hasOptInOutJsonFile"
+        case hasRegisterJsonFile        = "hasRegisterJsonFile"
+        case hasUnregisterJsonFile      = "hasUnregisterJsonFile"
+        case userAgentHeader            = "userAgentHeader"
+        case registrationSuccess        = "registrationSuccess"
+        case optSuccess                 = "optSuccess"
+        case isSetUserIdSucceed         = "isSetUserIdSucceed"
+        case userHasFirebase            = "userHasFirebase"
+        case apnsToken                  = "apnsToken"
+        case backupNotificationEvents   = "backupNotificationEvents"
+        case hasConfigurationFile       = "hasConfigurationFile"
     }
     
     static let shared = UserInSession()
@@ -241,6 +242,20 @@ class UserInSession: Synchronizable
                                                 key: UserDefaultsKeys.hasOptInOutJsonFile.rawValue)
         }
     }
+    
+    var hasConfigurationFile : Bool?
+    {
+        get
+        {
+            return UserDefaults.standard.value(forKey: UserDefaultsKeys.hasConfigurationFile.rawValue) as? Bool
+        }
+        set
+        {
+            self.setDefaultObject(forObject: newValue as Any,
+                                  key: UserDefaultsKeys.hasConfigurationFile.rawValue)
+        }
+    }
+    
     
     var hasRegisterJsonFile : Bool?
     {

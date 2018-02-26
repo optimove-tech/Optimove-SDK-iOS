@@ -21,6 +21,7 @@ class FirebaseInteractor:NSObject
     var clientHasFirebase:Bool
     var appController: FirebaseOptions?
     var clientServiceOptions:FirebaseOptions?
+    
     //MARK: Constructors
     init(clientHasFirebase:Bool)
     {
@@ -43,7 +44,8 @@ class FirebaseInteractor:NSObject
         if !clientHasFirebase
         {
             Optimove.sharedInstance.logger.debug("user indicate not hosted firebase")
-            if FirebaseApp.app() == nil {
+            if FirebaseApp.app() == nil
+            {
                 FirebaseApp.configure(options: appController)
             }
         }
@@ -71,6 +73,7 @@ class FirebaseInteractor:NSObject
         return true
     }
     
+    //MARK: - Private Methods
     private func generateOptimoveSecondaryOptions(from firebaseKeys: FirebaseMetaData) -> FirebaseOptions?
     {
         guard let webApiKey = firebaseKeys.webApiKey,
@@ -93,7 +96,7 @@ class FirebaseInteractor:NSObject
         return appControllerOptions
     }
     
-    func isNewFcmToken(receivedToken received:String) -> Bool
+    private func isNewFcmToken(receivedToken received:String) -> Bool
     {
         if let oldFCM = UserInSession.shared.fcmToken
         {
@@ -167,17 +170,35 @@ extension FirebaseInteractor:MessagingDelegate
     
     func subscribeTestMode()
     {
+        var topic = ""
         if let bundleID = Bundle.main.bundleIdentifier
         {
-            Messaging.messaging().subscribe(toTopic: "test_" + bundleID)
+            topic = "test_" + bundleID
+            
+            if !clientHasFirebase {
+                Messaging.messaging().subscribe(toTopic: topic)
+            } else {
+                if let fcm = UserInSession.shared.fcmToken {
+                    NetworkManager.register(fcmToken:  fcm, toTopics: [topic])
+                }
+            }
+            
         }
     }
     
     func unsubscribeTestMode()
     {
+        var topic = ""
         if let bundleID = Bundle.main.bundleIdentifier
         {
-            Messaging.messaging().unsubscribe(fromTopic: "test_" + bundleID)
+            topic = "test_" + bundleID
+            if !clientHasFirebase {
+                Messaging.messaging().unsubscribe(fromTopic: topic)
+            } else {
+                if let fcm = UserInSession.shared.fcmToken {
+                    NetworkManager.unregister(fcmToken: fcm, fromTopics: [topic])
+                }
+            }
         }
     }
     func handleRegistration(token:Data)
