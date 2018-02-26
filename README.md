@@ -30,45 +30,54 @@ perform the following steps.</br>
 [![apple_dashboared.png](https://s9.postimg.org/9ln5sfxe7/apple_dashboared.png)](https://postimg.org/image/itfe954gb/)
  
 
-## Installation
+## Setting up the SDK
+Optimove SDK for iOS is provided as a group of files within a Folder named “OptimoveSDK”.<br>
 
-The SDK is provided as a group of files, sitting inside a Folder name “Optimove”.
+To install the SDK, drag the folder into your project. <br>
 
-Drag the folder inside your project.
+If not all files inside the folder are members of the target application, add them.<br>
 
-Verify that all the files inside the folder members of the target application, if not add them.
+In order to work with the Optimove SDK, you also need to download some modules from CocoaPods. <br>
+In your Podfile, add the following:
 
+````swift
+pod 'Firebase','~> 4.8.0'
+pod 'FirebaseMessaging', '~> 2.0.8'
+pod 'FirebaseDynamicLinks', '~> 2.3.1'
+pod 'XCGLogger', '~> 6.0.2'
+pod 'OptimovePiwikTracker'
+````
 
-## SDK Setup:<br>
-In your AppDelegate class, inside method
- ```swift 
+In your AppDelegate class, inside the
+````swift
 application (_: didFinishLaunchingWithOptions:)
-```
-Create a new `OptimoveTenantInfo` object.
-> Note:this object should cotain:<br>
->1. Optimove Unique token.<br>
->2. Configuration key provided by Optimove CSM<br>
->3. Indication for exsiting Firebase module inside your application.
+````
+method, create a new `OptimoveTenantInfo` object.
+This object should cotain:<br>
+1. The end-point URL<br>
+2. Unique Optimove token.<br>
+3. Configuration key provided by Optimove CSM<br>
+4. Indication for exsiting Firebase module inside your application.<br>
 
 Use this Object as an argument for the SDK Function
- ```swift 
+```swift
  Optimove.sharedInstance.configure(info:) 
 ```
-This call would initialize the `OptimoveSDK` Singleton.
+This call initializes the _`OptimoveSDK`_ Singleton.
 
 for example:
-```swift
+````swift
 func application(_ application: UIApplication,
 didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 let info = OptimoveTenantInfo(url:"https://optimove.mobile.demo/sdk-configs/", // end-point url
 token: "abcdefg12345678", // token
 version: "myapp.ios.1.0.0", //config name
 hasFirebase: false) // indication for tenant autonomous firebase
-Optimove.sharedInstance.configure(info: info);
-```
+Optimove.sharedInstance.configure(info: info)
+````
 
 The initialization must be called **as soon as possible**, unless the tenant has its own Firebase SDK.
-In this case start the initialization right after calling FirebaseApp.configure().
+In this case start the initialization right after calling  `FirebaseApp.configure()`.
 
 ## State Registration
 
@@ -81,7 +90,8 @@ class AppDelegate: UIResponder,
   {
     var window: UIWindow?
     func application(_ application: UIApplication,
-                     didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool 
+                     didFinishLaunchingWithOptions launchOptions:
+                     [UIApplicationLaunchOptionsKey: Any]?) -> Bool
     {    
         let info = OptimoveTenantInfo(url:"https://optimove.mobile.demo/sdk-configs/",
                                       token: "abcdefg12345678",
@@ -96,69 +106,76 @@ class AppDelegate: UIResponder,
 ```
 Do not forget to implement the _`OptimoveStateDelegate`_ methods, and provide a unique Int id to any enitity that conform to the protocol.
 
-## Analytics
+## Reporting User Activities and Events
 Using the Optimove's iOS SDK, the hosting application can track events with analytical significance.<br>
-These events can range from basic _**`Screen Visits`**_ to _**`Visitor Conversion`**_ and _**`Custom Events`**_ defined in the `Optimove Configuration`.<br>If you want to use optitrack capabilities as your analytics tool, you may use Optimove API such as:
+These events can range from basic _**`Screen Visits`**_ to _**`Visitor Conversion`**_ and _**`Custom Events`**_ defined in the `Optimove Configuration`.<br>
+If you want to use optitrack capabilities as your analytics tool, you may use Optimove API such as:
 
 ### Set User ID
-Once the user has downloaded the application and the SDK run for the first time, the user is considered a _Visitor_, an unknown user.<br>
-At a certain point the user will authenticate and will become identified by a known `PublicCustomerId`, then the user is considered _Customer_.<br>
-Pass that `CustomerId` to the `Optimove` singleton as soon as the authentication occurs.<br>
->Note: the `CustomerId` is usually delivered by the Server App that manages customers, and is integrated with Optimove Data Transfer.<br>
->
->Due to its high importance, `set (userId:)` can be called at any given moment, regardless of the SDK's state.
+Once the user has downloaded the application and the _Optimove SDK_ run for the first time, the user is considered a _Visitor_, i.e. an unidentified person.<br>
+Once the user authenticates and becomes identified by a known `PublicCustomerId`, then the user is considered _Customer_.<br>
+As soon as this happens for each individual user, pass the  `CustomerId` to the `Optimove` singleton like this: <br>
 ```swift
 Optimove.sharedInstance.set(userId:)
 ```
+
+>Note: the `CustomerId` is usually provided by the Server App that manages customers, and is the same ID provided to Optimove during the daily customer data transfer.<br>
+>
+>Due to its high importance, `set (userId:)` may be called at any time, regardless of the SDK’s state.
+
 ### Report Screen Event
-To target which screens the user has visited in the app, create a new `ScreenName` event with the appropriate `screenName` and pass it to the `Optimove` singleton.
-```swift
-Optimove.sharedInstance.reportEvent(event: ScreenName(screenName: "report event screen"))
-```
+To track which screens the user has visited in your app, send a _setScreenEvent_ message to the shared Optimove instance:.<br>
+
+````swift
+Optimove.sharedInstance.setScreenEvent(viewControllersIdentifiers:url)
+````
+The _`viewControllersIdentifiers`_ argument should include an array that represents the path to the current screen.<br>
+To support more complex view hierarchies, you may also specify a screen URL in the second parameter.<br>
+
 ### Report Custom Event
-To create a _**`Custom Event`**_ (not provided as a predefined event by Optimove) implement the `OptimoveEvent protocol`.<br>
+To report a _**`Custom Event`**_ (one defined by you and the Optimove Integration Team and already configured in your Optimove site), you must implement the `OptimoveEvent` protocol.<br>
 The protocol defines 2 properties:
 1. `name: String` - Declares the custom event's name
-2. `parameters: [String:Any]` - Defines the custom event's parameters.
+2. `parameters: [String:Any]` - Defines the custom event's parameters.<br>
 Then send that event through the `reportEvent(event:)` method of the `Optimove` singleton.
->Note: Any _**`Custom Event`**_ must be declared in the _Tenant Configurations_. <br>
-_**`Custom Event`**_ reporting is only supported when OptiTrack Feature is enabled.
 
-```swift
+````swift
 override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        Optimove.sharedInstance.reportEvent(event: MyCustomEvent())
-    }
-```
->Note: The usage of `reportEvent` function depends on your needs.<br>
+super.viewDidAppear(animated)
+Optimove.sharedInstance.reportEvent(event: MyCustomEvent())
+}
+````
+>Note:<br>
+* All _**`Custom Event`**_ must be declared in the _Tenant Configurations_. <br>
+* _**`Custom Event`**_ reporting is only supported when OptiTrack Feature is enabled.<br>
+*  The usage of `reportEvent` function depends on your needs.<br>
 This function may include a completion handler that will be called once the report has finished, the default value for this argument is nil.
 
 
 ## Optipush:
+_*Optipush*_ is Optimove’s mobile push notification delivery add-in module, powering all aspects of preparing, delivering and tracking mobile push notification communications to customers, seamlessly from within Optimove.<br> _*Optimove SDK*_ for iOS includes built-in functionality for receiving push messages, presenting notifications in the app UI and tracking user responses.
 
-Optimove SDK provides Push Notification support.<br>
-A Prerequsite for the Push Notiication support is to receive APNs token from the developer.
-
-### Support the Token Delivery to the Optimove SDK using the following steps:
-Inside the application `AppDelegate` class
- ```swift 
+In order for Optipush to be able to deliver push notifications to your iOS app, Optimove SDK for iOS must receive an APN token from your app. This is accomplished by the following  steps:
+Inside the application `AppDelegate` class <br>
+````swift
 application(_:didRegisterForRemoteNotificationsWithDeviceToken:)
-``` 
-call
- ```swift 
- Optimove.sharedInstance.application(didRegisterForRemoteNotificationsWithDeviceToken:)
- ```
-And  in
-```swift
-application(_:didReceiveRemoteNotification:fetchCompletionHandler:)
-```
- call 
- ```swift
- Optimove.sharedInstance.handleRemoteNotificationArrived(userInfo:fetchCompletionHandler)
- ```
+````
+call <br>
 
- example:
- ```swift
+````swift
+ Optimove.sharedInstance.application(didRegisterForRemoteNotificationsWithDeviceToken:)
+````
+And  in <br>
+````swift
+application(_:didReceiveRemoteNotification:fetchCompletionHandler:)
+````
+ call <br>
+````swift
+ Optimove.sharedInstance.handleRemoteNotificationArrived(userInfo:fetchCompletionHandler)
+````
+
+ example:<br>
+````swift
  
   func application(_ application: UIApplication,
                      didReceiveRemoteNotification userInfo: [AnyHashable : Any],
@@ -175,11 +192,12 @@ application(_:didReceiveRemoteNotification:fetchCompletionHandler:)
         Optimove.sharedInstance.application(didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
     }
  
- ```
+````
 
 ## Deep Link:
 
-Other than _UI attributes_, an **_Optipush Notification_** can contain metadata that can lead the user to a specific screen within the hosting application, alongside custom (screen specific) data.<br>
+Other than _UI attributes_, an **_Optipush Notification_** can contain metadata linking to a specific screen within your application, along with custom (screen specific) data.<br>
+
 To support deep linking, you should:
 
 * Enable Associated Domains:
@@ -189,35 +207,36 @@ In your project capabilities, add the dynamic link domain with `applinks:` prefi
 <br>
 Any  _`ViewControler`_ should recieve DynamicLink data callback, should implement _`didReceive(dynamicLink:)`_, thus conforming to _`DynamicLinkCallback`_ protocol .<br>
 _`DynamicLinkCallback`_ protocol has one method:
-```swift
+````swift
 didReceive(dynamicLink:)
-```
+````
 
 A dynamicLinkComponent struct contains two properties:
 
-· ScreenName: for the required viewcontroller you need to segue to.
+· ScreenName: for the required _*viewcontroller*_ you need to segue to.
 
-· Query: That contain the content should be included in that view controller.
+· Query: That contain the content that should be included in that view controller.
 
 example:
-```swift
- func didReceive(dynamicLink: DynamicLinkComponents?)
+````swift
+func didReceive(deepLink: OptimoveDeepLinkComponents?) {
+    if let deepLink = deepLink {
+    DispatchQueue.main.asyncAfter(deadline: .now()+2.0)
     {
-        guard let dynamicLink = dynamicLink else {return}
-        switch dynamicLink.screenName {
-        case "required_screen":
-            guard let vc = dynamicLink.query["id"] else {return}
-                self.navigationController?.pushViewController(vc, animated: true)
-        default:
-            return
+        if let vc = self.storyboard?.instantiateViewController(withIdentifier: deepLink.screenName) {
+            self.navigationController?.pushViewController(vc, animated: true)
+            }
         }
     }
-```
+}
+````
 
 ### Test Optipush Templates
-It might be desired to test an **_Optipush Template_** on an actual device before creating an **_Optipush Campaign_**. To enable _"test campaigns"_ on one or more devices, call the _**`Optimove.sharedInstance.subscribeToTestMode()`**_ method. To stop receiving _"test campaigns"_ call the _**`Optimove.sharedInstance.unSubscribeFromTestMode()`**_.
+t is usually desirable to test an **_Optipush Template_** on an actual device before sending an **_Optipush Campaign_** to users.<br>
+To enable _"test campaigns"_ on one or more devices, call the _**`Optimove.sharedInstance.subscribeToTestMode()`**_ method.<br>
+To stop receiving _"test campaigns"_ call  _**`Optimove.sharedInstance.unSubscribeFromTestMode()`**_.<br>
 
-```swift
+````swift
 class ViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
@@ -225,7 +244,7 @@ class ViewController: UIViewController {
         Optimove.sharedInstance.subscribeToTestMode()                              
     }
 }
-```
+````
 
 ## Special Use Cases
 
@@ -234,7 +253,7 @@ class ViewController: UIViewController {
 #### Installation
 
 The _Optimove iOS SDK_ is dependent upon the _Firebase iOS SDK_.<br>
-If the application into which the **_Optimove iOS SDK_** is integrated already uses **_Firebase SDK_** or has a dependency with **_Firebase SDK_**, a build conflict might occur, and even **Runtime Exception**, due to backwards compatibility issues.<br>
+If your application already uses **_Firebase SDK_** or has a dependency with **_Firebase SDK_**, a build conflict or  runtime exception may occur,  due to backwards compatibility issues.<br>
 Therefor, it is highly recommended to match the application's **_Firebase SDK version_** to Optimove's **_Firebase SDK version_** as detailed in the following table.
 
 
