@@ -256,7 +256,6 @@ The _Optimove iOS SDK_ is dependent upon the _Firebase iOS SDK_.<br>
 If your application already uses **_Firebase SDK_** or has a dependency with **_Firebase SDK_**, a build conflict or  runtime exception may occur,  due to backwards compatibility issues.<br>
 Therefor, it is highly recommended to match the application's **_Firebase SDK version_** to Optimove's **_Firebase SDK version_** as detailed in the following table.
 
-
 | Optimove SDK Version | Firebase Version | Firebase Messaging Version | FirebaseDynamicLinks |   
 | --- | --- | --- | --- | 
 | 1.0.4               | 4.8.0            | 2.0.8                      | 2.3.1                |
