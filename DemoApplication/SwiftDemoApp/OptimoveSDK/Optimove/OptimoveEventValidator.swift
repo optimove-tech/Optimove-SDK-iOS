@@ -62,7 +62,7 @@ class OptimoveEventValidator
             }
             switch config.type //Verify Type is as defined
             {
-                case "number":
+                case "Number":
                     guard let numberValue = value as? NSNumber
                     else
                     {
@@ -75,7 +75,7 @@ class OptimoveEventValidator
                         return
                     }
 
-                case "string":
+                case "String":
                     guard let stringValue = value as? String
                     else
                     {

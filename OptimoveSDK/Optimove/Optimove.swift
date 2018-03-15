@@ -174,7 +174,7 @@ import XCGLogger
         }
     }
     
-    func report(event:OptimoveEvent, completionHandler: ResultBlockWithError? = nil)
+    func report(event:OptimoveEvent, completionHandler:  ((OptimoveError?) -> Void)? = nil)
     {
         guard let eventValidator = self.eventValidator else
         {
