@@ -111,7 +111,8 @@ struct Keys
         case optipushOptOut                             = "optipush_opt_out"
         case afterSetUserId                             = "after_set_user_id"
         case setUserAgent                               = "user_agent_header_event"
-        case userAgentHeader                            = "user_agent_header"
+        case userAgentHeader1                            = "user_agent_header1"
+        case userAgentHeader2                            = "user_agent_header2"
         case setScreenVisit                             = "set_screen_visit"
         case screenName                                 = "screen_name"
     }

@@ -104,7 +104,7 @@ Firebase SDK version to Optimove’s Firebase SDK:
 
 | **Optimove SDK Version ** | **Firebase Core Version ** | **Firebase Messaging Version ** | **FirebaseDynamicLinks** |
 |---------------------------|----------------------------|---------------------------------|--------------------------|
-| 1.0.3.2                     | 4.8.0                      | 2.0.8                           | 2.3.1                    |
+| 1.0.3.3                     | 4.8.0                      | 2.0.8                           | 2.3.1                    |
 
 Reporting User Activities and Events
 -------------------------------------
