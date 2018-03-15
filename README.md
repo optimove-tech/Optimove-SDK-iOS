@@ -259,4 +259,4 @@ Therefor, it is highly recommended to match the application's **_Firebase SDK ve
 
 | Optimove SDK Version | Firebase Version | Firebase Messaging Version | FirebaseDynamicLinks |   
 | --- | --- | --- | --- | 
-| 1.0.3.1                | 4.8.0            | 2.0.8                      | 2.3.1                |
+| 1.0.3.2                | 4.8.0            | 2.0.8                      | 2.3.1                |
