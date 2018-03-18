@@ -17,12 +17,18 @@ Please follow these instructions carefully to ensure that you’ll have an easy 
 Before you can begin using Optimove SDK for iOS, you will need to
 perform the following steps.</br>
 
-* A *tenant_information_suite* provided during the initial integration with Optimove and contains the following:
-        `end-point url` - The URL where the **_tenant configurations_** reside
-        `token` - The actual token, unique per tenant
-        `config name` - The name of the desired configuration
-* Tenant has a paid development account, and valid certificates for remote notifications or APN Auth key.
-* Deliver The APN Auth key (preferred) or APN Certificates was delivered to Optimove CSM.
+* A *tenant_information_suite* provided during the initial integration with Optimove and contains the following: </br>
+        `end-point url` - The URL where the **_tenant configurations_** reside </br>
+        `token` - The actual token, unique per tenant </br>
+        `config name` - The name of the desired configuration</br>
+* Tenant has a paid development account, and valid certificates for remote notifications or APN Auth key.</br>
+* Deliver The APN Auth key to Optimove CSM.</br>
+    1.  In your developer account, go to Certificates, Identifiers & Profiles, and under Keys, select All.
+    2.  Click the Add button (+) in the upper-right corner.
+    3. Enter a description for the APNs Auth Key
+    4. Under Key Services, select the APNs checkbox, and click Continue.
+    5. Click Confirm and then Download. Save your key in a secure place.
+    6. Remember Not to rename the file.
 * Deliver the Team ID
 * Deliver the Appstore ID of the application
 * Enable push notification and remote notification capabilities in your project
@@ -256,6 +262,7 @@ The _Optimove iOS SDK_ is dependent upon the _Firebase iOS SDK_.<br>
 If your application already uses **_Firebase SDK_** or has a dependency with **_Firebase SDK_**, a build conflict or  runtime exception may occur,  due to backwards compatibility issues.<br>
 Therefor, it is highly recommended to match the application's **_Firebase SDK version_** to Optimove's **_Firebase SDK version_** as detailed in the following table.
 
-| Optimove SDK Version | Firebase Version | Firebase Messaging Version | FirebaseDynamicLinks |   
-| --- | --- | --- | --- | 
-| 1.0.4               | 4.8.0            | 2.0.8                      | 2.3.1                |
+
+| Optimove SDK Version | Firebase Version | Firebase Messaging Version | FirebaseDynamicLinks |
+| -------------------- | ---------------- | -------------------------- | -------------------- |
+| 1.0.2                | 4.8.0            | 2.0.8                      | 2.3.1                |

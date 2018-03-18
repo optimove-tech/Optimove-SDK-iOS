@@ -1,7 +1,7 @@
 # Optimove SDK for iOS
 ====================
 
-###Introduction
+### Introduction
 ------------
 
 Marketers use Optimove to automate the execution of highly-personalized
@@ -10,12 +10,12 @@ Optimove clients an efficient way to integrate their iOS apps with
 Optimove for two primary purposes:
 
 -   Reporting user actions and events in realtime (used for customer
-analytics, customer targeting and the delivery of realtime,
-activity-triggered emails and website pop-ups)
+    analytics, customer targeting and the delivery of realtime,
+    activity-triggered emails and website pop-ups)
 
 -   Enabling Optimove to automatically send hyper-targeted, personalized
-push notification messages to app users (requires purchase of the
-Optipush add-on module)
+    push notification messages to app users (requires purchase of the
+    Optipush add-on module)
 
 The primary audience of this document is the technical staff who will
 implement the SDK in the company’s apps, while marketing/business
@@ -28,21 +28,27 @@ Before you can begin using Optimove SDK for iOS, you will need to
 perform the following steps.
 
 1.  Acquire a *tenant\_information\_suite* from the Optimove
-Integration Team. This contains:
+    Integration Team. This contains:
 
-1.  _`end-point url`_ – The URL where the tenant configurations reside
+    1.  _`end-point url`_ – The URL where the tenant configurations reside
 
-2.  _`token`_ – The actual token, unique per tenant
+    2.  _`token`_ – The actual token, unique per tenant
 
-3.  _`config name`_ – The version of the desired configuration
+    3.  _`config name`_ – The version of the desired configuration
 
 2.  Acquire a paid development account and valid certificates for remote
-notifications or APN Auth key.
+    notifications or APN Auth key.
 
 3.  Deliver the following information to your Optimove Customer Success Manager (CSM):</br>
-* APN Auth key (preferred) or APN Certificate.
-* Team ID
-* App Store ID
+* APN Auth key:</br>
+                    1.   In your developer account, go to Certificates, Identifiers & Profiles, and under Keys, select All.</br>
+                    2.  Click the Add button (+) in the upper-right corner.</br>
+                    3. Enter a description for the APNs Auth Key</br>
+                    4. Under Key Services, select the APNs checkbox, and click Continue.</br>
+                    5. Click Confirm and then Download. Save your key in a secure place.</br>
+                    6. Remember Not to rename the file.</br>
+* Team ID</br>
+* App Store ID </br>
 
 4.  Enable push notifications and remote notification capabilities in your project (this step is required only for sending push notifications using Optipush).
 
@@ -56,28 +62,28 @@ To install the SDK, drag this folder into your project. If not all files inside 
 
 In order to work with the Optimove SDK, you also need to download some modules from CocoaPods. In your Podfile, add the following: </br>
 
-pod 'Firebase','~> 4.8.0' </br>
-pod 'FirebaseMessaging', '~> 2.0.8' </br>
-pod 'FirebaseDynamicLinks', '~> 2.3.1' </br>
-pod 'XCGLogger', '~> 6.0.2' </br>
+pod 'Firebase', '~> 4.8.0' </br>
+pod 'FirebaseMessaging',  '~> 2.0.8' </br>
+pod 'FirebaseDynamicLinks',  '~> 2.3.1' </br>
+pod 'XCGLogger',  '~> 6.0.2' </br>
 pod 'OptimovePiwikTracker' </br>
 **Important**: For any Header file that uses the Optimove SDK, add an import with your module name followed by '-Swift.h', such as
-````smalltalk
+````objective-c
 #import "HelloWorld-Swift.h" </br>
 ````
-In your AppDelegate class, inside the application (_: didFinishLaunchingWithOptions:) method, create a new OptimoveTenantInfo object. This object should contain: </br>
+In your AppDelegate class, inside the application (_: didFinishLaunchingWithOptions: ) method, create a new OptimoveTenantInfo object. This object should contain: </br>
 
 1. The end-point URL
 2. Unique Optimove token
 3. The configuration key provided by your CSM
 4. Indication for existing Firebase module inside your application
 Use this object as an argument for the SDK function:
-````smalltalk
+````objective-c
 [Optimove.sharedInstance configureWithInfo:info];
 ````
 This call initializes the OptimoveSDK singleton. For example:
 
-````smalltalk
+````objective-c
 - (BOOL)application:(UIApplication \*)application
 didFinishLaunchingWithOptions:(NSDictionary \*)launchOptions {
 
@@ -104,9 +110,9 @@ Firebase SDK version to Optimove’s Firebase SDK:
 
 | **Optimove SDK Version ** | **Firebase Core Version ** | **Firebase Messaging Version ** | **FirebaseDynamicLinks** |
 |---------------------------|----------------------------|---------------------------------|--------------------------|
-| 1.0.4                    | 4.8.0                      | 2.0.8                           | 2.3.1                    |
+| 1.0.2                     | 4.8.0                      | 2.0.8                           | 2.3.1                    |
 
-Reporting User Activities and Events
+Reporting User Activities and Events 
 -------------------------------------
 
 Use Optimove SDK for iOS to report all relevant user actions and
@@ -138,7 +144,7 @@ Optimove singleton like this:
 
 Note: The CustomerId is usually provided by the server application that
 manages customers, and is the same ID provided to Optimove during the
-daily customer data transfer. Due to its high importance, set (userId:)
+daily customer data transfer. Due to its high importance, set (userId: )
 may be called at any time, regardless of the SDK’s state.
 
 ### Reporting a Screen Visit Event
@@ -163,31 +169,31 @@ This protocol defines two properties:
 1.  name: String – Declares the custom event’s name
 
 2.  parameters: \[String:Any\] – Specifies the custom
-event’s parameters.
+    event’s parameters.
 
-Then, send that event through the reportEvent(event:) method of the
+Then, send that event through the reportEvent(event: ) method of the
 Optimove singleton:
 
 - (IBAction)userPressOnSend:(UIButton *)sender {
-NSString* stringInput = _stringTextField.text;
-NSNumber* numberInput = @([_numberTextField.text intValue]);
-CombinedEvent* event = [[CombinedEvent alloc] initWithStringInput:stringInput andNumberInput:numberInput];
-[Optimove.sharedInstance reportEventWithEvent:event completionHandler:nil];
+    NSString* stringInput = _stringTextField.text;
+    NSNumber* numberInput = @([_numberTextField.text intValue]);
+    CombinedEvent* event = [[CombinedEvent alloc] initWithStringInput:stringInput andNumberInput:numberInput];
+    [Optimove.sharedInstance reportEventWithEvent:event completionHandler:nil];
 }
 
 Notes:
 
 -   As already mentioned, all custom events must be pre-defined in your
-Tenant Configurations by the Optimove Integration Team.
+    Tenant Configurations by the Optimove Integration Team.
 
 -   Reporting of custom events is only supported when you have purchased
-the
-[Optitrack](https://docs.optimove.com/implementing-optitrack-website-visitor-tracking/)
-add-in module is enabled.
+    the
+    [Optitrack](https://docs.optimove.com/implementing-optitrack-website-visitor-tracking/)
+    add-in module is enabled.
 
 -   The usage of the reportEvent function depends on your needs. This
-function may include a completion handler that will be called once
-the report has finished. The default value for this argument is nil.
+    function may include a completion handler that will be called once
+    the report has finished. The default value for this argument is nil.
 
 Delivering Push Notifications
 -----------------------------
@@ -205,22 +211,23 @@ This is accomplished by the following two steps:
 
 1.  Inside the application’s AppDelegate class
 ```objective-c
-application:didRegisterForRemoteNotificationsWithDeviceToken:
+    application:didRegisterForRemoteNotificationsWithDeviceToken:
 ````
-, call
-
+,
+    call
 ````objective-c
-[Optimove.sharedInstance applicationWithdidRegisterForRemoteNotificationsWithDeviceToken:];
+    [Optimove.sharedInstance applicationWithdidRegisterForRemoteNotificationsWithDeviceToken:];
 ````
 
 2.  In
 ````objective-c
-application(\_:didReceiveRemoteNotification:fetchCompletionHandler:)
+application(\_:didReceiveRemoteNotification:fetchCompletionHandler: )
 ````
 call
+    
 ````objective-c
-[Optimove.sharedInstance
-handleRemoteNotificationArrived:fetchCompletionHandler];
+    [Optimove.sharedInstance
+    handleRemoteNotificationArrived:fetchCompletionHandler];
 ````
 
 For example:
@@ -230,18 +237,18 @@ didReceiveRemoteNotification:(NSDictionary \*)userInfo
 fetchCompletionHandler:(void
 (^)(UIBackgroundFetchResult))completionHandler {
 
-[Optimove.sharedInstance
+\[Optimove.sharedInstance
 handleRemoteNotificationArrivedWithUserInfo:userInfo
-fetchCompletionHandler:completionHandler];
+fetchCompletionHandler:completionHandler\];
 
 }
 
-- (void) application:(UIApplication *)application
-didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+- (void) application:(UIApplication \*)application
+didRegisterForRemoteNotificationsWithDeviceToken:(NSData \*)deviceToken
 {
 
 \[Optimove.sharedInstance
-applicationWithDidRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+applicationWithDidRegisterForRemoteNotificationsWithDeviceToken:deviceToken\];
 
 }
 ````
@@ -260,23 +267,23 @@ CSM) with the applinks: prefix and without any https:// prefix.
 [![associated_domain.png](https://s9.postimg.org/hqrw4eqm7/associated_domain.png)](https://postimg.org/image/3x3jfcy0r/)
 
 Any ViewController should receive a DeepLink data callback, and should
-implement didReceive(deepLink:), thus conforming to the DeepLinkCallback
+implement didReceive(deepLink: ), thus conforming to the DeepLinkCallback
 protocol.
 
 The DeepLinkCallback protocol has one method:
-```objective-c
-didReceive(deepLink:)
-````
+
+> didReceive(deepLink: )
+
 The deepLinkComponent structure contains two properties:
 
 -   **ScreenName** – for the required ViewController you need to segue
-to
+    to
 
 -   **Query** – contains the content that should be included in that
-view controller
+    view controller
 
 For example:
-````objective-c
+
 - (void) didReceiveWithDeepLink:(OptimoveDeepLinkComponents \*)deepLink
 {
 
@@ -284,7 +291,7 @@ ViewController\* vc = \[\[ViewController alloc\]
 initWithNibName:deepLink.screenName bundle:nil\];
 
 \[\[self navigationController\] pushViewController:vc animated:true\]; }
-````
+
 ### Testing Push Notification Templates
 
 It is usually desirable to test an Optipush push notification template
@@ -295,7 +302,7 @@ To enable “test campaigns” on one or more devices, call the
 
 To stop receiving “test campaigns,” call \[Optimove.sharedInstance
 unSubscribeFromTestMode\].
-````objective-c
+```objective-c
 -(void)viewDidAppear:(BOOL)animated {
 
 \[super viewDidAppear:animated\];
@@ -303,10 +310,10 @@ unSubscribeFromTestMode\].
 \[Optimove.sharedInstance subscribeToTestMode\];
 
 }
-````
+```
+
 In order to test a push notification template, the marketer can send a
 test push notification campaign from within Optimove (using the Optipush
 UI). Notifications from such a campaign will only be delivered to
 devices running the version of your app in which the above “test
 campaigns” method was called.
-
