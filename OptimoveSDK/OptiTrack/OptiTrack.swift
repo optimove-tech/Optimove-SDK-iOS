@@ -141,14 +141,17 @@ final class OptiTrack
         
         func set(userID: String)
         {
-            if isInternetAvailable() {
-                Optimove.sharedInstance.logger.debug("report set user id: \(userID)")
-                Optimove.sharedInstance.report(event: BeforeSetUserId())
-                PiwikTracker.shared?.visitorId = userID
-                Optimove.sharedInstance.report(event: AfterSetUserId())
-                dispatchNow()
+            if !isInternetAvailable() { return }
+            Optimove.sharedInstance.logger.debug("report set user id: \(userID)")
+            Optimove.sharedInstance.report(event: BeforeSetUserId())
+            PiwikTracker.shared?.visitorId = userID
+            Optimove.sharedInstance.report(event: AfterSetUserId())
+            
+            DispatchQueue.main.async {
+                self.dispatchNow()
                 UserInSession.shared.isSetUserIdSucceed = true
             }
+            
         }
         
         func dispatchNow()
