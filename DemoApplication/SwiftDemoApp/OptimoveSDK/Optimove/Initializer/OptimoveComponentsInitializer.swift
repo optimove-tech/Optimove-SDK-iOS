@@ -149,10 +149,10 @@ class OptimoveComponentsInitializer
         Optimove.sharedInstance.optiPush = Optipush(from: json,
                                                     clientHasFirebase: self.clientHasFirebase,
                                                     initializationDelegate: self)
-        if Optimove.sharedInstance.optiPush != nil
-        {
+//        if Optimove.sharedInstance.optiPush != nil
+//        {
             self.didFinishInitialization(of: .optiPush)
-        }
+//        }
         
     }
     

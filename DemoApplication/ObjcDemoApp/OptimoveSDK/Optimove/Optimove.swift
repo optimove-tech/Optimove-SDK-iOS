@@ -25,7 +25,7 @@ import XCGLogger
     var monitor         : MonitorOptimoveState
     var eventValidator  : OptimoveEventValidator?
     var notificationHandler: OptimoveNotificationHandler
-    let evetReportingQueue: DispatchQueue
+    let eventReportingQueue: DispatchQueue
     let notificationEventQueue: DispatchQueue
     
     public let logger: XCGLogger
@@ -137,7 +137,7 @@ import XCGLogger
         
         monitor = MonitorOptimoveState()
         notificationHandler = OptimoveNotificationHandler()
-        evetReportingQueue = DispatchQueue(label: "event_optitrack",
+        eventReportingQueue = DispatchQueue(label: "event_optitrack",
                                            qos: .userInitiated,
                                            attributes: [],
                                            autoreleaseFrequency: .inherit,
@@ -168,7 +168,7 @@ import XCGLogger
     //MARK: - Internal API
     func reportSync(event:OptimoveEvent, completionHandler: ResultBlockWithError? = nil)
     {
-        evetReportingQueue.sync
+        eventReportingQueue.sync
             {
                 self.report(event:event, completionHandler:completionHandler)
         }
@@ -361,7 +361,9 @@ import XCGLogger
     @objc public func setScreenEvent(viewControllersIdetifiers:[String],url: URL?)
     {
         guard monitor.isComponentPubliclyAvailable(.optiTrack) else {return}
-        optiTrack?.setScreenEvent(viewControllersIdetifiers: viewControllersIdetifiers, url: url)
+        eventReportingQueue.async {
+            self.optiTrack?.setScreenEvent(viewControllersIdetifiers: viewControllersIdetifiers, url: url)
+        }
     }
     
     /// validate the permissions of the client to use optitrack component and if permit sends the report to the apropriate handler
@@ -372,8 +374,10 @@ import XCGLogger
     @objc (reportEventWithEvent: completionHandler:)
     public func objc_reportEvent(event:OptimoveEvent, completionHandler: ((OptimoveError) -> Void)? = nil)
     {
-        report(event: event) { (error) in
-            completionHandler?(error ?? OptimoveError.noError)
+        eventReportingQueue.async {
+            self.report(event: event) { (error) in
+                completionHandler?(error ?? OptimoveError.noError)
+            }
         }
     }
     
@@ -508,7 +512,9 @@ import XCGLogger
         if monitor.isComponentInternallyAvailable(.optiTrack) && UserInSession.shared.isSetUserIdSucceed == false
         {
             guard let userID = UserInSession.shared.customerID else {return}
-            optiTrack?.set(userID: userID)
+            eventReportingQueue.async {
+                self.optiTrack?.set(userID: userID)
+            }
         }
     }
     
@@ -520,7 +526,7 @@ import XCGLogger
     ///   - completionHandler: A block object to be executed when the report sequence ends. This block has no return value and takes a single Error argument that indicates whether or not the report actually finished before the completion handler was called. This parameter may be NULL.
     private func handleReport(event:OptimoveEvent, completionHandler: ((OptimoveError?) -> Void)? = nil)
     {
-        evetReportingQueue.async
+        eventReportingQueue.async
             {
                 self.report(event:event, completionHandler:completionHandler)
         }
@@ -582,7 +588,7 @@ extension Optimove
 {
     func criticalReportSync(event:OptimoveEvent, completionHandler: @escaping ResultBlockWithBool)
     {
-        evetReportingQueue.sync
+        eventReportingQueue.sync
             {
                 self.criticalReport(event:event, completionHandler:completionHandler)
         }

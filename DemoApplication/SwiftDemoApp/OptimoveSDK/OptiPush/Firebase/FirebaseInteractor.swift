@@ -163,9 +163,16 @@ extension FirebaseInteractor:MessagingDelegate
     
     fileprivate func subscribeToTopics()
     {
-        Messaging.messaging().subscribe(toTopic: "optipush_general")
-        Messaging.messaging().subscribe(toTopic: "ios")
-        Messaging.messaging().subscribe(toTopic: getMongoTypeBundleId() )
+        let optimoveTopics = ["optipush_general","ios",getMongoTypeBundleId()]
+        if !clientHasFirebase {
+            Messaging.messaging().subscribe(toTopic: "optipush_general")
+            Messaging.messaging().subscribe(toTopic: "ios")
+            Messaging.messaging().subscribe(toTopic: getMongoTypeBundleId() )
+        } else {
+            if let fcm = UserInSession.shared.fcmToken {
+                NetworkManager.register(fcmToken:  fcm, toTopics: optimoveTopics)
+            }
+        }
     }
     
     func subscribeTestMode()
@@ -173,7 +180,7 @@ extension FirebaseInteractor:MessagingDelegate
         var topic = ""
         if let bundleID = Bundle.main.bundleIdentifier
         {
-            topic = "test_" + bundleID
+            topic = "test_ios_" + bundleID
             
             if !clientHasFirebase {
                 Messaging.messaging().subscribe(toTopic: topic)
@@ -191,7 +198,7 @@ extension FirebaseInteractor:MessagingDelegate
         var topic = ""
         if let bundleID = Bundle.main.bundleIdentifier
         {
-            topic = "test_" + bundleID
+            topic = "test_ios_" + bundleID
             if !clientHasFirebase {
                 Messaging.messaging().unsubscribe(fromTopic: topic)
             } else {

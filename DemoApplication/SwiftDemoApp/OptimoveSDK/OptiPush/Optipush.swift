@@ -28,8 +28,7 @@ final class Optipush
             else
         {
             Optimove.sharedInstance.logger.severe("Failed to parse optipush metadata")
-            
-            initializationDelegate.didFailInitialization(of: .optiPush, rootCause: .optipushComponentUnavailable)
+//            initializationDelegate.didFailInitialization(of: .optiPush, rootCause: .optipushComponentUnavailable)
             return nil
         }
         firebaseInteractor = FirebaseInteractor(clientHasFirebase: clientHasFirebase)

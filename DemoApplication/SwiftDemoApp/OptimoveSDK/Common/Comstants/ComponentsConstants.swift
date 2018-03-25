@@ -13,6 +13,4 @@ enum Component
     case optiTrack
     case optiPush
     case validator
-    
-    static let numOfCompnents = 2
 }
