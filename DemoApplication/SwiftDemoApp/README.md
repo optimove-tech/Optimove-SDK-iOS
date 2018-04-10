@@ -14,6 +14,8 @@ Please follow these instructions carefully to ensure that you’ll have an easy 
 
 ### Prerequisites
 
+The deployment target for integrating the _*OptimoveSDK*_ should be at least  _*10.0*_. </br>
+
 Before you can begin using Optimove SDK for iOS, you will need to
 perform the following steps.</br>
 
@@ -47,9 +49,9 @@ In order to work with the Optimove SDK, you also need to download some modules f
 In your Podfile, add the following:
 
 ````swift
-pod 'Firebase','~> 4.8.0'
-pod 'FirebaseMessaging', '~> 2.0.8'
-pod 'FirebaseDynamicLinks', '~> 2.3.1'
+pod 'Firebase','~> 4.11.0'
+pod 'FirebaseMessaging', '~> 2.1.1'
+pod 'FirebaseDynamicLinks', '~> 2.3.2'
 pod 'XCGLogger', '~> 6.0.2'
 pod 'OptimovePiwikTracker'
 ````
@@ -265,4 +267,4 @@ Therefor, it is highly recommended to match the application's **_Firebase SDK ve
 
 | Optimove SDK Version | Firebase Version | Firebase Messaging Version | FirebaseDynamicLinks |
 | -------------------- | ---------------- | -------------------------- | -------------------- |
-| 1.0.4.3                | 4.8.0            | 2.0.8                      | 2.3.1                |
+| 1.0.5                | 4.11.0              | 2.1.1                      | 2.3.2                |

@@ -31,6 +31,9 @@ final class Optipush
 //            initializationDelegate.didFailInitialization(of: .optiPush, rootCause: .optipushComponentUnavailable)
             return nil
         }
+        if let isEnable = json["enableOptipush"] as? Bool {
+            UserInSession.shared.useOptipush = isEnable
+        }
         firebaseInteractor = FirebaseInteractor(clientHasFirebase: clientHasFirebase)
         registrar = Registrar(optipushMetaData: optipushMetaData)
         let firebaseSuccess = self.firebaseInteractor.setupFirebase(from: firebaseMetaData,
@@ -42,7 +45,6 @@ final class Optipush
             return nil
         }
         Optimove.sharedInstance.logger.debug("OptiPush initialization succeed")
-        
     }
     
     //MARK: - Internal methods
@@ -53,7 +55,6 @@ final class Optipush
     
     func subscribeToTestMode()
     {
-        
         firebaseInteractor.subscribeTestMode()
     }
     
@@ -67,8 +68,7 @@ final class Optipush
         Optimove.sharedInstance.logger.debug("Ask for user permission to present notifications")
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound])
         { (granted, error) in
-            DispatchQueue.main.async
-                {
+            DispatchQueue.main.async {
                     Optimove.sharedInstance.logger.debug("register for remote  notifications")
                     Optimove.sharedInstance.logger.debug("notification authorization response: \(granted)")
                     self.handlenNotificationAuthorizationResponse(granted: granted,error: error)
@@ -87,10 +87,7 @@ final class Optipush
     private func handleNotificationRejectionAtFirstLaunch()
     {
         Optimove.sharedInstance.logger.debug("User Opt for first time")
-        guard UserInSession.shared.fcmToken != nil
-            else
-        {
-            
+        guard UserInSession.shared.fcmToken != nil else {
             UserInSession.shared.isOptIn = false
             return
         }
@@ -109,7 +106,7 @@ final class Optipush
         guard let isOptIn = UserInSession.shared.isOptIn
             else
         { //Opt in on first launch
-           handleNotificationAuthorizedAtFirstLaunch()
+            handleNotificationAuthorizedAtFirstLaunch()
             return
         }
         if !isOptIn
@@ -183,8 +180,7 @@ extension Optipush: MessageHandleProtocol
             return
         }
         
-        if (token != oldFCMToken)
-        {
+        if (token != oldFCMToken) {
             registrar.unregister()
             {
                 UserInSession.shared.fcmToken = token

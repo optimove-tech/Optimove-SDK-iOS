@@ -87,18 +87,13 @@ import XCGLogger
         
         // Add the destination to the logger
         logger.add(destination: fileDestination)
-        
-        
-        
-        
-        
         let  autoRotatingFileDestination = AutoRotatingFileDestination(owner: nil,
                                                                        writeToFile: logUrl,
                                                                        identifier: "advancedLogger.fileDestination",
                                                                        shouldAppend: true,
                                                                        appendMarker: "**********************************",
                                                                        attributes: [:],
-                                                                       maxFileSize: 1024 * 5,
+                                                                       maxFileSize: 1024 * 3072,
                                                                        maxTimeInterval: 600,
                                                                        archiveSuffixDateFormatter: nil)
         
@@ -132,9 +127,6 @@ import XCGLogger
     private override init()
     {
         logger = XCGLogger(identifier: "advancedLogger", includeDefaultDestinations: false)
-        
-        
-        
         monitor = MonitorOptimoveState()
         notificationHandler = OptimoveNotificationHandler()
         eventReportingQueue = DispatchQueue(label: "event_optitrack",
@@ -168,7 +160,7 @@ import XCGLogger
     //MARK: - Internal API
     func reportSync(event:OptimoveEvent, completionHandler: ResultBlockWithError? = nil)
     {
-        eventReportingQueue.sync
+        eventReportingQueue.async
             {
                 self.report(event:event, completionHandler:completionHandler)
         }
@@ -180,7 +172,9 @@ import XCGLogger
         {
             if completionHandler != nil
             {
-                completionHandler!(.error)
+                DispatchQueue.main.async {
+                    completionHandler?(.error)
+                }
             }
             return
         }
@@ -189,19 +183,23 @@ import XCGLogger
             if error == nil
             {
                 guard let eventConfig = eventValidator.eventsConfigs[event.name] else { return }
-                    self.optiTrack?.report(event: event,withConfigs: eventConfig)
+                self.optiTrack?.report(event: event,withConfigs: eventConfig)
+                {
+                    if completionHandler != nil
                     {
-                        if completionHandler != nil
-                        {
-                            completionHandler!(nil)
+                        DispatchQueue.main.async {
+                            completionHandler?(nil)
                         }
                     }
+                }
             }
             else
             {
                 if completionHandler != nil
                 {
-                    completionHandler!(error)
+                    DispatchQueue.main.async {
+                        completionHandler?(error)
+                    }
                 }
             }
         }
@@ -265,6 +263,7 @@ import XCGLogger
             self.reportSync(event: e)
             { _ in // events are assumed to always be valid (ignore error)
                 counter -= 1 // callback is executed on main thread, therefor race condition is not a concern
+                self.logger.debug("reporting notification event no. \(counter) / \(events.count) of type \(e.name)" )
                 if counter == 0
                 {
                     tracker.dispathNow { success in
@@ -528,6 +527,7 @@ import XCGLogger
     {
         eventReportingQueue.async
             {
+                self.logger.debug("report event \(event.name)")
                 self.report(event:event, completionHandler:completionHandler)
         }
     }
@@ -559,6 +559,9 @@ extension Optimove : OptimoveStateDelegate
     
     private func handleSDKStartup()
     {
+        if UserInSession.shared.useOptipush == true {
+            notificationHandler.setDelegate()
+        }
         if monitor.isComponentInternallyAvailable(Component.optiTrack)
         {
             optiTrack?.storeVisitorId()
@@ -588,8 +591,10 @@ extension Optimove
 {
     func criticalReportSync(event:OptimoveEvent, completionHandler: @escaping ResultBlockWithBool)
     {
-        eventReportingQueue.sync
+        eventReportingQueue.async
             {
+                OptimoveNotificationHandler.NotificationDispatchSemaphore.wait()
+
                 self.criticalReport(event:event, completionHandler:completionHandler)
         }
     }

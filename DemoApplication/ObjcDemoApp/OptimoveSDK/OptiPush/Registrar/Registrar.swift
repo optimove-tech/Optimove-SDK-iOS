@@ -42,11 +42,12 @@ class Registrar
     
     //MARK: - Private Methods
     
-    private  func optInOutVisitor(state:State.Opt)
+    private func optInOutVisitor(state:State.Opt)
     {
          Optimove.sharedInstance.logger.debug("Visitor Opt InOut")
         if let json = RegistrationRequestComposer.composeOptInOutVisitorJSON(forState: state)
         {
+            UserInSession.shared.isOptRequestSuccess = false
             optimoveRegistrationRequest(type: .opt ,
                                         json: json,
                                         path: OptimoveRegistrationApiPaths.pathForOptInOutVisitor())
@@ -61,6 +62,7 @@ class Registrar
         Optimove.sharedInstance.logger.debug("Customr Opt InOut")
         if let json = RegistrationRequestComposer.composeOptInOutCustomerJSON(forState: state)
         {
+            UserInSession.shared.isOptRequestSuccess = false
             optimoveRegistrationRequest(type: .opt,
                                         json: json,
                                         path: OptimoveRegistrationApiPaths.pathForOptInOutCustomer())
@@ -175,11 +177,6 @@ class Registrar
             case OptimoveRegistrationApiPaths.pathForRegisterVisitor():
                 UserInSession.shared.hasRegisterJsonFile = true
                 actionFile = "register_data.json"
-            case OptimoveRegistrationApiPaths.pathForUnregisterVisitor():
-                fallthrough
-            case OptimoveRegistrationApiPaths.pathForUnregisterCustomer():
-                UserInSession.shared.hasUnregisterJsonFile = true
-                actionFile = "unregister_data.json"
             case OptimoveRegistrationApiPaths.pathForOptInOutVisitor():
                 fallthrough
             case OptimoveRegistrationApiPaths.pathForOptInOutCustomer():
@@ -202,11 +199,6 @@ class Registrar
             case OptimoveRegistrationApiPaths.pathForRegisterVisitor():
                 UserInSession.shared.hasRegisterJsonFile = false
                 actionFile = "register_data.json"
-            case OptimoveRegistrationApiPaths.pathForUnregisterVisitor():
-                fallthrough
-            case OptimoveRegistrationApiPaths.pathForUnregisterCustomer():
-                UserInSession.shared.hasUnregisterJsonFile = false
-                actionFile = "unregister_data.json"
             case OptimoveRegistrationApiPaths.pathForOptInOutVisitor():
                 fallthrough
             case OptimoveRegistrationApiPaths.pathForOptInOutCustomer():
@@ -235,26 +227,7 @@ class Registrar
     //MARK: - Internal Methods
     func retryFailedOperationsIfExist()
     {
-        let isVisitor = UserInSession.shared.customerID == nil ? true : false
-        
-        if UserInSession.shared.hasUnregisterJsonFile
-        {
-            let actionFile = "unregister_data.json"
-            let actionURL = OptimoveFileManager.shared.optimoveSDKDirectory.appendingPathComponent(actionFile)
-            do
-            {
-                let json  = try Data.init(contentsOf: actionURL)
-                
-                let path = isVisitor ? OptimoveRegistrationApiPaths.pathForUnregisterVisitor() : OptimoveRegistrationApiPaths.pathForUnregisterCustomer()
-                Optimove.sharedInstance.logger.debug("Try to send unregistration request from disk")
-                optimoveRegistrationRequest(type: .registration,
-                                            json: json,
-                                            path: path)
-            }
-            catch { return }
-        }
-        if let hasRegisterJSONFile = UserInSession.shared.hasRegisterJsonFile
-        {
+        func retryRegistration(hasRegisterJSONFile:Bool,isVisitor:Bool) {
             if hasRegisterJSONFile
             {
                 let actionFile = "register_data.json"
@@ -278,9 +251,14 @@ class Registrar
                 catch { return }
             }
         }
+        let isVisitor = UserInSession.shared.customerID == nil ? true : false
+       
+        if let hasRegisterJSONFile = UserInSession.shared.hasRegisterJsonFile
+        {
+            retryRegistration(hasRegisterJSONFile:hasRegisterJSONFile,isVisitor:isVisitor)
+        }
         if UserInSession.shared.hasOptInOutJsonFile
         {
-            
             let actionFile = "opt_in_out_data.json"
             let actionURL = OptimoveFileManager.shared.optimoveSDKDirectory.appendingPathComponent(actionFile)
             

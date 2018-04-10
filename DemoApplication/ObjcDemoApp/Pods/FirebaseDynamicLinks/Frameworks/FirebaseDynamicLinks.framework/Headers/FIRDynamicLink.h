@@ -1,7 +1,5 @@
 #import <Foundation/Foundation.h>
 
-#import "FIRDynamicLinksSwiftNameSupport.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -23,7 +21,7 @@ typedef NS_ENUM(NSUInteger, FIRDynamicLinkMatchConfidence) {
    *     information related to the Dynamic Link.
    */
   FIRDynamicLinkMatchConfidenceStrong
-} FIR_SWIFT_NAME(DynamicLinkMatchConfidence)
+} NS_SWIFT_NAME(DynamicLinkMatchConfidence)
     DEPRECATED_MSG_ATTRIBUTE("Use FIRDLMatchType instead.");
 
 /**
@@ -49,13 +47,13 @@ typedef NS_ENUM(NSUInteger, FIRDLMatchType) {
    *     information related to the Dynamic Link.
    */
   FIRDLMatchTypeUnique,
-} FIR_SWIFT_NAME(DLMatchType);
+} NS_SWIFT_NAME(DLMatchType);
 
 /**
  * @class FIRDynamicLink
  * @abstract A received Dynamic Link.
  */
-FIR_SWIFT_NAME(DynamicLink)
+NS_SWIFT_NAME(DynamicLink)
 @interface FIRDynamicLink : NSObject
 
 /**
@@ -70,7 +68,7 @@ FIR_SWIFT_NAME(DynamicLink)
  */
 @property(nonatomic, assign, readonly)
     FIRDynamicLinkMatchConfidence matchConfidence DEPRECATED_MSG_ATTRIBUTE(
-        "Use FIRDynamicLink.matchType instead.");
+        "Use FIRDynamicLink.matchType (DynamicLink.DLMatchType) instead.");
 
 /**
  * @property matchType

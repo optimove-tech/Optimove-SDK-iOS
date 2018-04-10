@@ -26,7 +26,6 @@ class UserInSession: Synchronizable
         case isFirstLaunch              = "isFirstLaunch"
         case hasOptInOutJsonFile        = "hasOptInOutJsonFile"
         case hasRegisterJsonFile        = "hasRegisterJsonFile"
-        case hasUnregisterJsonFile      = "hasUnregisterJsonFile"
         case userAgentHeader            = "userAgentHeader"
         case registrationSuccess        = "registrationSuccess"
         case optSuccess                 = "optSuccess"
@@ -35,6 +34,7 @@ class UserInSession: Synchronizable
         case apnsToken                  = "apnsToken"
         case backupNotificationEvents   = "backupNotificationEvents"
         case hasConfigurationFile       = "hasConfigurationFile"
+        case useOptipush                = "useOptipush"
     }
     
     static let shared = UserInSession()
@@ -105,6 +105,25 @@ class UserInSession: Synchronizable
         }
     }
     
+    var useOptipush: Bool?
+    {
+        get
+        {
+            
+            if let val = UserDefaults.standard.value(forKey: UserDefaultsKeys.useOptipush.rawValue) as? Bool
+            {
+                return val
+            }
+            return nil
+        }
+        set
+        {
+            self.setDefaultObject(forObject: newValue as Any,
+                                  key: UserDefaultsKeys.useOptipush.rawValue)
+            
+        }
+    }
+    
     var tenantToken: String?
     {
         get
@@ -140,7 +159,7 @@ class UserInSession: Synchronizable
     {
         get { return UserDefaults.standard.bool(forKey: UserDefaultsKeys.userHasFirebase.rawValue)}
         set { self.setDefaultObject(forObject: newValue as Any,
-                                                  key: UserDefaultsKeys.userHasFirebase.rawValue) }
+                                    key: UserDefaultsKeys.userHasFirebase.rawValue) }
     }
     
     var customerID:String?
@@ -256,7 +275,6 @@ class UserInSession: Synchronizable
         }
     }
     
-    
     var hasRegisterJsonFile : Bool?
     {
         get
@@ -267,18 +285,6 @@ class UserInSession: Synchronizable
         {
             self.setDefaultObject(forObject: newValue as Any,
                                                 key: UserDefaultsKeys.hasRegisterJsonFile.rawValue)
-        }
-    }
-    var hasUnregisterJsonFile : Bool
-    {
-        get
-        {
-            return UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasUnregisterJsonFile.rawValue)
-        }
-        set
-        {
-            self.setDefaultObject(forObject: newValue as Any,
-                                                key: UserDefaultsKeys.hasUnregisterJsonFile.rawValue)
         }
     }
     var isRegistrationSuccess : Bool

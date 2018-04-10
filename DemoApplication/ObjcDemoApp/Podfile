@@ -6,9 +6,9 @@ target 'ObjcDemoApp' do
    use_frameworks!
 
   # Pods for ObjcDemoApp
- pod 'Firebase','~> 4.8.0'
- pod 'FirebaseMessaging', '~> 2.0.8'
- pod 'FirebaseDynamicLinks', '~> 2.3.1'
+ pod 'Firebase','~> 4.11.0'
+ pod 'FirebaseMessaging', '~> 2.1.1'
+ pod 'FirebaseDynamicLinks', '~> 2.3.2'
  pod 'XCGLogger', '~> 6.0.2'
  pod 'OptimovePiwikTracker'
 

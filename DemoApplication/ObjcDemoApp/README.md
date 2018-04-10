@@ -23,6 +23,7 @@ executives may also find it informative.
 
 ### Prerequisites
 -------------
+The deployment target for integrating the _*OptimoveSDK*_ should be at least  _*10.0*_. </br>
 
 Before you can begin using Optimove SDK for iOS, you will need to
 perform the following steps.
@@ -110,7 +111,7 @@ Firebase SDK version to Optimove’s Firebase SDK:
 
 | **Optimove SDK Version ** | **Firebase Core Version ** | **Firebase Messaging Version ** | **FirebaseDynamicLinks** |
 |---------------------------|----------------------------|---------------------------------|--------------------------|
-| 1.0.4.3                     | 4.8.0                      | 2.0.8                           | 2.3.1                    |
+| 1.0.5                     | 4.11.0                      | 2.1.1                           | 2.3.2                    |
 
 Reporting User Activities and Events 
 -------------------------------------

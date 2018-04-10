@@ -120,6 +120,7 @@ extension FirebaseInteractor:MessagingDelegate
             if let token = token
             {
                 self.finishTokenRegistrations(forToken: token)
+                Optimove.sharedInstance.logger.debug("new fcm: \(String(describing: token))")
             }
         }
     }
@@ -136,7 +137,7 @@ extension FirebaseInteractor:MessagingDelegate
                     Optimove.sharedInstance.logger.debug("retreived token for sender ID")
                     Optimove.sharedInstance.logger.debug("old fcm: \(String(describing: UserInSession.shared.fcmToken))")
                     retreiveFcmToken(for: optimoveSenderId)
-                    Optimove.sharedInstance.logger.debug("new fcm: \(String(describing: UserInSession.shared.fcmToken))")
+                    
                 }
             }
             else

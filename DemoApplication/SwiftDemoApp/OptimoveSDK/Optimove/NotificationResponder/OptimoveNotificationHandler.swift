@@ -18,12 +18,15 @@ enum NotificationState
 }
 class OptimoveNotificationHandler: NSObject
 {
+    public static let NotificationDispatchSemaphore = DispatchSemaphore(value: 1)
+    
     //MARK: - Initializer
-   override init()
+    override init()
     {
         super.init()
-        UNUserNotificationCenter.current().delegate = self
-        configureUserNotificationsDismissCategory()
+        if UserInSession.shared.useOptipush != nil && UserInSession.shared.useOptipush! {
+            setDelegate()
+        }
     }
     
     //MARK: - API
@@ -37,6 +40,7 @@ class OptimoveNotificationHandler: NSObject
         insertLongDeepLinkUrl(from:userInfo, to: content)
         {
             let collapseId = (Bundle.main.bundleIdentifier ?? "") + "_" + (userInfo[Keys.Notification.collapseId.rawValue] as? String ?? "OptipushDefaultCollapseID")
+            Optimove.sharedInstance.logger.debug("Collapse id: \(collapseId)")
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.6, repeats: false)
             let request = UNNotificationRequest(identifier: collapseId,
                                                 content: content,
@@ -46,6 +50,13 @@ class OptimoveNotificationHandler: NSObject
         }
     }
     
+    func setDelegate()
+    {
+        if UNUserNotificationCenter.current().delegate == nil {
+            UNUserNotificationCenter.current().delegate = self
+            configureUserNotificationsDismissCategory()
+        }
+    }
     func handleNotification(userInfo:[AnyHashable : Any],
                             completionHandler:@escaping (UIBackgroundFetchResult) -> Void)
     {
@@ -99,10 +110,13 @@ class OptimoveNotificationHandler: NSObject
         switch type
         {
         case .dismissed:
+            Optimove.sharedInstance.logger.debug("before report notification dismissed: \(campaignDetails.campaignId)")
             event = NotificationDismissed(campaignDetails: campaignDetails)
         case .opened:
+            Optimove.sharedInstance.logger.debug("before report notification opened: \(campaignDetails.campaignId)")
             event = NotificationOpened(campaignDetails: campaignDetails)
         case .delivered:
+            Optimove.sharedInstance.logger.debug("before report notification delivered: \(campaignDetails.campaignId)")
             event = NotificationDelivered(campaignDetails: campaignDetails)
         }
         
@@ -117,12 +131,13 @@ class OptimoveNotificationHandler: NSObject
         Optimove.sharedInstance.criticalReportSync(event: event)
         {
             success in
+            OptimoveNotificationHandler.NotificationDispatchSemaphore.signal()
             guard success else
             {
                 UIApplication.shared.endBackgroundTask(taskId)
                 return
             }
-            Optimove.sharedInstance.logger.debug("report notification \(type)")
+            Optimove.sharedInstance.logger.debug("report notification \(type) with campiagn id: \(campaignDetails.campaignId)")
             Optimove.sharedInstance.clearStoredNotificationEvent(at: saveResult.index, withOldSize: saveResult.newSize)
             UIApplication.shared.endBackgroundTask(taskId)
         }

@@ -55,7 +55,7 @@ class OptimoveEventValidator
         for (name, value) in event.parameters
         {
             guard let config = configurations.params[name]
-            else
+                else
             {
                 completionHandler(.invalidEvent) //Verify client parameter exist in configurations
                 return
