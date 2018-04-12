@@ -199,7 +199,7 @@ var DeviceID : String
 {
     get
     {
-        return UIDevice.current.identifierForVendor?.uuidString ?? ""
+       return (SHA1.hexString(from:UIDevice.current.identifierForVendor?.uuidString ?? ""))!.replacingOccurrences(of: " ", with: "")
     }
 }
 var OSVersion : String

@@ -357,11 +357,11 @@ import XCGLogger
         }
     }
     
-    @objc public func setScreenEvent(viewControllersIdetifiers:[String],url: URL?)
+    @objc public func setScreenEvent(viewControllersIdentifiers:[String],url: URL?)
     {
         guard monitor.isComponentPubliclyAvailable(.optiTrack) else {return}
         eventReportingQueue.async {
-            self.optiTrack?.setScreenEvent(viewControllersIdetifiers: viewControllersIdetifiers, url: url)
+            self.optiTrack?.setScreenEvent(viewControllersIdentifiers: viewControllersIdentifiers, url: url)
         }
     }
     

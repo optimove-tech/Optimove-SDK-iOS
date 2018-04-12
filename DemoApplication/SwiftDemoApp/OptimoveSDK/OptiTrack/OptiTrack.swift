@@ -133,10 +133,10 @@ final class OptiTrack
             didComplete?()
         }
         
-        func setScreenEvent(viewControllersIdetifiers:[String],url: URL?)
+        func setScreenEvent(viewControllersIdentifiers:[String],url: URL? = nil)
         {
             Optimove.sharedInstance.logger.debug("report screen event")
-            tracker?.track(view: viewControllersIdetifiers, url: url)
+            tracker?.track(view: viewControllersIdentifiers, url: url)
         }
         
         func set(userID: String)

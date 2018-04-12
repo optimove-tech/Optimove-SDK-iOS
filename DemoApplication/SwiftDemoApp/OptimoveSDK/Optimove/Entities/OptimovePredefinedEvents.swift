@@ -19,7 +19,7 @@ class SetAdvertisingId : OptimoveEvent
     var parameters: [String : Any]
     {
         return [Keys.Configuration.advertisingId.rawValue   : ASIdentifierManager.shared().advertisingIdentifier.uuidString ,
-                Keys.Configuration.deviceId.rawValue        : (SHA1.hexString(from:DeviceID))!.replacingOccurrences(of: " ", with: ""),
+                Keys.Configuration.deviceId.rawValue        : DeviceID,
                 Keys.Configuration.appNs.rawValue           : Bundle.main.bundleIdentifier!]
     }
 }
@@ -255,7 +255,7 @@ class Opt :OptimoveEvent
     {
         return [Keys.Configuration.timestamp.rawValue   : Int(Date().timeIntervalSince1970),
                 Keys.Configuration.appNs.rawValue       : Bundle.main.bundleIdentifier!,
-                Keys.Configuration.deviceId.rawValue    :  (SHA1.hexString(from:DeviceID))!.replacingOccurrences(of: " ", with: ""),]
+                Keys.Configuration.deviceId.rawValue    :  DeviceID]
     }
 }
 
