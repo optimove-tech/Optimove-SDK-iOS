@@ -43,7 +43,7 @@ perform the following steps.
 4.  Enable push notifications and remote notification capabilities in your project (this step is required only for sending push notifications using Optipush).
 5.  The app's `Deployment Target` is at least iOS **10.0**
 
-[![apple_dashboared.png](https://s9.postimg.org/9ln5sfxe7/apple_dashboared.png)](https://postimg.org/image/itfe954gb/)
+[![apple_dashboared.png](https://s9.postimg.cc/9ln5sfxe7/apple_dashboared.png)](https://postimg.org/image/itfe954gb/)
 
 ## Setting Up the SDK
 
@@ -261,7 +261,7 @@ To support deep linking, enable Associated Domains. To do so: In your
 project capabilities, add the deep link domain (provided by Optimove
 CSM) with the applinks: prefix and without any https:// prefix.
 
-[![associated_domain.png](https://s9.postimg.org/hqrw4eqm7/associated_domain.png)](https://postimg.org/image/3x3jfcy0r/)
+[![associated_domain.png](https://s9.postimg.cc/hqrw4eqm7/associated_domain.png)](https://postimg.org/image/3x3jfcy0r/)
 
 Any ViewController should receive a DeepLink data callback, and should
 implement didReceive(deepLink: ), thus conforming to the DeepLinkCallback

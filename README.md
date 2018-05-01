@@ -36,7 +36,7 @@ perform the following steps.</br>
 * Enable push notification and remote notification capabilities in your project
 * The app's `Deployment Target` is at least iOS **10.0**
 
-[![apple_dashboared.png](https://s9.postimg.org/9ln5sfxe7/apple_dashboared.png)](https://postimg.org/image/itfe954gb/)
+[![apple_dashboared.png](https://s9.postimg.cc/9ln5sfxe7/apple_dashboared.png)](https://postimg.org/image/itfe954gb/)
  
 ## Setting up the SDK
 
@@ -244,7 +244,7 @@ To support deep linking, you should:
 
 In your project capabilities, add the deep link domain with `applinks:` prefix and without any `https://` prefix
 
-[![associated_domain.png](https://s9.postimg.org/hqrw4eqm7/associated_domain.png)](https://postimg.org/image/3x3jfcy0r/)
+[![associated_domain.png](https://s9.postimg.cc/hqrw4eqm7/associated_domain.png)](https://postimg.cc/image/3x3jfcy0r/)
 </br>
 
 Any  _`ViewControler`_ should recieve DeepLink data callback, should implement _`didReceive(deepLink:)`_, thus conforming to _`OptimoveDeepLinkCallback`_ protocol .</br>
