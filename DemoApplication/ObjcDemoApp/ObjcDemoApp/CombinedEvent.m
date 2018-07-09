@@ -1,13 +1,5 @@
-//
-//  CombinedEvent.m
-//  ObjcDemoApp
-//
-//  Created by Elkana Orbach on 21/01/2018.
-//  Copyright © 2018 Optimove. All rights reserved.
-//
 
 #import "CombinedEvent.h"
-#import "ObjcDemoApp-Swift.h"
 
 @implementation CombinedEvent
 

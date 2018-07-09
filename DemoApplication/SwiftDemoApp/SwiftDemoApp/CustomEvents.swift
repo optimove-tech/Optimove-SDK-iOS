@@ -1,12 +1,7 @@
-//
-//  CustomEvents.swift
-//  DevelopSDK
-//
-//  Created by Elkana Orbach on 20/11/2017.
-//  Copyright © 2017 Optimove. All rights reserved.
-//
+
 
 import Foundation
+import OptimoveSDK
 
 class StringEvent: OptimoveEvent
 {

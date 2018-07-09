@@ -1,0 +1,6 @@
+module OptimoveNotificationServiceExtension {
+  umbrella header "OptimoveNotificationServiceExtension-umbrella.h"
+
+  export *
+  module * { export * }
+}

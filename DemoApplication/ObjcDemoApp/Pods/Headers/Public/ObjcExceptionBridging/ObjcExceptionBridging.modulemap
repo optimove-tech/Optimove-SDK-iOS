@@ -1,0 +1,6 @@
+module ObjcExceptionBridging {
+  umbrella header "ObjcExceptionBridging-umbrella.h"
+
+  export *
+  module * { export * }
+}

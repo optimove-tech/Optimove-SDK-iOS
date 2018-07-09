@@ -1,12 +1,5 @@
-//
-//  setUserIdViewController.m
-//  HelloWorld
-//
-//  Created by Elkana Orbach on 17/01/2018.
-//  Copyright © 2018 Optimove. All rights reserved.
-//
-
 #import "SetUserIdViewController.h"
+@import OptimoveSDK;
 
 @implementation SetUserIdViewController
 - (IBAction)userPressOnSend {
@@ -14,10 +7,17 @@
     [Optimove.sharedInstance setWithUserID:name];
 }
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [Optimove.sharedInstance registerSuccessStateDelegate:self];
+}
 -(void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
     
-    [Optimove.sharedInstance setScreenEventWithViewControllersIdetifiers:@[@"main_screen",@"set user id"] url:nil];
+}
+- (void)optimove:(Optimove *)optimove didBecomeActiveWithMissingPermissions:(NSArray<NSNumber *> *)missingPermissions {
+    [Optimove.sharedInstance reportScreenVisitWithViewControllersIdentifiers:@[@"main_screen",@"set user id"] url:nil category:nil];
+    [Optimove.sharedInstance unregisterSuccessStateDelegate:self];
 }
 @end

@@ -1,13 +1,5 @@
-//
-//  EventTableViewCell.swift
-//  DevTest
-//
-//  Created by Elkana Orbach on 17/12/2017.
-//  Copyright © 2017 Optimove. All rights reserved.
-//
-
 import UIKit
-
+import OptimoveSDK
 
 class EventTableViewCell: UITableViewCell {
 
@@ -52,7 +44,7 @@ class EventTableViewCell: UITableViewCell {
             event = CombinedEvent(stringInput, numberInput != nil ? NSNumber(value:numberInput!): nil)
         default: return
         }
-        Optimove.sharedInstance.reportEvent(event: event,completionHandler: callback)
+        Optimove.sharedInstance.reportEvent( event)
         
     }
 }
