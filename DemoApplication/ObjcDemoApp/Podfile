@@ -4,12 +4,12 @@ use_modular_headers!
 
 target 'ObjcDemoApp' do
   
-  pod 'OptimoveSDK',:git => 'https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git', :branch => 'OptimoveNotificationExtension'
+  pod 'OptimoveSDK',:git => 'https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git', :branch => 'ios-v-1-2'
 
 end
 
 target 'Notification Extension' do
    
-    pod 'OptimoveNotificationServiceExtension',:git => 'https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git', :branch => 'OptimoveNotificationExtension'
+    pod 'OptimoveNotificationServiceExtension',:git => 'https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git', :branch => 'ios-v-1-2'
     
 end

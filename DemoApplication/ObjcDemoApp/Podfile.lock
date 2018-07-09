@@ -54,8 +54,8 @@ PODS:
     - ObjcExceptionBridging
 
 DEPENDENCIES:
-  - OptimoveNotificationServiceExtension (from `https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git`, branch `OptimoveNotificationExtension`)
-  - OptimoveSDK (from `https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git`, branch `OptimoveNotificationExtension`)
+  - OptimoveNotificationServiceExtension (from `https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git`, branch `ios-v-1-2`)
+  - OptimoveSDK (from `https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git`, branch `ios-v-1-2`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -74,18 +74,18 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   OptimoveNotificationServiceExtension:
-    :branch: OptimoveNotificationExtension
+    :branch: ios-v-1-2
     :git: https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git
   OptimoveSDK:
-    :branch: OptimoveNotificationExtension
+    :branch: ios-v-1-2
     :git: https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git
 
 CHECKOUT OPTIONS:
   OptimoveNotificationServiceExtension:
-    :commit: a045feceed57783fc7c5f77d2be24157f134edd9
+    :commit: 548e499474426122cb46eef06ca2f9b5df0e1b75
     :git: https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git
   OptimoveSDK:
-    :commit: a045feceed57783fc7c5f77d2be24157f134edd9
+    :commit: 548e499474426122cb46eef06ca2f9b5df0e1b75
     :git: https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git
 
 SPEC CHECKSUMS:
@@ -104,6 +104,6 @@ SPEC CHECKSUMS:
   Protobuf: 0fc0ad8bec688b2a3017a139953e01374fedbd5f
   XCGLogger: 4fc1bc0bdd5828cb8dc8da7a843536cda1bea8f3
 
-PODFILE CHECKSUM: 628b38bd8a7c5ce8f2117d40fa30208b744ba38c
+PODFILE CHECKSUM: e6c145c7575a4fbfcc28257bc87dc31a241376fe
 
 COCOAPODS: 1.5.3

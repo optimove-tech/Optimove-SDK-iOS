@@ -4,16 +4,18 @@ class RealtimeEvent: Encodable
 {
     var tid:String
     var cid:String?
-    var visitorid:String?
+    var visitorId:String?
     var eid:String
+    var firstVisitorDate:String
     var context:[String:Any]
     enum CodingKeys:String,CodingKey
     {
         case tid
         case cid
-        case visitorid
+        case visitorId
         case eid
         case context
+        case firstVisitorDate
     }
     struct ContextKey:CodingKey
     {
@@ -32,21 +34,23 @@ class RealtimeEvent: Encodable
         }
     }
     
-    init( tid:String, cid:String?,visitorid:String?, eid:String, context:[String:Any])
+    init( tid:String, cid:String?,visitorId:String?, eid:String, context:[String:Any])
     {
         self.tid = tid
-        self.visitorid = (cid != nil) ? nil : visitorid
+        self.visitorId = (cid != nil) ? nil : visitorId
         self.cid = cid ?? nil
         self.eid = eid
         self.context = context
+        self.firstVisitorDate = "\(Int(OptimoveUserDefaults.shared.firstVisitTimestamp))"
     }
     public func encode(to encoder: Encoder) throws
     {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(tid, forKey: .tid)
         try container.encodeIfPresent(cid, forKey: .cid)
-         try container.encodeIfPresent(eid, forKey: .eid)
-        try container.encodeIfPresent(visitorid, forKey: .visitorid)
+        try container.encodeIfPresent(eid, forKey: .eid)
+        try container.encodeIfPresent(visitorId, forKey: .visitorId)
+        try container.encodeIfPresent(firstVisitorDate, forKey: .firstVisitorDate)
         
         var contextContainer = container.nestedContainer(keyedBy: ContextKey.self, forKey: .context)
         for (key,value) in context {

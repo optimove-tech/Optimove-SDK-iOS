@@ -7,29 +7,38 @@
 //
 
 import UserNotifications
+import OptimoveNotificationServiceExtension
 
 class NotificationService: UNNotificationServiceExtension {
 
     var contentHandler: ((UNNotificationContent) -> Void)?
     var bestAttemptContent: UNMutableNotificationContent?
+    var optimoveNotificationServiceExtension:OptimoveNotificationServiceExtension!
 
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
-        self.contentHandler = contentHandler
-        bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
-        
-        if let bestAttemptContent = bestAttemptContent {
-            // Modify the notification content here...
-            bestAttemptContent.title = "\(bestAttemptContent.title) [modified]"
+        let tenantInfo = NotificationExtensionTenantInfo(endpoint: "https://appcontrollerproject-developer.firebaseapp.com", token: "demo_apps", version: "1.0.0", appBundleId: "com.optimove.sdk.demo.swift")
+        optimoveNotificationServiceExtension = OptimoveNotificationServiceExtension(tenantInfo: tenantInfo)
+        optimoveNotificationServiceExtension.didReceive(request, withContentHandler: contentHandler)
+        if !optimoveNotificationServiceExtension.isHandledByOptimove {
+            self.contentHandler = contentHandler
+            bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
             
-            contentHandler(bestAttemptContent)
+            if let bestAttemptContent = bestAttemptContent {
+                // Modify the notification content here...
+                bestAttemptContent.title = "\(bestAttemptContent.title) [modified]"
+                
+                contentHandler(bestAttemptContent)
+            }
         }
     }
     
     override func serviceExtensionTimeWillExpire() {
-        // Called just before the extension will be terminated by the system.
-        // Use this as an opportunity to deliver your "best attempt" at modified content, otherwise the original push payload will be used.
-        if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
-            contentHandler(bestAttemptContent)
+        if optimoveNotificationServiceExtension.isHandledByOptimove {
+            optimoveNotificationServiceExtension.serviceExtensionTimeWillExpire()
+        } else {
+            if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
+                contentHandler(bestAttemptContent)
+            }
         }
     }
 

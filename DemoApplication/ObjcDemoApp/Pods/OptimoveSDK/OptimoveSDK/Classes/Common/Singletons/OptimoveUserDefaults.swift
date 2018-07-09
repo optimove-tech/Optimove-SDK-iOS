@@ -20,41 +20,42 @@ class OptimoveUserDefaults: Synchronizable
     
     enum UserDefaultsKeys: String
     {
-        case configurationEndPoint          = "configurationEndPoint"
-        case isMbaasOptIn                   = "isMbaasOptIn"
-        case isOptiTrackOptIn               = "isOptiTrackOptIn"
-        case isFirstConversion              = "isFirstConversion"
-        case tenantToken                    = "tenantToken"
-        case siteID                         = "siteID"
-        case version                        = "version"
-        case customerID                     = "customerID"
-        case visitorID                      = "visitorID"
-        case userAgent                      = "userAgent"
-        case deviceToken                    = "deviceToken"
-        case fcmToken                       = "fcmToken"
-        case defaultFcmToken                = "defaultFcmToken"
-        case isFirstLaunch                  = "isFirstLaunch"
-        case userAgentHeader                = "userAgentHeader"
-        case unregistrationSuccess          = "unregistrationSuccess"
-        case registrationSuccess            = "registrationSuccess"
-        case optSuccess                     = "optSuccess"
-        case isSetUserIdSucceed             = "isSetUserIdSucceed"
-        case isClientHasFirebase            = "userHasFirebase"
-        case isClientUseFirebaseMessaging   = "isClientUseFirebaseMessaging"
-        case apnsToken                      = "apnsToken"
-        case hasConfigurationFile           = "hasConfigurationFile"
-        case topics                         = "topic"
-        case openAppTime                    = "openAppTime"
-        case clientUseBackgroundExecution   = "clientUseBackgroundExecution"
-        case lastPingTime                   = "lastPingTime"
-        case realtimeSetUserIdFailed        = "realtimeSetUserIdFailed"
-        case realtimeFailedEmail            = "realtimeFailedEmail"
-        case realtimeSetEmailFailed         = "realtimeSetEmailFailed"
-        case realtimeFailedOriginalVisitorId = "realtimeFailedOriginalVisitorId"
-        case initialVisitorId               = "initialVisitorId"
-        case deviceOs                        = "deviceOs"
-        case deviceResolutionWidth               = "deviceResolutionWidth"
+        case configurationEndPoint              = "configurationEndPoint"
+        case isMbaasOptIn                       = "isMbaasOptIn"
+        case isOptiTrackOptIn                   = "isOptiTrackOptIn"
+        case isFirstConversion                  = "isFirstConversion"
+        case tenantToken                        = "tenantToken"
+        case siteID                             = "siteID"
+        case version                            = "version"
+        case customerID                         = "customerID"
+        case visitorID                          = "visitorID"
+        case userAgent                          = "userAgent"
+        case deviceToken                        = "deviceToken"
+        case fcmToken                           = "fcmToken"
+        case defaultFcmToken                    = "defaultFcmToken"
+        case isFirstLaunch                      = "isFirstLaunch"
+        case userAgentHeader                    = "userAgentHeader"
+        case unregistrationSuccess              = "unregistrationSuccess"
+        case registrationSuccess                = "registrationSuccess"
+        case optSuccess                         = "optSuccess"
+        case isSetUserIdSucceed                 = "isSetUserIdSucceed"
+        case isClientHasFirebase                = "userHasFirebase"
+        case isClientUseFirebaseMessaging       = "isClientUseFirebaseMessaging"
+        case apnsToken                          = "apnsToken"
+        case hasConfigurationFile               = "hasConfigurationFile"
+        case topics                             = "topic"
+        case openAppTime                        = "openAppTime"
+        case clientUseBackgroundExecution       = "clientUseBackgroundExecution"
+        case lastPingTime                       = "lastPingTime"
+        case realtimeSetUserIdFailed            = "realtimeSetUserIdFailed"
+        case realtimeFailedEmail                = "realtimeFailedEmail"
+        case realtimeSetEmailFailed             = "realtimeSetEmailFailed"
+        case realtimeFailedOriginalVisitorId    = "realtimeFailedOriginalVisitorId"
+        case initialVisitorId                   = "initialVisitorId"
+        case deviceOs                           = "deviceOs"
+        case deviceResolutionWidth              = "deviceResolutionWidth"
         case deviceResolutionHeight             = "deviceResolutionHeight"
+        case firstVisitTimestamp                = "firstVisitTimestamp"
     }
     
     static let shared = OptimoveUserDefaults()
@@ -372,6 +373,13 @@ class OptimoveUserDefaults: Synchronizable
         get { return self.standardUserDefaults.double(forKey: UserDefaultsKeys.lastPingTime.rawValue)}
         set { self.setDefaultObject(forObject: newValue as Any,
                                     key: UserDefaultsKeys.lastPingTime.rawValue) }
+    }
+    
+    var firstVisitTimestamp: Int
+    {
+        get { return self.standardUserDefaults.integer(forKey: UserDefaultsKeys.firstVisitTimestamp.rawValue)}
+        set { self.setDefaultObject(forObject: newValue as Any,
+                                    key: UserDefaultsKeys.firstVisitTimestamp.rawValue) }
     }
     var isSetUserIdSucceed : Bool
     {
