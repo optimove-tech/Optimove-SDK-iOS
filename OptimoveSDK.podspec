@@ -19,8 +19,8 @@ Pod::Spec.new do |s|
   s.swift_version = '4.1'
   s.source_files = 'OptimoveSDK/Classes/**/*'
   s.dependency 'Firebase/Core', '~> 5.4.0'
-  s.dependency 'Firebase/Messaging','~> 3.0.3'
-  s.dependency 'Firebase/DynamicLinks','~> 3.0.1'
+  s.dependency 'Firebase/Messaging'
+  s.dependency 'Firebase/DynamicLinks'
   s.dependency 'OptiTrackCore'
   s.dependency 'XCGLogger','~> 6.0.4'
   
