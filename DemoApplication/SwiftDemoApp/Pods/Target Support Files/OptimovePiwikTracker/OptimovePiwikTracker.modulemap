@@ -1,6 +1,0 @@
-framework module OptimovePiwikTracker {
-  umbrella header "OptimovePiwikTracker-umbrella.h"
-
-  export *
-  module * { export * }
-}

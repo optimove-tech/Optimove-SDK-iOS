@@ -1,0 +1,6 @@
+framework module OptiTrackCore {
+  umbrella header "OptiTrackCore-umbrella.h"
+
+  export *
+  module * { export * }
+}

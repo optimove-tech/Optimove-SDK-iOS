@@ -19,10 +19,10 @@ NS_SWIFT_NAME(DynamicLinks)
 
 /**
  * @method dynamicLinks
- * @abstract Shared instance of FIRDynamicLinks. Returns nil on iOS versions prior to 8.
+ * @abstract Shared instance of FIRDynamicLinks.
  * @return Shared instance of FIRDynamicLinks.
  */
-+ (nullable instancetype)dynamicLinks NS_SWIFT_NAME(dynamicLinks());
++ (instancetype)dynamicLinks NS_SWIFT_NAME(dynamicLinks());
 
 /**
  * @method shouldHandleDynamicLinkFromCustomSchemeURL:

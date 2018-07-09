@@ -7,43 +7,47 @@
 //
 
 import UIKit
+import OptimoveSDK
 
-class ViewController: UIViewController, OptimoveDeepLinkCallback {
+class ViewController: UIViewController, OptimoveDeepLinkCallback,OptimoveSuccessStateListener
+{
     func didReceive(deepLink: OptimoveDeepLinkComponents?)
     {
         if let deepLink = deepLink {
-            DispatchQueue.main.asyncAfter(deadline: .now()+2.0)
-            {
-                if let vc = self.storyboard?.instantiateViewController(withIdentifier: deepLink.screenName) {
-                    self.navigationController?.pushViewController(vc, animated: true)
-                }
+            if let vc = self.storyboard?.instantiateViewController(withIdentifier: deepLink.screenName) {
+                self.navigationController?.pushViewController(vc, animated: true)
             }
         }
     }
     
+    
     override func viewDidLoad()
     {
         super.viewDidLoad()
+        Optimove.sharedInstance.registerSuccessStateListener(self)
         Optimove.sharedInstance.register(deepLinkResponder: OptimoveDeepLinkResponder(self))
     }
     
     override func viewDidAppear(_ animated: Bool)
     {
         super.viewDidAppear(animated)
-        Optimove.sharedInstance.setScreenEvent(viewControllersIdetifiers: ["main screen"], url: nil)
+        
     }
     
     
     @IBAction func subscribrToTest(_ sender: UIButton)
     {
-        Optimove.sharedInstance.subscribeToTestMode()
+        Optimove.sharedInstance.startTestMode()
     }
     
     @IBAction func unsubsribeFromTest(_ sender: UIButton)
     {
-        Optimove.sharedInstance.unSubscribeFromTestMode()
+        Optimove.sharedInstance.stopTestMode()
     }
-    
+    func optimove(_ optimove: Optimove, didBecomeActiveWithMissingPermissions missingPermissions: [OptimoveDeviceRequirement]) {
+        Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers: ["main screen"])
+        Optimove.sharedInstance.unregisterSuccessStateListener(self)
+    }
 }
 
 

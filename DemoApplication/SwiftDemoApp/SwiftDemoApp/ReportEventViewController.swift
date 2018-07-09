@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import OptimoveSDK
 
 
 class ReportEventViewController: UIViewController
@@ -19,7 +20,8 @@ class ReportEventViewController: UIViewController
     override func viewDidAppear(_ animated: Bool) {
         
         super.viewDidAppear(animated)
-        Optimove.sharedInstance.setScreenEvent(viewControllersIdetifiers: ["main_screen","report_event"], url: nil)
+        Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers: ["main_screen","report_event"])
+       
         
         //Table view configurations
         inputsTableView.dataSource = self
@@ -68,12 +70,11 @@ extension ReportEventViewController: UITableViewDataSource {
     func reportCallBack(error: OptimoveError?)
     {
         DispatchQueue.main.async {
-        let alert = UIAlertController(title: "Report Event Response", message: "\(error?.rawValue ?? 0)", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        self.present(alert,animated:true,completion: nil)
+            let alert = UIAlertController(title: "Report Event Response", message: "\(String(describing: error?.localizedDescription))", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert,animated:true,completion: nil)
         }
     }
-    
 }
 
 //Optional
@@ -81,6 +82,6 @@ extension ReportEventViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
     {
-        Optimove.sharedInstance.reportEvent(event: events[indexPath.row])
+        Optimove.sharedInstance.reportEvent( events[indexPath.row])
     }
 }

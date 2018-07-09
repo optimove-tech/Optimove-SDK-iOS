@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import OptimoveSDK
 
 class SetUserIDViewController: UIViewController
 {
@@ -22,6 +23,7 @@ class SetUserIDViewController: UIViewController
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        Optimove.sharedInstance.setScreenEvent(viewControllersIdetifiers: ["main_screen","login"], url: nil)
+        Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers: ["main_screen","login"])
+        
     }
 }

@@ -1,13 +1,6 @@
-//
-//  ReportEventViewController.m
-//  HelloWorld
-//
-//  Created by Elkana Orbach on 18/01/2018.
-//  Copyright © 2018 Optimove. All rights reserved.
-//
 
 #import "ReportEventViewController.h"
-#import "ObjcDemoApp-Swift.h"
+@import OptimoveSDK;
 #import "CombinedEvent.h"
 
 @interface ReportEventViewController ()
@@ -30,7 +23,7 @@
     NSString* stringInput = _stringTextField.text;
     NSNumber* numberInput = @([_numberTextField.text intValue]);
     CombinedEvent* event = [[CombinedEvent alloc] initWithStringInput:stringInput andNumberInput:numberInput];
-    [Optimove.sharedInstance reportEventWithEvent:event completionHandler:nil];
+    [Optimove.sharedInstance reportEvent:event];
 }
 
 /*
