@@ -419,14 +419,14 @@ extension Optimove {
             OptiLogger.error("configurations for event: \(event.name) are missing")
             return
         }
-        let eventDecorator = OptimoveEventDecorator(event: event, config: config)
         
         // Must pass the decorator in case some additional attributes become mandatory
-        let eventValidationError = OptimoveEventValidator().validate(event: eventDecorator, withConfig: config)
+        let eventValidationError = OptimoveEventValidator().validate(event: event, withConfig: config)
         guard eventValidationError == nil else {
             OptiLogger.error("report event \(event.name) is invalid with error \(eventValidationError!)")
             return
         }
+        let eventDecorator = OptimoveEventDecorator(event: event, config: config)
         
         if RunningFlagsIndication.isComponentRunning(.optiTrack) {
             reportToOptiTrack(config, eventDecorator)
