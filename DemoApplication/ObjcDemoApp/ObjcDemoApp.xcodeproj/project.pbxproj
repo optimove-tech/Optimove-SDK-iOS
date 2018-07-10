@@ -20,6 +20,7 @@
 		6788739E20ED1D8C000B25F2 /* Notification Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 6788739620ED1D8C000B25F2 /* Notification Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		678873A520ED2305000B25F2 /* OptimoveSwiftFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678873A420ED2305000B25F2 /* OptimoveSwiftFile.swift */; };
 		678873A620ED2308000B25F2 /* OptimoveSwiftFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678873A420ED2305000B25F2 /* OptimoveSwiftFile.swift */; };
+		67F2778020F4820A00D2FA28 /* MyCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 67F2777F20F4820A00D2FA28 /* MyCustomEvent.m */; };
 		AEB1FF9F204940DC06CC7F89 /* libPods-ObjcDemoApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F7152776B25CC4C9D1D1B689 /* libPods-ObjcDemoApp.a */; };
 		C5CD8609A57CD9D7105A2ABC /* libPods-Notification Extension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DDF832B52536FE033C818CA3 /* libPods-Notification Extension.a */; };
 /* End PBXBuildFile section */
@@ -73,6 +74,7 @@
 		6788739B20ED1D8C000B25F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		678873A320ED2304000B25F2 /* ObjcDemoApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ObjcDemoApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		678873A420ED2305000B25F2 /* OptimoveSwiftFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveSwiftFile.swift; sourceTree = "<group>"; };
+		67F2777F20F4820A00D2FA28 /* MyCustomEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyCustomEvent.m; sourceTree = "<group>"; };
 		A0ABE924B863B643A8117B2B /* Pods-ObjcDemoApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjcDemoApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ObjcDemoApp/Pods-ObjcDemoApp.debug.xcconfig"; sourceTree = "<group>"; };
 		B5684BA2A2EFCFBE8B68AD1F /* Pods-ObjcDemoApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjcDemoApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-ObjcDemoApp/Pods-ObjcDemoApp.release.xcconfig"; sourceTree = "<group>"; };
 		DDF832B52536FE033C818CA3 /* libPods-Notification Extension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notification Extension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -140,6 +142,7 @@
 				672DDE6120107C6400193051 /* ReportEventViewController.m */,
 				677AF6392014A467002CBA4F /* CombinedEvent.h */,
 				677AF63A2014A467002CBA4F /* CombinedEvent.m */,
+				67F2777F20F4820A00D2FA28 /* MyCustomEvent.m */,
 				678873A320ED2304000B25F2 /* ObjcDemoApp-Bridging-Header.h */,
 			);
 			path = ObjcDemoApp;
@@ -354,6 +357,7 @@
 				678873A520ED2305000B25F2 /* OptimoveSwiftFile.swift in Sources */,
 				677AF63B2014A467002CBA4F /* CombinedEvent.m in Sources */,
 				674DF0F9200BA1AC00518998 /* main.m in Sources */,
+				67F2778020F4820A00D2FA28 /* MyCustomEvent.m in Sources */,
 				674DF0EB200BA1AC00518998 /* AppDelegate.m in Sources */,
 				672DDE5C200F358000193051 /* SetUserIdViewController.m in Sources */,
 			);
