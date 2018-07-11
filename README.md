@@ -1,12 +1,10 @@
-
-
 - [Introduction](#Introduction)
 - [Basic Setup](#Basic%20Setup)
 - [Advanced Setup](#Advanced%20Setup)
 -   [Track](#Track)
 	-   [Stitching App Visitors to Registered Customer IDs](#Stitching%20Visitors%20to%20Users)
 	-   [Tracking Screen Visits](#Tracking%20a%20Screen%20Visit)
-	-   [Tracking Custom Events](https://docs.optimove.com/optimove-sdk/#Web_Reporting_Events)
+	-   [Tracking Custom Events](#Tracking%20Custom%20Events)
 -   [Trigger](#Trigger)
  	- [Executing via Optimail](#trigger-optimail)
 	- [Executing via Optimove APIs](#trigger-api)
@@ -21,7 +19,7 @@ This guide will show you how to setup the iOS (Swift) SDK in order to:
  - Track visitor and customer actions and events
  - Trigger Realtime campaigns
 
-To implement iOS SDK using **Objective-C**, go here.
+To implement iOS SDK using **Objective-C**, go [here](https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/README%20%28ObjC%29.md).
 
 # <a id="Basic Setup"></a> Basic Setup
 
@@ -262,7 +260,7 @@ For example:
 
 <br>
 
-## Tracking Custom Events  
+## <a id="Tracking Custom Events"></a>Tracking Custom Events  
 
 Optimove clients may use the Optimove Mobile SDK to track specific customer actions and other custom events to Optimove (beyond OOTB events such visits). This data is used for tracking visitor and customer behavior, targeting campaigns to specific visitor and/or customer segments and triggering campaigns based on particular visitor and/or customer actions/events.  
   
