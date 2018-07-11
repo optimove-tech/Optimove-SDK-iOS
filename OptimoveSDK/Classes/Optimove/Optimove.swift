@@ -542,7 +542,12 @@ extension Optimove
             OptiLogger.debug("email is not valid")
             return
         }
-        reportEvent(SetEmailEvent(email: email))
+        let event = SetEmailEvent(email: email)
+        let configs = eventWarehouse?.getConfig(ofEvent: event)!
+        let decorator = OptimoveEventDecorator(event: event, config: configs!)
+        optiTrack.report(event: decorator, withConfigs: configs!)
+        realTime.setEmail(event, withConfig: configs!)
+        
     }
     private func isValidEmail(email:String) -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"

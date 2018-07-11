@@ -16,8 +16,6 @@
     return @"custom_combined_event";
 }
 
-
-
 - (NSDictionary*) parameters {
     
     NSMutableDictionary* res = [NSMutableDictionary dictionary];

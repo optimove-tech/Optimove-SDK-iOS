@@ -16,7 +16,9 @@
 
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-   
+    
+    NSURL* url = [[NSURL alloc] initWithString:@"http://my.bundle.id/main/cart/pre_checkout"];
+    [Optimove.sharedInstance reportScreenVisitWithViewControllersIdentifiers:@[@"main",@"cart"] url:url category:@"Shoes"];
 }
 
 

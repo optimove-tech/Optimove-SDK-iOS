@@ -2,6 +2,7 @@
 #import "ReportEventViewController.h"
 @import OptimoveSDK;
 #import "CombinedEvent.h"
+#import "MyCustomEvent.m"
 
 @interface ReportEventViewController ()
 
@@ -24,6 +25,11 @@
     NSNumber* numberInput = @([_numberTextField.text intValue]);
     CombinedEvent* event = [[CombinedEvent alloc] initWithStringInput:stringInput andNumberInput:numberInput];
     [Optimove.sharedInstance reportEvent:event];
+    
+    NSDictionary* params = @{@"first_param" : @"1"};
+    MyCustomEvent* myEvent = [[MyCustomEvent alloc]initWithName:@"event_name" andParameters:params];
+    [Optimove.sharedInstance reportEvent:myEvent];
+    
 }
 
 /*

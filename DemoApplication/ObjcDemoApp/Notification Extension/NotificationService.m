@@ -8,7 +8,7 @@
 
 @property (nonatomic, strong) void (^contentHandler)(UNNotificationContent *contentToDeliver);
 @property (nonatomic, strong) UNMutableNotificationContent *bestAttemptContent;
-@property (nonatomic, strong) OptimoveNotificationServiceExtension* optimoveNotificationExtenstion;
+@property (nonatomic, strong) OptimoveNotificationServiceExtension* optimoveNotificationExtension;
 
 @end
 
@@ -16,9 +16,9 @@
 - (void)didReceiveNotificationRequest:(UNNotificationRequest *)request withContentHandler:(void (^)(UNNotificationContent * _Nonnull))contentHandler {
     
     NotificationExtensionTenantInfo* info = [[NotificationExtensionTenantInfo alloc] initWithEndpoint:@"https://appcontrollerproject-developer.firebaseapp.com" token:@"demo_apps" version:@"1.0.0" appBundleId:@"com.optimove.sdk.demo.objc"];
-    self.optimoveNotificationExtenstion = [[OptimoveNotificationServiceExtension alloc]initWithTenantInfo:info];
-    if (![self.optimoveNotificationExtenstion didReceive:request withContentHandler:contentHandler]) {
-        
+    self.optimoveNotificationExtension = [[OptimoveNotificationServiceExtension alloc]initWithTenantInfo:info];
+    [self.optimoveNotificationExtension didReceive:request withContentHandler:contentHandler];
+    if (!self.optimoveNotificationExtension.isHandledByOptimove) {
         self.contentHandler = contentHandler;
         self.bestAttemptContent = [request.content mutableCopy];
         
@@ -30,9 +30,9 @@
 }
 
 - (void)serviceExtensionTimeWillExpire {
-    if (!self.optimoveNotificationExtenstion.isHandledByOptimove) {
-        // Called just before the extension will be terminated by the system.
-        // Use this as an opportunity to deliver your "best attempt" at modified content, otherwise the original push payload will be used.
+    if (self.optimoveNotificationExtension.isHandledByOptimove) {
+        [self.optimoveNotificationExtension serviceExtensionTimeWillExpire];
+    } else {
         self.contentHandler(self.bestAttemptContent);
     }
 }

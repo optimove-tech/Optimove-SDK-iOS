@@ -64,7 +64,7 @@ class RealTime: OptimoveComponent
                 context: eventDecorator.parameters)
             self.deviceStateMonitor.getStatus(of: .internet) { (online) in
                 guard online else {
-                    OptiLogger.warning("Device is offline, skip realtime event set user id")
+                    OptiLogger.warning("Device is offline, skip realtime event set email")
                     OptimoveUserDefaults.shared.realtimeSetEmailFailed = true
                     OptimoveUserDefaults.shared.realtimeFailedEmail = event.email
                     return
