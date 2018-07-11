@@ -25,7 +25,7 @@ To implement iOS SDK using **Objective-C**, go [here](https://github.com/optimov
 
 ## **Request a Mobile SDK from Optimove**
 
-Before implementing the Optimove Track & Trigger to track visitor / customer activities or perform other functions ([OptiPush](https://github.com/optimove-tech/A/blob/master/O/O.md)), you will need to contact your Optimove Customer Success Manager (CSM) or Optimove point of contact. <br>
+Before implementing the Optimove Track & Trigger to track visitor / customer activities or perform other functions ([Optipush](https://github.com/optimove-tech/Optipush-Guide)), you will need to contact your Optimove Customer Success Manager (CSM) or Optimove point of contact. <br>
 To get started, please follow these instructions: 
 
 ### 1. Pre-requisites <br>
@@ -94,7 +94,7 @@ end
 * `Firebase/Messaging`
 * `Firebase/DynamicLinks`
 
-### 3. If you are using Optipush, see additional configurations [here](https://github.com/optimove-tech/A/tree/master/O/O%20for%20iOS/O%20for%20iOS%20V1.2#2-optipush-configuration)  
+### 3. If you are using Optipush, see additional configurations [here](https://github.com/optimove-tech/Optipush-Guide/tree/master/Opitpush%20for%20iOS#optipush-configuration)  
     
 ### 4. Run the SDK
 
