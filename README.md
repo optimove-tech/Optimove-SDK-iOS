@@ -1,4 +1,5 @@
 
+
 - [Introduction](#Introduction)
 - [Basic Setup](#Basic%20Setup)
 - [Advanced Setup](#Advanced%20Setup)
@@ -176,9 +177,18 @@ func application(_ application: UIApplication,
 	}
 }
 ```
-  
 
-### 3. Important Installation and Usage Notes
+Note: If your using you own 'FirebaseMessaging' (a.k.a you enter "true" on the 'useFirebaseMessaging' argument), you must notify Optimove for any changes in the `fcmToken` via calling 
+`optimove(didReceiveFirebaseRegistrationToken:` with the update `fcmToken` as argument.
+for example:
+
+```swift
+func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+        Optimove.sharedInstance.optimove(didReceiveFirebaseRegistrationToken: fcmToken)
+    }
+```
+
+### 5. Important Installation and Usage Notes
 
 The SDK initialization process occurs asynchronously, off the `Main Thread`.
 
@@ -188,7 +198,7 @@ Before calling the Public API methods, make sure that the SDK has finished initi
 
 When the SDK has finished its initialization process, the callback `optimove(_:didBecomeActiveWithMissingPermissions:)` is executed with any missing permissions that the SDK would require to operate optimally. 
 
-### 4. Tracking Visitor and Customer activity
+### 6. Tracking Visitor and Customer activity
  
 You will also need to include the following steps to complete the basic setup:
 
