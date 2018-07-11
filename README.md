@@ -21,6 +21,7 @@ This guide will show you how to setup the iOS (Swift) SDK in order to:
  - Track visitor and customer actions and events
  - Trigger Realtime campaigns
 
+To implement iOS SDK using **Objective-C**, go here.
 
 # <a id="Basic Setup"></a> Basic Setup
 
@@ -178,9 +179,10 @@ func application(_ application: UIApplication,
 }
 ```
 
-Note: If your using you own 'FirebaseMessaging' (a.k.a you enter "true" on the 'useFirebaseMessaging' argument), you must notify Optimove for any changes in the `fcmToken` via calling 
+>Note: If your using you own 'FirebaseMessaging' (a.k.a you enter "true" on the 'useFirebaseMessaging' argument), you must notify Optimove for any changes in the `fcmToken` via calling 
 `optimove(didReceiveFirebaseRegistrationToken:` with the update `fcmToken` as argument.
-for example:
+
+For example:
 
 ```swift
 func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
