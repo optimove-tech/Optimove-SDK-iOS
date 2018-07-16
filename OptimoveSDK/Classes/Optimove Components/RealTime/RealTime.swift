@@ -80,7 +80,7 @@ class RealTime: OptimoveComponent
                         } else {
                             OptimoveUserDefaults.shared.realtimeSetEmailFailed = false
                             OptimoveUserDefaults.shared.realtimeFailedEmail = nil
-                            OptiLogger.debug("real time set user id status:\(String(describing: String(data:data!,encoding:.utf8)!))")
+                            OptiLogger.debug("real time set email status:\(String(describing: String(data:data!,encoding:.utf8)!))")
                         }
                     }
                 } catch {
