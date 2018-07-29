@@ -8,7 +8,7 @@ class SetEmailEvent: OptimoveCoreEvent
         self.email = email
     }
     var name: String {
-        return  "Set_email_event"
+        return  "set_email_event"
     }
     
     var parameters: [String : Any] {

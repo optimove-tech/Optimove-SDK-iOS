@@ -54,8 +54,8 @@ PODS:
     - ObjcExceptionBridging
 
 DEPENDENCIES:
-  - OptimoveNotificationServiceExtension
-  - OptimoveSDK (from `/Users/mobiledeveloperoptimove/Development/repos/iOS-SDK-Integration-Guide/`)
+  - OptimoveNotificationServiceExtension (= 1.2.0)
+  - OptimoveSDK (= 1.2.1)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -69,13 +69,10 @@ SPEC REPOS:
     - nanopb
     - ObjcExceptionBridging
     - OptimoveNotificationServiceExtension
+    - OptimoveSDK
     - OptiTrackCore
     - Protobuf
     - XCGLogger
-
-EXTERNAL SOURCES:
-  OptimoveSDK:
-    :path: "/Users/mobiledeveloperoptimove/Development/repos/iOS-SDK-Integration-Guide/"
 
 SPEC CHECKSUMS:
   Firebase: d66f4f29c23f22d96808d9abc174d81d8eee968f
@@ -88,11 +85,11 @@ SPEC CHECKSUMS:
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   ObjcExceptionBridging: c30e00eb3700467e695faeea30e26e18bd445001
   OptimoveNotificationServiceExtension: f1e43171f41e661c1299e01ba26299bad61711e6
-  OptimoveSDK: 02f52ad3aa86acc654dcbc972de0dc3ef1502501
+  OptimoveSDK: 5e4f0ae90ccdfdd889c10fecc67f6ee77978a64a
   OptiTrackCore: 2004198a4088e3d0a8b2bac534f5d3d333777795
   Protobuf: 0fc0ad8bec688b2a3017a139953e01374fedbd5f
   XCGLogger: 4fc1bc0bdd5828cb8dc8da7a843536cda1bea8f3
 
-PODFILE CHECKSUM: 859dad0f6356245735e50242527f1651329fa3be
+PODFILE CHECKSUM: a1868bb874d9006e3246b5e59e2e6b77ef2ede8b
 
 COCOAPODS: 1.5.3
