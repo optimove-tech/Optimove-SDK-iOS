@@ -85,7 +85,7 @@ platform :ios, '10.0'
 use_modular_headers!
 
 target 'iOSDemo' do
-  pod 'OptimoveSDK'
+  pod 'OptimoveSDK','1.2.1'
 end
 ```
 
