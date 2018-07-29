@@ -3,9 +3,9 @@ platform :ios, '10.0'
 use_modular_headers!
 
 target 'ObjcDemoApp' do
-    pod 'OptimoveSDK'
+    pod 'OptimoveSDK', '1.2.1'
 end
 
 target 'Notification Extension' do
-    pod 'OptimoveNotificationServiceExtension''
+    pod 'OptimoveNotificationServiceExtension','1.2.0'
 end

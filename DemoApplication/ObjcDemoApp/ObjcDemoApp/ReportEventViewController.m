@@ -27,8 +27,8 @@
     [Optimove.sharedInstance reportEvent:event];
     
     NSDictionary* params = @{@"first_param" : @"1"};
-    MyCustomEvent* myEvent = [[MyCustomEvent alloc]initWithName:@"event_name" andParameters:params];
-    [Optimove.sharedInstance reportEvent:myEvent];
+//    MyCustomEvent* myEvent = [[MyCustomEvent alloc]initWithName:@"event_name" andParameters:params];
+//    [Optimove.sharedInstance reportEvent:myEvent];
     
 }
 

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		672DDE5C200F358000193051 /* SetUserIdViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 672DDE5B200F358000193051 /* SetUserIdViewController.m */; };
 		672DDE6220107C6400193051 /* ReportEventViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 672DDE6120107C6400193051 /* ReportEventViewController.m */; };
+		6731379A210DCFCD00839DD0 /* MessagingImplementer.m in Sources */ = {isa = PBXBuildFile; fileRef = 67313799210DCFCD00839DD0 /* MessagingImplementer.m */; };
 		674DF0EB200BA1AC00518998 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 674DF0EA200BA1AC00518998 /* AppDelegate.m */; };
 		674DF0EE200BA1AC00518998 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 674DF0ED200BA1AC00518998 /* MainViewController.m */; };
 		674DF0F1200BA1AC00518998 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 674DF0EF200BA1AC00518998 /* Main.storyboard */; };
@@ -55,6 +56,8 @@
 		672DDE5B200F358000193051 /* SetUserIdViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SetUserIdViewController.m; sourceTree = "<group>"; };
 		672DDE6020107C6400193051 /* ReportEventViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReportEventViewController.h; sourceTree = "<group>"; };
 		672DDE6120107C6400193051 /* ReportEventViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReportEventViewController.m; sourceTree = "<group>"; };
+		67313798210DCFCD00839DD0 /* MessagingImplementer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MessagingImplementer.h; sourceTree = "<group>"; };
+		67313799210DCFCD00839DD0 /* MessagingImplementer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessagingImplementer.m; sourceTree = "<group>"; };
 		674DF0E6200BA1AC00518998 /* ObjcDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ObjcDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		674DF0E9200BA1AC00518998 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		674DF0EA200BA1AC00518998 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -144,6 +147,8 @@
 				677AF63A2014A467002CBA4F /* CombinedEvent.m */,
 				67F2777F20F4820A00D2FA28 /* MyCustomEvent.m */,
 				678873A320ED2304000B25F2 /* ObjcDemoApp-Bridging-Header.h */,
+				67313798210DCFCD00839DD0 /* MessagingImplementer.h */,
+				67313799210DCFCD00839DD0 /* MessagingImplementer.m */,
 			);
 			path = ObjcDemoApp;
 			sourceTree = "<group>";
@@ -359,6 +364,7 @@
 				674DF0F9200BA1AC00518998 /* main.m in Sources */,
 				67F2778020F4820A00D2FA28 /* MyCustomEvent.m in Sources */,
 				674DF0EB200BA1AC00518998 /* AppDelegate.m in Sources */,
+				6731379A210DCFCD00839DD0 /* MessagingImplementer.m in Sources */,
 				672DDE5C200F358000193051 /* SetUserIdViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
