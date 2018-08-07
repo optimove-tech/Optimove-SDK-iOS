@@ -7,13 +7,20 @@ class RealTime: OptimoveComponent
     var metaData:RealtimeMetaData!
     let realTimeQueue = DispatchQueue(label: "com.optimove.realtime")
     
+    
+    
+    override func performInitializationOperations() {
+        super.performInitializationOperations()
+        setFirstTimeVisitIfNeeded()
+    }
+    
     func setUserId(_ event:SetUserId, withConfig config:OptimoveEventConfig)
     {
         realTimeQueue.async {
             let eventDecorator = OptimoveEventDecorator(event: event, config: config)
             let rtEvent = RealtimeEvent(tid: self.metaData.realtimeToken,
                                         cid: event.userId,
-                                        visitorid: event.originalVistorId,
+                                        visitorId: event.originalVistorId,
                                         eid: "\(config.id)",
                 context: eventDecorator.parameters)
             self.deviceStateMonitor.getStatus(of: .internet) { (online) in
@@ -27,6 +34,7 @@ class RealTime: OptimoveComponent
                 let json = JSONEncoder()
                 do {
                     let data = try json.encode(rtEvent)
+                    OptiLogger.debug("report set user id to realtime with JSON: \(String(data:data,encoding:.utf8)!)")
                     NetworkManager.post(toUrl: URL(string:Optimove.sharedInstance.realTime.metaData.realtimeGateway+"reportEvent")!, json: data) { (data, error) in
                         if error != nil {
                             OptimoveUserDefaults.shared.realtimeSetUserIdFailed = true
@@ -51,12 +59,12 @@ class RealTime: OptimoveComponent
             let eventDecorator = OptimoveEventDecorator(event: event, config: config)
             let rtEvent = RealtimeEvent(tid: self.metaData.realtimeToken,
                                         cid: CustomerID,
-                                        visitorid: VisitorID,
+                                        visitorId: VisitorID,
                                         eid: "\(config.id)",
                 context: eventDecorator.parameters)
             self.deviceStateMonitor.getStatus(of: .internet) { (online) in
                 guard online else {
-                    OptiLogger.warning("Device is offline, skip realtime event set user id")
+                    OptiLogger.warning("Device is offline, skip realtime event set email")
                     OptimoveUserDefaults.shared.realtimeSetEmailFailed = true
                     OptimoveUserDefaults.shared.realtimeFailedEmail = event.email
                     return
@@ -64,6 +72,7 @@ class RealTime: OptimoveComponent
                 let json = JSONEncoder()
                 do {
                     let data = try json.encode(rtEvent)
+                    OptiLogger.debug("report set email to realtime with JSON: \(String(data:data,encoding:.utf8)!)")
                     NetworkManager.post(toUrl: URL(string:Optimove.sharedInstance.realTime.metaData.realtimeGateway+"reportEvent")!, json: data) { (data, error) in
                         if error != nil {
                             OptimoveUserDefaults.shared.realtimeSetEmailFailed = true
@@ -71,7 +80,7 @@ class RealTime: OptimoveComponent
                         } else {
                             OptimoveUserDefaults.shared.realtimeSetEmailFailed = false
                             OptimoveUserDefaults.shared.realtimeFailedEmail = nil
-                            OptiLogger.debug("real time set user id status:\(String(describing: String(data:data!,encoding:.utf8)!))")
+                            OptiLogger.debug("real time set email status:\(String(describing: String(data:data!,encoding:.utf8)!))")
                         }
                     }
                 } catch {
@@ -104,7 +113,7 @@ class RealTime: OptimoveComponent
         }
         
         realTimeQueue.async {
-            let rtEvent = RealtimeEvent(tid: self.metaData.realtimeToken, cid: OptimoveUserDefaults.shared.customerID, visitorid: VisitorID, eid: String(config.id), context: event.parameters)
+            let rtEvent = RealtimeEvent(tid: self.metaData.realtimeToken, cid: OptimoveUserDefaults.shared.customerID, visitorId: VisitorID, eid: String(config.id), context: event.parameters)
             
             self.deviceStateMonitor.getStatus(of: .internet) { (online) in
                 guard online else {
@@ -114,6 +123,7 @@ class RealTime: OptimoveComponent
                 let json = JSONEncoder()
                 do {
                     let data = try json.encode(rtEvent)
+                    OptiLogger.debug("report event to realtime with JSON: \(String(data:data,encoding:.utf8)!)")
                     NetworkManager.post(toUrl: URL(string:Optimove.sharedInstance.realTime.metaData.realtimeGateway+"reportEvent")!, json: data) { (response, error) in
                         guard error == nil else {
                             OptiLogger.error("request to realtime failed: \(error.debugDescription)")
@@ -126,6 +136,11 @@ class RealTime: OptimoveComponent
                     return
                 }
             }
+        }
+    }
+    private func setFirstTimeVisitIfNeeded() {
+        if OptimoveUserDefaults.shared.firstVisitTimestamp == 0  {
+            OptimoveUserDefaults.shared.firstVisitTimestamp = Int(Date().timeIntervalSince1970) //Realtime server asked to get it in seconds
         }
     }
 }
