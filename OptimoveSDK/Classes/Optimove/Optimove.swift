@@ -543,10 +543,11 @@ extension Optimove
             return
         }
         let event = SetEmailEvent(email: email)
-        let configs = eventWarehouse?.getConfig(ofEvent: event)!
-        let decorator = OptimoveEventDecorator(event: event, config: configs!)
-        optiTrack.report(event: decorator, withConfigs: configs!)
-        realTime.setEmail(event, withConfig: configs!)
+        if let configs = eventWarehouse?.getConfig(ofEvent: event) {
+            let decorator = OptimoveEventDecorator(event: event, config: configs)
+            optiTrack.report(event: decorator, withConfigs: configs)
+            realTime.setEmail(event, withConfig: configs)
+        }
         
     }
     private func isValidEmail(email:String) -> Bool {
