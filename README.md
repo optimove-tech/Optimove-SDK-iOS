@@ -74,8 +74,9 @@ In order to work with the Optimove SDK for your iOS native app, need to download
 
 1. In your Podfile, add the following:
 
-`pod OptimoveSDK`
+`pod 'OptimoveSDK','1.2.0'`
 
+>Please make sure to import the EXACT version '1.2.0'
 
 Example:
 ```ruby
@@ -87,6 +88,7 @@ target 'iOSDemo' do
   pod 'OptimoveSDK','1.2.1'
 end
 ```
+
 
 2. `OptimoveSDK` relies on other modules as infrastructure, such as `Firebase`, so when you download `OptimoveSDK` you get the following frameworks:
 
