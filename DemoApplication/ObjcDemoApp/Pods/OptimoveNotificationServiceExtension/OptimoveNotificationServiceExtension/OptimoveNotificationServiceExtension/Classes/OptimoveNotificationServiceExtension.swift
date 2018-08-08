@@ -22,6 +22,7 @@ import UserNotifications
     }
     
     // Returns true if the message was consumed by Optimove
+    @discardableResult
     @objc public func didReceive(_ request: UNNotificationRequest,
                                  withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) -> Bool
     {

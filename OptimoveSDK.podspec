@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveSDK'
-  s.version          = '1.2.0'
+  s.version          = '1.2.1'
   s.summary          = 'Optimove SDK for Analytics and push notifications.'
 
   s.description      = <<-DESC
@@ -18,9 +18,9 @@ Pod::Spec.new do |s|
   s.static_framework = true
   s.swift_version = '4.1'
   s.source_files = 'OptimoveSDK/Classes/**/*'
-  s.dependency 'Firebase/Core', '~> 5.4.0'
-  s.dependency 'Firebase/Messaging'
-  s.dependency 'Firebase/DynamicLinks'
+  s.dependency 'Firebase/Core', '5.4.0'
+  s.dependency 'FirebaseMessaging','3.0.3'
+  s.dependency 'FirebaseDynamicLinks','3.0.1'
   s.dependency 'OptiTrackCore'
   s.dependency 'XCGLogger','~> 6.0.4'
   

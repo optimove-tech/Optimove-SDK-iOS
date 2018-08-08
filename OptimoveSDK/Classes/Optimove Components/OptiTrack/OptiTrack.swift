@@ -110,7 +110,12 @@ extension OptiTrack
                                                 CustomDimension(index: self.metaData.eventNameCustomDimensionId, value: event.name)]
             for (name,value) in event.parameters {
                 if let optitrackDimensionID = config.parameters[name]?.optiTrackDimensionId {
-                    dimensions.append(CustomDimension(index: optitrackDimensionID, value: String(describing: value)))
+                    if optitrackDimensionID <= (self.metaData.maxActionCustomDimensions + self.metaData.maxVisitCustomDimensions) {
+                        let truncatedValue = (String(describing: value).trimmingCharacters(in: .whitespaces))
+                        if !truncatedValue.isEmpty {
+                            dimensions.append(CustomDimension(index: optitrackDimensionID, value: String(describing: truncatedValue)))
+                        }
+                    }
                 }
             }
             let event = Event(tracker: self.tracker, action: [], url: nil, referer: nil, eventCategory: self.metaData.eventCategoryName, eventAction: event.name, eventName: nil, eventValue: nil, customTrackingParameters: self.optimoveCustomizePlugins, dimensions: dimensions, variables: [])

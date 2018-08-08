@@ -102,7 +102,7 @@ struct Keys
         static let eventDeviceType = "Mobile"
         static let eventPlatform    = "iOS"
         static let eventOs          =  "iOS \(OptimoveUserDefaults.shared.deviceOs)"
-        static let eventNativeMobile = 1
+        static let eventNativeMobile = true
     }
     struct AdditionalAttributesKeys
     {
