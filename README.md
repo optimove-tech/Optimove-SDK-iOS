@@ -76,8 +76,8 @@ In order to work with the Optimove SDK for your iOS native app, need to download
 
 1. In your Podfile, add the following:
 
-`pod 'OptimoveSDK','1.2.1'` (for Optimove version 6.6)
-`pod 'OptimoveSDK','1.2.0'`(for Optimove version 6.5)
+`pod 'OptimoveSDK','1.2.1'` (for Optimove version 6.6) <br>
+`pod 'OptimoveSDK','1.2.0'`(for Optimove version 6.5) <br>
 
 >Please make sure to import the EXACT OptimoveSDK version according the Optimove version you are using.<br>
 >For those on version 6.6, please use '1.2.1'<br>
