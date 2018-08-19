@@ -4,6 +4,8 @@
 -   [Track](#Track)
 	-   [Stitching App Visitors to Registered Customer IDs](#Stitching%20Visitors%20to%20Users)
 	-   [Tracking Screen Visits](#Tracking%20a%20Screen%20Visit)
+	-   [Tracking/Updating User Email Addresses](#Tracking%20emails)
+	-   [Registering the User ID and User Email at the Same Time](#Register%20user)
 	-   [Tracking Custom Events](#Tracking%20Custom%20Events)
 -   [Trigger](#Trigger)
  	- [Executing via Optimail](#trigger-optimail)
@@ -74,9 +76,13 @@ In order to work with the Optimove SDK for your iOS native app, need to download
 
 1. In your Podfile, add the following:
 
-`pod 'OptimoveSDK','1.2.1'`
+`pod 'OptimoveSDK','1.2.1'` (for Optimove version 6.6)
+`pod 'OptimoveSDK','1.2.0'`(for Optimove version 6.5)
 
->Please make sure to import the EXACT version '1.2.0'
+>Please make sure to import the EXACT OptimoveSDK version according the Optimove version you are using.<br>
+>For those on version 6.6, please use '1.2.1'<br>
+>For those on version 6.5, please use '1.2.0' <br>
+>Please confirm with your Product Integration Team representative which version you are using during implementation phase.
 
 Example:
 ```ruby
@@ -286,6 +292,27 @@ For example:
 ```
 >Note: The `reportScreenVisit` method should only be called after the initialization success callback was received.
 
+<br>
+
+## <a id="Tracking emails"></a> Tracking/Updating User Email Addresses
+
+To track a user’s email address, such as when a visitor enters the app and submits a register or subscribe form, call the `setUserEmail` method to record the address. This is best used when you want to capture realtime email event.
+
+```java
+// Call to notify the SDK that the user has a known email address. Can be called regardless of the "setUserId" call.
+Optimove.sharedInstance.setUserEmail(email: "a.valid@email.com");
+```
+> Notes:
+>-   In instances where you need to set both the visitor's user ID and email address simultaneously, you should use the `registerUser` method instead of `setUserEmail`. This applies to all situations in which a single user action requires you to set both the user ID and email address (e.g., registration, newsletter signup).
+
+## <a id="Register user"></a>  Registering the User ID and User Email at the Same Time
+
+In all situations where a single user action requires you to set both the customer ID and email address (e.g., registration, newsletter signup) simultaneously, you should use the `registerUser` method (instead of calling both `setUserId` and `setUserEmail`) to ensure the proper registration of the user in Optimove.
+
+```java
+// Convenience method to call both "setUserId" and "setEmail" simultaneously.
+Optimove.sharedInstance.registerUser(email: "a.valid@email.com", userId: "a-unique-user-id");
+```
 <br>
 
 ## <a id="Tracking Custom Events"></a>Tracking Custom Events  
