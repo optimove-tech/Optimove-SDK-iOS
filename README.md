@@ -264,7 +264,7 @@ Optimove.sharedInstance.set(userId:)
 
 >**Notes:** 
 >- The `CustomerId` is usually provided by the server application that manages customers, and is the **same** ID provided to Optimove during the daily customer data transfer. 
-> - Any userId that does not correspond to your Optimove unique identifier (Customer ID) due to faulty / unrecognized userIds will not be excluded from your customer tracked activity. Therefore please make sure that the userId sent via the userId is a recognizable ID.
+> - Any userId that does not correspond to your Optimove unique identifier (Customer ID) due to faulty / unrecognized userIds will now be excluded from your customer tracked activity. Therefore please make sure that the userId sent via the userId is a recognizable ID.
  >- You may call the `set(userId:)` method at any time, regardless if the initialization success callback was received
 > - If you will be sending encrypted userId, please follow the steps in [Reporting encrypted CustomerIDs](https://github.com/optimove-tech/Reporting-Encrypted-CustomerID)
  
