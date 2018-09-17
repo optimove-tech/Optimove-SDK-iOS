@@ -23,12 +23,12 @@ class FirebaseInteractor:NSObject
     var appController: FirebaseOptions?
     var clientServiceOptions:FirebaseOptions?
     
-    var reportEndPoint:String
+    var pushTopicsRegistrationEndpoint:String
     
     //MARK: Constructors
     override init()
     {
-        reportEndPoint = ""
+        pushTopicsRegistrationEndpoint = ""
     }
     
     //MARK: - static methods
@@ -63,7 +63,7 @@ class FirebaseInteractor:NSObject
     {
         setMessaginDelegate()
         OptiLogger.debug("Setup firebase")
-        reportEndPoint = endPointForTopics
+        pushTopicsRegistrationEndpoint = endPointForTopics
         self.delegate = delegate
         self.appController = FirebaseOptionsBuilder()
             .set(appId: firebaseMetaData.appid)
@@ -189,7 +189,7 @@ extension FirebaseInteractor:MessagingDelegate
             }
         } else {
             guard let fcm = OptimoveUserDefaults.shared.fcmToken else {return }
-            let endPoint = reportEndPoint + "registerClientToTopics"
+            let endPoint = pushTopicsRegistrationEndpoint + "registerClientToTopics"
             let urlEndpoint = URL(string: endPoint)!
             let json = buildTopicRegistrationJson(fcm, [topic])
             NetworkManager.post(toUrl: urlEndpoint, json: json) { (data, error) in
@@ -216,7 +216,7 @@ extension FirebaseInteractor:MessagingDelegate
             }
         } else {
             guard let fcm = OptimoveUserDefaults.shared.fcmToken else {return }
-            let endPoint = reportEndPoint + "unregisterClientFromTopics"
+            let endPoint = pushTopicsRegistrationEndpoint + "unregisterClientFromTopics"
             let urlEndpoint = URL(string: endPoint)!
             let json = buildTopicRegistrationJson(fcm, [topic])
             

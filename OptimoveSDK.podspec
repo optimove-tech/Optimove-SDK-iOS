@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveSDK'
-  s.version          = '1.2.1'
+  s.version          = '1.2.2'
   s.summary          = 'Optimove SDK for Analytics and push notifications.'
 
   s.description      = <<-DESC
@@ -25,5 +25,5 @@ Pod::Spec.new do |s|
   s.dependency 'XCGLogger','~> 6.0.4'
   
  
-  # s.frameworks = 'UIKit', 'MapKit'
+  s.frameworks = 'UIKit'
 end
