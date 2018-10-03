@@ -76,13 +76,8 @@ In order to work with the Optimove SDK for your iOS native app, need to download
 
 1. In your Podfile, add the following:
 
-`pod 'OptimoveSDK','1.2.1'` (for Optimove version 6.6) <br>
-`pod 'OptimoveSDK','1.2.0'`(for Optimove version 6.5) <br>
+`pod 'OptimoveSDK','1.2.2'` <br>
 
->Please make sure to import the EXACT OptimoveSDK version according the Optimove version you are using.<br>
->For those on version 6.6, please use '1.2.1'<br>
->For those on version 6.5, please use '1.2.0' <br>
->Please confirm with your Product Integration Team representative which version you are using during implementation phase.
 
 Example:
 ```ruby
@@ -91,7 +86,7 @@ platform :ios, '10.0'
 target 'iOSDemo' do
   use_frameworks!
 
-  pod 'OptimoveSDK','1.2.1'
+  pod 'OptimoveSDK','1.2.2'
 end
 ```
 
@@ -264,6 +259,7 @@ Optimove.sharedInstance.set(userId:)
 
 >**Notes:** 
 >- The `CustomerId` is usually provided by the server application that manages customers, and is the **same** ID provided to Optimove during the daily customer data transfer. 
+> - Any userId that does not correspond to your Optimove unique identifier (Customer ID) due to faulty / unrecognized userIds will now be excluded from your customer tracked activity. Therefore please make sure that the userId sent via the userId is a recognizable ID.
  >- You may call the `set(userId:)` method at any time, regardless if the initialization success callback was received
 > - If you will be sending encrypted userId, please follow the steps in [Reporting encrypted CustomerIDs](https://github.com/optimove-tech/Reporting-Encrypted-CustomerID)
  
