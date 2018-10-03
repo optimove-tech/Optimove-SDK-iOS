@@ -74,7 +74,7 @@ In order to work with the Optimove SDK for your iOS native app, need to download
 
 1. In your Podfile, add the following:
 
-`pod OptimoveSDK`
+`pod 'OptimoveSDK','1.2.2'`<br>
 
 Since _`OptimoveSDK`_ is written in `swift`, you must add `use_modular_headers!` globaly.
 
@@ -85,7 +85,7 @@ platform :ios, '10.0'
 use_modular_headers!
 
 target 'iOSDemo' do
-  pod 'OptimoveSDK','1.2.1'
+  pod 'OptimoveSDK','1.2.2'
 end
 ```
 
