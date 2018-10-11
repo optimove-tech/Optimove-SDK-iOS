@@ -97,9 +97,19 @@ class Registrar
             // TODO Handle corrupt state - should probably just delete the retry backup
             return
         }
+        var path:URL?
+        if url.path == "/registerCustomer" || url.path == "/registerVisitor" {
+            path = URL(string:(self.registrationEndPoint + url.path).replacingOccurrences(of: "//", with: "/"))
+        } else {
+            path = URL(string:(self.reportEndPoint + url.path).replacingOccurrences(of: "//", with: "/"))
+        }
         
-        OptiLogger.debug("send retry request to :\(url.path)")
-        NetworkManager.post(toUrl: url, json: json) { (data, error) in
+        guard path != nil else {
+            OptiLogger.debug("could not locate url for mbaas operation")
+            return
+        }
+        OptiLogger.debug("send retry request to :\(path!)")
+        NetworkManager.post(toUrl: path!, json: json) { (data, error) in
             guard error == nil else {
                 OptiLogger.error("retry request failed, lets try next time...")
                 return
@@ -226,7 +236,7 @@ extension Registrar: RegistrationProtocol
     private func handleFailedMbaasRequest(of mbaasRequest:MbaasRequestBody, to url: URL)
     {
         self.backupRequest(mbaasRequest)
-        UserDefaults.standard.set(url, forKey: "\(mbaasRequest.operation.rawValue)_endpoint") // TODO Clean this up - no literal constants should be here
+        UserDefaults.standard.set(url.path, forKey: "\(mbaasRequest.operation.rawValue)_endpoint") // TODO Clean this up - no literal constants should be here
         self.setSuccesFlag(succeed: false, for: mbaasRequest.operation)
     }
     

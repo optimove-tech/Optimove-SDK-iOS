@@ -12,10 +12,12 @@ struct OptipushMetaData:Decodable
 {
     let registrationServiceRegistrationEndPoint : String
     let registrationServiceOtherEndPoint        : String
+    let pushTopicsRegistrationEndpoint          : String
     let enableAdvertisingIdReport               : Bool?
     
     enum CodingKeys: String, CodingKey {
         case enableAdvertisingIdReport
+        case pushTopicsRegistrationEndpoint
         case registrationServiceRegistrationEndPoint = "onlyRegistrationServiceEndpoint"
         case registrationServiceOtherEndPoint = "otherRegistrationServiceEndpoint"
     }

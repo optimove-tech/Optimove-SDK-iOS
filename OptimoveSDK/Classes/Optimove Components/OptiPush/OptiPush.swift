@@ -34,7 +34,7 @@ final class OptiPush: OptimoveComponent
         firebaseInteractor.setupFirebase(from: firebaseMetaData,
                                          clientFirebaseMetaData: clientFirebaseMetaData,
                                          delegate: self,
-                                         endPointForTopics: optipushMetaData.registrationServiceOtherEndPoint)
+                                         endPointForTopics: optipushMetaData.pushTopicsRegistrationEndpoint)
     }
     
     func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data)
