@@ -39,7 +39,7 @@ struct RegistrationRequestBuilder
         bundle[OptimoveKeys.Registration.token.rawValue] = OptimoveUserDefaults.shared.fcmToken
         let app = [bundleID: bundle]
         var device: [String: Any] = [OptimoveKeys.Registration.apps.rawValue: app]
-        device[OptimoveKeys.Registration.osVersion.rawValue] = OSVersion
+        device[OptimoveKeys.Registration.osVersion.rawValue] = ProcessInfo().operatingSystemVersionOnlyString
         let ios = [DeviceID: device]
         requestJsonData[OptimoveKeys.Registration.iOSToken.rawValue]         = ios
         requestJsonData[OptimoveKeys.Registration.tenantID.rawValue]         = OptimoveUserDefaults.shared.siteID

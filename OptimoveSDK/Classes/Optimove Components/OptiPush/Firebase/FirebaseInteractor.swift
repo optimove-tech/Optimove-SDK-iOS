@@ -63,10 +63,7 @@ class FirebaseInteractor:NSObject,OptipushServiceInfra
     {
         setMessaginDelegate()
         OptiLogger.debug("Setup firebase")
-        self.pushTopicsRegistrationEndpoint = pushTopicsRegistrationEndpoint
-        if self.pushTopicsRegistrationEndpoint.last != "/"  {
-            self.pushTopicsRegistrationEndpoint.append("/")
-        }
+        self.pushTopicsRegistrationEndpoint = pushTopicsRegistrationEndpoint.last == "/" ? pushTopicsRegistrationEndpoint : "\(pushTopicsRegistrationEndpoint)/"
         self.delegate = delegate
         self.appController = FirebaseOptionsBuilder()
             .set(appId: firebaseMetaData.appid)

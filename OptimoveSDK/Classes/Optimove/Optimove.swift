@@ -13,9 +13,9 @@ import FirebaseDynamicLinks
 protocol OptimoveNotificationHandling
 {
     func didReceiveRemoteNotification(userInfo:[AnyHashable : Any],
-                                    didComplete:@escaping (UIBackgroundFetchResult) -> Void)
+                                      didComplete:@escaping (UIBackgroundFetchResult) -> Void)
     func didReceive(response:UNNotificationResponse,
-                                        withCompletionHandler completionHandler: @escaping (() -> Void))
+                    withCompletionHandler completionHandler: @escaping (() -> Void))
 }
 
 @objc protocol OptimoveDeepLinkResponding
@@ -211,8 +211,8 @@ extension Optimove
 //TODO: expose to  @objc
 extension Optimove
 {
-      public func registerSuccessStateListener(_ listener: OptimoveSuccessStateListener)
-     {
+    public func registerSuccessStateListener(_ listener: OptimoveSuccessStateListener)
+    {
         if RunningFlagsIndication.isSdkRunning {
             listener.optimove(self, didBecomeActiveWithMissingPermissions: self.deviceStateMonitor.getMissingPermissions())
             return
@@ -222,15 +222,16 @@ extension Optimove
         }
     }
     
-     public func unregisterSuccessStateListener(_ delegate: OptimoveSuccessStateListener)
-     {
+    public func unregisterSuccessStateListener(_ delegate: OptimoveSuccessStateListener)
+    {
         stateDelegateQueue.async {
             Optimove.swiftStateDelegates[ObjectIdentifier(delegate)] = nil
         }
     }
     
     @available(swift, obsoleted: 1.0)
-    @objc public func registerSuccessStateDelegate(_ delegate:OptimoveSuccessStateDelegate) {
+    @objc public func registerSuccessStateDelegate(_ delegate:OptimoveSuccessStateDelegate)
+    {
         if RunningFlagsIndication.isSdkRunning {
             delegate.optimove(self, didBecomeActiveWithMissingPermissions: self.deviceStateMonitor.getMissingPersmissions())
             return
@@ -257,13 +258,13 @@ extension Optimove
     ///   - userInfo: the data payload as sends by the the server
     ///   - completionHandler: an indication to the OS that the data is ready to be presented by the system as a notification
     @objc public func didReceiveRemoteNotification(userInfo: [AnyHashable: Any],
-                                                      didComplete: @escaping (UIBackgroundFetchResult) -> Void) -> Bool {
+                                                   didComplete: @escaping (UIBackgroundFetchResult) -> Void) -> Bool {
         OptiLogger.debug("Receive Remote Notification")
-        guard userInfo.isOptiPushNotification else {
+        guard userInfo[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true" else {
             return false
         }
         notificationHandler.didReceiveRemoteNotification(userInfo: userInfo,
-                                                       didComplete: didComplete)
+                                                         didComplete: didComplete)
         return true
     }
     
@@ -271,7 +272,7 @@ extension Optimove
                                   withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) -> Bool
     {
         OptiLogger.debug("received notification in foreground mode")
-        guard notification.request.content.userInfo.isOptiPushNotification else {
+        guard notification.request.content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true"  else {
             OptiLogger.debug("notification should not be handled by optimove")
             return false
         }
@@ -287,7 +288,7 @@ extension Optimove
     @objc public func didReceive(response:UNNotificationResponse,
                                  withCompletionHandler completionHandler: @escaping () -> Void) -> Bool
     {
-        guard response.notification.request.content.userInfo.isOptiPushNotification else {
+        guard response.notification.request.content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true" else {
             return false
         }
         notificationHandler.didReceive(response: response,
@@ -310,13 +311,14 @@ extension Optimove
     }
     
     /// Request to subscribe to test campaign topics
-    @objc public func startTestMode() {
+    @objc public func startTestMode()
+    {
         registerToOptipushTopic(optimoveTestTopic)
-        
     }
     
     /// Request to unsubscribe from test campaign topics
-    @objc public func stopTestMode() {
+    @objc public func stopTestMode()
+    {
         unregisterFromOptipushTopic(optimoveTestTopic)
     }
     
@@ -384,11 +386,12 @@ extension Optimove:OptimoveEventReporting
             }
             OptiLogger.debug("report \(event.name) to optitrack")
             optiTrack.report(event: event, withConfigs: config)
-                
+
         }
     }
     
-    fileprivate func reportToRealtime(_ config: OptimoveEventConfig, _ event: OptimoveEvent, completionHandler:(()-> Void)? = nil) {
+    fileprivate func reportToRealtime(_ config: OptimoveEventConfig, _ event: OptimoveEvent, completionHandler:(()-> Void)? = nil)
+    {
         if config.supportedOnRealTime {
             guard RunningFlagsIndication.isComponentRunning(.realtime) else {
                 OptiLogger.debug("event \(event.name) not reported to realtime since it is not running")
@@ -408,39 +411,44 @@ extension Optimove:OptimoveEventReporting
 }
 
 // MARK: - optiTrack related API
-extension Optimove {
+extension Optimove
+{
     /// validate the permissions of the client to use optitrack component and if permit sends the report to the apropriate handler
     ///
     /// - Parameters:
     ///   - event: optimove event object
-    @objc public func reportEvent(_ event: OptimoveEvent)
+    @objc public func reportEvent(_ originalEvent: OptimoveEvent)
     {
+        let event = OptimoveEventDecorator(event: originalEvent)
+
         guard let config = eventWarehouse?.getConfig(ofEvent: event) else {
             OptiLogger.error("configurations for event: \(event.name) are missing")
             return
         }
-        
+        event.processEventConfig(config)
+
         // Must pass the decorator in case some additional attributes become mandatory
         let eventValidationError = OptimoveEventValidator().validate(event: event, withConfig: config)
         guard eventValidationError == nil else {
             OptiLogger.error("report event \(event.name) is invalid with error \(eventValidationError!)")
             return
         }
-        let eventDecorator = OptimoveEventDecorator(event: event, config: config)
         
         if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            reportToOptiTrack(config, eventDecorator)
+            reportToOptiTrack(config, event)
         }  else {
             OptiLogger.debug("\(event.name) could not be reported to optitrack since it is not running")
         }
         if RunningFlagsIndication.isComponentRunning(.realtime) {
-        reportToRealtime(config, eventDecorator)
+            reportToRealtime(config, event)
         } else {
             OptiLogger.debug("\(event.name) could not be reported to realtime since it is not running")
         }
     }
 
-    @objc public func reportScreenVisit(viewControllersIdentifiers: [String], url: URL? = nil, category: String? = nil) {
+    
+    @objc public func reportScreenVisit(viewControllersIdentifiers: [String], url: URL? = nil, category: String? = nil)
+    {
         guard !viewControllersIdentifiers.isEmpty else {
             OptiLogger.error("trying to report screen visit with empty array")
             return
@@ -463,7 +471,8 @@ extension Optimove {
 }
 
 // MARK: - set user id API
-extension Optimove {
+extension Optimove
+{
 
     /// validate the permissions of the client to use optitrack component and if permit validate the userID content and sends:
     /// - conversion request to the DB
@@ -498,7 +507,7 @@ extension Optimove {
         let setUserIdEvent = SetUserId(originalVistorId: visitorId,userId:userId,updateVisitorId:updatedVisitorId)
         
         if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-        self.optiTrack.setUserId(setUserIdEvent)
+            self.optiTrack.setUserId(setUserIdEvent)
         } else {
             OptiLogger.debug("set user id failed since optitrack not running")
             //Retry done inside optitrack module
@@ -548,9 +557,9 @@ extension Optimove
             optiTrack.report(event: decorator, withConfigs: configs)
             realTime.setEmail(event, withConfig: configs)
         }
-        
     }
-    private func isValidEmail(email:String) -> Bool {
+    private func isValidEmail(email:String) -> Bool
+    {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
         return emailTest.evaluate(with: email)

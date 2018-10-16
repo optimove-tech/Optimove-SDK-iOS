@@ -28,7 +28,7 @@ struct MbaasRequestBody: CustomStringConvertible
         tenantId = TenantID ?? -1
         deviceId = DeviceID
         appNs = Bundle.main.bundleIdentifier?.replacingOccurrences(of: ".", with: "_") ?? ""
-        osVersion = OSVersion
+        osVersion = ProcessInfo().operatingSystemVersionOnlyString
     }
     
     func toMbaasJsonBody() ->Data?
@@ -53,7 +53,7 @@ struct MbaasRequestBody: CustomStringConvertible
             bundle[OptimoveKeys.Registration.token.rawValue] = OptimoveUserDefaults.shared.fcmToken
             let app = [appNs: bundle]
             var device: [String: Any] = [OptimoveKeys.Registration.apps.rawValue: app]
-            device[OptimoveKeys.Registration.osVersion.rawValue] = OSVersion
+            device[OptimoveKeys.Registration.osVersion.rawValue] = ProcessInfo().operatingSystemVersionOnlyString
             let ios = [deviceId: device]
             requestJsonData[OptimoveKeys.Registration.iOSToken.rawValue]         = ios
             requestJsonData[OptimoveKeys.Registration.tenantID.rawValue]         = OptimoveUserDefaults.shared.siteID

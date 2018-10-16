@@ -101,7 +101,7 @@ struct OptimoveKeys
     {
         static let eventDeviceType = "Mobile"
         static let eventPlatform    = "iOS"
-        static let eventOs          =  "iOS \(OptimoveUserDefaults.shared.deviceOs)"
+        static let eventOs          =  "iOS \(ProcessInfo().operatingSystemVersionOnlyString)"//\(OptimoveUserDefaults.shared.deviceOs)"
         static let eventNativeMobile = true
     }
     struct AdditionalAttributesKeys
@@ -174,13 +174,3 @@ var DeviceID : String
         return SHA1.hexString(from:UIDevice.current.identifierForVendor?.uuidString ?? "")!.replacingOccurrences(of: " ", with: "")
     }
 }
-var OSVersion : String
-{
-    get
-    {
-        return OptimoveUserDefaults.shared.deviceOs
-    }
-}
-
-
-

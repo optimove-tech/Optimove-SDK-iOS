@@ -10,15 +10,6 @@ import UIKit
 
 @objc public protocol OptimoveEvent
 {
-    @objc var name : String
-    {
-        get
-    }
-    @objc var parameters: [String:Any]
-    {
-        get 
-    }
+    @objc var name : String { get }
+    @objc var parameters: [String:Any] { get }
 }
-
-
-

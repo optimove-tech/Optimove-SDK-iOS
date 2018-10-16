@@ -10,6 +10,8 @@ class PageVisitEvent:OptimoveCoreEvent
         params["customURL"] = customURL
         params["pageTitle"] = pageTitle ?? nil
         params["category"] = category ?? nil
+
+        self.parameters = params
     }
     var name: String
     {
@@ -17,7 +19,4 @@ class PageVisitEvent:OptimoveCoreEvent
     }
     
     var parameters: [String : Any]
-    {
-        return params
-    }
 }

@@ -8,10 +8,11 @@ class Opt :OptimoveCoreEvent
         return ""
     }
     var parameters: [String : Any]
-    {
-        return [OptimoveKeys.Configuration.timestamp.rawValue   : Int(Date().timeIntervalSince1970),
-                OptimoveKeys.Configuration.appNs.rawValue       : Bundle.main.bundleIdentifier!,
-                OptimoveKeys.Configuration.deviceId.rawValue    : DeviceID]
+    
+    init() {
+        self.parameters = [OptimoveKeys.Configuration.timestamp.rawValue   : Int(Date().timeIntervalSince1970),
+                           OptimoveKeys.Configuration.appNs.rawValue       : Bundle.main.bundleIdentifier!,
+                           OptimoveKeys.Configuration.deviceId.rawValue    : DeviceID]
     }
 }
 

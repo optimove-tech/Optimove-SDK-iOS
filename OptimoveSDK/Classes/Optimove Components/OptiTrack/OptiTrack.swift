@@ -69,7 +69,7 @@ final class OptiTrack:OptimoveComponent
     }
     private func observeEnterToBackgroundMode()
     {
-        NotificationCenter.default.addObserver(forName: .UIApplicationDidEnterBackground,
+        NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidEnterBackground,
                                                object: self,
                                                queue: .main) { (notification) in
                                                 self.dispatchNow()
@@ -233,7 +233,7 @@ extension OptiTrack
     }
     
     private func trackAppOpened() {
-        NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationWillEnterForeground,
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationWillEnterForeground,
                                                object: nil,
                                                queue: .main) { (notification) in
                                                 if Date().timeIntervalSince1970 - self.openApplicationTime > 1800 {

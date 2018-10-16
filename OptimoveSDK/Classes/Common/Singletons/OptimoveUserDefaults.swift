@@ -140,23 +140,7 @@ class OptimoveUserDefaults: Synchronizable
             self.setDefaultObject(forObject: newValue as Any, key: UserDefaultsKeys.apnsToken.rawValue)
         }
     }
-    
-    var deviceOs:String
-    {
-        get
-        {
-            if let os = self.sharedUserDefaults.string(forKey: UserDefaultsKeys.deviceOs.rawValue)  {
-                return os
-            }
-            let os = UIDevice.current.systemVersion
-            self.sharedUserDefaults.set(os, forKey: UserDefaultsKeys.deviceOs.rawValue)
-            self.sharedUserDefaults.synchronize()
-            return os
-        }
-    }
-    
-    
-    
+
     var deviceResolutionWidth:Double
     {
         get

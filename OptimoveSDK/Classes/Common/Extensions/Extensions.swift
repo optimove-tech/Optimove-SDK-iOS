@@ -62,16 +62,16 @@ extension URL
     }
 }
 
-
-extension Notification.Name {
+extension Notification.Name
+{
     public static let internetStatusChanged = Notification.Name.init("internetStatusChanged")
 }
 
-extension Dictionary where Key == AnyHashable, Value == Any
+extension ProcessInfo
 {
-    var isOptiPushNotification: Bool {
+    var operatingSystemVersionOnlyString:String {
         get {
-            return self[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true" || self[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true"
+            return "\(self.operatingSystemVersion.majorVersion).\(self.operatingSystemVersion.minorVersion).\(self.operatingSystemVersion.patchVersion)"
         }
     }
 }

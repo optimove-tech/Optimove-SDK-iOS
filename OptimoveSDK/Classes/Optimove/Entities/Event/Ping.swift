@@ -9,7 +9,8 @@ class PingEvent: OptimoveCoreEvent{
     }
     
     var parameters: [String : Any]
-    {
+
+    init() {
         var dictionary = [OptimoveKeys.Configuration.appNs.rawValue: Bundle.main.bundleIdentifier!,
                           OptimoveKeys.Configuration.deviceId.rawValue: DeviceID]
         if CustomerID == nil {
@@ -17,6 +18,6 @@ class PingEvent: OptimoveCoreEvent{
         } else {
             dictionary[OptimoveKeys.Configuration.userId.rawValue] = CustomerID!
         }
-        return dictionary
+        self.parameters = dictionary
     }
 }

@@ -11,9 +11,11 @@ class SetAdvertisingId : OptimoveCoreEvent
     }
     
     var parameters: [String : Any]
-    {
-        return [OptimoveKeys.Configuration.advertisingId.rawValue   : ASIdentifierManager.shared().advertisingIdentifier.uuidString,
-                OptimoveKeys.Configuration.deviceId.rawValue        : DeviceID,
-                OptimoveKeys.Configuration.appNs.rawValue           : Bundle.main.bundleIdentifier!]
+    
+    init() {
+        let parameters = [OptimoveKeys.Configuration.advertisingId.rawValue   : ASIdentifierManager.shared().advertisingIdentifier.uuidString,
+                          OptimoveKeys.Configuration.deviceId.rawValue        : DeviceID,
+                          OptimoveKeys.Configuration.appNs.rawValue           : Bundle.main.bundleIdentifier!]
+        self.parameters = parameters
     }
 }
