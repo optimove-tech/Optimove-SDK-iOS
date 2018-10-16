@@ -16,14 +16,14 @@ protocol OptimoveMbaasRegistrationHandling:class
     func handleRegistrationTokenRefresh(token:String)
 }
 
-class FirebaseInteractor:NSObject
+class FirebaseInteractor:NSObject,OptipushServiceInfra
 {
     //MARK: - Properties
     weak var delegate: OptimoveMbaasRegistrationHandling?
     var appController: FirebaseOptions?
     var clientServiceOptions:FirebaseOptions?
-    
     var pushTopicsRegistrationEndpoint:String
+
     
     //MARK: Constructors
     override init()
@@ -59,11 +59,14 @@ class FirebaseInteractor:NSObject
     func setupFirebase(from firebaseMetaData: FirebaseProjectKeys,
                        clientFirebaseMetaData:ClientsServiceProjectKeys,
                        delegate:OptimoveMbaasRegistrationHandling,
-                       endPointForTopics:String)
+                       pushTopicsRegistrationEndpoint:String)
     {
         setMessaginDelegate()
         OptiLogger.debug("Setup firebase")
-        pushTopicsRegistrationEndpoint = endPointForTopics
+        self.pushTopicsRegistrationEndpoint = pushTopicsRegistrationEndpoint
+        if self.pushTopicsRegistrationEndpoint.last != "/"  {
+            self.pushTopicsRegistrationEndpoint.append("/")
+        }
         self.delegate = delegate
         self.appController = FirebaseOptionsBuilder()
             .set(appId: firebaseMetaData.appid)
@@ -239,8 +242,8 @@ extension FirebaseInteractor:MessagingDelegate
     private func buildTopicRegistrationJson(_ fcmToken: String, _ topics: [String]) -> Data
     {
         var requestJsonData = [String: Any]()
-        requestJsonData[Keys.Topics.fcmToken.rawValue] = fcmToken
-        requestJsonData[Keys.Topics.topics.rawValue] = topics
+        requestJsonData[OptimoveKeys.Topics.fcmToken.rawValue] = fcmToken
+        requestJsonData[OptimoveKeys.Topics.topics.rawValue] = topics
         return try! JSONSerialization.data(withJSONObject: requestJsonData, options: .prettyPrinted)
     }
 }

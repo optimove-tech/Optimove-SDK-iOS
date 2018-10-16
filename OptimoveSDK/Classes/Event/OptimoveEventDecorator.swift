@@ -17,14 +17,14 @@ class OptimoveEventDecorator:OptimoveEvent
         for parameter in config.parameters {
             switch parameter.key
             {
-            case Keys.AdditionalAttributesKeys.eventDeviceType:
-                params[Keys.AdditionalAttributesKeys.eventDeviceType] = Keys.AddtionalAttributesValues.eventDeviceType
-            case Keys.AdditionalAttributesKeys.eventNativeMobile:
-                params[Keys.AdditionalAttributesKeys.eventNativeMobile] = Keys.AddtionalAttributesValues.eventNativeMobile
-            case Keys.AdditionalAttributesKeys.eventOs:
-                params[Keys.AdditionalAttributesKeys.eventOs] = Keys.AddtionalAttributesValues.eventOs
-            case Keys.AdditionalAttributesKeys.eventPlatform:
-                params[Keys.AdditionalAttributesKeys.eventPlatform] = Keys.AddtionalAttributesValues.eventPlatform
+            case OptimoveKeys.AdditionalAttributesKeys.eventDeviceType:
+                params[OptimoveKeys.AdditionalAttributesKeys.eventDeviceType] = OptimoveKeys.AddtionalAttributesValues.eventDeviceType
+            case OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile:
+                params[OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile] = OptimoveKeys.AddtionalAttributesValues.eventNativeMobile
+            case OptimoveKeys.AdditionalAttributesKeys.eventOs:
+                params[OptimoveKeys.AdditionalAttributesKeys.eventOs] = OptimoveKeys.AddtionalAttributesValues.eventOs
+            case OptimoveKeys.AdditionalAttributesKeys.eventPlatform:
+                params[OptimoveKeys.AdditionalAttributesKeys.eventPlatform] = OptimoveKeys.AddtionalAttributesValues.eventPlatform
             default:
                 continue
             }

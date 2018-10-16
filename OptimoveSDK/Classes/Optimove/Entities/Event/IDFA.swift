@@ -7,13 +7,13 @@ class SetAdvertisingId : OptimoveCoreEvent
 {
     var name: String
     {
-        return Keys.Configuration.setAdvertisingId.rawValue
+        return OptimoveKeys.Configuration.setAdvertisingId.rawValue
     }
     
     var parameters: [String : Any]
     {
-        return [Keys.Configuration.advertisingId.rawValue   : ASIdentifierManager.shared().advertisingIdentifier.uuidString ,
-                Keys.Configuration.deviceId.rawValue        : DeviceID,
-                Keys.Configuration.appNs.rawValue           : Bundle.main.bundleIdentifier!]
+        return [OptimoveKeys.Configuration.advertisingId.rawValue   : ASIdentifierManager.shared().advertisingIdentifier.uuidString,
+                OptimoveKeys.Configuration.deviceId.rawValue        : DeviceID,
+                OptimoveKeys.Configuration.appNs.rawValue           : Bundle.main.bundleIdentifier!]
     }
 }

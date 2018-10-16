@@ -66,3 +66,12 @@ extension URL
 extension Notification.Name {
     public static let internetStatusChanged = Notification.Name.init("internetStatusChanged")
 }
+
+extension Dictionary where Key == AnyHashable, Value == Any
+{
+    var isOptiPushNotification: Bool {
+        get {
+            return self[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true" || self[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true"
+        }
+    }
+}

@@ -26,8 +26,8 @@ class SetUserId :OptimoveCoreEvent
             return [:]
         }
         
-        return [Keys.Configuration.originalVisitorId.rawValue   : originalVistorId as Any,
-                Keys.Configuration.realtimeUserId.rawValue      : userId as Any,
+        return [OptimoveKeys.Configuration.originalVisitorId.rawValue   : originalVistorId as Any,
+                OptimoveKeys.Configuration.realtimeUserId.rawValue      : userId as Any,
                 "updatedVisitorId": updatedVisitorId ]
         
     }

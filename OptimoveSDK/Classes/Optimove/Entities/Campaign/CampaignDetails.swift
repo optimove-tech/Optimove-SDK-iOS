@@ -18,11 +18,11 @@ extension CampaignDetails
 {
     static func extractCampaignDetails(from userInfo: [AnyHashable : Any] ) -> CampaignDetails?
     {
-        guard let campaignId   = (userInfo[Keys.Notification.campaignId.rawValue]   as? String),
-            let actionSerial = (userInfo[Keys.Notification.actionSerial.rawValue]   as? String),
-            let templateId   = (userInfo[Keys.Notification.templateId.rawValue]     as? String),
-            let engagementId = (userInfo[Keys.Notification.engagementId.rawValue]   as? String),
-            let campaignType = (userInfo[Keys.Notification.campaignType.rawValue]   as? String)
+        guard let campaignId   = (userInfo[OptimoveKeys.Notification.campaignId.rawValue]   as? String),
+            let actionSerial = (userInfo[OptimoveKeys.Notification.actionSerial.rawValue]   as? String),
+            let templateId   = (userInfo[OptimoveKeys.Notification.templateId.rawValue]     as? String),
+            let engagementId = (userInfo[OptimoveKeys.Notification.engagementId.rawValue]   as? String),
+            let campaignType = (userInfo[OptimoveKeys.Notification.campaignType.rawValue]   as? String)
             else
         {
             return nil

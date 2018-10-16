@@ -20,13 +20,13 @@ class SetUserAgent: OptimoveCoreEvent
     var userAgent2:String?
     
     
-    var name: String {return Keys.Configuration.setUserAgent.rawValue}
+    var name: String {return OptimoveKeys.Configuration.setUserAgent.rawValue}
     
     var parameters: [String : Any]
     {
-        var paramters = [Keys.Configuration.userAgentHeader1.rawValue: self.userAgent1]
+        var paramters = [OptimoveKeys.Configuration.userAgentHeader1.rawValue: self.userAgent1]
         if userAgent2 != nil {
-            paramters[Keys.Configuration.userAgentHeader2.rawValue] = self.userAgent2!
+            paramters[OptimoveKeys.Configuration.userAgentHeader2.rawValue] = self.userAgent2!
         }
         return paramters
     }

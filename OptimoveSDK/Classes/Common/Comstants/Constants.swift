@@ -8,7 +8,7 @@
 
 import UIKit
 
-struct Keys
+struct OptimoveKeys
 {
     enum Registration: String
     {
@@ -60,7 +60,7 @@ struct Keys
         case notificationOpened                         = "notification_opened"
         case notificationDismissed                      = "notification_dismissed"
        
-        case originalVisitorId                  = "originalVisitorId"
+        case originalVisitorId                          = "originalVisitorId"
         case userId                                     = "user_id"
         case realtimeUserId                             = "userId"
         case realtimeupdatedVisitorId                   = "updatedVisitorId"

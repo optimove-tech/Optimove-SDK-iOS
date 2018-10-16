@@ -259,7 +259,7 @@ extension Optimove
     @objc public func didReceiveRemoteNotification(userInfo: [AnyHashable: Any],
                                                       didComplete: @escaping (UIBackgroundFetchResult) -> Void) -> Bool {
         OptiLogger.debug("Receive Remote Notification")
-        guard isOptipushNotification(userInfo) else {
+        guard userInfo.isOptiPushNotification else {
             return false
         }
         notificationHandler.didReceiveRemoteNotification(userInfo: userInfo,
@@ -271,7 +271,7 @@ extension Optimove
                                   withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) -> Bool
     {
         OptiLogger.debug("received notification in foreground mode")
-        guard isOptipushNotification(notification.request.content.userInfo) else {
+        guard notification.request.content.userInfo.isOptiPushNotification else {
             OptiLogger.debug("notification should not be handled by optimove")
             return false
         }
@@ -287,7 +287,7 @@ extension Optimove
     @objc public func didReceive(response:UNNotificationResponse,
                                  withCompletionHandler completionHandler: @escaping () -> Void) -> Bool
     {
-        guard isOptipushNotification(response.notification.request.content.userInfo) else {
+        guard response.notification.request.content.userInfo.isOptiPushNotification else {
             return false
         }
         notificationHandler.didReceive(response: response,
@@ -554,14 +554,5 @@ extension Optimove
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
         return emailTest.evaluate(with: email)
-    }
-}
-
-// MARK: - Helper Methods
-extension Optimove
-{
-    private func isOptipushNotification(_ userInfo: [AnyHashable : Any]) -> Bool
-    {
-        return userInfo[Keys.Notification.isOptipush.rawValue] as? String == "true" || userInfo[Keys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true"
     }
 }

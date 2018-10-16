@@ -1,3 +1,4 @@
+import UIKit
 import FirebaseDynamicLinks
 import UserNotifications
 
@@ -29,17 +30,17 @@ class OptimoveNotificationHandler
                                           _ campaignDetails: CampaignDetails?,
                                           _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let content = UNMutableNotificationContent()
-        content.title = userInfo[Keys.Notification.title.rawValue] as? String ?? Bundle.main.infoDictionary![kCFBundleNameKey as String] as! String
-        content.body = userInfo[Keys.Notification.body.rawValue] as? String ?? ""
+        content.title = userInfo[OptimoveKeys.Notification.title.rawValue] as? String ?? Bundle.main.infoDictionary![kCFBundleNameKey as String] as! String
+        content.body = userInfo[OptimoveKeys.Notification.body.rawValue] as? String ?? ""
         content.categoryIdentifier = NotificationCategoryIdentifiers.dismiss
         if campaignDetails != nil {
             insertCampaignDetails(from: campaignDetails!, to: content)
         }
-        content.userInfo[Keys.Notification.isOptipush.rawValue] = "true"
+        content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] = "true"
         
         insertLongDeepLinkUrl(from:userInfo, to: content)
         {
-            let collapseId = (Bundle.main.bundleIdentifier ?? "") + "_" + (userInfo[Keys.Notification.collapseId.rawValue] as? String ?? "OptipushDefaultCollapseID")
+            let collapseId = (Bundle.main.bundleIdentifier ?? "") + "_" + (userInfo[OptimoveKeys.Notification.collapseId.rawValue] as? String ?? "OptipushDefaultCollapseID")
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.6, repeats: false)
             let request = UNNotificationRequest(identifier: collapseId,
                                                 content: content,
@@ -139,7 +140,7 @@ class OptimoveNotificationHandler
                 }
                 else
                 {
-                    content.userInfo[Keys.Notification.dynamikLink.rawValue] = longUrl?.url?.absoluteString
+                    content.userInfo[OptimoveKeys.Notification.dynamikLink.rawValue] = longUrl?.url?.absoluteString
                 }
                 completionHandler()
             }
@@ -153,15 +154,15 @@ class OptimoveNotificationHandler
     
     private func insertCampaignDetails(from campaignDetails: CampaignDetails,  to content: UNMutableNotificationContent)
     {
-        content.userInfo[Keys.Notification.campaignId.rawValue]     = campaignDetails.campaignId
-        content.userInfo[Keys.Notification.actionSerial.rawValue]   = campaignDetails.actionSerial
-        content.userInfo[Keys.Notification.templateId.rawValue]     = campaignDetails.templateId
-        content.userInfo[Keys.Notification.engagementId.rawValue]   = campaignDetails.engagementId
-        content.userInfo[Keys.Notification.campaignType.rawValue]   = campaignDetails.campaignType
+        content.userInfo[OptimoveKeys.Notification.campaignId.rawValue]     = campaignDetails.campaignId
+        content.userInfo[OptimoveKeys.Notification.actionSerial.rawValue]   = campaignDetails.actionSerial
+        content.userInfo[OptimoveKeys.Notification.templateId.rawValue]     = campaignDetails.templateId
+        content.userInfo[OptimoveKeys.Notification.engagementId.rawValue]   = campaignDetails.engagementId
+        content.userInfo[OptimoveKeys.Notification.campaignType.rawValue]   = campaignDetails.campaignType
     }
     
     private func handleDeepLinkDelegation(_ response: UNNotificationResponse) {
-        if let dynamicLink =  response.notification.request.content.userInfo[Keys.Notification.dynamikLink.rawValue] as? String
+        if let dynamicLink =  response.notification.request.content.userInfo[OptimoveKeys.Notification.dynamikLink.rawValue] as? String
         {
             if let absoluteUrl = URL(string: dynamicLink)
             {
@@ -176,10 +177,10 @@ class OptimoveNotificationHandler
     
     private func extractDeepLink(from userInfo:  [AnyHashable : Any]) -> URL?
     {
-        if let dl           = userInfo[Keys.Notification.dynamicLinks.rawValue] as? String ,
+        if let dl           = userInfo[OptimoveKeys.Notification.dynamicLinks.rawValue] as? String ,
             let data        = dl.data(using: .utf8),
             let json        = try? JSONSerialization.jsonObject(with: data, options:[.allowFragments]) as? [String:Any],
-            let ios         = json?[Keys.Notification.ios.rawValue] as? [String:Any],
+            let ios         = json?[OptimoveKeys.Notification.ios.rawValue] as? [String:Any],
             let deepLink =  ios[Bundle.main.bundleIdentifier?.setAsMongoKey() ?? "" ] as? String
         {
             return URL(string: deepLink)
@@ -228,8 +229,8 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling
             OptiLogger.debug("Urgent Initializtion success")
             
             OptiLogger.debug("Analyze notification")
-            if userInfo[Keys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true" {
-                guard let commandString = (userInfo[Keys.Notification.command.rawValue] as? String),
+            if userInfo[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true" {
+                guard let commandString = (userInfo[OptimoveKeys.Notification.command.rawValue] as? String),
                     let command = OptimoveSdkCommand.init(rawValue: commandString) else {
                         OptiLogger.error("could not parse sdk command")
                         didComplete(.newData)

@@ -9,19 +9,38 @@
 import Foundation
 import UserNotifications
 
+protocol OptipushServiceInfra {
+    func subscribeToTopics(didSucceed: ((Bool)->())?)
+    func unsubscribeFromTopics()
+    func setupFirebase(from firebaseMetaData: FirebaseProjectKeys,
+                       clientFirebaseMetaData:ClientsServiceProjectKeys,
+                       delegate:OptimoveMbaasRegistrationHandling,
+                       pushTopicsRegistrationEndpoint:String)
+    func handleRegistration(token:Data)
+    func optimoveReceivedRegistrationToken(_ fcmToken: String)
+
+    func subscribeToTopic(topic:String,didSucceed: ((Bool)->())?)
+    func unsubscribeFromTopic(topic:String, didSucceed: ((Bool)->())?)
+}
+
 final class OptiPush: OptimoveComponent
 {
     //MARK: - Variables
     var metaData: OptipushMetaData!
-    private var firebaseInteractor: FirebaseInteractor = FirebaseInteractor()
+    private var firebaseInteractor: OptipushServiceInfra
     private var registrar: RegistrationProtocol?
+
+    init(deviceStateMonitor: OptimoveDeviceStateMonitor, infrastructure: OptipushServiceInfra = FirebaseInteractor()) {
+        self.firebaseInteractor = infrastructure
+        super.init(deviceStateMonitor: deviceStateMonitor)
+    }
     
     override func performInitializationOperations()
     {
         if RunningFlagsIndication.isComponentRunning(.optiPush) {
             self.retryFailedMbaasOperations()
             self.optInOutIfNeeded()
-            firebaseInteractor.subscribeToTopics()
+            firebaseInteractor.subscribeToTopics(didSucceed: nil)
         }
     }
     
@@ -34,7 +53,7 @@ final class OptiPush: OptimoveComponent
         firebaseInteractor.setupFirebase(from: firebaseMetaData,
                                          clientFirebaseMetaData: clientFirebaseMetaData,
                                          delegate: self,
-                                         endPointForTopics: optipushMetaData.pushTopicsRegistrationEndpoint)
+                                         pushTopicsRegistrationEndpoint: optipushMetaData.pushTopicsRegistrationEndpoint)
     }
     
     func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data)
@@ -80,7 +99,7 @@ extension OptiPush: OptimoveMbaasRegistrationHandling
                 if success {
                     self.updateFcmTokenWith(token)
                     self.performRegistration()
-                    self.firebaseInteractor.subscribeToTopics()
+                    self.firebaseInteractor.subscribeToTopics(didSucceed: nil)
                 } else {
                     self.updateFcmTokenWith(token)
                 }
@@ -98,19 +117,14 @@ extension OptiPush: OptimoveMbaasRegistrationHandling
         OptiLogger.debug("Client receive a token for the first time")
         OptimoveUserDefaults.shared.fcmToken = token
         performRegistration()
-        firebaseInteractor.subscribeToTopics()
+        firebaseInteractor.subscribeToTopics(didSucceed: nil)
     }
     
     private func updateFcmTokenWith(_ fcmToken:String)
     {
         OptimoveUserDefaults.shared.fcmToken = fcmToken
     }
-    
-}
 
-extension OptiPush
-{
-    
     private func retryFailedMbaasOperations()
     {
         registrar?.retryFailedOperationsIfExist()
