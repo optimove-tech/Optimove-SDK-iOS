@@ -238,6 +238,14 @@ You will also need to include the following steps to complete the basic setup:
 
  - Tracking User Activities and Events
  - [Stitching App Visitors to Registered Customer IDs](https://github.com/optimove-tech/A/blob/master/i/V1.2/swift/README.md#stitching-app-visitors-to-registered-customer-ids)
+ 
+  > **Note**: Optimove collects the **IDFA** for tracking purposes. When submitting to the app store, if asked "Does this app use the Advertising Identifier (IDFA)?", choose 'Yes' and make sure to **check** the folllowing 3 boxes:
+ > 1.  “Attribute this app installation to a previously served advertisement”
+ > 2.  “Attribute an action taken within this app to a previously served advertisement”
+ > 3.  “I, YOUR_NAME, confirm that this app, and any third party…”
+>
+>You should  _not_  check the box labeled “Serve advertisements within the app” unless you are actually going to display ads. 
+ 
 <br>
 
 
