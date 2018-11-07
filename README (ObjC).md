@@ -175,6 +175,7 @@ Still in `AppDelegate`, please implement the following callbacks:
 ```
 
 <br>
+
 ### Forward Firebase Tokens to Optimove
 
 > Skip this version if your app **does not** implement a Firebase `FIRMessagingDelegate`
