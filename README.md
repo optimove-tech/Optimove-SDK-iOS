@@ -181,6 +181,7 @@ func application(_ application: UIApplication,
 ```
 
 <br>
+
 ### Forward Firebase Tokens to Optimove
 
 > Skip this version if your app **does not** implement a Firebase `MessagingDelegate`
