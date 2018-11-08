@@ -309,6 +309,8 @@ Optimove.sharedInstance.setUserEmail(email: "a.valid@email.com");
 > Notes:
 >-   In instances where you need to set both the visitor's user ID and email address simultaneously, you should use the `registerUser` method instead of `setUserEmail`. This applies to all situations in which a single user action requires you to set both the user ID and email address (e.g., registration, newsletter signup).
 
+<br>
+
 ## <a id="Register user"></a>  Registering the User ID and User Email at the Same Time
 
 In all situations where a single user action requires you to set both the customer ID and email address (e.g., registration, newsletter signup) simultaneously, you should use the `registerUser` method (instead of calling both `setUserId` and `setUserEmail`) to ensure the proper registration of the user in Optimove.
