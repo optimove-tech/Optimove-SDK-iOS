@@ -181,6 +181,7 @@ func application(_ application: UIApplication,
 ```
 
 <br>
+
 ### Forward Firebase Tokens to Optimove
 
 > Skip this version if your app **does not** implement a Firebase `MessagingDelegate`
@@ -308,6 +309,8 @@ Optimove.sharedInstance.setUserEmail(email: "a.valid@email.com");
 ```
 > Notes:
 >-   In instances where you need to set both the visitor's user ID and email address simultaneously, you should use the `registerUser` method instead of `setUserEmail`. This applies to all situations in which a single user action requires you to set both the user ID and email address (e.g., registration, newsletter signup).
+
+<br>
 
 ## <a id="Register user"></a>  Registering the User ID and User Email at the Same Time
 
