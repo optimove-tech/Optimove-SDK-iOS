@@ -127,7 +127,7 @@ extension OptimoveNotificationServiceExtension {
         }
         
         guard let eventConfig = eventConfigs["notification_delivered"] else {return}
-        let notificationEvent = NotificationDelivered(bundleId: tenantInfo.appBundleId, campaignDetails: campaignDetails, currentDeviceOS: "iOS \(sharedDefaults.string(forKey: "deviceOs")!)")
+        let notificationEvent = NotificationDelivered(bundleId: tenantInfo.appBundleId, campaignDetails: campaignDetails, currentDeviceOS: "iOS \(ProcessInfo().operatingSystemVersionOnlyString)")
         let queryItems = buildQueryItems(notificationEvent, eventConfig, optitrackMetadata)
         var reportEventUrl = URLComponents(string: optitrackMetadata.optitrackEndpoint)!
         reportEventUrl.queryItems = queryItems.filter { $0.value != nil }
@@ -216,5 +216,14 @@ extension OptimoveNotificationServiceExtension {
             return URL(string: deepLink)
         }
         return nil
+    }
+}
+
+extension ProcessInfo
+{
+    var operatingSystemVersionOnlyString:String {
+        get {
+            return "\(self.operatingSystemVersion.majorVersion).\(self.operatingSystemVersion.minorVersion).\(self.operatingSystemVersion.patchVersion)"
+        }
     }
 }

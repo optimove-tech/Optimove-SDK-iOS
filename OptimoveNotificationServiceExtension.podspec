@@ -1,6 +1,14 @@
+#
+# Be sure to run `pod lib lint OptimoveNotificationServiceExtension.podspec' to ensure this is a
+# valid spec before submitting.
+#
+# Any lines starting with a # are optional, but their use is encouraged
+# To learn more about a Podspec see https://guides.cocoapods.org/syntax/podspec.html
+#
+
 Pod::Spec.new do |s|
   s.name             = 'OptimoveNotificationServiceExtension'
-  s.version          = '1.2.0'
+  s.version          = '1.2.1'
   s.summary          = 'A notification extension framework for Optimove SDK applications'
 
   s.description      = <<-DESC
@@ -14,7 +22,7 @@ This framework is an addition for the main OptimoveSDK in order to handle notifi
   
 
   s.ios.deployment_target = '10.0'
-  s.swift_version = '4.1'
+  s.swift_version = '4.2'
   s.source_files = 'OptimoveNotificationServiceExtension/OptimoveNotificationServiceExtension/Classes/**/*'
-   s.frameworks = 'UserNotifications'
+   s.frameworks = 'UserNotifications','UIKit'
 end
