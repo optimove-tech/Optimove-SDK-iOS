@@ -35,7 +35,7 @@ To get started, please follow these instructions:
 1. You have a paid development account for your iOS app, and valid certificates for remote notifications or APN Auth key.
 2. The app's Deployment Target is at least iOS 10.0
 3. Your Cocoapods version is 1.5 or above
-4. You have a Firebase version of 5.9.0 (Optimove SDK is dependent on Firebase version 5.9.0)
+4. If you are already using Firebase in your current application, please make sure to use Firebase version of 5.9.0 (Optimove SDK is dependent on Firebase version 5.9.0)
 
 
 ### 2. Provide your iOS app details: <br>
