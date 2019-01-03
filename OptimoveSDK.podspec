@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
   s.dependency 'GoogleUtilities', '5.3.6'
   s.dependency 'Protobuf', '3.6.1'
   s.dependency 'nanopb', '0.3.901'
-  s.dependency 'OptiTrackCore', '0.3.0'
+  s.dependency 'OptiTrackCore', '1.3.0'
   # s.dependency 'XCGLogger', '6.1.0'
   
   
