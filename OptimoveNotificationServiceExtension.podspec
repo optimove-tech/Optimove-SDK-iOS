@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'OptimoveNotificationServiceExtension'
-  s.version          = '1.2.1'
+  s.version          = '1.3.0'
   s.summary          = 'A notification extension framework for Optimove SDK applications'
 
   s.description      = <<-DESC
@@ -24,5 +24,5 @@ This framework is an addition for the main OptimoveSDK in order to handle notifi
   s.ios.deployment_target = '10.0'
   s.swift_version = '4.2'
   s.source_files = 'OptimoveNotificationServiceExtension/OptimoveNotificationServiceExtension/Classes/**/*'
-   s.frameworks = 'UserNotifications','UIKit'
+  s.frameworks = 'UserNotifications', 'UIKit'
 end

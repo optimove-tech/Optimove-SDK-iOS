@@ -2,7 +2,7 @@
 #import "AppDelegate.h"
 #import <UserNotifications/UserNotifications.h>
 @import OptimoveSDK;
-
+@import Firebase;
 
 @interface AppDelegate ()
 
@@ -10,16 +10,15 @@
 
 @implementation AppDelegate
 
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     OptimoveTenantInfo* info = [[OptimoveTenantInfo alloc] initWithUrl:@"https://appcontrollerproject-developer.firebaseapp.com" token:@"demo_apps" version:@"1.0.0" hasFirebase:NO useFirebaseMessaging:NO];
-    
+
     [Optimove.sharedInstance configureFor:info];
     
     [Optimove.sharedInstance registerSuccessStateDelegate:self ];
     [UIApplication.sharedApplication registerForRemoteNotifications];
     [UNUserNotificationCenter currentNotificationCenter].delegate = self;
-    
+
     [[UNUserNotificationCenter currentNotificationCenter]requestAuthorizationWithOptions:UNAuthorizationOptionAlert completionHandler:^(BOOL granted, NSError * _Nullable error) {
         // Your app specific logic goes here
     }];
