@@ -11,8 +11,13 @@ public protocol OptimoveSuccessStateListener: class
     func optimove(_ optimove: Optimove, didBecomeActiveWithMissingPermissions missingPermissions:[OptimoveDeviceRequirement] )
 }
 
-struct OptimoveSuccessStateDelegateWrapper {
-     weak var observer: OptimoveSuccessStateDelegate?
+class OptimoveSuccessStateDelegateWrapper
+{
+    var observer: OptimoveSuccessStateDelegate
+    init(observer: OptimoveSuccessStateDelegate)
+    {
+        self.observer = observer
+    }
 }
 
 @objc public protocol OptimoveSuccessStateDelegate: class

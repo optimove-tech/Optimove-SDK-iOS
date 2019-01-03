@@ -1,11 +1,9 @@
-
-
 import Foundation
 class SetEmailEvent: OptimoveCoreEvent
 {
     let email:String
     var name: String {
-        return  "set_email_event"
+        return  OptimoveKeys.Configuration.setEmail.rawValue
     }
 
     var parameters: [String : Any]

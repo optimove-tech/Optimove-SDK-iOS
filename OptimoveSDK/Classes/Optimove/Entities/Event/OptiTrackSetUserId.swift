@@ -5,19 +5,19 @@ import Foundation
 
 class SetUserId :OptimoveCoreEvent
 {
-    let originalVistorId:String
+    let originalVisitorId:String
     let userId:String
     let updatedVisitorId:String
 
 
     var name: String
     {
-        return "set_user_id_event"
+        return OptimoveKeys.Configuration.setUserId.rawValue
     }
     var parameters: [String : Any]
    
     init(originalVistorId:String,userId:String,updateVisitorId:String) {
-        self.originalVistorId = originalVistorId
+        self.originalVisitorId = originalVistorId
         self.userId = userId
         self.updatedVisitorId = updateVisitorId
 

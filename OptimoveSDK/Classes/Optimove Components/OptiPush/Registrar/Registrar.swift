@@ -19,6 +19,13 @@ protocol RegistrationProtocol:class
 
 class Registrar
 {
+    enum MbaasRequestType: String {
+        case register = "register"
+        case unregister = "unregister"
+        case optIn = "opt in"
+        case optOut = "opt out"
+    }
+
     //MARK: - Internal Variables
     private var registrationEndPoint: String
     private var reportEndPoint: String
@@ -51,7 +58,7 @@ class Registrar
     
     private func clearBackupRequest(_ operation: MbaasOperations) {
         let path = getStoragePath(for: operation)
-        OptimoveFileManager.delete(file: path)
+        OptimoveFileManager.delete(file: path,isInSharedContainer: false)
     }
     
     private func getMbaasPath(for userPushToken: MbaasRequestBody) -> String {
@@ -122,20 +129,20 @@ class Registrar
     }
     
     func retryFailedOperationsIfExist() {
-        if (!OptimoveUserDefaults.shared.isUnregistrationSuccess) {
+        if !OptimoveUserDefaults.shared.isUnregistrationSuccess {
             let path = getStoragePath(for: .unregistration)
-            if let json = OptimoveFileManager.load(file: path) {
+            if let json = OptimoveFileManager.load(file: path,isInSharedContainer: false) {
                 self.retryFailedOperation(.unregistration, using: json)
             }
-        } else if (!OptimoveUserDefaults.shared.isRegistrationSuccess) {
+        } else if !OptimoveUserDefaults.shared.isRegistrationSuccess {
             let path = getStoragePath(for: .registration)
-            if let json = OptimoveFileManager.load(file: path) {
+            if let json = OptimoveFileManager.load(file: path,isInSharedContainer: false) {
                 self.retryFailedOperation(.registration, using: json)
             }
         }
-        if (!OptimoveUserDefaults.shared.isOptRequestSuccess) {
+        if !OptimoveUserDefaults.shared.isOptRequestSuccess {
             let path = getStoragePath(for: .optIn) // optIn and optOut share the same backup file
-            if let json = OptimoveFileManager.load(file: path) {
+            if let json = OptimoveFileManager.load(file: path,isInSharedContainer: false) {
                 self.retryFailedOperation(.optIn, using: json)
             }
         }
@@ -156,13 +163,7 @@ extension Registrar: RegistrationProtocol
         }
         OptiLogger.debug("send request to \(url) with body: \(String(describing: String(data:json,encoding:.utf8)!))")
         NetworkManager.post(toUrl: url, json: json) { (data, error) in
-            guard error == nil else {
-                OptiLogger.error("registration error: \(String(describing: error?.localizedDescription))")
-                self.handleFailedMbaasRequest(of: mbaasRequest, to: url)
-                return
-            }
-            OptiLogger.debug("registration response: \(String(describing: String(data:data!,encoding:.utf8)))")
-            self.handleSuccessMbaasRequest(of: mbaasRequest.operation, to: url)
+            self.handleResponseFromMbaas(ofRequest: mbaasRequest, withData: data, error: error, url: url)
         }
     }
     
@@ -176,15 +177,7 @@ extension Registrar: RegistrationProtocol
         }
         OptiLogger.debug("send request to \(url) with body: \(String(describing: String(data:json,encoding:.utf8)!))")
         NetworkManager.post(toUrl: url, json: json) { (data, error) in
-            guard error == nil else {
-                OptiLogger.error("unregistration error: \(String(describing: error?.localizedDescription))")
-               self.handleFailedMbaasRequest(of: mbaasRequest, to: url)
-                didComplete(false)
-                return
-            }
-            OptiLogger.debug("unregistration response: \(String(describing: String(data:data!,encoding:.utf8)))")
-            self.handleSuccessMbaasRequest(of: mbaasRequest.operation, to: url)
-            didComplete(true)
+            self.handleResponseFromMbaas(ofRequest: mbaasRequest, withData: data, error: error, url: url, didComplete: didComplete)
         }
     }
     
@@ -200,14 +193,7 @@ extension Registrar: RegistrationProtocol
         }
         OptiLogger.debug("send request to \(url) with body: \(String(describing: String(data:json,encoding:.utf8)!))")
         NetworkManager.post(toUrl: url, json: json) { (data, error) in
-            guard error == nil else {
-                OptiLogger.error("opt in error: \(String(describing: error?.localizedDescription))")
-                self.handleFailedMbaasRequest(of: mbaasRequest, to: url)
-                return
-            }
-            OptiLogger.debug("opt in response: \(String(describing: String(data:data!,encoding:.utf8)))")
-            OptimoveUserDefaults.shared.isMbaasOptIn = true
-            self.handleSuccessMbaasRequest(of: mbaasRequest.operation, to: url)
+            self.handleResponseFromMbaas(ofRequest: mbaasRequest, withData: data, error: error, url: url)
         }
     }
     
@@ -223,14 +209,27 @@ extension Registrar: RegistrationProtocol
         }
         OptiLogger.debug("send request to \(url) with body: \(String(describing: String(data:json,encoding:.utf8)!))")
         NetworkManager.post(toUrl: url, json: json) { (data, error) in
-            guard error == nil else {
-                OptiLogger.error("opt out error: \(String(describing: error?.localizedDescription))")
-                self.handleFailedMbaasRequest(of: mbaasRequest, to: url)
-                return
-            }
-            OptiLogger.debug("opt out response: \(String(describing: String(data:data!,encoding:.utf8)))")
-            self.handleSuccessMbaasRequest(of: mbaasRequest.operation, to: url)
+            self.handleResponseFromMbaas(ofRequest: mbaasRequest, withData: data, error: error, url: url)
         }
+    }
+
+    func handleResponseFromMbaas(ofRequest mbaasRequest:MbaasRequestBody, withData data:Data?, error:OptimoveError?, url:URL,didComplete:((Bool) -> Void)? = nil) {
+        //If the error code indicate a user error, there is no sense to retry this request again
+        if let error = error, (error == .badRequest || error == .notFound || error == .gone) {
+            return
+        }
+        guard error == nil else {
+            OptiLogger.error("\(mbaasRequest.operation.rawValue) error: \(String(describing: error?.localizedDescription))")
+            self.handleFailedMbaasRequest(of: mbaasRequest, to: url)
+            didComplete?(false)
+            return
+        }
+        OptiLogger.debug("\(mbaasRequest.operation.rawValue) response: \(String(describing: String(data:data!,encoding:.utf8)))")
+        if mbaasRequest.operation == .optIn {
+            OptimoveUserDefaults.shared.isMbaasOptIn = true
+        }
+        self.handleSuccessMbaasRequest(of: mbaasRequest.operation, to: url)
+        didComplete?(true)
     }
     
     private func handleFailedMbaasRequest(of mbaasRequest:MbaasRequestBody, to url: URL)

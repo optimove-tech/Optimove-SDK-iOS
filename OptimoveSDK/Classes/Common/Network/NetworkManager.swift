@@ -65,8 +65,24 @@ class NetworkManager
                 optimoveResponse(nil,OptimoveError.error(error.debugDescription))
                 return
             }
-            guard (response as? HTTPURLResponse)?.statusCode == 200 else {
-                optimoveResponse(nil,OptimoveError.statusCodeInvalid)
+            guard let responseCode = (response as? HTTPURLResponse)?.statusCode else {
+                optimoveResponse(nil,OptimoveError.error(error.debugDescription))
+                return
+            }
+            switch responseCode {
+            case 400:
+                optimoveResponse(nil,OptimoveError.badRequest)
+                return
+            case 404:
+                optimoveResponse(nil,OptimoveError.notFound)
+                return
+            case 410:
+                optimoveResponse(nil,OptimoveError.gone)
+                return
+            default: break;
+            }
+            guard responseCode == 200 else {
+                optimoveResponse(nil,OptimoveError.error("\(responseCode)"))
                 return
             }
             if let data = data {

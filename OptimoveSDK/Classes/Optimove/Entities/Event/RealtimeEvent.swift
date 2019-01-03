@@ -1,5 +1,5 @@
-
 import Foundation
+
 class RealtimeEvent: Encodable
 {
     var tid:String

@@ -9,7 +9,7 @@ class LocalConfigurationHandler {
         
         let configFileName =  fileName + ".json"
         
-        if let configData  = OptimoveFileManager.load(file: configFileName) {
+        if let configData  = OptimoveFileManager.load(file: configFileName, isInSharedContainer: true) {
             completionHandler(configData,nil)
         } else {
             completionHandler(nil,.emptyData)

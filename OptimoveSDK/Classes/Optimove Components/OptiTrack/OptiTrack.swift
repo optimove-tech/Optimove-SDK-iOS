@@ -23,11 +23,11 @@ final class OptiTrack:OptimoveComponent
     var metaData: OptitrackMetaData!
     var queue = OptimoveQueue()
     var tracker: MatomoTracker!
-    let evetReportingQueue      = DispatchQueue(label: "com.optimove.optitrack",
-                                                qos: .userInitiated,
-                                                attributes: [],
-                                                autoreleaseFrequency: .inherit,
-                                                target: nil)
+    private let evetReportingQueue  = DispatchQueue(label: "com.optimove.optitrack",
+                                                    qos: .userInitiated,
+                                                    attributes: [],
+                                                    autoreleaseFrequency: .inherit,
+                                                    target: nil)
     var openApplicationTime     : TimeInterval = Date().timeIntervalSince1970
     private var optimoveCustomizePlugins:[String:String] = [:]
     
@@ -44,13 +44,13 @@ final class OptiTrack:OptimoveComponent
             guard let trackerUserId =  tracker.userId else {
                 //Conversion missed
                 let event = SetUserId(originalVistorId: OptimoveUserDefaults.shared.initialVisitorId!, userId: customerId, updateVisitorId: OptimoveUserDefaults.shared.visitorID!)
-                setUserId(event)
+                setUserId(event.userId)
                 return
             }
             guard trackerUserId != customerId else {return}
             let ovid = SHA1.hexString(from:trackerUserId)!.replacingOccurrences(of: " ", with: "").prefix(16).description
             let event = SetUserId(originalVistorId: ovid, userId: trackerUserId, updateVisitorId: OptimoveUserDefaults.shared.visitorID!)
-            setUserId(event)
+            setUserId(event.userId)
         }
     }
     
@@ -69,7 +69,7 @@ final class OptiTrack:OptimoveComponent
     }
     private func observeEnterToBackgroundMode()
     {
-        NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidEnterBackground,
+        NotificationCenter.default.addObserver(forName:UIApplication.willResignActiveNotification,
                                                object: self,
                                                queue: .main) { (notification) in
                                                 self.dispatchNow()
@@ -81,15 +81,14 @@ extension OptiTrack
 {
     func report(event: OptimoveEventDecorator,withConfigs config: OptimoveEventConfig)
     {
-        if event.isOptimoveCoreEvent {
-            evetReportingQueue.async {
-                self.handleReport(event: event, withConfigs: config)
+        if event is OptimoveCustomEventDecorator {
+            guard isEnable else {
+                OptiLogger.debug("Tried to send custom event while optitrack module is not enable")
+                return
             }
-        } else {
-            guard isEnable else { return }
-            evetReportingQueue.async {
-                self.handleReport(event: event, withConfigs: config)
-            }
+        }
+        evetReportingQueue.async {
+            self.handleReport(event: event, withConfigs: config)
         }
     }
     
@@ -120,33 +119,49 @@ extension OptiTrack
             }
             let event = Event(tracker: self.tracker, action: [], url: nil, referer: nil, eventCategory: self.metaData.eventCategoryName, eventAction: event.name, eventName: nil, eventValue: nil, customTrackingParameters: self.optimoveCustomizePlugins, dimensions: dimensions, variables: [])
             self.tracker.track(event)
-            
+            if config.supportedOnRealTime {
+                self.deviceStateMonitor.getStatus(of: .internet, completionHandler: { (hasInternet) in
+                    if hasInternet {
+                        self.dispatchNow()
+                    }
+                })
+            }
             completionHandler?()
         }
     }
     
-    func setScreenEvent(viewControllersIdentifiers:[String],url: URL?)
+    func reportScreenEvent(viewControllersIdentifiers:[String], url: URL, category: String? = nil)
     {
-        guard let active = RunningFlagsIndication.componentsRunningStates[.optiTrack] else {return}
-        if active && isEnable {
-            evetReportingQueue.async {
-                OptiLogger.debug("report screen event of \(viewControllersIdentifiers)")
-                DispatchQueue.main.async {
-                    self.tracker?.track(view: viewControllersIdentifiers, url: url)
+        evetReportingQueue.async {
+            OptiLogger.debug("report screen event of \(viewControllersIdentifiers)")
+            DispatchQueue.main.async {
+                self.tracker?.track(view: viewControllersIdentifiers, url: url)
+                var urlString = url.absoluteString.removingPercentEncoding!
+
+                for prefix in ["https://www.", "http://www.", "https://", "http://"] {// Prefixes that are removed by Matomo and so shouldn't be hashed. Order matters.
+                    if urlString.hasPrefix(prefix) {
+                        urlString.removeFirst(prefix.count)
+                        break
+                    }
                 }
+
+                let originalEvent = PageVisitEvent(customURL: SHA1.hexString(from: urlString)!.replacingOccurrences(of: " ", with: ""), pageTitle: viewControllersIdentifiers.joined(separator: "/"), category: category)
+                let event = OptimoveEventDecorator(event: originalEvent)
+
+                guard let config = Optimove.sharedInstance.eventWarehouse?.getConfig(ofEvent: event) else {
+                    OptiLogger.error("configurations for event: \(event.name) are missing")
+                    return
+                }
+                event.processEventConfig(config)
+                self.report(event: event, withConfigs: config)
             }
         }
     }
     
-    func setUserId(_ event:SetUserId)
+    func setUserId(_ userId:String)
     {
-        OptiLogger.debug("Optitrack set User id for \(event.userId)")
-        self.tracker.userId = event.userId
-        
-        if let eventConfigs = Optimove.sharedInstance.eventWarehouse?.getConfig(ofEvent: event ) {
-            let dec = OptimoveEventDecorator(event: event, config: eventConfigs)
-            self.report(event: dec, withConfigs: eventConfigs)
-        }
+        OptiLogger.debug("Optitrack set User id for \(userId)")
+        self.tracker.userId = userId
     }
     
     
@@ -233,7 +248,7 @@ extension OptiTrack
     }
     
     private func trackAppOpened() {
-        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationWillEnterForeground,
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification,
                                                object: nil,
                                                queue: .main) { (notification) in
                                                 if Date().timeIntervalSince1970 - self.openApplicationTime > 1800 {
@@ -253,7 +268,7 @@ extension OptiTrack
     private func reportPendingEvents()
     {
         if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            if let jsonEvents =  OptimoveFileManager.load(file: "pendingOptimoveEvents.json") {
+            if let jsonEvents =  OptimoveFileManager.load(file: "pendingOptimoveEvents.json", isInSharedContainer: false) {
                 let decoder = JSONDecoder()
                 let events = try! decoder.decode([Event].self, from: jsonEvents)
                 
@@ -269,7 +284,7 @@ extension OptiTrack
     
     private func reportAppOpen()
     {
-         let event = AppOpenEvent()
+        let event = AppOpenEvent()
         guard let config = Optimove.sharedInstance.eventWarehouse?.getConfig(ofEvent: event) else {
             OptiLogger.error("could not load open app event configs")
             return

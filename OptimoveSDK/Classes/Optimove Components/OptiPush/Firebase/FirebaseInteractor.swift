@@ -61,8 +61,8 @@ class FirebaseInteractor:NSObject,OptipushServiceInfra
                        delegate:OptimoveMbaasRegistrationHandling,
                        pushTopicsRegistrationEndpoint:String)
     {
-        setMessaginDelegate()
         OptiLogger.debug("Setup firebase")
+
         self.pushTopicsRegistrationEndpoint = pushTopicsRegistrationEndpoint.last == "/" ? pushTopicsRegistrationEndpoint : "\(pushTopicsRegistrationEndpoint)/"
         self.delegate = delegate
         self.appController = FirebaseOptionsBuilder()
@@ -84,14 +84,14 @@ class FirebaseInteractor:NSObject,OptipushServiceInfra
         guard let appController = self.appController,
             let clientServiceOptions = self.clientServiceOptions
             else {return }
-        
+
         setupAppController(appController)
         setupSdkController(clientServiceOptions)
+        setMessaginDelegate()
         if OptimoveUserDefaults.shared.fcmToken == nil && Messaging.messaging().fcmToken != nil{
             optimoveReceivedRegistrationToken(Messaging.messaging().fcmToken!)
         }
-        
-        
+
         OptiLogger.debug("firebase finish setup")
     }
     

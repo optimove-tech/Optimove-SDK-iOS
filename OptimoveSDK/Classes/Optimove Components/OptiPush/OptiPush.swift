@@ -80,7 +80,9 @@ final class OptiPush: OptimoveComponent
     
     func performRegistration()
     {
-        registrar?.register()
+//        if OptimoveUserDefaults.shared.fcmToken != nil {
+            registrar?.register()
+//        }
     }
 }
 

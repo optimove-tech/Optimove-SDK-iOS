@@ -1,40 +1,39 @@
+////
+////  UserInSession.swift
+////  OptimoveSDKDev
+////
+////  Created by Mobile Developer Optimove on 11/09/2017.
+////  Copyright © 2017 Optimove. All rights reserved.
+////
 //
-//  UserInSession.swift
-//  OptimoveSDKDev
+//import UIKit
 //
-//  Created by Mobile Developer Optimove on 11/09/2017.
-//  Copyright © 2017 Optimove. All rights reserved.
-//
-
-import UIKit
-
-class OptimoveUserDefaults: Synchronizable
+class OptimoveUserDefaults
 {
     let lock:NSLock
-    
+//
     // Use for constants that are only available inside the main application process
     let standardUserDefaults = UserDefaults.standard
-    
+
     // Use for constants that are used in the shared "group.<bundle-id>.optimove" container
     let sharedUserDefaults = UserDefaults(suiteName: "group.\(Bundle.main.bundleIdentifier!).optimove")! // If this line is crashing the client forgot to add the app group as described in the documentation
-    
+//
     enum UserDefaultsKeys: String
     {
         case configurationEndPoint              = "configurationEndPoint"
         case isMbaasOptIn                       = "isMbaasOptIn"
         case isOptiTrackOptIn                   = "isOptiTrackOptIn"
         case isFirstConversion                  = "isFirstConversion"
+        case bundleIdentifier                   = "bundleIdentifier"
         case tenantToken                        = "tenantToken"
         case siteID                             = "siteID"
         case version                            = "version"
         case customerID                         = "customerID"
+        case email                              = "email"
         case visitorID                          = "visitorID"
         case userAgent                          = "userAgent"
-        case deviceToken                        = "deviceToken"
         case fcmToken                           = "fcmToken"
         case defaultFcmToken                    = "defaultFcmToken"
-        case isFirstLaunch                      = "isFirstLaunch"
-        case userAgentHeader                    = "userAgentHeader"
         case unregistrationSuccess              = "unregistrationSuccess"
         case registrationSuccess                = "registrationSuccess"
         case optSuccess                         = "optSuccess"
@@ -42,29 +41,28 @@ class OptimoveUserDefaults: Synchronizable
         case isClientHasFirebase                = "userHasFirebase"
         case isClientUseFirebaseMessaging       = "isClientUseFirebaseMessaging"
         case apnsToken                          = "apnsToken"
-        case hasConfigurationFile               = "hasConfigurationFile"
-        case topics                             = "topic"
-        case openAppTime                        = "openAppTime"
-        case clientUseBackgroundExecution       = "clientUseBackgroundExecution"
-        case lastPingTime                       = "lastPingTime"
         case realtimeSetUserIdFailed            = "realtimeSetUserIdFailed"
-        case realtimeFailedEmail                = "realtimeFailedEmail"
         case realtimeSetEmailFailed             = "realtimeSetEmailFailed"
-        case realtimeFailedOriginalVisitorId    = "realtimeFailedOriginalVisitorId"
         case initialVisitorId                   = "initialVisitorId"
-        case deviceOs                           = "deviceOs"
-        case deviceResolutionWidth              = "deviceResolutionWidth"
-        case deviceResolutionHeight             = "deviceResolutionHeight"
         case firstVisitTimestamp                = "firstVisitTimestamp"
     }
-    
+
     static let shared = OptimoveUserDefaults()
     private init()
     {
         lock = NSLock()
     }
-    
-    //MARK: Persist data
+
+    //MARK: Shared with App Extension
+
+    var bundleId: String {
+        get {
+            return sharedUserDefaults.string(forKey: UserDefaultsKeys.bundleIdentifier.rawValue)!
+        }
+        set {
+            self.sharedUserDefaults.set(Bundle.main.bundleIdentifier, forKey: UserDefaultsKeys.bundleIdentifier.rawValue)
+        }
+    }
     var customerID:String?
     {
         get
@@ -78,9 +76,9 @@ class OptimoveUserDefaults: Synchronizable
         set
         {
             self.sharedUserDefaults.set(newValue, forKey: UserDefaultsKeys.customerID.rawValue)
-            self.sharedUserDefaults.synchronize()
         }
     }
+
     var visitorID:String?
     {
         get
@@ -93,8 +91,7 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.sharedUserDefaults.set(newValue, forKey: UserDefaultsKeys.visitorID.rawValue)
-            self.sharedUserDefaults.synchronize()
+            self.sharedUserDefaults.set(newValue?.lowercased(), forKey: UserDefaultsKeys.visitorID.rawValue)
         }
     }
     var initialVisitorId: String?
@@ -109,8 +106,7 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.sharedUserDefaults.set(newValue, forKey: UserDefaultsKeys.initialVisitorId.rawValue)
-            self.sharedUserDefaults.synchronize()
+            self.sharedUserDefaults.set(newValue?.lowercased(), forKey: UserDefaultsKeys.initialVisitorId.rawValue)
         }
     }
     var userAgent:String?
@@ -129,6 +125,64 @@ class OptimoveUserDefaults: Synchronizable
             self.sharedUserDefaults.synchronize()
         }
     }
+   
+
+    var configurationEndPoint: String
+    {
+        get
+        {
+            if let id = self.sharedUserDefaults.string(forKey: UserDefaultsKeys.configurationEndPoint.rawValue)
+            {
+                return id
+            }
+            return ""
+        }
+        set
+        {
+            self.sharedUserDefaults.set(newValue, forKey: UserDefaultsKeys.configurationEndPoint.rawValue)
+        }
+    }
+
+    var tenantToken: String?
+    {
+        get
+        {
+            if let id = self.sharedUserDefaults.string(forKey: UserDefaultsKeys.tenantToken.rawValue)
+            {
+                return id
+            }
+            return nil
+        }
+        set
+        {
+            self.sharedUserDefaults.set(newValue, forKey:  UserDefaultsKeys.tenantToken.rawValue)
+        }
+    }
+    var version:String?
+    {
+        get
+        { return  self.sharedUserDefaults.string(forKey: UserDefaultsKeys.version.rawValue) ?? nil
+        }
+        set { self.sharedUserDefaults.set(newValue, forKey:  UserDefaultsKeys.version.rawValue) }
+    }
+
+    //MARK: Standard
+    var userEmail:String?
+    {
+        get
+        {
+            if let id = self.standardUserDefaults.string(forKey: UserDefaultsKeys.email.rawValue)
+            {
+                return id
+            }
+            return nil
+        }
+        set
+        {
+            self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.email.rawValue)
+        }
+    }
+
     var apnsToken: Data?
     {
         get
@@ -137,57 +191,16 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.setDefaultObject(forObject: newValue as Any, key: UserDefaultsKeys.apnsToken.rawValue)
+            if newValue == nil {
+                standardUserDefaults.removeObject(forKey: UserDefaultsKeys.apnsToken.rawValue)
+            } else {
+                self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.apnsToken.rawValue)
+            }
         }
     }
 
-    var deviceResolutionWidth:Double
-    {
-        get
-        {
-            var size = self.sharedUserDefaults.double(forKey: UserDefaultsKeys.deviceResolutionWidth.rawValue)
-            if size > 0 {
-                return size
-            }
-            size = Double(UIScreen.main.bounds.size.width)
-            self.sharedUserDefaults.set(size, forKey: UserDefaultsKeys.deviceResolutionWidth.rawValue)
-            self.sharedUserDefaults.synchronize()
-            return size
-        }
-    }
-    var deviceResolutionHeight:Double
-    {
-        get
-        {
-            var size = self.sharedUserDefaults.double(forKey: UserDefaultsKeys.deviceResolutionHeight.rawValue)
-            if size > 0 {
-                return size
-            }
-            size = Double(UIScreen.main.bounds.size.height)
-            self.sharedUserDefaults.set(size, forKey: UserDefaultsKeys.deviceResolutionHeight.rawValue)
-            self.sharedUserDefaults.synchronize()
-            return size
-        }
-    }
-    
-    
     //MARK: Initializtion Flags
-    var configurationEndPoint: String
-    {
-        get
-        {
-            if let id = self.standardUserDefaults.string(forKey: UserDefaultsKeys.configurationEndPoint.rawValue)
-            {
-                return id
-            }
-            return ""
-        }
-        set
-        {
-            self.setDefaultObject(forObject: newValue as Any,
-                                  key: UserDefaultsKeys.configurationEndPoint.rawValue)
-        }
-    }
+
     var siteID:Int?
     {
         get
@@ -200,62 +213,23 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.setDefaultObject(forObject: newValue as Any, key: UserDefaultsKeys.siteID.rawValue)
+            self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.siteID.rawValue)
         }
     }
-    var tenantToken: String?
-    {
-        get
-        {
-            if let id = self.standardUserDefaults.string(forKey: UserDefaultsKeys.tenantToken.rawValue)
-            {
-                return id
-            }
-            return nil
-        }
-        set
-        {
-            self.setDefaultObject(forObject: newValue as Any, key: UserDefaultsKeys.tenantToken.rawValue)
-        }
-    }
-    var version:String?
-    {
-        get
-        {
-            if let id = self.standardUserDefaults.string(forKey: UserDefaultsKeys.version.rawValue) {
-                return id
-            }
-            return nil
-        }
-        set { self.setDefaultObject(forObject: newValue as Any,
-                                    key: UserDefaultsKeys.version.rawValue) }
-    }
-    var hasConfigurationFile : Bool?
-    {
-        get
-        {
-            return self.standardUserDefaults.value(forKey: UserDefaultsKeys.hasConfigurationFile.rawValue) as? Bool
-        }
-        set
-        {
-            self.setDefaultObject(forObject: newValue as Any,
-                                  key: UserDefaultsKeys.hasConfigurationFile.rawValue)
-        }
-    }
+
+
     var isClientHasFirebase : Bool
     {
         get { return self.standardUserDefaults.bool(forKey: UserDefaultsKeys.isClientHasFirebase.rawValue)}
-        set { self.setDefaultObject(forObject: newValue as Any,
-                                    key: UserDefaultsKeys.isClientHasFirebase.rawValue) }
+        set { self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.isClientHasFirebase.rawValue) }
     }
     var isClientUseFirebaseMessaging : Bool
     {
         get { return self.standardUserDefaults.bool(forKey: UserDefaultsKeys.isClientUseFirebaseMessaging.rawValue)}
-        set { self.setDefaultObject(forObject: newValue as Any,
-                                    key: UserDefaultsKeys.isClientUseFirebaseMessaging.rawValue) }
+        set { self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.isClientUseFirebaseMessaging.rawValue) }
     }
-    
-    
+
+
     // MARK: Optipush Flags
     var isMbaasOptIn: Bool?
     {
@@ -269,8 +243,7 @@ class OptimoveUserDefaults: Synchronizable
         set
         {
             lock.lock()
-            self.setDefaultObject(forObject: newValue as Any,
-                                  key: UserDefaultsKeys.isMbaasOptIn.rawValue)
+            standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.isMbaasOptIn.rawValue)
             lock.unlock()
         }
     }
@@ -282,8 +255,7 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.setDefaultObject(forObject: newValue as Any,
-                                  key: UserDefaultsKeys.unregistrationSuccess.rawValue)
+            self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.unregistrationSuccess.rawValue)
         }
     }
     var isRegistrationSuccess : Bool
@@ -294,8 +266,7 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.setDefaultObject(forObject: newValue as Any,
-                                  key: UserDefaultsKeys.registrationSuccess.rawValue)
+            self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.registrationSuccess.rawValue)
         }
     }
     var isOptRequestSuccess : Bool
@@ -306,16 +277,14 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.setDefaultObject(forObject: newValue as Any,
-                                  key: UserDefaultsKeys.optSuccess.rawValue)
+            self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.optSuccess.rawValue)
         }
     }
-    
+
     var isFirstConversion : Bool?
     {
         get { return self.standardUserDefaults.value(forKey: UserDefaultsKeys.isFirstConversion.rawValue) as? Bool }
-        set { self.setDefaultObject(forObject: newValue as Any,
-                                    key: UserDefaultsKeys.isFirstConversion.rawValue) }
+        set { self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.isFirstConversion.rawValue)}
     }
     var defaultFcmToken: String?
     {
@@ -325,7 +294,7 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.setDefaultObject(forObject: newValue as Any, key: UserDefaultsKeys.defaultFcmToken.rawValue)
+            self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.defaultFcmToken.rawValue)
         }
     }
     var fcmToken: String?
@@ -336,7 +305,7 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.setDefaultObject(forObject: newValue as Any, key: UserDefaultsKeys.fcmToken.rawValue)
+            self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.fcmToken.rawValue)
         }
     }
     // MARK: OptiTrack Flags
@@ -348,29 +317,23 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.setDefaultObject(forObject: newValue as Any,
-                                  key: UserDefaultsKeys.isOptiTrackOptIn.rawValue)
+            self.standardUserDefaults.set(newValue,
+                                  forKey: UserDefaultsKeys.isOptiTrackOptIn.rawValue)
         }
     }
-    var lastPingTime: TimeInterval
-    {
-        get { return self.standardUserDefaults.double(forKey: UserDefaultsKeys.lastPingTime.rawValue)}
-        set { self.setDefaultObject(forObject: newValue as Any,
-                                    key: UserDefaultsKeys.lastPingTime.rawValue) }
-    }
-    
+
     var firstVisitTimestamp: Int
     {
         get { return self.standardUserDefaults.integer(forKey: UserDefaultsKeys.firstVisitTimestamp.rawValue)}
-        set { self.setDefaultObject(forObject: newValue as Any,
-                                    key: UserDefaultsKeys.firstVisitTimestamp.rawValue) }
+        set { self.standardUserDefaults.set(newValue,
+                                    forKey: UserDefaultsKeys.firstVisitTimestamp.rawValue) }
     }
     var isSetUserIdSucceed : Bool
     {
         get { return  self.standardUserDefaults.bool(forKey: UserDefaultsKeys.isSetUserIdSucceed.rawValue)}
-        
-        set { self.setDefaultObject(forObject: newValue as Bool,
-                                    key: UserDefaultsKeys.isSetUserIdSucceed.rawValue) }
+
+        set { self.standardUserDefaults.set(newValue,
+                                    forKey: UserDefaultsKeys.isSetUserIdSucceed.rawValue) }
     }
     // MARK: Real time flags
     var realtimeSetUserIdFailed: Bool
@@ -381,26 +344,11 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.setDefaultObject(forObject: newValue as Any,
-                                  key: UserDefaultsKeys.realtimeSetUserIdFailed.rawValue)
+            self.standardUserDefaults.set(newValue,
+                                  forKey: UserDefaultsKeys.realtimeSetUserIdFailed.rawValue)
         }
     }
-    var realtimeFailedOriginalVisitorId: String?
-    {
-        get
-        {
-            return self.standardUserDefaults.string(forKey: UserDefaultsKeys.realtimeFailedOriginalVisitorId.rawValue)
-        }
-        set
-        {
-            if newValue == nil {
-                standardUserDefaults.removeObject(forKey: UserDefaultsKeys.realtimeFailedOriginalVisitorId.rawValue)
-            } else {
-                self.setDefaultObject(forObject: newValue as Any,
-                                      key: UserDefaultsKeys.realtimeFailedOriginalVisitorId.rawValue)
-            }
-        }
-    }
+
     var realtimeSetEmailFailed: Bool
     {
         get
@@ -409,24 +357,8 @@ class OptimoveUserDefaults: Synchronizable
         }
         set
         {
-            self.setDefaultObject(forObject: newValue as Any,
-                                  key: UserDefaultsKeys.realtimeSetEmailFailed.rawValue)
-        }
-    }
-    var realtimeFailedEmail: String?
-    {
-        get
-        {
-            return self.standardUserDefaults.string(forKey: UserDefaultsKeys.realtimeFailedEmail.rawValue)
-        }
-        set
-        {
-            if newValue == nil {
-                standardUserDefaults.removeObject(forKey: UserDefaultsKeys.realtimeFailedEmail.rawValue)
-            } else {
-                self.setDefaultObject(forObject: newValue as Any,
-                                      key: UserDefaultsKeys.realtimeFailedEmail.rawValue)
-            }
+            self.standardUserDefaults.set(newValue,
+                                  forKey: UserDefaultsKeys.realtimeSetEmailFailed.rawValue)
         }
     }
 }

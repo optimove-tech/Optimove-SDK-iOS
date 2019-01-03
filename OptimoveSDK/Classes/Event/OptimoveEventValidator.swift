@@ -71,8 +71,5 @@ class OptimoveEventValidator
         }
         return nil
     }
-    func validate(userId:String) -> Bool
-    {
-        return !userId.isEmpty && !userId.contains("undefine") && !(userId == "null")
-    }
+   
 }

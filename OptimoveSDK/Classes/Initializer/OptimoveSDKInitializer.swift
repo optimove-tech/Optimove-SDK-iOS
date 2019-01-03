@@ -83,7 +83,7 @@ class OptimoveSDKInitializer
     private func handleFetchConfigurationFromLocal()
     {
         guard let version = Version,
-            OptimoveFileManager.isExist(file: version+".json") else {
+            OptimoveFileManager.isExist(file: version+".json", isInSharedContainer: true) else {
                 OptiLogger.debug("configurtion file not exist")
                 //TODO: delete all configuration files because they are not relevant to current version anymore
                 return
@@ -116,7 +116,7 @@ class OptimoveSDKInitializer
     {
         if let version = OptimoveUserDefaults.shared.version {
             let fileName = version + ".json"
-            OptimoveFileManager.save(data: data, toFileName: fileName)
+            OptimoveFileManager.save(data: data, toFileName: fileName,isForSharedContainer: true)
         }
     }
     

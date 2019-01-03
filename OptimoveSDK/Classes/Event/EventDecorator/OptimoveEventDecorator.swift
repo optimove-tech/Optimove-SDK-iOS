@@ -4,24 +4,15 @@ import Foundation
 /// Adjust event entity to satisfy Optimove's business logic before dispatch
 class OptimoveEventDecorator:OptimoveEvent
 {
-    var name: String
-    var parameters: [String : Any]
-    let isOptimoveCoreEvent:Bool
+     var name: String
+     var parameters: [String : Any]
 
-    /// For custom events, where the source might not apply to Optimove's naming conventions, use this designated initializer to first apply normalization rules. Then, with the normalized event wrapped in the decorator, you can fetch the event's configs from the configuration file and call the processEventConfig(_) method.
-    /// - Parameter event: Event that is sent to Track & Trigger
-    init(event:OptimoveEvent)
-    {
+
+    init(event:OptimoveEvent) {
         self.name = event.name
         self.parameters = event.parameters
-        self.isOptimoveCoreEvent = event is OptimoveCoreEvent
-
-        if !isOptimoveCoreEvent {
-            name = name.lowercased().trimmingCharacters(in: .whitespaces).replacingOccurrences(of: " ", with: "_")
-            parameters = normalize(parameters: parameters)
-        }
     }
-
+    
     /// For core events, where the naming conventions is satisfy by the event source, use this convenience initializer to just add the additional attributes according to the config file.
     ///
     /// - Parameters:
@@ -32,6 +23,8 @@ class OptimoveEventDecorator:OptimoveEvent
         self.init(event: event)
         self.processEventConfig(config)
     }
+
+
 
     /// Add Additional attributes according to event configuration
     ///
@@ -50,19 +43,22 @@ class OptimoveEventDecorator:OptimoveEvent
         if config.parameters[OptimoveKeys.AdditionalAttributesKeys.eventPlatform] != nil {
             self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventPlatform] = OptimoveKeys.AddtionalAttributesValues.eventPlatform
         }
+
+        normalizeParameters(config)
     }
 
-    /// Normalize all event parameters to fulfill Optimove settings
+    /// For core events, where the naming conventions is satisfy by the event source, just normalize the parameter type if necessary
     ///
-    /// - Parameter parameters: The original parameters as provided by the client
-    /// - Returns: The mutated parameters
-    private func normalize(parameters: [String:Any]) -> [String:Any]
-    {
-        var normalizeParams = parameters
-        for key in parameters.keys {
-            normalizeParams[key.lowercased().trimmingCharacters(in: .whitespaces).replacingOccurrences(of: " ", with: "_")] = parameters[key]
+    /// - Parameter config: The configuration of the event as provided from the config file
+    func normalizeParameters(_ config: OptimoveEventConfig) {
+        var normalizedParameters = [String:Any]()
+        for (key,value) in parameters {
+            if let numValue =  value as? NSNumber, config.parameters[key]!.type == "Boolean" {
+                normalizedParameters[key] = Bool(truncating: numValue)
+            } else {
+                normalizedParameters[key] = value
+            }
         }
-        return normalizeParams
+        self.parameters = normalizedParameters
     }
 }
-

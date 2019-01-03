@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveSDK'
-  s.version          = '1.2.2'
+  s.version          = '1.3.0'
   s.summary          = 'Optimove SDK for Analytics and push notifications.'
 
   s.description      = <<-DESC
@@ -16,14 +16,25 @@ Pod::Spec.new do |s|
   
   s.ios.deployment_target = '10.0'
   s.static_framework = true
-  s.swift_version = '4.1'
+  s.swift_version = '4.2'
   s.source_files = 'OptimoveSDK/Classes/**/*'
-  s.dependency 'Firebase/Core', '5.4.0'
-  s.dependency 'FirebaseMessaging','3.0.3'
-  s.dependency 'FirebaseDynamicLinks','3.0.1'
-  s.dependency 'OptiTrackCore'
-  s.dependency 'XCGLogger','~> 6.0.4'
+  
+  s.dependency 'Firebase/Core', '5.15.0'
+  s.dependency 'FirebaseAnalytics', '5.4.0'
+  s.dependency 'FirebaseAnalyticsInterop', '1.1.0'
+  s.dependency 'FirebaseCore', '5.1.10'
+  s.dependency 'FirebaseDynamicLinks', '3.3.0'
+  s.dependency 'FirebaseInstanceID', '3.3.0'
+  s.dependency 'FirebaseMessaging', '3.2.2'
+  s.dependency 'GoogleAppMeasurement', '5.4.0'
+  s.dependency 'GoogleUtilities', '5.3.6'
+  s.dependency 'Protobuf', '3.6.1'
+  s.dependency 'nanopb', '0.3.901'
+  s.dependency 'OptiTrackCore', '0.3.0'
+  # s.dependency 'XCGLogger', '6.1.0'
+  
+  
   
  
-  s.frameworks = 'UIKit'
+  s.frameworks = 'UIKit','SystemConfiguration','UserNotifications','AdSupport'
 end

@@ -1,8 +1,4 @@
-
-
-import CoreLocation
 import UserNotifications
-import AdSupport
 
 @objc public enum OptimoveDeviceRequirement: Int
 {
