@@ -136,24 +136,24 @@ extension OptiTrack
             OptiLogger.debug("report screen event of \(viewControllersIdentifiers)")
             DispatchQueue.main.async {
                 self.tracker?.track(view: viewControllersIdentifiers, url: url)
-                var urlString = url.absoluteString.removingPercentEncoding!
-
-                for prefix in ["https://www.", "http://www.", "https://", "http://"] {// Prefixes that are removed by Matomo and so shouldn't be hashed. Order matters.
-                    if urlString.hasPrefix(prefix) {
-                        urlString.removeFirst(prefix.count)
-                        break
-                    }
-                }
-
-                let originalEvent = PageVisitEvent(customURL: SHA1.hexString(from: urlString)!.replacingOccurrences(of: " ", with: ""), pageTitle: viewControllersIdentifiers.joined(separator: "/"), category: category)
-                let event = OptimoveEventDecorator(event: originalEvent)
-
-                guard let config = Optimove.sharedInstance.eventWarehouse?.getConfig(ofEvent: event) else {
-                    OptiLogger.error("configurations for event: \(event.name) are missing")
-                    return
-                }
-                event.processEventConfig(config)
-                self.report(event: event, withConfigs: config)
+//                var urlString = url.absoluteString.removingPercentEncoding!
+//
+//                for prefix in ["https://www.", "http://www.", "https://", "http://"] {// Prefixes that are removed by Matomo and so shouldn't be hashed. Order matters.
+//                    if urlString.hasPrefix(prefix) {
+//                        urlString.removeFirst(prefix.count)
+//                        break
+//                    }
+//                }
+//
+//                let originalEvent = PageVisitEvent(customURL: SHA1.hexString(from: urlString)!.replacingOccurrences(of: " ", with: ""), pageTitle: viewControllersIdentifiers.joined(separator: "/"), category: category)
+//                let event = OptimoveEventDecorator(event: originalEvent)
+//
+//                guard let config = Optimove.sharedInstance.eventWarehouse?.getConfig(ofEvent: event) else {
+//                    OptiLogger.error("configurations for event: \(event.name) are missing")
+//                    return
+//                }
+//                event.processEventConfig(config)
+//                self.report(event: event, withConfigs: config)
             }
         }
     }
