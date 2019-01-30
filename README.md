@@ -325,8 +325,6 @@ Optimove.sharedInstance.registerUser(email: "a.valid@email.com", userId: "a-uniq
 
 Optimove clients may use the Optimove Mobile SDK to track specific customer actions and other custom events to Optimove (beyond OOTB events such visits). This data is used for tracking visitor and customer behavior, targeting campaigns to specific visitor and/or customer segments and triggering campaigns based on particular visitor and/or customer actions/events.  
   
-To see examples of Custom Events, please visit [Defining the Set of Custom Tracking Events](https://github.com/optimove-tech/SDK-Custom-Events-for-Your-Vertical) that you will report for more information.
-
 >**Note**: While you can always add/change the custom events and parameters at a later date (by speaking with the Optimove Product Integration Team), only the particular custom events that you and the Optimove Product Integration Team have already defined together will be supported by your Optimove site.
 
 ### How to Track a Custom Event from within your iOS app
@@ -364,7 +362,7 @@ override func viewDidAppear(_ animated: Bool) {
 
 >**Notes**:
 >- The `reportEvent(event:)` method should only be called after the initialization success callback was received.
->- As already mentioned, all [custom events](https://github.com/optimove-tech/SDK-Custom-Events-for-Your-Vertical) must be pre-defined in your Tenant configurations by the Optimove Product Integration Team.
+>- As already mentioned, all custom events must be pre-defined in your Tenant configurations by the Optimove Product Integration Team.
 >- Reporting of custom events is only supported if you have the basic Mobile SDK setup implemented.
 >- Events use **snake_case** as a naming convention. Separate each word with one underscore character (_) and no spaces. (e.g., Checkout_Completed)
 
@@ -384,5 +382,5 @@ For more information on how to add Optimail to your account, please contact your
 ## <a id="trigger-api"></a>Executing via Optimove APIs
 You can also trigger Optimove realtime campaigns using Optimove’s APIs:
 * Register listener to receive realtime campaign notifications, please refer to RegisterEventListener (where eventid = 11)
-* To view your realtime API payload, please refer to [Optimove Realtime Execution Channels](https://docs.optimove.com/optimove-realtime-execution-channels/) (see Method 3: Realtime API) 
-For more information on how to acquire an API key to use Optimove APIs, please request one from your CSM or your Optimove point of contact.
+* To view the realtime execution flow, please refer to [Realtime Flow](https://github.com/optimove-tech/Optimove-APIs/tree/master/API-Integrations#rt-flow) 
+* For more information on how to acquire an API key to use Optimove APIs, please request one from your CSM or your Optimove point of contact.
