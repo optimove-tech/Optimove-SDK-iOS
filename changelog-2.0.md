@@ -1,51 +1,31 @@
 
-## iOS Mobile SDK Changelog v2.0
+# iOS Mobile SDK Changelog v2.0
 
-### SDK Configurations
+## Dependencies
+1. Firebase 5.20.2
+2. includes `FirebaseMessaging` 3.5.0, and `FirebaseDynamicLinks` 3.4.3
 
-Please update the following SDK Details as follows:
+## Versioning
+The below will allow any newer minor version of  `OptimoveSDK`  not to break the existing API (i.e 2._._) and will be auto-fetched during any  `pod update`.
+OptimoveSDK uses __semantic versioning__. Therefore, in your  `Podfile`  set the pod version with the  `~>`  sign.
 
- 1. **Podfile details**:
-	```ruby
-	platform :ios, '10.0'
-	# Update "target" accordingly to support silent minor upgrades:
-	target '<YOUR_TARGET_NAME>' do
-	    use_frameworks!
-	    pod 'OptimoveSDK','~> 2.0'
-	end
+Example code snippet:
+```ruby
+platform :ios, '10.0'
+# Update "target" accordingly to support silent minor upgrades:
+target '<YOUR_TARGET_NAME>' do
+    use_frameworks!
+    pod 'OptimoveSDK', '~> 2.0'
+end
 
-	target 'Notification Extension' do
-	    use_frameworks!
-	    pod 'OptimoveNotificationServiceExtension', '~> 2.0'
-	end
-	```
+target 'Notification Extension' do
+    use_frameworks!
+    pod 'OptimoveNotificationServiceExtension','~> 2.0'
+end
+```
 
- 2. **Firebase Dependency**  
-Firebase 5.20.2
-
- 3. **Update configure()**  
-
-	- Change Optimove.sharedInstance.configure(for: info) to Optimove.configure(for: info) 
-	- Change "token" to "tenantToken"
-	- Change "version" to "configName"
-	- Remove from Optimove.configure(for: info) the "hasFirebase: false," and "useFirebaseMessaging: false" - No need to notify Optimove SDK about your internal 'Firebase' integration as this is now done automatically for you
-	- Add (and call) FirebaseApp.configure() before Optimove.configure(for: info) 
-
-	Example Code Snippet:
-	```ruby
-	FirebaseApp.configure()
-	let info = OptimoveTenantInfo(
-          tenantToken: "<YOUR_TOKEN>",
-          configName: "<YOUR_MOBILE_CONFIG_NAME>"
-          )
-    Optimove.configure(for: info)
-	```
-
- 4. **Mobile Config Name**: request from the Product Integration Team a new version of your mobile config
-
-<br/>
-
-### Update Screen Visit function
+## Features
+### Screen Visit function
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 
 - Change from 
@@ -67,11 +47,55 @@ Optimove.shared.setScreenVisit(screenPathArray: ["Home", "Store", "Footware", "B
 	 - **screenTitle**: which represent the current scene
 	 - **screenPath**: which represent the path to the current screen in the form of 'path/to/scene
 	 - **screenCategory**: which adds the scene category it belongs to. 
+<br/>
+
+### Optipush
+The `OptimoveDeepLinkComponents` Object has a new property called `parameters` to support dynamic parameters when using deep linking.
+
+Code snippet example:
+```ruby
+class ViewController: UIViewController, OptimoveDeepLinkCallback {
+    func didReceive(deepLink: OptimoveDeepLinkComponents?)
+    {
+        guard let deepLink = deepLink else {return}
+        guard let vc = storyboard?.instantiateViewController(withIdentifier: "deepLinkVc") as? DeepLinkViewController else { return }
+
+        vc.deepLinkComp = deepLink
+        // Retrieve the targetted screen name
+        let screenName = deepLink.screenName
+        // Retrieve the deep link Key-Value parameters
+        let deepLinkParams = deepLink.parameters
+        present(vc, animated: true)
+    }
+}
+```
+
+## API Changes
+
+### configure function
+ 1. Change `Optimove.sharedInstance.configure(for: info)` to `Optimove.configure(for: info)` 
+ 2. Remove `url` from `OptimoveTenantInfo()`
+ 3. Change `token` to `tenantToken`
+ 4.  Change `version` to `configName`
+ 5. Remove `hasFirebase: false,` and `useFirebaseMessaging: false` from `configure()`- No need to notify Optimove SDK about your internal 'Firebase' integration as this is done automatically for you
+ 6. Add (and call) `FirebaseApp.configure()` before `Optimove.configure(for: info)` 
+
+	Example Code Snippet:
+	```ruby
+	FirebaseApp.configure()
+	let info = OptimoveTenantInfo(
+          tenantToken: "<YOUR_SDK_TENANT_TOKEN>",
+          configName: "<YOUR_MOBILE_CONFIG_NAME>"
+          )
+    Optimove.configure(for: info)
+	```
+	Note: Please request from the Product Integration team your `tenantToken` and `configName` dedicated to your Optimove instance.
 
 <br/>
 
-### Update User ID function
+### User ID function
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
+
 - Change from 
 ```ruby
 Optimove.sharedInstance.set(userId:)
@@ -96,37 +120,13 @@ Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")
 ```
 <br/>
 
-### Optipush
-The `OptimoveDeepLinkComponents` Object has a new property called `parameters`
-
-Code snippet example:
-```ruby
-class ViewController: UIViewController, OptimoveDeepLinkCallback {
-    func didReceive(deepLink: OptimoveDeepLinkComponents?)
-    {
-        guard let deepLink = deepLink else {return}
-        guard let vc = storyboard?.instantiateViewController(withIdentifier: "deepLinkVc") as? DeepLinkViewController else { return }
-
-        vc.deepLinkComp = deepLink
-        // Retrieve the targetted screen name
-        let screenName = deepLink.screenName
-        // Retrieve the deep link Key-Value parameters
-        let deepLinkParams = deepLink.parameters
-        present(vc, animated: true)
-    }
-}
-```
-
-<br/>
-
-### During Integration only
--   During integration process, while on staging phase, add the flag  "OPTIMOVE_CLIENT_STG_ENV"  to your user-defined Build settings with value "true".  
-    In the build Setting of your target, press the  `+`  button and select "Add User-Defined Setting"  
+### During integration phase only
+-   During integration, add the flag  `OPTIMOVE_CLIENT_STG_ENV`  to your user-defined Build settings with value `true`.  
+    In the build Setting of your target, press the  `+`  button and select `Add User-Defined Setting`
     <IMAGE1>
     
-
-- Add "OPTIMOVE_CLIENT_STG_ENV" key with "true" as value  
+- Add `OPTIMOVE_CLIENT_STG_ENV` key with `true` as value  
  <IMAGE2>
 
-- In the "info.plist", add an entry that map to this value  
+- In the `info.plist`, add an entry that map to this value  
  <IMAGE3>
