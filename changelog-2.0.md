@@ -31,12 +31,12 @@ No need to notify `OptimoveSDK` about your internal 'Firebase' integration as th
 
 	Example Code Snippet:
 	```java
-		firebaseApp.configure()
-		let info = OptimoveTenantInfo(
-	          token: "abcdefg12345678",
-	          version: "mobileconfig.1.0.0"
-	          )
-	    Optimove.sharedInstance.configure(for: info)
+	firebaseApp.configure()
+	let info = OptimoveTenantInfo(
+          token: "abcdefg12345678",
+          version: "mobileconfig.1.0.0"
+          )
+    Optimove.sharedInstance.configure(for: info)
 	```
 
  4. **Mobile Config Name**: request from the Product Integration Team a new version of your mobile config
