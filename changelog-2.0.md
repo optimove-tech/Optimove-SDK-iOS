@@ -49,7 +49,7 @@ Optimove.shared.setScreenVisit(screenPathArray: ["Home", "Store", "Footware", "B
 	 - **screenCategory**: which adds the scene category it belongs to. 
 <br/>
 
-### Optipush
+### Optipush (Dynamic Deep Link support)
 The `OptimoveDeepLinkComponents` Object has a new property called `parameters` to support dynamic parameters when using deep linking.
 
 Code snippet example:
