@@ -116,3 +116,17 @@ class ViewController: UIViewController, OptimoveDeepLinkCallback {
     }
 }
 ```
+
+<br/>
+
+### During Integration only
+-   During integration process, while on staging phase, add the flag  **"OPTIMOVE_CLIENT_STG_ENV"**  to your user-defined Build settings with value "true".  
+    In the build Setting of your target, press the  `+`  button and select "Add User-Defined Setting"  
+    <IMAGE1>
+    
+
+- Add "OPTIMOVE_CLIENT_STG_ENV" key with "true" as value  
+ <IMAGE2>
+
+- In the "info.plist", add an entry that map to this value  
+ <IMAGE3>
