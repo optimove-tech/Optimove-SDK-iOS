@@ -88,10 +88,10 @@ Optimove.shared.setUserId("<MY_SDK_ID>")
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 - Change from 
 ```java
-Optimove.sharedInstance.registerUser(email: "<MY_EMAIL>", userId: "<MY_SDK_ID>");
+Optimove.sharedInstance.registerUser(email: "<MY_EMAIL>", userId: "<MY_SDK_ID>")
 ```
 
 - To:
 ```java
-`Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")`
+Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")
 ```
