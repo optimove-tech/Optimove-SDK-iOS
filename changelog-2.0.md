@@ -1,3 +1,4 @@
+
 ## iOS Mobile SDK Changelog v2.0
 
 ### SDK Configurations
@@ -10,7 +11,6 @@ Please update the following SDK Details as follows:
 	# Update "target" accordingly to support silent minor upgrades:
 	target '<YOUR_TARGET_NAME>' do
 	    use_frameworks!
-	    pod 'OptimoveSDK',
 	    pod 'OptimoveSDK','~> 2.0'
 	end
 
@@ -29,14 +29,14 @@ Firebase 5.20.2
 	- Change "token" to "tenantToken"
 	- Change "version" to "configName"
 	- Remove from Optimove.configure(for: info) the "hasFirebase: false," and "useFirebaseMessaging: false" - No need to notify Optimove SDK about your internal 'Firebase' integration as this is now done automatically for you
-	- Add (and call) **FirebaseApp.configure()** before Optimove.configure(for: info) 
+	- Add (and call) FirebaseApp.configure() before Optimove.configure(for: info) 
 
 	Example Code Snippet:
 	```java
 	FirebaseApp.configure()
 	let info = OptimoveTenantInfo(
-          tenantToken: "your token",
-          configName: "mobileconfig.1.0.0"
+          tenantToken: "<YOUR_TOKEN>",
+          configName: "<YOUR_MOBILE_CONFIG_NAME>"
           )
     Optimove.configure(for: info)
 	```
