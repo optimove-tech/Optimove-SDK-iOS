@@ -15,7 +15,7 @@ class DynamicLinkParser :NSObject, URLSessionDataDelegate
         
     }
     
-    func parse(_ dynamicLink:URL) {
+    func parse(_ dynamicLink: URL) {
         session.dataTask(with: dynamicLink).resume()
     }
     

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="7Sd-3F-aOm">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="7Sd-3F-aOm">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -172,6 +172,50 @@
             </objects>
             <point key="canvasLocation" x="927" y="776"/>
         </scene>
+        <!--Deep Link View Controller-->
+        <scene sceneID="Ucm-el-PqG">
+            <objects>
+                <viewController storyboardIdentifier="deepLinkVc" id="qwt-4L-zxW" customClass="DeepLinkViewController" customModule="SwiftDemoApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="auo-68-wQC"/>
+                        <viewControllerLayoutGuide type="bottom" id="g4O-8x-tQH"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="nfA-vJ-asI">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4bm-vC-6cn">
+                                <rect key="frame" x="16" y="44" width="343" height="579"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BJe-XD-vji">
+                                <rect key="frame" x="160" y="593" width="54" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Dismiss"/>
+                                <connections>
+                                    <action selector="dismissMe:" destination="qwt-4L-zxW" eventType="touchUpInside" id="9Lu-ea-AUs"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="4bm-vC-6cn" firstAttribute="leading" secondItem="nfA-vJ-asI" secondAttribute="leading" constant="16" id="Lqd-hO-b86"/>
+                            <constraint firstAttribute="trailing" secondItem="4bm-vC-6cn" secondAttribute="trailing" constant="16" id="No9-8u-HGh"/>
+                            <constraint firstItem="4bm-vC-6cn" firstAttribute="top" secondItem="auo-68-wQC" secondAttribute="bottom" constant="24" id="ScF-nF-Nfm"/>
+                            <constraint firstItem="4bm-vC-6cn" firstAttribute="centerY" secondItem="nfA-vJ-asI" secondAttribute="centerY" id="ds7-PD-5wk"/>
+                            <constraint firstItem="4bm-vC-6cn" firstAttribute="centerX" secondItem="nfA-vJ-asI" secondAttribute="centerX" id="tOj-Vf-EwY"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="deepLinkLabel" destination="4bm-vC-6cn" id="8pG-3J-DCe"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="w1l-NI-5AL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="926" y="50"/>
+        </scene>
         <!--Set UserID View Controller-->
         <scene sceneID="lIk-SE-yUt">
             <objects>
@@ -198,7 +242,7 @@
                                     <action selector="pressSetUserID:" destination="f8d-FY-Kek" eventType="touchUpInside" id="UvI-5v-y9C"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Set User" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="niB-pc-nD4">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Set User ID" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="niB-pc-nD4">
                                 <rect key="frame" x="4" y="72" width="367" height="48"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="40"/>
                                 <nil key="textColor"/>

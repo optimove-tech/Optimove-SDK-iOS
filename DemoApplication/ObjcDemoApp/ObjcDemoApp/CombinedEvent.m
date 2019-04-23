@@ -1,5 +1,13 @@
+//
+//  CombinedEvent.m
+//  ObjcDemoApp
+//
+//  Created by Elkana Orbach on 21/01/2018.
+//  Copyright © 2018 Optimove. All rights reserved.
+//
 
 #import "CombinedEvent.h"
+@import OptimoveSDK;
 
 @implementation CombinedEvent
 
@@ -13,8 +21,10 @@
 }
 
 - (NSString*) name {
-    return @"custom_combined_event";
+    return @"simple_custom_event";
 }
+
+
 
 - (NSDictionary*) parameters {
     

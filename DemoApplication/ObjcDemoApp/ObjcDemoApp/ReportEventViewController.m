@@ -1,8 +1,14 @@
+//
+//  ReportEventViewController.m
+//  HelloWorld
+//
+//  Created by Elkana Orbach on 18/01/2018.
+//  Copyright © 2018 Optimove. All rights reserved.
+//
 
 #import "ReportEventViewController.h"
 @import OptimoveSDK;
 #import "CombinedEvent.h"
-#import "MyCustomEvent.m"
 
 @interface ReportEventViewController ()
 
@@ -24,22 +30,8 @@
     NSString* stringInput = _stringTextField.text;
     NSNumber* numberInput = @([_numberTextField.text intValue]);
     CombinedEvent* event = [[CombinedEvent alloc] initWithStringInput:stringInput andNumberInput:numberInput];
-    [Optimove.sharedInstance reportEvent:event];
-    
-    NSDictionary* params = @{@"first_param" : @"1"};
-    MyCustomEvent* myEvent = [[MyCustomEvent alloc]initWithName:@"event_name" andParameters:params];
-    [Optimove.sharedInstance reportEvent:myEvent];
-    
+    [Optimove.shared reportEvent:event];
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

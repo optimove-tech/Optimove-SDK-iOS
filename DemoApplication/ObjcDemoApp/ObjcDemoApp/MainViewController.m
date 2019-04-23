@@ -1,5 +1,3 @@
-
-
 #import "MainViewController.h"
 
 @interface MainViewController ()
@@ -10,36 +8,36 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [Optimove.sharedInstance registerSuccessStateDelegate:self];
-    [Optimove.sharedInstance registerWithDeepLinkResponder: [[OptimoveDeepLinkResponder alloc] init: self]];
+    [Optimove.shared registerWithDeepLinkResponder: [[OptimoveDeepLinkResponder alloc] init: self]];
+    [Optimove.shared setScreenVisitWithScreenPathArray:@[@"vc1",@"vc2"] screenTitle:@"vc2" screenCategory:nil];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
-    NSURL* url = [[NSURL alloc] initWithString:@"http://my.bundle.id/main/cart/pre_checkout"];
-    [Optimove.sharedInstance reportScreenVisitWithViewControllersIdentifiers:@[@"main",@"cart"] url:url category:@"Shoes"];
+   
 }
 
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
 
 - (void) didReceiveWithDeepLink:(OptimoveDeepLinkComponents *)deepLink {
+    
     if (deepLink != nil) {
         UIViewController* vc = [[self storyboard] instantiateViewControllerWithIdentifier:deepLink.screenName];
         [[self navigationController] pushViewController:vc animated:true];
     }
 }
 - (IBAction)subscribeTotestMode:(UIButton *)sender {
-     [Optimove.sharedInstance startTestMode];
+     [Optimove.shared startTestMode];
 }
 
 - (IBAction)unsubscribeToTestMode:(UIButton *)sender {
-    [Optimove.sharedInstance stopTestMode];
+    [Optimove.shared stopTestMode];
 }
 
-- (void)optimove:(Optimove *)optimove didBecomeActiveWithMissingPermissions:(NSArray<NSNumber *> *)missingPermissions {
-    [Optimove.sharedInstance reportScreenVisitWithViewControllersIdentifiers:@[@"vc1",@"vc2"] url:nil category:nil];
-    [Optimove.sharedInstance unregisterSuccessStateDelegate:self];
-}
-
+- (void)optimove:(Optimove *)optimove didBecomeActiveWithMissingPermissions:(NSArray<NSNumber *> *)missingPermissions
+{}
 
 @end

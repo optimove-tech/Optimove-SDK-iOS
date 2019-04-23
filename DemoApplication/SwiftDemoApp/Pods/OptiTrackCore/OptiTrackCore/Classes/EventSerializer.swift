@@ -29,14 +29,22 @@ fileprivate extension Event {
         let customVariableParameterValue: [String] = customVariables.map { "\"\($0.index)\":[\"\($0.name)\",\"\($0.value)\"]" }
         return "{\(customVariableParameterValue.joined(separator: ","))}"
     }
+    
+    private func orderItemParameterValue() -> String {
+        let orderItemParameterValue: [String] = orderItems.map { "[\"\($0.sku)\",\"\($0.name)\",\"\($0.category)\",\"\($0.price)\",\"\($0.quantity)\"]" }
+        return "[\(orderItemParameterValue.joined(separator: ","))]"
+    }
 
     var queryItems: [URLQueryItem] {
         get {
+            let lastOrderTimestamp = orderLastDate != nil ? "\(Int(orderLastDate!.timeIntervalSince1970))" : nil
+            
             let items = [
                 URLQueryItem(name: "idsite", value: siteId),
                 URLQueryItem(name: "rec", value: "1"),
                 // Visitor
                 URLQueryItem(name: "_id", value: visitor.id),
+                URLQueryItem(name: "cid", value: visitor.forcedId),
                 URLQueryItem(name: "uid", value: visitor.userId),
                 
                 // Session
@@ -62,13 +70,36 @@ fileprivate extension Event {
                 URLQueryItem(name: "e_n", value: eventName),
                 URLQueryItem(name: "e_v", value: eventValue != nil ? "\(eventValue!)" : nil),
                 
+                URLQueryItem(name: "_rcn", value: campaignName),
+                URLQueryItem(name: "_rck", value: campaignKeyword),
+
+                URLQueryItem(name: "search", value: searchQuery),
+                URLQueryItem(name: "search_cat", value: searchCategory),
+                URLQueryItem(name: "search_count", value: searchResultsCount != nil ? "\(searchResultsCount!)" : nil),
+                
+                URLQueryItem(name: "c_n", value: contentName),
+                URLQueryItem(name: "c_p", value: contentPiece),
+                URLQueryItem(name: "c_t", value: contentTarget),
+                URLQueryItem(name: "c_i", value: contentInteraction),
+                
+                URLQueryItem(name: "idgoal", value: goalId != nil ? "\(goalId!)" : nil),
+                URLQueryItem(name: "revenue", value: revenue != nil ? "\(revenue!)" : nil),
+
+                URLQueryItem(name: "ec_id", value: orderId),
+                URLQueryItem(name: "revenue", value: orderRevenue != nil ? "\(orderRevenue!)" : nil),
+                URLQueryItem(name: "ec_st", value: orderSubTotal != nil ? "\(orderSubTotal!)" : nil),
+                URLQueryItem(name: "ec_tx", value: orderTax != nil ? "\(orderTax!)" : nil),
+                URLQueryItem(name: "ec_sh", value: orderShippingCost != nil ? "\(orderShippingCost!)" : nil),
+                URLQueryItem(name: "ec_dt", value: orderDiscount != nil ? "\(orderDiscount!)" : nil),
+                URLQueryItem(name: "_ects", value: lastOrderTimestamp),
                 ].filter { $0.value != nil }
 
             let dimensionItems = dimensions.map { URLQueryItem(name: "dimension\($0.index)", value: $0.value) }
             let customItems = customTrackingParameters.map { return URLQueryItem(name: $0.key, value: $0.value) }
             let customVariableItems = customVariables.count > 0 ? [URLQueryItem(name: "_cvar", value: customVariableParameterValue())] : []
+            let ecommerceOrderItemsAndFlag = orderItems.count > 0 ? [URLQueryItem(name: "ec_items", value: orderItemParameterValue()), URLQueryItem(name: "idgoal", value: "0")] : []
 
-            return items + dimensionItems + customItems + customVariableItems
+            return items + dimensionItems + customItems + customVariableItems + ecommerceOrderItemsAndFlag
         }
     }
 }

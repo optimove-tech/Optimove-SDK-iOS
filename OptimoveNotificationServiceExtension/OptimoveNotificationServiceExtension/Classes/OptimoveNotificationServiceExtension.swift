@@ -46,35 +46,50 @@ import UserNotifications
             }
             let userInfo = request.content.userInfo
             self.extractDeepLink(from: userInfo) { deepLink in
-                if let dl = deepLink {
-                    self.bestAttemptContent?.userInfo["dynamic_link"] = dl.absoluteString
+                guard let dl = deepLink else {
+                    group.leave()
+                    return
                 }
+                var dlStr = dl.absoluteString
+                if let query = dl.query {
+                    // The redirect converts %20 to + and not " " (space literal). Force replace it here
+                    dlStr = dlStr.replacingOccurrences(of: query, with: query.replacingOccurrences(of: "+", with: "%20"))
+                }
+                if let personalizationTags = self.extractPersonaliztionTags(from: userInfo) {
+                    for (key,value) in personalizationTags {
+                        guard let key = key.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+                            let value = value.addingPercentEncoding(withAllowedCharacters: .alphanumerics) else { continue }
+                        dlStr = dlStr.replacingOccurrences(of: key, with: value)
+                    }
+                }
+                self.bestAttemptContent?.userInfo["dynamic_link"] = dlStr
                 group.leave()
             }
+
             self.reportNotificationDelivered(using: configs, and: userInfo) {
                 group.leave()
             }
         }
-        
+
         group.notify(queue: DispatchQueue.main) {
             contentHandler(self.bestAttemptContent!)
         }
         return true
     }
-    
+
     @objc public func serviceExtensionTimeWillExpire()
     {
         if let bestAttemptContent = bestAttemptContent , let contentHandler = contentHandler {
             contentHandler(bestAttemptContent)
         }
     }
-    
-    
+
+
     private func isForOptimove(_ request: UNNotificationRequest) -> Bool
     {
         return request.content.userInfo["is_optipush"] as? String == "true"
     }
-    
+
     private func fetchConfigurations(_ completionHandler: @escaping (OptimoveConfigForExtension?) -> Void)
     {
         handleFetchConfigFromRemoteEndpoint { [weak self] (configurations) in
@@ -100,7 +115,6 @@ import UserNotifications
                 return
             }
 
-            print("configurations:\(String(describing: String(data:data!,encoding:.utf8)))")
             guard let optimoveConfigs = try? JSONDecoder().decode(OptimoveConfigForExtension.self, from: data!) else {
                 print("failed to parse configuration file")
                 completionHandler(nil)
@@ -112,7 +126,7 @@ import UserNotifications
         task.resume()
     }
 
-   private func handleFetchConfigFromLocalFileSystem(completionHandler: @escaping (OptimoveConfigForExtension?)->Void)
+    private func handleFetchConfigFromLocalFileSystem(completionHandler: @escaping (OptimoveConfigForExtension?)->Void)
     {
         let fileManager = FileManager.default
         let containerAppllicationUrl = fileManager.containerURL(forSecurityApplicationGroupIdentifier: "group.\(self.appBundleId).optimove")
@@ -246,7 +260,7 @@ extension OptimoveNotificationServiceExtension
 extension OptimoveNotificationServiceExtension
 {
 
-    private func extractDeepLink(from userInfo: [AnyHashable:Any],complete: @escaping (URL?) -> ())
+    private func extractDeepLink(from userInfo: [AnyHashable:Any],complete:  @escaping (URL?) -> ())
     {
         if let dynamicLink = extractDynamicLink(from: userInfo) {
             DynamicLinkParser(parsingCallback: complete).parse(dynamicLink)
@@ -265,6 +279,15 @@ extension OptimoveNotificationServiceExtension
             return URL(string: deepLink)
         }
         return nil
+    }
+
+    private func extractPersonaliztionTags(from userInfo:[AnyHashable : Any] ) -> [String:String]?
+    {
+        guard let dl           = userInfo["deep_link_personalization_values"] as? String,
+            let data        = dl.data(using: .utf8),
+            let json        = try? JSONSerialization.jsonObject(with: data, options:[.allowFragments]) as? [String:String]
+            else { return nil }
+        return json
     }
 }
 

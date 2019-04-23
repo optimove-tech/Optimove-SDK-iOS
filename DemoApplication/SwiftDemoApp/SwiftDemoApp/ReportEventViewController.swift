@@ -1,14 +1,7 @@
-//
-//  ReportEventViewController.swift
-//  OptimoveSDKDev
-//
-//  Created by Mobile Developer Optimove on 24/09/2017.
-//  Copyright © 2017 Optimove. All rights reserved.
-//
+
 
 import UIKit
 import OptimoveSDK
-
 
 class ReportEventViewController: UIViewController
 {
@@ -20,8 +13,7 @@ class ReportEventViewController: UIViewController
     override func viewDidAppear(_ animated: Bool) {
         
         super.viewDidAppear(animated)
-        Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers: ["main_screen","report_event"])
-       
+        Optimove.shared.setScreenVisit(screenPathArray: ["main_screen","report_event"], screenTitle: "report_event")
         
         //Table view configurations
         inputsTableView.dataSource = self
@@ -48,15 +40,15 @@ extension ReportEventViewController: UITableViewDataSource {
         
         switch indexPath.row {
         case 0:
-            cell.setup(CustomEventType.string, reportCallBack)
+            cell.setup(CustomEventType.string)
             cell.numberInputTextField.isHidden = true
             cell.stringInputTextField.isHidden = false
         case 1:
-            cell.setup(CustomEventType.number, reportCallBack)
+            cell.setup(CustomEventType.number)
             cell.numberInputTextField.isHidden = false
             cell.stringInputTextField.isHidden = true
         case 2:
-            cell.setup(CustomEventType.combined, reportCallBack)
+            cell.setup(CustomEventType.combined)
             cell.numberInputTextField.isHidden = false
             cell.stringInputTextField.isHidden = false
         default:
@@ -66,15 +58,6 @@ extension ReportEventViewController: UITableViewDataSource {
         
         return cell
     }
-    
-    func reportCallBack(error: OptimoveError?)
-    {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(title: "Report Event Response", message: "\(String(describing: error?.localizedDescription))", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            self.present(alert,animated:true,completion: nil)
-        }
-    }
 }
 
 //Optional
@@ -82,6 +65,6 @@ extension ReportEventViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
     {
-        Optimove.sharedInstance.reportEvent( events[indexPath.row])
+        Optimove.shared.reportEvent(events[indexPath.row])
     }
 }

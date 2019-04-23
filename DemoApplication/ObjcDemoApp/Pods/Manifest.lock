@@ -1,95 +1,150 @@
 PODS:
-  - Firebase/Core (5.4.0):
+  - Firebase (5.20.2):
+    - Firebase/Core (= 5.20.2)
+  - Firebase/Core (5.20.2):
     - Firebase/CoreOnly
-    - FirebaseAnalytics (= 5.0.1)
-  - Firebase/CoreOnly (5.4.0):
-    - FirebaseCore (= 5.0.5)
-  - Firebase/DynamicLinks (5.4.0):
-    - Firebase/Core
-    - FirebaseDynamicLinks (= 3.0.1)
-  - Firebase/Messaging (5.4.0):
-    - Firebase/CoreOnly
-    - FirebaseMessaging (= 3.0.3)
-  - FirebaseAnalytics (5.0.1):
-    - FirebaseCore (~> 5.0)
-    - FirebaseInstanceID (~> 3.0)
-    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
+    - FirebaseAnalytics (= 5.8.1)
+  - Firebase/CoreOnly (5.20.2):
+    - FirebaseCore (= 5.4.1)
+  - FirebaseAnalytics (5.8.1):
+    - FirebaseCore (~> 5.4)
+    - FirebaseInstanceID (~> 3.8)
+    - GoogleAppMeasurement (= 5.8.1)
+    - GoogleUtilities/AppDelegateSwizzler (~> 5.2)
+    - GoogleUtilities/MethodSwizzler (~> 5.2)
+    - GoogleUtilities/Network (~> 5.2)
+    - "GoogleUtilities/NSData+zlib (~> 5.2)"
     - nanopb (~> 0.3)
-  - FirebaseCore (5.0.5):
-    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
-  - FirebaseDynamicLinks (3.0.1):
-    - FirebaseAnalytics (~> 5.0)
-  - FirebaseInstanceID (3.1.1):
-    - FirebaseCore (~> 5.0)
-  - FirebaseMessaging (3.0.3):
-    - FirebaseCore (~> 5.0)
-    - FirebaseInstanceID (~> 3.0)
-    - GoogleToolboxForMac/Logger (~> 2.1)
+  - FirebaseAnalyticsInterop (1.2.0)
+  - FirebaseCore (5.4.1):
+    - GoogleUtilities/Environment (~> 5.2)
+    - GoogleUtilities/Logger (~> 5.2)
+  - FirebaseDynamicLinks (3.4.3):
+    - FirebaseAnalytics (~> 5.1)
+    - FirebaseAnalyticsInterop (~> 1.0)
+    - FirebaseCore (~> 5.2)
+  - FirebaseInstanceID (3.8.1):
+    - FirebaseCore (~> 5.2)
+    - GoogleUtilities/Environment (~> 5.2)
+    - GoogleUtilities/UserDefaults (~> 5.2)
+  - FirebaseMessaging (3.5.0):
+    - FirebaseAnalyticsInterop (~> 1.1)
+    - FirebaseCore (~> 5.2)
+    - FirebaseInstanceID (~> 3.6)
+    - GoogleUtilities/Environment (~> 5.3)
+    - GoogleUtilities/Reachability (~> 5.3)
+    - GoogleUtilities/UserDefaults (~> 5.3)
     - Protobuf (~> 3.1)
-  - GoogleToolboxForMac/Defines (2.1.4)
-  - GoogleToolboxForMac/Logger (2.1.4):
-    - GoogleToolboxForMac/Defines (= 2.1.4)
-  - "GoogleToolboxForMac/NSData+zlib (2.1.4)":
-    - GoogleToolboxForMac/Defines (= 2.1.4)
-  - nanopb (0.3.8):
-    - nanopb/decode (= 0.3.8)
-    - nanopb/encode (= 0.3.8)
-  - nanopb/decode (0.3.8)
-  - nanopb/encode (0.3.8)
-  - ObjcExceptionBridging (1.0.1):
-    - ObjcExceptionBridging/ObjcExceptionBridging (= 1.0.1)
-  - ObjcExceptionBridging/ObjcExceptionBridging (1.0.1)
-  - OptimoveNotificationServiceExtension (1.2.0)
-  - OptimoveSDK (1.2.1):
-    - Firebase/Core (= 5.4.0)
-    - Firebase/DynamicLinks
-    - Firebase/Messaging
-    - OptiTrackCore
-    - XCGLogger (~> 6.0.4)
-  - OptiTrackCore (0.2.2)
-  - Protobuf (3.6.0)
-  - XCGLogger (6.0.4):
-    - XCGLogger/Core (= 6.0.4)
-  - XCGLogger/Core (6.0.4):
-    - ObjcExceptionBridging
+  - GoogleAppMeasurement (5.8.1):
+    - GoogleUtilities/AppDelegateSwizzler (~> 5.2)
+    - GoogleUtilities/MethodSwizzler (~> 5.2)
+    - GoogleUtilities/Network (~> 5.2)
+    - "GoogleUtilities/NSData+zlib (~> 5.2)"
+    - nanopb (~> 0.3)
+  - GoogleUtilities (5.7.0):
+    - GoogleUtilities/AppDelegateSwizzler (= 5.7.0)
+    - GoogleUtilities/Environment (= 5.7.0)
+    - GoogleUtilities/ISASwizzler (= 5.7.0)
+    - GoogleUtilities/Logger (= 5.7.0)
+    - GoogleUtilities/MethodSwizzler (= 5.7.0)
+    - GoogleUtilities/Network (= 5.7.0)
+    - "GoogleUtilities/NSData+zlib (= 5.7.0)"
+    - GoogleUtilities/Reachability (= 5.7.0)
+    - GoogleUtilities/SwizzlerTestHelpers (= 5.7.0)
+    - GoogleUtilities/UserDefaults (= 5.7.0)
+  - GoogleUtilities/AppDelegateSwizzler (5.7.0):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Network
+  - GoogleUtilities/Environment (5.7.0)
+  - GoogleUtilities/ISASwizzler (5.7.0)
+  - GoogleUtilities/Logger (5.7.0):
+    - GoogleUtilities/Environment
+  - GoogleUtilities/MethodSwizzler (5.7.0):
+    - GoogleUtilities/Logger
+  - GoogleUtilities/Network (5.7.0):
+    - GoogleUtilities/Logger
+    - "GoogleUtilities/NSData+zlib"
+    - GoogleUtilities/Reachability
+  - "GoogleUtilities/NSData+zlib (5.7.0)"
+  - GoogleUtilities/Reachability (5.7.0):
+    - GoogleUtilities/Logger
+  - GoogleUtilities/SwizzlerTestHelpers (5.7.0)
+  - GoogleUtilities/UserDefaults (5.7.0):
+    - GoogleUtilities/Logger
+  - nanopb (0.3.901):
+    - nanopb/decode (= 0.3.901)
+    - nanopb/encode (= 0.3.901)
+  - nanopb/decode (0.3.901)
+  - nanopb/encode (0.3.901)
+  - OptimoveNotificationServiceExtension (2.0.0)
+  - OptimoveSDK (2.0.0):
+    - Firebase (= 5.20.2)
+    - FirebaseAnalytics (= 5.8.1)
+    - FirebaseAnalyticsInterop (= 1.2.0)
+    - FirebaseCore (= 5.4.1)
+    - FirebaseDynamicLinks (= 3.4.3)
+    - FirebaseInstanceID (= 3.8.1)
+    - FirebaseMessaging (= 3.5.0)
+    - GoogleAppMeasurement (= 5.8.1)
+    - GoogleUtilities (= 5.7.0)
+    - nanopb (= 0.3.901)
+    - OptiTrackCore (= 1.3.0)
+    - Protobuf (= 3.7.0)
+  - OptiTrackCore (1.3.0)
+  - Protobuf (3.7.0)
 
 DEPENDENCIES:
-  - OptimoveNotificationServiceExtension (= 1.2.0)
-  - OptimoveSDK (= 1.2.1)
+  - OptimoveNotificationServiceExtension (from `https://mobius.visualstudio.com/DefaultCollection/Backstage/_git/OptimoveSDK_Native-iOS`, branch `qa`)
+  - OptimoveSDK (from `https://mobius.visualstudio.com/DefaultCollection/Backstage/_git/OptimoveSDK_Native-iOS`, branch `qa`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Firebase
     - FirebaseAnalytics
+    - FirebaseAnalyticsInterop
     - FirebaseCore
     - FirebaseDynamicLinks
     - FirebaseInstanceID
     - FirebaseMessaging
-    - GoogleToolboxForMac
+    - GoogleAppMeasurement
+    - GoogleUtilities
     - nanopb
-    - ObjcExceptionBridging
-    - OptimoveNotificationServiceExtension
-    - OptimoveSDK
     - OptiTrackCore
     - Protobuf
-    - XCGLogger
+
+EXTERNAL SOURCES:
+  OptimoveNotificationServiceExtension:
+    :branch: qa
+    :git: https://mobius.visualstudio.com/DefaultCollection/Backstage/_git/OptimoveSDK_Native-iOS
+  OptimoveSDK:
+    :branch: qa
+    :git: https://mobius.visualstudio.com/DefaultCollection/Backstage/_git/OptimoveSDK_Native-iOS
+
+CHECKOUT OPTIONS:
+  OptimoveNotificationServiceExtension:
+    :commit: a129adc565b3a4da99a97f1b0586abd41073c353
+    :git: https://mobius.visualstudio.com/DefaultCollection/Backstage/_git/OptimoveSDK_Native-iOS
+  OptimoveSDK:
+    :commit: a129adc565b3a4da99a97f1b0586abd41073c353
+    :git: https://mobius.visualstudio.com/DefaultCollection/Backstage/_git/OptimoveSDK_Native-iOS
 
 SPEC CHECKSUMS:
-  Firebase: d66f4f29c23f22d96808d9abc174d81d8eee968f
-  FirebaseAnalytics: b3628aea54c50464c32c393fb2ea032566e7ecc2
-  FirebaseCore: 42b3267233bd21a5abd54117ccc38ca3dd0f8e83
-  FirebaseDynamicLinks: d624a7adc81a8fd70d52be5a6a47a2bc0644b923
-  FirebaseInstanceID: f3f0657372592ecdfdfe2cac604a5a75758376a6
-  FirebaseMessaging: f43eb0c0e1da096e659de6f713038e74862a62cd
-  GoogleToolboxForMac: 91c824d21e85b31c2aae9bb011c5027c9b4e738f
-  nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
-  ObjcExceptionBridging: c30e00eb3700467e695faeea30e26e18bd445001
-  OptimoveNotificationServiceExtension: f1e43171f41e661c1299e01ba26299bad61711e6
-  OptimoveSDK: 5e4f0ae90ccdfdd889c10fecc67f6ee77978a64a
-  OptiTrackCore: 2004198a4088e3d0a8b2bac534f5d3d333777795
-  Protobuf: 0fc0ad8bec688b2a3017a139953e01374fedbd5f
-  XCGLogger: 4fc1bc0bdd5828cb8dc8da7a843536cda1bea8f3
+  Firebase: 0c8cf33f266410c61ab3e2265cfa412200351d9c
+  FirebaseAnalytics: ece1aa57a4f43c64d53a648b5a5e05151aae947b
+  FirebaseAnalyticsInterop: efbe45c8385ec626e29f9525e5ebd38520dfb6c1
+  FirebaseCore: f1a9a8be1aee4bf71a2fc0f4096df6788bdfda61
+  FirebaseDynamicLinks: f7a8717e2c7ea652923882a2d60b0045d6fd99d5
+  FirebaseInstanceID: a122b0c258720cf250551bb2bedf48c699f80d90
+  FirebaseMessaging: 4235f949ce1c4e827aeb19705ba5c53f9b85aa10
+  GoogleAppMeasurement: ffe513e90551844a739e7bcbb1d2aca1c28a4338
+  GoogleUtilities: 273e67030e0de313e7304f6dcfa96fc5214f6c23
+  nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
+  OptimoveNotificationServiceExtension: 5977a00cd500893f7c3b7bb4635a54223b292a9c
+  OptimoveSDK: 1313440d9f34bca8b044f4cb4173287b6a10aef6
+  OptiTrackCore: f8e6bd41d156303647fb535c04c2bff2a8e6a17d
+  Protobuf: 7a877b7f3e5964e3fce995e2eb323dbc6831bb5a
 
-PODFILE CHECKSUM: a1868bb874d9006e3246b5e59e2e6b77ef2ede8b
+PODFILE CHECKSUM: 6cab0a1b122b74079eddd04860321a398418dfb8
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.1

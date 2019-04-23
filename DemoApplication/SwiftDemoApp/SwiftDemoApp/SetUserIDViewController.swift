@@ -1,10 +1,3 @@
-//
-//  SetUSerIDViewController.swift
-//  OptimoveSDKDev
-//
-//  Created by Mobile Developer Optimove on 24/09/2017.
-//  Copyright © 2017 Optimove. All rights reserved.
-//
 
 import UIKit
 import OptimoveSDK
@@ -17,13 +10,12 @@ class SetUserIDViewController: UIViewController
     {
         if let text = userIDTextField.text
         {
-            Optimove.sharedInstance.set(userID: text)
+            Optimove.shared.setUserId(text)
         }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers: ["main_screen","login"])
-        
+        Optimove.shared.setScreenVisit(screenPathArray: ["main_screen","login"], screenTitle: "login")
     }
 }

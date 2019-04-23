@@ -1,53 +1,41 @@
-//
-//  ViewController.swift
-//  OptimoveSDKDev
-//
-//  Created by Mobile Developer Optimove on 05/09/2017.
-//  Copyright © 2017 Optimove. All rights reserved.
-//
 
 import UIKit
 import OptimoveSDK
 
-class ViewController: UIViewController, OptimoveDeepLinkCallback,OptimoveSuccessStateListener
-{
+class ViewController: UIViewController, OptimoveDeepLinkCallback {
     func didReceive(deepLink: OptimoveDeepLinkComponents?)
     {
-        if let deepLink = deepLink {
-            if let vc = self.storyboard?.instantiateViewController(withIdentifier: deepLink.screenName) {
-                self.navigationController?.pushViewController(vc, animated: true)
-            }
-        }
+        guard let deepLink = deepLink else {return}
+        guard let vc = storyboard?.instantiateViewController(withIdentifier: "deepLinkVc") as? DeepLinkViewController else { return }
+
+        vc.deepLinkComp = deepLink
+       
+        present(vc, animated: true)
     }
-    
     
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        Optimove.sharedInstance.registerSuccessStateListener(self)
-        Optimove.sharedInstance.register(deepLinkResponder: OptimoveDeepLinkResponder(self))
+        Optimove.shared.register(deepLinkResponder: OptimoveDeepLinkResponder(self))
     }
     
     override func viewDidAppear(_ animated: Bool)
     {
         super.viewDidAppear(animated)
-        
+        Optimove.shared.setScreenVisit(screenPathArray: ["main screen"], screenTitle: "main screen")
     }
     
     
     @IBAction func subscribrToTest(_ sender: UIButton)
     {
-        Optimove.sharedInstance.startTestMode()
+        Optimove.shared.startTestMode()
     }
     
     @IBAction func unsubsribeFromTest(_ sender: UIButton)
     {
-        Optimove.sharedInstance.stopTestMode()
+        Optimove.shared.stopTestMode()
     }
-    func optimove(_ optimove: Optimove, didBecomeActiveWithMissingPermissions missingPermissions: [OptimoveDeviceRequirement]) {
-        Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers: ["main screen"])
-        Optimove.sharedInstance.unregisterSuccessStateListener(self)
-    }
+    
 }
 
 

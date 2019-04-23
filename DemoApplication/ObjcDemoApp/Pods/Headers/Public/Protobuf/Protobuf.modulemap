@@ -1,6 +1,1 @@
-module Protobuf {
-  umbrella header "Protobuf-umbrella.h"
-
-  export *
-  module * { export * }
-}
+../../../Target Support Files/Protobuf/Protobuf.modulemap

@@ -8,11 +8,15 @@
 
 import Foundation
 
-public struct Visitor: Codable {
+struct Visitor: Codable {
     /// Unique ID per visitor (device in this case). Should be
     /// generated upon first start and never changed after.
     /// api-key: _id
-    let id: String
+    var id: String
+    
+    /// A unique visitor ID, possuble to override by the SDK user.
+    /// api-key: cid
+    let forcedId: String?
     
     /// An optional user identifier such as email or username.
     /// api-key: uid
@@ -30,8 +34,9 @@ extension Visitor {
             matomoUserDefaults.clientId = newId
             id = newId
         }
+        let forcedVisitorId = matomoUserDefaults.forcedVisitorId
         let userId = matomoUserDefaults.visitorUserId
-        return Visitor(id: id, userId: userId)
+        return Visitor(id: id, forcedId: forcedVisitorId, userId: userId)
     }
     
     static func newVisitorID() -> String {

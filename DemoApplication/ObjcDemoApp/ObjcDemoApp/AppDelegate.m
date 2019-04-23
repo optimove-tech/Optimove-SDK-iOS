@@ -1,8 +1,4 @@
-
 #import "AppDelegate.h"
-#import <UserNotifications/UserNotifications.h>
-@import OptimoveSDK;
-@import Firebase;
 
 @interface AppDelegate ()
 
@@ -10,51 +6,45 @@
 
 @implementation AppDelegate
 
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    OptimoveTenantInfo* info = [[OptimoveTenantInfo alloc] initWithUrl:@"https://appcontrollerproject-developer.firebaseapp.com" token:@"demo_apps" version:@"1.0.0" hasFirebase:NO useFirebaseMessaging:NO];
-
-    [Optimove.sharedInstance configureFor:info];
-    
-    [Optimove.sharedInstance registerSuccessStateDelegate:self ];
+    OptimoveTenantInfo *info = [[OptimoveTenantInfo alloc] initWithTenantToken:@"MY_TENANT_TOKEN" configName:@"MY_CONFIG_NAME"];
+    [Optimove configureFor:info];
+    [Optimove.shared registerSuccessStateDelegate:self];
     [UIApplication.sharedApplication registerForRemoteNotifications];
-    [UNUserNotificationCenter currentNotificationCenter].delegate = self;
-
-    [[UNUserNotificationCenter currentNotificationCenter]requestAuthorizationWithOptions:UNAuthorizationOptionAlert completionHandler:^(BOOL granted, NSError * _Nullable error) {
-        // Your app specific logic goes here
+    [UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions:UNAuthorizationOptionAlert completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        
     }];
+    UNUserNotificationCenter.currentNotificationCenter.delegate = self;
     
     return YES;
 }
 
-- (void)optimove:(Optimove *)optimove didBecomeActiveWithMissingPermissions:(NSArray<NSNumber *> *)missingPermissions {
-    
-}
+
+
 - (void) application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-    
-    // Forward the callback to the Optimove SDK
-    if (![Optimove.sharedInstance didReceiveRemoteNotificationWithUserInfo:userInfo didComplete:completionHandler]) {
-        // The push message was not targeted for Optimove SDK. Implement your logic here or leave as is.
+    if (![Optimove.shared didReceiveRemoteNotificationWithUserInfo:userInfo didComplete:completionHandler]) {
         completionHandler(UIBackgroundFetchResultNewData);
     }
 }
 
 - (void) application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    [Optimove.sharedInstance applicationWithDidRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+    [Optimove.shared applicationWithDidRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
 }
+
+- (void)optimove:(Optimove * _Nonnull)optimove didBecomeActiveWithMissingPermissions:(NSArray<NSNumber *> * _Nonnull)missingPermissions {
+   
+}
+
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
-    // Forward the callback to the SDK first
-    if (![Optimove.sharedInstance willPresentWithNotification:notification withCompletionHandler:completionHandler]) {
-        // The callback was NOT processed by the SDK, apply your app's logic here
-        completionHandler(UNNotificationPresentationOptionAlert);
+    if (![Optimove.shared willPresentWithNotification:notification withCompletionHandler:completionHandler]) {
+        completionHandler(UNAuthorizationOptionAlert | UNAuthorizationOptionSound);
     }
 }
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
-    // Forward the callback to the SDK first
-    if (![Optimove.sharedInstance didReceiveWithResponse:response withCompletionHandler:completionHandler]) {
-         // The callback was NOT processed by the SDK, apply your app's logic here
+    if(![Optimove.shared didReceiveWithResponse:response withCompletionHandler:completionHandler]) {
         completionHandler();
     }
 }
-
 
 @end

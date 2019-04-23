@@ -1,5 +1,8 @@
+
+
 import UIKit
 import OptimoveSDK
+
 
 class EventTableViewCell: UITableViewCell {
 
@@ -10,11 +13,11 @@ class EventTableViewCell: UITableViewCell {
     @IBOutlet weak var numberInputTextField: UITextField!
     @IBOutlet weak var stringInputTextField: UITextField!
 
-    func setup(_ customEventType: CustomEventType,_ callback: @escaping ResultBlockWithError)
+    func setup(_ customEventType: CustomEventType)
     {
         
         self.customEventType = customEventType
-        self.callback = callback
+        
         switch customEventType {
         case .string:
             eventTypeLabel.text = "String Event"
@@ -36,15 +39,15 @@ class EventTableViewCell: UITableViewCell {
         var event: OptimoveEvent
         switch customEventType
         {
-        case .string:
+        case .string?:
             event = StringEvent(stringInput)
-        case .number:
+        case .number?:
             event = NumberEvent(numberInput != nil ? NSNumber(value:numberInput!): nil)
-        case .combined:
+        case .combined?:
             event = CombinedEvent(stringInput, numberInput != nil ? NSNumber(value:numberInput!): nil)
         default: return
         }
-        Optimove.sharedInstance.reportEvent( event)
+        Optimove.shared.reportEvent(event)
         
     }
 }

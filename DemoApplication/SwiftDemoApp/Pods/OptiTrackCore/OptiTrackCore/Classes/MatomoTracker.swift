@@ -17,11 +17,9 @@ final public class MatomoTracker: NSObject {
         }
     }
     
-    //MARK: - Changed by Optimove
-    
     /// Will be used to associate all future events with a given userID. This property
     /// is persisted between app launches.
-    public var userId: String? {
+    @objc public var userId: String? {
         get {
             return matomoUserDefaults.visitorUserId
         }
@@ -31,17 +29,40 @@ final public class MatomoTracker: NSObject {
         }
     }
     
-    public var visitorId: String {
+    @objc public var visitorId: String {
         get {
             return visitor.id
         }
         set {
             matomoUserDefaults.clientId = newValue
-            visitor = Visitor.current(in: matomoUserDefaults)
+            visitor.id = newValue
         }
     }
     
-    //MARK: -
+    /// Will be used to associate all future events with a given visitorId / cid. This property
+    /// is persisted between app launches.
+    /// The `forcedVisitorId` can only be a 16 character long hexadecimal string. Setting an invalid
+    /// string will have no effect.
+    @objc public var forcedVisitorId: String? {
+        get {
+            return matomoUserDefaults.forcedVisitorId
+        }
+        set {
+            logger.debug("Setting the forcedVisitorId to \(forcedVisitorId)")
+            if let newValue = newValue {
+                let isValidString = Int(newValue, radix: 16) != nil && newValue.count == 16
+                if isValidString {
+                    matomoUserDefaults.forcedVisitorId = newValue
+                } else {
+                    logger.error("forcedVisitorId is invalid. It must be a 16 character long hex string.")
+                    logger.error("forcedVisitorId is still \(forcedVisitorId)")
+                }
+            } else {
+                matomoUserDefaults.forcedVisitorId = nil
+            }
+            visitor = Visitor.current(in: matomoUserDefaults)
+        }
+    }
     
     internal var matomoUserDefaults: MatomoUserDefaults
     private let dispatcher: Dispatcher
@@ -196,6 +217,36 @@ final public class MatomoTracker: NSObject {
     internal var session: Session
     internal var nextEventStartsANewSession = false
 
+    internal var campaignName: String? = nil
+    internal var campaignKeyword: String? = nil
+    
+    /// Adds the name and keyword for the current campaign.
+    /// This is usually very helpfull if you use deeplinks into your app.
+    ///
+    /// More information on campaigns: [https://matomo.org/docs/tracking-campaigns/](https://matomo.org/docs/tracking-campaigns/)
+    ///
+    /// - Parameters:
+    ///   - name: The name of the campaign.
+    ///   - keyword: The keyword of the campaign.
+    @objc public func trackCampaign(name: String?, keyword: String?) {
+        campaignName = name
+        campaignKeyword = keyword
+    }
+    
+    /// There are several ways to track content impressions and interactions manually, semi-automatically and automatically. Please be aware that content impressions will be tracked using bulk tracking which will always send a POST request, even if  GET is configured which is the default. For more details have a look at the in-depth guide to Content Tracking.
+    /// More information on content: [https://matomo.org/docs/content-tracking/](https://matomo.org/docs/content-tracking/)
+    ///
+    /// - Parameters:
+    ///   - name: The name of the content. For instance 'Ad Foo Bar'
+    ///   - piece: The actual content piece. For instance the path to an image, video, audio, any text
+    ///   - target: The target of the content. For instance the URL of a landing page
+    ///   - interaction: The name of the interaction with the content. For instance a 'click'
+    @objc public func trackContentImpression(name: String, piece: String?, target: String?) {
+        track(Event(tracker: self, action: [], contentName: name, contentPiece: piece, contentTarget: target))
+    }
+    @objc public func trackContentInteraction(name: String, interaction: String, piece: String?, target: String?) {
+        track(Event(tracker: self, action: [], contentName: name, contentInteraction: interaction, contentPiece: piece, contentTarget: target))
+    }
 }
 
 extension MatomoTracker {
@@ -218,6 +269,11 @@ extension MatomoTracker {
     /// - Parameter event: The event that should be tracked.
     public func track(_ event: Event) {
         queue(event: event)
+        
+        if (event.campaignName == campaignName && event.campaignKeyword == campaignKeyword) {
+            campaignName = nil
+            campaignKeyword = nil
+        }
     }
     
     /// Tracks a screenview.
@@ -233,8 +289,6 @@ extension MatomoTracker {
     }
     
     /// Tracks an event as described here: https://matomo.org/docs/event-tracking/
-    
-    /// Track an event as described here: https://matomo.org/docs/event-tracking/
     ///
     /// - Parameters:
     ///   - category: The Category of the Event
@@ -245,6 +299,51 @@ extension MatomoTracker {
     ///   - url: The optional url of the page that was viewed.
     public func track(eventWithCategory category: String, action: String, name: String? = nil, value: Float? = nil, dimensions: [CustomDimension] = [], url: URL? = nil) {
         let event = Event(tracker: self, action: [], url: url, eventCategory: category, eventAction: action, eventName: name, eventValue: value, dimensions: dimensions)
+        queue(event: event)
+    }
+    
+    /// Tracks a goal as described here: https://matomo.org/docs/tracking-goals-web-analytics/
+    ///
+    /// - Parameters:
+    ///   - goalId: The defined ID of the Goal
+    ///   - revenue: The monetary value that was generated by the Goal
+    public func trackGoal(id goalId: Int?, revenue: Float?) {
+        let event = Event(tracker: self, action: [], goalId: goalId, revenue: revenue)
+        queue(event: event)
+    }
+
+    /// Tracks an order as described here: https://matomo.org/docs/ecommerce-analytics/#tracking-ecommerce-orders-items-purchased-required
+    ///
+    /// - Parameters:
+    ///   - id: The unique ID of the order
+    ///   - items: The array of items to be ordered
+    ///   - revenue: The grand total for the order (includes tax, shipping and subtracted discount)
+    ///   - subTotal: The sub total of the order (excludes shipping)
+    ///   - tax: The tax amount of the order
+    ///   - shippingCost: The shipping cost of the order
+    ///   - discount: The discount offered
+    public func trackOrder(id: String, items: [OrderItem], revenue: Float, subTotal: Float? = nil, tax: Float? = nil, shippingCost: Float? = nil, discount: Float? = nil) {
+        let lastOrderDate = matomoUserDefaults.lastOrder
+
+        let event = Event(tracker: self, action: [], orderId: id, orderItems: items, orderRevenue: revenue, orderSubTotal: subTotal, orderTax: tax, orderShippingCost: shippingCost, orderDiscount: discount, orderLastDate: lastOrderDate)
+        queue(event: event)
+        
+        matomoUserDefaults.lastOrder = Date()
+    }
+}
+
+extension MatomoTracker {
+    
+    /// Tracks a search result page as described here: https://matomo.org/docs/site-search/
+    ///
+    /// - Parameters:
+    ///   - query: The string the user was searching for
+    ///   - category: An optional category which the user was searching in
+    ///   - resultCount: The number of results that were displayed for that search
+    ///   - dimensions: An optional array of dimensions, that will be set only in the scope of this event.
+    ///   - url: The optional url of the page that was viewed.
+    public func trackSearch(query: String, category: String?, resultCount: Int?, dimensions: [CustomDimension] = [], url: URL? = nil) {
+        let event = Event(tracker: self, action: [], url: url, searchQuery: query, searchCategory: category, searchResultsCount: resultCount, dimensions: dimensions)
         queue(event: event)
     }
 }
@@ -341,6 +440,10 @@ extension MatomoTracker {
     @available(*, deprecated, message: "use trackEventWithCategory:action:name:number:url instead")
     @objc public func track(eventWithCategory category: String, action: String, name: String? = nil, number: NSNumber? = nil) {
         track(eventWithCategory: category, action: action, name: name, number: number, url: nil)
+    }
+    
+    @objc public func trackSearch(query: String, category: String?, resultCount: Int, url: URL? = nil) {
+        trackSearch(query: query, category: category, resultCount: resultCount, dimensions: [], url: url)
     }
 }
 

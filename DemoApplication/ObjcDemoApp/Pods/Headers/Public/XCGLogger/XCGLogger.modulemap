@@ -1,6 +1,0 @@
-module XCGLogger {
-  umbrella header "XCGLogger-umbrella.h"
-
-  export *
-  module * { export * }
-}

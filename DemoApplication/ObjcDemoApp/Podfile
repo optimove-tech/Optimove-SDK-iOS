@@ -1,11 +1,10 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '10.0'
-use_modular_headers!
+ platform :ios, '10.0'
+ use_modular_headers!
 
 target 'ObjcDemoApp' do
-    pod 'OptimoveSDK', '1.2.1'
+   pod 'OptimoveSDK','~> 2.0'
 end
-
-target 'Notification Extension' do
-    pod 'OptimoveNotificationServiceExtension','1.2.0'
+target 'NotificationExtension' do
+       pod 'OptimoveNotificationServiceExtension','~> 2.0'
 end
