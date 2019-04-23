@@ -2,8 +2,13 @@
 # iOS Mobile SDK Changelog v2.0
 
 ## Dependencies
-1. Firebase 5.20.2
-2. includes `FirebaseMessaging` 3.5.0, and `FirebaseDynamicLinks` 3.4.3
+* Firebase => 5.20.2
+* FirebaseAnalytics => 5.8.1
+* FirebaseAnalyticsInterop => 1.2.0
+* FirebaseCore => 5.4.1
+* FirebaseDynamicLinks => 3.4.3
+* FirebaseInstanceID => 3.8.1
+* FirebaseMessaging => 3.5.0
 
 ## Versioning
 The below will allow any newer minor version of  `OptimoveSDK`  not to break the existing API (i.e 2._._) and will be auto-fetched during any  `pod update`.
@@ -26,20 +31,20 @@ end
 
 ## Features
 ### Screen Visit function
-Aligned all Web & Mobile SDK to use the same naming convention for this function.
+Aligned all Web & Mobile SDKs to use the same naming convention for this function.
 
 - Change from 
-```ruby
-Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers:url:category)
+```swift
+Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers:url:category:)
 ```
 
 - To single screen title:
-```ruby
+```swift
 Optimove.shared.setScreenVisit(screenPath: "<YOUR_PATH>", screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
 ```
 - Or an array of screen titles
 Added a screen reporting function which takes an array of screen titles instead of a screenPath String: 
-```ruby
+```swift
 Optimove.shared.setScreenVisit(screenPathArray: ["Home", "Store", "Footware", "Boots"], screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
 ```
 
@@ -52,8 +57,8 @@ Optimove.shared.setScreenVisit(screenPathArray: ["Home", "Store", "Footware", "B
 ### Optipush (Dynamic Deep Link support)
 The `OptimoveDeepLinkComponents` Object has a new property called `parameters` to support dynamic parameters when using deep linking.
 
-Code snippet example:
-```ruby
+Partial code snippet example:
+```swift
 class ViewController: UIViewController, OptimoveDeepLinkCallback {
     func didReceive(deepLink: OptimoveDeepLinkComponents?)
     {
@@ -73,23 +78,20 @@ class ViewController: UIViewController, OptimoveDeepLinkCallback {
 ## API Changes
 
 ### configure function
- 1. Change `Optimove.sharedInstance.configure(for: info)` to `Optimove.configure(for: info)` 
- 2. Remove `url` from `OptimoveTenantInfo()`
- 3. Change `token` to `tenantToken`
- 4.  Change `version` to `configName`
- 5. Remove `hasFirebase: false,` and `useFirebaseMessaging: false` from `configure()`- No need to notify Optimove SDK about your internal 'Firebase' integration as this is done automatically for you
- 6. Add (and call) `FirebaseApp.configure()` before `Optimove.configure(for: info)` 
+1. Changed `Optimove.sharedInstance.configure(for: info)` to `Optimove.configure(for: info)` 
+2. Removed `url` from `OptimoveTenantInfo`
+3. Changed `token` to `tenantToken` in `OptimoveTenantInfo`
+4. Changed `version` to `configName` in `OptimoveTenantInfo`
+5. Removed `hasFirebase: false,` and `useFirebaseMessaging: false` from `OptimoveTenantInfo` - No need to notify Optimove SDK about your internal 'Firebase' integration as this is done automatically for you.
 
-	Example Code Snippet:
-	```ruby
-	FirebaseApp.configure()
-	let info = OptimoveTenantInfo(
-          tenantToken: "<YOUR_SDK_TENANT_TOKEN>",
-          configName: "<YOUR_MOBILE_CONFIG_NAME>"
-          )
-    Optimove.configure(for: info)
-	```
-	Note: Please request from the Product Integration team your `tenantToken` and `configName` dedicated to your Optimove instance.
+> 1. If you use the Firebase SDK, add `FirebaseApp.configure()` before `Optimove.configure(for: info)`. Failing to do so when you use the Firebase SDK will cause unexpected behavior and even crashes.
+> Example Code Snippet:
+> ```swift
+> FirebaseApp.configure()
+> let info = OptimoveTenantInfo(tenantToken: "<YOUR_SDK_TENANT_TOKEN>", configName: "<YOUR_MOBILE_CONFIG_NAME>")
+> Optimove.configure(for: info)
+> ```
+> 2. Please request from the Product Integration team your `tenantToken` and `configName` dedicated to your Optimove instance.
 
 <br/>
 
@@ -121,12 +123,15 @@ Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")
 <br/>
 
 ### During integration phase only
--   During integration, add the flag  `OPTIMOVE_CLIENT_STG_ENV`  to your user-defined Build settings with value `true`.  
-    In the build Setting of your target, press the  `+`  button and select `Add User-Defined Setting`
+-   During integration, add the flag `OPTIMOVE_CLIENT_STG_ENV` to your Build Settings as a User-Defined setting. Only for the Build schemas of your **Staging** environment, set the value to `true`. For any other schema, the value **must** be `false`.
+
+In the build Setting of your target, press the `+` button and select `Add User-Defined Setting`
 <p align="left"><kbd><img src="https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/images/user-defined-settings-1.png?raw=true"></kbd></p>
     
-- Add `OPTIMOVE_CLIENT_STG_ENV` key with `true` as value  
+- Add `OPTIMOVE_CLIENT_STG_ENV` key with `true` as value for the correct Build Schema.
 <p align="left"><kbd><img src="https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/images/user-defined-settings-2.png?raw=true"></kbd></p>
 
-- In the `info.plist`, add an entry that map to this value  
+- In the `info.plist`, add an entry that uses "Build settings placeholder" by setting the value to `$(OPTIMOVE_CLIENT_STG_ENV)` and the key to `OPTIMOVE_CLIENT_STG_ENV`
 <p align="left"><kbd><img src="https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/images/user-defined-settings-3.png?raw=true"></kbd></p>
+
+> This concept is similar to using different Bundle Ids for different App Development lifecycles (.dev/.stg)
