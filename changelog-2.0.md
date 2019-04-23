@@ -32,7 +32,7 @@ Firebase 5.20.2
 	- Add (and call) FirebaseApp.configure() before Optimove.configure(for: info) 
 
 	Example Code Snippet:
-	```java
+	```ruby
 	FirebaseApp.configure()
 	let info = OptimoveTenantInfo(
           tenantToken: "<YOUR_TOKEN>",
@@ -49,17 +49,17 @@ Firebase 5.20.2
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 
 - Change from 
-```java
+```ruby
 Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers:url:category)
 ```
 
 - To single screen title:
-```java
+```ruby
 Optimove.shared.setScreenVisit(screenPath: "<YOUR_PATH>", screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
 ```
 - Or an array of screen titles
 Added a screen reporting function which takes an array of screen titles instead of a screenPath String: 
-```java
+```ruby
 Optimove.shared.setScreenVisit(screenPath: "<YOUR_PATH>", screenTitle: screenTitleArray, screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
 ```
 
@@ -73,12 +73,12 @@ Optimove.shared.setScreenVisit(screenPath: "<YOUR_PATH>", screenTitle: screenTit
 ### Update User ID function
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 - Change from 
-```java
+```ruby
 Optimove.sharedInstance.set(userId:)
 ```
 
 - To:
-```java
+```ruby
 Optimove.shared.setUserId("<MY_SDK_ID>")
 ```
 <br/>
@@ -86,12 +86,12 @@ Optimove.shared.setUserId("<MY_SDK_ID>")
 ### Update registerUser function
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 - Change from 
-```java
+```ruby
 Optimove.sharedInstance.registerUser(email: "<MY_EMAIL>", userId: "<MY_SDK_ID>")
 ```
 
 - To:
-```java
+```ruby
 Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")
 ```
 <br/>
@@ -100,7 +100,7 @@ Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")
 The `OptimoveDeepLinkComponents` Object has a new property called `parameters`
 
 Code snippet example:
-```java
+```ruby
 class ViewController: UIViewController, OptimoveDeepLinkCallback {
     func didReceive(deepLink: OptimoveDeepLinkComponents?)
     {
