@@ -1,5 +1,5 @@
-### Change Log 2.0 - April 2019
-[PLEASE READ new change log](https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/changelog-2.0.md)
+### Change Log v2.0 - April 2019
+[PLEASE READ new iOS change log v2.0](https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/changelog-2.0.md)
 <br/><br/>
 - [Introduction](#Introduction)
 - [Basic Setup](#Basic%20Setup)
