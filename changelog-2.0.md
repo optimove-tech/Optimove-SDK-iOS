@@ -1,11 +1,12 @@
-## iOS SDK Change Log v2.-
-### 1. SDK configuration
+## iOS Mobile SDK Changelog v2.0
+
+### 1. SDK Configurations
+
 Please update the following SDK Details as follows:
 
- 1. Mobile Config Name: request from the Product Integration Team
- 2. Podfile details:
+ 1. **Podfile details**:
 	 a. Platform :iOS, '10.0'
-	 b. Update "target":
+	 b. Update "target" accordingly to support silent minor upgrades:
 	```java
 	target 'optimovemobileclientnofirebase' do
 	    use_frameworks!
@@ -20,28 +21,43 @@ Please update the following SDK Details as follows:
 	end
 	```
 
- 3. **Firebase Dependency**  
-OptimoveSDK version 2.0.0 depends on Firebase 5.20.2
+ 2. **Firebase Dependency**  
+Firebase 5.20.2
+
+ 3. **Removed "hasFirebase" and "useFirebaseMessaging"**  
+No need to notify `OptimoveSDK` about your internal 'Firebase' integration as this is not done automatically for you.
+	- Remove from Optimove.sharedInstance.configure(for: info) the "hasFirebase: false," and "useFirebaseMessaging: false"
+	- Add (and call) **firebaseApp.configure()** before Optimove.shareInstance.configure(for: info) 
+
+	Example Code Snippet:
+	```java
+		firebaseApp.configure()
+		let info = OptimoveTenantInfo(
+	          token: "abcdefg12345678",
+	          version: "mobileconfig.1.0.0"
+	          )
+	    Optimove.sharedInstance.configure(for: info)
+	```
+
+ 4. **Mobile Config Name**: request from the Product Integration Team a new version of your mobile config
 
 <br/>
-### 2. Enhancement Report Screen Visit function
-Enhancement of the public API so it is more convenient to report event using clear parameters like:
 
- - **screenTitle**: which represent the current scene
- - **ScreenPath**: which represent the path to the current screen in the form of 'path/to/scene
- - **category**: which adds the scene category it belongs to.
- - 
-<br/>
-### 3. Removed _hasFirebase_ from the `configure` method
-Now you don't need to worry about notify `OptimoveSDK` about your internal 'Firebase' integration.
-Remove from .....configure(for: info)
-This means you first need to call Firebase intiialization and then the Optimove intitialize
-Remove hasFirebase
-Add:
-- **FirebaseApp.configure()** - show some code snippet and make sure its bolder/highlighted
-- **Optimove.shareInstance.configure(for: info)**
+### 2. Updated Screen Visit function
+Aligned all Web & Mobile SDK to use the same naming convenstion for this function.
 
-<br/>
-### 4. Removed _hasFirebaseMessaging_ from the `configure` method
-Now you don't need to worry aboud notify `OptimoveSDK` about chages in the `fcmToken` since `OptimoveSDK` listen for the changes by itself.
+- Change from 
+```java
+Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers:url:category)
+```
+
+- To:
+```java
+Optimove.sharedInstance.setScreenVisit(viewControllersIdentifiers:screenPath:screenTitle:screenCategory)
+```
+- Where:
+	 - **screenTitle**: which represent the current scene
+	 - **screenPath**: which represent the path to the current screen in the form of 'path/to/scene
+	 - **screenCategory**: which adds the scene category it belongs to. 
+
 
