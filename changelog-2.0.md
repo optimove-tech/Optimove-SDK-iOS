@@ -5,8 +5,8 @@
 Please update the following SDK Details as follows:
 
  1. **Podfile details**:
-	 a. Platform :iOS, '10.0'
-	 b. Update "target" accordingly to support silent minor upgrades:
+	 - Platform :iOS, '10.0'
+	 - Update "target" accordingly to support silent minor upgrades:
 	```java
 	target 'optimovemobileclientnofirebase' do
 	    use_frameworks!
