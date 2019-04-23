@@ -5,19 +5,18 @@
 Please update the following SDK Details as follows:
 
  1. **Podfile details**:
-	 - Platform :iOS, '10.0'
-	 - Update "target" accordingly to support silent minor upgrades:
-	```java
-	target 'optimovemobileclientnofirebase' do
+	```ruby
+	platform :ios, '10.0'
+	# Update "target" accordingly to support silent minor upgrades:
+	target '<YOUR_TARGET_NAME>' do
 	    use_frameworks!
 	    pod 'OptimoveSDK',
-	pod 'OptimoveSDK','~> 2.0'
-
+	    pod 'OptimoveSDK','~> 2.0'
 	end
 
 	target 'Notification Extension' do
 	    use_frameworks!
-	    pod 'OptimoveNotificationServiceExtension,'~> 2.0'
+	    pod 'OptimoveNotificationServiceExtension', '~> 2.0'
 	end
 	```
 
