@@ -108,8 +108,10 @@ class ViewController: UIViewController, OptimoveDeepLinkCallback {
         guard let vc = storyboard?.instantiateViewController(withIdentifier: "deepLinkVc") as? DeepLinkViewController else { return }
 
         vc.deepLinkComp = deepLink
-        deepLink.screenName
-        deepLink.parameters
+        // Retrieve the targetted screen name
+        let screenName = deepLink.screenName
+        // Retrieve the deep link Key-Value parameters
+        let deepLinkParams = deepLink.parameters
         present(vc, animated: true)
     }
 }
