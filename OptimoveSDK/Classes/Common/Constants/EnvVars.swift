@@ -2,11 +2,7 @@ import Foundation
 
 class EnvVars {
 
-    #if DEBUG
-    static let sdkEnv: SdkEnv = .dev
-    #else
     static let sdkEnv: SdkEnv = .prod
-    #endif
 
     static var isClientStgEnv: Bool {
         let rawValue = getEnvVar(for: "OPTIMOVE_CLIENT_STG_ENV", defaultValue: "false")!
