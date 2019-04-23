@@ -94,3 +94,23 @@ Optimove.sharedInstance.registerUser(email: "<MY_EMAIL>", userId: "<MY_SDK_ID>")
 ```java
 Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")
 ```
+<br/>
+
+### Deep Linking
+The `OptimoveDeepLinkComponents` Object has a new property called `parameters`
+
+Code snippet example:
+```java
+class ViewController: UIViewController, OptimoveDeepLinkCallback {
+    func didReceive(deepLink: OptimoveDeepLinkComponents?)
+    {
+        guard let deepLink = deepLink else {return}
+        guard let vc = storyboard?.instantiateViewController(withIdentifier: "deepLinkVc") as? DeepLinkViewController else { return }
+
+        vc.deepLinkComp = deepLink
+        deepLink.screenName
+        deepLink.parameters
+        present(vc, animated: true)
+    }
+}
+```
