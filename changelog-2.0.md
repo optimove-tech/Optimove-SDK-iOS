@@ -60,7 +60,7 @@ Optimove.shared.setScreenVisit(screenPath: "<YOUR_PATH>", screenTitle: "<YOUR_TI
 - Or an array of screen titles
 Added a screen reporting function which takes an array of screen titles instead of a screenPath String: 
 ```ruby
-Optimove.shared.setScreenVisit(screenPath: "<YOUR_PATH>", screenTitle: screenTitleArray, screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
+Optimove.shared.setScreenVisit(screenPathArray: ["Home", "Store", "Footware", "Boots"], screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
 ```
 
 - Where:
@@ -96,7 +96,7 @@ Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")
 ```
 <br/>
 
-### Deep Linking
+### Optipush
 The `OptimoveDeepLinkComponents` Object has a new property called `parameters`
 
 Code snippet example:
@@ -120,7 +120,7 @@ class ViewController: UIViewController, OptimoveDeepLinkCallback {
 <br/>
 
 ### During Integration only
--   During integration process, while on staging phase, add the flag  **"OPTIMOVE_CLIENT_STG_ENV"**  to your user-defined Build settings with value "true".  
+-   During integration process, while on staging phase, add the flag  "OPTIMOVE_CLIENT_STG_ENV"  to your user-defined Build settings with value "true".  
     In the build Setting of your target, press the  `+`  button and select "Add User-Defined Setting"  
     <IMAGE1>
     
