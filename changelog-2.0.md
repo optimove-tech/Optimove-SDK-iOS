@@ -123,10 +123,10 @@ Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")
 ### During integration phase only
 -   During integration, add the flag  `OPTIMOVE_CLIENT_STG_ENV`  to your user-defined Build settings with value `true`.  
     In the build Setting of your target, press the  `+`  button and select `Add User-Defined Setting`
-    <IMAGE1>
+<p align="left"><kbd><img src="https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/images/user-defined-settings-1.png?raw=true"></kbd></p>
     
 - Add `OPTIMOVE_CLIENT_STG_ENV` key with `true` as value  
- <IMAGE2>
+<p align="left"><kbd><img src="https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/images/user-defined-settings-2.png?raw=true"></kbd></p>
 
 - In the `info.plist`, add an entry that map to this value  
- <IMAGE3>
+<p align="left"><kbd><img src="https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/images/user-defined-settings-3.png?raw=true"></kbd></p>
