@@ -1,6 +1,6 @@
 ## iOS Mobile SDK Changelog v2.0
 
-### 1. SDK Configurations
+### SDK Configurations
 
 Please update the following SDK Details as follows:
 
@@ -46,7 +46,7 @@ Firebase 5.20.2
 
 <br/>
 
-### 2. Update Screen Visit function
+### Update Screen Visit function
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 
 - Change from 
@@ -71,7 +71,7 @@ Optimove.shared.setScreenVisit(screenPath: "<YOUR_PATH>", screenTitle: screenTit
 
 <br/>
 
-### 2. Update User ID function
+### Update User ID function
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 - Change from 
 ```java
@@ -81,4 +81,17 @@ Optimove.sharedInstance.set(userId:)
 - To:
 ```java
 Optimove.shared.setUserId("<MY_SDK_ID>")
+```
+<br/>
+
+### Update registerUser function
+Aligned all Web & Mobile SDK to use the same naming convention for this function.
+- Change from 
+```java
+Optimove.sharedInstance.registerUser(email: "<MY_EMAIL>", userId: "<MY_SDK_ID>");
+```
+
+- To:
+```java
+`Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")`
 ```
