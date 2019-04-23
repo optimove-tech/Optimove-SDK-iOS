@@ -24,12 +24,12 @@ Please update the following SDK Details as follows:
  2. **Firebase Dependency**  
 Firebase 5.20.2
 
- 3. **Removed "hasFirebase" and "useFirebaseMessaging"**  
-No need to notify Optimove SDK about your internal 'Firebase' integration as this is now done automatically for you.
+ 3. **Update configure()**  
+
 	- Change Optimove.sharedInstance.configure(for: info) to Optimove.configure(for: info) 
 	- Change "token" to "tenantToken"
 	- Change "version" to "configName"
-	- Remove from Optimove.configure(for: info) the "hasFirebase: false," and "useFirebaseMessaging: false"
+	- Remove from Optimove.configure(for: info) the "hasFirebase: false," and "useFirebaseMessaging: false" - No need to notify Optimove SDK about your internal 'Firebase' integration as this is now done automatically for you
 	- Add (and call) **FirebaseApp.configure()** before Optimove.configure(for: info) 
 
 	Example Code Snippet:
