@@ -46,21 +46,39 @@ Firebase 5.20.2
 
 <br/>
 
-### 2. Updated Screen Visit function
-Aligned all Web & Mobile SDK to use the same naming convenstion for this function.
+### 2. Update Screen Visit function
+Aligned all Web & Mobile SDK to use the same naming convention for this function.
 
 - Change from 
 ```java
 Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers:url:category)
 ```
 
-- To:
+- To single screen title:
 ```java
 Optimove.shared.setScreenVisit(screenPath: "<YOUR_PATH>", screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
 ```
+- Or an array of screen titles
+Added a screen reporting function which takes an array of screen titles instead of a screenPath String: 
+```java
+Optimove.shared.setScreenVisit(screenPath: "<YOUR_PATH>", screenTitle: screenTitleArray, screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
+```
+
 - Where:
 	 - **screenTitle**: which represent the current scene
 	 - **screenPath**: which represent the path to the current screen in the form of 'path/to/scene
 	 - **screenCategory**: which adds the scene category it belongs to. 
 
+<br/>
 
+### 2. Update User ID function
+Aligned all Web & Mobile SDK to use the same naming convention for this function.
+- Change from 
+```java
+Optimove.sharedInstance.set(userId:)
+```
+
+- To:
+```java
+Optimove.shared.setUserId("<MY_SDK_ID>")
+```
