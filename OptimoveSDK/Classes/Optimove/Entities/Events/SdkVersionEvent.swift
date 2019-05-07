@@ -11,7 +11,7 @@ class SdkVersionEvent:OptimoveCoreEvent {
 
     init(configUrl:String) {
         self.name = "optimove_sdk_metadata"
-        self.parameters  = ["sdk_version": "2.0.0",
+        self.parameters  = ["sdk_version": "2.0.1",
                             "config_file_url": configUrl,
                             "sdk_platform": "iOS",
         "app_ns":Bundle.main.bundleIdentifier!]

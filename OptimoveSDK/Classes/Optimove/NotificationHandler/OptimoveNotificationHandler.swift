@@ -142,7 +142,9 @@ class OptimoveNotificationHandler {
         if let queryItems = urlComp.queryItems {
             params = [:]
             for qItem in queryItems {
-                guard let value = qItem.value else { continue }
+                guard let value = qItem.value else {
+                    params![qItem.name] = ""
+                    continue }
                 params![qItem.name] = value
             }
         }
@@ -207,12 +209,6 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
                 }
                 self.handleSdkCommand(command: command, completionHandler: didComplete)
             }
-
-            //            else if userInfo[Keys.Notification.isOptipush.rawValue] as? String == "true" {
-            //                self.handleNotificationDelivered(userInfo, completionHandler: didComplete)
-            //            } else {
-            //                didComplete(.noData)
-            //            }
         }
     }
 

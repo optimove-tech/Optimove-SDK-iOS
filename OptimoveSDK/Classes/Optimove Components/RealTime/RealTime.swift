@@ -58,7 +58,7 @@ class RealTime: OptimoveComponent {
 
 			self.deviceStateMonitor.getStatus(of: .internet) { (online) in
 				guard online else {
-					OptiLoggerMessages.logOfflineStatusForrealtime(eventName: event.name)
+					OptiLoggerMessages.logOfflineStatusForRealtime(eventName: event.name)
 					return
 				}
 				let json = JSONEncoder()
@@ -75,7 +75,7 @@ class RealTime: OptimoveComponent {
 						OptiLoggerMessages.logRealtimeReportStatus(json: String(decoding: response!, as: UTF8.self))
 					}
 				} catch {
-					OptiLoggerMessages.logRealtimeSetUSerIdEncodeFailure()
+					OptiLoggerMessages.logRealtimeSetUserIdEncodeFailure()
 					return
 				}
 			}
@@ -109,7 +109,7 @@ class RealTime: OptimoveComponent {
 					}
 				} catch {
 					OptimoveUserDefaults.shared.realtimeSetUserIdFailed = true
-					OptiLoggerMessages.logRealtimeSetUserIDEncodeFailure()
+					OptiLoggerMessages.logRealtimeSetUserIdEncodeFailure()
 					return
 				}
 			}

@@ -4,9 +4,10 @@ class EnvVars {
 
     static let sdkEnv: SdkEnv = .prod
 
+
     static var isClientStgEnv: Bool {
         let rawValue = getEnvVar(for: "OPTIMOVE_CLIENT_STG_ENV", defaultValue: "false")!
-        return Bool(rawValue)!
+        return NSString(string:rawValue.trimmingCharacters(in: .whitespacesAndNewlines)).boolValue
     }
 
     static var minLogLevelToShow: LogLevel = {

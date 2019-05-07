@@ -57,9 +57,18 @@ import UserNotifications
                 }
                 if let personalizationTags = self.extractPersonaliztionTags(from: userInfo) {
                     for (key,value) in personalizationTags {
-                        guard let key = key.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
-                            let value = value.addingPercentEncoding(withAllowedCharacters: .alphanumerics) else { continue }
-                        dlStr = dlStr.replacingOccurrences(of: key, with: value)
+                        guard let percentKey = key.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { continue }
+                        guard let percentValue = (value as? String)?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) else {
+                            if let campaignDetails = CampaignDetails.extractCampaignDetails(from: userInfo) {
+                                if Int(campaignDetails.campaignId) ?? -1 > 0  {// This is not Test campaign, any non-string values must be replaced with empty string
+                                    dlStr = dlStr.replacingOccurrences(of: percentKey, with: "")
+                                    continue
+                                } // This is a test campaign PN, tags must stay as keys
+                            }
+                            continue
+                        }
+
+                        dlStr = dlStr.replacingOccurrences(of: percentKey, with: percentValue)
                     }
                 }
                 self.bestAttemptContent?.userInfo["dynamic_link"] = dlStr
@@ -281,11 +290,11 @@ extension OptimoveNotificationServiceExtension
         return nil
     }
 
-    private func extractPersonaliztionTags(from userInfo:[AnyHashable : Any] ) -> [String:String]?
+    private func extractPersonaliztionTags(from userInfo:[AnyHashable : Any] ) -> [String:Any]?
     {
         guard let dl           = userInfo["deep_link_personalization_values"] as? String,
             let data        = dl.data(using: .utf8),
-            let json        = try? JSONSerialization.jsonObject(with: data, options:[.allowFragments]) as? [String:String]
+            let json        = try? JSONSerialization.jsonObject(with: data, options:[]) as? [String:Any]
             else { return nil }
         return json
     }
