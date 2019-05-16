@@ -40,7 +40,7 @@ Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers:url:categor
 
 - To single screen title:
 ```swift
-Optimove.shared.setScreenVisit(screenPath: "<YOUR_PATH>", screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
+Optimove.shared.setScreenVisit(screenPath: "Home/Store/Footware/Boots", screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
 ```
 - Or an array of screen titles
 Added a screen reporting function which takes an array of screen titles instead of a screenPath String: 
