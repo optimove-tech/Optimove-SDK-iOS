@@ -451,15 +451,26 @@ extension Optimove {
         return SHA1.hexString(from: userId)?.replacingOccurrences(of: " ", with: "").prefix(16).description.lowercased() ?? ""
     }
 
-    /// Send the user id and the user email
+    /// Send the sdk id and the user email
     ///
     /// - Parameters:
     ///   - email: The user email
-    ///   - userId: THe user ID
+    ///   - sdkId: The user ID
+
+    @available(*,deprecated, renamed: "registerUser(sdkId:email:)" )
     @objc public func registerUser(email: String, sdkId: String) {
+        registerUser(sdkId: sdkId, email: email)
+    }
+    /// Send the sdk id and the user email
+    ///
+    /// - Parameters:
+    ///   - sdkId: The user ID
+    ///   - email: The user email
+    @objc public func registerUser(sdkId: String,email: String) {
         self.setUserId(sdkId)
         self.setUserEmail(email: email)
     }
+
 
     /// Call for the SDK to send the user email to its components
     ///
