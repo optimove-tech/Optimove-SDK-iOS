@@ -99,12 +99,12 @@ class ViewController: UIViewController, OptimoveDeepLinkCallback {
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 
 - Change from 
-```ruby
+```swift
 Optimove.sharedInstance.set(userId:)
 ```
 
 - To:
-```ruby
+```swift
 Optimove.shared.setUserId("<MY_SDK_ID>")
 ```
 <br/>
@@ -112,13 +112,13 @@ Optimove.shared.setUserId("<MY_SDK_ID>")
 ### Update registerUser function
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 - Change from 
-```ruby
+```swift
 Optimove.sharedInstance.registerUser(email: "<MY_EMAIL>", userId: "<MY_SDK_ID>")
 ```
 
 - To:
-```ruby
-Optimove.shared.registerUser(email: "<MY_EMAIL>", sdkId: "<MY_SDK_ID>")
+```swift
+Optimove.shared.registerUser(sdkId: "<MY_SDK_ID>", email: "<MY_EMAIL>")
 ```
 <br/>
 
