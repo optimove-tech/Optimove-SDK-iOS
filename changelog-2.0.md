@@ -122,6 +122,9 @@ Optimove.shared.registerUser(sdkId: "<MY_SDK_ID>", email: "<MY_EMAIL>")
 ```
 <br/>
 
+### Removed the need for custom FirebaseMessaging Delegate
+The [Forward Firebase Tokens to Optimove](https://github.com/optimove-tech/iOS-SDK-Integration-Guide#forward-firebase-tokens-to-optimove) is no longer needed. You can remove any code that was handling this step.
+
 ### During integration phase only
 -   During integration, add the flag `OPTIMOVE_CLIENT_STG_ENV` to your Build Settings as a User-Defined setting. Only for the Build schemas of your **Staging** environment, set the value to `true`. For any other schema, the value **must** be `false`.
 
