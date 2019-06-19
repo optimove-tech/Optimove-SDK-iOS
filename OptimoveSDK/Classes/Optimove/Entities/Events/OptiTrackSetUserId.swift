@@ -21,9 +21,11 @@ class SetUserId: OptimoveCoreEvent {
             return
         }
 
-        self.parameters = [OptimoveKeys.Configuration.originalVisitorId.rawValue: originalVistorId as Any,
-                OptimoveKeys.Configuration.realtimeUserId.rawValue: userId as Any,
-                "updatedVisitorId": updatedVisitorId ]
+        self.parameters = [
+            OptimoveKeys.Configuration.originalVisitorId.rawValue: originalVistorId as Any,
+            OptimoveKeys.Configuration.realtimeUserId.rawValue: userId as Any,
+            "updatedVisitorId": updatedVisitorId
+        ]
 
     }
 }

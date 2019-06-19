@@ -7,6 +7,7 @@ class RealtimeEvent: Encodable {
     var eid: String
     var firstVisitorDate: String
     var context: [String: Any]
+
     enum CodingKeys: String, CodingKey {
         case tid
         case cid
@@ -15,6 +16,7 @@ class RealtimeEvent: Encodable {
         case context
         case firstVisitorDate
     }
+
     struct ContextKey: CodingKey {
         var stringValue: String
 
@@ -29,7 +31,7 @@ class RealtimeEvent: Encodable {
         }
     }
 
-    init( tid: String, cid: String?, visitorId: String?, eid: String, context: [String: Any]) {
+    init(tid: String, cid: String?, visitorId: String?, eid: String, context: [String: Any]) {
         self.tid = tid
         self.visitorId = (cid != nil) ? nil : visitorId
         self.cid = cid ?? nil
@@ -37,6 +39,7 @@ class RealtimeEvent: Encodable {
         self.context = context
         self.firstVisitorDate = "\(Int(OptimoveUserDefaults.shared.firstVisitTimestamp))"
     }
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(tid, forKey: .tid)

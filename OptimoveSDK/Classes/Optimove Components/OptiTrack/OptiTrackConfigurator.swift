@@ -7,14 +7,17 @@ class OptiTrackConfigurator: OptimoveComponentConfigurator<OptiTrack> {
     }
 
     override func setEnabled(from tenantConfig: TenantConfig) {
-       component.isEnable = tenantConfig.enableOptitrack
+        component.isEnable = tenantConfig.enableOptitrack
     }
 
     override func getRequirements() -> [OptimoveDeviceRequirement] {
-        return[.advertisingId, .internet]
+        return [.advertisingId, .internet]
     }
 
-    override func executeInternalConfigurationLogic(from tenantConfig: TenantConfig, didComplete:@escaping ResultBlockWithBool) {
+    override func executeInternalConfigurationLogic(
+        from tenantConfig: TenantConfig,
+        didComplete: @escaping ResultBlockWithBool
+    ) {
         OptiLoggerMessages.logConfigureOptitrack()
         guard let optitrackMetadata = tenantConfig.optitrackMetaData else {
             OptiLoggerMessages.logOptitrackConfigurationInvalid()
@@ -38,10 +41,12 @@ class OptiTrackConfigurator: OptimoveComponentConfigurator<OptiTrack> {
 
     private func setupTracker() {
         if let url = URL.init(string: component.metaData.optitrackEndpoint) {
-            component.tracker = MatomoTracker(siteId: String(component.metaData.siteId),
-                                              baseURL: url,
-                                              queue: component.queue,
-                                              userAgent: nil)
+            component.tracker = MatomoTracker(
+                siteId: String(component.metaData.siteId),
+                baseURL: url,
+                queue: component.queue,
+                userAgent: nil
+            )
         }
     }
 }

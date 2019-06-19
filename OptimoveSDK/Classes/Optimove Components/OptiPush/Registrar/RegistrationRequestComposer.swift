@@ -12,16 +12,21 @@ struct RegistrationRequestBuilder {
     func buildOptRequest(state: State.Opt) -> Data? {
         var requestJsonData = [String: Any]()
         if let bundleID = Bundle.main.bundleIdentifier?.replacingOccurrences(of: ".", with: "_") {
-            let iOSToken = [OptimoveKeys.Registration.bundleID.rawValue: bundleID,
-                            OptimoveKeys.Registration.deviceID.rawValue: DeviceID ]
-            requestJsonData[OptimoveKeys.Registration.iOSToken.rawValue]    = iOSToken
-            requestJsonData[OptimoveKeys.Registration.tenantID.rawValue]    = TenantID
+            let iOSToken = [
+                OptimoveKeys.Registration.bundleID.rawValue: bundleID,
+                OptimoveKeys.Registration.deviceID.rawValue: DeviceID
+            ]
+            requestJsonData[OptimoveKeys.Registration.iOSToken.rawValue] = iOSToken
+            requestJsonData[OptimoveKeys.Registration.tenantID.rawValue] = TenantID
             if let customerId = OptimoveUserDefaults.shared.customerID {
                 requestJsonData[OptimoveKeys.Registration.customerID.rawValue] = customerId
             } else {
-                requestJsonData[OptimoveKeys.Registration.visitorID.rawValue]   = VisitorID
+                requestJsonData[OptimoveKeys.Registration.visitorID.rawValue] = VisitorID
             }
-            let dictionary = state == .optIn ? [OptimoveKeys.Registration.optIn.rawValue: requestJsonData] : [OptimoveKeys.Registration.optOut.rawValue: requestJsonData]
+            let dictionary = state == .optIn
+                ? [OptimoveKeys.Registration.optIn.rawValue: requestJsonData] : [
+                    OptimoveKeys.Registration.optOut.rawValue: requestJsonData
+                ]
 
             return try! JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted)
         }
@@ -29,7 +34,7 @@ struct RegistrationRequestBuilder {
     }
 
     func buildRegisterRequest() -> Data? {
-        guard let bundleID = Bundle.main.bundleIdentifier?.replacingOccurrences(of: ".", with: "_")  else { return nil }
+        guard let bundleID = Bundle.main.bundleIdentifier?.replacingOccurrences(of: ".", with: "_") else { return nil }
         var requestJsonData = [String: Any]()
         var bundle = [String: Any]()
         bundle[OptimoveKeys.Registration.optIn.rawValue] = OptimoveUserDefaults.shared.isMbaasOptIn
@@ -38,15 +43,16 @@ struct RegistrationRequestBuilder {
         var device: [String: Any] = [OptimoveKeys.Registration.apps.rawValue: app]
         device[OptimoveKeys.Registration.osVersion.rawValue] = ProcessInfo().operatingSystemVersionOnlyString
         let ios = [DeviceID: device]
-        requestJsonData[OptimoveKeys.Registration.iOSToken.rawValue]         = ios
-        requestJsonData[OptimoveKeys.Registration.tenantID.rawValue]         = OptimoveUserDefaults.shared.siteID
+        requestJsonData[OptimoveKeys.Registration.iOSToken.rawValue] = ios
+        requestJsonData[OptimoveKeys.Registration.tenantID.rawValue] = OptimoveUserDefaults.shared.siteID
 
         if let customerId = OptimoveUserDefaults.shared.customerID {
-            requestJsonData[OptimoveKeys.Registration.origVisitorID.rawValue]    = OptimoveUserDefaults.shared.visitorID
-            requestJsonData[OptimoveKeys.Registration.isConversion.rawValue]    = OptimoveUserDefaults.shared.isFirstConversion
-            requestJsonData[OptimoveKeys.Registration.customerID.rawValue]       = customerId
+            requestJsonData[OptimoveKeys.Registration.origVisitorID.rawValue] = OptimoveUserDefaults.shared.visitorID
+            requestJsonData[OptimoveKeys.Registration.isConversion.rawValue]
+                = OptimoveUserDefaults.shared.isFirstConversion
+            requestJsonData[OptimoveKeys.Registration.customerID.rawValue] = customerId
         } else {
-            requestJsonData[OptimoveKeys.Registration.visitorID.rawValue]        = OptimoveUserDefaults.shared.visitorID
+            requestJsonData[OptimoveKeys.Registration.visitorID.rawValue] = OptimoveUserDefaults.shared.visitorID
         }
         let dictionary = [OptimoveKeys.Registration.registrationData.rawValue: requestJsonData]
 
@@ -54,18 +60,20 @@ struct RegistrationRequestBuilder {
     }
 
     func buildUnregisterRequest() -> Data? {
-        guard let bundleID = Bundle.main.bundleIdentifier?.replacingOccurrences(of: ".", with: "_")  else {return nil}
-         var requestJsonData = [String: Any]()
-        let iOSToken = [OptimoveKeys.Registration.bundleID.rawValue: bundleID,
-                        OptimoveKeys.Registration.deviceID.rawValue: DeviceID ]
+        guard let bundleID = Bundle.main.bundleIdentifier?.replacingOccurrences(of: ".", with: "_") else { return nil }
+        var requestJsonData = [String: Any]()
+        let iOSToken = [
+            OptimoveKeys.Registration.bundleID.rawValue: bundleID,
+            OptimoveKeys.Registration.deviceID.rawValue: DeviceID
+        ]
 
-        requestJsonData[OptimoveKeys.Registration.iOSToken.rawValue]     = iOSToken
-        requestJsonData[OptimoveKeys.Registration.tenantID.rawValue]     = TenantID
+        requestJsonData[OptimoveKeys.Registration.iOSToken.rawValue] = iOSToken
+        requestJsonData[OptimoveKeys.Registration.tenantID.rawValue] = TenantID
 
         if let customerId = OptimoveUserDefaults.shared.customerID {
             requestJsonData[OptimoveKeys.Registration.customerID.rawValue] = customerId
         } else {
-            requestJsonData[OptimoveKeys.Registration.visitorID.rawValue]    = VisitorID
+            requestJsonData[OptimoveKeys.Registration.visitorID.rawValue] = VisitorID
         }
         let dictionary = [OptimoveKeys.Registration.unregistrationData.rawValue: requestJsonData]
 

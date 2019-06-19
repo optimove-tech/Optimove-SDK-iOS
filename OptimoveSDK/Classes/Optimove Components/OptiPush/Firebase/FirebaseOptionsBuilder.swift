@@ -1,6 +1,6 @@
-import Foundation
-import FirebaseMessaging
 import FirebaseCore
+import FirebaseMessaging
+import Foundation
 
 class FirebaseOptionsBuilder {
     var webApiKey: String = ""
@@ -15,11 +15,13 @@ class FirebaseOptionsBuilder {
         self.webApiKey = webApiKey
         return self
     }
+
     @discardableResult
     func set(appId: String) -> FirebaseOptionsBuilder {
         self.appId = appId
         return self
     }
+
     @discardableResult
     func set(dbUrl: String) -> FirebaseOptionsBuilder {
         self.dbUrl = dbUrl
@@ -37,6 +39,7 @@ class FirebaseOptionsBuilder {
         self.storageBucket = storageBucket
         return self
     }
+
     @discardableResult
     func set(projectId: String) -> FirebaseOptionsBuilder {
         self.projectId = projectId

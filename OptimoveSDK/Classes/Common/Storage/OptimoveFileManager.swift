@@ -1,11 +1,13 @@
 import Foundation
 
 class OptimoveFileManager {
-     static func getOptimoveSDKDirectory(isForSharedContainer: Bool) -> URL {
+    static func getOptimoveSDKDirectory(isForSharedContainer: Bool) -> URL {
         let fileManager = FileManager.default
         var url: URL!
         if isForSharedContainer {
-            url =  fileManager.containerURL(forSecurityApplicationGroupIdentifier: "group.\(Bundle.main.bundleIdentifier!).optimove")
+            url = fileManager.containerURL(
+                forSecurityApplicationGroupIdentifier: "group.\(Bundle.main.bundleIdentifier!).optimove"
+            )
         } else {
             url = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         }
@@ -21,7 +23,11 @@ class OptimoveFileManager {
             let filePath = url.appendingPathComponent(fileName).path
             let success = fileManager.createFile(atPath: filePath, contents: data, attributes: nil)
             addSkipBackupAttributeToItemAtURL(filePath: filePath)
-            OptiLoggerMessages.logStoringFileStatus(name: fileName, successStatus: success.description, fileLocation: url.path)
+            OptiLoggerMessages.logStoringFileStatus(
+                name: fileName,
+                successStatus: success.description,
+                fileLocation: url.path
+            )
         } catch {
             OptiLoggerMessages.logStringFailureStatus(name: fileName)
             return
@@ -33,8 +39,11 @@ class OptimoveFileManager {
         let fileUrl = url.appendingPathComponent(fileName)
         return FileManager.default.fileExists(atPath: fileUrl.path)
     }
+
     static func load(file fileName: String, isInSharedContainer: Bool) -> Data? {
-        let fileUrl = getOptimoveSDKDirectory(isForSharedContainer: isInSharedContainer).appendingPathComponent(fileName)
+        let fileUrl = getOptimoveSDKDirectory(isForSharedContainer: isInSharedContainer).appendingPathComponent(
+            fileName
+        )
         do {
             let contents = try Data.init(contentsOf: fileUrl)
             OptiLoggerMessages.logLoadFile(fileUrl: fileUrl.path)
@@ -46,7 +55,9 @@ class OptimoveFileManager {
     }
 
     static func delete(file fileName: String, isInSharedContainer: Bool) {
-        let fileUrl = getOptimoveSDKDirectory(isForSharedContainer: isInSharedContainer).appendingPathComponent(fileName)
+        let fileUrl = getOptimoveSDKDirectory(isForSharedContainer: isInSharedContainer).appendingPathComponent(
+            fileName
+        )
         if FileManager.default.fileExists(atPath: fileUrl.absoluteString) {
             do {
                 try FileManager.default.removeItem(at: fileUrl)

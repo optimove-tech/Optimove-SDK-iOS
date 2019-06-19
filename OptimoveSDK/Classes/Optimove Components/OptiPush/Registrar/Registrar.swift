@@ -62,11 +62,10 @@ class Registrar {
         let suffix = userPushToken.publicCustomerId == nil ? "Visitor" : "Customer"
         switch userPushToken.operation {
         case .registration:
-            return  "\(registrationEndPoint)register\(suffix)"
+            return "\(registrationEndPoint)register\(suffix)"
         case .unregistration:
             return "\(reportEndPoint)unregister\(suffix)"
-        case .optIn: fallthrough
-        case .optOut:
+        case .optIn, .optOut:
             return "\(reportEndPoint)optInOut\(suffix)"
         }
     }
@@ -77,8 +76,7 @@ class Registrar {
             return "register_data.json"
         case .unregistration:
             return "unregister_data.json"
-        case .optIn: fallthrough
-        case .optOut:
+        case .optIn, .optOut:
             return "opt_in_out_data.json"
         }
     }
@@ -96,7 +94,7 @@ class Registrar {
     }
 
     private func retryFailedOperation(_ operation: MbaasOperations, using json: Data) {
-        guard let url = UserDefaults.standard.url(forKey: "\(operation.rawValue)_endpoint") else { // TODO Clean this up - no literal constants should be here
+        guard let url = UserDefaults.standard.url(forKey: "\(operation.rawValue)_endpoint") else {  // TODO Clean this up - no literal constants should be here
             // TODO Handle corrupt state - should probably just delete the retry backup
             return
         }
@@ -137,7 +135,7 @@ class Registrar {
             }
         }
         if !OptimoveUserDefaults.shared.isOptRequestSuccess {
-            let path = getStoragePath(for: .optIn) // optIn and optOut share the same backup file
+            let path = getStoragePath(for: .optIn)  // optIn and optOut share the same backup file
             if let json = OptimoveFileManager.load(file: path, isInSharedContainer: false) {
                 self.retryFailedOperation(.optIn, using: json)
             }
@@ -147,9 +145,10 @@ class Registrar {
 
 extension Registrar: RegistrationProtocol {
     func register() {
-        let mbaasRequest = MbaasRequestBuilder(operation: .registration)
-            .setUserInfo(visitorId: VisitorID, customerId: CustomerID)
-            .build()
+        let mbaasRequest = MbaasRequestBuilder(operation: .registration).setUserInfo(
+            visitorId: VisitorID,
+            customerId: CustomerID
+        ).build()
         let url = URL(string: getMbaasPath(for: mbaasRequest))!
         guard let json = mbaasRequest.toMbaasJsonBody() else {
             OptiLoggerMessages.logJsonBuildFailure(mbaasRequestOperation: mbaasRequest.operation.rawValue)
@@ -162,7 +161,10 @@ extension Registrar: RegistrationProtocol {
     }
 
     func unregister(didComplete: @escaping ResultBlockWithBool) {
-        let mbaasRequest = MbaasRequestBuilder(operation: .unregistration).setUserInfo(visitorId: VisitorID, customerId: CustomerID).build()
+        let mbaasRequest = MbaasRequestBuilder(operation: .unregistration).setUserInfo(
+            visitorId: VisitorID,
+            customerId: CustomerID
+        ).build()
         let url = URL(string: getMbaasPath(for: mbaasRequest))!
         guard let json = mbaasRequest.toMbaasJsonBody() else {
             OptiLoggerMessages.logJsonBuildFailure(mbaasRequestOperation: mbaasRequest.operation.rawValue)
@@ -170,14 +172,21 @@ extension Registrar: RegistrationProtocol {
         }
         OptiLoggerMessages.logSendMbaasRequest(url: url, json: String(decoding: json, as: UTF8.self))
         NetworkManager.post(toUrl: url, json: json) { (data, error) in
-            self.handleResponseFromMbaas(ofRequest: mbaasRequest, withData: data, error: error, url: url, didComplete: didComplete)
+            self.handleResponseFromMbaas(
+                ofRequest: mbaasRequest,
+                withData: data,
+                error: error,
+                url: url,
+                didComplete: didComplete
+            )
         }
     }
 
     func optIn() {
-        let mbaasRequest = MbaasRequestBuilder(operation: .optIn)
-            .setUserInfo(visitorId: VisitorID, customerId: CustomerID)
-            .build()
+        let mbaasRequest = MbaasRequestBuilder(operation: .optIn).setUserInfo(
+            visitorId: VisitorID,
+            customerId: CustomerID
+        ).build()
         let url = URL(string: getMbaasPath(for: mbaasRequest))!
         guard let json = mbaasRequest.toMbaasJsonBody() else {
             OptiLoggerMessages.logJsonBuildFailure(mbaasRequestOperation: mbaasRequest.operation.rawValue)
@@ -190,9 +199,10 @@ extension Registrar: RegistrationProtocol {
     }
 
     func optOut() {
-        let mbaasRequest = MbaasRequestBuilder(operation: .optOut)
-            .setUserInfo(visitorId: VisitorID, customerId: CustomerID)
-            .build()
+        let mbaasRequest = MbaasRequestBuilder(operation: .optOut).setUserInfo(
+            visitorId: VisitorID,
+            customerId: CustomerID
+        ).build()
         let url = URL(string: getMbaasPath(for: mbaasRequest))!
         guard let json = mbaasRequest.toMbaasJsonBody() else {
             OptiLoggerMessages.logJsonBuildFailure(mbaasRequestOperation: mbaasRequest.operation.rawValue)
@@ -204,20 +214,35 @@ extension Registrar: RegistrationProtocol {
         }
     }
 
-    func handleResponseFromMbaas(ofRequest mbaasRequest: MbaasRequestBody, withData data: Data?, error: OptimoveError?, url: URL, didComplete: ((Bool) -> Void)? = nil) {
+    func handleResponseFromMbaas(
+        ofRequest mbaasRequest: MbaasRequestBody,
+        withData data: Data?,
+        error: OptimoveError?,
+        url: URL,
+        didComplete: ((Bool) -> Void)? = nil
+    ) {
         //If the error code indicate a user error, there is no sense to retry this request again
-        if let error = error, (error == .badRequest || error == .notFound || error == .gone) {
-            OptiLoggerMessages.logMbaasRequestError(mbaasRequestOperation: mbaasRequest.operation.rawValue, errorDescription: "\(error.localizedDescription)")
+        if let error = error, error == .badRequest || error == .notFound || error == .gone {
+            OptiLoggerMessages.logMbaasRequestError(
+                mbaasRequestOperation: mbaasRequest.operation.rawValue,
+                errorDescription: "\(error.localizedDescription)"
+            )
             didComplete?(false)
             return
         }
         guard error == nil else {
-            OptiLoggerMessages.logMbaasRequestError(mbaasRequestOperation: mbaasRequest.operation.rawValue, errorDescription: error.debugDescription)
+            OptiLoggerMessages.logMbaasRequestError(
+                mbaasRequestOperation: mbaasRequest.operation.rawValue,
+                errorDescription: error.debugDescription
+            )
             self.handleFailedMbaasRequest(of: mbaasRequest, to: url)
             didComplete?(false)
             return
         }
-        OptiLoggerMessages.logMbaasResponse(mbaasRequestOperation: mbaasRequest.operation.rawValue, response: String(decoding: data!, as: UTF8.self))
+        OptiLoggerMessages.logMbaasResponse(
+            mbaasRequestOperation: mbaasRequest.operation.rawValue,
+            response: String(decoding: data!, as: UTF8.self)
+        )
         if mbaasRequest.operation == .optIn {
             OptimoveUserDefaults.shared.isMbaasOptIn = true
         }
@@ -227,13 +252,13 @@ extension Registrar: RegistrationProtocol {
 
     private func handleFailedMbaasRequest(of mbaasRequest: MbaasRequestBody, to url: URL) {
         self.backupRequest(mbaasRequest)
-        UserDefaults.standard.set(url.path, forKey: "\(mbaasRequest.operation.rawValue)_endpoint") // TODO Clean this up - no literal constants should be here
+        UserDefaults.standard.set(url.path, forKey: "\(mbaasRequest.operation.rawValue)_endpoint")  // TODO Clean this up - no literal constants should be here
         self.setSuccesFlag(succeed: false, for: mbaasRequest.operation)
     }
 
     private func handleSuccessMbaasRequest(of operation: MbaasOperations, to url: URL) {
         self.clearBackupRequest(operation)
-        UserDefaults.standard.removeObject(forKey: "\(operation.rawValue)_endpoint") // TODO Clean this up - no literal constants should be here
+        UserDefaults.standard.removeObject(forKey: "\(operation.rawValue)_endpoint")  // TODO Clean this up - no literal constants should be here
         self.setSuccesFlag(succeed: true, for: operation)
     }
 }

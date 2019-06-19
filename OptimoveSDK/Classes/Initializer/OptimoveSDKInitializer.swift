@@ -24,12 +24,13 @@ class OptimoveSDKInitializer {
     let deviceStateMonitor: OptimoveDeviceStateMonitor
 
     // MARK: - Initializers
-    init(deviceStateMonitor: OptimoveDeviceStateMonitor ) {
+    init(deviceStateMonitor: OptimoveDeviceStateMonitor) {
         OptiLoggerMessages.logInitializtionOfInsitalizerStart()
         self.deviceStateMonitor = deviceStateMonitor
         requirementStateDictionary = [:]
         OptiLoggerMessages.logInitializerInitializtionFinish()
     }
+
     // MARK: - Internal API
     func initializeFromRemoteServer(didComplete: @escaping ResultBlockWithBool) {
         self.didSucceed = didComplete
@@ -64,32 +65,35 @@ class OptimoveSDKInitializer {
             }
             let decoder = JSONDecoder()
             do {
-                let parsed = try decoder.decode(TenantConfig.self, from: data)
-
-                if let tid = TenantID {
-                    for stream in OptiLoggerStreamsContainer.outputStreams.values {
-                        guard let serviceStream = stream as? MobileLogServiceLoggerStream else { continue }
-                        serviceStream.tenantId = tid
-                        break
-                    }
-                }
-
+                let newConfig = try decoder.decode(TenantConfig.self, from: data)
+                self.updateEnvironment(newConfig)
                 self.saveConfigurationToLocalStorage(data)
                 OptiLoggerMessages.logSetupComponentsFromRemote()
-                guard RunningFlagsIndication.isSdkNeedInitializing() else {return}
-                self.setupOptimoveComponents(from: parsed)
+                guard RunningFlagsIndication.isSdkNeedInitializing() else { return }
+                self.setupOptimoveComponents(from: newConfig)
             } catch {
                 self.didSucceed?(false)
             }
         }
     }
+    
+    private func updateEnvironment(_ config: TenantConfig) {
+        updateLoggerStreamContainers(config)
+    }
+    
+    private func updateLoggerStreamContainers(_ config: TenantConfig) {
+        let newTenantId = config.siteID
+        OptiLoggerStreamsContainer.outputStreams.values
+            .compactMap { $0 as? MutableOptiLoggerOutputStream }
+            .forEach { $0.tenantId = newTenantId }
+    }
 
     private func handleFetchConfigurationFromLocal() {
         guard let version = Version,
             OptimoveFileManager.isExist(file: version+".json", isInSharedContainer: true) else {
-                OptiLoggerMessages.logConfigFileNotExist()
-                //TODO: delete all configuration files because they are not relevant to current version anymore
-                return
+            OptiLoggerMessages.logConfigFileNotExist()
+            //TODO: delete all configuration files because they are not relevant to current version anymore
+            return
         }
         LocalConfigurationHandler().get { (configurationData, error) in
             guard error == nil else {
@@ -98,16 +102,16 @@ class OptimoveSDKInitializer {
             }
             OptiLoggerMessages.logLocalConfigFileFetchSuccess()
             guard let data = configurationData else {
-                    OptiLoggerMessages.logIssueWithConfigFile()
-                    return
+                OptiLoggerMessages.logIssueWithConfigFile()
+                return
             }
 
             let decoder = JSONDecoder()
             do {
-            let parsed = try decoder.decode(TenantConfig.self, from: data)
+                let parsed = try decoder.decode(TenantConfig.self, from: data)
 
                 OptiLoggerMessages.logSetupCopmponentsFromLocalConfiguraitonStart()
-            self.setupOptimoveComponents(from: parsed )
+                self.setupOptimoveComponents(from: parsed)
             } catch {
                 OptiLoggerMessages.logConfigurationParsingError()
             }

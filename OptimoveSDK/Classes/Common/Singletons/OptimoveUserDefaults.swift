@@ -10,41 +10,42 @@
 //
 class OptimoveUserDefaults {
     let lock: NSLock
-//
+    //
     // Use for constants that are only available inside the main application process
     let standardUserDefaults = UserDefaults.standard
 
     // Use for constants that are used in the shared "group.<bundle-id>.optimove" container
-    let sharedUserDefaults = UserDefaults(suiteName: "group.\(Bundle.main.bundleIdentifier!).optimove")! // If this line is crashing the client forgot to add the app group as described in the documentation
-//
+    let sharedUserDefaults = UserDefaults(suiteName: "group.\(Bundle.main.bundleIdentifier!).optimove")!  // If this line is crashing the client forgot to add the app group as described in the documentation
+    //
     enum UserDefaultsKeys: String {
-        case configurationEndPoint              = "configurationEndPoint"
-        case isMbaasOptIn                       = "isMbaasOptIn"
-        case isOptiTrackOptIn                   = "isOptiTrackOptIn"
-        case isFirstConversion                  = "isFirstConversion"
-        case bundleIdentifier                   = "bundleIdentifier"
-        case tenantToken                        = "tenantToken"
-        case siteID                             = "siteID"
-        case version                            = "version"
-        case customerID                         = "customerID"
-        case email                              = "email"
-        case visitorID                          = "visitorID"
-        case userAgent                          = "userAgent"
-        case fcmToken                           = "fcmToken"
-        case defaultFcmToken                    = "defaultFcmToken"
-        case unregistrationSuccess              = "unregistrationSuccess"
-        case registrationSuccess                = "registrationSuccess"
-        case optSuccess                         = "optSuccess"
-        case isSetUserIdSucceed                 = "isSetUserIdSucceed"
-        case isClientHasFirebase                = "userHasFirebase"
-        case apnsToken                          = "apnsToken"
-        case realtimeSetUserIdFailed            = "realtimeSetUserIdFailed"
-        case realtimeSetEmailFailed             = "realtimeSetEmailFailed"
-        case initialVisitorId                   = "initialVisitorId"
-        case firstVisitTimestamp                = "firstVisitTimestamp"
+        case configurationEndPoint = "configurationEndPoint"
+        case isMbaasOptIn = "isMbaasOptIn"
+        case isOptiTrackOptIn = "isOptiTrackOptIn"
+        case isFirstConversion = "isFirstConversion"
+        case bundleIdentifier = "bundleIdentifier"
+        case tenantToken = "tenantToken"
+        case siteID = "siteID"
+        case version = "version"
+        case customerID = "customerID"
+        case email = "email"
+        case visitorID = "visitorID"
+        case userAgent = "userAgent"
+        case fcmToken = "fcmToken"
+        case defaultFcmToken = "defaultFcmToken"
+        case unregistrationSuccess = "unregistrationSuccess"
+        case registrationSuccess = "registrationSuccess"
+        case optSuccess = "optSuccess"
+        case isSetUserIdSucceed = "isSetUserIdSucceed"
+        case isClientHasFirebase = "userHasFirebase"
+        case apnsToken = "apnsToken"
+        case realtimeSetUserIdFailed = "realtimeSetUserIdFailed"
+        case realtimeSetEmailFailed = "realtimeSetEmailFailed"
+        case initialVisitorId = "initialVisitorId"
+        case firstVisitTimestamp = "firstVisitTimestamp"
     }
 
     static let shared = OptimoveUserDefaults()
+
     private init() {
         lock = NSLock()
     }
@@ -56,9 +57,13 @@ class OptimoveUserDefaults {
             return sharedUserDefaults.string(forKey: UserDefaultsKeys.bundleIdentifier.rawValue)!
         }
         set {
-            self.sharedUserDefaults.set(Bundle.main.bundleIdentifier, forKey: UserDefaultsKeys.bundleIdentifier.rawValue)
+            self.sharedUserDefaults.set(
+                Bundle.main.bundleIdentifier,
+                forKey: UserDefaultsKeys.bundleIdentifier.rawValue
+            )
         }
     }
+
     var customerID: String? {
         get {
             if let id = self.sharedUserDefaults.string(forKey: UserDefaultsKeys.customerID.rawValue) {
@@ -82,6 +87,7 @@ class OptimoveUserDefaults {
             self.sharedUserDefaults.set(newValue?.lowercased(), forKey: UserDefaultsKeys.visitorID.rawValue)
         }
     }
+
     var initialVisitorId: String? {
         get {
             if let id = self.sharedUserDefaults.string(forKey: UserDefaultsKeys.initialVisitorId.rawValue) {
@@ -93,6 +99,7 @@ class OptimoveUserDefaults {
             self.sharedUserDefaults.set(newValue?.lowercased(), forKey: UserDefaultsKeys.initialVisitorId.rawValue)
         }
     }
+
     var userAgent: String? {
         get {
             if let ua = self.sharedUserDefaults.string(forKey: UserDefaultsKeys.userAgent.rawValue) {
@@ -129,8 +136,10 @@ class OptimoveUserDefaults {
             self.sharedUserDefaults.set(newValue, forKey: UserDefaultsKeys.tenantToken.rawValue)
         }
     }
+
     var version: String? {
-        get { return  self.sharedUserDefaults.string(forKey: UserDefaultsKeys.version.rawValue) ?? nil
+        get {
+            return self.sharedUserDefaults.string(forKey: UserDefaultsKeys.version.rawValue) ?? nil
         }
         set { self.sharedUserDefaults.set(newValue, forKey: UserDefaultsKeys.version.rawValue) }
     }
@@ -176,10 +185,9 @@ class OptimoveUserDefaults {
     }
 
     var isClientHasFirebase: Bool {
-        get { return self.standardUserDefaults.bool(forKey: UserDefaultsKeys.isClientHasFirebase.rawValue)}
+        get { return self.standardUserDefaults.bool(forKey: UserDefaultsKeys.isClientHasFirebase.rawValue) }
         set { self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.isClientHasFirebase.rawValue) }
     }
-    
 
     // MARK: Optipush Flags
     var isMbaasOptIn: Bool? {
@@ -195,22 +203,27 @@ class OptimoveUserDefaults {
             lock.unlock()
         }
     }
+
     var isUnregistrationSuccess: Bool {
         get {
-            return (self.standardUserDefaults.value(forKey: UserDefaultsKeys.unregistrationSuccess.rawValue) as? Bool) ?? true
+            return (self.standardUserDefaults.value(forKey: UserDefaultsKeys.unregistrationSuccess.rawValue) as? Bool)
+                ?? true
         }
         set {
             self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.unregistrationSuccess.rawValue)
         }
     }
+
     var isRegistrationSuccess: Bool {
         get {
-            return (self.standardUserDefaults.value(forKey: UserDefaultsKeys.registrationSuccess.rawValue) as? Bool) ?? true
+            return (self.standardUserDefaults.value(forKey: UserDefaultsKeys.registrationSuccess.rawValue) as? Bool)
+                ?? true
         }
         set {
             self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.registrationSuccess.rawValue)
         }
     }
+
     var isOptRequestSuccess: Bool {
         get {
             return (self.standardUserDefaults.value(forKey: UserDefaultsKeys.optSuccess.rawValue) as? Bool) ?? true
@@ -222,8 +235,9 @@ class OptimoveUserDefaults {
 
     var isFirstConversion: Bool? {
         get { return self.standardUserDefaults.value(forKey: UserDefaultsKeys.isFirstConversion.rawValue) as? Bool }
-        set { self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.isFirstConversion.rawValue)}
+        set { self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.isFirstConversion.rawValue) }
     }
+
     var defaultFcmToken: String? {
         get {
             return self.standardUserDefaults.string(forKey: UserDefaultsKeys.defaultFcmToken.rawValue) ?? nil
@@ -232,6 +246,7 @@ class OptimoveUserDefaults {
             self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.defaultFcmToken.rawValue)
         }
     }
+
     var fcmToken: String? {
         get {
             return self.standardUserDefaults.string(forKey: UserDefaultsKeys.fcmToken.rawValue) ?? nil
@@ -240,36 +255,51 @@ class OptimoveUserDefaults {
             self.standardUserDefaults.set(newValue, forKey: UserDefaultsKeys.fcmToken.rawValue)
         }
     }
+
     // MARK: OptiTrack Flags
     var isOptiTrackOptIn: Bool? {
         get {
             return self.standardUserDefaults.value(forKey: UserDefaultsKeys.isOptiTrackOptIn.rawValue) as? Bool
         }
         set {
-            self.standardUserDefaults.set(newValue,
-                                  forKey: UserDefaultsKeys.isOptiTrackOptIn.rawValue)
+            self.standardUserDefaults.set(
+                newValue,
+                forKey: UserDefaultsKeys.isOptiTrackOptIn.rawValue
+            )
         }
     }
 
     var firstVisitTimestamp: Int {
-        get { return self.standardUserDefaults.integer(forKey: UserDefaultsKeys.firstVisitTimestamp.rawValue)}
-        set { self.standardUserDefaults.set(newValue,
-                                    forKey: UserDefaultsKeys.firstVisitTimestamp.rawValue) }
+        get { return self.standardUserDefaults.integer(forKey: UserDefaultsKeys.firstVisitTimestamp.rawValue) }
+        set {
+            self.standardUserDefaults.set(
+                newValue,
+                forKey: UserDefaultsKeys.firstVisitTimestamp.rawValue
+            )
+        }
     }
-    var isSetUserIdSucceed: Bool {
-        get { return  self.standardUserDefaults.bool(forKey: UserDefaultsKeys.isSetUserIdSucceed.rawValue)}
 
-        set { self.standardUserDefaults.set(newValue,
-                                    forKey: UserDefaultsKeys.isSetUserIdSucceed.rawValue) }
+    var isSetUserIdSucceed: Bool {
+        get { return self.standardUserDefaults.bool(forKey: UserDefaultsKeys.isSetUserIdSucceed.rawValue) }
+
+        set {
+            self.standardUserDefaults.set(
+                newValue,
+                forKey: UserDefaultsKeys.isSetUserIdSucceed.rawValue
+            )
+        }
     }
+
     // MARK: Real time flags
     var realtimeSetUserIdFailed: Bool {
         get {
             return self.standardUserDefaults.bool(forKey: UserDefaultsKeys.realtimeSetUserIdFailed.rawValue)
         }
         set {
-            self.standardUserDefaults.set(newValue,
-                                  forKey: UserDefaultsKeys.realtimeSetUserIdFailed.rawValue)
+            self.standardUserDefaults.set(
+                newValue,
+                forKey: UserDefaultsKeys.realtimeSetUserIdFailed.rawValue
+            )
         }
     }
 
@@ -278,8 +308,10 @@ class OptimoveUserDefaults {
             return self.standardUserDefaults.bool(forKey: UserDefaultsKeys.realtimeSetEmailFailed.rawValue)
         }
         set {
-            self.standardUserDefaults.set(newValue,
-                                  forKey: UserDefaultsKeys.realtimeSetEmailFailed.rawValue)
+            self.standardUserDefaults.set(
+                newValue,
+                forKey: UserDefaultsKeys.realtimeSetEmailFailed.rawValue
+            )
         }
     }
 }

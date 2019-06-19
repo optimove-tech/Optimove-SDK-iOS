@@ -12,10 +12,8 @@ class OptimoveEventValidator {
     // MARK: - Internal Methods
     func validate(event: OptimoveEvent, withConfig config: OptimoveEventConfig) -> OptimoveError? {
         //Verify mandatory parameter exist
-        for (name, paramConfigs) in config.parameters where paramConfigs.mandatory
-        {
-            if  event.parameters[name] == nil
-            {
+        for (name, paramConfigs) in config.parameters where paramConfigs.mandatory {
+            if event.parameters[name] == nil {
                 return .mandatoryParameterMissing
             }
         }
@@ -28,15 +26,15 @@ class OptimoveEventValidator {
                         OptiLoggerMessages.logParameterIsNotNumber(name: name)
                         return .mismatchParamterType
                     }
-                    if String(describing: numberValue).count > 255 // Verify parameter value
+                    if String(describing: numberValue).count > 255  // Verify parameter value
                     {
                         return .illegalParameterLength
                     }
 
                 case "String":
                     guard let stringValue = value as? String
-                        else {
-                         OptiLoggerMessages.logParameterIsNotString(name: name)
+                    else {
+                        OptiLoggerMessages.logParameterIsNotString(name: name)
                         return .mismatchParamterType
 
                     }
@@ -47,7 +45,7 @@ class OptimoveEventValidator {
                     }
                 case "Boolean":
                     guard let _ = value as? Bool
-                        else {
+                    else {
                         OptiLoggerMessages.logParameterIsNotBoolean(name: name)
                         return .mismatchParamterType
                     }

@@ -20,6 +20,7 @@ extension String {
     func setAsMongoKey() -> String {
         return self.replacingOccurrences(of: ".", with: "_")
     }
+
     func deletingPrefix(_ prefix: String) -> String {
         guard self.hasPrefix(prefix) else { return self }
         return String(self.dropFirst(prefix.count))
@@ -38,9 +39,13 @@ extension String {
 
 extension URL {
     public var queryParameters: [String: String]? {
-        guard let components = URLComponents(url: self,
-                                             resolvingAgainstBaseURL: true),
-            let queryItems = components.queryItems else {
+        guard
+            let components = URLComponents(
+            url: self,
+            resolvingAgainstBaseURL: true
+        ),
+            let queryItems = components.queryItems
+        else {
             return nil
         }
 
@@ -58,8 +63,7 @@ extension Notification.Name {
 
 extension ProcessInfo {
     var operatingSystemVersionOnlyString: String {
-        get {
-            return "\(self.operatingSystemVersion.majorVersion).\(self.operatingSystemVersion.minorVersion).\(self.operatingSystemVersion.patchVersion)"
-        }
+        return
+            "\(self.operatingSystemVersion.majorVersion).\(self.operatingSystemVersion.minorVersion).\(self.operatingSystemVersion.patchVersion)"
     }
 }

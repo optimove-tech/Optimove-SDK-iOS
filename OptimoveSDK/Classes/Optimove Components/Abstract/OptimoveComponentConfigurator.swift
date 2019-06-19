@@ -1,20 +1,20 @@
 import Foundation
 
 protocol OptimoveComponentInitializationProtocol {
-	associatedtype T: OptimoveComponent
-	init(component: T)
+    associatedtype T: OptimoveComponent
+    init(component: T)
 
-	func setEnabled(from tenantConfig: TenantConfig)
-	func getRequirements() -> [OptimoveDeviceRequirement]
-	func executeInternalConfigurationLogic(from tenantConfig: TenantConfig, didComplete: @escaping ResultBlockWithBool)
+    func setEnabled(from tenantConfig: TenantConfig)
+    func getRequirements() -> [OptimoveDeviceRequirement]
+    func executeInternalConfigurationLogic(from tenantConfig: TenantConfig, didComplete: @escaping ResultBlockWithBool)
 }
 
 class OptimoveComponentConfigurator<T: OptimoveComponent>: OptimoveComponentInitializationProtocol {
-	let component: T
+    let component: T
 
-	required init(component: T) {
-		self.component = component
-	}
+    required init(component: T) {
+        self.component = component
+    }
 
     func configure(from tenantConfig: TenantConfig, didComplete: @escaping ResultBlockWithBool) {
         setEnabled(from: tenantConfig)
@@ -29,15 +29,16 @@ class OptimoveComponentConfigurator<T: OptimoveComponent>: OptimoveComponentInit
     }
 
     func setEnabled(from tenantConfig: TenantConfig) {
-		fatalError("Not Implemented")
-	}
+        fatalError("Not Implemented")
+    }
 
-	func getRequirements() -> [OptimoveDeviceRequirement] {
-		fatalError("Not Implemented")
-	}
+    func getRequirements() -> [OptimoveDeviceRequirement] {
+        fatalError("Not Implemented")
+    }
 
-	func executeInternalConfigurationLogic(from tenantConfig: TenantConfig, didComplete: @escaping ResultBlockWithBool) {
-		fatalError("Not Implemented")
-	}
+    func executeInternalConfigurationLogic(from tenantConfig: TenantConfig, didComplete: @escaping ResultBlockWithBool)
+    {
+        fatalError("Not Implemented")
+    }
 
 }

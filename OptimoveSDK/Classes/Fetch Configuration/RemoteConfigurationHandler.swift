@@ -17,7 +17,7 @@ class RemoteConfigurationHandler {
 
             if let url = URL(string: path) {
                 NetworkManager.get(from: url) {
-                    (response, error)  in
+                    (response, error) in
                     didComplete(response, error)
                 }
             }

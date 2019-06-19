@@ -16,6 +16,7 @@ class MbaasRequestBuilder {
         mbaasRequesstBody.token = token
         return self
     }
+
     func setOptIn(optIn: Bool) -> MbaasRequestBuilder {
         mbaasRequesstBody.optIn = optIn
         return self

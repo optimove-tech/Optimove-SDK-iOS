@@ -1,4 +1,5 @@
 import Foundation
+
 enum OptimoveSdkCommand: RawRepresentable {
     init?(rawValue: String) {
         switch rawValue {

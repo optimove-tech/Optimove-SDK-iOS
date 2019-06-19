@@ -1,4 +1,5 @@
 import Foundation
+
 struct TenantConfig: Decodable {
     let version: String
     let enableOptitrack: Bool
@@ -30,7 +31,10 @@ struct TenantConfig: Decodable {
         let mobile = try values.nestedContainer(keyedBy: AdditionalInfoKeys.self, forKey: .mobile)
         optipushMetaData = try? mobile.decode(OptipushMetaData.self, forKey: .optipushMetaData)
         firebaseProjectKeys = try? mobile.decode(FirebaseProjectKeys.self, forKey: .firebaseProjectKeys)
-        clientsServiceProjectKeys = try? mobile.decode(ClientsServiceProjectKeys.self, forKey: .clientsServiceProjectKeys)
+        clientsServiceProjectKeys = try? mobile.decode(
+            ClientsServiceProjectKeys.self,
+            forKey: .clientsServiceProjectKeys
+        )
 
         events = try values.decode([String: OptimoveEventConfig].self, forKey: .events)
 
@@ -41,6 +45,7 @@ struct TenantConfig: Decodable {
             optitrackMetaData = nil
         }
     }
+
     enum CodingKeys: String, CodingKey {
         case version
         case enableOptitrack
@@ -53,6 +58,7 @@ struct TenantConfig: Decodable {
         case events
         case siteId
     }
+
     enum AdditionalInfoKeys: String, CodingKey {
         case optitrackMetaData
         case optipushMetaData

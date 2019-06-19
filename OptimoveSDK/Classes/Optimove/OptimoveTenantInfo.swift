@@ -8,17 +8,15 @@
 
 import Foundation
 
-@objc public class OptimoveTenantInfo: NSObject
-{
-    var url                         : String
-    @objc public var tenantToken    : String
-    @objc public var configName     : String
+@objc public class OptimoveTenantInfo: NSObject {
+    var url: String
+    @objc public var tenantToken: String
+    @objc public var configName: String
 
-    
-    
-    @objc public init(tenantToken: String,
-                      configName     : String
-        )
+    @objc public init(
+        tenantToken: String,
+        configName: String
+    )
 
     {
         self.url = "https://sdk-cdn.optimove.net/mobilesdkconfig"

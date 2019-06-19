@@ -4,8 +4,7 @@
 
 import Foundation
 
-struct LogBody
-{
+struct LogBody {
     let tenantId: Int
     let appNs: String
     let sdkEnv: SdkEnv
@@ -17,4 +16,4 @@ struct LogBody
     let message: String
 }
 
-extension LogBody:Codable {}
+extension LogBody: Codable {}
