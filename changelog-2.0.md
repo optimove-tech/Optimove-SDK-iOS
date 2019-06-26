@@ -2,12 +2,7 @@
 # iOS Mobile SDK Changelog v2.0
 
 ## Dependencies
-* Firebase => 5.20.2
-* FirebaseAnalytics => 5.8.1
-* FirebaseAnalyticsInterop => 1.2.0
-* FirebaseCore => 5.4.1
 * FirebaseDynamicLinks => 4.0.0
-* FirebaseInstanceID => 3.8.1
 * FirebaseMessaging => 4.0.2
 
 ## Versioning
