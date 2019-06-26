@@ -6,9 +6,9 @@
 * FirebaseAnalytics => 5.8.1
 * FirebaseAnalyticsInterop => 1.2.0
 * FirebaseCore => 5.4.1
-* FirebaseDynamicLinks => 3.4.3
+* FirebaseDynamicLinks => 4.0.0
 * FirebaseInstanceID => 3.8.1
-* FirebaseMessaging => 3.5.0
+* FirebaseMessaging => 4.0.2
 
 ## Versioning
 The below will allow any newer minor version of  `OptimoveSDK`  not to break the existing API (i.e 2._._) and will be auto-fetched during any  `pod update`.
