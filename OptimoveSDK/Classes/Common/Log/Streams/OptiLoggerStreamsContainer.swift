@@ -4,6 +4,7 @@
 
     private static let logQueue = DispatchQueue(label: "com.optimove.sdk.log")
 
+    @objc(logWithLevel:fileName:methodName:logModule:message:)
     public static func log(
         level: LogLevel,
         fileName: String?,
