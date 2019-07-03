@@ -8,8 +8,8 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    OptimoveTenantInfo *info = [[OptimoveTenantInfo alloc] initWithTenantToken:@"MY_TENANT_TOKEN" configName:@"MY_CONFIG_NAME"];
-    [Optimove configureFor:info];
+    OptimoveTenantInfo *info = [[OptimoveTenantInfo alloc] initWithTenantToken: @"<YOUR_SDK_TENANT_TOKEN>" configName: @"<YOUR_MOBILE_CONFIG_NAME>"];
+    [Optimove configureFor: info];
     [Optimove.shared registerSuccessStateDelegate:self];
     [UIApplication.sharedApplication registerForRemoteNotifications];
     [UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions:UNAuthorizationOptionAlert completionHandler:^(BOOL granted, NSError * _Nullable error) {

@@ -1,5 +1,7 @@
 #import "MainViewController.h"
 
+@import OptimoveSDK;
+
 @interface MainViewController ()
 
 @end
@@ -9,7 +11,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [Optimove.shared registerWithDeepLinkResponder: [[OptimoveDeepLinkResponder alloc] init: self]];
-    [Optimove.shared setScreenVisitWithScreenPathArray:@[@"vc1",@"vc2"] screenTitle:@"vc2" screenCategory:nil];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
@@ -22,13 +23,15 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void) didReceiveWithDeepLink:(OptimoveDeepLinkComponents *)deepLink {
-    
+- (void) didReceiveWithDeepLink:(OptimoveDeepLinkComponents *) deepLink {
     if (deepLink != nil) {
-        UIViewController* vc = [[self storyboard] instantiateViewControllerWithIdentifier:deepLink.screenName];
-        [[self navigationController] pushViewController:vc animated:true];
+        // Retrieve the targetted screen name
+        NSString* screenName = deepLink.screenName;
+        // Retrieve the deep link Key-Value parameters
+        NSDictionary* deepLinkParams = deepLink.parameters;
     }
 }
+
 - (IBAction)subscribeTotestMode:(UIButton *)sender {
      [Optimove.shared startTestMode];
 }
@@ -37,7 +40,11 @@
     [Optimove.shared stopTestMode];
 }
 
-- (void)optimove:(Optimove *)optimove didBecomeActiveWithMissingPermissions:(NSArray<NSNumber *> *)missingPermissions
-{}
+- (void)optimove:(Optimove *)optimove didBecomeActiveWithMissingPermissions:(NSArray<NSNumber *> *)missingPermissions {
+    // Report screen visit like this
+    [Optimove.shared setScreenVisitWithScreenPath: @"Home/Store/Footware/Boots" screenTitle: @"<YOUR_TITLE>" screenCategory: @"<OPTIONAL: YOUR_CATEGORY>"];
+    // OR like that
+    [Optimove.shared setScreenVisitWithScreenPathArray: @[@"Home", @"Store", @"Footware", @"Boots"] screenTitle: @"<YOUR_TITLE>" screenCategory: @"<OPTIONAL: YOUR_CATEGORY>"];
+}
 
 @end

@@ -12,6 +12,7 @@
 - (IBAction)userPressOnSend {
     NSString* name = [self.userIdTextField text];
     [Optimove.shared setUserId:name];
+    [Optimove.shared registerUserWithSdkId: @"<SDK_ID>" email: @"<EMAIL>"]
 }
 
 -(void) viewDidAppear:(BOOL)animated {
