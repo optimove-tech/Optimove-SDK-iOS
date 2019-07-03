@@ -14,19 +14,25 @@ class OptiPushConfigurator: OptimoveComponentConfigurator<OptiPush> {
         return [.userNotification, .internet]
     }
 
-    override func executeInternalConfigurationLogic(from tenantConfig: TenantConfig, didComplete:@escaping ResultBlockWithBool) {
-       OptiLoggerMessages.logConfigureOptipush()
+    override func executeInternalConfigurationLogic(
+        from tenantConfig: TenantConfig,
+        didComplete: @escaping ResultBlockWithBool
+    ) {
+        OptiLoggerMessages.logConfigureOptipush()
         guard let optipushMetadata = tenantConfig.optipushMetaData,
             let firebaseProjectKeys = tenantConfig.firebaseProjectKeys,
-            let clientsServiceProjectKeys = tenantConfig.clientsServiceProjectKeys else {
-                OptiLoggerMessages.logOptipushConfigurationFailure()
-                didComplete(false)
-                return
+            let clientsServiceProjectKeys = tenantConfig.clientsServiceProjectKeys
+        else {
+            OptiLoggerMessages.logOptipushConfigurationFailure()
+            didComplete(false)
+            return
         }
         setMetaData(optipushMetadata)
-        component.setup(firebaseMetaData: firebaseProjectKeys,
-                        clientFirebaseMetaData: clientsServiceProjectKeys,
-                        optipushMetaData: optipushMetadata )
+        component.setup(
+            firebaseMetaData: firebaseProjectKeys,
+            clientFirebaseMetaData: clientsServiceProjectKeys,
+            optipushMetaData: optipushMetadata
+        )
         OptiLoggerMessages.logOptipushConfigurationSuccess()
         didComplete(true)
     }

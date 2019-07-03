@@ -1,10 +1,10 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveSDK'
-  s.version          = '2.0.2'
+  s.version          = '2.1.1'
   s.summary          = 'Optimove SDK for Analytics and push notifications.'
 
   s.description      = <<-DESC
-  This Pod includes the Optimove framework for reporting events and receiving optipush notifications
+  This Pod includes the Optimove framework for reporting events and receive optimove push notifications
                        DESC
 
   s.homepage         = 'https://github.com/optimove-tech/iOS-SDK-Integration-Guide'
@@ -19,17 +19,9 @@ Pod::Spec.new do |s|
   s.swift_version = '4.2'
   s.source_files = 'OptimoveSDK/Classes/**/*'
   
-  s.dependency 'Firebase', '5.20.2'
-  s.dependency 'FirebaseAnalytics', '5.8.1'
-  s.dependency 'FirebaseAnalyticsInterop', '1.2.0'
-  s.dependency 'FirebaseCore', '5.4.1'
-  s.dependency 'FirebaseDynamicLinks', '3.4.3'
-  s.dependency 'FirebaseInstanceID', '3.8.1'
-  s.dependency 'FirebaseMessaging', '3.5.0'
-  s.dependency 'GoogleAppMeasurement', '5.8.1'
-  s.dependency 'GoogleUtilities', '5.7.0'
-  s.dependency 'Protobuf', '3.7.0'
-  s.dependency 'nanopb', '0.3.901'
+
+  s.dependency 'FirebaseDynamicLinks', '4.0.0'
+  s.dependency 'FirebaseMessaging', '4.0.2'
   s.dependency 'OptiTrackCore', '1.3.0'
   
   s.frameworks = 'UIKit','SystemConfiguration','UserNotifications','AdSupport'

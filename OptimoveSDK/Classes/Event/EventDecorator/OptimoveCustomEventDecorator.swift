@@ -20,7 +20,7 @@ class OptimoveCustomEventDecorator: OptimoveEventDecorator {
         var normalizedParameters = [String: Any]()
         for (key, value) in parameters {
             let normalizedKey = normalize(key)
-            if let numValue =  value as? NSNumber, config.parameters[normalizedKey]!.type == "Boolean" {
+            if let numValue = value as? NSNumber, config.parameters[normalizedKey]!.type == "Boolean" {
                 normalizedParameters[normalizedKey] = Bool(truncating: numValue)
                 if normalizedKey != key {
                     normalizedParameters[key] = nil

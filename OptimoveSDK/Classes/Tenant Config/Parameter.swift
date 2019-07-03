@@ -1,4 +1,5 @@
 import Foundation
+
 struct Parameter: Decodable {
     let mandatory: Bool
     let name: String

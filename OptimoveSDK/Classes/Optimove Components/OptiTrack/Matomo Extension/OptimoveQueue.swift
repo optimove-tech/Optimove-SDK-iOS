@@ -14,8 +14,8 @@ class OptimoveQueue: Queue {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         do {
-        let eventJson = try encoder.encode(items)
-        OptimoveFileManager.save(data: eventJson, toFileName: "pendingOptimoveEvents.json")
+            let eventJson = try encoder.encode(items)
+            OptimoveFileManager.save(data: eventJson, toFileName: "pendingOptimoveEvents.json")
         } catch {
             OptiLoggerMessages.logEventsfileCouldNotLoad()
         }
@@ -30,7 +30,12 @@ class OptimoveQueue: Queue {
 
     func remove(events: [Event], completion: () -> Void) {
         OptiLoggerMessages.logRemoveEventsFromQueue()
-        items = items.filter({ event in !events.contains(where: { eventToRemove in eventToRemove.uuid == event.uuid })})
+        items
+            = items.filter({ event in
+            !events.contains(where: { eventToRemove in
+                eventToRemove.uuid == event.uuid
+            })
+        })
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         do {

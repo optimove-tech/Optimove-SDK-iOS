@@ -19,7 +19,7 @@ public typealias ResultBlockWithBool = (Bool) -> Void
 public typealias ResultBlockWithData = (Data?, OptimoveError?) -> Void
 
 class NetworkManager {
-    static func get(from url: URL, optimoveResponse:@escaping ResultBlockWithData) {
+    static func get(from url: URL, optimoveResponse: @escaping ResultBlockWithData) {
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             DispatchQueue.main.async {
                 guard error == nil else {
@@ -46,8 +46,10 @@ class NetworkManager {
             var request = URLRequest(url: url)
             request.timeoutInterval = 60
             request.httpMethod = HttpMethod.post.rawValue
-            request.setValue(MediaType.json.rawValue,
-                             forHTTPHeaderField: HttpHeader.contentType.rawValue)
+            request.setValue(
+                MediaType.json.rawValue,
+                forHTTPHeaderField: HttpHeader.contentType.rawValue
+            )
             return request
         }
 

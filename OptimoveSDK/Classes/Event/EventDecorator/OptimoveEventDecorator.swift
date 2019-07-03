@@ -2,8 +2,8 @@ import Foundation
 
 /// Adjust event entity to satisfy Optimove's business logic before dispatch
 class OptimoveEventDecorator: OptimoveEvent {
-     var name: String
-     var parameters: [String: Any]
+    var name: String
+    var parameters: [String: Any]
 
     init(event: OptimoveEvent) {
         self.name = event.name
@@ -25,16 +25,20 @@ class OptimoveEventDecorator: OptimoveEvent {
     /// - Parameter config: The event configurations as provided in file
     func processEventConfig(_ config: OptimoveEventConfig) {
         if config.parameters[OptimoveKeys.AdditionalAttributesKeys.eventDeviceType] != nil {
-            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventDeviceType] = OptimoveKeys.AddtionalAttributesValues.eventDeviceType
+            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventDeviceType]
+                = OptimoveKeys.AddtionalAttributesValues.eventDeviceType
         }
         if config.parameters[OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile] != nil {
-            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile] = OptimoveKeys.AddtionalAttributesValues.eventNativeMobile
+            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile]
+                = OptimoveKeys.AddtionalAttributesValues.eventNativeMobile
         }
         if config.parameters[OptimoveKeys.AdditionalAttributesKeys.eventOs] != nil {
-            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventOs] = OptimoveKeys.AddtionalAttributesValues.eventOs
+            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventOs]
+                = OptimoveKeys.AddtionalAttributesValues.eventOs
         }
         if config.parameters[OptimoveKeys.AdditionalAttributesKeys.eventPlatform] != nil {
-            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventPlatform] = OptimoveKeys.AddtionalAttributesValues.eventPlatform
+            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventPlatform]
+                = OptimoveKeys.AddtionalAttributesValues.eventPlatform
         }
 
         normalizeParameters(config)

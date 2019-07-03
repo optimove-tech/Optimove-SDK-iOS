@@ -1,4 +1,5 @@
 import Foundation
+
 class AppOpenEvent: OptimoveCoreEvent {
     var name: String {
         return "app_open"
@@ -7,8 +8,9 @@ class AppOpenEvent: OptimoveCoreEvent {
     var parameters: [String: Any]
 
     init() {
-        var dictionary = [OptimoveKeys.Configuration.appNs.rawValue: Bundle.main.bundleIdentifier!,
-                          OptimoveKeys.Configuration.deviceId.rawValue: DeviceID
+        var dictionary = [
+            OptimoveKeys.Configuration.appNs.rawValue: Bundle.main.bundleIdentifier!,
+            OptimoveKeys.Configuration.deviceId.rawValue: DeviceID,
         ]
         if CustomerID == nil {
             dictionary[OptimoveKeys.Configuration.visitorId.rawValue] = VisitorID

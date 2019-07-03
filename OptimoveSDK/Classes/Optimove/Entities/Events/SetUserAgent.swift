@@ -1,9 +1,10 @@
 import Foundation
+
 class SetUserAgent: OptimoveCoreEvent {
     var userAgent1: String
     var userAgent2: String?
 
-    var name: String {return OptimoveKeys.Configuration.setUserAgent.rawValue}
+    var name: String { return OptimoveKeys.Configuration.setUserAgent.rawValue }
     var parameters: [String: Any]
 
     init(userAgent: String) {

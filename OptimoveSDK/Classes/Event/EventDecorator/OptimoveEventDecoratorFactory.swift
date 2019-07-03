@@ -13,7 +13,9 @@ class OptimoveEventDecoratorFactory {
         }
     }
 
-    static func getEventDecorator(forEvent event: OptimoveEvent, withConfig config: OptimoveEventConfig) -> OptimoveEventDecorator {
+    static func getEventDecorator(forEvent event: OptimoveEvent, withConfig config: OptimoveEventConfig)
+        -> OptimoveEventDecorator
+    {
         let dec = getEventDecorator(forEvent: event)
         dec.processEventConfig(config)
         return dec

@@ -5,17 +5,20 @@ import Foundation
 import UserNotifications
 
 protocol OptipushServiceInfra {
-    func subscribeToTopics(didSucceed: ((Bool)->Void)?)
+    func subscribeToTopics(didSucceed: ((Bool) -> Void)?)
     func unsubscribeFromTopics()
-    func setupFirebase(from firebaseMetaData: FirebaseProjectKeys,
-                       clientFirebaseMetaData: ClientsServiceProjectKeys,
-                       delegate: OptimoveMbaasRegistrationHandling,
-                       pushTopicsRegistrationEndpoint: String)
+
+    func setupFirebase(
+        from firebaseMetaData: FirebaseProjectKeys,
+        clientFirebaseMetaData: ClientsServiceProjectKeys,
+        delegate: OptimoveMbaasRegistrationHandling,
+        pushTopicsRegistrationEndpoint: String
+    )
     func handleRegistration(token: Data)
     func optimoveReceivedRegistrationToken(_ fcmToken: String)
 
-    func subscribeToTopic(topic: String, didSucceed: ((Bool)->Void)?)
-    func unsubscribeFromTopic(topic: String, didSucceed: ((Bool)->Void)?)
+    func subscribeToTopic(topic: String, didSucceed: ((Bool) -> Void)?)
+    func unsubscribeFromTopic(topic: String, didSucceed: ((Bool) -> Void)?)
 }
 
 final class OptiPush: OptimoveComponent {
@@ -38,28 +41,33 @@ final class OptiPush: OptimoveComponent {
     }
 
     // MARK: - Internal methods
-    func setup(firebaseMetaData: FirebaseProjectKeys,
-               clientFirebaseMetaData: ClientsServiceProjectKeys,
-               optipushMetaData: OptipushMetaData) {
+    func setup(
+        firebaseMetaData: FirebaseProjectKeys,
+        clientFirebaseMetaData: ClientsServiceProjectKeys,
+        optipushMetaData: OptipushMetaData
+    ) {
         registrar = Registrar(optipushMetaData: optipushMetaData)
-        firebaseInteractor.setupFirebase(from: firebaseMetaData,
-                                         clientFirebaseMetaData: clientFirebaseMetaData,
-                                         delegate: self,
-                                         pushTopicsRegistrationEndpoint: optipushMetaData.pushTopicsRegistrationEndpoint)
+        firebaseInteractor.setupFirebase(
+            from: firebaseMetaData,
+            clientFirebaseMetaData: clientFirebaseMetaData,
+            delegate: self,
+            pushTopicsRegistrationEndpoint: optipushMetaData.pushTopicsRegistrationEndpoint
+        )
     }
 
     func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         firebaseInteractor.handleRegistration(token: deviceToken)
     }
 
-    func subscribeToTopic(topic: String, didSucceed: ((Bool)->Void)?  = nil) {
+    func subscribeToTopic(topic: String, didSucceed: ((Bool) -> Void)? = nil) {
         if isEnable {
             firebaseInteractor.subscribeToTopic(topic: topic, didSucceed: didSucceed)
         } else {
             didSucceed?(false)
         }
     }
-    func unsubscribeFromTopic(topic: String, didSucceed: ((Bool)->Void)? = nil) {
+
+    func unsubscribeFromTopic(topic: String, didSucceed: ((Bool) -> Void)? = nil) {
         if isEnable {
             firebaseInteractor.unsubscribeFromTopic(topic: topic, didSucceed: didSucceed)
         } else {
@@ -107,7 +115,7 @@ extension OptiPush: OptimoveMbaasRegistrationHandling {
 
 extension OptiPush {
     private func optInOutIfNeeded() {
-        guard OptimoveUserDefaults.shared.isOptRequestSuccess else {return}
+        guard OptimoveUserDefaults.shared.isOptRequestSuccess else { return }
         deviceStateMonitor.getStatus(of: .userNotification) { (granted) in
             if granted {
                 self.handleNotificationAuthorized()
@@ -116,13 +124,15 @@ extension OptiPush {
             }
         }
     }
+
     private func handleNotificationAuthorizedAtFirstLaunch() {
         OptiLoggerMessages.logUserOptOPutFirstTime()
         OptimoveUserDefaults.shared.isMbaasOptIn = true
     }
+
     private func handleNotificationAuthorized() {
         OptiLoggerMessages.logUserNotificationAuthorizedByUser()
-        guard let isOptIn = OptimoveUserDefaults.shared.isMbaasOptIn else { //Opt in on first launch
+        guard let isOptIn = OptimoveUserDefaults.shared.isMbaasOptIn else {  //Opt in on first launch
             handleNotificationAuthorizedAtFirstLaunch()
             return
         }
@@ -132,6 +142,7 @@ extension OptiPush {
 
         }
     }
+
     private func handleNotificationRejection() {
         OptiLoggerMessages.logUserNotificationRejectedByUser()
 
@@ -146,6 +157,7 @@ extension OptiPush {
             OptimoveUserDefaults.shared.isMbaasOptIn = false
         }
     }
+
     private func handleNotificationRejectionAtFirstLaunch() {
         OptiLoggerMessages.logOptOutFirstLaunch()
         guard OptimoveUserDefaults.shared.fcmToken != nil else {

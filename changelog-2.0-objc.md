@@ -29,18 +29,18 @@ end
 Aligned all Web & Mobile SDKs to use the same naming convention for this function.
 
 - Change from 
-```swift
-Optimove.sharedInstance.reportScreenVisit(viewControllersIdentifiers:url:category:)
+```objc
+[Optimove.sharedInstance reportScreenVisitWithViewControllersIdentifiers: @[@"Home", @"Store", @"Footware", @"Boots"] url: @"<OPTIONAL: YOUR_URL>" category: @"<OPTIONAL: YOUR_CATEGORY>"];
 ```
 
-- To single screen title:
-```swift
-Optimove.shared.setScreenVisit(screenPath: "Home/Store/Footware/Boots", screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
+- To pass the path as a String literal:
+```objc
+[Optimove.shared setScreenVisitWithScreenPath: @"Home/Store/Footware/Boots" screenTitle: @"<YOUR_TITLE>" screenCategory: @"<OPTIONAL: YOUR_CATEGORY>"];
 ```
 - Or an array of screen titles
 Added a screen reporting function which takes an array of screen titles instead of a screenPath String: 
-```swift
-Optimove.shared.setScreenVisit(screenPathArray: ["Home", "Store", "Footware", "Boots"], screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
+```objc
+[Optimove.shared setScreenVisitWithScreenPathArray: @[@"Home", @"Store", @"Footware", @"Boots"] screenTitle: @"<YOUR_TITLE>" screenCategory: @"<OPTIONAL: YOUR_CATEGORY>"];
 ```
 
 - Where:
@@ -52,28 +52,44 @@ Optimove.shared.setScreenVisit(screenPathArray: ["Home", "Store", "Footware", "B
 ### Optipush (Dynamic Deep Link support)
 The `OptimoveDeepLinkComponents` Object has a new property called `parameters` to support dynamic parameters when using deep linking.
 
-Partial code snippet example:
-```swift
-class ViewController: UIViewController, OptimoveDeepLinkCallback {
-    func didReceive(deepLink: OptimoveDeepLinkComponents?)
-    {
-        guard let deepLink = deepLink else {return}
-        guard let vc = storyboard?.instantiateViewController(withIdentifier: "deepLinkVc") as? DeepLinkViewController else { return }
+`UIViewController` Header Example:
+```objc
+#import <UIKit/UIKit.h>
+@import OptimoveSDK;
 
-        vc.deepLinkComp = deepLink
+@interface MainViewController : UIViewController <OptimoveDeepLinkCallback, OptimoveSuccessStateDelegate>
+@property (weak, nonatomic) IBOutlet UILabel *output;
+
+
+@end
+```
+
+`UIViewController` implementation Example:
+```objc
+@implementation MainViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [Optimove.shared registerWithDeepLinkResponder: [[OptimoveDeepLinkResponder alloc] init: self]];
+}
+
+- (void) didReceiveWithDeepLink:(OptimoveDeepLinkComponents *) deepLink {
+    if (deepLink != nil) {
         // Retrieve the targetted screen name
-        let screenName = deepLink.screenName
+        NSString* screenName = deepLink.screenName;
         // Retrieve the deep link Key-Value parameters
-        let deepLinkParams = deepLink.parameters
-        present(vc, animated: true)
+        NSDictionary* deepLinkParams = deepLink.parameters;
     }
 }
+
+@end
 ```
 
 ## API Changes
 
 ### configure function
-1. Changed `Optimove.sharedInstance.configure(for: info)` to `Optimove.configure(for: info)` 
+1. Changed `Optimove.sharedInstance` to `Optimove.shared`
+1. Changed `[Optimove.sharedInstance configureFor: info];` to `[Optimove configureFor: info];` 
 2. Removed `url` from `OptimoveTenantInfo`
 3. Changed `token` to `tenantToken` in `OptimoveTenantInfo`
 4. Changed `version` to `configName` in `OptimoveTenantInfo`
@@ -81,10 +97,10 @@ class ViewController: UIViewController, OptimoveDeepLinkCallback {
 
 > 1. If you use the Firebase SDK, add `FirebaseApp.configure()` before `Optimove.configure(for: info)`. Failing to do so when you use the Firebase SDK will cause unexpected behavior and even crashes.
 > Example Code Snippet:
-> ```swift
-> FirebaseApp.configure()
-> let info = OptimoveTenantInfo(tenantToken: "<YOUR_SDK_TENANT_TOKEN>", configName: "<YOUR_MOBILE_CONFIG_NAME>")
-> Optimove.configure(for: info)
+> ```objc
+> [FirebaseApp configure];
+> OptimoveTenantInfo *info = [[OptimoveTenantInfo alloc] initWithTenantToken: @"<YOUR_SDK_TENANT_TOKEN>" configName: @"<YOUR_MOBILE_CONFIG_NAME>"];
+> [Optimove configureFor: info];
 > ```
 > 2. Please request from the Product Integration team your `tenantToken` and `configName` dedicated to your Optimove instance.
 
@@ -94,26 +110,26 @@ class ViewController: UIViewController, OptimoveDeepLinkCallback {
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 
 - Change from 
-```swift
-Optimove.sharedInstance.set(userId:)
+```objc
+[Optimove.sharedInstance setWithIserId: @"<SDK_ID>"];
 ```
 
 - To:
-```swift
-Optimove.shared.setUserId("<MY_SDK_ID>")
+```objc
+[Optimove.shared setUserId: @"<SDK_ID>"];
 ```
 <br/>
 
 ### Update registerUser function
 Aligned all Web & Mobile SDK to use the same naming convention for this function.
 - Change from 
-```swift
-Optimove.sharedInstance.registerUser(email: "<MY_EMAIL>", userId: "<MY_SDK_ID>")
+```objc
+[Optimove.sharedInstance registerUserWithEmail: "<MY_EMAIL>" userId: "<MY_SDK_ID>"];
 ```
 
 - To:
-```swift
-Optimove.shared.registerUser(sdkId: "<MY_SDK_ID>", email: "<MY_EMAIL>")
+```objc
+[Optimove.shared registerUserWithSdkId: @"<SDK_ID>" email: @"<EMAIL>"]
 ```
 <br/>
 

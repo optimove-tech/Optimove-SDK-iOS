@@ -1,9 +1,9 @@
 import UserNotifications
 
 @objc public enum OptimoveDeviceRequirement: Int {
-    case internet           = 0
-    case advertisingId      = 1
-    case userNotification   = 2
+    case internet = 0
+    case advertisingId = 1
+    case userNotification = 2
 
     static let userDependentPermissions: [OptimoveDeviceRequirement] = [.userNotification, .advertisingId]
 }
@@ -11,7 +11,7 @@ import UserNotifications
 class OptimoveDeviceStateMonitor {
     private var deviceRequirementStatuses: [OptimoveDeviceRequirement: Bool] = [:]
 
-    private var deviceRequirementRequests: [OptimoveDeviceRequirement: [ResultBlockWithBool]] = [:] //cache any request from client
+    private var deviceRequirementRequests: [OptimoveDeviceRequirement: [ResultBlockWithBool]] = [:]  //cache any request from client
 
     func getStatus(of requiredService: OptimoveDeviceRequirement, completionHandler: @escaping ResultBlockWithBool) {
         guard let status = deviceRequirementStatuses[requiredService] else {
@@ -29,8 +29,10 @@ class OptimoveDeviceStateMonitor {
         completionHandler(status)
     }
 
-    func getStatus(of deviceRequirements: [OptimoveDeviceRequirement],
-                   completionHandler: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void ) {
+    func getStatus(
+        of deviceRequirements: [OptimoveDeviceRequirement],
+        completionHandler: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void
+    ) {
         var result = [OptimoveDeviceRequirement: Bool]()
         deviceRequirements.forEach { (req) in
             getStatus(of: req) { (status) in
@@ -47,7 +49,7 @@ class OptimoveDeviceStateMonitor {
     }
 
     private func getStatusFromFetcher(deviceRequirement: OptimoveDeviceRequirement) {
-        DeviceReuirementFetcherFactory.getInstance(requirement: deviceRequirement).fetch {(status) in
+        DeviceReuirementFetcherFactory.getInstance(requirement: deviceRequirement).fetch { (status) in
             OptiLoggerMessages.logRequirementtatus(deviceRequirement: deviceRequirement, status: status)
             self.deviceRequirementStatuses[deviceRequirement] = status
             self.deviceRequirementRequests[deviceRequirement]?.forEach { resultBlock in
