@@ -94,6 +94,7 @@ The `OptimoveDeepLinkComponents` Object has a new property called `parameters` t
 3. Changed `token` to `tenantToken` in `OptimoveTenantInfo`
 4. Changed `version` to `configName` in `OptimoveTenantInfo`
 5. Removed `hasFirebase: false,` and `useFirebaseMessaging: false` from `OptimoveTenantInfo` - No need to notify Optimove SDK about your internal 'Firebase' integration as this is done automatically for you.
+6. `OptimoveNotificationServiceExtension` is now initialized as follow: `[[OptimoveNotificationServiceExtension alloc] initWithAppBundleId:@"<YOUR_APP_TARGET_BUNDLE_ID>"];`
 
 > 1. If you use the Firebase SDK, add `FirebaseApp.configure()` before `Optimove.configure(for: info)`. Failing to do so when you use the Firebase SDK will cause unexpected behavior and even crashes.
 > Example Code Snippet:
