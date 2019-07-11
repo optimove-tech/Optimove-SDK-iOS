@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveSDK'
-  s.version          = '2.1.1'
+  s.version          = '2.1.2'
   s.summary          = 'Optimove SDK for Analytics and push notifications.'
 
   s.description      = <<-DESC
@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'FirebaseDynamicLinks', '4.0.0'
   s.dependency 'FirebaseMessaging', '4.0.2'
-  s.dependency 'OptiTrackCore', '1.3.0'
+  s.dependency 'OptiTrackCore', '1.3.1'
   
   s.frameworks = 'UIKit','SystemConfiguration','UserNotifications','AdSupport'
 end
