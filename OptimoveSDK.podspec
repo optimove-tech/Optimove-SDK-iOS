@@ -7,9 +7,9 @@ Pod::Spec.new do |s|
   This Pod includes the Optimove framework for reporting events and receive optimove push notifications
                        DESC
 
-  s.homepage         = 'https://github.com/optimove-tech/iOS-SDK-Integration-Guide'
+  s.homepage         = 'https://github.com/optimove-tech/Mobile-SDK-Integration-Guide/tree/master/iOS Integration Guide'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'optimove mobile developer' => 'optimove.develop.mobile@gmail.com' }
+  s.author           = { 'Mobius Solutions' => 'mobile@optimove.com' }
   s.source           = { :git => 'https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/Optimove'
   

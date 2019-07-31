@@ -1,6 +1,0 @@
-module OptimoveSDK {
-  umbrella header "OptimoveSDK-umbrella.h"
-
-  export *
-  module * { export * }
-}
