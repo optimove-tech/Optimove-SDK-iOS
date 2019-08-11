@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveNotificationServiceExtension'
-  s.version          = '2.1.0'
+  s.version          = '2.2.0'
   s.summary          = 'A notification extension framework for Optimove SDK'
   s.description      = <<-DESC
 This framework is an addition for the main OptimoveSDK in order to handle notifications
