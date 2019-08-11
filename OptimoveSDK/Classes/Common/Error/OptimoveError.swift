@@ -1,23 +1,58 @@
 import Foundation
 
-public enum OptimoveError: Error, Equatable {
-    //    case noError
+public enum OptimoveError: LocalizedError, Equatable {
     case error(String)
-    //    case noNetwork
+    case noStatusCode
     case statusCodeInvalid
-    //    case noPermissions
     case invalidEvent
-    //    case optipushServerNotAvailable
-    //    case optipushComponentUnavailable
-    //    case optiTrackComponentUnavailable
     case illegalParameterLength
     case mismatchParamterType
     case mandatoryParameterMissing
-    //    case cantStoreFileInLocalStorage
-    //    case canNotParseData
     case emptyData
-
     case badRequest
     case notFound
     case gone
+    case responseError(Response)
+
+    public var errorDescription: String? {
+        switch self {
+        case let .error(string):
+            return string
+        case .noStatusCode:
+            return "noStatusCode"
+        case .statusCodeInvalid:
+            return "statusCodeInvalid"
+        case .invalidEvent:
+            return "invalidEvent"
+        case .illegalParameterLength:
+            return "illegalParameterLength"
+        case .mismatchParamterType:
+            return "mismatchParamterType"
+        case .mandatoryParameterMissing:
+            return "mandatoryParameterMissing"
+        case .emptyData:
+            return "emptyData"
+        case .badRequest:
+            return "badRequest"
+        case .notFound:
+            return "notFound"
+        case .gone:
+            return "gone"
+        case let .responseError(response):
+            return "responseError: \(String(describing: response.errorDescription))"
+        }
+    }
+}
+
+public extension OptimoveError {
+    enum Response: LocalizedError {
+        case noData
+
+        public var errorDescription: String? {
+            switch self {
+            case .noData:
+                return "noData"
+            }
+        }
+    }
 }

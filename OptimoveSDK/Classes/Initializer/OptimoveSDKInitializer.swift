@@ -8,34 +8,46 @@
 
 import Foundation
 
-class OptimoveSDKInitializer {
+final class OptimoveSDKInitializer {
+
     // MARK: - Private Variables
+
+    private static let semaphore = DispatchSemaphore(value: 1)
+
+    private let configuratorFactory: ComponentConfiguratorFactory
+    private let warehouseProvider: EventsConfigWarehouseProvider
+    private let deviceStateMonitor: OptimoveDeviceStateMonitor
+    private let storage: OptimoveStorage
+    private let networking: RemoteConfigurationNetworking
 
     private var requirementStateDictionary: [OptimoveDeviceRequirement: Bool]
     private var completionHandler: ResultBlockWithBool?
-
+    private var didSucceed: ResultBlockWithBool?
     private var componentsCounter = 0
-    static let semaphore = DispatchSemaphore(value: 1)
-
-    var didSucceed: ResultBlockWithBool?
-
-    // MARK: - Constants
-
-    let deviceStateMonitor: OptimoveDeviceStateMonitor
 
     // MARK: - Initializers
-    init(deviceStateMonitor: OptimoveDeviceStateMonitor) {
+
+    init(deviceStateMonitor: OptimoveDeviceStateMonitor,
+         configuratorFactory: ComponentConfiguratorFactory,
+         warehouseProvider: EventsConfigWarehouseProvider,
+         storage: OptimoveStorage,
+         networking: RemoteConfigurationNetworking) {
         OptiLoggerMessages.logInitializtionOfInsitalizerStart()
         self.deviceStateMonitor = deviceStateMonitor
+        self.configuratorFactory = configuratorFactory
+        self.warehouseProvider = warehouseProvider
+        self.storage = storage
+        self.networking = networking
         requirementStateDictionary = [:]
         OptiLoggerMessages.logInitializerInitializtionFinish()
     }
 
     // MARK: - Internal API
+
     func initializeFromRemoteServer(didComplete: @escaping ResultBlockWithBool) {
         self.didSucceed = didComplete
 
-        deviceStateMonitor.getStatus(of: .internet) { (available) in
+        deviceStateMonitor.getStatus(for: .internet) { (available) in
             if available {
                 self.handleFetchConfigurationFromRemote()
             } else {
@@ -54,48 +66,46 @@ class OptimoveSDKInitializer {
     // MARK: - Private methods
 
     private func handleFetchConfigurationFromRemote() {
-        RemoteConfigurationHandler().get { (configurationData, error) in
-            guard error == nil else {
-                self.didSucceed!(false)
-                return
-            }
-            guard let data = configurationData else {
-                self.didSucceed?(false)
-                return
-            }
-            let decoder = JSONDecoder()
-            do {
-                let newConfig = try decoder.decode(TenantConfig.self, from: data)
-                self.updateEnvironment(newConfig)
-                self.saveConfigurationToLocalStorage(data)
+        networking.downloadConfigurations { (result) in
+            switch result {
+            case let .success(configurations):
+                self.updateEnvironment(configurations)
                 OptiLoggerMessages.logSetupComponentsFromRemote()
                 guard RunningFlagsIndication.isSdkNeedInitializing() else { return }
-                self.setupOptimoveComponents(from: newConfig)
-            } catch {
+                self.setupOptimoveComponents(from: configurations)
+            case let .failure(error):
+                OptiLoggerMessages.logError(error: error)
                 self.didSucceed?(false)
             }
         }
     }
-    
+
     private func updateEnvironment(_ config: TenantConfig) {
+        saveConfigurationToLocalStorage(config)
         updateLoggerStreamContainers(config)
+        setupStorage(from: config)
     }
     
     private func updateLoggerStreamContainers(_ config: TenantConfig) {
-        let newTenantId = config.siteID
+        guard let newTenantId = config.optitrackMetaData?.siteId else { return }
         OptiLoggerStreamsContainer.outputStreams.values
             .compactMap { $0 as? MutableOptiLoggerOutputStream }
             .forEach { $0.tenantId = newTenantId }
     }
 
     private func handleFetchConfigurationFromLocal() {
-        guard let version = Version,
-            OptimoveFileManager.isExist(file: version+".json", isInSharedContainer: true) else {
+        let isExist: Bool = {
+            if let version = storage.version, let isExist = try? storage.isExist(fileName: version + ".json", shared: true) {
+                return isExist
+            }
+            return false
+        }()
+        guard isExist else {
             OptiLoggerMessages.logConfigFileNotExist()
             //TODO: delete all configuration files because they are not relevant to current version anymore
             return
         }
-        LocalConfigurationHandler().get { (configurationData, error) in
+        LocalConfigurationHandler(storage: storage).get { (configurationData, error) in
             guard error == nil else {
                 OptiLoggerMessages.logLocalFetchFailure()
                 return
@@ -105,12 +115,11 @@ class OptimoveSDKInitializer {
                 OptiLoggerMessages.logIssueWithConfigFile()
                 return
             }
-
             let decoder = JSONDecoder()
             do {
                 let parsed = try decoder.decode(TenantConfig.self, from: data)
-
                 OptiLoggerMessages.logSetupCopmponentsFromLocalConfiguraitonStart()
+                self.setupStorage(from: parsed)
                 self.setupOptimoveComponents(from: parsed)
             } catch {
                 OptiLoggerMessages.logConfigurationParsingError()
@@ -118,10 +127,17 @@ class OptimoveSDKInitializer {
         }
     }
 
-    private func saveConfigurationToLocalStorage(_ data: Data) {
-        if let version = OptimoveUserDefaults.shared.version {
-            let fileName = version + ".json"
-            OptimoveFileManager.save(data: data, toFileName: fileName, isForSharedContainer: true)
+    private func saveConfigurationToLocalStorage(_ configuration: TenantConfig) {
+        guard let version = storage.version else { return }
+        let fileName = version + ".json"
+        do {
+            try storage.save(
+                data: configuration,
+                toFileName: fileName,
+                shared: true
+            )
+        } catch {
+            OptiLoggerMessages.logError(error: error)
         }
     }
 
@@ -143,6 +159,12 @@ class OptimoveSDKInitializer {
         return false
     }
 
+    private func setupStorage(from tenantConfig: TenantConfig) {
+        if let siteId = tenantConfig.optitrackMetaData?.siteId {
+            storage.set(value: siteId, key: .siteID)
+        }
+    }
+
     private func setupOptimoveComponents(from tenantConfig: TenantConfig) {
         guard RunningFlagsIndication.isSdkNeedInitializing() else {
             OptiLoggerMessages.logSdkAlreadyRunning()
@@ -155,21 +177,20 @@ class OptimoveSDKInitializer {
         }
         RunningFlagsIndication.isInitializerRunning = true
         OptimoveSDKInitializer.semaphore.signal()
-
         let group = DispatchGroup()
-        Optimove.shared.eventWarehouse = OptimoveEventConfigsWarehouse(from: tenantConfig)
+        warehouseProvider.setWarehouse(OptimoveEventConfigsWarehouseImpl(from: tenantConfig))
         group.enter()
-        OptiTrackConfigurator(component: Optimove.shared.optiTrack).configure(from: tenantConfig) { (succeed) in
+        configuratorFactory.createOptiTrackConfigurator().configure(from: tenantConfig) { (succeed) in
             RunningFlagsIndication.setComponentRunningFlag(component: .optiTrack, state: succeed)
             group.leave()
         }
         group.enter()
-        OptiPushConfigurator(component: Optimove.shared.optiPush).configure(from: tenantConfig) { (succeed) in
+        configuratorFactory.createOptiPushConfigurator().configure(from: tenantConfig) { (succeed) in
             RunningFlagsIndication.setComponentRunningFlag(component: .optiPush, state: succeed)
             group.leave()
         }
         group.enter()
-        RealTimeConfigurator(component: Optimove.shared.realTime).configure(from: tenantConfig) { (succeed) in
+        configuratorFactory.createRealTimeConfigurator().configure(from: tenantConfig) { (succeed) in
             RunningFlagsIndication.setComponentRunningFlag(component: .realtime, state: succeed)
             group.leave()
         }

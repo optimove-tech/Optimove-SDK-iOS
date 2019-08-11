@@ -1,20 +1,20 @@
-import SystemConfiguration
+import Reachability
 
-class NetworkCapabilitiesFetcher: Fetchable {
-    let reachability = Reachability(hostname: "google.com")
+final class NetworkCapabilitiesFetcher: Fetchable {
 
-    func fetch(completionHandler: @escaping ResultBlockWithBool) {
+    private let reachability = Reachability(hostname: "google.com")
 
+    /// NOTE: All closures are run on the main queue.
+    func fetch(completion: @escaping ResultBlockWithBool) {
         reachability?.whenReachable = { _ in
-            completionHandler(true)
+            completion(true)
         }
         reachability?.whenUnreachable = { _ in
-            completionHandler(false)
+            completion(false)
         }
         do {
             try reachability?.startNotifier()
-        } catch {
-        }
+        } catch { }
     }
 
     deinit {

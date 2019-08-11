@@ -9,138 +9,30 @@
 import FirebaseCore
 import FirebaseMessaging
 import Foundation
+import os.log
 
 protocol OptimoveMbaasRegistrationHandling: class {
     func handleRegistrationTokenRefresh(token: String)
 }
 
-class FirebaseInteractor: NSObject, OptipushServiceInfra {
-    // MARK: - Properties
+final class FirebaseInteractor: NSObject {
+
     weak var delegate: OptimoveMbaasRegistrationHandling?
     var appController: FirebaseOptions?
     var clientServiceOptions: FirebaseOptions?
-    var pushTopicsRegistrationEndpoint: String
 
-    // MARK: Constructors
-    override init() {
-        pushTopicsRegistrationEndpoint = ""
+    private var storage: OptimoveStorage
+    private let networking: FirebaseInteractorNetworking
+
+    init(storage: OptimoveStorage,
+         networking: FirebaseInteractorNetworking) {
+        self.storage = storage
+        self.networking = networking
     }
 
-    private func setupAppController(_ appController: FirebaseOptions) {
-        if FirebaseApp.app() != nil {
-            OptiLoggerMessages.logUserUseAutonomousFirebase(logModule: "OptiPush")
-            FirebaseApp.configure(
-                name: "appController",
-                options: appController
-            )
-            OptimoveUserDefaults.shared.isClientHasFirebase = true
-        } else {
-            OptiLoggerMessages.logUserNotUseOwnFirebase()
-            OptimoveUserDefaults.shared.isClientHasFirebase = false
-            FirebaseApp.configure(options: appController)
-        }
-    }
-
-    private func setupSdkController(_ clientServiceOptions: FirebaseOptions) {
-        FirebaseApp.configure(name: "sdkController", options: clientServiceOptions)
-    }
-
-    fileprivate func registerIfTokenChanged(updatedFcmToken: String?) {
-        let isTokenNew = updatedFcmToken != nil && OptimoveUserDefaults.shared.fcmToken != updatedFcmToken
-        if isTokenNew {
-            optimoveReceivedRegistrationToken(updatedFcmToken!)
-        }
-    }
-
-    func setupFirebase(
-        from firebaseMetaData: FirebaseProjectKeys,
-        clientFirebaseMetaData: ClientsServiceProjectKeys,
-        delegate: OptimoveMbaasRegistrationHandling,
-        pushTopicsRegistrationEndpoint: String
-    ) {
-        OptiLoggerMessages.logSetupFirebase()
-
-        self.pushTopicsRegistrationEndpoint = pushTopicsRegistrationEndpoint.last == "/"
-            ? pushTopicsRegistrationEndpoint : "\(pushTopicsRegistrationEndpoint)/"
-        self.delegate = delegate
-        self.appController = FirebaseOptionsBuilder().set(appId: firebaseMetaData.appid).set(
-            dbUrl: firebaseMetaData.dbUrl
-        ).set(projectId: firebaseMetaData.projectId).set(senderId: firebaseMetaData.senderId).set(
-            webApiKey: firebaseMetaData.webApiKey
-        ).set(storageBucket: firebaseMetaData.storageBucket).build()
-        self.clientServiceOptions = FirebaseOptionsBuilder().set(appId: clientFirebaseMetaData.appid).set(
-            dbUrl: clientFirebaseMetaData.dbUrl
-        ).set(projectId: clientFirebaseMetaData.projectId).set(senderId: clientFirebaseMetaData.senderId).set(
-            webApiKey: clientFirebaseMetaData.webApiKey
-        ).set(storageBucket: clientFirebaseMetaData.storageBucket).build()
-        guard let appController = self.appController,
-            let clientServiceOptions = self.clientServiceOptions
-        else { return }
-
-        setupAppController(appController)
-        setupSdkController(clientServiceOptions)
-
-        if let token = Messaging.messaging().fcmToken {
-            registerIfTokenChanged(updatedFcmToken: token)
-        } else {
-            NotificationCenter.default.addObserver(
-                forName: NSNotification.Name.MessagingRegistrationTokenRefreshed,
-                object: nil,
-                queue: .main
-            ) { (_) in
-                self.registerIfTokenChanged(updatedFcmToken: Messaging.messaging().fcmToken)
-            }
-        }
-        OptiLoggerMessages.logFirebaseStupFinished()
-    }
-
-    // MARK: - Private Methods
-    private func isNewFcmToken(receivedToken received: String) -> Bool {
-        if let oldFCM = OptimoveUserDefaults.shared.fcmToken {
-            return received != oldFCM
-        }
-        return true
-    }
 }
 
-extension FirebaseInteractor: MessagingDelegate {
-    func retreiveFcmToken(for senderId: String, completion: @escaping (String) -> Void) {
-        Messaging.messaging().retrieveFCMToken(forSenderID: senderId) { (token, error) in
-            guard error == nil else {
-                OptiLoggerMessages.logFcmTOkenRetreiveError(errorDescription: error.debugDescription)
-                return
-            }
-            if let token = token {
-                completion(token)
-            }
-        }
-    }
-
-    func optimoveReceivedRegistrationToken(_ fcmToken: String) {
-        if OptimoveUserDefaults.shared.isClientHasFirebase {
-            guard OptimoveUserDefaults.shared.defaultFcmToken != fcmToken else {
-                OptiLoggerMessages.logFcmTokenNotNew()
-                return
-            }
-            guard let optimoveAppSenderId = self.appController?.gcmSenderID else {
-                OptiLoggerMessages.logAppControllerNotConfigure()
-                return
-            }
-            OptiLoggerMessages.logOldFcmToken(token: String(describing: OptimoveUserDefaults.shared.fcmToken ?? ""))
-            retreiveFcmToken(for: optimoveAppSenderId) { [unowned self] (token) in
-                OptiLoggerMessages.logNewFcmToken(token: token)
-                self.delegate?.handleRegistrationTokenRefresh(token: token)
-                OptimoveUserDefaults.shared.defaultFcmToken = fcmToken
-            }
-        } else {
-            OptiLoggerMessages.logFcmTokenForAppController(fcmToken: fcmToken)
-            self.delegate?.handleRegistrationTokenRefresh(token: fcmToken)
-        }
-    }
-
-    private func getMongoTypeBundleId() -> String {
-        return Bundle.main.bundleIdentifier?.setAsMongoKey() ?? ""
-    }
+extension FirebaseInteractor: OptipushServiceInfra {
 
     func subscribeToTopics(didSucceed: ((Bool) -> Void)? = nil) {
         let dict = OptimoveTopicsUserDefaults.topics?.dictionaryRepresentation()
@@ -163,8 +55,72 @@ extension FirebaseInteractor: MessagingDelegate {
         }
     }
 
+    func setupFirebase(
+        from firebaseMetaData: FirebaseProjectKeys,
+        clientFirebaseMetaData: ClientsServiceProjectKeys,
+        delegate: OptimoveMbaasRegistrationHandling
+    ) {
+        OptiLoggerMessages.logSetupFirebase()
+
+        self.delegate = delegate
+        let appController = FirebaseOptionsBuilder(
+            provider: firebaseMetaData,
+            bundleID: try! Bundle.getApplicationNameSpace()
+        ).build()
+        self.appController = appController
+
+        let clientServiceOptions = FirebaseOptionsBuilder(
+            provider: clientFirebaseMetaData,
+            bundleID: try! Bundle.getApplicationNameSpace()
+            ).build()
+        self.clientServiceOptions = clientServiceOptions
+
+        setupAppController(appController)
+        setupSdkController(clientServiceOptions)
+
+        if let token = Messaging.messaging().fcmToken {
+            registerIfTokenChanged(updatedFcmToken: token)
+        } else {
+            NotificationCenter.default.addObserver(
+                forName: NSNotification.Name.MessagingRegistrationTokenRefreshed,
+                object: nil,
+                queue: .main
+            ) { (_) in
+                self.registerIfTokenChanged(updatedFcmToken: Messaging.messaging().fcmToken)
+            }
+        }
+        OptiLoggerMessages.logFirebaseStupFinished()
+    }
+
+    func handleRegistration(token: Data) {
+        Messaging.messaging().apnsToken = token
+    }
+
+    func optimoveReceivedRegistrationToken(_ fcmToken: String) {
+        if storage.isClientHasFirebase {
+            guard storage.defaultFcmToken != fcmToken else {
+                OptiLoggerMessages.logFcmTokenNotNew()
+                OptiLoggerMessages.logFcmTokenForAppController(fcmToken: fcmToken)
+                return
+            }
+            guard let optimoveAppSenderId = self.appController?.gcmSenderID else {
+                OptiLoggerMessages.logAppControllerNotConfigure()
+                return
+            }
+            OptiLoggerMessages.logOldFcmToken(token: String(describing: storage.fcmToken ?? ""))
+            retreiveFcmToken(for: optimoveAppSenderId) { [weak self] (token) in
+                OptiLoggerMessages.logNewFcmToken(token: token)
+                self?.delegate?.handleRegistrationTokenRefresh(token: token)
+                self?.storage.defaultFcmToken = fcmToken
+            }
+        } else {
+            OptiLoggerMessages.logFcmTokenForAppController(fcmToken: fcmToken)
+            self.delegate?.handleRegistrationTokenRefresh(token: fcmToken)
+        }
+    }
+
     func subscribeToTopic(topic: String, didSucceed: ((Bool) -> Void)? = nil) {
-        if !OptimoveUserDefaults.shared.isClientHasFirebase {
+        if !storage.isClientHasFirebase {
             Messaging.messaging().subscribe(toTopic: topic) { (error) in
                 if error != nil {
                     didSucceed?(false)
@@ -173,24 +129,28 @@ extension FirebaseInteractor: MessagingDelegate {
                 }
             }
         } else {
-            guard let fcm = OptimoveUserDefaults.shared.fcmToken else { return }
-            let endPoint = pushTopicsRegistrationEndpoint + "registerClientToTopics"
-            let urlEndpoint = URL(string: endPoint)!
-            let json = buildTopicRegistrationJson(fcm, [topic])
-            NetworkManager.post(toUrl: urlEndpoint, json: json) { (_, error) in
-                guard error == nil else {
+            networking.subscribe(topic: topic) { (result) in
+                switch result {
+                case .success(_):
+                    os_log(
+                        "Subscribed topic '%{private}@' successful.",
+                        log: OSLog.firebaseInteractor,
+                        type: .info,
+                        topic
+                    )
+                    OptimoveTopicsUserDefaults.topics?.set(true, forKey: "optimove_\(topic)")
+                    didSucceed?(true)
+                case let .failure(error):
+                    OptiLoggerMessages.logError(error: error)
                     OptimoveTopicsUserDefaults.topics?.set(false, forKey: "optimove_\(topic)")
                     didSucceed?(false)
-                    return
                 }
-                OptimoveTopicsUserDefaults.topics?.set(true, forKey: "optimove_\(topic)")
-                didSucceed?(true)
             }
         }
     }
 
     func unsubscribeFromTopic(topic: String, didSucceed: ((Bool) -> Void)? = nil) {
-        if !OptimoveUserDefaults.shared.isClientHasFirebase {
+        if !storage.isClientHasFirebase {
             Messaging.messaging().unsubscribe(fromTopic: topic) { (error) in
                 if error != nil {
                     didSucceed?(false)
@@ -199,30 +159,91 @@ extension FirebaseInteractor: MessagingDelegate {
                 }
             }
         } else {
-            guard let fcm = OptimoveUserDefaults.shared.fcmToken else { return }
-            let endPoint = pushTopicsRegistrationEndpoint + "unregisterClientFromTopics"
-            let urlEndpoint = URL(string: endPoint)!
-            let json = buildTopicRegistrationJson(fcm, [topic])
-
-            NetworkManager.post(toUrl: urlEndpoint, json: json) { (_, error) in
-                guard error == nil else {
+            networking.unsubscribe(topic: topic) { (result) in
+                switch result {
+                case .success(_):
+                    os_log(
+                        "Unsubscribed topic '%{private}@' successful.",
+                        log: OSLog.firebaseInteractor,
+                        type: .info,
+                        topic
+                    )
+                    OptimoveTopicsUserDefaults.topics?.removeObject(forKey: "optimove_\(topic)")
+                    didSucceed?(true)
+                case let .failure(error):
+                    OptiLoggerMessages.logError(error: error)
                     didSucceed?(false)
-                    return
                 }
-                OptimoveTopicsUserDefaults.topics?.removeObject(forKey: "optimove_\(topic)")
-                didSucceed?(true)
             }
         }
     }
 
-    func handleRegistration(token: Data) {
-        Messaging.messaging().apnsToken = token
+}
+
+extension FirebaseInteractor: MessagingDelegate {
+
+//    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+//
+//    }
+//
+//    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
+//
+//    }
+
+}
+
+private extension FirebaseInteractor {
+
+    func setupAppController(_ appController: FirebaseOptions) {
+        if FirebaseApp.app() != nil {
+            OptiLoggerMessages.logUserUseAutonomousFirebase(logModule: "OptiPush")
+            FirebaseApp.configure(
+                name: "appController",
+                options: appController
+            )
+            storage.isClientHasFirebase = true
+        } else {
+            OptiLoggerMessages.logUserNotUseOwnFirebase()
+            storage.isClientHasFirebase = false
+            FirebaseApp.configure(options: appController)
+        }
     }
 
-    private func buildTopicRegistrationJson(_ fcmToken: String, _ topics: [String]) -> Data {
-        var requestJsonData = [String: Any]()
-        requestJsonData[OptimoveKeys.Topics.fcmToken.rawValue] = fcmToken
-        requestJsonData[OptimoveKeys.Topics.topics.rawValue] = topics
-        return try! JSONSerialization.data(withJSONObject: requestJsonData, options: .prettyPrinted)
+    func setupSdkController(_ clientServiceOptions: FirebaseOptions) {
+        FirebaseApp.configure(name: "sdkController", options: clientServiceOptions)
     }
+
+    func registerIfTokenChanged(updatedFcmToken: String?) {
+        let isTokenNew = updatedFcmToken != nil && storage.fcmToken != updatedFcmToken
+        if isTokenNew {
+            optimoveReceivedRegistrationToken(updatedFcmToken!)
+        }
+    }
+
+    func isNewFcmToken(receivedToken received: String) -> Bool {
+        if let oldFCM = storage.fcmToken {
+            return received != oldFCM
+        }
+        return true
+    }
+
+    func retreiveFcmToken(for senderId: String, completion: @escaping (String) -> Void) {
+        Messaging.messaging().retrieveFCMToken(forSenderID: senderId) { (token, error) in
+            guard error == nil else {
+                OptiLoggerMessages.logFcmTOkenRetreiveError(errorDescription: error.debugDescription)
+                return
+            }
+            if let token = token {
+                completion(token)
+            }
+        }
+    }
+
+    func getMongoTypeBundleId() -> String {
+        return Bundle.main.bundleIdentifier?.setAsMongoKey() ?? ""
+    }
+}
+
+extension OSLog {
+    static let firebaseInteractor = OSLog(subsystem: subsystem, category: "firebase_interactor")
 }

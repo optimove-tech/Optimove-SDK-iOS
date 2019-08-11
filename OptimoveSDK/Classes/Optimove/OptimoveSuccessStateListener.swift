@@ -11,7 +11,7 @@ public protocol OptimoveSuccessStateListener: class {
     )
 }
 
-class OptimoveSuccessStateDelegateWrapper {
+final class OptimoveSuccessStateDelegateWrapper {
     var observer: OptimoveSuccessStateDelegate
 
     init(observer: OptimoveSuccessStateDelegate) {

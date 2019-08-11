@@ -2,6 +2,22 @@ import Foundation
 
 final class OptiLoggerMessages {
 
+    static func logError(
+        fileName: String = #file,
+        methodName: String = #function,
+        logModule: String? = nil,
+        error: Error
+        ) {
+
+        OptiLoggerStreamsContainer.log(
+            level: .error,
+            fileName: fileName,
+            methodName: methodName,
+            logModule: logModule,
+            error.localizedDescription
+        )
+    }
+
     //MARK: SDK Initialization
 
     static func logPathToRemoteConfiguration(
@@ -430,21 +446,6 @@ final class OptiLoggerMessages {
 
     //MARK: Realtime
 
-    static func logRealtimeDisable(
-        eventName: String,
-        fileName: String = #file,
-        methodName: String = #function,
-        logModule: String? = nil
-    ) {
-        OptiLoggerStreamsContainer.log(
-            level: .warn,
-            fileName: fileName,
-            methodName: methodName,
-            logModule: logModule,
-            "Attempt to report event \(eventName) when Realtime was not enabled. Maybe check the configurations?"
-        )
-    }
-
     static func logOfflineStatusForRealtime(
         eventName: String,
         fileName: String = #file,
@@ -544,36 +545,6 @@ final class OptiLoggerMessages {
             methodName: methodName,
             logModule: logModule,
             "Device is offline, skip realtime event set email"
-        )
-    }
-
-    static func logRealtimeSetUserIdReport(
-        json: String,
-        fileName: String = #file,
-        methodName: String = #function,
-        logModule: String? = "RealTime"
-    ) {
-        OptiLoggerStreamsContainer.log(
-            level: .debug,
-            fileName: fileName,
-            methodName: methodName,
-            logModule: logModule,
-            "report set user id to realtime with JSON: \(json)"
-        )
-    }
-
-    static func logRealtimeSetEmailReport(
-        json: String,
-        fileName: String = #file,
-        methodName: String = #function,
-        logModule: String? = "RealTime"
-    ) {
-        OptiLoggerStreamsContainer.log(
-            level: .debug,
-            fileName: fileName,
-            methodName: methodName,
-            logModule: logModule,
-            "report set email to realtime with JSON: \(json)"
         )
     }
 
@@ -819,18 +790,7 @@ final class OptiLoggerMessages {
             fileName: fileName,
             methodName: methodName,
             logModule: logModule,
-            "events file could not be saved"
-        )
-    }
-
-    static func logOptiTrackDisable(fileName: String = #file, methodName: String = #function, logModule: String? = nil)
-    {
-        OptiLoggerStreamsContainer.log(
-            level: .warn,
-            fileName: fileName,
-            methodName: methodName,
-            logModule: logModule,
-            "Tried to send custom event while optitrack module is not enable"
+            "Events file could not be saved."
         )
     }
 
@@ -873,7 +833,7 @@ final class OptiLoggerMessages {
             fileName: fileName,
             methodName: methodName,
             logModule: logModule,
-            "events file could not be saved"
+            "Events file could not be saved."
         )
     }
 
@@ -1126,7 +1086,7 @@ final class OptiLoggerMessages {
             fileName: fileName,
             methodName: methodName,
             logModule: logModule,
-            "old fcm: \(token)"
+            "🚀 FCM token old: \(token)"
         )
     }
 
@@ -1141,7 +1101,7 @@ final class OptiLoggerMessages {
             fileName: fileName,
             methodName: methodName,
             logModule: logModule,
-            "new fcm: \(token)"
+            "🚀 FCM token new: \(token)"
         )
     }
 
@@ -1156,7 +1116,7 @@ final class OptiLoggerMessages {
             fileName: fileName,
             methodName: methodName,
             logModule: logModule,
-            "fcm for app controller:\(fcmToken)"
+            "🚀 FCM token for app controller: \(fcmToken)"
         )
     }
 
@@ -1188,21 +1148,6 @@ final class OptiLoggerMessages {
         )
     }
 
-    static func logMbaasRequestEncodeError(
-        mbaasRequestBody: String,
-        fileName: String = #file,
-        methodName: String = #function,
-        logModule: String? = nil
-    ) {
-        OptiLoggerStreamsContainer.log(
-            level: .error,
-            fileName: fileName,
-            methodName: methodName,
-            logModule: logModule,
-            "Could not encode user push token: \(mbaasRequestBody)"
-        )
-    }
-
     static func logMbaasRequestUrlEncodeError(
         fileName: String = #file,
         methodName: String = #function,
@@ -1214,21 +1159,6 @@ final class OptiLoggerMessages {
             methodName: methodName,
             logModule: logModule,
             "could not locate url for mbaas operation"
-        )
-    }
-
-    static func logSendRetryTo(
-        path: String,
-        fileName: String = #file,
-        methodName: String = #function,
-        logModule: String? = nil
-    ) {
-        OptiLoggerStreamsContainer.log(
-            level: .debug,
-            fileName: fileName,
-            methodName: methodName,
-            logModule: logModule,
-            "send retry request to :\(path)"
         )
     }
 
@@ -1859,20 +1789,6 @@ final class OptiLoggerMessages {
         )
     }
 
-    static func logCustomerIdNilError(
-        fileName: String = #file,
-        methodName: String = #function,
-        logModule: String? = nil
-    ) {
-        OptiLoggerStreamsContainer.log(
-            level: .error,
-            fileName: fileName,
-            methodName: methodName,
-            logModule: logModule,
-            "customer id nil"
-        )
-    }
-
     static func logDeviceRequirementNil(
         requiredService: OptimoveDeviceRequirement,
         fileName: String = #file,
@@ -1884,7 +1800,7 @@ final class OptiLoggerMessages {
             fileName: fileName,
             methodName: methodName,
             logModule: logModule,
-            "deviceRequirementStatuses[\(requiredService)] returns nil"
+            "deviceRequirementStatuses[\(requiredService.description)] returns nil"
         )
     }
 
@@ -1899,7 +1815,7 @@ final class OptiLoggerMessages {
             fileName: fileName,
             methodName: methodName,
             logModule: logModule,
-            "register closure to receive \(requiredService) status"
+            "register closure to receive \(requiredService.description) status"
         )
     }
 
@@ -1914,7 +1830,7 @@ final class OptiLoggerMessages {
             fileName: fileName,
             methodName: methodName,
             logModule: logModule,
-            "get status from fetcher of \(requiredService)"
+            "get status from fetcher of \(requiredService.description)"
         )
     }
 
@@ -1930,7 +1846,7 @@ final class OptiLoggerMessages {
             fileName: fileName,
             methodName: methodName,
             logModule: logModule,
-            "\(deviceRequirement) status is : \(status)"
+            "\(deviceRequirement.description) status is : \(status)"
         )
     }
 

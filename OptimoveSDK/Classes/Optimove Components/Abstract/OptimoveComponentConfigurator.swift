@@ -4,7 +4,6 @@ protocol OptimoveComponentInitializationProtocol {
     associatedtype T: OptimoveComponent
     init(component: T)
 
-    func setEnabled(from tenantConfig: TenantConfig)
     func getRequirements() -> [OptimoveDeviceRequirement]
     func executeInternalConfigurationLogic(from tenantConfig: TenantConfig, didComplete: @escaping ResultBlockWithBool)
 }
@@ -17,19 +16,15 @@ class OptimoveComponentConfigurator<T: OptimoveComponent>: OptimoveComponentInit
     }
 
     func configure(from tenantConfig: TenantConfig, didComplete: @escaping ResultBlockWithBool) {
-        setEnabled(from: tenantConfig)
 
         let requirements = getRequirements()
-        component.deviceStateMonitor.getStatus(of: requirements) { _ in
+        // TODO: Remove deprecated method and be off from the Main thread.
+        component.deviceStateMonitor.getStatuses(for: requirements) { _ in
             DispatchQueue.main.async {
                 self.executeInternalConfigurationLogic(from: tenantConfig, didComplete: didComplete)
                 self.component.performInitializationOperations()
             }
         }
-    }
-
-    func setEnabled(from tenantConfig: TenantConfig) {
-        fatalError("Not Implemented")
     }
 
     func getRequirements() -> [OptimoveDeviceRequirement] {

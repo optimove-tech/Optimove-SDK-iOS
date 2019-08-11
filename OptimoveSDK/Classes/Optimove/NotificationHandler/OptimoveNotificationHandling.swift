@@ -2,8 +2,8 @@
 //  OptimoveNotificationHandling.swift
 //  OptimoveSDK
 
-import Foundation
 import UserNotifications
+import UIKit
 
 protocol OptimoveNotificationHandling {
     func didReceiveRemoteNotification(

@@ -6,10 +6,10 @@ import Foundation
 
 @objc public enum LogLevel: Int, Codable, Comparable {
 
-    case debug
-    case info
-    case warn
-    case error
+    case debug = 0
+    case info = 1
+    case warn = 2
+    case error = 3
 
     enum CodingKeys: String, CodingKey {
         case debug
@@ -34,6 +34,21 @@ import Foundation
         case .info: return "info"
         case .warn: return "warn"
         case .error: return "error"
+        }
+    }
+
+    init?(string: String) {
+        switch string {
+        case LogLevel.debug.name:
+            self = .debug
+        case LogLevel.info.name:
+            self = .info
+        case LogLevel.warn.name:
+            self = .warn
+        case LogLevel.error.name:
+            self = .error
+        default:
+            return nil
         }
     }
 

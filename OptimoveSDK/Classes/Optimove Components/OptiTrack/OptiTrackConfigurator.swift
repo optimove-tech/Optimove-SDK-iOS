@@ -1,13 +1,22 @@
 import Foundation
-import OptiTrackCore
 
-class OptiTrackConfigurator: OptimoveComponentConfigurator<OptiTrack> {
-    required init(component: OptiTrack) {
+final class OptiTrackConfigurator: OptimoveComponentConfigurator<OptiTrack> {
+
+    private let metaDataProvider: MetaDataProvider<OptitrackMetaData>
+    private let storage: OptimoveStorage
+
+    required init(
+        component: OptiTrack,
+        metaDataProvider: MetaDataProvider<OptitrackMetaData>,
+        storage: OptimoveStorage) {
+        self.metaDataProvider = metaDataProvider
+        self.storage = storage
         super.init(component: component)
     }
 
-    override func setEnabled(from tenantConfig: TenantConfig) {
-        component.isEnable = tenantConfig.enableOptitrack
+    @available(*, unavailable, renamed: "init(component:metaDataProvider:storage:)")
+    required init(component: T) {
+        fatalError()
     }
 
     override func getRequirements() -> [OptimoveDeviceRequirement] {
@@ -24,29 +33,19 @@ class OptiTrackConfigurator: OptimoveComponentConfigurator<OptiTrack> {
             didComplete(false)
             return
         }
-        setMetaData(optitrackMetadata)
-        storeSiteIdInLocalStorage()
-        setupTracker()
-        OptiLoggerMessages.logOptitrackConfigurationSuccess()
-        didComplete(true)
-    }
-
-    private func setMetaData(_ optitrackMetaData: OptitrackMetaData) {
-        component.metaData = optitrackMetaData
-    }
-
-    private func storeSiteIdInLocalStorage() {
-        OptimoveUserDefaults.shared.siteID = component.metaData.siteId
-    }
-
-    private func setupTracker() {
-        if let url = URL.init(string: component.metaData.optitrackEndpoint) {
-            component.tracker = MatomoTracker(
-                siteId: String(component.metaData.siteId),
-                baseURL: url,
-                queue: component.queue,
-                userAgent: nil
-            )
+        do {
+            updateMetaData(optitrackMetadata)
+            try component.setupTracker()
+            OptiLoggerMessages.logOptitrackConfigurationSuccess()
+            didComplete(true)
+        } catch {
+            OptiLoggerMessages.logError(error: error)
+            didComplete(false)
         }
     }
+
+    private func updateMetaData(_ optitrackMetaData: OptitrackMetaData) {
+        metaDataProvider.setMetaData(optitrackMetaData)
+    }
+
 }

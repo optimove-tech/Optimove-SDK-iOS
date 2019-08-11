@@ -1,13 +1,21 @@
 import Foundation
 
-class DeviceReuirementFetcherFactory {
-    static var dictionary: [OptimoveDeviceRequirement: Fetchable] = [
-        OptimoveDeviceRequirement.advertisingId: AdvertisingIdPermissionFetcher(),
-        .userNotification: NotificationPermissionFetcher(),
-        OptimoveDeviceRequirement.internet: NetworkCapabilitiesFetcher()
-    ]
+protocol DeviceRequirementFetcherFactory {
+    func createFetcher(for: OptimoveDeviceRequirement) -> Fetchable
+}
 
-    static func getInstance(requirement: OptimoveDeviceRequirement) -> Fetchable! {
-        return dictionary[requirement]
+final class DeviceRequirementFetcherFactoryImpl { }
+
+extension DeviceRequirementFetcherFactoryImpl: DeviceRequirementFetcherFactory {
+    
+    func createFetcher(for requirement: OptimoveDeviceRequirement) -> Fetchable {
+        switch requirement {
+        case .advertisingId:
+            return AdvertisingIdPermissionFetcher()
+        case .userNotification:
+            return NotificationPermissionFetcher()
+        case .internet:
+            return NetworkCapabilitiesFetcher()
+        }
     }
 }

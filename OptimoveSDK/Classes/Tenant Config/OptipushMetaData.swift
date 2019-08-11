@@ -8,10 +8,10 @@
 
 import Foundation
 
-struct OptipushMetaData: Decodable {
-    let registrationServiceRegistrationEndPoint: String
-    let registrationServiceOtherEndPoint: String
-    let pushTopicsRegistrationEndpoint: String
+struct OptipushMetaData: Codable, MetaData {
+    let registrationServiceRegistrationEndPoint: URL
+    let registrationServiceOtherEndPoint: URL
+    let pushTopicsRegistrationEndpoint: URL
     let enableAdvertisingIdReport: Bool?
 
     enum CodingKeys: String, CodingKey {

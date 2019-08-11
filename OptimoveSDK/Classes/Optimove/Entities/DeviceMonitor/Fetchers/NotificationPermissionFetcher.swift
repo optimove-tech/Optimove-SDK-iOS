@@ -1,13 +1,14 @@
 import Foundation
 import UserNotifications
 
-class NotificationPermissionFetcher: Fetchable {
-    func fetch(completionHandler: @escaping ResultBlockWithBool) {
+final class NotificationPermissionFetcher: Fetchable {
+
+    func fetch(completion: @escaping ResultBlockWithBool) {
         UNUserNotificationCenter.current().getNotificationSettings { (settings) in
             if settings.authorizationStatus == .authorized || settings.authorizationStatus == .notDetermined {
-                completionHandler(true)
+                completion(true)
             } else {
-                completionHandler(false)
+                completion(false)
             }
         }
     }

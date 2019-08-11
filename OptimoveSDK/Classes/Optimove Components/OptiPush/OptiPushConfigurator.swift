@@ -1,13 +1,19 @@
 import Foundation
 
-class OptiPushConfigurator: OptimoveComponentConfigurator<OptiPush> {
+final class OptiPushConfigurator: OptimoveComponentConfigurator<OptiPush> {
 
-    required init(component: OptiPush) {
+    private let metaDataProvider: MetaDataProvider<OptipushMetaData>
+
+    required init(
+        component: OptiPush,
+        metaDataProvider: MetaDataProvider<OptipushMetaData>) {
+        self.metaDataProvider = metaDataProvider
         super.init(component: component)
     }
 
-    override func setEnabled(from tenantConfig: TenantConfig) {
-        component.isEnable = tenantConfig.enableOptipush
+    @available(*, unavailable, renamed: "init(component:metaDataProvider:)")
+    required init(component: T) {
+        fatalError("init(component:) has not been implemented. Use insted init(component:metaDataProvider:)")
     }
 
     override func getRequirements() -> [OptimoveDeviceRequirement] {
@@ -27,7 +33,7 @@ class OptiPushConfigurator: OptimoveComponentConfigurator<OptiPush> {
             didComplete(false)
             return
         }
-        setMetaData(optipushMetadata)
+        metaDataProvider.setMetaData(optipushMetadata)
         component.setup(
             firebaseMetaData: firebaseProjectKeys,
             clientFirebaseMetaData: clientsServiceProjectKeys,
@@ -35,10 +41,6 @@ class OptiPushConfigurator: OptimoveComponentConfigurator<OptiPush> {
         )
         OptiLoggerMessages.logOptipushConfigurationSuccess()
         didComplete(true)
-    }
-
-    private func setMetaData(_ optipushMetadata: OptipushMetaData) {
-        component.metaData = optipushMetadata
     }
 
 }

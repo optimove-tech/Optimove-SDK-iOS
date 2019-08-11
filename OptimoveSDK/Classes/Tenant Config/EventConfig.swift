@@ -1,14 +1,8 @@
-//
-//  OptimoveEvent.swift
-//  iOS-SDK
-//
-//  Created by Mobile Developer Optimove on 04/09/2017.
-//  Copyright © 2017 Optimove. All rights reserved.
-//
+//  Copyright © 2017 Optimove.
 
 import Foundation
 
-struct OptimoveEventConfig: Decodable {
+struct EventsConfig: Codable {
     let id: Int
     let supportedOnOptitrack: Bool
     let supportedOnRealTime: Bool

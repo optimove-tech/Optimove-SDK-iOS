@@ -4,13 +4,9 @@ enum OptimoveComponentType {
     case optiPush
     case optiTrack
     case realtime
-
-    static let numberOfTypes = 3
 }
 
-class RunningFlagsIndication {
-
-    static let queue = DispatchQueue(label: "com.optimove.sdkState")
+final class RunningFlagsIndication {
 
     static var isSdkRunning = false
 
@@ -27,14 +23,5 @@ class RunningFlagsIndication {
 
     static func setComponentRunningFlag(component: OptimoveComponentType, state: Bool) {
         componentsRunningStates[component] = state
-    }
-
-    static func isAllComponentsFaulted() -> Bool {
-        for (_, running) in componentsRunningStates {
-            if running {
-                return false
-            }
-        }
-        return true
     }
 }

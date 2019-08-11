@@ -1,14 +1,26 @@
 import Foundation
 
-class FirebaseProjectKeys: FirebaseKeys {
-    var appid: String
+final class FirebaseProjectKeys: BaseFirebaseKeys, FirebaseKeys {
+    let appid: String
 
     required init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        let appIds = try values.nestedContainer(keyedBy: CodingKeys.self, forKey: .appIds)
-        let ios = try appIds.nestedContainer(keyedBy: CK.self, forKey: .ios)
-        let key = Bundle.main.bundleIdentifier!
-        appid = try ios.decode(String.self, forKey: CK(stringValue: key)!)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let appIDsContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .appIds)
+        let iosContainer = try appIDsContainer.nestedContainer(keyedBy: RuntimeCodingKey.self, forKey: .ios)
+        let bundleIdentifierKey: String = try cast(Bundle.main.bundleIdentifier)
+        let codingKey: RuntimeCodingKey = try cast(RuntimeCodingKey(stringValue: bundleIdentifierKey))
+        appid = try iosContainer.decode(String.self, forKey: codingKey)
         try super.init(from: decoder)
     }
+
+    override func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        var appIDsContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .appIds)
+        var iosContainer = appIDsContainer.nestedContainer(keyedBy: RuntimeCodingKey.self, forKey: .ios)
+        let bundleIdentifierKey: String = try cast(Bundle.main.bundleIdentifier)
+        let codingKey: RuntimeCodingKey = try cast(RuntimeCodingKey(stringValue: bundleIdentifierKey))
+        try iosContainer.encode(appid, forKey: codingKey)
+        try super.encode(to: encoder)
+    }
+
 }

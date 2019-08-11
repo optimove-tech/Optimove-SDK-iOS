@@ -1,13 +1,18 @@
 import Foundation
 
-class LocalConfigurationHandler {
+final class LocalConfigurationHandler {
+
+    private let storage: OptimoveStorage
+
+    init(storage: OptimoveStorage) {
+        self.storage = storage
+    }
+
     func get(completionHandler: @escaping ResultBlockWithData) {
-
-        guard let fileName = OptimoveUserDefaults.shared.version else { return }
-
+        guard let fileName = storage.version else { return }
         let configFileName = fileName + ".json"
 
-        if let configData = OptimoveFileManager.load(file: configFileName, isInSharedContainer: true) {
+        if let configData = try? storage.load(fileName: configFileName, shared: true) {
             completionHandler(configData, nil)
         } else {
             completionHandler(nil, .emptyData)

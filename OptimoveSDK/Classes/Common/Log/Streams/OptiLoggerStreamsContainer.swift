@@ -1,4 +1,11 @@
+import Foundation
+
 @objc public final class OptiLoggerStreamsContainer: NSObject {
+
+    private struct Constants {
+        static let delimiter = "/"
+        static let placeholder = ""
+    }
 
     static var outputStreams: [ObjectIdentifier: OptiLoggerOutputStream] = [:]
 
@@ -15,11 +22,11 @@
         logQueue.async {
             outputStreams.values.forEach {
                 if $0.isVisibleToClient {
-                    if EnvVars.minLogLevelToShow <= level {
+                    if SDK.logLevelToShow <= level {
                         $0.log(
                             level: level,
-                            fileName: fileName?.components(separatedBy: "/").last ?? "",
-                            methodName: methodName ?? "",
+                            fileName: fileName?.components(separatedBy: Constants.delimiter).last ?? Constants.placeholder,
+                            methodName: methodName ?? Constants.placeholder,
                             logModule: logModule,
                             message: message
                         )
@@ -27,8 +34,8 @@
                 } else {
                     $0.log(
                         level: level,
-                        fileName: fileName?.components(separatedBy: "/").last ?? "",
-                        methodName: methodName ?? "",
+                        fileName: fileName?.components(separatedBy: Constants.delimiter).last ?? Constants.placeholder,
+                        methodName: methodName ?? Constants.placeholder,
                         logModule: logModule,
                         message: message
                     )

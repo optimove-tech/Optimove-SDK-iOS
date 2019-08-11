@@ -9,11 +9,12 @@
 import UIKit
 
 struct OptimoveKeys {
-    enum Registration: String {
+
+    enum Registration: String, CodingKey {
         case tenantID = "tenant_id"
         case customerID = "public_customer_id"
         case visitorID = "visitor_id"
-        case iOSToken = "ios_token"
+        case iosToken = "ios_token"
         case isVisitor = "is_visitor"
         case isConversion = "is_conversion"
         case origVisitorID = "orig_visitor_id"
@@ -63,10 +64,7 @@ struct OptimoveKeys {
         case optipushOptIn = "optipush_opt_in"
         case optipushOptOut = "optipush_opt_out"
         case setUserAgent = "user_agent_header_event"
-        case userAgentHeader1 = "user_agent_header1"
-        case userAgentHeader2 = "user_agent_header2"
         case email = "email"
-
     }
 
     enum Notification: String {
@@ -86,16 +84,12 @@ struct OptimoveKeys {
         case command = "command"
     }
 
-    enum Topics: String {
-        case fcmToken = "fcmToken"
-        case topics = "topics"
-    }
-
     struct AddtionalAttributesValues {
         static let eventDeviceType = "Mobile"
         static let eventPlatform = "iOS"
-        static let eventOs = "iOS \(ProcessInfo().operatingSystemVersionOnlyString)"
+        static let eventOs = "iOS \(operatingSystemVersionOnlyString)"
         static let eventNativeMobile = true
+        private static let operatingSystemVersionOnlyString = ProcessInfo().operatingSystemVersionOnlyString
     }
 
     struct AdditionalAttributesKeys {
@@ -106,51 +100,7 @@ struct OptimoveKeys {
     }
 }
 
+/// The counterpart constant with OptimoveNotificationServiceExtension.
 struct NotificationCategoryIdentifiers {
     static let dismiss = "dismiss"
-}
-
-enum HttpHeader: String {
-    case contentType = "Content-Type"
-    case userAgent = "User-Agent"
-}
-
-enum HttpMethod: String {
-    case get = "GET"
-    case post = "POST"
-    case head = "HEAD"
-    case put = "PUT"
-    case delete = "DELETE"
-    case options = "OPTIONS"
-    case connect = "CONNECT"
-}
-
-enum MediaType: String {
-    case json = "application/json"
-}
-
-var TenantID: Int? {
-    return OptimoveUserDefaults.shared.siteID
-}
-var Version: String? {
-    return OptimoveUserDefaults.shared.version
-}
-var CustomerID: String? {
-    return OptimoveUserDefaults.shared.customerID
-}
-var UserEmail: String? {
-    return OptimoveUserDefaults.shared.userEmail
-}
-var VisitorID: String {
-    return OptimoveUserDefaults.shared.visitorID!
-}
-
-var InitialVisitorID: String {
-    return OptimoveUserDefaults.shared.initialVisitorId!
-}
-var DeviceID: String {
-    return SHA1.hexString(from: UIDevice.current.identifierForVendor?.uuidString ?? "")!.replacingOccurrences(
-        of: " ",
-        with: ""
-    )
 }

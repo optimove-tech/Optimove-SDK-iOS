@@ -1,83 +1,119 @@
 import UserNotifications
 
-@objc public enum OptimoveDeviceRequirement: Int {
+public enum OptimoveDeviceRequirement: Int, CaseIterable, CustomStringConvertible {
     case internet = 0
     case advertisingId = 1
     case userNotification = 2
 
     static let userDependentPermissions: [OptimoveDeviceRequirement] = [.userNotification, .advertisingId]
-}
-
-class OptimoveDeviceStateMonitor {
-    private var deviceRequirementStatuses: [OptimoveDeviceRequirement: Bool] = [:]
-
-    private var deviceRequirementRequests: [OptimoveDeviceRequirement: [ResultBlockWithBool]] = [:]  //cache any request from client
-
-    func getStatus(of requiredService: OptimoveDeviceRequirement, completionHandler: @escaping ResultBlockWithBool) {
-        guard let status = deviceRequirementStatuses[requiredService] else {
-            OptiLoggerMessages.logDeviceRequirementNil(requiredService: requiredService)
-            OptiLoggerMessages.logRegisterToReceiveRequirementStatus(requiredService: requiredService)
-            if deviceRequirementRequests[requiredService] == nil {
-                deviceRequirementRequests[requiredService] = [completionHandler]
-            } else {
-                deviceRequirementRequests[requiredService]?.append(completionHandler)
-            }
-            OptiLoggerMessages.logGetStatusOf(requiredService: requiredService)
-            getStatusFromFetcher(deviceRequirement: requiredService)
-            return
-        }
-        completionHandler(status)
+    var isUserDependentPermissions: Bool {
+        return OptimoveDeviceRequirement.userDependentPermissions.contains(self)
     }
 
-    func getStatus(
-        of deviceRequirements: [OptimoveDeviceRequirement],
-        completionHandler: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void
-    ) {
-        var result = [OptimoveDeviceRequirement: Bool]()
-        deviceRequirements.forEach { (req) in
-            getStatus(of: req) { (status) in
-                result[req] = status
-                self.deviceRequirementStatuses[req] = status
+    public var description: String {
+        switch self {
+        case .internet:
+            return "Internet"
+        case .advertisingId:
+            return "AdvertisingId"
+        case .userNotification:
+            return "UserNotification"
+        }
+    }
+}
 
-                //TODO: Check Thread Safety
-                // first aid for not having request management system
-                if result.count == deviceRequirements.count {
-                    completionHandler(result)
+protocol OptimoveDeviceStateMonitor {
+    func getStatus(for: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool)
+    
+    func getStatuses(for: [OptimoveDeviceRequirement], completion: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void)
+    
+    /// - Warning: Returning cached results.
+    /// - ToDo: Change to `getMissingPermissions(completion: @escaping (Result<[OptimoveDeviceRequirement], Error> -> Void))`.
+    func getMissingPermissions() -> [OptimoveDeviceRequirement]
+}
+
+final class OptimoveDeviceStateMonitorImpl {
+    
+    private let accessQueue: DispatchQueue
+    private let fetcherFactory: DeviceRequirementFetcherFactory
+    private var fetchers: [OptimoveDeviceRequirement: Fetchable] = [:]
+    private var statuses: [OptimoveDeviceRequirement: Bool] = [:]
+    private var requests: [OptimoveDeviceRequirement: [ResultBlockWithBool]] = [:]  //cache any request from client
+    
+    init(fetcherFactory: DeviceRequirementFetcherFactory) {
+        self.fetcherFactory = fetcherFactory
+        accessQueue = DispatchQueue(label: "com.optimove.sdk.queue.deviceState", qos: .background)
+    }
+}
+
+extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
+
+    func getStatus(for deviceRequirement: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool) {
+        accessQueue.sync {
+            if let status = statuses[deviceRequirement] {
+                completion(status)
+                return
+            }
+            requestStatus(for: deviceRequirement, completion: completion)
+        }
+    }
+    
+    func getStatuses(for requirements: [OptimoveDeviceRequirement], completion: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void) {
+        let group = DispatchGroup()
+        DispatchQueue.global(qos: .background).async {
+            requirements.forEach { (requirement) in
+                group.enter()
+                self.getStatus(for: requirement) { _ in
+                    group.leave()
                 }
             }
         }
-    }
-
-    private func getStatusFromFetcher(deviceRequirement: OptimoveDeviceRequirement) {
-        DeviceReuirementFetcherFactory.getInstance(requirement: deviceRequirement).fetch { (status) in
-            OptiLoggerMessages.logRequirementtatus(deviceRequirement: deviceRequirement, status: status)
-            self.deviceRequirementStatuses[deviceRequirement] = status
-            self.deviceRequirementRequests[deviceRequirement]?.forEach { resultBlock in
-                resultBlock(status)
-            }
-            self.deviceRequirementRequests[deviceRequirement] = nil
+        group.notify(queue: accessQueue) {
+            let statuses = self.statuses
+            completion(statuses)
         }
     }
-
+    
     func getMissingPermissions() -> [OptimoveDeviceRequirement] {
-        var result: [OptimoveDeviceRequirement] = []
-        for (requirement, status) in deviceRequirementStatuses {
-            if status { continue }
-            if OptimoveDeviceRequirement.userDependentPermissions.contains(requirement) {
-                result.append(requirement)
-            }
+        return accessQueue.sync {
+            return statuses
+                .filter { $0.value == false }
+                .compactMap { $0.key.isUserDependentPermissions ? $0.key : nil }
         }
-        return result
+    }
+}
+
+private extension OptimoveDeviceStateMonitorImpl {
+    
+    func requestStatus(for requiredService: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool) {
+        OptiLoggerMessages.logDeviceRequirementNil(requiredService: requiredService)
+        OptiLoggerMessages.logRegisterToReceiveRequirementStatus(requiredService: requiredService)
+        if requests[requiredService] == nil {
+            requests[requiredService] = [completion]
+        } else {
+            requests[requiredService]?.append(completion)
+        }
+        OptiLoggerMessages.logGetStatusOf(requiredService: requiredService)
+        let fetcher = getFetcher(for: requiredService)
+        fetcher.fetch { [weak self] (status) in
+            OptiLoggerMessages.logRequirementtatus(deviceRequirement: requiredService, status: status)
+            self?.handleFetcherResult(deviceRequirement: requiredService, status: status)
+        }
     }
 
-    @objc func getMissingPersmissions() -> [Int] {
-        var result: [Int] = []
-        for (requirement, status) in deviceRequirementStatuses {
-            if status { continue }
-            if OptimoveDeviceRequirement.userDependentPermissions.contains(requirement) {
-                result.append(requirement.rawValue)
-            }
-        }
-        return result
+    func handleFetcherResult(deviceRequirement: OptimoveDeviceRequirement, status: Bool) {
+        statuses[deviceRequirement] = status
+        requests[deviceRequirement]?.forEach { $0(status) }
+        requests[deviceRequirement] = nil
     }
+
+    func getFetcher(for requirement: OptimoveDeviceRequirement) -> Fetchable {
+        if let fetcher = fetchers[requirement] {
+            return fetcher
+        }
+        let fetcher = fetcherFactory.createFetcher(for: requirement)
+        fetchers[requirement] = fetcher
+        return fetcher
+    }
+
 }

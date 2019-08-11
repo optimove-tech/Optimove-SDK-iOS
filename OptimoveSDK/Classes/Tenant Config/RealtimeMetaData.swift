@@ -1,6 +1,6 @@
 import Foundation
 
-struct RealtimeMetaData: Codable {
+struct RealtimeMetaData: Codable, MetaData {
     var realtimeToken: String
-    var realtimeGateway: String
+    var realtimeGateway: URL
 }

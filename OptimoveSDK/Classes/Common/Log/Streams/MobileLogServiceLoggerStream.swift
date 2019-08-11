@@ -4,7 +4,7 @@
 
 import Foundation
 
-class MobileLogServiceLoggerStream: MutableOptiLoggerOutputStream {
+final class MobileLogServiceLoggerStream: MutableOptiLoggerOutputStream {
 
     var tenantId: Int
     private let appNs: String
@@ -20,7 +20,7 @@ class MobileLogServiceLoggerStream: MutableOptiLoggerOutputStream {
         self.sdkPlatform = .ios
         self.appNs = Bundle.main.bundleIdentifier!
 
-        switch EnvVars.sdkEnv {
+        switch SDK.environment {
         case .dev, .qa:
             self.destination = URL(
                 string: "https://us-central1-appcontrollerproject-developer.cloudfunctions.net/reportLog"
@@ -35,7 +35,7 @@ class MobileLogServiceLoggerStream: MutableOptiLoggerOutputStream {
         let data = LogBody(
             tenantId: self.tenantId,
             appNs: self.appNs,
-            sdkEnv: EnvVars.sdkEnv,
+            sdkEnv: SDK.environment,
             sdkPlatform: self.sdkPlatform,
             level: level,
             logModule: "",

@@ -1,10 +1,13 @@
-import UIKit
+import UIKit.UIWebView
 
-class Device {
-    typealias UserAgent = String
+struct Device {
 
-    static func evaluateUserAgent() -> UserAgent {
+    static var uuid: String {
+        return UIDevice.current.identifierForVendor?.uuidString.sha1() ?? ""
+    }
+    static func evaluateUserAgent() -> String {
         let webView = UIWebView(frame: .zero)
         return webView.stringByEvaluatingJavaScript(from: "navigator.userAgent") ?? ""
     }
+
 }

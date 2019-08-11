@@ -1,26 +1,62 @@
 import Foundation
 
-class RemoteConfigurationHandler {
+final class RemoteConfigurationHandler {
 
-    func get(completionHandler: @escaping ResultBlockWithData) {
-        self.downloadConfigurations { (data, error) in
-            completionHandler(data, error)
-        }
+    private let networking: RemoteConfigurationNetworking
+
+    init(networking: RemoteConfigurationNetworking) {
+        self.networking = networking
     }
 
-    private func downloadConfigurations(didComplete: @escaping ResultBlockWithData) {
-        if let tenantToken = OptimoveUserDefaults.shared.tenantToken, let version = Version {
-            // configuration end point always ends with '/'
-            let path = "\(OptimoveUserDefaults.shared.configurationEndPoint)\(tenantToken)/\(version).json"
+    func get(completion: @escaping (Result<TenantConfig, Error>) -> Void) {
+        networking.downloadConfigurations(completion)
+    }
+}
 
-            OptiLoggerMessages.logPathToRemoteConfiguration(path: path)
+final class RemoteConfigurationRequestBuilder {
 
-            if let url = URL(string: path) {
-                NetworkManager.get(from: url) {
-                    (response, error) in
-                    didComplete(response, error)
-                }
+    private let storage: OptimoveStorage
+
+    init(storage: OptimoveStorage) {
+        self.storage = storage
+    }
+
+    func createDownloadConfigurationsRequest() throws -> NetworkRequest {
+        let tenantToken = try storage.getTenantToken()
+        let version = try storage.getVersion()
+        let configurationEndPoint = try storage.getConfigurationEndPoint()
+        let url: URL = try cast(URL(string: configurationEndPoint + tenantToken))
+        OptiLoggerMessages.logPathToRemoteConfiguration(path: url.absoluteString)
+        return NetworkRequest(method: .get, baseURL: url, path: "\(version).json")
+    }
+
+}
+
+
+final class RemoteConfigurationNetworking {
+
+    private let networkClient: NetworkClient
+    private let requestBuilder: RemoteConfigurationRequestBuilder
+
+    init(networkClient: NetworkClient,
+         requestBuilder: RemoteConfigurationRequestBuilder) {
+        self.networkClient = networkClient
+        self.requestBuilder = requestBuilder
+    }
+
+    func downloadConfigurations(_ completion: @escaping (Result<TenantConfig, Error>) -> Void) {
+        do {
+            let request = try requestBuilder.createDownloadConfigurationsRequest()
+            networkClient.perform(request) { (result) in
+                completion(
+                    Result {
+                        return try result.get().decode(to: TenantConfig.self)
+                    }
+                )
             }
+        } catch {
+            completion(.failure(error))
         }
     }
+
 }

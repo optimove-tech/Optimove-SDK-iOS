@@ -1,5 +1,5 @@
 import Foundation
 
 protocol Fetchable {
-    func fetch(completionHandler: @escaping ResultBlockWithBool)
+    func fetch(completion: @escaping ResultBlockWithBool)
 }

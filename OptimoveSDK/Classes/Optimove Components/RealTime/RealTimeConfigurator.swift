@@ -1,8 +1,18 @@
 import Foundation
 
-class RealTimeConfigurator: OptimoveComponentConfigurator<RealTime> {
-    override func setEnabled(from tenantConfig: TenantConfig) {
-        component.isEnable = tenantConfig.enableRealtime
+final class RealTimeConfigurator: OptimoveComponentConfigurator<RealTime> {
+
+    private let metaDataPriovider: MetaDataProvider<RealtimeMetaData>
+
+    init(component: RealTime,
+         metaDataPriovider: MetaDataProvider<RealtimeMetaData>) {
+        self.metaDataPriovider = metaDataPriovider
+        super.init(component: component)
+    }
+
+    @available(*, unavailable, renamed: "init(component:metaDataProvider:)")
+    required init(component: T) {
+        fatalError()
     }
 
     override func getRequirements() -> [OptimoveDeviceRequirement] {
@@ -15,18 +25,17 @@ class RealTimeConfigurator: OptimoveComponentConfigurator<RealTime> {
     ) {
         OptiLoggerMessages.logConfigrureRealtime()
 
-        guard let realtimeMetadata = tenantConfig.realtimeMetaData else {
+        guard let realtimeMetaData = tenantConfig.realtimeMetaData else {
             OptiLoggerMessages.logRealtimeConfiguirationFailure()
             didComplete(false)
             return
         }
-        setMetaData(realtimeMetadata)
+
+        metaDataPriovider.setMetaData(realtimeMetaData)
 
         OptiLoggerMessages.logRealtimeCOnfigurationSuccess()
         didComplete(true)
     }
 
-    private func setMetaData(_ realtimeMetaData: RealtimeMetaData) {
-        component.metaData = realtimeMetaData
-    }
 }
+

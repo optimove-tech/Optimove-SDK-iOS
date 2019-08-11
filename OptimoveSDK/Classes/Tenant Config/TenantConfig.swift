@@ -1,43 +1,39 @@
 import Foundation
 
-struct TenantConfig: Decodable {
+struct TenantConfig: Codable {
     let version: String
-    let enableOptitrack: Bool
-    let enableOptipush: Bool
     let enableVisitors: Bool
-    let enableRealtime: Bool
-    let siteID: Int
     let realtimeMetaData: RealtimeMetaData?
     var optitrackMetaData: OptitrackMetaData?
     let optipushMetaData: OptipushMetaData?
     let firebaseProjectKeys: FirebaseProjectKeys?
     let clientsServiceProjectKeys: ClientsServiceProjectKeys?
-    let events: [String: OptimoveEventConfig]
+    let events: [String: EventsConfig]
 
     init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        version = try values.decode(String.self, forKey: .version)
-        enableOptitrack = try values.decode(Bool.self, forKey: .enableOptitrack)
-        enableOptipush = try values.decode(Bool.self, forKey: .enableOptipush)
-        enableVisitors = try values.decode(Bool.self, forKey: .enableVisitors)
-        enableRealtime = try values.decode(Bool.self, forKey: .enableRealtime)
-        realtimeMetaData = try? values.decode(RealtimeMetaData.self, forKey: .realtimeMetaData)
-        let s = try values.nestedContainer(keyedBy: CodingKeys.self, forKey: .optitrackMetaData)
-        siteID = try s.decode(Int.self, forKey: .siteId)
+        version = try container.decode(String.self, forKey: .version)
+        enableVisitors = try container.decode(Bool.self, forKey: .enableVisitors)
 
-        optitrackMetaData = try? values.decode(OptitrackMetaData.self, forKey: .optitrackMetaData)
+        realtimeMetaData = try container.decodeIfPresent(RealtimeMetaData.self, forKey: .realtimeMetaData)
+        optitrackMetaData = try container.decodeIfPresent(OptitrackMetaData.self, forKey: .optitrackMetaData)
 
-        let mobile = try values.nestedContainer(keyedBy: AdditionalInfoKeys.self, forKey: .mobile)
-        optipushMetaData = try? mobile.decode(OptipushMetaData.self, forKey: .optipushMetaData)
-        firebaseProjectKeys = try? mobile.decode(FirebaseProjectKeys.self, forKey: .firebaseProjectKeys)
-        clientsServiceProjectKeys = try? mobile.decode(
+        events = try container.decode([String: EventsConfig].self, forKey: .events)
+
+        // mobile
+        let mobile = try container.nestedContainer(keyedBy: MobileCodingKey.self, forKey: .mobile)
+        optipushMetaData = try mobile.decodeIfPresent(OptipushMetaData.self, forKey: .optipushMetaData)
+        firebaseProjectKeys = try mobile.decodeIfPresent(FirebaseProjectKeys.self, forKey: .firebaseProjectKeys)
+        clientsServiceProjectKeys = try mobile.decodeIfPresent(
             ClientsServiceProjectKeys.self,
             forKey: .clientsServiceProjectKeys
         )
 
-        events = try values.decode([String: OptimoveEventConfig].self, forKey: .events)
-
+        // By historical reason, the `enableAdvertisingIdReport` flag was added to
+        // `optipushMetaData` instead of `optitrackMetaData`.
+        // If `optipushMetaData` will be nil, that means config is broken and
+        // the whole `optitrackMetaData` should be wiped.
         if let enableIdfa = optipushMetaData?.enableAdvertisingIdReport {
             optitrackMetaData?.enableAdvertisingIdReport = enableIdfa
         } else {
@@ -46,12 +42,25 @@ struct TenantConfig: Decodable {
         }
     }
 
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(version, forKey: .version)
+        try container.encode(enableVisitors, forKey: .enableVisitors)
+
+        try container.encodeIfPresent(realtimeMetaData, forKey: .realtimeMetaData)
+        try container.encodeIfPresent(optitrackMetaData, forKey: .optitrackMetaData)
+
+        try container.encode(events, forKey: .events)
+
+        var mobile =  container.nestedContainer(keyedBy: MobileCodingKey.self, forKey: .mobile)
+        try mobile.encodeIfPresent(optipushMetaData, forKey: .optipushMetaData)
+        try mobile.encodeIfPresent(firebaseProjectKeys, forKey: .firebaseProjectKeys)
+        try mobile.encodeIfPresent(clientsServiceProjectKeys, forKey: .clientsServiceProjectKeys)
+    }
+
     enum CodingKeys: String, CodingKey {
         case version
-        case enableOptitrack
-        case enableOptipush
         case enableVisitors
-        case enableRealtime
         case realtimeMetaData
         case optitrackMetaData
         case mobile
@@ -59,7 +68,7 @@ struct TenantConfig: Decodable {
         case siteId
     }
 
-    enum AdditionalInfoKeys: String, CodingKey {
+    enum MobileCodingKey: String, CodingKey {
         case optitrackMetaData
         case optipushMetaData
         case firebaseProjectKeys

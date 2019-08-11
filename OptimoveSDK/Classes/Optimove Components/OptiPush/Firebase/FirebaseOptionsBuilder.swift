@@ -1,59 +1,31 @@
 import FirebaseCore
-import FirebaseMessaging
-import Foundation
 
-class FirebaseOptionsBuilder {
-    var webApiKey: String = ""
-    var appId: String = ""
-    var dbUrl: String = ""
-    var senderId: String = ""
-    var storageBucket: String = ""
-    var projectId: String = ""
+final class FirebaseOptionsBuilder {
 
-    @discardableResult
-    func set(webApiKey: String) -> FirebaseOptionsBuilder {
-        self.webApiKey = webApiKey
-        return self
+    private struct Constants {
+        static let clientID = "gibrish"
     }
 
-    @discardableResult
-    func set(appId: String) -> FirebaseOptionsBuilder {
-        self.appId = appId
-        return self
-    }
+    private let provider: FirebaseKeys
+    private let bundleID: String
 
-    @discardableResult
-    func set(dbUrl: String) -> FirebaseOptionsBuilder {
-        self.dbUrl = dbUrl
-        return self
-    }
-
-    @discardableResult
-    func set(senderId: String) -> FirebaseOptionsBuilder {
-        self.senderId = senderId
-        return self
-    }
-
-    @discardableResult
-    func set(storageBucket: String) -> FirebaseOptionsBuilder {
-        self.storageBucket = storageBucket
-        return self
-    }
-
-    @discardableResult
-    func set(projectId: String) -> FirebaseOptionsBuilder {
-        self.projectId = projectId
-        return self
+    init(provider: FirebaseKeys,
+         bundleID: String) {
+        self.provider = provider
+        self.bundleID = bundleID
     }
 
     func build() -> FirebaseOptions {
-        let options = FirebaseOptions(googleAppID: appId, gcmSenderID: senderId)
-        options.apiKey = webApiKey
-        options.databaseURL = dbUrl
-        options.storageBucket = storageBucket
-        options.projectID = projectId
-        options.bundleID = Bundle.main.bundleIdentifier!
-        options.clientID = "gibrish"
+        let options = FirebaseOptions(
+            googleAppID: provider.appid,
+            gcmSenderID: provider.senderId
+        )
+        options.apiKey = provider.webApiKey
+        options.databaseURL = provider.dbUrl
+        options.storageBucket = provider.storageBucket
+        options.projectID = provider.projectId
+        options.bundleID = bundleID
+        options.clientID = Constants.clientID
         return options
     }
 }
