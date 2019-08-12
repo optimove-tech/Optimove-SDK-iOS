@@ -3,6 +3,7 @@
 //  OptimoveSDK
 
 import Foundation
+import OptimoveCore
 
 final class OptimoveCustomEventDecorator: OptimoveEventDecorator {
 

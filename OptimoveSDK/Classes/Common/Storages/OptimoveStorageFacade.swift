@@ -1,12 +1,13 @@
 // Copiright 2019 Optimove
 
 import Foundation
+import OptimoveCore
 
 final class OptimoveStorageFacade {
 
     // Use for constants that are only available inside the main application process.
     private let sharedStorage: OptimoveCarefullStorage
-    private let sharedKeys: Set<StorageKey> = [
+    private let sharedKeys: Set<SharedStorageKey> = [
         .userEmail,
         .apnsToken,
         .siteID,
@@ -27,29 +28,24 @@ final class OptimoveStorageFacade {
 
     // Use for constants that are used in the shared "group.<bundle-id>.optimove" container.
     private let groupStorage: OptimoveCarefullStorage
-    private let groupKeys: Set<StorageKey> = [
+    private let groupKeys: Set<GroupedStorageKey> = [
         .customerID,
         .configurationEndPoint,
         .initialVisitorId,
         .tenantToken,
         .visitorID,
-        .version,
-        .userAgent
+        .version
     ]
 
-    private let fileStorage: OptimoveFileStorage
+    private let fileStorage: FileStorage
 
     init(sharedStorage: OptimoveCarefullStorage,
          groupStorage: OptimoveCarefullStorage,
-         fileStorage: OptimoveFileStorage) {
+         fileStorage: FileStorage) {
         self.sharedStorage = sharedStorage
         self.groupStorage = groupStorage
         self.fileStorage = fileStorage
 
-        precondition(
-            sharedKeys.union(groupKeys).isSuperset(of: StorageKey.allCases),
-            "A `sharedKeys` and `groupKeys` together are not a superset of all StorageKeys"
-        )
         prepare()
     }
 
@@ -61,28 +57,41 @@ final class OptimoveStorageFacade {
         careService.makeSomeCare()
     }
 
-    private func storage(for key: StorageKey) -> OptimoveKeyValueStorage {
-        return sharedKeys.contains(key) ? sharedStorage : groupStorage
-    }
-
 }
 
 extension OptimoveStorageFacade: OptimoveStorage {
 
-    func set(value: Any?, key: StorageKey) {
-        storage(for: key).set(value: value, key: key)
+    func set(value: Any?, key: GroupedStorageKey) {
+        groupStorage.set(value: value, key: key)
     }
 
-    func value(for key: StorageKey) -> Any? {
-        return storage(for: key).value(for: key)
+    func value(for key: GroupedStorageKey) -> Any? {
+        return groupStorage.value(for: key)
     }
 
-    subscript<T>(key: StorageKey) -> T? {
+    subscript<T>(key: GroupedStorageKey) -> T? {
         get {
-            return storage(for: key).value(for: key) as? T
+            return groupStorage.value(for: key) as? T
         }
         set {
-            storage(for: key).set(value: newValue, key: key)
+            groupStorage.set(value: newValue, key: key)
+        }
+    }
+
+    func set(value: Any?, key: SharedStorageKey) {
+        sharedStorage.set(value: value, key: key)
+    }
+
+    func value(for key: SharedStorageKey) -> Any? {
+        return sharedStorage.value(for: key)
+    }
+
+    subscript<T>(key: SharedStorageKey) -> T? {
+        get {
+            return sharedStorage.value(for: key) as? T
+        }
+        set {
+            sharedStorage.set(value: newValue, key: key)
         }
     }
 
@@ -123,15 +132,17 @@ extension OptimoveStorageFacade: OptimoveStorage {
 
 extension UserDefaults: OptimoveCarefullStorage {
 
-    func set(value: Any?, key: StorageKey) {
+    // MARK: - SharedKeyValueStorage
+
+    func set(value: Any?, key: SharedStorageKey) {
         self.set(value, forKey: key.rawValue)
     }
 
-    func value(for key: StorageKey) -> Any? {
+    func value(for key: SharedStorageKey) -> Any? {
         return self.value(forKey: key.rawValue)
     }
 
-    subscript<T>(key: StorageKey) -> T? {
+    subscript<T>(key: SharedStorageKey) -> T? {
         get {
             return value(for: key) as? T
         }
@@ -139,6 +150,10 @@ extension UserDefaults: OptimoveCarefullStorage {
             set(value: newValue, key: key)
         }
     }
+
+
+
+    // MARK: - CarefullStorage
 
     func removeValue(forKey key: String) {
         self.removeObject(forKey: key)

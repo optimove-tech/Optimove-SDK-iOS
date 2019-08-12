@@ -1,6 +1,7 @@
 // Copiright 2019 Optimove
 
 import Foundation
+import OptimoveCore
 
 // Using for defining type of realtime event.
 enum RealTimeEventType {

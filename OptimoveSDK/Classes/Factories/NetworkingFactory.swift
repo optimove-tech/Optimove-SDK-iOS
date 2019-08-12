@@ -1,6 +1,7 @@
 // Copiright 2019 Optimove
 
 import Foundation
+import OptimoveCore
 
 /// Create network request builders.
 final class NetworkRequestBuilderFactory {

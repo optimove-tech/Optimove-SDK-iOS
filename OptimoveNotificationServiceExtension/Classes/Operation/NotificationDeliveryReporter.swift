@@ -2,6 +2,7 @@
 
 import Foundation
 import os.log
+import OptimoveCore
 
 final class NotificationDeliveryReporter: AsyncOperation {
     
@@ -23,7 +24,7 @@ final class NotificationDeliveryReporter: AsyncOperation {
     override func main() {
         state = .executing
         do {
-            let configuration = try repository.obtain()
+            let configuration = try repository.getConfiguration()
             switch notificationPayload.campaign {
             case let campaign as ScheduledNotificationCampaign:
                 reportScheduledNotificationDelivered(campaign: campaign, configuration: configuration)
@@ -43,7 +44,7 @@ private extension NotificationDeliveryReporter {
 
     func reportTriggeredNotificationDelivered(
         campaign: TriggeredNotificationCampaign,
-        configuration: OptimoveConfigForExtension) {
+        configuration: Configuration) {
         let event = TriggeredNotificationDelivered(
             bundleId: self.bundleIdentifier,
             campaign: campaign
@@ -52,12 +53,12 @@ private extension NotificationDeliveryReporter {
             state = .finished
             return
         }
-        prepareAndSendEvent(event, eventConfig, configuration.optitrackMetaData)
+        prepareAndSendEvent(event, eventConfig, configuration.optitrack)
     }
 
     func reportScheduledNotificationDelivered(
         campaign: ScheduledNotificationCampaign,
-        configuration: OptimoveConfigForExtension) {
+        configuration: Configuration) {
         let event = ScheduledNotificationDelivered(
             bundleId: self.bundleIdentifier,
             campaign: campaign
@@ -66,14 +67,14 @@ private extension NotificationDeliveryReporter {
             state = .finished
             return
         }
-        prepareAndSendEvent(event, eventConfig, configuration.optitrackMetaData)
+        prepareAndSendEvent(event, eventConfig, configuration.optitrack)
     }
 
     func prepareAndSendEvent(_ event: OptimoveEvent,
-                             _ eventConfig: OptimoveEventConfig,
-                             _ optitrackMetadata: OptitrackMetadata) {
-        let queryItems = buildQueryItems(event, eventConfig, optitrackMetadata)
-        var reportEventUrl = URLComponents(string: optitrackMetadata.optitrackEndpoint)!
+                             _ eventConfig: EventsConfig,
+                             _ optitrack: OptitrackConfig) {
+        let queryItems = buildQueryItems(event, eventConfig, optitrack)
+        var reportEventUrl = URLComponents(url: optitrack.optitrackEndpoint, resolvingAgainstBaseURL: false)!
         reportEventUrl.queryItems = queryItems.filter { $0.value != nil }
         let reportEventRequest = URLRequest(
             url: reportEventUrl.url!,
@@ -97,8 +98,8 @@ private extension NotificationDeliveryReporter {
 
     func buildQueryItems(
         _ notificationEvent: OptimoveEvent,
-        _ eventConfig: OptimoveEventConfig,
-        _ optitrackMetadata: OptitrackMetadata
+        _ eventConfig: EventsConfig,
+        _ optitrack: OptitrackConfig
         ) -> [URLQueryItem] {
         let date = Date()
         
@@ -108,7 +109,7 @@ private extension NotificationDeliveryReporter {
         let visitorId = sharedDefaults.string(forKey: "visitorID")
         
         var queryItems: [URLQueryItem] = [
-            URLQueryItem(name: "idsite", value: String(describing: optitrackMetadata.siteId)),
+            URLQueryItem(name: "idsite", value: String(describing: optitrack.tenantID)),
             URLQueryItem(name: "rec", value: "1"),
             URLQueryItem(name: "api", value: "1"),
             // Visitor
@@ -129,14 +130,14 @@ private extension NotificationDeliveryReporter {
                     self.sharedDefaults.double(forKey: "deviceResolutionHeight")
                 )
             ),
-            URLQueryItem(name: "e_c", value: optitrackMetadata.eventCategoryName),
+            URLQueryItem(name: "e_c", value: optitrack.eventCategoryName),
             URLQueryItem(name: "e_a", value: "notification_delivered"),
             URLQueryItem(
-                name: "dimension\(optitrackMetadata.eventIdCustomDimensionId)",
+                name: "dimension\(optitrack.customDimensionIDS.eventIDCustomDimensionID)",
                 value: eventConfig.id.description
             ),
             URLQueryItem(
-                name: "dimension\(optitrackMetadata.eventNameCustomDimensionId)",
+                name: "dimension\(optitrack.customDimensionIDS.eventNameCustomDimensionID)",
                 value: notificationEvent.name
             )
         ]

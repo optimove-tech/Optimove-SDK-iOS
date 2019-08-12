@@ -1,5 +1,7 @@
 import Foundation
 
+import OptimoveCore
+
 final class RealTime {
 
     private let configuration: RealtimeConfig

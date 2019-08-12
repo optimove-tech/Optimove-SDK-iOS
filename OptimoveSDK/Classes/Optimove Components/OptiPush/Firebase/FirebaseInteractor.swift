@@ -10,6 +10,7 @@ import FirebaseCore
 import FirebaseMessaging
 import Foundation
 import os.log
+import OptimoveCore
 
 protocol OptimoveMbaasRegistrationHandling: class {
     func handleRegistrationTokenRefresh(token: String)

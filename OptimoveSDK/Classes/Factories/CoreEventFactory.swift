@@ -167,7 +167,7 @@ private extension CoreEventFactoryImpl {
     }
 
     func getSdkVersion() -> String {
-        return SDK.version
+        return StaticVersion.version
     }
 
 }

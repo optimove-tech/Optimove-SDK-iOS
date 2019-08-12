@@ -1,5 +1,7 @@
 // Copiright 2019 Optimove
 
+import OptimoveCore
+
 final class ComponentFactory {
 
     private let serviceLocator: ServiceLocator
@@ -64,7 +66,6 @@ final class ComponentFactory {
         return OptiTrack(
             configuration: configuration.optitrack,
             deviceStateMonitor: serviceLocator.deviceStateMonitor(),
-            warehouseProvider: serviceLocator.warehouseProvider(),
             storage: serviceLocator.storage(),
             coreEventFactory: coreEventFactory,
             dateTimeProvider: serviceLocator.dateTimeProvider(),

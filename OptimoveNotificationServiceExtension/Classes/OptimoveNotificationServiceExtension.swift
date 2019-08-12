@@ -1,6 +1,7 @@
 import Foundation
 import UserNotifications
 import os.log
+import OptimoveCore
 
 @objc public class OptimoveNotificationServiceExtension: NSObject {
 
@@ -8,7 +9,6 @@ import os.log
     
     private let bundleIdentifier: String
     private let tenantInfo: NotificationExtensionTenantInfo
-    private let configurationRepository = ConfigurationRepository()
     private let sharedDefaults: UserDefaults
     private var bestAttemptContent: UNMutableNotificationContent!
     private var contentHandler: ((UNNotificationContent) -> Void)!
@@ -17,6 +17,7 @@ import os.log
         queue.qualityOfService = .userInitiated
         return queue
     }()
+    private let networking = NetworkClientImpl()
 
     @objc public init(appBundleId: String) {
         bundleIdentifier = appBundleId
@@ -45,11 +46,41 @@ import os.log
         self.isHandledByOptimove = true
         self.contentHandler = contentHandler
 
-        let configurationFetcher = ConfigurationFetcher(
-            tenantInfo: tenantInfo,
-            repository: configurationRepository,
-            bundleIdentifier: bundleIdentifier
+        let storage = GroupedStorageFacade(
+            groupedValue: sharedDefaults,
+            fileStorage: GroupedFileManager(
+                fileManager: .default
+            )
         )
+
+        let configurationRepository = ConfigurationRepositoryImpl(storage: storage)
+
+        let configurationNetworking = RemoteConfigurationNetworking(
+            networkClient: networking,
+            requestBuilder: RemoteConfigurationRequestBuilder(storage: storage)
+        )
+
+        // Operations that execute asynchronously to fetch remote configs.
+        let downloadOperations: [Operation] = [
+            GlobalConfigurationDownloader(
+                networking: configurationNetworking,
+                repository: configurationRepository
+            ),
+            TenantConfigurationDownloader(
+                networking: configurationNetworking,
+                repository: configurationRepository
+            )
+        ]
+
+        // Operation merge all remote configs to a invariant.
+        let mergeOperation = MergeRemoteConfigurationOperation(
+            repository: configurationRepository
+        )
+
+        // Set the merge operation as dependent on the download operations.
+        downloadOperations.forEach {
+            mergeOperation.addDependency($0)
+        }
         let notificationDeliveryReporter = NotificationDeliveryReporter(
             repository: configurationRepository,
             bundleIdentifier: bundleIdentifier,
@@ -57,12 +88,11 @@ import os.log
             notificationPayload: payload
         )
 
-        // `NotificationDeliveryReporter` operation should be executed after `ConfigurationFetcher` operation
-        // because it has the dependency on a configuration, that provides by `ConfigurationRepository`.
-        notificationDeliveryReporter.addDependency(configurationFetcher)
+        // `NotificationDeliveryReporter` operation should be executed after all configuration were fetched.
+        notificationDeliveryReporter.addDependency(mergeOperation)
         
         let operations: [Operation] = [
-            configurationFetcher,
+            mergeOperation,
             notificationDeliveryReporter,
             DeeplinkExtracter(
                 bundleIdentifier: bundleIdentifier,
@@ -73,7 +103,7 @@ import os.log
                 notificationPayload: payload,
                 bestAttemptContent: bestAttemptContent
             )
-        ]
+        ] + downloadOperations
 
         // The completion operation going to be executed right after all operations are finished.
         let completionOperation = BlockOperation {

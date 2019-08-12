@@ -1,6 +1,7 @@
 // Copiright 2019 Optimove
 
 import Foundation
+import OptimoveCore
 
 protocol RealTimeNetworking {
     func report(event: RealtimeEvent, completion: @escaping (Result<String, Error>) -> Void) throws

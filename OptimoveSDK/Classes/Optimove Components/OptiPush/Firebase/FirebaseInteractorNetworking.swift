@@ -1,6 +1,7 @@
 // Copiright 2019 Optimove
 
 import Foundation
+import OptimoveCore
 
 protocol FirebaseInteractorNetworking {
     func subscribe(topic: String, completion: @escaping (Result<Void, Error>) -> Void)

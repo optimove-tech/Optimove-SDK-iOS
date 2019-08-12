@@ -3,6 +3,7 @@
 //  FirebaseCore
 
 import Foundation
+import OptimoveCore
 
 final class OptimoveEventDecoratorFactory {
     static func getEventDecorator(forEvent event: OptimoveEvent) -> OptimoveEventDecorator {

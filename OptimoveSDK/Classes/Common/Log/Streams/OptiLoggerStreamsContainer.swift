@@ -22,7 +22,7 @@ import Foundation
         logQueue.async {
             outputStreams.values.forEach {
                 if $0.isVisibleToClient {
-                    if SDK.logLevelToShow <= level {
+                    if LoggerSettings.logLevelToShow <= level {
                         $0.log(
                             level: level,
                             fileName: fileName?.components(separatedBy: Constants.delimiter).last ?? Constants.placeholder,

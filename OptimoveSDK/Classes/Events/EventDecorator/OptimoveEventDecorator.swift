@@ -1,4 +1,5 @@
 import Foundation
+import OptimoveCore
 
 /// Adjust event entity to satisfy Optimove's business logic before dispatch
 class OptimoveEventDecorator: OptimoveEvent {

@@ -1,6 +1,7 @@
 // Copiright 2019 Optimove
 
 import Foundation
+import OptimoveCore
 
 final class ServiceLocator {
 
@@ -41,7 +42,7 @@ final class ServiceLocator {
         return OptimoveStorageFacade(
             sharedStorage: UserDefaults.standard,
             groupStorage: groupStorage,
-            fileStorage: OptimoveFileManager(
+            fileStorage: GroupedFileManager(
                 fileManager: .default
             )
         )

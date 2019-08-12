@@ -1,5 +1,7 @@
 import Foundation
 
+import OptimoveCore
+
 protocol EventsConfigWarehouse {
     func getConfig(for event: OptimoveEvent) -> EventsConfig?
 }

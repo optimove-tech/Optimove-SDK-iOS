@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OptimoveCore
 
 class OptimoveEventValidator {
     // MARK: - Internal Methods

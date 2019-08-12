@@ -1,6 +1,7 @@
 // Copiright 2019 Optimove
 
 import Foundation
+import OptimoveCore
 
 protocol RealTimeRequestBuildable {
     func createReportEventRequest(event: RealtimeEvent, gateway: URL) throws -> NetworkRequest

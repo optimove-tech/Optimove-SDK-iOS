@@ -1,31 +1,24 @@
 ///  Copyright © 2017 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
-typealias OptimoveStorage = OptimoveKeyValueStorage & OptimoveFileStorage
-typealias OptimoveKeyValueStorage = KeyValueStorage & OptimoveValue
-
-/// Used only for CareService
-typealias OptimoveCarefullStorage = OptimoveKeyValueStorage & CarefullStorage
-
-protocol KeyValueStorage {
-    func set(value: Any?, key: StorageKey)
-    func value(for: StorageKey) -> Any?
-    subscript<T>(key: StorageKey) -> T? { get set }
-}
+typealias OptimoveStorage = SharedValue & GroupedValue & FileStorage
+typealias OptimoveCarefullStorage = SharedValue & GroupedValue & CarefullStorage
+typealias SharedStorage = SharedValue & FileStorage
+typealias SharedValue = SharedKeyValueStorage & SharedOptimoveValue
 
 protocol CarefullStorage {
     func removeValue(forKey: String)
 }
 
-enum StorageKey: String, CaseIterable {
-    case customerID
-    case configurationEndPoint
-    case initialVisitorId
-    case tenantToken
-    case visitorID
-    case version
-    case userAgent
+protocol SharedKeyValueStorage {
+    func set(value: Any?, key: SharedStorageKey)
+    func value(for: SharedStorageKey) -> Any?
+    subscript<T>(key: SharedStorageKey) -> T? { get set }
+}
+
+enum SharedStorageKey: String, CaseIterable {
     case userEmail
     case apnsToken
     case siteID
@@ -44,13 +37,7 @@ enum StorageKey: String, CaseIterable {
     case realtimeSetEmailFailed
 }
 
-protocol OptimoveValue {
-    var customerID: String? { get set }
-    var configurationEndPoint: URL? { get set }
-    var initialVisitorId: String? { get set }
-    var tenantToken: String? { get set }
-    var visitorID: String? { get set }
-    var version: String? { get set }
+protocol SharedOptimoveValue {
     var userEmail: String? { get set }
     var apnsToken: Data? { get set }
     var siteID: Int? { get set }
@@ -68,13 +55,6 @@ protocol OptimoveValue {
     var realtimeSetUserIdFailed: Bool { get set }
     var realtimeSetEmailFailed: Bool { get set }
 
-    // A value accessor that throws an error.
-    func getConfigurationEndPoint() throws -> URL
-    func getCustomerID() throws -> String
-    func getInitialVisitorId() throws -> String
-    func getTenantToken() throws -> String
-    func getVisitorID() throws -> String
-    func getVersion() throws -> String
     func getUserEmail() throws -> String
     func getApnsToken() throws -> Data
     func getSiteID() throws -> Int
@@ -86,70 +66,8 @@ protocol OptimoveValue {
 
 private let lock = UnfairLock()
 
-extension KeyValueStorage where Self: OptimoveValue {
+extension SharedKeyValueStorage where Self: SharedOptimoveValue {
 
-    // MARK: Shared with App Extension
-
-    var customerID: String? {
-        get {
-            return self[.customerID]
-        }
-        set {
-            self[.customerID] = newValue
-        }
-    }
-    
-    var visitorID: String? {
-        get {
-            return self[.visitorID]
-        }
-        set {
-            self[.visitorID] = newValue?.lowercased()
-        }
-    }
-    
-    var initialVisitorId: String? {
-        get {
-            return self[.initialVisitorId]
-        }
-        set {
-            self[.initialVisitorId] = newValue?.lowercased()
-        }
-    }
-    
-    var configurationEndPoint: URL? {
-        get {
-            do {
-                return URL(string: try unwrap(self[.configurationEndPoint]))
-            } catch {
-                return nil
-            }
-        }
-        set {
-            self[.configurationEndPoint] = newValue?.absoluteString
-        }
-    }
-    
-    var tenantToken: String? {
-        get {
-            return self[.tenantToken]
-        }
-        set {
-            self[.tenantToken] = newValue
-        }
-    }
-    
-    var version: String? {
-        get {
-            return self[.version]
-        }
-        set {
-            self[.version] = newValue
-        }
-    }
-    
-    
-    // MARK: Standard
     var userEmail: String? {
         get {
             return self[.userEmail]
@@ -167,9 +85,7 @@ extension KeyValueStorage where Self: OptimoveValue {
             self[.apnsToken] = newValue
         }
     }
-    
-    // MARK: Initializtion Flags
-    
+
     var siteID: Int? {
         get {
             return self[.siteID]
@@ -187,8 +103,6 @@ extension KeyValueStorage where Self: OptimoveValue {
             self[.isClientHasFirebase] = newValue
         }
     }
-    
-    // MARK: Optipush Flags
 
     var isMbaasOptIn: Bool? {
         get {
@@ -256,8 +170,7 @@ extension KeyValueStorage where Self: OptimoveValue {
             self[.fcmToken] = newValue
         }
     }
-    
-    // MARK: OptiTrack Flags
+
     var isOptiTrackOptIn: Bool {
         get {
             return self[.isOptiTrackOptIn] ?? false
@@ -284,8 +197,7 @@ extension KeyValueStorage where Self: OptimoveValue {
             self[.isSetUserIdSucceed] = newValue
         }
     }
-    
-    // MARK: Real time flags
+
     var realtimeSetUserIdFailed: Bool {
         get {
             return self[.realtimeSetUserIdFailed] ?? false
@@ -304,105 +216,63 @@ extension KeyValueStorage where Self: OptimoveValue {
         }
     }
 
-    func getConfigurationEndPoint() throws -> URL {
-        guard let value = configurationEndPoint else {
-            throw OptimoveStorageError.noValue(.configurationEndPoint)
-        }
-        return value
-    }
-
-    func getCustomerID() throws -> String {
-        guard let value = customerID else {
-            throw OptimoveStorageError.noValue(.customerID)
-        }
-        return value
-    }
-
-    func getInitialVisitorId() throws -> String {
-        guard let value = initialVisitorId else {
-            throw OptimoveStorageError.noValue(.initialVisitorId)
-        }
-        return value
-    }
-
-    func getTenantToken() throws -> String {
-        guard let value = tenantToken else {
-            throw OptimoveStorageError.noValue(.tenantToken)
-        }
-        return value
-    }
-
-    func getVisitorID() throws -> String {
-        guard let value = visitorID else {
-            throw OptimoveStorageError.noValue(.visitorID)
-        }
-        return value
-    }
-
-    func getVersion() throws -> String {
-        guard let value = version else {
-            throw OptimoveStorageError.noValue(.version)
-        }
-        return value
-    }
-
     func getUserEmail() throws -> String {
         guard let value = userEmail else {
-            throw OptimoveStorageError.noValue(.userEmail)
+            throw SharedStorageError.noValue(.userEmail)
         }
         return value
     }
 
     func getApnsToken() throws -> Data {
         guard let value = apnsToken else {
-            throw OptimoveStorageError.noValue(.apnsToken)
+            throw SharedStorageError.noValue(.apnsToken)
         }
         return value
     }
 
     func getSiteID() throws -> Int {
         guard let value = siteID else {
-            throw OptimoveStorageError.noValue(.siteID)
+            throw SharedStorageError.noValue(.siteID)
         }
         return value
     }
 
     func getIsMbaasOptIn() throws -> Bool {
         guard let value = isMbaasOptIn else {
-            throw OptimoveStorageError.noValue(.isMbaasOptIn)
+            throw SharedStorageError.noValue(.isMbaasOptIn)
         }
         return value
     }
 
     func getDefaultFcmToken() throws -> String {
         guard let value = defaultFcmToken else {
-            throw OptimoveStorageError.noValue(.defaultFcmToken)
+            throw SharedStorageError.noValue(.defaultFcmToken)
         }
         return value
     }
 
     func getFcmToken() throws -> String {
         guard let value = fcmToken else {
-            throw OptimoveStorageError.noValue(.fcmToken)
+            throw SharedStorageError.noValue(.fcmToken)
         }
         return value
     }
 
     func getFirstVisitTimestamp() throws -> Int {
         guard let value = firstVisitTimestamp else {
-            throw OptimoveStorageError.noValue(.firstVisitTimestamp)
+            throw SharedStorageError.noValue(.firstVisitTimestamp)
         }
         return value
     }
 }
 
-enum OptimoveStorageError: LocalizedError {
-    case noValue(StorageKey)
+enum SharedStorageError: LocalizedError {
+    case noValue(SharedStorageKey)
 
     var errorDescription: String? {
         switch self {
         case let .noValue(key):
-            return "OptimoveStorage: No value for key \(key.rawValue)"
+            return "SharedStorage: No value for key \(key.rawValue)"
         }
     }
 }

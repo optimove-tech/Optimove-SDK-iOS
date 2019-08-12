@@ -2,7 +2,8 @@
 
 import Foundation
 import UserNotifications
-import os
+import os.log
+import OptimoveCore
 
 final class DeeplinkExtracter: AsyncOperation {
     

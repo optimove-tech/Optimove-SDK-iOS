@@ -1,6 +1,7 @@
 // Copiright 2019 Optimove
 
 import Foundation
+import OptimoveCore
 
 protocol RegistrarNetworking {
     func sendToMbaas(model: BaseMbaasModel, completion: @escaping (Result<String, Error>) -> Void)

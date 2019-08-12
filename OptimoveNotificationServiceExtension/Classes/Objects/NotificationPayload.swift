@@ -38,25 +38,7 @@ struct NotificationPayload: Decodable {
         self.content = try container.decode(String.self, forKey: .content)
         self.dynamicLinks = try DynamicLinks(firebaseFrom: decoder)
         self.deepLinkPersonalization = try? DeeplinkPersonalization(firebaseFrom: decoder)
-        let campaignContainer = try container.nestedContainer(keyedBy: NotificationCampaignType.self, forKey: .campaign)
-        switch campaignContainer.allKeys {
-        case [NotificationCampaignType.scheduled]:
-            campaign = try campaignContainer.decode(ScheduledNotificationCampaign.self, forKey: .scheduled)
-        case [NotificationCampaignType.triggered]:
-            campaign = try campaignContainer.decode(TriggeredNotificationCampaign.self, forKey: .triggered)
-        default:
-            throw DecodingError.valueNotFound(
-                NotificationCampaign.self,
-                DecodingError.Context(
-                    codingPath: campaignContainer.codingPath,
-                    debugDescription:
-                    """
-                    Unable to find a supported Notification campaign type.
-                    Supported types: \(NotificationCampaignType.allCases.map { $0.rawValue })
-                    """
-                )
-            )
-        }
+        self.campaign = try NotificationCampaignContainer(firebaseFrom: decoder).campaign
         self.collapseKey = try container.decodeIfPresent(String.self, forKey: .collapseKey)
         self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
         self.media = try? MediaAttachment(firebaseFrom: decoder)
@@ -71,12 +53,45 @@ enum NotificationCampaignType: String, CodingKey, CaseIterable {
     case triggered
 }
 
-protocol NotificationCampaign: Codable {
+protocol NotificationCampaign: Decodable {
     var type: NotificationCampaignType { get }
 }
 
+struct NotificationCampaignContainer: Decodable {
+    let campaign: NotificationCampaign
+
+    init(firebaseFrom decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
+        let string = try container.decode(String.self, forKey: .campaign)
+        let data: Data = try cast(string.data(using: .utf8))
+        self = try JSONDecoder().decode(NotificationCampaignContainer.self, from: data)
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: NotificationCampaignType.self)
+        switch container.allKeys {
+        case [NotificationCampaignType.scheduled]:
+            campaign = try container.decode(ScheduledNotificationCampaign.self, forKey: .scheduled)
+        case [NotificationCampaignType.triggered]:
+            campaign = try container.decode(TriggeredNotificationCampaign.self, forKey: .triggered)
+        default:
+            throw DecodingError.valueNotFound(
+                NotificationCampaign.self,
+                DecodingError.Context(
+                    codingPath: container.codingPath,
+                    debugDescription:
+                    """
+                    Unable to find a supported Notification campaign type.
+                    Supported types: \(NotificationCampaignType.allCases.map { $0.rawValue })
+                    """
+                )
+            )
+        }
+    }
+}
+
 struct TriggeredNotificationCampaign: NotificationCampaign {
-    let type: NotificationCampaignType = .triggered
+    private(set) var type: NotificationCampaignType = .triggered
     let actionSerial: Int
     let actionID: Int
     let templateID: Int
@@ -86,10 +101,19 @@ struct TriggeredNotificationCampaign: NotificationCampaign {
         case actionID = "action_id"
         case templateID = "template_id"
     }
+
+
+    /// The custom decoder does preprocess before the primary decoder.
+    init(firebaseFrom decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
+        let string = try container.decode(String.self, forKey: .campaign)
+        let data: Data = try cast(string.data(using: .utf8))
+        self = try JSONDecoder().decode(TriggeredNotificationCampaign.self, from: data)
+    }
 }
 
 struct ScheduledNotificationCampaign: NotificationCampaign {
-    let type: NotificationCampaignType = .scheduled
+    private(set) var type: NotificationCampaignType = .scheduled
     let campaignID: Int
     let actionSerial: Int
     let templateID: Int
@@ -102,6 +126,14 @@ struct ScheduledNotificationCampaign: NotificationCampaign {
         case templateID = "template_id"
         case engagementID = "engagement_id"
         case campaignType = "campaign_type"
+    }
+
+    /// The custom decoder does preprocess before the primary decoder.
+    init(firebaseFrom decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
+        let string = try container.decode(String.self, forKey: .campaign)
+        let data: Data = try cast(string.data(using: .utf8))
+        self = try JSONDecoder().decode(ScheduledNotificationCampaign.self, from: data)
     }
     
 }

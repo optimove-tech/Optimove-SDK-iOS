@@ -1,13 +1,14 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
+import Foundation
+import OptimoveCore
+
 typealias ComponentsPool = Pushable & Eventable
 
 protocol MutableComponentsPool: ComponentsPool {
     func addEventableComponent(_: Eventable)
     func addPushableComponent(_: Pushable)
 }
-
-import Foundation
 
 final class ComponentsPoolImpl {
 

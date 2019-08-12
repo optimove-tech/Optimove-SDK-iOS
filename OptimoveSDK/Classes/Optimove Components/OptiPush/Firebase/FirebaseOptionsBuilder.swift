@@ -1,4 +1,5 @@
 import FirebaseCore
+import OptimoveCore
 
 final class FirebaseOptionsBuilder {
 

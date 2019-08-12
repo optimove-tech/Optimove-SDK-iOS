@@ -1,6 +1,7 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 final class OptimoveSDKInitializer {
 
@@ -77,7 +78,6 @@ private extension OptimoveSDKInitializer {
 
         // Operation merge all remote configs to a invariant.
         let mergeOperation = MergeRemoteConfigurationOperation(
-            warehouseProvider: warehouseProvider,
             repository: configurationRepository
         )
 

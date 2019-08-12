@@ -1,6 +1,7 @@
 //  Copyright © 2017 Optimove
 
 import UIKit
+import OptimoveCore
 
 final class OptiTrack {
 
@@ -12,7 +13,6 @@ final class OptiTrack {
     }
 
     private let configuration: OptitrackConfig
-    private let warehouseProvider: EventsConfigWarehouseProvider
     private var storage: OptimoveStorage
     private let coreEventFactory: CoreEventFactory
     private let dateTimeProvider: DateTimeProvider
@@ -25,14 +25,12 @@ final class OptiTrack {
     required init(
         configuration: OptitrackConfig,
         deviceStateMonitor: OptimoveDeviceStateMonitor,
-        warehouseProvider: EventsConfigWarehouseProvider,
         storage: OptimoveStorage,
         coreEventFactory: CoreEventFactory,
         dateTimeProvider: DateTimeProvider,
         statisticService: StatisticService,
         tracker: Tracker) {
         self.configuration = configuration
-        self.warehouseProvider = warehouseProvider
         self.storage = storage
         self.coreEventFactory = coreEventFactory
         self.dateTimeProvider = dateTimeProvider
@@ -107,9 +105,8 @@ extension OptiTrack {
     // MARK: - Report
 
     func report(event: OptimoveEvent) {
-        let warehouse = try? warehouseProvider.getWarehouse()
         let event = OptimoveEventDecorator(event: event)
-        guard let config = warehouse?.getConfig(for: event) else {
+        guard let config = configuration.events[event.name] else {
             OptiLoggerMessages.logConfugurationForEventMissing(eventName: event.name)
             return
         }

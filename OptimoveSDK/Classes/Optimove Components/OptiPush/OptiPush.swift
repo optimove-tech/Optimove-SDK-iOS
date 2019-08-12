@@ -3,6 +3,7 @@
 
 import Foundation
 import UserNotifications
+import OptimoveCore
 
 protocol OptipushServiceInfra {
     func subscribeToTopics(didSucceed: ((Bool) -> Void)?)
