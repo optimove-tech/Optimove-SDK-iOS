@@ -3,7 +3,7 @@
 import Foundation
 
 protocol RealTimeRequestBuildable {
-    func createReportEventRequest(event: RealtimeEvent, metadata: RealtimeMetaData) throws -> NetworkRequest
+    func createReportEventRequest(event: RealtimeEvent, gateway: URL) throws -> NetworkRequest
 }
 
 final class RealTimeRequestBuilder {
@@ -28,10 +28,10 @@ final class RealTimeRequestBuilder {
 
 extension RealTimeRequestBuilder: RealTimeRequestBuildable {
 
-    func createReportEventRequest(event: RealtimeEvent, metadata: RealtimeMetaData) throws -> NetworkRequest {
+    func createReportEventRequest(event: RealtimeEvent, gateway: URL) throws -> NetworkRequest {
         let request = try NetworkRequest(
             method: .post,
-            baseURL: metadata.realtimeGateway,
+            baseURL: gateway,
             path: Constants.Paths.reportEvent,
             body: event,
             timeoutInterval: Constants.timeoutInterval

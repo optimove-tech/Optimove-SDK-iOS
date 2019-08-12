@@ -49,18 +49,18 @@ final class OptimoveDeviceStateMonitorImpl {
 extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
 
     func getStatus(for deviceRequirement: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool) {
-        accessQueue.sync {
-            if let status = statuses[deviceRequirement] {
+        accessQueue.async {
+            if let status = self.statuses[deviceRequirement] {
                 completion(status)
                 return
             }
-            requestStatus(for: deviceRequirement, completion: completion)
+            self.requestStatus(for: deviceRequirement, completion: completion)
         }
     }
     
     func getStatuses(for requirements: [OptimoveDeviceRequirement], completion: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void) {
         let group = DispatchGroup()
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .utility).async {
             requirements.forEach { (requirement) in
                 group.enter()
                 self.getStatus(for: requirement) { _ in

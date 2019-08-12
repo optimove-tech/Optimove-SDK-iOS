@@ -6,15 +6,15 @@ protocol EventsConfigWarehouse {
 
 struct OptimoveEventConfigsWarehouseImpl: EventsConfigWarehouse {
 
-    private let eventsConfigs: [String: EventsConfig]
+    private let events: [String: EventsConfig]
 
-    init(from tenantConfig: TenantConfig) {
+    init(events: [String: EventsConfig]) {
         OptiLoggerMessages.logEventsWarehouseInitializtionStart()
-        eventsConfigs = tenantConfig.events
+        self.events = events
         OptiLoggerMessages.logEventsWarehouseInitializtionFinish()
     }
 
     func getConfig(for event: OptimoveEvent) -> EventsConfig? {
-        return eventsConfigs[event.name]
+        return events[event.name]
     }
 }

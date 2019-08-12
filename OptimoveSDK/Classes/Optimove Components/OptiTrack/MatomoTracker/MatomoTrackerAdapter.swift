@@ -12,17 +12,17 @@ final class MatomoTrackerAdapter {
     private let tracker: MatomoTracker
     private let storage: OptimoveStorage
 
-    init(metaData: OptitrackMetaData,
-         storage: OptimoveStorage) throws {
+    init(configuration: OptitrackConfig,
+         storage: OptimoveStorage) {
         self.storage = storage
         let baseURL: URL = {
-            if !metaData.optitrackEndpoint.absoluteString.contains(Constants.piwikPath) {
-                return metaData.optitrackEndpoint.appendingPathComponent(Constants.piwikPath)
+            if !configuration.optitrackEndpoint.absoluteString.contains(Constants.piwikPath) {
+                return configuration.optitrackEndpoint.appendingPathComponent(Constants.piwikPath)
             }
-            return metaData.optitrackEndpoint
+            return configuration.optitrackEndpoint
         }()
         self.tracker = MatomoTracker(
-            siteId: String(metaData.siteId),
+            siteId: String(configuration.tenantID),
             queue: OptimoveQueue(
                 storage: storage
             ),

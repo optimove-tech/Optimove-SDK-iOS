@@ -7,4 +7,5 @@ import Foundation
 
 protocol MutableOptiLoggerOutputStream: OptiLoggerOutputStream {
     var tenantId: Int { get set }
+    var endpoint: URL { get set }
 }

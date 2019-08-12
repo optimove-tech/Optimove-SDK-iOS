@@ -26,9 +26,9 @@ final class ConfigurationRepository {
     }
     
     func update(_ new: OptimoveConfigForExtension) {
-        accessQueue.sync {
+        accessQueue.async {
             os_log("Updates value.", log: OSLog.repository, type: .debug)
-            state = new
+            self.state = new
         }
     }
 }

@@ -9,7 +9,7 @@ struct NotificationPayload: Decodable {
     let content: String
     let dynamicLinks: DynamicLinks
     let deepLinkPersonalization: DeeplinkPersonalization?
-    let campaignDetails: CampaignDetails?
+    let campaign: NotificationCampaign
     let collapseKey: String?
     let isOptipush: Bool
     let media: MediaAttachment?
@@ -20,6 +20,7 @@ struct NotificationPayload: Decodable {
         case content
         case dynamicLinks = "dynamic_links"
         case deepLinkPersonalization = "deep_link_personalization_values"
+        case campaign
         case campaignID = "campaign_id"
         case actionSerial = "action_serial"
         case templateID = "template_id"
@@ -37,7 +38,25 @@ struct NotificationPayload: Decodable {
         self.content = try container.decode(String.self, forKey: .content)
         self.dynamicLinks = try DynamicLinks(firebaseFrom: decoder)
         self.deepLinkPersonalization = try? DeeplinkPersonalization(firebaseFrom: decoder)
-        self.campaignDetails = try? CampaignDetails(firebaseFrom: decoder)
+        let campaignContainer = try container.nestedContainer(keyedBy: NotificationCampaignType.self, forKey: .campaign)
+        switch campaignContainer.allKeys {
+        case [NotificationCampaignType.scheduled]:
+            campaign = try campaignContainer.decode(ScheduledNotificationCampaign.self, forKey: .scheduled)
+        case [NotificationCampaignType.triggered]:
+            campaign = try campaignContainer.decode(TriggeredNotificationCampaign.self, forKey: .triggered)
+        default:
+            throw DecodingError.valueNotFound(
+                NotificationCampaign.self,
+                DecodingError.Context(
+                    codingPath: campaignContainer.codingPath,
+                    debugDescription:
+                    """
+                    Unable to find a supported Notification campaign type.
+                    Supported types: \(NotificationCampaignType.allCases.map { $0.rawValue })
+                    """
+                )
+            )
+        }
         self.collapseKey = try container.decodeIfPresent(String.self, forKey: .collapseKey)
         self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
         self.media = try? MediaAttachment(firebaseFrom: decoder)
@@ -45,25 +64,48 @@ struct NotificationPayload: Decodable {
     }
 }
 
-// MARK: - Campaing details
+// MARK: - Notification campaign
 
-struct CampaignDetails: Decodable {
-    let campaignId: Int
+enum NotificationCampaignType: String, CodingKey, CaseIterable {
+    case scheduled
+    case triggered
+}
+
+protocol NotificationCampaign: Codable {
+    var type: NotificationCampaignType { get }
+}
+
+struct TriggeredNotificationCampaign: NotificationCampaign {
+    let type: NotificationCampaignType = .triggered
     let actionSerial: Int
-    let templateId: Int
-    let engagementId: Int
-    let campaignType: Int
+    let actionID: Int
+    let templateID: Int
 
-    /// The custom decoder does preprocess before the primary decoder.
-    init(firebaseFrom decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
-        self.campaignId = try container.decode(StringCodableMap<Int>.self, forKey: .campaignID).decoded
-        self.actionSerial = try container.decode(StringCodableMap<Int>.self, forKey: .actionSerial).decoded
-        self.templateId = try container.decode(StringCodableMap<Int>.self, forKey: .templateID).decoded
-        self.engagementId = try container.decode(StringCodableMap<Int>.self, forKey: .engagementID).decoded
-        self.campaignType = try container.decode(StringCodableMap<Int>.self, forKey: .campaignType).decoded
+    enum CodingKeys: String, CodingKey {
+        case actionSerial = "action_serial"
+        case actionID = "action_id"
+        case templateID = "template_id"
     }
 }
+
+struct ScheduledNotificationCampaign: NotificationCampaign {
+    let type: NotificationCampaignType = .scheduled
+    let campaignID: Int
+    let actionSerial: Int
+    let templateID: Int
+    let engagementID: Int
+    let campaignType: Int
+
+    enum CodingKeys: String, CodingKey {
+        case campaignID = "campaign_id"
+        case actionSerial = "action_serial"
+        case templateID = "template_id"
+        case engagementID = "engagement_id"
+        case campaignType = "campaign_type"
+    }
+    
+}
+
 struct DeeplinkPersonalization: Decodable {
     let values: [String: String]
 

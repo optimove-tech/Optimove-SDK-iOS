@@ -15,24 +15,11 @@ final class OptimoveNotificationHandler {
         self.storage = storage
         self.coreEventFactory = coreEventFactory
         self.optimove = optimove
-        configureUserNotificationsDismissCategory()
     }
 }
 
 // MARK: - Private Methods
 private extension OptimoveNotificationHandler {
-
-    /// That category used for handling a custom dismiss action.
-    /// A new received OptiPush notification will have this identifier, so in this case we can track the user's response.
-    func configureUserNotificationsDismissCategory() {
-        let category = UNNotificationCategory(
-            identifier: NotificationCategoryIdentifiers.dismiss,
-            actions: [],
-            intentIdentifiers: [],
-            options: [.customDismissAction]
-        )
-        UNUserNotificationCenter.current().setNotificationCategories([category])
-    }
 
     func handleSdkCommand(
         command: OptimoveSdkCommand,
@@ -101,7 +88,7 @@ private extension OptimoveNotificationHandler {
                 identifier: newCategory.categoryIdentifier,
                 actions: actions,
                 intentIdentifiers: [],
-                options: .customDismissAction
+                options: [.customDismissAction]
             )
             let notificationCenter = UNUserNotificationCenter.current()
             notificationCenter.setNotificationCategories([category])

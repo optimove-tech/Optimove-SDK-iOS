@@ -98,7 +98,11 @@ private extension CoreEventFactoryImpl {
             let configurationEndPoint = try storage.getConfigurationEndPoint()
             let tenantToken = try storage.getTenantToken()
             let version = try storage.getVersion()
-            return configurationEndPoint + tenantToken + "/" + version + ".json"
+            return configurationEndPoint
+                .appendingPathComponent(tenantToken)
+                .appendingPathComponent(version)
+                .appendingPathExtension("json")
+                .absoluteString
         }
         let configUrl = try getFullConfigurationPath()
         let tenantBundle = try getApplicationNamespace()

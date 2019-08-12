@@ -14,7 +14,7 @@ final class OptiPushServiceLocator {
         return serviceLocator.storage()
     }
 
-    func registrar(metaData: OptipushMetaData) -> Registrable {
+    func registrar(configuration: OptipushConfig) -> Registrable {
         return Registrar(
             storage: storage(),
             modelFactory: MbaasModelFactory(
@@ -27,7 +27,7 @@ final class OptiPushServiceLocator {
                 networkClient: serviceLocator.networking(),
                 requestBuilder: RegistrarNetworkingRequestBuilder(
                     storage: storage(),
-                    metaData: metaData
+                    configuration: configuration
                 )
             ),
             backup: MbaasBackupImpl(

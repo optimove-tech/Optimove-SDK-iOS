@@ -1,7 +1,8 @@
 import Foundation
 
-final class RealTime: OptimoveComponent {
+final class RealTime {
 
+    private let configuration: RealtimeConfig
     private let realTimeQueue: DispatchQueue
     private let networking: RealTimeNetworking
     private let hanlder: RealTimeHanlder
@@ -9,10 +10,12 @@ final class RealTime: OptimoveComponent {
     private var storage: OptimoveStorage
     private let eventBuilder: RealTimeEventBuilder
     private let coreEventFactory: CoreEventFactory
+    private let deviceStateMonitor: OptimoveDeviceStateMonitor
 
     // MARK: - Public
 
     required init(
+        configuration: RealtimeConfig,
         storage: OptimoveStorage,
         networking: RealTimeNetworking,
         warehouse: EventsConfigWarehouseProvider,
@@ -20,25 +23,32 @@ final class RealTime: OptimoveComponent {
         eventBuilder: RealTimeEventBuilder,
         handler: RealTimeHanlder,
         coreEventFactory: CoreEventFactory) {
+        self.configuration = configuration
         self.storage = storage
         self.networking = networking
         self.warehouse = warehouse
         self.realTimeQueue = DispatchQueue(
             label: "com.optimove.queue.realtime",
-            qos: .userInitiated
+            qos: .utility
         )
         self.hanlder = handler
         self.eventBuilder = eventBuilder
         self.coreEventFactory = coreEventFactory
-        super.init(deviceStateMonitor: deviceStateMonitor)
+        self.deviceStateMonitor = deviceStateMonitor
+
+        performInitializationOperations()
     }
     
-    override func performInitializationOperations() {
-        super.performInitializationOperations()
+    func performInitializationOperations() {
         setFirstTimeVisitIfNeeded()
     }
 
     func report(event: OptimoveEvent, config: EventsConfig, retryFailedEvents: Bool = true) {
+        guard config.supportedOnRealTime else {
+            OptiLoggerMessages.logEventNotsupportedOnRealtime(eventName: event.name)
+            return
+        }
+        OptiLoggerMessages.logRealtimeReportEvent(eventName: event.name)
         do {
             let context = createEventContext(event: event, config: config)
             try report(context: context, retryFailedEvents: retryFailedEvents)
@@ -49,15 +59,14 @@ final class RealTime: OptimoveComponent {
 
 }
 
-// MARK: - Additional public API
+extension RealTime: Eventable {
 
-extension RealTime {
+    func setUserId(_ userId: String) {
+        try? reportUserId()
+    }
 
-    func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) {
-        let event = OptimoveEventDecorator(event: event)
-        guard let config = obtainConfiguration(for: event) else { return }
-        event.processEventConfig(config)
-        report(event: event, config: config, retryFailedEvents: retryFailedEvents)
+    func report(event: OptimoveEvent, config: EventsConfig) {
+        report(event: event, config: config, retryFailedEvents: true)
     }
 
     func reportScreenEvent(customURL: String,
@@ -71,6 +80,22 @@ extension RealTime {
         )
         reportEvent(event: event)
     }
+
+    func dispatchNow() {
+        // Consciously do nothing.
+    }
+
+}
+
+extension RealTime {
+
+    func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) {
+        let event = OptimoveEventDecorator(event: event)
+        guard let config = obtainConfiguration(for: event) else { return }
+        event.processEventConfig(config)
+        report(event: event, config: config, retryFailedEvents: retryFailedEvents)
+    }
+
 
     func reportUserId() throws {
         let event = try coreEventFactory.createEvent(.setUserId)
@@ -166,6 +191,7 @@ private extension RealTime {
     // MARK: Send report
     
     func sentReportEvent(context: RealTimeEventContext) {
+        let realtimeToken = configuration.realtimeToken
         isAllowToSendReport { [realTimeQueue, hanlder, networking, eventBuilder] (allow) in
             guard allow else {
                 hanlder.handleOffline(context)
@@ -173,7 +199,7 @@ private extension RealTime {
             }
             realTimeQueue.async {
                 do {
-                    let realtimeEvent = try eventBuilder.createEvent(context: context)
+                    let realtimeEvent = try eventBuilder.createEvent(context: context, realtimeToken: realtimeToken)
                     try networking.report(event: realtimeEvent) { (result) in
                         switch result {
                         case let .success(json):

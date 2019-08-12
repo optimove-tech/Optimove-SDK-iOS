@@ -37,7 +37,7 @@ import os.log
         let payload: NotificationPayload
         do {
             payload = try extractNotificationPayload(request)
-            self.bestAttemptContent = try cast(createBestAttemptBaseContent(request: request, payload: payload))
+            self.bestAttemptContent = try unwrap(createBestAttemptBaseContent(request: request, payload: payload))
         } catch {
             contentHandler(request.content)
             return false
@@ -117,8 +117,6 @@ private extension OptimoveNotificationServiceExtension {
             os_log("Unable to copy content.", log: OSLog.notification, type: .fault)
             return nil
         }
-        // Set the counterpart category identifier with OptimoveSDK for tracking dismiss action.
-        bestAttemptContent.categoryIdentifier = ExtensionNotification.CategoryIdentifiers.dismiss
         bestAttemptContent.title = payload.title
         bestAttemptContent.body = payload.content
         return bestAttemptContent

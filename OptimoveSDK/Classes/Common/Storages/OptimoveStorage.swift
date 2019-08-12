@@ -19,7 +19,6 @@ protocol CarefullStorage {
 }
 
 enum StorageKey: String, CaseIterable {
-    // MARK: - Shared with App Extension
     case customerID
     case configurationEndPoint
     case initialVisitorId
@@ -27,13 +26,10 @@ enum StorageKey: String, CaseIterable {
     case visitorID
     case version
     case userAgent
-    // MARK: Group
     case userEmail
     case apnsToken
-    // MARK: Initializtion Flags
     case siteID
     case isClientHasFirebase
-    // MARK: Optipush Flags
     case isMbaasOptIn
     case unregistrationSuccess
     case registrationSuccess
@@ -41,28 +37,24 @@ enum StorageKey: String, CaseIterable {
     case isFirstConversion
     case defaultFcmToken
     case fcmToken
-    // MARK: OptiTrack Flags
     case isOptiTrackOptIn
     case firstVisitTimestamp
     case isSetUserIdSucceed
-    // MARK: Real time flags -
     case realtimeSetUserIdFailed
     case realtimeSetEmailFailed
 }
 
 protocol OptimoveValue {
     var customerID: String? { get set }
-    var configurationEndPoint: String? { get set }
+    var configurationEndPoint: URL? { get set }
     var initialVisitorId: String? { get set }
     var tenantToken: String? { get set }
     var visitorID: String? { get set }
     var version: String? { get set }
     var userEmail: String? { get set }
     var apnsToken: Data? { get set }
-    // MARK: Initializtion Flags
     var siteID: Int? { get set }
     var isClientHasFirebase: Bool { get set }
-    // MARK: Optipush Flags
     var isMbaasOptIn: Bool? { get set }
     var isUnregistrationSuccess: Bool { get set }
     var isRegistrationSuccess: Bool { get set }
@@ -70,16 +62,14 @@ protocol OptimoveValue {
     var isFirstConversion: Bool { get set }
     var defaultFcmToken: String? { get set }
     var fcmToken: String? { get set }
-    // MARK: OptiTrack Flags
     var isOptiTrackOptIn: Bool { get set }
     var firstVisitTimestamp: Int? { get set }
     var isSetUserIdSucceed: Bool { get set }
-    // MARK: Real time flags
     var realtimeSetUserIdFailed: Bool { get set }
     var realtimeSetEmailFailed: Bool { get set }
 
     // A value accessor that throws an error.
-    func getConfigurationEndPoint() throws -> String
+    func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
     func getInitialVisitorId() throws -> String
     func getTenantToken() throws -> String
@@ -127,12 +117,16 @@ extension KeyValueStorage where Self: OptimoveValue {
         }
     }
     
-    var configurationEndPoint: String? {
+    var configurationEndPoint: URL? {
         get {
-            return self[.configurationEndPoint]
+            do {
+                return URL(string: try unwrap(self[.configurationEndPoint]))
+            } catch {
+                return nil
+            }
         }
         set {
-            self[.configurationEndPoint] = newValue
+            self[.configurationEndPoint] = newValue?.absoluteString
         }
     }
     
@@ -310,7 +304,7 @@ extension KeyValueStorage where Self: OptimoveValue {
         }
     }
 
-    func getConfigurationEndPoint() throws -> String {
+    func getConfigurationEndPoint() throws -> URL {
         guard let value = configurationEndPoint else {
             throw OptimoveStorageError.noValue(.configurationEndPoint)
         }

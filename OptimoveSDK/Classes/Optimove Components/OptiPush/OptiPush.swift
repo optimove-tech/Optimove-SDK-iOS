@@ -20,71 +20,81 @@ protocol OptipushServiceInfra {
     func unsubscribeFromTopic(topic: String, didSucceed: ((Bool) -> Void)?)
 }
 
-final class OptiPush: OptimoveComponent {
+final class OptiPush {
 
-    private var firebaseInteractor: OptipushServiceInfra
-    private var registrar: Registrable?
+    private let configuration: OptipushConfig
+    private let firebaseInteractor: OptipushServiceInfra
+    private let registrar: Registrable
     private var storage: OptimoveStorage
     private let serviceLocator: OptiPushServiceLocator
+    private let deviceStateMonitor: OptimoveDeviceStateMonitor
 
-    init(deviceStateMonitor: OptimoveDeviceStateMonitor,
+    init(configuration: OptipushConfig,
+         deviceStateMonitor: OptimoveDeviceStateMonitor,
          infrastructure: OptipushServiceInfra,
          storage: OptimoveStorage,
          localServiceLocator: OptiPushServiceLocator) {
+        self.configuration = configuration
         self.firebaseInteractor = infrastructure
         self.storage = storage
         self.serviceLocator = localServiceLocator
-        super.init(deviceStateMonitor: deviceStateMonitor)
+        self.deviceStateMonitor = deviceStateMonitor
+
+        registrar = serviceLocator.registrar(configuration: configuration)
+        firebaseInteractor.setupFirebase(
+            from: configuration.firebaseProjectKeys,
+            clientFirebaseMetaData: configuration.clientsServiceProjectKeys,
+            delegate: self
+        )
+
+        performInitializationOperations()
     }
 
-    override func performInitializationOperations() {
+    func performInitializationOperations() {
         if RunningFlagsIndication.isComponentRunning(.optiPush) {
             self.retryFailedMbaasOperations()
             self.optInOutIfNeeded()
             firebaseInteractor.subscribeToTopics(didSucceed: nil)
+            if let clientApnsToken = storage.apnsToken {
+                application(didRegisterForRemoteNotificationsWithDeviceToken: clientApnsToken)
+                storage.apnsToken = nil
+            }
         }
     }
 
-    // MARK: - Internal methods
-    func setup(
-        firebaseMetaData: FirebaseProjectKeys,
-        clientFirebaseMetaData: ClientsServiceProjectKeys,
-        optipushMetaData: OptipushMetaData
-    ) {
-        registrar = serviceLocator.registrar(metaData: optipushMetaData)
-        firebaseInteractor.setupFirebase(
-            from: firebaseMetaData,
-            clientFirebaseMetaData: clientFirebaseMetaData,
-            delegate: self
-        )
-    }
+}
+
+extension OptiPush: Pushable {
 
     func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         firebaseInteractor.handleRegistration(token: deviceToken)
     }
 
-    func subscribeToTopic(topic: String, didSucceed: ((Bool) -> Void)? = nil) {
-        firebaseInteractor.subscribeToTopic(topic: topic, didSucceed: didSucceed)
+    func subscribeToTopic(topic: String) {
+        firebaseInteractor.subscribeToTopic(topic: topic, didSucceed: nil)
     }
 
-    func unsubscribeFromTopic(topic: String, didSucceed: ((Bool) -> Void)? = nil) {
-        firebaseInteractor.unsubscribeFromTopic(topic: topic, didSucceed: didSucceed)
+    func unsubscribeFromTopic(topic: String) {
+        firebaseInteractor.unsubscribeFromTopic(topic: topic, didSucceed: nil)
     }
 
     func performRegistration() {
-        registrar?.register()
+        registrar.register()
     }
+
 }
 
 extension OptiPush: OptimoveMbaasRegistrationHandling {
+
     // MARK: - Protocol conformance
+
     func handleRegistrationTokenRefresh(token: String) {
         guard let _ = storage.fcmToken else {
             handleFcmTokenReceivedForTheFirstTime(token)
             return
         }
 
-        registrar?.unregister {
+        registrar.unregister {
             //The order of the following operations matter
             self.updateFcmTokenWith(token)
             self.performRegistration()
@@ -92,25 +102,27 @@ extension OptiPush: OptimoveMbaasRegistrationHandling {
         }
     }
 
-    private func handleFcmTokenReceivedForTheFirstTime(_ token: String) {
+}
+
+private extension OptiPush {
+
+    func handleFcmTokenReceivedForTheFirstTime(_ token: String) {
         OptiLoggerMessages.logClientreceiveFcmTOkenForTheFirstTime()
         storage.fcmToken = token
         performRegistration()
         firebaseInteractor.subscribeToTopics(didSucceed: nil)
     }
 
-    private func updateFcmTokenWith(_ fcmToken: String) {
+    func updateFcmTokenWith(_ fcmToken: String) {
         storage.fcmToken = fcmToken
 
     }
 
-    private func retryFailedMbaasOperations() {
-        try? registrar?.retryFailedOperationsIfExist()
+    func retryFailedMbaasOperations() {
+        try? registrar.retryFailedOperationsIfExist()
     }
-}
 
-extension OptiPush {
-    private func optInOutIfNeeded() {
+    func optInOutIfNeeded() {
         guard storage.isOptRequestSuccess else { return }
         deviceStateMonitor.getStatus(for: .userNotification) { (granted) in
             if granted {
@@ -121,12 +133,12 @@ extension OptiPush {
         }
     }
 
-    private func handleNotificationAuthorizedAtFirstLaunch() {
+    func handleNotificationAuthorizedAtFirstLaunch() {
         OptiLoggerMessages.logUserOptOPutFirstTime()
         storage.isMbaasOptIn = true
     }
 
-    private func handleNotificationAuthorized() {
+    func handleNotificationAuthorized() {
         OptiLoggerMessages.logUserNotificationAuthorizedByUser()
         guard let isOptIn = storage.isMbaasOptIn else {  //Opt in on first launch
             handleNotificationAuthorizedAtFirstLaunch()
@@ -134,12 +146,11 @@ extension OptiPush {
         }
         if !isOptIn {
             OptiLoggerMessages.logOptinRequest()
-            registrar?.optIn()
-
+            registrar.optIn()
         }
     }
 
-    private func handleNotificationRejection() {
+    func handleNotificationRejection() {
         OptiLoggerMessages.logUserNotificationRejectedByUser()
 
         guard let isOptIn = storage.isMbaasOptIn else {
@@ -149,12 +160,12 @@ extension OptiPush {
         }
         if isOptIn {
             OptiLoggerMessages.logOptoutRequest()
-            registrar?.optOut()
+            registrar.optOut()
             storage.isMbaasOptIn = false
         }
     }
 
-    private func handleNotificationRejectionAtFirstLaunch() {
+    func handleNotificationRejectionAtFirstLaunch() {
         OptiLoggerMessages.logOptOutFirstLaunch()
         guard storage.fcmToken != nil else {
             storage.isMbaasOptIn = false
@@ -163,7 +174,7 @@ extension OptiPush {
 
         if storage.isRegistrationSuccess {
             storage.isMbaasOptIn = false
-            self.registrar?.optOut()
+            registrar.optOut()
         }
     }
 }

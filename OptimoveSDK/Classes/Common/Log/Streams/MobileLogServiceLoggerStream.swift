@@ -7,9 +7,9 @@ import Foundation
 final class MobileLogServiceLoggerStream: MutableOptiLoggerOutputStream {
 
     var tenantId: Int
+    var endpoint = Endpoints.Logger.defaultEndpint
     private let appNs: String
     private let sdkPlatform: SdkPlatform
-    private let destination: URL
 
     var isVisibleToClient: Bool {
         return false
@@ -19,16 +19,6 @@ final class MobileLogServiceLoggerStream: MutableOptiLoggerOutputStream {
         self.tenantId = tenantId
         self.sdkPlatform = .ios
         self.appNs = Bundle.main.bundleIdentifier!
-
-        switch SDK.environment {
-        case .dev, .qa:
-            self.destination = URL(
-                string: "https://us-central1-appcontrollerproject-developer.cloudfunctions.net/reportLog"
-            )!
-        case .prod:
-            self.destination = URL(string: "https://us-central1-mobilepush-161510.cloudfunctions.net/reportLog")!
-        }
-
     }
 
     func log(level: LogLevel, fileName: String, methodName: String, logModule: String?, message: String) {
@@ -43,7 +33,7 @@ final class MobileLogServiceLoggerStream: MutableOptiLoggerOutputStream {
             logMethodName: methodName,
             message: message
         )
-        if let request = self.buildLogRequest(data) {
+        if let request = try? self.buildLogRequest(data) {
             let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
 
             }
@@ -51,15 +41,12 @@ final class MobileLogServiceLoggerStream: MutableOptiLoggerOutputStream {
         }
     }
 
-    private func buildLogRequest(_ data: LogBody) -> URLRequest? {
-        if let logBody = try? JSONEncoder().encode(data) {
-            var request = URLRequest(url: self.destination)
-            request.httpBody = logBody
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            return request
-        } else {
-            return nil
-        }
+    private func buildLogRequest(_ data: LogBody) throws -> URLRequest {
+        let logBody = try JSONEncoder().encode(data)
+        var request = URLRequest(url: endpoint)
+        request.httpBody = logBody
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        return request
     }
 }

@@ -2,7 +2,7 @@
 
 import UIKit
 
-final class OptiTrack: OptimoveComponent {
+final class OptiTrack {
 
     struct Constants {
         struct AppOpen {
@@ -11,47 +11,48 @@ final class OptiTrack: OptimoveComponent {
         }
     }
 
+    private let configuration: OptitrackConfig
     private let warehouseProvider: EventsConfigWarehouseProvider
     private var storage: OptimoveStorage
-    private let metaDataProvider: MetaDataProvider<OptitrackMetaData>
     private let coreEventFactory: CoreEventFactory
     private let dateTimeProvider: DateTimeProvider
-    private let statisticService: StatisticService
+    private var statisticService: StatisticService
     private let eventReportingQueue = DispatchQueue(label: "com.optimove.optitrack", qos: .background)
-
-    // TODO: Make private after resolve construction lifecycle.
-    var tracker: Tracker?
-    private var lastReportedOpenApplicationTime: TimeInterval?
+    private let deviceStateMonitor: OptimoveDeviceStateMonitor
     private var optimoveCustomizePlugins: [String: String] = [:]
+    private var tracker: Tracker
 
     required init(
+        configuration: OptitrackConfig,
         deviceStateMonitor: OptimoveDeviceStateMonitor,
         warehouseProvider: EventsConfigWarehouseProvider,
         storage: OptimoveStorage,
-        metaDataProvider: MetaDataProvider<OptitrackMetaData>,
         coreEventFactory: CoreEventFactory,
         dateTimeProvider: DateTimeProvider,
-        statisticService: StatisticService) {
+        statisticService: StatisticService,
+        tracker: Tracker) {
+        self.configuration = configuration
         self.warehouseProvider = warehouseProvider
         self.storage = storage
-        self.metaDataProvider = metaDataProvider
         self.coreEventFactory = coreEventFactory
         self.dateTimeProvider = dateTimeProvider
         self.statisticService = statisticService
-        super.init(deviceStateMonitor: deviceStateMonitor)
-        setupPluginFlags()
+        self.deviceStateMonitor = deviceStateMonitor
+        self.tracker = tracker
+        optimoveCustomizePlugins = createPluginFlags()
+
+        performInitializationOperations()
     }
 
     // MARK: - Internal Methods
 
-    override func performInitializationOperations() {
+    func performInitializationOperations() {
         guard RunningFlagsIndication.isComponentRunning(.optiTrack) else { return }
         do {
-            lastReportedOpenApplicationTime = dateTimeProvider.now.timeIntervalSince1970
             injectVisitorAndUserIdToMatomo()
             reportPendingEvents()
             try reportMetaData()
-            try reportIdfaIfAllowed()
+            reportIdfaIfAllowed()
             try reportUserAgent()
             reportOptInOutIfNeeded()
             try reportAppOpenedIfNeeded()
@@ -61,13 +62,44 @@ final class OptiTrack: OptimoveComponent {
             OptiLoggerMessages.logError(error: error)
         }
     }
+}
 
-    func setupTracker() throws {
-        tracker = try MatomoTrackerAdapter(
-            metaData: try metaDataProvider.getMetaData(),
-            storage: storage
-        )
+extension OptiTrack: Eventable {
+
+    func setUserId(_ userId: String) {
+        OptiLoggerMessages.logOptitrackSetUserID(userId: userId)
+        tracker.userId = userId
     }
+
+    func report(event: OptimoveEvent, config: EventsConfig) {
+        guard config.supportedOnOptitrack else { return }
+        eventReportingQueue.async {
+            self.sendReport(event: event, config: config)
+        }
+    }
+
+    func reportScreenEvent(customURL: String, pageTitle: String, category: String?) throws {
+        OptiLoggerMessages.logReportScreenEvent(screenTitle: pageTitle)
+        tracker.track(view: [customURL], url: URL(string: "http://\(customURL)"))
+
+        let event = try coreEventFactory.createEvent(
+            .pageVisit(screenPath: customURL.sha1(),
+                       screenTitle: pageTitle,
+                       category: category
+            )
+        )
+        report(event: event)
+    }
+
+    func dispatchNow() {
+        if RunningFlagsIndication.isComponentRunning(.optiTrack) {
+            OptiLoggerMessages.logOptitrackDispatchRequest()
+            tracker.dispatch()
+        } else {
+            OptiLoggerMessages.logOptitrackNotRunning()
+        }
+    }
+
 }
 
 extension OptiTrack {
@@ -83,25 +115,14 @@ extension OptiTrack {
         }
         OptiLoggerMessages.logOptitrackReport(event: event.name)
         event.processEventConfig(config)
-        report(event: event, withConfigs: config)
-    }
-
-
-    func report(event: OptimoveEvent, withConfigs config: EventsConfig) {
-        eventReportingQueue.async {
-            do {
-                try self.sendReport(event: event, config: config)
-            } catch {
-                OptiLoggerMessages.logError(error: error)
-            }
-        }
+        report(event: event, config: config)
     }
 
     func reportScreenEvent(screenTitle: String,
                            screenPath: String,
                            category: String? = nil) throws {
         OptiLoggerMessages.logReportScreenEvent(screenTitle: screenTitle)
-        tracker?.track(view: [screenTitle], url: URL(string: "http://\(screenPath)"))
+        tracker.track(view: [screenTitle], url: URL(string: "http://\(screenPath)"))
 
         let event = try coreEventFactory.createEvent(
             .pageVisit(screenPath: screenPath.sha1(),
@@ -112,21 +133,6 @@ extension OptiTrack {
         report(event: event)
     }
 
-    func setUserId(_ userId: String) {
-        OptiLoggerMessages.logOptitrackSetUserID(userId: userId)
-        tracker?.userId = userId
-    }
-
-    // MARK: - Dispatch
-
-    func dispatchNow() {
-        if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            OptiLoggerMessages.logOptitrackDispatchRequest()
-            tracker?.dispatch()
-        } else {
-            OptiLoggerMessages.logOptitrackNotRunning()
-        }
-    }
 }
 
 
@@ -135,13 +141,13 @@ extension OptiTrack {
 
     func injectVisitorAndUserIdToMatomo() {
         if let globalVisitorID = storage.visitorID {
-            let localVisitorID: String? = tracker?.forcedVisitorId
+            let localVisitorID: String? = tracker.forcedVisitorId
             if localVisitorID != globalVisitorID {
-                tracker?.forcedVisitorId = globalVisitorID
+                tracker.forcedVisitorId = globalVisitorID
             }
         }
         if let globalUserID = storage.customerID {
-            let localUserID: String? = tracker?.userId
+            let localUserID: String? = tracker.userId
             if localUserID != globalUserID {
                 setUserId(globalUserID)
             }
@@ -158,45 +164,42 @@ extension OptiTrack {
         }
     }
 
-    func setupPluginFlags() {
+    func createPluginFlags() -> [String: String] {
+        guard let initialVisitorId: String = storage[.initialVisitorId] else { return [:] }
         let pluginFlags = ["fla", "java", "dir", "qt", "realp", "pdf", "wma", "gears"]
-        guard let initialVisitorId: String = storage[.initialVisitorId] else { return }
         let pluginValues = initialVisitorId.split(by: 2)
             .map { Int($0, radix: 16)! / 2 }
             .map { $0.description }
-        for i in 0..<pluginFlags.count {
-            let pluginFlag = pluginFlags[i]
-            let pluginValue = pluginValues[i]
-            self.optimoveCustomizePlugins[pluginFlag] = pluginValue
-        }
+
+        return Dictionary(uniqueKeysWithValues: zip(pluginFlags, pluginValues))
     }
 
-    func sendReport(event: OptimoveEvent, config: EventsConfig) throws {
-        let metaData = try metaDataProvider.getMetaData()
-        let maxCustomDimensions = metaData.maxActionCustomDimensions + metaData.maxVisitCustomDimensions
+    func sendReport(event: OptimoveEvent, config: EventsConfig) {
+        let customDimensionIDS = configuration.customDimensionIDS
+        let maxCustomDimensions = customDimensionIDS.maxActionCustomDimensions + customDimensionIDS.maxVisitCustomDimensions
 
         let getOptitrackDimensionId: (String) -> Int? = { parameterName in
             return config.parameters[parameterName]?.optiTrackDimensionId
         }
 
-        let dimensions: [TrackerEvent.CustomDimension] = event.parameters
+        let parameterDimensions: [TrackerEvent.CustomDimension] = event.parameters
             .compactMapKeys(getOptitrackDimensionId)
             .filter { $0.key <= maxCustomDimensions }
             .mapValues { String(describing: $0).trimmingCharacters(in: .whitespaces) }
             .map { TrackerEvent.CustomDimension(index: $0.key, value: $0.value) }
 
-        let metadataDimensions: [TrackerEvent.CustomDimension] = [
-            TrackerEvent.CustomDimension(index: metaData.eventIdCustomDimensionId, value: String(config.id)),
-            TrackerEvent.CustomDimension(index: metaData.eventNameCustomDimensionId, value: event.name)
+        let nameDimensions: [TrackerEvent.CustomDimension] = [
+            TrackerEvent.CustomDimension(index: customDimensionIDS.eventIDCustomDimensionID, value: String(config.id)),
+            TrackerEvent.CustomDimension(index: customDimensionIDS.eventNameCustomDimensionID, value: event.name)
         ]
 
         let event = TrackerEvent(
-            category: metaData.eventCategoryName,
+            category: configuration.eventCategoryName,
             action: event.name,
-            dimensions: dimensions + metadataDimensions,
+            dimensions: parameterDimensions + nameDimensions,
             customTrackingParameters: self.optimoveCustomizePlugins
         )
-        self.tracker?.track(event)
+        tracker.track(event)
         
         // ELI: TODO: Check this point out.
         if config.supportedOnRealTime {
@@ -208,9 +211,8 @@ extension OptiTrack {
         }
     }
 
-    func reportIdfaIfAllowed() throws {
-        let metaData = try metaDataProvider.getMetaData()
-        guard metaData.enableAdvertisingIdReport == true else { return }
+    func reportIdfaIfAllowed() {
+        guard configuration.enableAdvertisingIdReport == true else { return }
         deviceStateMonitor.getStatus(for: .advertisingId) { [coreEventFactory] (isAllowed) in
             guard isAllowed else { return }
             do {
@@ -282,7 +284,7 @@ extension OptiTrack {
     func handleWillEnterForegroundNotification() throws {
         let threshold: TimeInterval = Constants.AppOpen.throttlingThreshold
         let now = dateTimeProvider.now.timeIntervalSince1970
-        let appOpenTime = lastReportedOpenApplicationTime ?? statisticService.applicationOpenTime
+        let appOpenTime = statisticService.applicationOpenTime
         if (now - appOpenTime) > threshold {
             try reportAppOpen()
         }
@@ -290,13 +292,13 @@ extension OptiTrack {
 
     func reportPendingEvents() {
         if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            tracker?.dispathPendingEvents()
+            tracker.dispathPendingEvents()
         }
     }
 
     func reportAppOpen() throws {
         let event = try coreEventFactory.createEvent(.appOpen)
         report(event: event)
-        lastReportedOpenApplicationTime = dateTimeProvider.now.timeIntervalSince1970
+        statisticService.applicationOpenTime = dateTimeProvider.now.timeIntervalSince1970
     }
 }

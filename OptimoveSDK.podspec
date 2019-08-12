@@ -16,5 +16,6 @@ Pod::Spec.new do |s|
   s.dependency 'FirebaseMessaging', '~> 4.0'
   s.dependency 'MatomoTracker', '~> 6.0'
   s.dependency 'ReachabilitySwift', '~> 4.0'
+  s.dependency 'OptimoveCore'
   s.frameworks = 'UIKit', 'SystemConfiguration', 'UserNotifications', 'AdSupport'
 end

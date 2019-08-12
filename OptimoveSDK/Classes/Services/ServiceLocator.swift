@@ -19,21 +19,6 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _realtimeMetaDataProvider: MetaDataProvider<RealtimeMetaData> = {
-        return MetaDataProvider<RealtimeMetaData>()
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _optitrackMetaData: MetaDataProvider<OptitrackMetaData> = {
-        return MetaDataProvider<OptitrackMetaData>()
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _optipushMetaData: MetaDataProvider<OptipushMetaData> = {
-        return MetaDataProvider<OptipushMetaData>()
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
     private lazy var _notificationListener: OptimoveNotificationHandler = {
         return OptimoveNotificationHandler(
             storage: storage(),
@@ -67,20 +52,14 @@ final class ServiceLocator {
         return StatisticServiceImpl()
     }()
 
+    /// Keeps as singleton in reason to share a session state between a service consumers.
+    private lazy var _componentsPool: MutableComponentsPool = {
+        return ComponentsPoolImpl(
+            componentFactory: componentFactory()
+        )
+    }()
 
     // MARK: - Functions
-
-    func realtimeMetaDataProvider() -> MetaDataProvider<RealtimeMetaData> {
-        return _realtimeMetaDataProvider
-    }
-
-    func optitrackMetaDataProvider() -> MetaDataProvider<OptitrackMetaData> {
-        return _optitrackMetaData
-    }
-
-    func optipushMetaDataProvider() -> MetaDataProvider<OptipushMetaData> {
-        return _optipushMetaData
-    }
 
     func storage() -> OptimoveStorage {
         return _storage
@@ -112,6 +91,47 @@ final class ServiceLocator {
 
     func networkClient() -> NetworkClient {
         return NetworkClientImpl()
+    }
+
+    func configurationRepository() -> ConfigurationRepository {
+        return ConfigurationRepositoryImpl(storage: storage())
+    }
+
+    func initializer() -> OptimoveSDKInitializer {
+        let networkingFactory = NetworkingFactory(
+            networkClient: NetworkClientImpl(),
+            requestBuilderFactory: NetworkRequestBuilderFactory(
+                serviceLocator: self
+            )
+        )
+        return OptimoveSDKInitializer(
+            deviceStateMonitor: deviceStateMonitor(),
+            warehouseProvider: warehouseProvider(),
+            storage: storage(),
+            networking: networkingFactory.createRemoteConfigurationNetworking(),
+            configurationRepository: configurationRepository(),
+            componentFactory: componentFactory(),
+            componentsPool: mutableComponentsPool()
+        )
+    }
+
+    // FIXME: Move to Main factory
+    func componentFactory() -> ComponentFactory {
+        return ComponentFactory(
+            serviceLocator: self,
+            coreEventFactory: CoreEventFactoryImpl(
+                storage: storage(),
+                dateTimeProvider: dateTimeProvider()
+            )
+        )
+    }
+
+    func componentsPool() -> ComponentsPool {
+        return _componentsPool
+    }
+
+    func mutableComponentsPool() -> MutableComponentsPool {
+        return _componentsPool
     }
 
 }
