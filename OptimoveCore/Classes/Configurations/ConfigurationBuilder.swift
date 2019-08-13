@@ -2,13 +2,13 @@
 
 import Foundation
 
-final class ConfigurationBuilder {
+public final class ConfigurationBuilder {
 
     private let globalConfig: GlobalConfig
     private let tenantConfig: TenantConfig
     private let events: [String: EventsConfig]
 
-    init(globalConfig: GlobalConfig,
+    public init(globalConfig: GlobalConfig,
          tenantConfig: TenantConfig) {
         self.globalConfig = globalConfig
         self.tenantConfig = tenantConfig
@@ -18,7 +18,7 @@ final class ConfigurationBuilder {
         )
     }
 
-    func build() -> Configuration {
+    public func build() -> Configuration {
         return Configuration(
             tenantID: tenantConfig.optitrack.siteId,
             logger: buildLoggerConfig(),

@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 public final class RemoteConfigurationRequestBuilder {
 
@@ -18,7 +19,7 @@ public final class RemoteConfigurationRequestBuilder {
             .appendingPathComponent(tenantToken)
             .appendingPathComponent(version)
             .appendingPathExtension("json")
-//        OptiLoggerMessages.logPathToRemoteConfiguration(path: url.absoluteString)
+        OptiLoggerMessages.logPathToRemoteConfiguration(path: url.absoluteString)
         return NetworkRequest(method: .get, baseURL: url)
     }
 

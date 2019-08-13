@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 public final class RemoteConfigurationNetworking {
 

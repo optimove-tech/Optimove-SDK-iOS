@@ -530,12 +530,12 @@ private extension Optimove {
     func storeTenantInfo(_ info: OptimoveTenantInfo) {
         storage.tenantToken = info.tenantToken
         storage.version = info.configName
-        storage.configurationEndPoint = Endpoints.Remote.tenantConfig
+        storage.configurationEndPoint = Endpoints.Remote.TenantConfig.url
 
         OptiLoggerMessages.logStoreUserInfo(
             tenantToken: info.tenantToken,
             tenantVersion: info.configName,
-            tenantUrl: Endpoints.Remote.tenantConfig.absoluteString
+            tenantUrl: Endpoints.Remote.TenantConfig.url.absoluteString
         )
 
     }
