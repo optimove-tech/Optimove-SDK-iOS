@@ -15,7 +15,8 @@ The Optimove SDK for iOS Core framework provides:
   base_dir = "OptimoveCore/"
   s.source_files = base_dir + 'Classes/**/*'
   s.frameworks = 'Foundation'
-  s.test_spec 'tests' do |unit_tests|
-    unit_tests.source_files = base_dir + 'Tests/**/*'
+  s.test_spec do |unit_tests|
+    unit_tests.source_files = base_dir + 'Tests/Sources/**/*'
+    unit_tests.resources = base_dir + 'Tests/Resources/**/*'
   end
 end
