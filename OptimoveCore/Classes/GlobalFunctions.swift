@@ -41,3 +41,14 @@ public enum CastError: LocalizedError {
     }
 
 }
+
+public enum GuardError: LocalizedError {
+    case custom(String)
+
+    public var errorDescription: String? {
+        switch self {
+        case let .custom(message):
+            return message
+        }
+    }
+}
