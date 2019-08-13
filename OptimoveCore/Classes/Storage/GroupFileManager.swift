@@ -10,7 +10,7 @@ public protocol FileStorage {
     ///   - fileName: The file name on disk space.
     ///   - shared: set `true` if the requested file should be lookup in a shared container.
     /// - Returns: Return `true` if the requested file exist.
-    func isExist(fileName: String, shared: Bool) throws -> Bool
+    func isExist(fileName: String, shared: Bool) -> Bool
 
     /// Save file.
     ///
@@ -52,17 +52,15 @@ public final class GroupedFileManager {
     }
 
     private let fileManager: FileManager
-    private lazy var groupedDirectoryURL: URL? = {
-        let bundleIdentifier = Bundle.main.bundleIdentifier!
-        let groupIdentifier = "group.\(bundleIdentifier).optimove"
-        return fileManager.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier)
-    }()
-    private lazy var sharedDirectoryURL: URL? = {
-        return fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-    }()
+    private let groupedDirectoryURL: URL
+    private let sharedDirectoryURL: URL
 
-    public init(fileManager: FileManager) {
+    public init(bundleIdentifier: String,
+                fileManager: FileManager) throws {
         self.fileManager = fileManager
+
+        groupedDirectoryURL = try fileManager.groupContainer(tenantBundleIdentifier: bundleIdentifier)
+        sharedDirectoryURL = try unwrap(fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first)
     }
 
     private func addSkipBackupAttributeToItemAtURL(fileURL: URL) throws {
@@ -72,34 +70,22 @@ public final class GroupedFileManager {
         try url.setResourceValues(resourceValues)
     }
 
-    private func getDirectory(shared: Bool) throws -> URL {
-        let groupURL: URL? = {
-            if shared {
-                return groupedDirectoryURL
-            }
-            return sharedDirectoryURL
-        }()
-        guard let url = groupURL else {
-            fatalError("""
-To enable OptiPush, check adding an `App group` capability in both the app and the extension targets.
-The group name convention should be: `group.<bundleIdentifier>.optimove`
-""")
-        }
+    private func getDirectory(shared: Bool) -> URL {
+        let url = shared ? groupedDirectoryURL : sharedDirectoryURL
         return url.appendingPathComponent(Constants.folderName)
     }
 }
 
 extension GroupedFileManager: FileStorage {
 
-    public func isExist(fileName: String, shared: Bool) throws -> Bool {
-        let url = try getDirectory(shared: shared)
+    public func isExist(fileName: String, shared: Bool) -> Bool {
+        let url = getDirectory(shared: shared)
         let fileUrl = url.appendingPathComponent(fileName)
         return fileManager.fileExists(atPath: fileUrl.path)
     }
 
     public func load(fileName: String, shared: Bool) throws -> Data {
-        let fileUrl = try getDirectory(shared: shared)
-            .appendingPathComponent(fileName)
+        let fileUrl = getDirectory(shared: shared).appendingPathComponent(fileName)
         do {
             let contents = try Data.init(contentsOf: fileUrl)
 //            OptiLoggerMessages.logLoadFile(fileUrl: fileUrl.path)
@@ -124,7 +110,7 @@ extension GroupedFileManager: FileStorage {
         toFileName fileName: String,
         shared: Bool = false) throws {
         do {
-            let url = try getDirectory(shared: shared)
+            let url = getDirectory(shared: shared)
             try fileManager.createDirectory(at: url, withIntermediateDirectories: true)
             let fileURL = url.appendingPathComponent(fileName)
             let success = fileManager.createFile(atPath: fileURL.path, contents: data, attributes: nil)
@@ -142,7 +128,7 @@ extension GroupedFileManager: FileStorage {
 
     public func delete(fileName: String, shared: Bool) throws {
         do {
-            let fileUrl = try getDirectory(shared: shared).appendingPathComponent(fileName)
+            let fileUrl = getDirectory(shared: shared).appendingPathComponent(fileName)
             try fileManager.removeItem(at: fileUrl)
 //            OptiLoggerMessages.logDeleteFile(name: fileName)
         } catch {

@@ -107,8 +107,8 @@ extension OptimoveStorageFacade: OptimoveStorage {
 
     // MARK: - OptimoveFileStorage
 
-    func isExist(fileName: String, shared: Bool) throws -> Bool {
-        return try fileStorage.isExist(fileName: fileName, shared: shared)
+    func isExist(fileName: String, shared: Bool) -> Bool {
+        return fileStorage.isExist(fileName: fileName, shared: shared)
     }
 
     func save<T>(data: T, toFileName: String, shared: Bool) throws where T : Encodable {

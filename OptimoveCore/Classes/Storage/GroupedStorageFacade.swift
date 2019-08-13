@@ -37,8 +37,8 @@ extension GroupedStorageFacade: GroupedStorage {
     }
 
 
-    public func isExist(fileName: String, shared: Bool) throws -> Bool {
-        return try fileStorage.isExist(fileName: fileName, shared: shared)
+    public func isExist(fileName: String, shared: Bool) -> Bool {
+        return fileStorage.isExist(fileName: fileName, shared: shared)
     }
 
     public func save<T>(data: T, toFileName: String, shared: Bool) throws where T : Encodable {
