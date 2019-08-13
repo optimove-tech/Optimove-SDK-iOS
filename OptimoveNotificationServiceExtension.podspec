@@ -14,7 +14,7 @@ The Notification service extension for Optimove SDK framework provides:
   s.swift_version = '5'
   base_dir = "OptimoveNotificationServiceExtension/"
   s.source_files = base_dir + 'Classes/**/*'
-  s.dependency 'OptimoveCore'
+  s.dependency 'OptimoveCore', '~> 2.0'
   s.frameworks = 'UserNotifications', 'UIKit'
   # s.test_spec do |unit_tests|
   #   unit_tests.source_files = base_dir + 'Tests/Sources/**/*'
