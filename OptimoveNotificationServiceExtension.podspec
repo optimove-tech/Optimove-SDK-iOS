@@ -16,8 +16,8 @@ The Notification service extension for Optimove SDK framework provides:
   s.source_files = base_dir + 'Classes/**/*'
   s.dependency 'OptimoveCore'
   s.frameworks = 'UserNotifications', 'UIKit'
-  s.test_spec do |unit_tests|
-    unit_tests.source_files = base_dir + 'Tests/Sources/**/*'
-    unit_tests.resources = base_dir + 'Tests/Resources/**/*'
-  end
+  # s.test_spec do |unit_tests|
+  #   unit_tests.source_files = base_dir + 'Tests/Sources/**/*'
+  #   unit_tests.resources = base_dir + 'Tests/Resources/**/*'
+  # end
 end

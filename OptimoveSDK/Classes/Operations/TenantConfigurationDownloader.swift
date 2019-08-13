@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 public final class TenantConfigurationDownloader: AsyncOperation {
 
@@ -20,7 +21,7 @@ public final class TenantConfigurationDownloader: AsyncOperation {
                 let tenant = try result.get()
                 try self.repository.saveTenant(tenant)
             } catch {
-//                OptiLoggerMessages.logError(error: error)
+                OptiLoggerMessages.logError(error: error)
             }
             self.state = .finished
         }
