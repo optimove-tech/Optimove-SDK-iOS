@@ -11,7 +11,7 @@ final class MatomoTrackerAdapter {
     }
 
     private let tracker: MatomoTracker
-    private let storage: OptimoveStorage
+    private var storage: OptimoveStorage
 
     init(configuration: OptitrackConfig,
          storage: OptimoveStorage) {
@@ -31,6 +31,13 @@ final class MatomoTrackerAdapter {
                 baseURL: baseURL
             )
         )
+        setupForNotificationExtension()
+    }
+
+    private func setupForNotificationExtension() {
+        let screenSize = Device.makeCurrentDevice().screenSize
+        storage.deviceResolutionHeight = Float(screenSize.height)
+        storage.deviceResolutionWidth = Float(screenSize.width)
     }
 
     private func convertToMatomoEvent(_ event: TrackerEvent) -> Event {

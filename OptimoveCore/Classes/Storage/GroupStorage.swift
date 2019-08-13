@@ -13,6 +13,8 @@ public enum GroupedStorageKey: String, CaseIterable {
     case visitorID
     case version
     case userAgent
+    case deviceResolutionWidth
+    case deviceResolutionHeight
 }
 
 public protocol GroupedOptimoveValue {
@@ -23,6 +25,8 @@ public protocol GroupedOptimoveValue {
     var visitorID: String? { get set }
     var version: String? { get set }
     var userAgent: String? { get set }
+    var deviceResolutionWidth: Float? { get set }
+    var deviceResolutionHeight: Float? { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -31,6 +35,8 @@ public protocol GroupedOptimoveValue {
     func getVisitorID() throws -> String
     func getVersion() throws -> String
     func getUserAgent() throws -> String
+    func getDeviceResolutionWidth() throws -> Float
+    func getDeviceResolutionHeight() throws -> Float
 }
 
 public protocol GroupKeyValueStorage {
@@ -108,6 +114,24 @@ public extension GroupKeyValueStorage where Self: GroupedOptimoveValue {
         }
     }
 
+    var deviceResolutionWidth: Float? {
+        get {
+            return self[.deviceResolutionWidth]
+        }
+        set {
+            self[.deviceResolutionWidth] = newValue
+        }
+    }
+
+    var deviceResolutionHeight: Float? {
+        get {
+            return self[.deviceResolutionHeight]
+        }
+        set {
+            self[.deviceResolutionHeight] = newValue
+        }
+    }
+
     func getConfigurationEndPoint() throws -> URL {
         guard let value = configurationEndPoint else {
             throw GroupedStorageError.noValue(.configurationEndPoint)
@@ -156,6 +180,21 @@ public extension GroupKeyValueStorage where Self: GroupedOptimoveValue {
         }
         return value
     }
+
+    func getDeviceResolutionWidth() throws -> Float {
+        guard let value = deviceResolutionWidth else {
+            throw GroupedStorageError.noValue(.deviceResolutionWidth)
+        }
+        return value
+    }
+
+    func getDeviceResolutionHeight() throws -> Float {
+        guard let value = deviceResolutionHeight else {
+            throw GroupedStorageError.noValue(.deviceResolutionHeight)
+        }
+        return value
+    }
+    
 }
 
 public enum GroupedStorageError: LocalizedError {
