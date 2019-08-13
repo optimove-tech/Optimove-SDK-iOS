@@ -22,6 +22,7 @@ public protocol GroupedOptimoveValue {
     var tenantToken: String? { get set }
     var visitorID: String? { get set }
     var version: String? { get set }
+    var userAgent: String? { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -29,6 +30,7 @@ public protocol GroupedOptimoveValue {
     func getTenantToken() throws -> String
     func getVisitorID() throws -> String
     func getVersion() throws -> String
+    func getUserAgent() throws -> String
 }
 
 public protocol GroupKeyValueStorage {
@@ -97,6 +99,15 @@ public extension GroupKeyValueStorage where Self: GroupedOptimoveValue {
         }
     }
 
+    var userAgent: String? {
+        get {
+            return self[.userAgent]
+        }
+        set {
+            self[.userAgent] = newValue
+        }
+    }
+
     func getConfigurationEndPoint() throws -> URL {
         guard let value = configurationEndPoint else {
             throw GroupedStorageError.noValue(.configurationEndPoint)
@@ -135,6 +146,13 @@ public extension GroupKeyValueStorage where Self: GroupedOptimoveValue {
     func getVersion() throws -> String {
         guard let value = version else {
             throw GroupedStorageError.noValue(.version)
+        }
+        return value
+    }
+
+    func getUserAgent() throws -> String {
+        guard let value = userAgent else {
+            throw GroupedStorageError.noValue(.userAgent)
         }
         return value
     }

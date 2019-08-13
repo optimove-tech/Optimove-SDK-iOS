@@ -557,8 +557,7 @@ private extension Optimove {
     }
 
     func setUserAgent() {
-        let userAgent = Device.evaluateUserAgent()
-        storage.set(value: userAgent, key: .userAgent)
+        storage.userAgent = Device.evaluateUserAgent()
     }
 
     func setVisitorIdIfNeeded() {
