@@ -209,10 +209,11 @@ extension Optimove {
         }
         let missingPermissions = serviceLocator.deviceStateMonitor().getMissingPermissions()
         let missingPermissionsObjc = missingPermissions.map { $0.rawValue }
-        zip(Optimove.swiftStateDelegates.values, Optimove.objcStateDelegate.values).forEach {
-            (zipped: (swift: OptimoveSuccessStateListenerWrapper, objc: OptimoveSuccessStateDelegateWrapper)) in
-            zipped.swift.observer?.optimove(self, didBecomeActiveWithMissingPermissions: missingPermissions)
-            zipped.objc.observer.optimove(self, didBecomeActiveWithMissingPermissions: missingPermissionsObjc)
+        Optimove.swiftStateDelegates.values.forEach { (wrapper) in
+            wrapper.observer?.optimove(self, didBecomeActiveWithMissingPermissions: missingPermissions)
+        }
+        Optimove.objcStateDelegate.values.forEach { (wrapper) in
+            wrapper.observer.optimove(self, didBecomeActiveWithMissingPermissions: missingPermissionsObjc)
         }
     }
 }
