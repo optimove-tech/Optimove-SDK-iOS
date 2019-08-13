@@ -21,7 +21,7 @@ final class OptiPushServiceLocator {
             modelFactory: MbaasModelFactory(
                 storage: storage(),
                 processInfo: ProcessInfo(),
-                device: Device.self,
+                device: SDKDevice.self,
                 bundle: Bundle.self
             ),
             networking: RegistrarNetworkingImpl(

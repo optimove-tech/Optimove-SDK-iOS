@@ -24,7 +24,7 @@ import AdSupport
 final class CoreEventFactoryImpl {
 
     private let storage: OptimoveStorage
-    private let deviceId: String = Device.uuid
+    private let deviceId: String = SDKDevice.uuid
     private let dateTimeProvider: DateTimeProvider
     private var timestamp: TimeInterval {
         return dateTimeProvider.now.timeIntervalSince1970
@@ -116,7 +116,7 @@ private extension CoreEventFactoryImpl {
 
     func createSetUserAgentEvent() throws -> SetUserAgent {
         return SetUserAgent(
-            userAgent: Device.evaluateUserAgent()
+            userAgent: SDKDevice.evaluateUserAgent()
         )
     }
 

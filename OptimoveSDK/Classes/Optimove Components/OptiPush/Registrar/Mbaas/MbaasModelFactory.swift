@@ -6,12 +6,12 @@ final class MbaasModelFactory {
 
     private let storage: OptimoveStorage
     private let processInfo: ProcessInfo
-    private let device: Device.Type
+    private let device: SDKDevice.Type
     private let bundle: Bundle.Type
 
     init(storage: OptimoveStorage,
          processInfo: ProcessInfo,
-         device: Device.Type,
+         device: SDKDevice.Type,
          bundle: Bundle.Type) {
         self.storage = storage
         self.processInfo = processInfo

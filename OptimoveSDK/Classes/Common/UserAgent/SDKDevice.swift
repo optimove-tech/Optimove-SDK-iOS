@@ -1,6 +1,6 @@
 import UIKit.UIWebView
 
-struct Device {
+struct SDKDevice {
 
     static var uuid: String {
         return UIDevice.current.identifierForVendor?.uuidString.sha1() ?? ""
