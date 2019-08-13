@@ -8,21 +8,16 @@ import OptimoveCore
     @objc public private(set) var isHandledByOptimove: Bool = false
     
     private let bundleIdentifier: String
-    private let tenantInfo: NotificationExtensionTenantInfo
-    private let sharedDefaults: UserDefaults
-    private var bestAttemptContent: UNMutableNotificationContent!
-    private var contentHandler: ((UNNotificationContent) -> Void)!
-    private lazy var operationQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.qualityOfService = .userInitiated
-        return queue
-    }()
-    private let networking = NetworkClientImpl()
+    private let operationQueue: OperationQueue
+
+    private var bestAttemptContent: UNMutableNotificationContent?
+    private var contentHandler: ((UNNotificationContent) -> Void)?
 
     @objc public init(appBundleId: String) {
         bundleIdentifier = appBundleId
-        sharedDefaults = UserDefaults(suiteName: "group.\(appBundleId).optimove")!
-        tenantInfo = NotificationExtensionTenantInfo(sharedUserDefaults: sharedDefaults)
+
+        operationQueue = OperationQueue()
+        operationQueue.qualityOfService = .userInitiated
     }
     
     @objc public convenience override init() {
@@ -32,99 +27,69 @@ import OptimoveCore
         self.init(appBundleId: bundleIdentifier)
     }
 
-    // Returns true if the message was consumed by Optimove
+
+    /// The method verified that a request belong to Optimove channel. The Oprimove request might be modified.
+    ///
+    /// - Parameters:
+    ///   - request: The original notification request.
+    ///   - contentHandler: A UNNotificationContent object with the content to be displayed to the user.
+    /// - Returns: Returns `true` if the message was consumed by Optimove, otherwise this request is not  from Optimove.
     @objc public func didReceive(_ request: UNNotificationRequest,
                                  withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) -> Bool {
         let payload: NotificationPayload
+        let groupedUserDefaults: UserDefaults
+        let fileStorage: FileStorage
         do {
+            groupedUserDefaults = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
+            fileStorage = try GroupedFileManager(bundleIdentifier: bundleIdentifier, fileManager: .default)
             payload = try extractNotificationPayload(request)
-            self.bestAttemptContent = try unwrap(createBestAttemptBaseContent(request: request, payload: payload))
+            bestAttemptContent = try unwrap(createBestAttemptBaseContent(request: request, payload: payload))
         } catch {
             contentHandler(request.content)
             return false
         }
-        self.isHandledByOptimove = true
+        isHandledByOptimove = true
         self.contentHandler = contentHandler
 
         let storage = GroupedStorageFacade(
-            groupedValue: sharedDefaults,
-            fileStorage: GroupedFileManager(
-                fileManager: .default
-            )
+            groupedValue: groupedUserDefaults,
+            fileStorage: fileStorage
         )
-
         let configurationRepository = ConfigurationRepositoryImpl(storage: storage)
-
-        let configurationNetworking = RemoteConfigurationNetworking(
-            networkClient: networking,
-            requestBuilder: RemoteConfigurationRequestBuilder(storage: storage)
-        )
-
-        // Operations that execute asynchronously to fetch remote configs.
-        let downloadOperations: [Operation] = [
-            GlobalConfigurationDownloader(
-                networking: configurationNetworking,
-                repository: configurationRepository
-            ),
-            TenantConfigurationDownloader(
-                networking: configurationNetworking,
-                repository: configurationRepository
-            )
-        ]
-
-        // Operation merge all remote configs to a invariant.
-        let mergeOperation = MergeRemoteConfigurationOperation(
-            repository: configurationRepository
-        )
-
-        // Set the merge operation as dependent on the download operations.
-        downloadOperations.forEach {
-            mergeOperation.addDependency($0)
-        }
-        let notificationDeliveryReporter = NotificationDeliveryReporter(
-            repository: configurationRepository,
-            bundleIdentifier: bundleIdentifier,
-            sharedDefaults: sharedDefaults,
-            notificationPayload: payload
-        )
-
-        // `NotificationDeliveryReporter` operation should be executed after all configuration were fetched.
-        notificationDeliveryReporter.addDependency(mergeOperation)
-        
-        let operations: [Operation] = [
-            mergeOperation,
-            notificationDeliveryReporter,
-            DeeplinkExtracter(
+        let operationsToExecute: [Operation] = [
+            NotificationDeliveryReporter(
+                repository: configurationRepository,
                 bundleIdentifier: bundleIdentifier,
-                notificationPayload: payload,
-                bestAttemptContent: bestAttemptContent
+                storage: storage,
+                notificationPayload: payload
             ),
+            // TODO: Deeplink Extracter move to main app.
             MediaAttachmentDownloader(
                 notificationPayload: payload,
-                bestAttemptContent: bestAttemptContent
+                bestAttemptContent: bestAttemptContent!
             )
-        ] + downloadOperations
-
+        ]
         // The completion operation going to be executed right after all operations are finished.
         let completionOperation = BlockOperation {
             os_log("Operations were completed", log: OSLog.notification, type: .info)
-            contentHandler(self.bestAttemptContent)
+            contentHandler(self.bestAttemptContent!)
         }
         os_log("Operations were scheduled", log: OSLog.notification, type: .info)
-        operations.forEach {
+        operationsToExecute.forEach {
             // Set the completion operation as dependent for all operations before they start executing.
             completionOperation.addDependency($0)
             operationQueue.addOperation($0)
         }
         // The completion operation is performing on the main queue.
         OperationQueue.main.addOperation(completionOperation)
-        
         return true
     }
 
+    /// The method called by system in case if `didReceive(_:withContentHandler:)` takes to long to execute or
+    /// out of memory.
     @objc public func serviceExtensionTimeWillExpire() {
-        if let bestAttemptContent = bestAttemptContent, let contentHandler = contentHandler {
-            contentHandler(bestAttemptContent)
+        if let bestAttemptContent = bestAttemptContent {
+            contentHandler?(bestAttemptContent)
         }
     }
 }
@@ -133,10 +98,7 @@ private extension OptimoveNotificationServiceExtension {
     
     func extractNotificationPayload(_ request: UNNotificationRequest) throws -> NotificationPayload {
         let userInfo = request.content.userInfo
-        let data = try JSONSerialization.data(
-            withJSONObject: userInfo,
-            options: JSONSerialization.WritingOptions(rawValue: 0)
-        )
+        let data = try JSONSerialization.data(withJSONObject: userInfo)
         let decoder = JSONDecoder()
         return try decoder.decode(NotificationPayload.self, from: data)
     }

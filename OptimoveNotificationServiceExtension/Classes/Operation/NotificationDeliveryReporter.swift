@@ -8,16 +8,16 @@ final class NotificationDeliveryReporter: AsyncOperation {
     
     private let repository: ConfigurationRepository
     private let bundleIdentifier: String
-    private let sharedDefaults: UserDefaults
+    private let storage: GroupedStorage
     private let notificationPayload: NotificationPayload
     
     init(repository: ConfigurationRepository,
          bundleIdentifier: String,
-         sharedDefaults: UserDefaults,
+         storage: GroupedStorage,
          notificationPayload: NotificationPayload) {
         self.repository = repository
         self.bundleIdentifier = bundleIdentifier
-        self.sharedDefaults = sharedDefaults
+        self.storage = storage
         self.notificationPayload = notificationPayload
     }
     
@@ -27,9 +27,9 @@ final class NotificationDeliveryReporter: AsyncOperation {
             let configuration = try repository.getConfiguration()
             switch notificationPayload.campaign {
             case let campaign as ScheduledNotificationCampaign:
-                reportScheduledNotificationDelivered(campaign: campaign, configuration: configuration)
+                try reportScheduledNotificationDelivered(campaign: campaign, configuration: configuration)
             case let campaign as TriggeredNotificationCampaign:
-                reportTriggeredNotificationDelivered(campaign: campaign, configuration: configuration)
+                try reportTriggeredNotificationDelivered(campaign: campaign, configuration: configuration)
             default:
                 os_log("Unrecognized campaign type.", log: OSLog.reporter, type: .error)
                 state = .finished
@@ -44,36 +44,30 @@ private extension NotificationDeliveryReporter {
 
     func reportTriggeredNotificationDelivered(
         campaign: TriggeredNotificationCampaign,
-        configuration: Configuration) {
+        configuration: Configuration) throws {
         let event = TriggeredNotificationDelivered(
             bundleId: self.bundleIdentifier,
             campaign: campaign
         )
-        guard let eventConfig = configuration.events[event.name] else {
-            state = .finished
-            return
-        }
-        prepareAndSendEvent(event, eventConfig, configuration.optitrack)
+        let eventConfig = try unwrap(configuration.events[event.name])
+        try prepareAndSendEvent(event, eventConfig, configuration.optitrack)
     }
 
     func reportScheduledNotificationDelivered(
         campaign: ScheduledNotificationCampaign,
-        configuration: Configuration) {
+        configuration: Configuration) throws {
         let event = ScheduledNotificationDelivered(
             bundleId: self.bundleIdentifier,
             campaign: campaign
         )
-        guard let eventConfig = configuration.events[event.name] else {
-            state = .finished
-            return
-        }
-        prepareAndSendEvent(event, eventConfig, configuration.optitrack)
+        let eventConfig = try unwrap(configuration.events[event.name])
+        try prepareAndSendEvent(event, eventConfig, configuration.optitrack)
     }
 
     func prepareAndSendEvent(_ event: OptimoveEvent,
                              _ eventConfig: EventsConfig,
-                             _ optitrack: OptitrackConfig) {
-        let queryItems = buildQueryItems(event, eventConfig, optitrack)
+                             _ optitrack: OptitrackConfig) throws {
+        let queryItems = try buildQueryItems(event, eventConfig, optitrack)
         var reportEventUrl = URLComponents(url: optitrack.optitrackEndpoint, resolvingAgainstBaseURL: false)!
         reportEventUrl.queryItems = queryItems.filter { $0.value != nil }
         let reportEventRequest = URLRequest(
@@ -100,34 +94,29 @@ private extension NotificationDeliveryReporter {
         _ notificationEvent: OptimoveEvent,
         _ eventConfig: EventsConfig,
         _ optitrack: OptitrackConfig
-        ) -> [URLQueryItem] {
+        ) throws -> [URLQueryItem] {
         let date = Date()
-        
-        let currentUserAgent = sharedDefaults.string(forKey: "userAgent")!
-        
-        let userId = sharedDefaults.string(forKey: "customerID")
-        let visitorId = sharedDefaults.string(forKey: "visitorID")
+        let currentUserAgent = try storage.getUserAgent()
+        let userId = try storage.getCustomerID()
+        let visitorId = try storage.getVisitorID()
+        let initialVisitorId = try storage.getInitialVisitorId()
         
         var queryItems: [URLQueryItem] = [
             URLQueryItem(name: "idsite", value: String(describing: optitrack.tenantID)),
             URLQueryItem(name: "rec", value: "1"),
             URLQueryItem(name: "api", value: "1"),
-            // Visitor
             URLQueryItem(name: "_id", value: visitorId),
             URLQueryItem(name: "uid", value: userId),
-            // Session
             URLQueryItem(name: "lang", value: Locale.httpAcceptLanguage),
             URLQueryItem(name: "ua", value: currentUserAgent),
             URLQueryItem(name: "h", value: DateFormatter.hourDateFormatter.string(from: date)),
             URLQueryItem(name: "m", value: DateFormatter.minuteDateFormatter.string(from: date)),
             URLQueryItem(name: "s", value: DateFormatter.secondsDateFormatter.string(from: date)),
-            //screen resolution
             URLQueryItem(
                 name: "res",
-                value: String(
-                    format: "%1.0fx%1.0f",
-                    self.sharedDefaults.double(forKey: "deviceResolutionWidth"),
-                    self.sharedDefaults.double(forKey: "deviceResolutionHeight")
+                value: String(format: "%1.0fx%1.0f",
+                    try storage.getDeviceResolutionWidth(),
+                    try storage.getDeviceResolutionHeight()
                 )
             ),
             URLQueryItem(name: "e_c", value: optitrack.eventCategoryName),
@@ -147,7 +136,7 @@ private extension NotificationDeliveryReporter {
                 URLQueryItem(name: "dimension\(paramConfig.optiTrackDimensionId)", value: "\(paramValue)")
             )
         }
-        return queryItems + queryItemsWithPluginFlags(from: sharedDefaults.string(forKey: "initialVisitorId")!)
+        return queryItems + queryItemsWithPluginFlags(from: initialVisitorId)
     }
 
     func queryItemsWithPluginFlags(from visitorId: String) -> [URLQueryItem] {
