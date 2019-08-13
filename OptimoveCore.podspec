@@ -12,6 +12,10 @@ The Optimove SDK for iOS Core framework provides:
   s.source           = { :git => 'https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git', :tag => 'Core-' + s.version.to_s }
   s.ios.deployment_target = '10.0'
   s.swift_version = '5'
-  s.source_files = 'OptimoveCore/Classes/**/*'
+  base_dir = "OptimoveCore/"
+  s.source_files = base_dir + 'Classes/**/*'
   s.frameworks = 'Foundation'
+  s.test_spec 'tests' do |unit_tests|
+    unit_tests.source_files = base_dir + 'Tests/**/*'
+  end
 end

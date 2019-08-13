@@ -12,7 +12,12 @@ The Notification service extension for Optimove SDK framework provides:
   s.source           = { :git => 'https://github.com/optimove-tech/iOS-SDK-Integration-Guide.git', :tag => s.version.to_s }
   s.ios.deployment_target = '10.0'
   s.swift_version = '5'
-  s.source_files = 'OptimoveNotificationServiceExtension/Classes/**/*'
+  base_dir = "OptimoveNotificationServiceExtension/"
+  s.source_files = base_dir + 'Classes/**/*'
   s.dependency 'OptimoveCore'
   s.frameworks = 'UserNotifications', 'UIKit'
+  s.test_spec 'tests' do |unit_tests|
+    unit_tests.source_files = base_dir + 'Tests/**/*'
+    unit_tests.requires_app_host = true
+  end
 end
