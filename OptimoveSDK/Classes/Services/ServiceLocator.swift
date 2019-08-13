@@ -33,19 +33,20 @@ final class ServiceLocator {
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
     private lazy var _storage: OptimoveStorageFacade = {
-        guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
-            fatalError("The `CFBundleIdentifier` key is not defined in the bundle’s information property list.")
-        }
-        guard let groupStorage = UserDefaults(suiteName: "group.\(bundleIdentifier).optimove") else {
-            fatalError("If this line is crashing the client forgot to add the app group as described in the documentation.")
-        }
-        return OptimoveStorageFacade(
-            sharedStorage: UserDefaults.standard,
-            groupStorage: groupStorage,
-            fileStorage: GroupedFileManager(
-                fileManager: .default
+        do {
+            let bundleIdentifier = try Bundle.getApplicationNameSpace()
+            let groupStorage = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
+            return OptimoveStorageFacade(
+                sharedStorage: UserDefaults.standard,
+                groupStorage: groupStorage,
+                fileStorage: try GroupedFileManager(
+                    bundleIdentifier: bundleIdentifier,
+                    fileManager: .default
+                )
             )
-        )
+        } catch {
+            fatalError(error.localizedDescription)
+        }
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
