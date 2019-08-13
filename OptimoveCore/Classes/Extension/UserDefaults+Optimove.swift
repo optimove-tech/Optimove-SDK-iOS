@@ -4,6 +4,8 @@ import Foundation
 
 public extension UserDefaults {
 
+    /* Returns the UserDefaults associated with the Optimove SDK group.
+     */
     static func grouped(tenantBundleIdentifier: String) throws -> UserDefaults {
         guard let userDefaults = UserDefaults(suiteName: "group.\(tenantBundleIdentifier).optimove") else {
             throw GuardError.custom(
