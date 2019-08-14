@@ -39,9 +39,9 @@ class AppOpenEventTests: XCTestCase {
         )
 
         // then
-        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.bundleIdentifier] as? String == bundleIdentifier)
+        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.appNS] as? String == bundleIdentifier)
         XCTAssert(event.parameters[AppOpenEvent.Constants.Key.deviceID] as? String == deviceID)
-        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.visitorId] as? String == visitorID)
+        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.visitorID] as? String == visitorID)
     }
 
     func test_event_parameters_customer() {
@@ -59,9 +59,9 @@ class AppOpenEventTests: XCTestCase {
         )
 
         // then
-        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.bundleIdentifier] as? String == bundleIdentifier)
+        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.appNS] as? String == bundleIdentifier)
         XCTAssert(event.parameters[AppOpenEvent.Constants.Key.deviceID] as? String == deviceID)
-        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.customerId] as? String == customerID)
+        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.userID] as? String == customerID)
     }
 
     func test_event_if_customer_no_visitor() {
@@ -80,10 +80,10 @@ class AppOpenEventTests: XCTestCase {
         )
 
         // then
-        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.bundleIdentifier] as? String == bundleIdentifier)
+        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.appNS] as? String == bundleIdentifier)
         XCTAssert(event.parameters[AppOpenEvent.Constants.Key.deviceID] as? String == deviceID)
-        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.customerId] as? String == customerID)
-        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.visitorId] == nil)
+        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.userID] as? String == customerID)
+        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.visitorID] == nil)
     }
 
     func test_event_if_visitor_no_cutomer() {
@@ -101,10 +101,10 @@ class AppOpenEventTests: XCTestCase {
         )
 
         // then
-        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.bundleIdentifier] as? String == bundleIdentifier)
+        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.appNS] as? String == bundleIdentifier)
         XCTAssert(event.parameters[AppOpenEvent.Constants.Key.deviceID] as? String == deviceID)
-        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.customerId] == nil)
-        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.visitorId] as? String == visitorID)
+        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.userID] == nil)
+        XCTAssert(event.parameters[AppOpenEvent.Constants.Key.visitorID] as? String == visitorID)
     }
 
 }

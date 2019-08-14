@@ -6,7 +6,7 @@ final class SetUserIdEvent: OptimoveCoreEvent {
         static let name = OptimoveKeys.Configuration.setUserId.rawValue
         struct Key {
             static let originalVistorId = OptimoveKeys.Configuration.originalVisitorId.rawValue
-            static let realtimeUserId = OptimoveKeys.Configuration.realtimeUserId.rawValue
+            static let userId = OptimoveKeys.Configuration.realtimeUserId.rawValue
             static let updatedVisitorId = OptimoveKeys.Configuration.realtimeupdatedVisitorId.rawValue
         }
     }
@@ -17,7 +17,7 @@ final class SetUserIdEvent: OptimoveCoreEvent {
     init(originalVistorId: String, userId: String, updateVisitorId: String) {
         parameters = [
             Constants.Key.originalVistorId: originalVistorId,
-            Constants.Key.realtimeUserId: userId,
+            Constants.Key.userId: userId,
             Constants.Key.updatedVisitorId: updateVisitorId
         ]
     }

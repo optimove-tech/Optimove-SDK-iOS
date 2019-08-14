@@ -29,7 +29,7 @@ class SetUserIdEventTests: XCTestCase {
 
         // then
         XCTAssert(event.parameters[SetUserIdEvent.Constants.Key.originalVistorId] as? String == originalVistorId)
-        XCTAssert(event.parameters[SetUserIdEvent.Constants.Key.realtimeUserId] as? String == userId)
+        XCTAssert(event.parameters[SetUserIdEvent.Constants.Key.userId] as? String == userId)
         XCTAssert(event.parameters[SetUserIdEvent.Constants.Key.updatedVisitorId] as? String == updateVisitorId)
     }
 

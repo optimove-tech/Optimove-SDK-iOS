@@ -12,7 +12,7 @@ class MbaasModelFactoryTests: OptimoveTestCase {
         factory = MbaasModelFactory(
             storage: storage,
             processInfo: ProcessInfo(),
-            device: Device.self,
+            device: SDKDevice.self,
             bundle: Bundle.self
         )
     }
@@ -37,7 +37,7 @@ class MbaasModelFactoryTests: OptimoveTestCase {
         XCTAssert(model.userIdPayload == BaseMbaasModel.UserIdPayload.visitorID(StubConstants.visitorID))
         XCTAssert(model.operation == operation)
         XCTAssert(model.appNs == expectedAppNs)
-        XCTAssert(model.deviceId == Device.uuid)
+        XCTAssert(model.deviceId == SDKDevice.uuid)
     }
 
     func test_create_registration_for_customer() {
@@ -66,7 +66,7 @@ class MbaasModelFactoryTests: OptimoveTestCase {
         )
         XCTAssert(model.operation == operation)
         XCTAssert(model.appNs == expectedAppNs)
-        XCTAssert(model.deviceId == Device.uuid)
+        XCTAssert(model.deviceId == SDKDevice.uuid)
     }
 
     func test_create_unregistration_for_visitor() {
@@ -113,7 +113,7 @@ class MbaasModelFactoryTests: OptimoveTestCase {
         )
         XCTAssert(model.operation == operation)
         XCTAssert(model.appNs == expectedAppNs)
-        XCTAssert(model.deviceId == Device.uuid)
+        XCTAssert(model.deviceId == SDKDevice.uuid)
     }
 
     private func runDefaultModelAsVisitor(operation: MbaasOperation) {
@@ -130,7 +130,7 @@ class MbaasModelFactoryTests: OptimoveTestCase {
         XCTAssert(model.userIdPayload == BaseMbaasModel.UserIdPayload.visitorID(StubConstants.visitorID))
         XCTAssert(model.operation == operation)
         XCTAssert(model.appNs == expectedAppNs)
-        XCTAssert(model.deviceId == Device.uuid)
+        XCTAssert(model.deviceId == SDKDevice.uuid)
     }
 
 }

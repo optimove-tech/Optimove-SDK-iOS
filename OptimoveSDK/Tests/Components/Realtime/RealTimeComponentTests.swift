@@ -1,6 +1,7 @@
 // Copiright 2019 Optimove
 
 import XCTest
+import OptimoveCore
 @testable import OptimoveSDK
 
 class RealTimeComponentTests: XCTestCase {
@@ -249,7 +250,7 @@ class RealTimeComponentTests: XCTestCase {
             return stubEvent.isStubEvent(event)
         }
         let isUserIdEvent: (RealtimeEvent) -> Bool = { (event) in
-            return event.context[SetUserIdEvent.Constants.Key.realtimeUserId] as? String == StubVariables.customerID
+            return event.context[SetUserIdEvent.Constants.Key.userId] as? String == StubVariables.customerID
         }
         networking.assertFunction = { (event) -> Result<String, Error> in
             if isRegularEvent(event) {
@@ -343,7 +344,7 @@ class RealTimeComponentTests: XCTestCase {
             return stubEvent.isStubEvent(event)
         }
         let isUserIdEvent: (RealtimeEvent) -> Bool = { (event) in
-            return event.context[SetUserIdEvent.Constants.Key.realtimeUserId] as? String == StubVariables.customerID
+            return event.context[SetUserIdEvent.Constants.Key.userId] as? String == StubVariables.customerID
         }
         networking.assertFunction = { (event) -> Result<String, Error> in
             if isEmailEvent(event) {
