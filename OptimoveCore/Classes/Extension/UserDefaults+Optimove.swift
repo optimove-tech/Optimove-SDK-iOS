@@ -18,4 +18,17 @@ public extension UserDefaults {
         return userDefaults
     }
 
+    /* Returns the UserDefaults associated with a host application.
+     */
+    static func shared(tenantBundleIdentifier: String) throws -> UserDefaults {
+        guard let userDefaults = UserDefaults(suiteName: tenantBundleIdentifier) else {
+            throw GuardError.custom(
+                """
+                The passed bundle identifier does not have any related UserDefault's container.
+                """
+            )
+        }
+        return userDefaults
+    }
+
 }

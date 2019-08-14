@@ -8,12 +8,12 @@ final class NotificationDeliveryReporter: AsyncOperation {
     
     private let repository: ConfigurationRepository
     private let bundleIdentifier: String
-    private let storage: GroupedStorage
+    private let storage: OptimoveStorage
     private let notificationPayload: NotificationPayload
     
     init(repository: ConfigurationRepository,
          bundleIdentifier: String,
-         storage: GroupedStorage,
+         storage: OptimoveStorage,
          notificationPayload: NotificationPayload) {
         self.repository = repository
         self.bundleIdentifier = bundleIdentifier
@@ -64,7 +64,7 @@ private extension NotificationDeliveryReporter {
         try prepareAndSendEvent(event, eventConfig, configuration.optitrack)
     }
 
-    func prepareAndSendEvent(_ event: OptimoveEvent,
+    func prepareAndSendEvent(_ event: OptimoveEventInternal,
                              _ eventConfig: EventsConfig,
                              _ optitrack: OptitrackConfig) throws {
         let queryItems = try buildQueryItems(event, eventConfig, optitrack)
@@ -91,7 +91,7 @@ private extension NotificationDeliveryReporter {
 
 
     func buildQueryItems(
-        _ notificationEvent: OptimoveEvent,
+        _ notificationEvent: OptimoveEventInternal,
         _ eventConfig: EventsConfig,
         _ optitrack: OptitrackConfig
         ) throws -> [URLQueryItem] {

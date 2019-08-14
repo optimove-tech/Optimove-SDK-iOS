@@ -38,10 +38,12 @@ import OptimoveCore
                                  withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) -> Bool {
         let payload: NotificationPayload
         let groupedUserDefaults: UserDefaults
+        let sharedUserDefaults: UserDefaults
         let fileStorage: FileStorage
         do {
             groupedUserDefaults = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
-            fileStorage = try GroupedFileManager(bundleIdentifier: bundleIdentifier, fileManager: .default)
+            sharedUserDefaults = try UserDefaults.shared(tenantBundleIdentifier: bundleIdentifier)
+            fileStorage = try FileStorageImpl(bundleIdentifier: bundleIdentifier, fileManager: .default)
             payload = try extractNotificationPayload(request)
             bestAttemptContent = try unwrap(createBestAttemptBaseContent(request: request, payload: payload))
         } catch {
@@ -51,8 +53,9 @@ import OptimoveCore
         isHandledByOptimove = true
         self.contentHandler = contentHandler
 
-        let storage = GroupedStorageFacade(
-            groupedValue: groupedUserDefaults,
+        let storage = StorageFacade(
+            groupedStorage: groupedUserDefaults,
+            sharedStorage: sharedUserDefaults,
             fileStorage: fileStorage
         )
         let configurationRepository = ConfigurationRepositoryImpl(storage: storage)

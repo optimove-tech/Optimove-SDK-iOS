@@ -11,7 +11,8 @@ public extension FileManager {
         guard let url = self.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier) else {
             throw GuardError.custom(
                 """
-                If this line is crashing the client forgot to add the app group as described in the documentation.
+                Unable to found container for the application group identifier: \(groupIdentifier).
+                Reason: a client forgot to add the app group as described in the documentation.
                 Link: ttps://tinyurl.com/y3kfnjw9
                 """
             )

@@ -310,8 +310,8 @@ extension Optimove: OptimoveEventReporting {
 
 extension Optimove {
 
-    /// Validate the permissions of the client to use optitrack component and if permit sends the
-    /// report to the apropriate handler.
+    /// Validate the permissions of the client to use Optitrack component and if permit sends the
+    /// report to the appropriate handler.
     ///
     /// - Parameters:
     ///   - event: optimove event object

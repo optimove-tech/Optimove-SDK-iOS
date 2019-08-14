@@ -39,7 +39,7 @@ final class ServiceLocator {
             return StorageFacade(
                 groupedStorage: groupStorage,
                 sharedStorage: UserDefaults.standard,
-                fileStorage: try GroupedFileManager(
+                fileStorage: try FileStorageImpl(
                     bundleIdentifier: bundleIdentifier,
                     fileManager: .default
                 )

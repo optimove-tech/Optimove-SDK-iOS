@@ -52,7 +52,7 @@ extension MbaasBackupImpl: MbaasBackup {
 
     func clearLast(for operation: MbaasOperation) throws {
         let path = getStoragePath(for: operation)
-        if try storage.isExist(fileName: path, shared: false) {
+        if storage.isExist(fileName: path, shared: false) {
             try storage.delete(fileName: path, shared: false)
         }
     }
