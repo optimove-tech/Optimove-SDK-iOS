@@ -9,11 +9,33 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
     public let optitrack: OptitrackConfig
     public let optipush: OptipushConfig
     public let events: [String : EventsConfig]
+
+    public init(
+        tenantID: Int,
+        logger: LoggerConfig,
+        realtime: RealtimeConfig,
+        optitrack: OptitrackConfig,
+        optipush: OptipushConfig,
+        events: [String : EventsConfig]) {
+        self.tenantID = tenantID
+        self.logger = logger
+        self.realtime = realtime
+        self.optitrack = optitrack
+        self.optipush = optipush
+        self.events = events
+    }
 }
 
 public struct LoggerConfig: Codable, TenantInfo {
     public let tenantID: Int
     public let logServiceEndpoint: URL
+
+    public init(
+        tenantID: Int,
+        logServiceEndpoint: URL) {
+        self.tenantID = tenantID
+        self.logServiceEndpoint = logServiceEndpoint
+    }
 }
 
 public struct RealtimeConfig: Codable, TenantInfo, EventInfo {
@@ -21,6 +43,17 @@ public struct RealtimeConfig: Codable, TenantInfo, EventInfo {
     public let realtimeToken: String
     public let realtimeGateway: URL
     public let events: [String : EventsConfig]
+
+    public init(
+        tenantID: Int,
+        realtimeToken: String,
+        realtimeGateway: URL,
+        events: [String : EventsConfig]) {
+        self.tenantID = tenantID
+        self.realtimeToken = realtimeToken
+        self.realtimeGateway = realtimeGateway
+        self.events = events
+    }
 }
 
 public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
@@ -30,6 +63,21 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
     public let eventCategoryName: String
     public let customDimensionIDS: CustomDimensionIDs
     public let events: [String : EventsConfig]
+
+    public init(
+        tenantID: Int,
+        optitrackEndpoint: URL,
+        enableAdvertisingIdReport: Bool,
+        eventCategoryName: String,
+        customDimensionIDS: CustomDimensionIDs,
+        events: [String : EventsConfig]) {
+        self.tenantID = tenantID
+        self.optitrackEndpoint = optitrackEndpoint
+        self.enableAdvertisingIdReport = enableAdvertisingIdReport
+        self.eventCategoryName = eventCategoryName
+        self.customDimensionIDS = customDimensionIDS
+        self.events = events
+    }
 }
 
 public struct OptipushConfig: Codable, TenantInfo {
@@ -38,6 +86,19 @@ public struct OptipushConfig: Codable, TenantInfo {
     public let pushTopicsRegistrationEndpoint: URL
     public let firebaseProjectKeys: FirebaseProjectKeys
     public let clientsServiceProjectKeys: ClientsServiceProjectKeys
+
+    public init(
+        tenantID: Int,
+        registrationServiceEndpoint: URL,
+        pushTopicsRegistrationEndpoint: URL,
+        firebaseProjectKeys: FirebaseProjectKeys,
+        clientsServiceProjectKeys: ClientsServiceProjectKeys) {
+        self.tenantID = tenantID
+        self.registrationServiceEndpoint = registrationServiceEndpoint
+        self.pushTopicsRegistrationEndpoint = pushTopicsRegistrationEndpoint
+        self.firebaseProjectKeys = firebaseProjectKeys
+        self.clientsServiceProjectKeys = clientsServiceProjectKeys
+    }
 }
 
 public protocol TenantInfo {
