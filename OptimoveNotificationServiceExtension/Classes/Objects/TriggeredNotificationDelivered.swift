@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class TriggeredNotificationDelivered: OptimoveEvent {
+final class TriggeredNotificationDelivered: OptimoveEventInternal {
 
     let name = "triggered_notification_received"
 
