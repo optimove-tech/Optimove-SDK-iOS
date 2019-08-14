@@ -1,6 +1,7 @@
 // Copiright 2019 Optimove
 
 import Foundation
+import OptimoveCore
 
 protocol MbaasBackup {
     func backup<T: BaseMbaasModel>(_ model: T) throws

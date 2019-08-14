@@ -5,9 +5,9 @@ import OptimoveCore
 
 public final class RemoteConfigurationRequestBuilder {
 
-    private let storage: GroupedStorage
+    private let storage: OptimoveStorage
 
-    public init(storage: GroupedStorage) {
+    public init(storage: OptimoveStorage) {
         self.storage = storage
     }
 

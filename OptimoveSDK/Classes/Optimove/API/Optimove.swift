@@ -2,6 +2,7 @@
 
 import UIKit
 import UserNotifications
+import OptimoveCore
 
 protocol OptimoveEventReporting: class {
     func reportEvent(_ event: OptimoveEvent)

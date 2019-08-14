@@ -32,13 +32,13 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _storage: OptimoveStorageFacade = {
+    private lazy var _storage: StorageFacade = {
         do {
             let bundleIdentifier = try Bundle.getApplicationNameSpace()
             let groupStorage = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
-            return OptimoveStorageFacade(
+            return StorageFacade(
+                groupedStorage: groupStorage,
                 sharedStorage: UserDefaults.standard,
-                groupStorage: groupStorage,
                 fileStorage: try GroupedFileManager(
                     bundleIdentifier: bundleIdentifier,
                     fileManager: .default

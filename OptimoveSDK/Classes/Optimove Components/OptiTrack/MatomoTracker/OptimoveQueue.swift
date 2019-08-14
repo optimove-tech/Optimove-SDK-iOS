@@ -1,5 +1,6 @@
 import Foundation
 import MatomoTracker
+import OptimoveCore
 
 final class OptimoveQueue {
 

@@ -1,6 +1,7 @@
 import UIKit
 import UserNotifications
 import os.log
+import OptimoveCore
 
 final class OptimoveNotificationHandler {
 

@@ -32,9 +32,9 @@ public final class ConfigurationRepositoryImpl {
         }
     }
 
-    private let storage: GroupedStorage
+    private let storage: OptimoveStorage
 
-    public init(storage: GroupedStorage) {
+    public init(storage: OptimoveStorage) {
         self.storage = storage
     }
 

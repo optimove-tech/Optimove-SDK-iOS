@@ -1,6 +1,7 @@
 //  Copyright © 2017 Optimove
 
 import Foundation
+import OptimoveCore
 
 protocol Registrable {
     func register()

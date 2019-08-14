@@ -2,40 +2,559 @@
 
 import Foundation
 
-public final class GroupedStorageFacade {
+/// Combined protocol for a convenince access to stored values and files.
+public typealias OptimoveStorage = KeyValueStorage & FileStorage & StorageValue
 
-    // Use for constants that are used in the shared "group.<bundle-id>.optimove" container.
-    private let groupedValue: GroupedValue
+// MARK: - StorageKey
+
+public  enum StorageKey: String, CaseIterable {
+
+    // MARK: Grouped keys
+
+    case customerID
+    case configurationEndPoint
+    case initialVisitorId
+    case tenantToken
+    case visitorID
+    case version
+    case userAgent
+    case deviceResolutionWidth
+    case deviceResolutionHeight
+
+    // MARK: Shared keys
+
+    case userEmail
+    case apnsToken
+    case siteID
+    case isClientHasFirebase
+    case isMbaasOptIn
+    case unregistrationSuccess
+    case registrationSuccess
+    case optSuccess
+    case isFirstConversion
+    case defaultFcmToken
+    case fcmToken
+    case isOptiTrackOptIn
+    case firstVisitTimestamp
+    case isSetUserIdSucceed
+    case realtimeSetUserIdFailed
+    case realtimeSetEmailFailed
+}
+
+// MARK: - StorageValue
+
+/// The protocol used as convenience accessor to storage values.
+public protocol StorageValue {
+
+    // MARK: Grouped values
+
+    var customerID: String? { get set }
+    var configurationEndPoint: URL? { get set }
+    var initialVisitorId: String? { get set }
+    var tenantToken: String? { get set }
+    var visitorID: String? { get set }
+    var version: String? { get set }
+    var userAgent: String? { get set }
+    var deviceResolutionWidth: Float? { get set }
+    var deviceResolutionHeight: Float? { get set }
+
+    func getConfigurationEndPoint() throws -> URL
+    func getCustomerID() throws -> String
+    func getInitialVisitorId() throws -> String
+    func getTenantToken() throws -> String
+    func getVisitorID() throws -> String
+    func getVersion() throws -> String
+    func getUserAgent() throws -> String
+    func getDeviceResolutionWidth() throws -> Float
+    func getDeviceResolutionHeight() throws -> Float
+
+
+    // MARK: Shared values
+
+    var userEmail: String? { get set }
+    var apnsToken: Data? { get set }
+    var siteID: Int? { get set }
+    var isClientHasFirebase: Bool { get set }
+    var isMbaasOptIn: Bool? { get set }
+    var isUnregistrationSuccess: Bool { get set }
+    var isRegistrationSuccess: Bool { get set }
+    var isOptRequestSuccess: Bool { get set }
+    var isFirstConversion: Bool { get set }
+    var defaultFcmToken: String? { get set }
+    var fcmToken: String? { get set }
+    var isOptiTrackOptIn: Bool { get set }
+    var firstVisitTimestamp: Int? { get set }
+    var isSetUserIdSucceed: Bool { get set }
+    var realtimeSetUserIdFailed: Bool { get set }
+    var realtimeSetEmailFailed: Bool { get set }
+
+    func getUserEmail() throws -> String
+    func getApnsToken() throws -> Data
+    func getSiteID() throws -> Int
+    func getIsMbaasOptIn() throws -> Bool
+    func getDefaultFcmToken() throws -> String
+    func getFcmToken() throws -> String
+    func getFirstVisitTimestamp() throws -> Int
+}
+
+/// The protocol used for convenience implementation of any storage technology below this protocol.
+public protocol KeyValueStorage {
+    func set(value: Any?, key: StorageKey)
+    func value(for: StorageKey) -> Any?
+    subscript<T>(key: StorageKey) -> T? { get set }
+}
+
+
+/// Class implements the Façade pattern for hiding complexity of the OptimoveStorage protocol.
+public final class StorageFacade: OptimoveStorage {
+
+    // Use for constants that are used in the grouped "group.<bundle-main-id>.optimove" container.
+    private let groupedStorage: KeyValueStorage
+    private let groupKeys: Set<StorageKey> = [
+        .customerID,
+        .configurationEndPoint,
+        .initialVisitorId,
+        .tenantToken,
+        .visitorID,
+        .version,
+        .userAgent
+    ]
+
+    // Use for constants that are used in the shared "<bundle-main-id>" container.
+    private let sharedStorage: KeyValueStorage
+    private let sharedKeys: Set<StorageKey> = [
+        .userEmail,
+        .apnsToken,
+        .siteID,
+        .isClientHasFirebase,
+        .isMbaasOptIn,
+        .unregistrationSuccess,
+        .registrationSuccess,
+        .optSuccess,
+        .isFirstConversion,
+        .defaultFcmToken,
+        .fcmToken,
+        .isOptiTrackOptIn,
+        .firstVisitTimestamp,
+        .isSetUserIdSucceed,
+        .realtimeSetUserIdFailed,
+        .realtimeSetEmailFailed,
+    ]
 
     private let fileStorage: FileStorage
 
-    public init(groupedValue: GroupedValue,
-         fileStorage: FileStorage) {
-        self.groupedValue = groupedValue
+    public init(
+        groupedStorage: KeyValueStorage,
+        sharedStorage: KeyValueStorage,
+        fileStorage: FileStorage) {
+        self.groupedStorage = groupedStorage
+        self.sharedStorage = sharedStorage
         self.fileStorage = fileStorage
+        precondition(
+            sharedKeys.union(groupKeys).isSuperset(of: StorageKey.allCases),
+            "The `sharedKeys` and `groupKeys` together are not a superset of all StorageKeys."
+        )
+    }
+
+    private func storage(for key: StorageKey) -> KeyValueStorage {
+        return sharedKeys.contains(key) ? sharedStorage : groupedStorage
     }
 
 }
 
-extension GroupedStorageFacade: GroupedStorage {
+// MARK: - StorageValue
 
-    public func set(value: Any?, key: GroupedStorageKey) {
-        groupedValue.set(value: value, key: key)
-    }
+/// TODO: Check necessity of this lock.
+private let lock = UnfairLock()
 
-    public func value(for key: GroupedStorageKey) -> Any? {
-        return groupedValue.value(for: key)
-    }
+extension StorageFacade {
 
-    public subscript<T>(key: GroupedStorageKey) -> T? {
+    // MARK: Grouped values
+
+    public var customerID: String? {
         get {
-            return groupedValue.value(for: key) as? T
+            return self[.customerID]
         }
         set {
-            groupedValue.set(value: newValue, key: key)
+            self[.customerID] = newValue
         }
     }
 
+    public var visitorID: String? {
+        get {
+            return self[.visitorID]
+        }
+        set {
+            self[.visitorID] = newValue?.lowercased()
+        }
+    }
+
+    public var initialVisitorId: String? {
+        get {
+            return self[.initialVisitorId]
+        }
+        set {
+            self[.initialVisitorId] = newValue?.lowercased()
+        }
+    }
+
+    public var configurationEndPoint: URL? {
+        get {
+            do {
+                return URL(string: try unwrap(self[.configurationEndPoint]))
+            } catch {
+                return nil
+            }
+        }
+        set {
+            self[.configurationEndPoint] = newValue?.absoluteString
+        }
+    }
+
+    public var tenantToken: String? {
+        get {
+            return self[.tenantToken]
+        }
+        set {
+            self[.tenantToken] = newValue
+        }
+    }
+
+    public var version: String? {
+        get {
+            return self[.version]
+        }
+        set {
+            self[.version] = newValue
+        }
+    }
+
+    public var userAgent: String? {
+        get {
+            return self[.userAgent]
+        }
+        set {
+            self[.userAgent] = newValue
+        }
+    }
+
+    public var deviceResolutionWidth: Float? {
+        get {
+            return self[.deviceResolutionWidth]
+        }
+        set {
+            self[.deviceResolutionWidth] = newValue
+        }
+    }
+
+    public var deviceResolutionHeight: Float? {
+        get {
+            return self[.deviceResolutionHeight]
+        }
+        set {
+            self[.deviceResolutionHeight] = newValue
+        }
+    }
+
+    public func getConfigurationEndPoint() throws -> URL {
+        guard let value = configurationEndPoint else {
+            throw StorageError.noValue(.configurationEndPoint)
+        }
+        return value
+    }
+
+    public func getCustomerID() throws -> String {
+        guard let value = customerID else {
+            throw StorageError.noValue(.customerID)
+        }
+        return value
+    }
+
+    public func getInitialVisitorId() throws -> String {
+        guard let value = initialVisitorId else {
+            throw StorageError.noValue(.initialVisitorId)
+        }
+        return value
+    }
+
+    public func getTenantToken() throws -> String {
+        guard let value = tenantToken else {
+            throw StorageError.noValue(.tenantToken)
+        }
+        return value
+    }
+
+    public func getVisitorID() throws -> String {
+        guard let value = visitorID else {
+            throw StorageError.noValue(.visitorID)
+        }
+        return value
+    }
+
+    public func getVersion() throws -> String {
+        guard let value = version else {
+            throw StorageError.noValue(.version)
+        }
+        return value
+    }
+
+    public func getUserAgent() throws -> String {
+        guard let value = userAgent else {
+            throw StorageError.noValue(.userAgent)
+        }
+        return value
+    }
+
+    public func getDeviceResolutionWidth() throws -> Float {
+        guard let value = deviceResolutionWidth else {
+            throw StorageError.noValue(.deviceResolutionWidth)
+        }
+        return value
+    }
+
+    public func getDeviceResolutionHeight() throws -> Float {
+        guard let value = deviceResolutionHeight else {
+            throw StorageError.noValue(.deviceResolutionHeight)
+        }
+        return value
+    }
+
+    // MARK: Shared values
+
+    public var userEmail: String? {
+        get {
+            return self[.userEmail]
+        }
+        set {
+            self[.userEmail] = newValue
+        }
+    }
+
+    public var apnsToken: Data? {
+        get {
+            return self[.apnsToken]
+        }
+        set {
+            self[.apnsToken] = newValue
+        }
+    }
+
+    public var siteID: Int? {
+        get {
+            return self[.siteID]
+        }
+        set {
+            self[.siteID] = newValue
+        }
+    }
+
+    public var isClientHasFirebase: Bool {
+        get {
+            return self[.isClientHasFirebase] ?? false
+        }
+        set {
+            self[.isClientHasFirebase] = newValue
+        }
+    }
+
+    public var isMbaasOptIn: Bool? {
+        get {
+            return lock.sync {
+                return self[.isMbaasOptIn]
+            }
+        }
+        set {
+            lock.sync {
+                self[.isMbaasOptIn] = newValue
+            }
+        }
+    }
+
+    public var isUnregistrationSuccess: Bool {
+        get {
+            return self[.unregistrationSuccess] ?? true
+        }
+        set {
+            self[.unregistrationSuccess] = newValue
+        }
+    }
+
+    public var isRegistrationSuccess: Bool {
+        get {
+            return self[.registrationSuccess] ?? true
+        }
+        set {
+            return self[.registrationSuccess] = newValue
+        }
+    }
+
+    public var isOptRequestSuccess: Bool {
+        get {
+            return self[.optSuccess] ?? true
+        }
+        set {
+            return self[.optSuccess] = newValue
+        }
+    }
+
+    public var isFirstConversion: Bool {
+        get {
+            return self[.isFirstConversion] ?? false
+        }
+        set {
+            return self[.isFirstConversion] = newValue
+        }
+    }
+
+    public var defaultFcmToken: String? {
+        get {
+            return self[.defaultFcmToken]
+        }
+        set {
+            self[.defaultFcmToken] = newValue
+        }
+    }
+
+    public var fcmToken: String? {
+        get {
+            return self[.fcmToken]
+        }
+        set {
+            self[.fcmToken] = newValue
+        }
+    }
+
+    public var isOptiTrackOptIn: Bool {
+        get {
+            return self[.isOptiTrackOptIn] ?? false
+        }
+        set {
+            self[.isOptiTrackOptIn] = newValue
+        }
+    }
+
+    public var firstVisitTimestamp: Int? {
+        get {
+            return self[.firstVisitTimestamp]
+        }
+        set {
+            self[.firstVisitTimestamp] = newValue
+        }
+    }
+
+    public var isSetUserIdSucceed: Bool {
+        get {
+            return self[.isSetUserIdSucceed] ?? false
+        }
+        set {
+            self[.isSetUserIdSucceed] = newValue
+        }
+    }
+
+    public var realtimeSetUserIdFailed: Bool {
+        get {
+            return self[.realtimeSetUserIdFailed] ?? false
+        }
+        set {
+            self[.realtimeSetUserIdFailed] = newValue
+        }
+    }
+
+    public var realtimeSetEmailFailed: Bool {
+        get {
+            return self[.realtimeSetEmailFailed] ?? false
+        }
+        set {
+            self[.realtimeSetEmailFailed] = newValue
+        }
+    }
+
+    public func getUserEmail() throws -> String {
+        guard let value = userEmail else {
+            throw StorageError.noValue(.userEmail)
+        }
+        return value
+    }
+
+    public func getApnsToken() throws -> Data {
+        guard let value = apnsToken else {
+            throw StorageError.noValue(.apnsToken)
+        }
+        return value
+    }
+
+    public func getSiteID() throws -> Int {
+        guard let value = siteID else {
+            throw StorageError.noValue(.siteID)
+        }
+        return value
+    }
+
+    public func getIsMbaasOptIn() throws -> Bool {
+        guard let value = isMbaasOptIn else {
+            throw StorageError.noValue(.isMbaasOptIn)
+        }
+        return value
+    }
+
+    public func getDefaultFcmToken() throws -> String {
+        guard let value = defaultFcmToken else {
+            throw StorageError.noValue(.defaultFcmToken)
+        }
+        return value
+    }
+
+    public func getFcmToken() throws -> String {
+        guard let value = fcmToken else {
+            throw StorageError.noValue(.fcmToken)
+        }
+        return value
+    }
+
+    public func getFirstVisitTimestamp() throws -> Int {
+        guard let value = firstVisitTimestamp else {
+            throw StorageError.noValue(.firstVisitTimestamp)
+        }
+        return value
+    }
+}
+
+// MARK: - KeyValueStorage
+
+extension StorageFacade {
+
+    public func set(value: Any?, key: StorageKey) {
+        storage(for: key).set(value: value, key: key)
+    }
+
+    public func value(for key: StorageKey) -> Any? {
+        return storage(for: key).value(for: key)
+    }
+
+    public subscript<T>(key: StorageKey) -> T? {
+        get {
+            return storage(for: key).value(for: key) as? T
+        }
+        set {
+            storage(for: key).set(value: newValue, key: key)
+        }
+    }
+
+// TODO: Should be supported in the future version of Swift. https://bugs.swift.org/browse/SR-238
+//    subscript<T>(key: UserDefaultsKey) -> () throws -> T {
+//        get {
+//            return { try cast(self.storage(for: key).value(forKey: key.rawValue)) }
+//        }
+//        set {
+//            storage(for: key).set(newValue, forKey: key.rawValue)
+//        }
+//    }
+
+}
+
+// MARK: - FileStorage
+
+extension StorageFacade {
 
     public func isExist(fileName: String, shared: Bool) -> Bool {
         return fileStorage.isExist(fileName: fileName, shared: shared)
@@ -55,6 +574,39 @@ extension GroupedStorageFacade: GroupedStorage {
 
     public func delete(fileName: String, shared: Bool) throws {
         try fileStorage.delete(fileName: fileName, shared: shared)
+    }
+
+}
+
+public enum StorageError: LocalizedError {
+    case noValue(StorageKey)
+
+    public var errorDescription: String? {
+        switch self {
+        case let .noValue(key):
+            return "StorageError: No value for key \(key.rawValue)"
+        }
+    }
+}
+
+
+extension UserDefaults: KeyValueStorage {
+
+    public func set(value: Any?, key: StorageKey) {
+        self.set(value, forKey: key.rawValue)
+    }
+
+    public func value(for key: StorageKey) -> Any? {
+        return self.value(forKey: key.rawValue)
+    }
+
+    public subscript<T>(key: StorageKey) -> T? {
+        get {
+            return value(for: key) as? T
+        }
+        set {
+            set(value: newValue, key: key)
+        }
     }
 
 }
