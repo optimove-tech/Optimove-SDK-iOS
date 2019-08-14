@@ -2,7 +2,12 @@
 
 import Foundation
 
-struct TenantRealtimeConfig: Codable {
-    var realtimeToken: String
-    var realtimeGateway: URL
+public struct TenantRealtimeConfig: Codable {
+    public var realtimeToken: String
+    public var realtimeGateway: URL
+
+    public init(realtimeToken: String, realtimeGateway: URL) {
+        self.realtimeToken = realtimeToken
+        self.realtimeGateway = realtimeGateway
+    }
 }

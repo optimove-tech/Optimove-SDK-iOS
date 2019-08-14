@@ -1,14 +1,14 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
 public struct TenantConfig: Codable {
-    let realtime: TenantRealtimeConfig
-    var optitrack: TenantOptitrackConfig
-    let optipush: TenantOptipushConfig
-    let firebaseProjectKeys: FirebaseProjectKeys
-    let clientsServiceProjectKeys: ClientsServiceProjectKeys
-    let events: [String: EventsConfig]
+    public let realtime: TenantRealtimeConfig
+    public var optitrack: TenantOptitrackConfig
+    public let optipush: TenantOptipushConfig
+    public let firebaseProjectKeys: FirebaseProjectKeys
+    public let clientsServiceProjectKeys: ClientsServiceProjectKeys
+    public let events: [String: EventsConfig]
 
-    init(realtime: TenantRealtimeConfig,
+    public init(realtime: TenantRealtimeConfig,
          optitrack: TenantOptitrackConfig,
          optipush: TenantOptipushConfig,
          firebaseProjectKeys: FirebaseProjectKeys,

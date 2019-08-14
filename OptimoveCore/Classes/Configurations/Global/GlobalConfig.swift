@@ -5,12 +5,12 @@ import Foundation
 // MARK: - GlobalConfig
 
 public struct GlobalConfig: Codable {
-    let general: GlobalGeneralConfig
-    let optitrack: GlobalOptitrackConfig
-    let optipush: GlobalOptipushConfig
-    let coreEvents: [String: EventsConfig]
+    public let general: GlobalGeneralConfig
+    public let optitrack: GlobalOptitrackConfig
+    public let optipush: GlobalOptipushConfig
+    public let coreEvents: [String: EventsConfig]
 
-    init(general: GlobalGeneralConfig,
+    public init(general: GlobalGeneralConfig,
          optitrack: GlobalOptitrackConfig,
          optipush: GlobalOptipushConfig,
          coreEvents: [String : EventsConfig]) {
@@ -45,8 +45,12 @@ public struct GlobalConfig: Codable {
 }
 
 // MARK: - General
-struct GlobalGeneralConfig: Codable {
-    let logsServiceEndpoint: URL
+public struct GlobalGeneralConfig: Codable {
+    public let logsServiceEndpoint: URL
+
+    public init(logsServiceEndpoint: URL) {
+        self.logsServiceEndpoint = logsServiceEndpoint
+    }
 
     enum CodingKeys: String, CodingKey {
         case logsServiceEndpoint = "logs_service_endpoint"
@@ -54,8 +58,12 @@ struct GlobalGeneralConfig: Codable {
 }
 
 // MARK: - Optipush
-struct GlobalOptipushConfig: Codable {
-    let registrationServiceEndpoint: URL
+public struct GlobalOptipushConfig: Codable {
+    public let registrationServiceEndpoint: URL
+
+    public init(registrationServiceEndpoint: URL) {
+        self.registrationServiceEndpoint = registrationServiceEndpoint
+    }
 
     enum CodingKeys: String, CodingKey {
         case registrationServiceEndpoint = "registration_service_endpoint"
@@ -63,9 +71,14 @@ struct GlobalOptipushConfig: Codable {
 }
 
 // MARK: - Optitrack
-struct GlobalOptitrackConfig: Codable {
-    let eventCategoryName: String
-    let customDimensionIDs: CustomDimensionIDs
+public struct GlobalOptitrackConfig: Codable {
+    public let eventCategoryName: String
+    public let customDimensionIDs: CustomDimensionIDs
+
+    public init(eventCategoryName: String, customDimensionIDs: CustomDimensionIDs) {
+        self.eventCategoryName = eventCategoryName
+        self.customDimensionIDs = customDimensionIDs
+    }
 
     enum CodingKeys: String, CodingKey {
         case eventCategoryName = "event_category_name"
@@ -81,6 +94,21 @@ public struct CustomDimensionIDs: Codable {
     public let maxVisitCustomDimensions: Int
     public let actionCustomDimensionsStartID: Int
     public let maxActionCustomDimensions: Int
+
+    public init(
+        eventIDCustomDimensionID: Int,
+        eventNameCustomDimensionID: Int,
+        visitCustomDimensionsStartID: Int,
+        maxVisitCustomDimensions: Int,
+        actionCustomDimensionsStartID: Int,
+        maxActionCustomDimensions: Int) {
+        self.eventIDCustomDimensionID = eventIDCustomDimensionID
+        self.eventNameCustomDimensionID = eventNameCustomDimensionID
+        self.visitCustomDimensionsStartID = visitCustomDimensionsStartID
+        self.maxVisitCustomDimensions = maxVisitCustomDimensions
+        self.actionCustomDimensionsStartID = actionCustomDimensionsStartID
+        self.maxActionCustomDimensions = maxActionCustomDimensions
+    }
 
     enum CodingKeys: String, CodingKey {
         case eventIDCustomDimensionID = "event_id_custom_dimension_id"

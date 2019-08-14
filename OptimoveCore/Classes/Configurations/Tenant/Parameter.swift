@@ -5,6 +5,15 @@ public struct Parameter: Codable {
     public let optiTrackDimensionId: Int
     public let optional: Bool
 
+    public init(
+        type: String,
+        optiTrackDimensionId: Int,
+        optional: Bool) {
+        self.type = type
+        self.optiTrackDimensionId = optiTrackDimensionId
+        self.optional = optional
+    }
+
     public var mandatory: Bool {
         return !optional
     }

@@ -8,12 +8,13 @@ public final class ClientsServiceProjectKeys: BaseFirebaseKeys, FirebaseKeys {
     
     public let appid: String
 
-    init(appid: String,
-         webApiKey: String,
-         dbUrl: String,
-         senderId: String,
-         storageBucket: String,
-         projectId: String) {
+    public init(
+        appid: String,
+        webApiKey: String,
+        dbUrl: String,
+        senderId: String,
+        storageBucket: String,
+        projectId: String) {
         self.appid = appid
         super.init(webApiKey: webApiKey, dbUrl: dbUrl, senderId: senderId, storageBucket: storageBucket,
                    projectId: projectId)

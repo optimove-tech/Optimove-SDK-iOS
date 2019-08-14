@@ -5,7 +5,7 @@ import Foundation
 public final class FirebaseProjectKeys: BaseFirebaseKeys, FirebaseKeys {
     public let appid: String
 
-    init(appid: String,
+    public init(appid: String,
          webApiKey: String,
          dbUrl: String,
          senderId: String,
