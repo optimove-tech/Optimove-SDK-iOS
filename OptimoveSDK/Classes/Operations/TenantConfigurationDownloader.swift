@@ -3,18 +3,18 @@
 import Foundation
 import OptimoveCore
 
-public final class TenantConfigurationDownloader: AsyncOperation {
+final class TenantConfigurationDownloader: AsyncOperation {
 
     private let networking: RemoteConfigurationNetworking
     private let repository: ConfigurationRepository
 
-    public init(networking: RemoteConfigurationNetworking,
+    init(networking: RemoteConfigurationNetworking,
          repository: ConfigurationRepository) {
         self.networking = networking
         self.repository = repository
     }
 
-    public override func main() {
+    override func main() {
         state = .executing
         networking.getTenantConfiguration { (result) in
             do {

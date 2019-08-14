@@ -3,18 +3,18 @@
 import Foundation
 import OptimoveCore
 
-public final class RemoteConfigurationNetworking {
+final class RemoteConfigurationNetworking {
 
     private let networkClient: NetworkClient
     private let requestBuilder: RemoteConfigurationRequestBuilder
 
-    public init(networkClient: NetworkClient,
+    init(networkClient: NetworkClient,
          requestBuilder: RemoteConfigurationRequestBuilder) {
         self.networkClient = networkClient
         self.requestBuilder = requestBuilder
     }
 
-    public func getTenantConfiguration(_ completion: @escaping (Result<TenantConfig, Error>) -> Void) {
+    func getTenantConfiguration(_ completion: @escaping (Result<TenantConfig, Error>) -> Void) {
         do {
             let request = try requestBuilder.createTenantConfigurationsRequest()
             networkClient.perform(request) { (result) in
@@ -29,7 +29,7 @@ public final class RemoteConfigurationNetworking {
         }
     }
 
-    public func getGlobalConfiguration(_ completion: @escaping (Result<GlobalConfig, Error>) -> Void) {
+    func getGlobalConfiguration(_ completion: @escaping (Result<GlobalConfig, Error>) -> Void) {
         let request = requestBuilder.createGlobalConfigurationsRequest()
         networkClient.perform(request) { (result) in
             completion(
