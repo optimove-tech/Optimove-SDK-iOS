@@ -1,6 +1,7 @@
 // Copiright 2019 Optimove
 
 import Foundation
+import OptimoveCore
 
 /// Used only for `MbaasOperation.registration`
 final class RegistartionMbaasModel: BaseMbaasModel {
