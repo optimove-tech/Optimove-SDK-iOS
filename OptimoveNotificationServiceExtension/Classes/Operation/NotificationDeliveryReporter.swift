@@ -64,7 +64,7 @@ private extension NotificationDeliveryReporter {
         try prepareAndSendEvent(event, eventConfig, configuration.optitrack)
     }
 
-    func prepareAndSendEvent(_ event: OptimoveEventInternal,
+    func prepareAndSendEvent(_ event: OptimoveEvent,
                              _ eventConfig: EventsConfig,
                              _ optitrack: OptitrackConfig) throws {
         let queryItems = try buildQueryItems(event, eventConfig, optitrack)
@@ -91,7 +91,7 @@ private extension NotificationDeliveryReporter {
 
 
     func buildQueryItems(
-        _ notificationEvent: OptimoveEventInternal,
+        _ notificationEvent: OptimoveEvent,
         _ eventConfig: EventsConfig,
         _ optitrack: OptitrackConfig
         ) throws -> [URLQueryItem] {

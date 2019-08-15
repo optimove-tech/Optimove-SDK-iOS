@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class ScheduledNotificationDelivered: OptimoveEventInternal {
+final class ScheduledNotificationDelivered: OptimoveEvent {
 
     let name = "notification_delivered"
     let campaignId: Int
