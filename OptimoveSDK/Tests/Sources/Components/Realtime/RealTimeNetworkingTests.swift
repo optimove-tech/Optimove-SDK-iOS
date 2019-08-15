@@ -16,7 +16,7 @@ class RealTimeNetworkingTests: XCTestCase {
         networking = RealTimeNetworkingImpl(
             networkClient: client,
             realTimeRequestBuildable: RealTimeRequestBuilder(),
-            configuration: ConfigurationFixture().realtimeConfigFixture()
+            configuration: ConfigurationFixture.build().realtime
         )
     }
 

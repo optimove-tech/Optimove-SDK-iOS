@@ -26,7 +26,7 @@ class RealTimeComponentTests: XCTestCase {
         )
         dateProvider = MockDateTimeProvider()
         realTime = RealTime(
-            configuration: ConfigurationFixture().realtimeConfigFixture(),
+            configuration: ConfigurationFixture.build().realtime,
             storage: storage,
             networking: networking,
             warehouse: warehouseProvider,
@@ -634,4 +634,12 @@ class RealTimeComponentTests: XCTestCase {
         realTime.reportEvent(event: StubEvent())
         waitForExpectations(timeout: expectationTimeout)
     }
+}
+
+extension StubEvent {
+
+    func isStubEvent(_ event: RealtimeEvent) -> Bool {
+        return (event.context[Constnats.key] as? String) == Constnats.value
+    }
+
 }

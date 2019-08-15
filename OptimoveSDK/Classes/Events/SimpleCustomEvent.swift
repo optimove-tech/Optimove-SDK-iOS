@@ -1,3 +1,5 @@
+import OptimoveCore
+
 class SimpleCustomEvent: OptimoveEvent {
     var name: String
     var parameters: [String: Any]

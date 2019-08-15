@@ -17,7 +17,7 @@ class RegistrarNetworkingTests: XCTestCase {
             networkClient: client,
             requestBuilder: RegistrarNetworkingRequestBuilder(
                 storage: MockOptimoveStorage(),
-                configuration: ConfigurationFixture().optipushConfigFixture()
+                configuration: ConfigurationFixture.build().optipush
             )
         )
     }

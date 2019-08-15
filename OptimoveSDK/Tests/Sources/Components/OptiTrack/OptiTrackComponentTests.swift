@@ -27,7 +27,7 @@ final class OptiTrackComponentTests: XCTestCase {
         statisticService = MockStatisticService()
 
         optitrack = OptiTrack(
-            configuration: ConfigurationFixture().optitrackConfigFixture(),
+            configuration: ConfigurationFixture.build().optitrack,
             deviceStateMonitor: deviceStateMonitor,
             storage: storage,
             coreEventFactory: CoreEventFactoryImpl(
@@ -210,7 +210,14 @@ final class OptiTrackComponentTests: XCTestCase {
             11: MetaDataEvent.Constants.Key.appNS
         ]
 
-        let expectedDimensions = sdkVersionDimensions.merging(StubVariables.coreParameters) { (current, _) in current }
+        let coreParameters: [Int: String] = [
+            12: OptimoveKeys.AdditionalAttributesKeys.eventPlatform,
+            13: OptimoveKeys.AdditionalAttributesKeys.eventDeviceType,
+            14: OptimoveKeys.AdditionalAttributesKeys.eventOs,
+            15: OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile,
+        ]
+
+        let expectedDimensions = sdkVersionDimensions.merging(coreParameters) { (current, _) in current }
 
         // and
         warehouse.addParameters(

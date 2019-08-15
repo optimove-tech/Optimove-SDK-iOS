@@ -20,8 +20,8 @@ Pod::Spec.new do |s|
   s.dependency 'OptimoveCore', '~> 2.0'
   s.frameworks = 'UIKit', 'SystemConfiguration', 'UserNotifications', 'AdSupport'
   s.test_spec do |unit_tests|
-    unit_tests.source_files = base_dir + 'Tests/Sources/**/*'
-    unit_tests.resources = base_dir + 'Tests/Resources/**/*'
+    unit_tests.source_files = base_dir + 'Tests/Sources/**/*',  'Shared/Tests/Sources/**/*'
+    unit_tests.resources = [base_dir + 'Tests/Resources/**/*', 'Shared/Tests/Resources/**/*']
     unit_tests.dependency 'Mocker', '~> 1.0.0'
   end
 end

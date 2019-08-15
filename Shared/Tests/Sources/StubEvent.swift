@@ -1,6 +1,6 @@
 // Copiright 2019 Optimove
 
-@testable import OptimoveSDK
+@testable import OptimoveCore
 
 final class StubEvent: OptimoveEvent {
 
@@ -15,7 +15,7 @@ final class StubEvent: OptimoveEvent {
         Constnats.key: Constnats.value
     ]
 
-    func isStubEvent(_ event: RealtimeEvent) -> Bool {
-        return (event.context[Constnats.key] as? String) == Constnats.value
-    }
+//    func isStubEvent(_ event: RealtimeEvent) -> Bool {
+//        return (event.context[Constnats.key] as? String) == Constnats.value
+//    }
 }

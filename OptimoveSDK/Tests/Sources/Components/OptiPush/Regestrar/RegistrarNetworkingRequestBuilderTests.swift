@@ -13,7 +13,7 @@ class RegistrarNetworkingRequestBuilderTests: XCTestCase {
         storage = MockOptimoveStorage()
         builder = RegistrarNetworkingRequestBuilder(
             storage: storage,
-            configuration: ConfigurationFixture().optipushConfigFixture()
+            configuration: ConfigurationFixture.build().optipush
         )
     }
 

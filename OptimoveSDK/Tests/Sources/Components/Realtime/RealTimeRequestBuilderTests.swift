@@ -5,7 +5,7 @@ import XCTest
 
 class RealTimeRequestBuilderTests: XCTestCase {
 
-    let configuration = ConfigurationFixture().configurationFixture()
+    let configuration = ConfigurationFixture.build()
     var builder: RealTimeRequestBuilder!
 
     override func setUp() {

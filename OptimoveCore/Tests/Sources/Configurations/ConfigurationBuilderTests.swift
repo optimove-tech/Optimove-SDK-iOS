@@ -6,8 +6,8 @@ import XCTest
 class ConfigurationBuilderTests: XCTestCase {
 
     func test_build_configuration() {
-        let tenantConfig = tenantConfigFixture()
-        let globalConfig = globalConfigFixture()
+        let tenantConfig = TenantConfigFixture().build()
+        let globalConfig = GlobalConfigFixture().build()
 
         let builder = ConfigurationBuilder(globalConfig: globalConfig, tenantConfig: tenantConfig)
         let configuration = builder.build()
