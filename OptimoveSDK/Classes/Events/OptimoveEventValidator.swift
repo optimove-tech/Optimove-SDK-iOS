@@ -1,10 +1,4 @@
-//
-//  EventValidator.swift
-//  OptimoveSDKDev
-//
-//  Created by Mobile Developer Optimove on 05/09/2017.
 //  Copyright © 2017 Optimove. All rights reserved.
-//
 
 import Foundation
 import OptimoveCore

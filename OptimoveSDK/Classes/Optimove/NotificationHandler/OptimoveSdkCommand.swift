@@ -1,5 +1,6 @@
-import Foundation
+//  Copyright © 2019 Optimove. All rights reserved.
 
+import Foundation
 
 /// A type that describe a remote command.
 ///

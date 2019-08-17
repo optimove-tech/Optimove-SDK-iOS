@@ -1,4 +1,4 @@
-//  Copyright © 2017 Optimove
+//  Copyright © 2017 Optimove. All rights reserved.
 
 import Foundation
 import OptimoveCore

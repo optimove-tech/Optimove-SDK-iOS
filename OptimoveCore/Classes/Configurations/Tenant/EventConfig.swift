@@ -1,4 +1,4 @@
-//  Copyright © 2017 Optimove.
+//  Copyright © 2017 Optimove. All rights reserved.
 
 public struct EventsConfig: Codable {
     public let id: Int

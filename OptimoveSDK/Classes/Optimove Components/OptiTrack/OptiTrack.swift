@@ -1,4 +1,4 @@
-//  Copyright © 2017 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import UIKit
 import OptimoveCore

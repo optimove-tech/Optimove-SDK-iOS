@@ -1,3 +1,5 @@
+//  Copyright © 2019 Optimove. All rights reserved.
+
 import UserNotifications
 
 public enum OptimoveDeviceRequirement: Int, CaseIterable, CustomStringConvertible {
