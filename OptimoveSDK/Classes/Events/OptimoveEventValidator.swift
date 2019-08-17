@@ -18,7 +18,7 @@ class OptimoveEventValidator {
                 switch parameterConfiguration.type {
                 case "Number":
                     guard let numberValue = value as? NSNumber else {
-                        OptiLoggerMessages.logParameterIsNotNumber(name: name)
+                        Logger.error("Parameter '\(name)' is not number type.")
                         return .mismatchParamterType
                     }
                     if String(describing: numberValue).count > 255  // Verify parameter value
@@ -27,11 +27,9 @@ class OptimoveEventValidator {
                     }
 
                 case "String":
-                    guard let stringValue = value as? String
-                    else {
-                        OptiLoggerMessages.logParameterIsNotString(name: name)
+                    guard let stringValue = value as? String else {
+                        Logger.error("Parameter \(name) is not string type.")
                         return .mismatchParamterType
-
                     }
                     // Verify parameter value length
                     if stringValue.count > 255 {
@@ -39,12 +37,10 @@ class OptimoveEventValidator {
 
                     }
                 case "Boolean":
-                    guard let _ = value as? Bool
-                    else {
-                        OptiLoggerMessages.logParameterIsNotBoolean(name: name)
+                    guard let _ = value as? Bool else {
+                        Logger.error("Parameter \(name) is not boolean type.")
                         return .mismatchParamterType
                     }
-
                 default:
                     return .invalidEvent
                 }

@@ -26,10 +26,6 @@ final class Registrar {
         self.modelFactory = modelFactory
         self.networking = networking
         self.backup = backup
-
-        // WTF?
-        OptiLoggerMessages.logRegistrarInitializtionStart()
-        OptiLoggerMessages.logRegistrarInitializtionFinish()
     }
 
 }
@@ -83,7 +79,7 @@ private extension Registrar {
                 completion?()
             }
         } catch {
-            OptiLoggerMessages.logJsonBuildFailure(mbaasRequestOperation: error.localizedDescription)
+            Logger.error("OptiPush: Could not build JSON object. Reason: \(error.localizedDescription)")
         }
     }
 
@@ -97,8 +93,8 @@ private extension Registrar {
                 if model.operation == .unregistration {
                     self?.register()
                 }
-            case .failure:
-                OptiLoggerMessages.logRetryFailed()
+            case let .failure(error):
+                Logger.error("OptiPush: Retry request failed. Reason: \(error.localizedDescription)")
             }
         }
     }
@@ -108,7 +104,7 @@ private extension Registrar {
             try backup.backup(model)
             setSuccesFlag(succeed: false, for: model.operation)
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 
@@ -120,7 +116,7 @@ private extension Registrar {
                 storage.isMbaasOptIn = true
             }
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 

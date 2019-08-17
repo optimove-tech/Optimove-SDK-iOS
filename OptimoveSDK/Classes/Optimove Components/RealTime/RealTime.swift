@@ -49,15 +49,14 @@ final class RealTime {
 
     func report(event: OptimoveEvent, config: EventsConfig, retryFailedEvents: Bool = true) {
         guard config.supportedOnRealTime else {
-            OptiLoggerMessages.logEventNotsupportedOnRealtime(eventName: event.name)
+            Logger.warn("Realtime: Event \(event.name) is not supported.")
             return
         }
-        OptiLoggerMessages.logRealtimeReportEvent(eventName: event.name)
         do {
             let context = createEventContext(event: event, config: config)
             try report(context: context, retryFailedEvents: retryFailedEvents)
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 
@@ -136,7 +135,7 @@ private extension RealTime {
     func obtainConfiguration(for event: OptimoveEvent) -> EventsConfig? {
         guard let warehouse = try? warehouse.getWarehouse(),
             let config = warehouse.getConfig(for: event) else {
-                OptiLoggerMessages.logConfigForEventMissing(eventName: event.name)
+                Logger.error("Configurations are missing for event \(event.name)")
                 return nil
         }
         return config
@@ -145,11 +144,23 @@ private extension RealTime {
     func createEventContext(event: OptimoveEvent, config: EventsConfig) -> RealTimeEventContext {
         switch event.name {
         case OptimoveKeys.Configuration.setUserId.rawValue:
-            return SetUserIdEventContext(event: event, config: config)
+            return RealTimeEventContext(
+                event: event,
+                config: config,
+                type: .setUserID
+            )
         case OptimoveKeys.Configuration.setEmail.rawValue:
-            return SetUserEmailEventContext(event: event, config: config)
+            return RealTimeEventContext(
+                event: event,
+                config: config,
+                type: .setUserEmail
+            )
         default:
-            return RegularEventContext(event: event, config: config)
+            return RealTimeEventContext(
+                event: event,
+                config: config,
+                type: .regular
+            )
         }
     }
 
@@ -196,7 +207,7 @@ private extension RealTime {
         let realtimeToken = configuration.realtimeToken
         isAllowToSendReport { [realTimeQueue, hanlder, networking, eventBuilder] (allow) in
             guard allow else {
-                hanlder.handleOffline(context)
+                hanlder.handleOnError(context, error: RealTimeError.deviceOffline)
                 return
             }
             realTimeQueue.async {
@@ -211,7 +222,7 @@ private extension RealTime {
                         }
                     }
                 } catch {
-                    hanlder.handleOnCatch(context, error: error)
+                    hanlder.handleOnError(context, error: error)
                 }
             }
         }
@@ -221,11 +232,14 @@ private extension RealTime {
 
 enum RealTimeError: LocalizedError {
     case eitherCustomerOrVisitorIdIsNil
+    case deviceOffline
 
     var errorDescription: String? {
         switch self {
         case .eitherCustomerOrVisitorIdIsNil:
             return "Either a CustomerID or a VisitorID should not be nil."
+        case .deviceOffline:
+            return "Device is offline."
         }
     }
 }

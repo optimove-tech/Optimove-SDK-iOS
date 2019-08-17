@@ -20,7 +20,7 @@ final class GlobalConfigurationDownloader: AsyncOperation {
                 let global = try result.get()
                 try self.repository.saveGlobal(global)
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
             self.state = .finished
         }

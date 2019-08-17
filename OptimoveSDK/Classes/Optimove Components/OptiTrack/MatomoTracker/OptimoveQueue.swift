@@ -23,7 +23,7 @@ extension OptimoveQueue: Queue {
     }
 
     func enqueue(events: [Event], completion: (() -> Void)?) {
-        OptiLoggerMessages.logAddEventsFromQueue()
+        Logger.debug("OptimoveQueue: Enqueue")
         cachedEvents.append(contentsOf: events)
         do {
             try storage.save(
@@ -32,7 +32,7 @@ extension OptimoveQueue: Queue {
                 shared: TrackerConstants.isSharedStorage
             )
         } catch {
-            OptiLoggerMessages.logEventsfileCouldNotLoad()
+            Logger.error("OptimoveQueue: Events file could not be saved. Reason: \(error.localizedDescription)")
         }
         completion?()
     }
@@ -44,7 +44,7 @@ extension OptimoveQueue: Queue {
     }
 
     func remove(events: [Event], completion: () -> Void) {
-        OptiLoggerMessages.logRemoveEventsFromQueue()
+        Logger.debug("OptimoveQueue: Dequeue")
         cachedEvents = cachedEvents.filter { cachedEvent in
             !events.contains(cachedEvent)
         }
@@ -55,7 +55,7 @@ extension OptimoveQueue: Queue {
                 shared: TrackerConstants.isSharedStorage
             )
         } catch {
-            OptiLoggerMessages.logEventFileSaveFailure()
+            Logger.error("OptimoveQueue: Events file could not be saved. Reason: \(error.localizedDescription)")
         }
         completion()
     }

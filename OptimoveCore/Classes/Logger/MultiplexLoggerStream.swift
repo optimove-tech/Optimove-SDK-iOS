@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-final class MultiplexLoggerStream {
+public final class MultiplexLoggerStream {
 
     private struct Constants {
         static let delimiter = "/"
@@ -11,7 +11,7 @@ final class MultiplexLoggerStream {
 
     private static let logQueue = DispatchQueue(label: "com.optimove.sdk.log")
 
-    static func log(
+    public static func log(
         level: LogLevel,
         fileName: String?,
         methodName: String?,
@@ -39,11 +39,18 @@ final class MultiplexLoggerStream {
         }
     }
 
-    static func add(stream: LoggerStream) {
+    public static func add(stream: LoggerStream) {
         outputStreams[ObjectIdentifier(stream)] = stream
     }
 
-    static func remove(stream: LoggerStream) {
+    public static func remove(stream: LoggerStream) {
         outputStreams.removeValue(forKey: ObjectIdentifier(stream))
+    }
+
+    public static func mutateStreams(mutator: (MutableLoggerStream) -> Void) {
+        outputStreams
+            .values
+            .compactMap { $0 as? MutableLoggerStream }
+            .forEach (mutator)
     }
 }

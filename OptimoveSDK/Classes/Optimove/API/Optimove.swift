@@ -41,15 +41,16 @@ protocol OptimoveEventReporting: class {
     ///
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
+        Logger.warn("Optimove: Use tenant config \(tenantInfo.configName)")
         shared.configureLogger()
-        OptiLoggerMessages.logStartConfigureOptimoveSDK()
+        Logger.debug("Optimove: configure started.")
         shared.storeTenantInfo(tenantInfo)
         shared.startNormalInitProcess { (sucess) in
             guard sucess else {
-                OptiLoggerMessages.logNormalInitFailed()
+                Logger.error("Optimove: configure failed.")
                 return
             }
-            OptiLoggerMessages.logNormalInitSuccess()
+            Logger.info("Optimove: configure finished. ✅")
         }
     }
 
@@ -74,9 +75,9 @@ protocol OptimoveEventReporting: class {
 extension Optimove {
 
     func startNormalInitProcess(didSucceed: @escaping ResultBlockWithBool) {
-        OptiLoggerMessages.logStartInitFromRemote()
+        Logger.info("Start Optimove component initialization from remote.")
         if RunningFlagsIndication.isSdkRunning {
-            OptiLoggerMessages.logSkipNormalInitSinceRunning()
+            Logger.debug("Skip normal initializtion since SDK already running")
             didSucceed(true)
             return
         }
@@ -94,9 +95,9 @@ extension Optimove {
     }
 
     func startUrgentInitProcess(didSucceed: @escaping ResultBlockWithBool) {
-        OptiLoggerMessages.logStartUrgentInitProcess()
+        Logger.info("Start Optimove urgent initiazlition process")
         if RunningFlagsIndication.isSdkRunning {
-            OptiLoggerMessages.logSkipUrgentInitSinceRunning()
+            Logger.debug("Skip urgent initializtion since SDK already running")
             didSucceed(true)
             return
         }
@@ -138,9 +139,7 @@ extension Optimove {
             return
         }
         stateDelegateQueue.async {
-            Optimove.swiftStateDelegates[ObjectIdentifier(listener)] = OptimoveSuccessStateListenerWrapper(
-                observer: listener
-            )
+            Optimove.swiftStateDelegates[ObjectIdentifier(listener)] = OptimoveSuccessStateListenerWrapper(observer: listener)
         }
     }
 
@@ -185,7 +184,7 @@ extension Optimove {
         userInfo: [AnyHashable: Any],
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
         ) -> Bool {
-        OptiLoggerMessages.logReceiveRemoteNotification()
+        Logger.info("Receive remote notification.")
         guard userInfo[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true" else {
             return false
         }
@@ -200,10 +199,10 @@ extension Optimove {
         notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
         ) -> Bool {
-        OptiLoggerMessages.logReceiveNotificationInForeground()
+        Logger.info("Received notification in foreground mode.")
         guard notification.request.content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true"
             else {
-                OptiLoggerMessages.logNotificationShouldNotHandleByOptimove()
+                Logger.debug("Notification should not be handled by optimove")
                 return false
         }
         completionHandler([.alert, .sound, .badge])
@@ -219,12 +218,10 @@ extension Optimove {
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
-        guard
-            response.notification.request.content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String
-                == "true"
-            else {
-                OptiLoggerMessages.logNotificationResponse()
-                return false
+        let userInfo = response.notification.request.content.userInfo
+        guard userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true" else {
+            Logger.debug("User respond to non optimove notification")
+            return false
         }
         serviceLocator.notificationListener().didReceive(
             response: response,
@@ -321,21 +318,17 @@ extension Optimove {
 
         guard let warehouse = try? serviceLocator.warehouseProvider().getWarehouse(),
             let config = warehouse.getConfig(for: event) else {
-            OptiLoggerMessages.logConfigurationForEventMissing(eventName: eventDecor.name)
+            Logger.error("Optimove: configurations for event: \(event.name) are missing.")
             return
         }
         eventDecor.processEventConfig(config)
 
         // Must pass the decorator in case some additional attributes become mandatory
-        if let eventValidationError = OptimoveEventValidator().validate(event: eventDecor, withConfig: config) {
-            OptiLoggerMessages.logReportEventFailed(
-                eventName: eventDecor.name,
-                eventValidationError: eventValidationError.localizedDescription
-            )
+        if let error = OptimoveEventValidator().validate(event: eventDecor, withConfig: config) {
+            Logger.error("Optimove: Event '\(event.name)' is invalid. Reason: \(error.localizedDescription)")
             return
         }
 
-        OptiLoggerMessages.logOptitrackReport(event: eventDecor.name)
         components.report(event: eventDecor, config: config)
 
         // FIXME: Handle it in a different way. If needed
@@ -366,7 +359,7 @@ extension Optimove {
     @objc public func setUserId(_ sdkId: String) {
         let userId = sdkId.trimmingCharacters(in: .whitespaces)
         guard isValid(userId: userId) else {
-            OptiLoggerMessages.logUserIdNotValid(userID: userId)
+            Logger.error("Optimove: User id '\(userId)' is not valid.")
             return
         }
 
@@ -386,7 +379,7 @@ extension Optimove {
                 storage.isFirstConversion = false
             }
         } else {
-            OptiLoggerMessages.logUserIdNotNew(userId: userId)
+            Logger.warn("Optimove: User id '\(userId)' was already set in.")
             return
         }
         storage.isRegistrationSuccess = false
@@ -441,7 +434,7 @@ extension Optimove {
     /// - Parameter email: The user email
     @objc public func setUserEmail(email: String) {
         guard isValid(email: email) else {
-            OptiLoggerMessages.logEmailNotValid()
+            Logger.error("Optimove: Email is not valid")
             return
         }
         storage.userEmail = email
@@ -470,9 +463,9 @@ extension Optimove {
     // MARK: - Report screen visit
 
     @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
-        OptiLoggerMessages.logReportScreen()
+        Logger.debug("User ask to report screen event.")
         guard !screenTitle.trimmingCharacters(in: .whitespaces).isEmpty else {
-            OptiLoggerMessages.logReportScreenWithEmptyTitleError()
+            Logger.error("Trying to report screen visit with empty title")
             return
         }
         let path = screenPathArray.joined(separator: "/")
@@ -483,11 +476,11 @@ extension Optimove {
         let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
         var screenPath = screenPath.trimmingCharacters(in: .whitespaces)
         guard !screenTitle.isEmpty else {
-            OptiLoggerMessages.logReportScreenWithEmptyTitleError()
+            Logger.error("Trying to report screen visit with empty title")
             return
         }
         guard !screenPath.isEmpty else {
-            OptiLoggerMessages.logReportScreenWithEmptyScreenPath()
+            Logger.error("Trying to report screen visit with empty path")
             return
         }
 
@@ -534,22 +527,20 @@ private extension Optimove {
         storage.version = info.configName
         storage.configurationEndPoint = Endpoints.Remote.TenantConfig.url
 
-        OptiLoggerMessages.logStoreUserInfo(
-            tenantToken: info.tenantToken,
-            tenantVersion: info.configName,
-            tenantUrl: Endpoints.Remote.TenantConfig.url.absoluteString
+        Logger.debug(
+            """
+            Stored user info in local storage:
+            token: \(info.tenantToken)
+            version: \(info.configName)
+            end point: \(Endpoints.Remote.TenantConfig.url.absoluteString)
+            """
         )
-
     }
 
     func configureLogger() {
-        let consoleStream = OptiLoggerConsoleStream()
-        OptiLoggerStreamsContainer.add(stream: consoleStream)
+        MultiplexLoggerStream.add(stream: ConsoleLoggerStream())
         if SDK.isStaging {
-            let tenantID: Int = storage.siteID ?? -1
-            OptiLoggerStreamsContainer.add(
-                stream: MobileLogServiceLoggerStream(tenantId: tenantID)
-            )
+            MultiplexLoggerStream.add(stream: RemoteLoggerStream(tenantId: storage.siteID ?? -1))
         }
     }
 

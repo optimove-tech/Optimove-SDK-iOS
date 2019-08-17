@@ -88,11 +88,10 @@ extension FileStorageImpl: FileStorage {
         let fileUrl = getDirectory(shared: shared).appendingPathComponent(fileName)
         do {
             let contents = try unwrap(fileManager.contents(atPath: fileUrl.path))
-//            OptiLoggerMessages.logLoadFile(fileUrl: fileUrl.path)
+            Logger.debug("Load file at \(fileName)")
             return contents
         } catch {
-//            OptiLoggerMessages.logLoadFileFailure(name: fileName)
-//            OptiLoggerMessages.logError(error: error)
+            Logger.error("Unable to load file \(fileName) at \(fileUrl.path). Reason: \(error.localizedDescription)")
             throw error
         }
     }
@@ -115,13 +114,9 @@ extension FileStorageImpl: FileStorage {
             let fileURL = url.appendingPathComponent(fileName)
             let success = fileManager.createFile(atPath: fileURL.path, contents: data, attributes: nil)
             try addSkipBackupAttributeToItemAtURL(fileURL: fileURL)
-//            OptiLoggerMessages.logStoringFileStatus(
-//                name: fileName,
-//                successStatus: success.description,
-//                fileLocation: url.path
-//            )
+            Logger.debug("File stored at \(fileName) successfull \(success.description).")
         } catch {
-//            OptiLoggerMessages.logStringFailureStatus(name: fileName)
+            Logger.error("Unable to store file \(fileName) failed. Reason: \(error.localizedDescription)")
             throw error
         }
     }
@@ -130,10 +125,9 @@ extension FileStorageImpl: FileStorage {
         do {
             let fileUrl = getDirectory(shared: shared).appendingPathComponent(fileName)
             try fileManager.removeItem(at: fileUrl)
-//            OptiLoggerMessages.logDeleteFile(name: fileName)
+            Logger.debug("File deleted at \(fileUrl.absoluteString).")
         } catch {
-//            OptiLoggerMessages.logFileDeletionFailure(name: fileName)
-//            OptiLoggerMessages.logError(error: error)
+            Logger.error("Unable to delete file \(fileName). Reason: \(error.localizedDescription)")
             throw error
         }
     }

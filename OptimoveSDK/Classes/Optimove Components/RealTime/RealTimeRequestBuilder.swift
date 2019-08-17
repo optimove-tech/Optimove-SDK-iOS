@@ -18,11 +18,12 @@ final class RealTimeRequestBuilder {
 
     private func log(_ request: NetworkRequest) {
         do {
-            OptiLoggerMessages.logRealtimeReportEvent(
-                json: try cast(String(data: request.httpBody ?? Data(), encoding: .utf8))
+            let json = try unwrap(String(data: request.httpBody ?? Data(), encoding: .utf8))
+            Logger.debug(
+                "Realtime: Report event: \(json)"
             )
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 }

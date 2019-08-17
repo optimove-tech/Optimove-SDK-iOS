@@ -13,9 +13,7 @@ struct OptimoveEventConfigsWarehouseImpl: EventsConfigWarehouse {
     private let events: [String: EventsConfig]
 
     init(events: [String: EventsConfig]) {
-        OptiLoggerMessages.logEventsWarehouseInitializtionStart()
         self.events = events
-        OptiLoggerMessages.logEventsWarehouseInitializtionFinish()
     }
 
     func getConfig(for event: OptimoveEvent) -> EventsConfig? {

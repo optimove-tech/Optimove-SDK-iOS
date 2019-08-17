@@ -43,7 +43,7 @@ private extension OptimoveNotificationHandler {
         switch common {
         case .reregister:
             let bgtask = UIApplication.shared.beginBackgroundTask(withName: "reregister")
-            OptiLoggerMessages.logRequestToRegister()
+            Logger.debug("Request to reregister.")
             DispatchQueue.global().async { [optimove] in
                 optimove.performRegistration()
                 DispatchQueue.main.asyncAfter(deadline: .now() + min(UIApplication.shared.backgroundTimeRemaining, 2.0)) {
@@ -54,19 +54,16 @@ private extension OptimoveNotificationHandler {
 
         case .ping:
             let bgtask = UIApplication.shared.beginBackgroundTask(withName: "ping")
-            OptiLoggerMessages.logRequestToPing()
+            Logger.debug("Request to ping.")
             do {
                 let event = try coreEventFactory.createEvent(.ping)
                 optimove.reportEvent(event)
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + min(UIApplication.shared.backgroundTimeRemaining, 1.0)) { [optimove] in
                 optimove.dispatchQueuedEventsNow()
             }
-            OptiLoggerMessages.logRemainBackgroundTime(
-                backgroundTimeRemaining: UIApplication.shared.backgroundTimeRemaining
-            )
             DispatchQueue.main.asyncAfter(deadline: .now() + min(UIApplication.shared.backgroundTimeRemaining, 3.0)) {
 
                 completion(.newData)
@@ -97,22 +94,21 @@ private extension OptimoveNotificationHandler {
             notificationCenter.setNotificationCategories([category])
             notificationCenter.getNotificationCategories { (categories) in
                 categories.forEach({ (categoty) in
-                    os_log("Category registred: %{PRIVATE}@", log: OSLog.consoleStream, type: .debug, categoty.identifier)
+                    Logger.debug("Category registred: \(categoty.identifier)")
                 })
-                os_log("User actions successfully added.", log: OSLog.consoleStream, type: .debug)
+                Logger.debug("User actions successfully added.")
                 completion(.newData)
             }
         }
     }
 
     func reportNotification(response: UNNotificationResponse) {
-        OptiLoggerMessages.logUserReactToNotification()
-        OptiLoggerMessages.logUserReaction(userResponseToNotification: response.actionIdentifier)
+        Logger.info("User react '\(response.actionIdentifier)' to a notification.")
 
         let notificationDetails = response.notification.request.content.userInfo
 
         guard let campaignDetails = CampaignDetails.extractCampaignDetails(from: notificationDetails) else {
-            OptiLoggerMessages.logCampignDetailsCouldNotBeExtracted()
+            Logger.warn("Campaign details could not be extracted. Stop execution.")
             return
         }
 
@@ -121,9 +117,6 @@ private extension OptimoveNotificationHandler {
         case UNNotificationDismissActionIdentifier:
             optimove.reportEvent(NotificationDismissedEvent(campaignDetails: campaignDetails))
             optimove.dispatchQueuedEventsNow()
-            OptiLoggerMessages.logRemainBackgroundTime(
-                backgroundTimeRemaining: UIApplication.shared.backgroundTimeRemaining
-            )
             DispatchQueue.main.asyncAfter(deadline: .now() + min(UIApplication.shared.backgroundTimeRemaining, 2.0)) {
                 UIApplication.shared.endBackgroundTask(task)
             }
@@ -131,9 +124,6 @@ private extension OptimoveNotificationHandler {
         case UNNotificationDefaultActionIdentifier:
             optimove.reportEvent(NotificationOpenedEvent(campaignDetails: campaignDetails))
             optimove.dispatchQueuedEventsNow()
-            OptiLoggerMessages.logRemainBackgroundTime(
-                backgroundTimeRemaining: UIApplication.shared.backgroundTimeRemaining
-            )
             DispatchQueue.main.asyncAfter(deadline: .now() + min(UIApplication.shared.backgroundTimeRemaining, 2.0)) {
                 UIApplication.shared.endBackgroundTask(task)
             }
@@ -175,14 +165,13 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
     ) {
         optimove.startUrgentInitProcess { (success) in
             guard success else {
-                OptiLoggerMessages.logUrgentInitFailed()
+                Logger.error("Urgent initializtion failed")
                 return
             }
-            OptiLoggerMessages.logUrgentInitSuccess()
+            Logger.info("Urgent Initialization success")
 
-            OptiLoggerMessages.logAnalyzenotification()
             guard userInfo[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true" else {
-                OptiLoggerMessages.logCommandNotificationFailure()
+                Logger.debug("The notification do not contains SDK command.")
                 didComplete(.newData)
                 return
             }
@@ -192,7 +181,7 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
                 let command = try decoder.decode(OptimoveSdkCommand.self, from: data)
                 self.handleSdkCommand(command: command, completionHandler: didComplete)
             } catch {
-                OptiLoggerMessages.logCommandNotificationFailure()
+                Logger.error("Could not parse SDK command. Reason: \(error.localizedDescription)")
                 didComplete(.newData)
             }
         }
@@ -204,10 +193,10 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
     ) {
         optimove.startUrgentInitProcess { (success) in
             guard success else {
-                OptiLoggerMessages.logUrgentInitFailed()
+                Logger.error("Urgent initializtion failed")
                 return
             }
-            OptiLoggerMessages.logUrgentInitSuccess()
+            Logger.info("Urgent Initialization success")
 
             self.reportNotification(response: response)
             if self.isNotificationOpened(response: response) {

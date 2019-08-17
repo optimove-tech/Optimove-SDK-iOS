@@ -21,7 +21,7 @@ final class TenantConfigurationDownloader: AsyncOperation {
                 let tenant = try result.get()
                 try self.repository.saveTenant(tenant)
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
             self.state = .finished
         }

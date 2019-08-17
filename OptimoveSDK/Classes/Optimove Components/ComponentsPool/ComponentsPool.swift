@@ -31,7 +31,9 @@ extension ComponentsPoolImpl: Eventable {
         }
         // TODO: Handle by checking `eventableComponents.isEmpty` after the logger refactoring will be completed.
         if !RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            OptiLoggerMessages.logOptitrackNotRunningForSetUserId()
+            Logger.error(
+                "OptiTrack: Event user id could not be reported. Reason: Component is not running."
+            )
         }
     }
 
@@ -41,10 +43,14 @@ extension ComponentsPoolImpl: Eventable {
         }
         // TODO: Handle by checking `eventableComponents.isEmpty` after the logger refactoring will be completed.
         if !RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            OptiLoggerMessages.logOptiTrackNotRunning(eventName: event.name)
+            Logger.error(
+                "OptiTrack: Event '\(event.name)' could not be reported. Reason: Component is not running."
+            )
         }
         if !RunningFlagsIndication.isComponentRunning(.realtime) {
-             OptiLoggerMessages.logRealtimeNotrunning(eventName: event.name)
+            Logger.error(
+                "Realtime: Event '\(event.name)' could not be reported. Reason: Component is not running."
+            )
         }
     }
 
@@ -76,7 +82,9 @@ extension ComponentsPoolImpl: Pushable {
         }
         // TODO: Handle by checking `pushableComponents.isEmpty` after the logger refactoring will be completed.
         if !RunningFlagsIndication.isComponentRunning(.optiPush) {
-            OptiLoggerMessages.logOptipushNOtRunningForRegistration()
+            Logger.error(
+                "OptiPush: Event user id could not be reported. Reason: Component is not running."
+            )
         }
     }
 

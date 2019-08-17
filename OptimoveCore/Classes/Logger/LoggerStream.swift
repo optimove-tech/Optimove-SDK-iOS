@@ -8,7 +8,7 @@ public protocol LoggerStream: AnyObject {
     func log(level: LogLevel, fileName: String, methodName: String, logModule: String?, message: String)
 }
 
-protocol MutableLoggerStream: LoggerStream {
+public protocol MutableLoggerStream: LoggerStream {
     var tenantId: Int { get set }
     var endpoint: URL { get set }
 }

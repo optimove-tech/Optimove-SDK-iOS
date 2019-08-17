@@ -57,7 +57,7 @@ final class OptiTrack {
             trackAppOpened()
             observeEnterToBackgroundMode()
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 }
@@ -65,7 +65,7 @@ final class OptiTrack {
 extension OptiTrack: Eventable {
 
     func setUserId(_ userId: String) {
-        OptiLoggerMessages.logOptitrackSetUserID(userId: userId)
+        Logger.info("OptiTrack: Set user id \(userId)")
         tracker.userId = userId
     }
 
@@ -77,7 +77,7 @@ extension OptiTrack: Eventable {
     }
 
     func reportScreenEvent(customURL: String, pageTitle: String, category: String?) throws {
-        OptiLoggerMessages.logReportScreenEvent(screenTitle: pageTitle)
+        Logger.debug("OptiTrack: Report screen event: title='\(pageTitle)', path='\(customURL)'")
         tracker.track(view: [customURL], url: URL(string: "http://\(customURL)"))
 
         let event = try coreEventFactory.createEvent(
@@ -91,10 +91,10 @@ extension OptiTrack: Eventable {
 
     func dispatchNow() {
         if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            OptiLoggerMessages.logOptitrackDispatchRequest()
+            Logger.debug("OptiTrack: User asked to dispatch.")
             tracker.dispatch()
         } else {
-            OptiLoggerMessages.logOptitrackNotRunning()
+            Logger.error("OptiTrack: Unable to dispatch. Reason: Component is not running.")
         }
     }
 
@@ -107,10 +107,9 @@ extension OptiTrack {
     func report(event: OptimoveEvent) {
         let event = OptimoveEventDecorator(event: event)
         guard let config = configuration.events[event.name] else {
-            OptiLoggerMessages.logConfugurationForEventMissing(eventName: event.name)
+            Logger.error("OptiTrack: Configurations for event '\(event.name)' are missing.")
             return
         }
-        OptiLoggerMessages.logOptitrackReport(event: event.name)
         event.processEventConfig(config)
         report(event: event, config: config)
     }
@@ -118,7 +117,7 @@ extension OptiTrack {
     func reportScreenEvent(screenTitle: String,
                            screenPath: String,
                            category: String? = nil) throws {
-        OptiLoggerMessages.logReportScreenEvent(screenTitle: screenTitle)
+        Logger.debug("OptiTrack: Report screen event: title='\(screenTitle)', path='\(screenPath)'")
         tracker.track(view: [screenTitle], url: URL(string: "http://\(screenPath)"))
 
         let event = try coreEventFactory.createEvent(
@@ -215,7 +214,7 @@ extension OptiTrack {
                 let event = try coreEventFactory.createEvent(.setAdvertisingId)
                 self.report(event: event)
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
         }
     }
@@ -258,7 +257,7 @@ extension OptiTrack {
                     self.storage.isOptiTrackOptIn = false
                 }
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
         }
     }
@@ -272,7 +271,7 @@ extension OptiTrack {
             do {
                 try self?.handleWillEnterForegroundNotification()
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
         }
     }
