@@ -2,6 +2,7 @@
 
 import Foundation
 import os.log
+import OptimoveCore
 
 final class OptiLoggerConsoleStream: NSObject, OptiLoggerOutputStream {
 

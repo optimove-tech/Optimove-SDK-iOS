@@ -2,7 +2,7 @@
 
 import Foundation
 
-struct SDK {
+public struct SDK {
 
     private struct Constants {
         struct Bundle {
@@ -18,7 +18,7 @@ struct SDK {
         }
     }
 
-    static var environment: Environment {
+    public static var environment: Environment {
         guard let envvar = getEnvironmentVariable(for: Constants.Key.environment),
               let value = Environment(rawValue: envvar)
         else {
@@ -27,7 +27,7 @@ struct SDK {
         return value
     }
 
-    static var isStaging: Bool {
+    public static var isStaging: Bool {
         let envvar = getEnvironmentVariable(for: Constants.Key.staging, defaultValue: Constants.Var.false)
         return envvar == Constants.Var.true
     }
@@ -43,26 +43,4 @@ struct SDK {
         let envvarValue = Bundle.main.object(forInfoDictionaryKey: key) as? String
         return envvarValue?.trimmingCharacters(in: .whitespacesAndNewlines)
     }
-}
-
-struct LoggerSettings {
-
-    private struct Constants {
-        struct Key {
-            static let logLevel = "OPTIMOVE_MIN_LOG_LEVEL"
-        }
-    }
-
-    static var logLevelToShow: LogLevel = {
-        if let minLogLevel = logLevel {
-            return minLogLevel
-        }
-        return SDK.isStaging ? LogLevel.info : LogLevel.warn
-    }()
-
-    private static var logLevel: LogLevel? {
-        guard let levelStr = SDK.getEnvironmentVariable(for: Constants.Key.logLevel) else { return nil }
-        return LogLevel(string: levelStr.lowercased())
-    }
-
 }
