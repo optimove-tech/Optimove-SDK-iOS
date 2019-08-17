@@ -8,7 +8,7 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
     public let realtime: RealtimeConfig
     public let optitrack: OptitrackConfig
     public let optipush: OptipushConfig
-    public let events: [String : EventsConfig]
+    public let events: [String: EventsConfig]
 
     public init(
         tenantID: Int,
@@ -16,7 +16,7 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
         realtime: RealtimeConfig,
         optitrack: OptitrackConfig,
         optipush: OptipushConfig,
-        events: [String : EventsConfig]) {
+        events: [String: EventsConfig]) {
         self.tenantID = tenantID
         self.logger = logger
         self.realtime = realtime
@@ -42,13 +42,13 @@ public struct RealtimeConfig: Codable, TenantInfo, EventInfo {
     public let tenantID: Int
     public let realtimeToken: String
     public let realtimeGateway: URL
-    public let events: [String : EventsConfig]
+    public let events: [String: EventsConfig]
 
     public init(
         tenantID: Int,
         realtimeToken: String,
         realtimeGateway: URL,
-        events: [String : EventsConfig]) {
+        events: [String: EventsConfig]) {
         self.tenantID = tenantID
         self.realtimeToken = realtimeToken
         self.realtimeGateway = realtimeGateway
@@ -62,7 +62,7 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
     public let enableAdvertisingIdReport: Bool
     public let eventCategoryName: String
     public let customDimensionIDS: CustomDimensionIDs
-    public let events: [String : EventsConfig]
+    public let events: [String: EventsConfig]
 
     public init(
         tenantID: Int,
@@ -70,7 +70,7 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
         enableAdvertisingIdReport: Bool,
         eventCategoryName: String,
         customDimensionIDS: CustomDimensionIDs,
-        events: [String : EventsConfig]) {
+        events: [String: EventsConfig]) {
         self.tenantID = tenantID
         self.optitrackEndpoint = optitrackEndpoint
         self.enableAdvertisingIdReport = enableAdvertisingIdReport
@@ -106,5 +106,5 @@ public protocol TenantInfo {
 }
 
 public protocol EventInfo {
-    var events: [String : EventsConfig] { get }
+    var events: [String: EventsConfig] { get }
 }

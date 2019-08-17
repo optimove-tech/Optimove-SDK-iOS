@@ -8,7 +8,7 @@ final class OptiTrack {
     struct Constants {
         struct AppOpen {
             // The threshold used for throttling emits an AppOpen event.
-            static let throttlingThreshold: TimeInterval = 1800 // 30 minutes.
+            static let throttlingThreshold: TimeInterval = 1_800 // 30 minutes.
         }
     }
 
@@ -132,7 +132,6 @@ extension OptiTrack {
 
 }
 
-
 // ELI: Changed access level for extension for tests purposes.
 extension OptiTrack {
 
@@ -197,7 +196,7 @@ extension OptiTrack {
             customTrackingParameters: self.optimoveCustomizePlugins
         )
         tracker.track(event)
-        
+
         // ELI: TODO: Check this point out.
         if config.supportedOnRealTime {
             self.deviceStateMonitor.getStatus(for: .internet) { (hasInternet) in

@@ -1,7 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 final class SetUserAgent: OptimoveCoreEvent {
-    
+
     struct Constants {
         static let name = OptimoveKeys.Configuration.setUserAgent.rawValue
         static let userAgentSliceLenght: Int = 255

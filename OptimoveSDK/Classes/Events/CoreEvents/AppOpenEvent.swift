@@ -1,7 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 final class AppOpenEvent: OptimoveCoreEvent {
-    
+
     struct Constants {
         static let name = "app_open"
         struct Key {
@@ -11,9 +11,9 @@ final class AppOpenEvent: OptimoveCoreEvent {
             static let userID = OptimoveKeys.Configuration.userId.rawValue
         }
     }
-    
+
     let name: String = Constants.name
-    let parameters: [String : Any]
+    let parameters: [String: Any]
 
     init(bundleIdentifier: String, deviceID: String, visitorID: String?, customerID: String?) {
         var parameters = [

@@ -3,10 +3,10 @@
 import Foundation
 
 class NotificationEvent: OptimoveCoreEvent {
-    
+
     var name: String { return "" }
     var parameters: [String: Any]
-    
+
     init(campaignDetails: CampaignDetails,
          timeStamp: TimeInterval = Date().timeIntervalSince1970) {
         parameters = [

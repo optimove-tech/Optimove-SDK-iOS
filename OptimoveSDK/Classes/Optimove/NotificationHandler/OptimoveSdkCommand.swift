@@ -12,11 +12,11 @@ enum OptimoveSdkCommand: Decodable {
 }
 
 extension OptimoveSdkCommand {
-    
+
     enum CodingKeys: CodingKey {
         case command
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         if let commonValue = try? container.decode(Common.self, forKey: .command) {
@@ -25,7 +25,7 @@ extension OptimoveSdkCommand {
             self = .parameterized(.newNotificationCategory(argumentsValue))
         } else {
             throw DecodingError.dataCorrupted(
-                DecodingError.Context.init(
+                DecodingError.Context(
                     codingPath: [CodingKeys.command],
                     debugDescription: "Unbale to parse an Optiove SDK command. Unsupported command."
                 )
@@ -34,9 +34,8 @@ extension OptimoveSdkCommand {
     }
 }
 
-
 extension OptimoveSdkCommand {
-    
+
     /// A simple remote command type.
     ///
     /// - ping:  TODO: Add documentation
@@ -45,7 +44,7 @@ extension OptimoveSdkCommand {
         case ping
         case reregister
     }
-    
+
     /// A parametrized remote command type.
     ///
     /// - newNotificationCategory: A new category.
@@ -61,20 +60,20 @@ extension OptimoveSdkCommand.Parameterized {
     struct Category: Decodable {
         let categoryIdentifier: String
         let actions: [Action]
-        
+
         enum CodingKeys: String, CodingKey {
             case categoryIdentifier = "category_identifier"
             case actions
         }
     }
-    
+
     // MARK: - Action
     /// A type of a deserialized action.
     struct Action: Decodable {
         let identifier: String
         let title: String
         let deeplink: String?
-        
+
         enum CodingKeys: String, CodingKey {
             case identifier
             case title

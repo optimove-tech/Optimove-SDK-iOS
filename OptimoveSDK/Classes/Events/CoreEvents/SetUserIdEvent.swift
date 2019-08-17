@@ -10,7 +10,7 @@ final class SetUserIdEvent: OptimoveCoreEvent {
             static let updatedVisitorId = OptimoveKeys.Configuration.realtimeupdatedVisitorId.rawValue
         }
     }
-    
+
     let name: String = Constants.name
     let parameters: [String: Any]
 

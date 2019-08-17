@@ -27,7 +27,7 @@ final class RealtimeEvent: Encodable {
          firstVisitorDate: Int) {
         self.tid = tid
         self.visitorId = (cid != nil) ? nil : visitorId
-        self.cid = cid ?? nil
+        self.cid = cid
         self.eid = eid
         self.context = context
         self.firstVisitorDate = String(firstVisitorDate)

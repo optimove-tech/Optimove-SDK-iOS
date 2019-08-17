@@ -16,7 +16,7 @@ class OptimoveDeviceStateMonitorTests: XCTestCase {
     }
     var fetcherFactory: MockDeviceRequirementFetcherFactory!
     var deviceStateMonitor: OptimoveDeviceStateMonitor!
-    
+
     override func setUp() {
         fetcherFactory = MockDeviceRequirementFetcherFactory(
             fetchers: fetchers
@@ -25,7 +25,7 @@ class OptimoveDeviceStateMonitorTests: XCTestCase {
             fetcherFactory: fetcherFactory
         )
     }
-    
+
     func testThatGetStatusImplWorks() {
         // given
         let requirements: [OptimoveDeviceRequirement] = [
@@ -33,7 +33,7 @@ class OptimoveDeviceStateMonitorTests: XCTestCase {
             .internet,
             .userNotification
         ]
-        
+
         // when
         var expectations: [XCTestExpectation] = []
         requirements.forEach { requirement in
@@ -55,7 +55,7 @@ class OptimoveDeviceStateMonitorTests: XCTestCase {
             .internet,
             .userNotification
         ]
-        
+
         // when
         let statusesExpectation = expectation(description: "statuses")
         deviceStateMonitor.getStatuses(for: requirements) { (results) in
@@ -94,26 +94,26 @@ class OptimoveDeviceStateMonitorTests: XCTestCase {
 }
 
 class MockDeviceRequirementFetcherFactory: DeviceRequirementFetcherFactory {
-    
+
     var fetchers: FetchersGenerator
-    
+
     init(fetchers: @escaping FetchersGenerator) {
         self.fetchers = fetchers
     }
-    
+
     func createFetcher(for requirement: OptimoveDeviceRequirement) -> Fetchable {
         return fetchers().filter { $0.type == requirement }.first!
     }
-    
+
 }
 
 struct MockDeviceRequirementFetcher: Fetchable {
-    
+
     let type: OptimoveDeviceRequirement
     var isEnabled: Bool = true
-    
+
     func fetch(completion: @escaping ResultBlockWithBool) {
         completion(isEnabled)
     }
-    
+
 }

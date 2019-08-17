@@ -13,7 +13,7 @@ public struct TenantConfig: Codable {
          optipush: TenantOptipushConfig,
          firebaseProjectKeys: FirebaseProjectKeys,
          clientsServiceProjectKeys: ClientsServiceProjectKeys,
-         events: [String : EventsConfig]) {
+         events: [String: EventsConfig]) {
         self.realtime = realtime
         self.optitrack = optitrack
         self.optipush = optipush
@@ -38,7 +38,7 @@ public struct TenantConfig: Codable {
         try container.encode(realtime, forKey: .realtime)
         try container.encode(optitrack, forKey: .optitrack)
         try container.encode(events, forKey: .events)
-        var mobile =  container.nestedContainer(keyedBy: MobileCodingKey.self, forKey: .mobile)
+        var mobile = container.nestedContainer(keyedBy: MobileCodingKey.self, forKey: .mobile)
         try mobile.encode(optipush, forKey: .optipush)
         try mobile.encode(firebaseProjectKeys, forKey: .firebaseProjectKeys)
         try mobile.encode(clientsServiceProjectKeys, forKey: .clientsServiceProjectKeys)

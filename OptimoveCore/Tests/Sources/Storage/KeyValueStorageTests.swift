@@ -13,7 +13,7 @@ class MockKeyValueStorage: KeyValueStorage {
     }
 
     func value(for key: StorageKey) -> Any? {
-        return state[key] ?? nil
+        return state[key]
     }
 
     subscript<T>(key: StorageKey) -> T? {
@@ -34,7 +34,7 @@ class MockFileStorage: FileStorage {
         return storage[fileName] != nil
     }
 
-    func save<T>(data: T, toFileName: String, shared: Bool) throws where T : Encodable {
+    func save<T>(data: T, toFileName: String, shared: Bool) throws where T: Encodable {
         storage[toFileName] = try JSONEncoder().encode(data)
     }
 
@@ -49,9 +49,8 @@ class MockFileStorage: FileStorage {
     func delete(fileName: String, shared: Bool) throws {
         return storage[fileName] = nil
     }
-    
-}
 
+}
 
 class KeyValueStorageTests: XCTestCase {
 
@@ -289,7 +288,6 @@ class KeyValueStorageTests: XCTestCase {
         // then
         XCTAssertThrowsError(try storage.getSiteID())
     }
-
 
     // MARK: Simple
 

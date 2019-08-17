@@ -23,7 +23,7 @@ final class MbaasModel: BaseMbaasModel {
     }
 
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy:  RuntimeCodingKey.self)
+        let container = try decoder.container(keyedBy: RuntimeCodingKey.self)
 
         /// Assume that each data should contain only one operation.
         let operationKey = try unwrap(

@@ -15,7 +15,6 @@ final class NetworkingFactory {
         self.requestBuilderFactory = requestBuilderFactory
     }
 
-
     func createRemoteConfigurationNetworking() -> RemoteConfigurationNetworking {
         return RemoteConfigurationNetworking(
             networkClient: networkClient,

@@ -13,7 +13,7 @@ struct NetworkClientImpl {
     let session: URLSession
 
     init(configuration: URLSessionConfiguration = URLSessionConfiguration.default) {
-        session = URLSession.init(configuration: configuration)
+        session = URLSession(configuration: configuration)
     }
 
 }

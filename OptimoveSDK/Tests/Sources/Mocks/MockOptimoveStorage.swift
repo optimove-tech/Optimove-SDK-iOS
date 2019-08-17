@@ -14,7 +14,7 @@ final class MockOptimoveStorage: OptimoveStorage {
     }
 
     func value(for key: StorageKey) -> Any? {
-        return state[key] ?? nil
+        return state[key]
     }
 
     subscript<T>(key: StorageKey) -> T? {
@@ -32,7 +32,7 @@ final class MockOptimoveStorage: OptimoveStorage {
         return storage[fileName] != nil
     }
 
-    func save<T>(data: T, toFileName: String, shared: Bool) throws where T : Encodable {
+    func save<T>(data: T, toFileName: String, shared: Bool) throws where T: Encodable {
          storage[toFileName] = try JSONEncoder().encode(data)
     }
 

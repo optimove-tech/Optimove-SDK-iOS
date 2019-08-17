@@ -28,7 +28,7 @@ final class TriggeredNotificationDelivered: OptimoveEvent {
             "event_device_type": "Mobile",
             "event_platform": "iOS",
             "event_os": currentDeviceOS,
-            "event_native_mobile": true,
+            "event_native_mobile": true
         ]
     }
 

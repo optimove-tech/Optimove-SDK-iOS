@@ -26,22 +26,22 @@ public enum OptimoveDeviceRequirement: Int, CaseIterable, CustomStringConvertibl
 
 protocol OptimoveDeviceStateMonitor {
     func getStatus(for: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool)
-    
+
     func getStatuses(for: [OptimoveDeviceRequirement], completion: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void)
-    
+
     /// - Warning: Returning cached results.
     /// - ToDo: Change to `getMissingPermissions(completion: @escaping (Result<[OptimoveDeviceRequirement], Error> -> Void))`.
     func getMissingPermissions() -> [OptimoveDeviceRequirement]
 }
 
 final class OptimoveDeviceStateMonitorImpl {
-    
+
     private let accessQueue: DispatchQueue
     private let fetcherFactory: DeviceRequirementFetcherFactory
     private var fetchers: [OptimoveDeviceRequirement: Fetchable] = [:]
     private var statuses: [OptimoveDeviceRequirement: Bool] = [:]
     private var requests: [OptimoveDeviceRequirement: [ResultBlockWithBool]] = [:]  //cache any request from client
-    
+
     init(fetcherFactory: DeviceRequirementFetcherFactory) {
         self.fetcherFactory = fetcherFactory
         accessQueue = DispatchQueue(label: "com.optimove.sdk.queue.deviceState", qos: .background)
@@ -59,7 +59,7 @@ extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
             self.requestStatus(for: deviceRequirement, completion: completion)
         }
     }
-    
+
     func getStatuses(for requirements: [OptimoveDeviceRequirement], completion: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void) {
         let group = DispatchGroup()
         DispatchQueue.global(qos: .utility).async {
@@ -75,7 +75,7 @@ extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
             completion(statuses)
         }
     }
-    
+
     func getMissingPermissions() -> [OptimoveDeviceRequirement] {
         return accessQueue.sync {
             return statuses
@@ -86,7 +86,7 @@ extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
 }
 
 private extension OptimoveDeviceStateMonitorImpl {
-    
+
     func requestStatus(for requiredService: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool) {
         OptiLoggerMessages.logDeviceRequirementNil(requiredService: requiredService)
         OptiLoggerMessages.logRegisterToReceiveRequirementStatus(requiredService: requiredService)

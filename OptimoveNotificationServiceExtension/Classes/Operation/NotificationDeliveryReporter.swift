@@ -5,12 +5,12 @@ import os.log
 import OptimoveCore
 
 final class NotificationDeliveryReporter: AsyncOperation {
-    
+
     private let repository: ConfigurationRepository
     private let bundleIdentifier: String
     private let storage: OptimoveStorage
     private let notificationPayload: NotificationPayload
-    
+
     init(repository: ConfigurationRepository,
          bundleIdentifier: String,
          storage: OptimoveStorage,
@@ -20,7 +20,7 @@ final class NotificationDeliveryReporter: AsyncOperation {
         self.storage = storage
         self.notificationPayload = notificationPayload
     }
-    
+
     override func main() {
         state = .executing
         do {
@@ -89,7 +89,6 @@ private extension NotificationDeliveryReporter {
         ).resume()
     }
 
-
     func buildQueryItems(
         _ notificationEvent: OptimoveEvent,
         _ eventConfig: EventsConfig,
@@ -100,7 +99,7 @@ private extension NotificationDeliveryReporter {
         let userId = try storage.getCustomerID()
         let visitorId = try storage.getVisitorID()
         let initialVisitorId = try storage.getInitialVisitorId()
-        
+
         var queryItems: [URLQueryItem] = [
             URLQueryItem(name: "idsite", value: String(describing: optitrack.tenantID)),
             URLQueryItem(name: "rec", value: "1"),

@@ -10,7 +10,7 @@ final class PingEvent: OptimoveCoreEvent {
             static let visitorId = OptimoveKeys.Configuration.visitorId.rawValue
         }
     }
-    
+
     let name: String = Constants.name
     let parameters: [String: Any]
 

@@ -35,7 +35,6 @@ class SetAdvertisingIdEventTests: XCTestCase {
             appNs: appNs
         )
 
-
         // then
         XCTAssert(event.parameters[SetAdvertisingIdEvent.Constants.Key.advertisingId] as? String == advertisingId)
         XCTAssert(event.parameters[SetAdvertisingIdEvent.Constants.Key.deviceId] as? String == deviceId)

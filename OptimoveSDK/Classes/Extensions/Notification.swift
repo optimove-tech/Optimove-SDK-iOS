@@ -3,5 +3,5 @@
 import Foundation
 
 extension Notification.Name {
-    public static let internetStatusChanged = Notification.Name.init("internetStatusChanged")
+    public static let internetStatusChanged = Notification.Name("internetStatusChanged")
 }

@@ -102,7 +102,7 @@ class RealTimeComponentTests: XCTestCase {
         prefilledStorage()
 
         // and setup config
-        let eventId = 1000
+        let eventId = 1_000
         let parameterName = "parameterName"
         warehouse.config = EventsConfig(
             id: eventId,
@@ -180,7 +180,7 @@ class RealTimeComponentTests: XCTestCase {
         prefilledStorage()
 
         // and
-        let timestamp = 123456
+        let timestamp = 123_456
         storage[.firstVisitTimestamp] = timestamp
 
         // then
@@ -195,7 +195,6 @@ class RealTimeComponentTests: XCTestCase {
         realTime.reportEvent(event: StubEvent())
         waitForExpectations(timeout: expectationTimeout)
     }
-
 
 // MARK: - Sending Regular Events
 
@@ -240,7 +239,6 @@ class RealTimeComponentTests: XCTestCase {
         prefilledStorage()
         storage[.realtimeSetUserIdFailed] = true
         let stubEvent = StubEvent()
-
 
         // then
         let userIdEventExpectation = expectation(description: "userIdEvent was not generated")
@@ -377,11 +375,11 @@ class RealTimeComponentTests: XCTestCase {
             userIdEventExpectation,
             userEmailEventExpectation,
             regularEventExpectation
-            ], timeout: expectationTimeout, enforceOrder: true)
+        ], timeout: expectationTimeout, enforceOrder: true)
         wait(for: [
             failedUserIdFlagExpectation,
             failedUserEmailFlagExpectation
-            ], timeout: expectationTimeout, enforceOrder: true
+        ], timeout: expectationTimeout, enforceOrder: true
         )
     }
 
@@ -438,7 +436,7 @@ class RealTimeComponentTests: XCTestCase {
             stubEventAExpectation,
             stubEventBExpectation,
             stubEventCExpectation
-            ], timeout: expectationTimeout, enforceOrder: true)
+        ], timeout: expectationTimeout, enforceOrder: true)
     }
 
     func test_decoration_invoke() {
@@ -500,7 +498,7 @@ class RealTimeComponentTests: XCTestCase {
     func test_SetUserIdEvent_reported_with_internet_expect_failedSetUserId_flag_false() {
         // given
         prefilledStorage()
-        
+
         let event = SetUserIdEvent(
             originalVistorId: storage[.initialVisitorId]!,
             userId: storage[.customerID]!,
@@ -515,7 +513,7 @@ class RealTimeComponentTests: XCTestCase {
                 expect.fulfill()
             }
         }
-        
+
         // when
         realTime.reportEvent(event: event)
         waitForExpectations(timeout: expectationTimeout)

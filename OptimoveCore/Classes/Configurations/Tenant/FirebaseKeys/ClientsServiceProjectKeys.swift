@@ -5,7 +5,7 @@ public final class ClientsServiceProjectKeys: BaseFirebaseKeys, FirebaseKeys {
     private struct Constant {
         static let masterKey = "ios.master.app"
     }
-    
+
     public let appid: String
 
     public init(

@@ -6,15 +6,15 @@ import os.log
 import OptimoveCore
 
 final class DeeplinkExtracter: AsyncOperation {
-    
+
     private struct Constants {
         static let dynamicLinksKey = "dynamic_link"
     }
-    
+
     private let bundleIdentifier: String
     private let notificationPayload: NotificationPayload
     private let bestAttemptContent: UNMutableNotificationContent
-    
+
     init(bundleIdentifier: String,
          notificationPayload: NotificationPayload,
          bestAttemptContent: UNMutableNotificationContent) {
@@ -22,10 +22,10 @@ final class DeeplinkExtracter: AsyncOperation {
         self.notificationPayload = notificationPayload
         self.bestAttemptContent = bestAttemptContent
     }
-    
+
     override func main() {
         state = .executing
-        
+
         let appKey = bundleIdentifier.replacingOccurrences(of: ".", with: "_")
         guard let url = notificationPayload.dynamicLinks.ios[appKey] else {
             os_log("Found no url for this app", log: OSLog.extracter, type: .error)
@@ -34,11 +34,11 @@ final class DeeplinkExtracter: AsyncOperation {
         }
         DynamicLinkParser(parsingCallback: parserHandler).parse(url)
     }
-    
+
 }
 
 private extension DeeplinkExtracter {
-    
+
     func parserHandler(result: Result<URL, Error>) {
         switch result {
         case let .success(url):
@@ -64,13 +64,13 @@ private extension DeeplinkExtracter {
             }
             os_log("Dynamic links were updated.", log: OSLog.extracter, type: .debug)
             bestAttemptContent.userInfo[Constants.dynamicLinksKey] = urlString
-            
+
         case let .failure(error):
             os_log("Error: %{PRIVATE}@", log: OSLog.extracter, type: .error, error.localizedDescription)
         }
         state = .finished
     }
-    
+
     func replaceSpecialSymbols(in url: URL) -> String {
         let urlString = url.absoluteString
         if let query = url.query {

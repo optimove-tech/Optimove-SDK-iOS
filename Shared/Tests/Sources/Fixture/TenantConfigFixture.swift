@@ -37,7 +37,6 @@ final class TenantConfigFixture {
         )
     }
 
-
     func firebaseProjectKeysFixture() -> FirebaseProjectKeys {
         return FirebaseProjectKeys(
             appid: StubVariables.string,
@@ -63,11 +62,11 @@ final class TenantConfigFixture {
     func createTenantEventFixture() -> [String: EventsConfig] {
         return [
             StubEvent.Constnats.name: EventsConfig(
-                id: 2000,
+                id: 2_000,
                 supportedOnOptitrack: true,
                 supportedOnRealTime: true,
                 parameters: [
-                    StubEvent.Constnats.key : Parameter(
+                    StubEvent.Constnats.key: Parameter(
                         type: "String",
                         optiTrackDimensionId: 20,
                         optional: false

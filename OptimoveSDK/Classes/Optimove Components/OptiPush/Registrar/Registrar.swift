@@ -75,9 +75,9 @@ private extension Registrar {
             let model = try modelFactory.createModel(for: operation)
             networking.sendToMbaas(model: model) { [weak self] (result) in
                 switch result {
-                case .success(_):
+                case .success:
                     self?.handleSuccessMbaasModel(model)
-                case .failure(_):
+                case .failure:
                     self?.handleFailedMbaasModel(model)
                 }
                 completion?()
@@ -90,14 +90,14 @@ private extension Registrar {
     func retryFailedOperation(with model: BaseMbaasModel) {
         networking.sendToMbaas(model: model) { [weak self] (result) in
             switch result {
-            case .success(_):
+            case .success:
                 self?.handleSuccessMbaasModel(model)
 
                 /// Helps prevent to keeping an old fcm token at server side, only for retry.
                 if model.operation == .unregistration {
                     self?.register()
                 }
-            case .failure(_):
+            case .failure:
                 OptiLoggerMessages.logRetryFailed()
             }
         }

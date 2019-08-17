@@ -42,7 +42,7 @@ final class RealTime {
 
         performInitializationOperations()
     }
-    
+
     func performInitializationOperations() {
         setFirstTimeVisitIfNeeded()
     }
@@ -99,7 +99,6 @@ extension RealTime {
         event.processEventConfig(config)
         report(event: event, config: config, retryFailedEvents: retryFailedEvents)
     }
-
 
     func reportUserId() throws {
         let event = try coreEventFactory.createEvent(.setUserId)
@@ -185,7 +184,6 @@ private extension RealTime {
         }
     }
 
-
     func retrySetUserEmailIfNeeded() throws {
         if storage[.realtimeSetEmailFailed] ?? false {
             reportUserEmail(try cast(storage[.userEmail]))
@@ -193,7 +191,7 @@ private extension RealTime {
     }
 
     // MARK: Send report
-    
+
     func sentReportEvent(context: RealTimeEventContext) {
         let realtimeToken = configuration.realtimeToken
         isAllowToSendReport { [realTimeQueue, hanlder, networking, eventBuilder] (allow) in

@@ -15,7 +15,7 @@ final class StubOptimoveDeviceStateMonitor: OptimoveDeviceStateMonitor {
     }
 
     func getStatuses(for requirement: [OptimoveDeviceRequirement],
-                     completion: @escaping ([OptimoveDeviceRequirement : Bool]) -> Void) {
+                     completion: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void) {
         fatalError("Not implemented")
     }
 

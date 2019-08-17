@@ -214,7 +214,7 @@ final class OptiTrackComponentTests: XCTestCase {
             12: OptimoveKeys.AdditionalAttributesKeys.eventPlatform,
             13: OptimoveKeys.AdditionalAttributesKeys.eventDeviceType,
             14: OptimoveKeys.AdditionalAttributesKeys.eventOs,
-            15: OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile,
+            15: OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile
         ]
 
         let expectedDimensions = sdkVersionDimensions.merging(coreParameters) { (current, _) in current }
@@ -414,7 +414,6 @@ final class OptiTrackComponentTests: XCTestCase {
         XCTAssertNoThrow(try optitrack.handleWillEnterForegroundNotification())
         wait(for: [trackEventExpectation], timeout: expectationTimeout, enforceOrder: true)
     }
-
 
     func test_reportPendingEvents() {
         // then

@@ -5,7 +5,7 @@ import Foundation
 enum CastError: LocalizedError {
     case failedToUnwrap(value: Any?, expectedType: Any.Type)
     case unableCast(value: Any, expectedType: Any.Type)
-    
+
     var errorDescription: String? {
         switch self {
         case .failedToUnwrap(let value, let expectedType):
@@ -14,7 +14,7 @@ enum CastError: LocalizedError {
             return "Unable cast value: '\(value)', to type: '\(expectedType)'"
         }
     }
-    
+
 }
 
 /// Return a non-nil generic type or throw an error. A type will be defined by type inference. Using for simplifying unwrap and cast procedures.
@@ -41,4 +41,3 @@ func unwrap<T>(_ raw: T?) throws -> T {
     }
     return unwrapped
 }
-

@@ -12,7 +12,7 @@ open class AsyncOperation: Operation {
         case cancelled = "isCancelled"
     }
 
-    public var state: State = State.waiting {
+    public var state = State.waiting {
         willSet {
             willChangeValue(forKey: State.ready.rawValue)
             willChangeValue(forKey: State.executing.rawValue)
@@ -82,7 +82,7 @@ open class AsyncOperation: Operation {
 
 open class AsyncBlockOperation: AsyncOperation {
 
-    public typealias Closure = (AsyncBlockOperation) -> ()
+    public typealias Closure = (AsyncBlockOperation) -> Void
 
     public let closure: Closure
 

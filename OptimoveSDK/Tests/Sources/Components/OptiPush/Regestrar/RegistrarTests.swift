@@ -91,7 +91,6 @@ class RegistrarTests: OptimoveTestCase {
             backupExpectation.fulfill()
         }
 
-
         // when
         let callbackExpectation = expectation(description: "Callback was not generated.")
         registrable.unregister {
@@ -269,7 +268,6 @@ class RegistrarTests: OptimoveTestCase {
             XCTAssert(operation == .registration)
             backupExpectation.fulfill()
         }
-
 
         // when
         try! registrable.retryFailedOperationsIfExist()

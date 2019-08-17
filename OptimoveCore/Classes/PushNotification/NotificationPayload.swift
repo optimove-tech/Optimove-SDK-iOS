@@ -14,7 +14,7 @@ public struct NotificationPayload: Decodable {
     public let isOptipush: Bool
     public let media: MediaAttachment?
     public let userAction: UserAction?
-    
+
     enum CodingKeys: String, CodingKey {
         case title
         case content
@@ -31,7 +31,7 @@ public struct NotificationPayload: Decodable {
         case media
         case userAction = "user_action"
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.title = try container.decode(String.self, forKey: .title)
@@ -102,7 +102,6 @@ public struct TriggeredNotificationCampaign: NotificationCampaign {
         case templateID = "template_id"
     }
 
-
     /// The custom decoder does preprocess before the primary decoder.
     init(firebaseFrom decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
@@ -135,7 +134,7 @@ public struct ScheduledNotificationCampaign: NotificationCampaign {
         let data: Data = try cast(string.data(using: .utf8))
         self = try JSONDecoder().decode(ScheduledNotificationCampaign.self, from: data)
     }
-    
+
 }
 
 public struct DeeplinkPersonalization: Decodable {
@@ -149,7 +148,6 @@ public struct DeeplinkPersonalization: Decodable {
         values = try JSONDecoder().decode([String: String].self, from: data)
     }
 }
-
 
 // MARK: - Dynamic links
 
@@ -166,19 +164,18 @@ public struct DynamicLinks: Decodable {
     }
 }
 
-
 // MARK: - Media
 
 public struct MediaAttachment: Decodable {
     public let url: URL
     public let mediaType: MediaType
-    
+
     public enum MediaType: String, Codable {
         case image
         case video
         case gif
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case url
         case mediaType = "media_type"
@@ -199,7 +196,7 @@ public struct MediaAttachment: Decodable {
 public struct UserAction: Decodable {
     public let categoryIdentifier: String
     public let actions: [Action]
-    
+
     enum CodingKeys: String, CodingKey {
         case categoryIdentifier = "category_identifier"
         case actions = "actions"
@@ -223,7 +220,7 @@ public struct Action: Decodable {
 }
 
 /// https://stackoverflow.com/a/44596291
-struct StringCodableMap<Decoded: LosslessStringConvertible> : Codable {
+struct StringCodableMap<Decoded: LosslessStringConvertible>: Codable {
 
     var decoded: Decoded
 

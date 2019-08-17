@@ -20,7 +20,7 @@ final class OptiLoggerMessages {
         )
     }
 
-    //MARK: SDK Initialization
+    // MARK: SDK Initialization
 
     static func logPathToRemoteConfiguration(
         path: String,
@@ -248,7 +248,7 @@ final class OptiLoggerMessages {
         )
     }
 
-    //MARK: Event Validation
+    // MARK: Event Validation
     static func logParameterIsNotNumber(
         name: String,
         fileName: String = #file,
@@ -294,7 +294,7 @@ final class OptiLoggerMessages {
         )
     }
 
-    //MARK: Device Permissions
+    // MARK: Device Permissions
     static func logIdfaPermissionMissing(
         fileName: String = #file,
         methodName: String = #function,
@@ -309,7 +309,7 @@ final class OptiLoggerMessages {
         )
     }
 
-    //MARK: Network Requests
+    // MARK: Network Requests
     static func logRequesterror(
         errorDescription: String,
         fileName: String = #file,
@@ -446,7 +446,7 @@ final class OptiLoggerMessages {
         )
     }
 
-    //MARK: Realtime
+    // MARK: Realtime
 
     static func logOfflineStatusForRealtime(
         eventName: String,
@@ -636,7 +636,7 @@ final class OptiLoggerMessages {
         )
     }
 
-    //MARK: OptiTrack
+    // MARK: OptiTrack
 
     static func logConfugurationForEventMissing(
         eventName: String,
@@ -839,7 +839,7 @@ final class OptiLoggerMessages {
         )
     }
 
-    //MARK: OptiPush
+    // MARK: OptiPush
 
     static func logClientreceiveFcmTOkenForTheFirstTime(
         fileName: String = #file,
@@ -925,8 +925,7 @@ final class OptiLoggerMessages {
         )
     }
 
-    static func logOptOutFirstLaunch(fileName: String = #file, methodName: String = #function, logModule: String? = nil)
-    {
+    static func logOptOutFirstLaunch(fileName: String = #file, methodName: String = #function, logModule: String? = nil) {
         OptiLoggerStreamsContainer.log(
             level: .debug,
             fileName: fileName,
@@ -1241,7 +1240,7 @@ final class OptiLoggerMessages {
         )
     }
 
-    //MARK: Gateway
+    // MARK: Gateway
 
     static func logReportScreen(
         fileName: String = #file,

@@ -9,13 +9,13 @@ final class MediaAttachmentDownloader: AsyncOperation {
 
     private let notificationPayload: NotificationPayload
     private let bestAttemptContent: UNMutableNotificationContent
-    
+
     init(notificationPayload: NotificationPayload,
          bestAttemptContent: UNMutableNotificationContent) {
         self.notificationPayload = notificationPayload
         self.bestAttemptContent = bestAttemptContent
     }
-    
+
     override func main() {
         state = .executing
         guard let media: MediaAttachment = notificationPayload.media else {
@@ -39,7 +39,7 @@ final class MediaAttachmentDownloader: AsyncOperation {
 }
 
 extension MediaAttachmentDownloader {
-    
+
     func taskHandler(data: Data?, response: URLResponse?, error: Error?, fileIdentifier: String) {
         if let error = error {
             os_log("Error: %{PUBLIC}@", log: OSLog.downloader, type: .error, error.localizedDescription)
@@ -54,7 +54,7 @@ extension MediaAttachmentDownloader {
         }
         state = .finished
     }
-    
+
     func saveData(_ data: Data, fileIdentifier: String) throws {
         let fileManager = FileManager.default
         let folderName = ProcessInfo.processInfo.globallyUniqueString
@@ -66,7 +66,7 @@ extension MediaAttachmentDownloader {
         bestAttemptContent.attachments = [attachment]
         os_log("Media attachment added successfully", log: OSLog.downloader, type: .debug)
     }
-    
+
 }
 
 extension OSLog {

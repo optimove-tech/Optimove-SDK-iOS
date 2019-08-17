@@ -19,7 +19,6 @@ final class FirebaseInteractorRequestBuilder {
         self.configuration = configuration
     }
 
-
     func createUnsubscribeRequest(topic: String) throws -> NetworkRequest {
         let baseURL = configuration.pushTopicsRegistrationEndpoint.appendingPathComponent(Path.unregister)
         let body = RequestBody(

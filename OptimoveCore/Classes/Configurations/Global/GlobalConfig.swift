@@ -13,7 +13,7 @@ public struct GlobalConfig: Codable {
     public init(general: GlobalGeneralConfig,
          optitrack: GlobalOptitrackConfig,
          optipush: GlobalOptipushConfig,
-         coreEvents: [String : EventsConfig]) {
+         coreEvents: [String: EventsConfig]) {
         self.general = general
         self.optitrack = optitrack
         self.optipush = optipush

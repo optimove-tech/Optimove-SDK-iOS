@@ -3,7 +3,7 @@
 import Foundation
 
 extension Bundle {
-    
+
     static func extractHostAppBundle() -> Bundle? {
         let mainBundle = Bundle.main
         if mainBundle.bundleURL.pathExtension == "appex" {
@@ -15,5 +15,5 @@ extension Bundle {
         }
         return nil
     }
-    
+
 }

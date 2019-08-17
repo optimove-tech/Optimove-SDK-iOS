@@ -12,7 +12,7 @@ final class GlobalConfigFixture: FileAccessible {
         events = try! JSONDecoder().decode([String: EventsConfig].self, from: data)
     }
 
-    func build() ->  GlobalConfig {
+    func build() -> GlobalConfig {
         return GlobalConfig(
             general: generalConfigFuxture(),
             optitrack: optitrackConfigFixture(),

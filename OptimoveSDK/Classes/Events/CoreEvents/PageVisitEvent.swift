@@ -10,7 +10,7 @@ final class PageVisitEvent: OptimoveCoreEvent {
             static let category = "category"
         }
     }
-    
+
     let name: String = Constants.name
     let parameters: [String: Any]
 

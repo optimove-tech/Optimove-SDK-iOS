@@ -29,9 +29,9 @@ class NetworkClientTests: XCTestCase {
         let success = expectation(description: "Result with success was not generated")
         client.perform(request) { (result) in
             switch result {
-            case .success(_):
+            case .success:
                 success.fulfill()
-            case .failure(_):
+            case .failure:
                 XCTFail()
             }
         }
@@ -63,9 +63,9 @@ class NetworkClientTests: XCTestCase {
         let success = expectation(description: "Result with success was not generated")
         client.perform(request) { (result) in
             switch result {
-            case .success(_):
+            case .success:
                 success.fulfill()
-            case .failure(_):
+            case .failure:
                 XCTFail()
             }
         }

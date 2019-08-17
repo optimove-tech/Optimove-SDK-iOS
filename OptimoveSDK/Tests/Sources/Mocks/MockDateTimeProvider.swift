@@ -4,7 +4,7 @@ import Foundation
 @testable import OptimoveSDK
 
 final class MockDateTimeProvider {
-    var mockedNow: Date = Date()
+    var mockedNow = Date()
 }
 
 extension MockDateTimeProvider: DateTimeProvider {

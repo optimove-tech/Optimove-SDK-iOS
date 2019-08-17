@@ -9,7 +9,7 @@ protocol DeviceRequirementFetcherFactory {
 final class DeviceRequirementFetcherFactoryImpl { }
 
 extension DeviceRequirementFetcherFactoryImpl: DeviceRequirementFetcherFactory {
-    
+
     func createFetcher(for requirement: OptimoveDeviceRequirement) -> Fetchable {
         switch requirement {
         case .advertisingId:

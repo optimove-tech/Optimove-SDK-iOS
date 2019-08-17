@@ -5,8 +5,8 @@ import XCTest
 
 final class MockedFileManager: FileManager {
 
-    private let groupedURL =  URL(fileURLWithPath: "grouped")
-    private let sharedURL =  URL(fileURLWithPath: "shared")
+    private let groupedURL = URL(fileURLWithPath: "grouped")
+    private let sharedURL = URL(fileURLWithPath: "shared")
     private var state: [String: Data] = [:]
 
     override func containerURL(forSecurityApplicationGroupIdentifier groupIdentifier: String) -> URL? {

@@ -126,7 +126,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
         } else {
             networking.subscribe(topic: topic) { (result) in
                 switch result {
-                case .success(_):
+                case .success:
                     os_log(
                         "Subscribed topic '%{private}@' successful.",
                         log: OSLog.firebaseInteractor,
@@ -156,7 +156,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
         } else {
             networking.unsubscribe(topic: topic) { (result) in
                 switch result {
-                case .success(_):
+                case .success:
                     os_log(
                         "Unsubscribed topic '%{private}@' successful.",
                         log: OSLog.firebaseInteractor,

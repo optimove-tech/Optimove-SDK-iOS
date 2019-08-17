@@ -14,7 +14,7 @@ extension NetworkResponse where Body == Data? {
         return try JSONDecoder().decode(BodyType.self, from: data)
     }
 
-    func unwrap() throws -> Data  {
+    func unwrap() throws -> Data {
         guard let data = body else {
             throw NetworkError.noData
         }

@@ -74,4 +74,3 @@ extension ConfigurationRepositoryImpl: ConfigurationRepository {
         try storage.save(data: config, toFileName: fileName, shared: Constants.Tenant.sharedStorage)
     }
 }
-

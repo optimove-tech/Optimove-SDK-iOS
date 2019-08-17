@@ -46,9 +46,9 @@ class RegistrarNetworkingTests: XCTestCase {
         let resultExpectation = expectation(description: "Result was not generated.")
         networking.sendToMbaas(model: model) { (result) in
             switch result {
-            case .success(_):
+            case .success:
                 resultExpectation.fulfill()
-            case .failure(_):
+            case .failure:
                 XCTFail()
             }
         }
@@ -87,9 +87,9 @@ class RegistrarNetworkingTests: XCTestCase {
         let resultExpectation = expectation(description: "Result was not generated.")
         networking.sendToMbaas(model: model) { (result) in
             switch result {
-            case .success(_):
+            case .success:
                 resultExpectation.fulfill()
-            case .failure(_):
+            case .failure:
                 XCTFail()
             }
         }

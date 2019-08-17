@@ -6,7 +6,7 @@ import XCTest
 class OptimoveStorageFacadeTests: XCTestCase {
 
     var storage: StorageFacade!
-    
+
     override func setUp() {
         storage = StorageFacade(
             groupedStorage: MockKeyValueStorage(),

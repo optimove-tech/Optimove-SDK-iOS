@@ -68,7 +68,6 @@ public protocol StorageValue {
     func getDeviceResolutionWidth() throws -> Float
     func getDeviceResolutionHeight() throws -> Float
 
-
     // MARK: Shared values
 
     var userEmail: String? { get set }
@@ -168,7 +167,6 @@ public final class StorageFacade: OptimoveStorage {
 
 }
 
-
 // MARK: - KeyValueStorage
 
 extension StorageFacade {
@@ -210,7 +208,7 @@ extension StorageFacade {
         return fileStorage.isExist(fileName: fileName, shared: shared)
     }
 
-    public func save<T>(data: T, toFileName: String, shared: Bool) throws where T : Encodable {
+    public func save<T>(data: T, toFileName: String, shared: Bool) throws where T: Encodable {
         try fileStorage.save(data: data, toFileName: toFileName, shared: shared)
     }
 
@@ -596,7 +594,6 @@ public enum StorageError: LocalizedError {
         }
     }
 }
-
 
 extension UserDefaults: KeyValueStorage {
 

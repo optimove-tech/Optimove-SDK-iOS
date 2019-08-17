@@ -12,7 +12,7 @@ final class MetaDataEvent: OptimoveCoreEvent {
             static let appNS = "app_ns"
         }
     }
-    
+
     let name: String = Constants.name
     let parameters: [String: Any]
 

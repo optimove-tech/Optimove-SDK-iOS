@@ -44,9 +44,9 @@ final class RegistrarNetworkingRequestBuilder {
     private func createURL(_ model: BaseMbaasModel) -> URL {
         let suffix: String = {
             switch model.userIdPayload {
-            case .visitorID(_):
+            case .visitorID:
                 return Constants.Path.Suffix.visitor
-            case .customerID(_):
+            case .customerID:
                 return Constants.Path.Suffix.customer
             }
         }()

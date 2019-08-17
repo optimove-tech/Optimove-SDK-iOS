@@ -8,7 +8,7 @@ import OptimoveCore
 @objc public class OptimoveNotificationServiceExtension: NSObject {
 
     @objc public private(set) var isHandledByOptimove: Bool = false
-    
+
     private let bundleIdentifier: String
     private let operationQueue: OperationQueue
 
@@ -21,14 +21,13 @@ import OptimoveCore
         operationQueue = OperationQueue()
         operationQueue.qualityOfService = .userInitiated
     }
-    
+
     @objc public convenience override init() {
         guard let bundleIdentifier = Bundle.extractHostAppBundle()?.bundleIdentifier else {
             fatalError("Unable to find a bundle identifier.")
         }
         self.init(appBundleId: bundleIdentifier)
     }
-
 
     /// The method verified that a request belong to Optimove channel. The Oprimove request might be modified.
     ///
@@ -100,14 +99,14 @@ import OptimoveCore
 }
 
 private extension OptimoveNotificationServiceExtension {
-    
+
     func extractNotificationPayload(_ request: UNNotificationRequest) throws -> NotificationPayload {
         let userInfo = request.content.userInfo
         let data = try JSONSerialization.data(withJSONObject: userInfo)
         let decoder = JSONDecoder()
         return try decoder.decode(NotificationPayload.self, from: data)
     }
-    
+
     func createBestAttemptBaseContent(request: UNNotificationRequest,
                                       payload: NotificationPayload) -> UNMutableNotificationContent? {
         guard let bestAttemptContent = request.content.mutableCopy() as? UNMutableNotificationContent else {

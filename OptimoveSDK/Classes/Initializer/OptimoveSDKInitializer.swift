@@ -188,6 +188,6 @@ extension OptimoveSDKInitializer {
             .forEach { logger in
                 logger.tenantId = config.tenantID
                 logger.endpoint = config.logger.logServiceEndpoint
-        }
+            }
     }
 }

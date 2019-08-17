@@ -10,7 +10,7 @@ final class OptimoveNotificationHandler {
     private let storage: OptimoveStorage
     private let coreEventFactory: CoreEventFactory
     private let optimove: Optimove
-    
+
     required init(
         storage: OptimoveStorage,
         coreEventFactory: CoreEventFactory,
@@ -35,7 +35,7 @@ private extension OptimoveNotificationHandler {
             handleParametrizedCommand(parameter, completion: completionHandler)
         }
     }
-    
+
     func handleCommonCommand(
         _ common: (OptimoveSdkCommand.Common),
         completion: @escaping (UIBackgroundFetchResult) -> Void
@@ -51,7 +51,7 @@ private extension OptimoveNotificationHandler {
                     UIApplication.shared.endBackgroundTask(bgtask)
                 }
             }
-            
+
         case .ping:
             let bgtask = UIApplication.shared.beginBackgroundTask(withName: "ping")
             OptiLoggerMessages.logRequestToPing()
@@ -68,13 +68,13 @@ private extension OptimoveNotificationHandler {
                 backgroundTimeRemaining: UIApplication.shared.backgroundTimeRemaining
             )
             DispatchQueue.main.asyncAfter(deadline: .now() + min(UIApplication.shared.backgroundTimeRemaining, 3.0)) {
-                
+
                 completion(.newData)
                 UIApplication.shared.endBackgroundTask(bgtask)
             }
         }
     }
-    
+
     func handleParametrizedCommand(
         _ parameter: OptimoveSdkCommand.Parameterized,
         completion: @escaping (UIBackgroundFetchResult) -> Void
@@ -147,7 +147,7 @@ private extension OptimoveNotificationHandler {
             let dynamicLink = response.notification.request.content.userInfo[
             OptimoveKeys.Notification.dynamikLink.rawValue] as? String,
             let urlComp = URLComponents(string: dynamicLink) else { return }
-        var params: [String: String]? = nil
+        var params: [String: String]?
         if let queryItems = urlComp.queryItems {
             params = [:]
             for qItem in queryItems {
@@ -179,7 +179,7 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
                 return
             }
             OptiLoggerMessages.logUrgentInitSuccess()
-            
+
             OptiLoggerMessages.logAnalyzenotification()
             guard userInfo[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true" else {
                 OptiLoggerMessages.logCommandNotificationFailure()

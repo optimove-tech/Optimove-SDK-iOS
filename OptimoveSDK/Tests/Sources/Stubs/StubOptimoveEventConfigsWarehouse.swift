@@ -5,7 +5,7 @@ import OptimoveCore
 
 final class StubOptimoveEventConfigsWarehouse: EventsConfigWarehouse {
 
-    var config: EventsConfig = EventsConfig(
+    var config = EventsConfig(
         id: Int(Int16.max),
         supportedOnOptitrack: true,
         supportedOnRealTime: true,

@@ -45,9 +45,9 @@ class RealTimeNetworkingTests: XCTestCase {
         let resultExpectation = expectation(description: "Result was not generated.")
         try! networking.report(event: event) { (result) in
             switch result {
-            case .success(_):
+            case .success:
                 resultExpectation.fulfill()
-            case .failure(_):
+            case .failure:
                 XCTFail()
             }
         }

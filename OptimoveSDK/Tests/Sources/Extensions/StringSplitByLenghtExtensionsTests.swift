@@ -7,7 +7,7 @@ class StringSplitByLenghtExtensionsTests: XCTestCase {
 
     func test_output_strideS_count() {
         // given
-        let inputStringLenght = 1000
+        let inputStringLenght = 1_000
         let inputString = Array(repeating: "a", count: inputStringLenght).joined()
         let outputStrideLenght = 255
         let expectedCount = Int((Float(inputStringLenght) / Float(outputStrideLenght)).rounded(.up))
@@ -22,7 +22,7 @@ class StringSplitByLenghtExtensionsTests: XCTestCase {
 
     func test_output_stride_count() {
         // given
-        let inputStringLenght = 1000
+        let inputStringLenght = 1_000
         let inputString = Array(repeating: "a", count: inputStringLenght).joined()
         let outputStrideLenght = 255
         let expectedCount = Int((Float(inputStringLenght) / Float(outputStrideLenght)).rounded(.down))
@@ -51,6 +51,5 @@ class StringSplitByLenghtExtensionsTests: XCTestCase {
         XCTAssert(outputStrides.count == expectedCount,
                   "Expected \(expectedCount). Actual \(outputStrides.count)")
     }
-
 
 }
