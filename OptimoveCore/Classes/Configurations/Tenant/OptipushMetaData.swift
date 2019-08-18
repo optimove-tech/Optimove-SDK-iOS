@@ -2,7 +2,7 @@
 
 import Foundation
 
-public struct TenantOptipushConfig: Codable {
+public struct TenantOptipushConfig: Codable, Equatable {
     public let pushTopicsRegistrationEndpoint: URL
     public let enableAdvertisingIdReport: Bool
 

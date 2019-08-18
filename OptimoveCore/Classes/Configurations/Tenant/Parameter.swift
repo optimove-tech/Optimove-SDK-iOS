@@ -1,6 +1,6 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
-public struct Parameter: Codable {
+public struct Parameter: Codable, Equatable {
     public let type: String
     public let optiTrackDimensionId: Int
     public let optional: Bool

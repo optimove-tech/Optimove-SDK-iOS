@@ -10,8 +10,8 @@ public protocol ConfigurationRepository {
     func getGlobal() throws -> GlobalConfig
     func saveGlobal(_: GlobalConfig) throws
 
-    func saveTenant(_: TenantConfig) throws
     func getTenant() throws -> TenantConfig
+    func saveTenant(_: TenantConfig) throws
 
 }
 

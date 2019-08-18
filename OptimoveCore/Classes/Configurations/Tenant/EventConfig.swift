@@ -1,6 +1,6 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
-public struct EventsConfig: Codable {
+public struct EventsConfig: Codable, Equatable {
     public let id: Int
     public let supportedOnOptitrack: Bool
     public let supportedOnRealTime: Bool

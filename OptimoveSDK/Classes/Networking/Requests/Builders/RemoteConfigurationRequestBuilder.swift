@@ -24,7 +24,7 @@ public final class RemoteConfigurationRequestBuilder {
     }
 
     public func createGlobalConfigurationsRequest() -> NetworkRequest {
-        return NetworkRequest(method: .get, baseURL: Endpoints.Remote.GlobalConfig.url(.prod))
+        return NetworkRequest(method: .get, baseURL: Endpoints.Remote.GlobalConfig.url(SDK.environment))
     }
 
 }
