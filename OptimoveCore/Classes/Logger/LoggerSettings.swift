@@ -10,16 +10,16 @@ public struct LoggerSettings {
         }
     }
 
-    public static var logLevelToShow: LogLevel = {
+    public static var logLevelToShow: LogLevelCore = {
         if let minLogLevel = logLevel {
             return minLogLevel
         }
-        return SDK.isStaging ? LogLevel.info : LogLevel.warn
+        return SDK.isStaging ? LogLevelCore.info : LogLevelCore.warn
     }()
 
-    private static var logLevel: LogLevel? {
+    private static var logLevel: LogLevelCore? {
         guard let levelStr = SDK.getEnvironmentVariable(for: Constants.Key.logLevel) else { return nil }
-        return LogLevel(string: levelStr.lowercased())
+        return LogLevelCore(string: levelStr.lowercased())
     }
 
 }

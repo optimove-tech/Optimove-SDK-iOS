@@ -18,7 +18,7 @@ public final class RemoteLoggerStream: MutableLoggerStream {
     }
 
     public func log(
-        level: LogLevel,
+        level: LogLevelCore,
         fileName: String,
         methodName: String,
         logModule: String?,

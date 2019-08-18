@@ -5,7 +5,7 @@ import Foundation
 @objc(OptimoveLoggerStream)
 public protocol LoggerStream: AnyObject {
     var policy: LoggerStreamPolicy { get }
-    func log(level: LogLevel, fileName: String, methodName: String, logModule: String?, message: String)
+    func log(level: LogLevelCore, fileName: String, methodName: String, logModule: String?, message: String)
 }
 
 public protocol MutableLoggerStream: LoggerStream {

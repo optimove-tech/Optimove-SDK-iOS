@@ -3,7 +3,7 @@
 public final class Logger {
 
     public static func log(
-        level: LogLevel,
+        level: LogLevelCore,
         _ message: @autoclosure () -> String,
         file: String = #file,
         function: String = #function,
