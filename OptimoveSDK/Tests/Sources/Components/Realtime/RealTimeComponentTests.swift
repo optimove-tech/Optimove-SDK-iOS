@@ -623,7 +623,7 @@ class RealTimeComponentTests: XCTestCase {
     func test_report_without_customerID_and_visitorID() {
         // then
         let eventExpectation = expectation(description: "An error wasn't generated without cid and vid.")
-        handler.handleOnCatchAssertFunc = { (eventType: RealTimeEventType, error: Error) in
+        handler.handleOnErrorAssertFunc = { (eventType: RealTimeEventType, error: Error) in
             XCTAssert(eventType == .regular)
             XCTAssert(error.localizedDescription == RealTimeError.eitherCustomerOrVisitorIdIsNil.localizedDescription)
             eventExpectation.fulfill()

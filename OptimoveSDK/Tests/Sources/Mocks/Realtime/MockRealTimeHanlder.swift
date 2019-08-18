@@ -11,13 +11,6 @@ final class RealTimeHanlderAssertionProxy: RealTimeHanlder {
         self.target = target
     }
 
-    var handleOfflineAssertFunc: ((RealTimeEventType) -> Void)?
-
-    func handleOffline(_ context: RealTimeEventContext) {
-        handleOfflineAssertFunc?(context.type)
-        target.handleOffline(context)
-    }
-
     var handleOnSuccessAssertFunc: ((RealTimeEventType) -> Void)?
 
     func handleOnSuccess(_ context: RealTimeEventContext, json: String) {
@@ -30,13 +23,6 @@ final class RealTimeHanlderAssertionProxy: RealTimeHanlder {
     func handleOnError(_ context: RealTimeEventContext, error: Error) {
         handleOnErrorAssertFunc?(context.type, error)
         target.handleOnError(context, error: error)
-    }
-
-    var handleOnCatchAssertFunc: ((RealTimeEventType, Error) -> Void)?
-
-    func handleOnCatch(_ context: RealTimeEventContext, error: Error) {
-        handleOnCatchAssertFunc?(context.type, error)
-        target.handleOnCatch(context, error: error)
     }
 
 }
