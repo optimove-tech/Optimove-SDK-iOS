@@ -15,18 +15,24 @@ import OptimoveCore
     private var bestAttemptContent: UNMutableNotificationContent?
     private var contentHandler: ((UNNotificationContent) -> Void)?
 
-    @objc public init(appBundleId: String) {
-        bundleIdentifier = appBundleId
-
-        operationQueue = OperationQueue()
-        operationQueue.qualityOfService = .userInitiated
+    @available(*, deprecated, message: "For automatically fetching the bundle identifier, please use convenience init()")
+    @objc public convenience init(appBundleId: String) {
+        self.init(bundleIdentifier: appBundleId)
     }
 
+    /// The convenience init will fetch the bundle identifier automatically.
     @objc public convenience override init() {
         guard let bundleIdentifier = Bundle.extractHostAppBundle()?.bundleIdentifier else {
             fatalError("Unable to find a bundle identifier.")
         }
-        self.init(appBundleId: bundleIdentifier)
+        self.init(bundleIdentifier: bundleIdentifier)
+    }
+
+    private init(bundleIdentifier: String) {
+        self.bundleIdentifier = bundleIdentifier
+
+        operationQueue = OperationQueue()
+        operationQueue.qualityOfService = .userInitiated
     }
 
     /// The method verified that a request belong to Optimove channel. The Oprimove request might be modified.
@@ -38,12 +44,12 @@ import OptimoveCore
     @objc public func didReceive(_ request: UNNotificationRequest,
                                  withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) -> Bool {
         let payload: NotificationPayload
-        let groupedUserDefaults: UserDefaults
-        let sharedUserDefaults: UserDefaults
+        let groupedStorage: UserDefaults
+        let sharedStorage: UserDefaults
         let fileStorage: FileStorage
         do {
-            groupedUserDefaults = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
-            sharedUserDefaults = try UserDefaults.shared(tenantBundleIdentifier: bundleIdentifier)
+            groupedStorage = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
+            sharedStorage = try UserDefaults.shared(tenantBundleIdentifier: bundleIdentifier)
             fileStorage = try FileStorageImpl(bundleIdentifier: bundleIdentifier, fileManager: .default)
             payload = try extractNotificationPayload(request)
             bestAttemptContent = try unwrap(createBestAttemptBaseContent(request: request, payload: payload))
@@ -55,8 +61,8 @@ import OptimoveCore
         self.contentHandler = contentHandler
 
         let storage = StorageFacade(
-            groupedStorage: groupedUserDefaults,
-            sharedStorage: sharedUserDefaults,
+            groupedStorage: groupedStorage,
+            sharedStorage: sharedStorage,
             fileStorage: fileStorage
         )
         let configurationRepository = ConfigurationRepositoryImpl(storage: storage)

@@ -44,9 +44,10 @@ private extension NotificationDeliveryReporter {
 
     func reportTriggeredNotificationDelivered(
         campaign: TriggeredNotificationCampaign,
-        configuration: Configuration) throws {
-        let event = TriggeredNotificationDelivered(
-            bundleId: self.bundleIdentifier,
+        configuration: Configuration
+    ) throws {
+        let event = TriggeredNotificationRecieved(
+            bundleId: bundleIdentifier,
             campaign: campaign
         )
         let eventConfig = try unwrap(configuration.events[event.name])
@@ -55,9 +56,10 @@ private extension NotificationDeliveryReporter {
 
     func reportScheduledNotificationDelivered(
         campaign: ScheduledNotificationCampaign,
-        configuration: Configuration) throws {
+        configuration: Configuration
+    ) throws {
         let event = ScheduledNotificationDelivered(
-            bundleId: self.bundleIdentifier,
+            bundleId: bundleIdentifier,
             campaign: campaign
         )
         let eventConfig = try unwrap(configuration.events[event.name])

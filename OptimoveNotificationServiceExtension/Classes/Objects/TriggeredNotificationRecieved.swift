@@ -3,9 +3,9 @@
 import Foundation
 import OptimoveCore
 
-final class TriggeredNotificationDelivered: OptimoveEvent {
+final class TriggeredNotificationRecieved: OptimoveEvent {
 
-    let name = "triggered_notification_received"
+    let name = "triggered_notification_recieved"
 
     let timestamp: Int
     let bundleId: String
