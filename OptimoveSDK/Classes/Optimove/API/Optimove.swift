@@ -41,10 +41,10 @@ protocol OptimoveEventReporting: class {
     ///
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
-        Logger.warn("Optimove: Use tenant config \(tenantInfo.configName)")
         shared.configureLogger()
-        Logger.debug("Optimove: configure started.")
+        Logger.warn("Optimove: Use tenant config \(tenantInfo.configName)")
         shared.storeTenantInfo(tenantInfo)
+        Logger.debug("Optimove: configure started.")
         shared.startNormalInitProcess { (sucess) in
             guard sucess else {
                 Logger.error("Optimove: configure failed.")
