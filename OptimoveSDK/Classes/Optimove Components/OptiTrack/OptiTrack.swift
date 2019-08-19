@@ -69,7 +69,11 @@ extension OptiTrack: Eventable {
         tracker.userId = userId
     }
 
-    func report(event: OptimoveEvent, config: EventsConfig) {
+    func report(event: OptimoveEvent) throws {
+        let event = OptimoveEventDecoratorFactory.getEventDecorator(forEvent: event)
+        let config = try obtainConfiguration(for: event)
+        try OptimoveEventValidator.validate(event: event, withConfig: config)
+        event.processEventConfig(config)
         guard config.supportedOnOptitrack else { return }
         eventReportingQueue.async {
             self.sendReport(event: event, config: config)
@@ -86,7 +90,7 @@ extension OptiTrack: Eventable {
                        category: category
             )
         )
-        report(event: event)
+        try report(event: event)
     }
 
     func dispatchNow() {
@@ -104,14 +108,11 @@ extension OptiTrack {
 
     // MARK: - Report
 
-    func report(event: OptimoveEvent) {
-        let event = OptimoveEventDecorator(event: event)
+    func obtainConfiguration(for event: OptimoveEvent) throws -> EventsConfig {
         guard let config = configuration.events[event.name] else {
-            Logger.error("OptiTrack: Configurations for event '\(event.name)' are missing.")
-            return
+            throw GuardError.custom("Configurations are missing for event \(event.name)")
         }
-        event.processEventConfig(config)
-        report(event: event, config: config)
+        return config
     }
 
     func reportScreenEvent(screenTitle: String,
@@ -126,7 +127,7 @@ extension OptiTrack {
                        category: category
             )
         )
-        report(event: event)
+        try report(event: event)
     }
 
 }
@@ -212,7 +213,7 @@ extension OptiTrack {
             guard isAllowed else { return }
             do {
                 let event = try coreEventFactory.createEvent(.setAdvertisingId)
-                self.report(event: event)
+                try self.report(event: event)
             } catch {
                 Logger.error(error.localizedDescription)
             }
@@ -221,12 +222,12 @@ extension OptiTrack {
 
     func reportUserAgent() throws {
         let event = try coreEventFactory.createEvent(.setUserAgent)
-        report(event: event)
+        try report(event: event)
     }
 
     func reportMetaData() throws {
         let event = try coreEventFactory.createEvent(.metaData)
-        report(event: event)
+        try report(event: event)
     }
 
     func reportAppOpenedIfNeeded() throws {
@@ -249,11 +250,11 @@ extension OptiTrack {
             do {
                 if granted {
                     let event = try coreEventFactory.createEvent(.optipushOptIn)
-                    self.report(event: event)
+                    try self.report(event: event)
                     self.storage.isOptiTrackOptIn = true
                 } else {
                     let event = try coreEventFactory.createEvent(.optipushOptOut)
-                    self.report(event: event)
+                    try self.report(event: event)
                     self.storage.isOptiTrackOptIn = false
                 }
             } catch {
@@ -286,14 +287,12 @@ extension OptiTrack {
     }
 
     func reportPendingEvents() {
-        if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            tracker.dispathPendingEvents()
-        }
+        tracker.dispathPendingEvents()
     }
 
     func reportAppOpen() throws {
         let event = try coreEventFactory.createEvent(.appOpen)
-        report(event: event)
+        try report(event: event)
         statisticService.applicationOpenTime = dateTimeProvider.now.timeIntervalSince1970
     }
 }

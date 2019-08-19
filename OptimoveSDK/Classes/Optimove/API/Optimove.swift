@@ -314,30 +314,19 @@ extension Optimove {
     /// - Parameters:
     ///   - event: optimove event object
     @objc public func reportEvent(_ event: OptimoveEvent) {
-        let eventDecor = OptimoveEventDecoratorFactory.getEventDecorator(forEvent: event)
+        do {
+            try components.report(event: event)
 
-        guard let warehouse = try? serviceLocator.warehouseProvider().getWarehouse(),
-            let config = warehouse.getConfig(for: event) else {
-            Logger.error("Optimove: configurations for event: \(event.name) are missing.")
-            return
-        }
-        eventDecor.processEventConfig(config)
-
-        // Must pass the decorator in case some additional attributes become mandatory
-        if let error = OptimoveEventValidator().validate(event: eventDecor, withConfig: config) {
-            Logger.error("Optimove: Event '\(event.name)' is invalid. Reason: \(error.localizedDescription)")
-            return
-        }
-
-        components.report(event: eventDecor, config: config)
-
-        // FIXME: Handle it in a different way. If needed
-        if !RunningFlagsIndication.isComponentRunning(.realtime) {
-            if eventDecor.name == OptimoveKeys.Configuration.setUserId.rawValue {
-                storage.realtimeSetUserIdFailed = true
-            } else if eventDecor.name == OptimoveKeys.Configuration.setEmail.rawValue {
-                storage.realtimeSetEmailFailed = true
+            // FIXME: Handle it in a different way. If needed
+            if !RunningFlagsIndication.isComponentRunning(.realtime) {
+                if event.name == OptimoveKeys.Configuration.setUserId.rawValue {
+                    storage.realtimeSetUserIdFailed = true
+                } else if event.name == OptimoveKeys.Configuration.setEmail.rawValue {
+                    storage.realtimeSetEmailFailed = true
+                }
             }
+        } catch {
+            Logger.error(error.localizedDescription)
         }
     }
 

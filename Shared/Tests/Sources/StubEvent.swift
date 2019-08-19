@@ -5,6 +5,7 @@
 final class StubEvent: OptimoveEvent {
 
     struct Constnats {
+        static let id = 2_000
         static let name = "stub_name"
         static let key = "stub_key"
         static let value = "stub_value"
@@ -15,7 +16,4 @@ final class StubEvent: OptimoveEvent {
         Constnats.key: Constnats.value
     ]
 
-//    func isStubEvent(_ event: RealtimeEvent) -> Bool {
-//        return (event.context[Constnats.key] as? String) == Constnats.value
-//    }
 }

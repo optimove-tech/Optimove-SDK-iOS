@@ -24,7 +24,6 @@ final class ComponentFactory {
                 realTimeRequestBuildable: RealTimeRequestBuilder(),
                 configuration: configuration.realtime
             ),
-            warehouse: serviceLocator.warehouseProvider(),
             deviceStateMonitor: serviceLocator.deviceStateMonitor(),
             eventBuilder: RealTimeEventBuilder(
                 storage: storage

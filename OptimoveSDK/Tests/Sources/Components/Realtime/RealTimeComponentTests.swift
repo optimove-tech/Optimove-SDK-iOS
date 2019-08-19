@@ -9,8 +9,6 @@ class RealTimeComponentTests: XCTestCase {
     var realTime: RealTime!
     var storage: MockOptimoveStorage!
     var networking: MockRealTimeNetworking!
-    var warehouseProvider: EventsConfigWarehouseProvider!
-    var warehouse: StubOptimoveEventConfigsWarehouse!
     var deviceStateMonitor: StubOptimoveDeviceStateMonitor!
     var handler: RealTimeHanlderAssertionProxy!
     var dateProvider: MockDateTimeProvider!
@@ -19,8 +17,6 @@ class RealTimeComponentTests: XCTestCase {
         storage = MockOptimoveStorage()
         networking = MockRealTimeNetworking()
         deviceStateMonitor = StubOptimoveDeviceStateMonitor()
-        warehouseProvider = EventsConfigWarehouseProvider()
-        warehouse = StubOptimoveEventConfigsWarehouse()
         handler = RealTimeHanlderAssertionProxy(
             target: RealTimeHanlderImpl(storage: storage)
         )
@@ -29,7 +25,6 @@ class RealTimeComponentTests: XCTestCase {
             configuration: ConfigurationFixture.build().realtime,
             storage: storage,
             networking: networking,
-            warehouse: warehouseProvider,
             deviceStateMonitor: deviceStateMonitor,
             eventBuilder: RealTimeEventBuilder(
                 storage: storage
@@ -40,7 +35,6 @@ class RealTimeComponentTests: XCTestCase {
                 dateTimeProvider: dateProvider
             )
         )
-        warehouseProvider.setWarehouse(warehouse)
         // FIXME: `performInitializationOperations()` should be called from a related test.
         realTime.performInitializationOperations()
     }
@@ -71,7 +65,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: StubEvent())
+        try! realTime.reportEvent(event: StubEvent())
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -92,7 +86,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: StubEvent())
+        try! realTime.reportEvent(event: StubEvent())
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -100,38 +94,18 @@ class RealTimeComponentTests: XCTestCase {
     func test_that_realtimeEvent_has_a_correct_eventId() {
         // given
         prefilledStorage()
-
-        // and setup config
-        let eventId = 1_000
-        let parameterName = "parameterName"
-        warehouse.config = EventsConfig(
-            id: eventId,
-            supportedOnOptitrack: true,
-            supportedOnRealTime: true,
-            parameters: [
-                parameterName: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 8,
-                    optional: false
-                )
-            ]
-        )
-
-        // and setup event
         let stubEvent = StubEvent()
-        stubEvent.name = parameterName
 
         // then
         let expect = expectation(description: "Event was not generated.")
         networking.assertFunction = { (event) -> Result<String, Error> in
-            XCTAssert(event.eid == String(eventId),
-                      "Expected event id value \(eventId). Actual \(event.eid).")
+            XCTAssertEqual(event.eid, String(StubEvent.Constnats.id))
             expect.fulfill()
             return .success("")
         }
 
         // when
-        realTime.reportEvent(event: stubEvent)
+        try! realTime.reportEvent(event: stubEvent)
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -142,25 +116,20 @@ class RealTimeComponentTests: XCTestCase {
 
         // and
         let stubEvent = StubEvent()
-        let parameters: [String: Any] = [
-            "keyA": "value",
-            "keyB": 1
-        ]
-        stubEvent.parameters = parameters
 
         // then
         let expect = expectation(description: "Event was not generated.")
         networking.assertFunction = { (event) -> Result<String, Error> in
-            event.context.forEach { context in
-                guard let value = parameters[context.key] else {
-                    XCTFail("Cannot find expected value for key \(context.key)")
+            stubEvent.parameters.forEach { parameter in
+                guard let value = event.context[parameter.key] else {
+                    XCTFail("Cannot find expected value for key \(parameter.key)")
                     return
                 }
                 switch value {
                 case let value as String:
-                    XCTAssert(value == context.value as? String)
+                    XCTAssert(value == parameter.value as? String)
                 case let value as Int:
-                    XCTAssert(value == context.value as? Int)
+                    XCTAssert(value == parameter.value as? Int)
                 default:
                     XCTFail("Unsupported value: \(value.self)")
                 }
@@ -170,7 +139,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: stubEvent)
+        try! realTime.reportEvent(event: stubEvent)
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -192,7 +161,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: StubEvent())
+        try! realTime.reportEvent(event: StubEvent())
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -212,7 +181,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: event)
+        try! realTime.reportEvent(event: event)
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -229,7 +198,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: StubEvent())
+        try! realTime.reportEvent(event: StubEvent())
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -269,7 +238,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: stubEvent)
+        try! realTime.reportEvent(event: stubEvent)
         wait(for: [userIdEventExpectation, regularEventExpectation], timeout: expectationTimeout, enforceOrder: true)
         wait(for: [failedUserIdFlagExpectation], timeout: expectationTimeout)
     }
@@ -314,7 +283,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: stubEvent)
+        try! realTime.reportEvent(event: stubEvent)
         wait(for: [userEmailEventExpectation, regularEventExpectation], timeout: expectationTimeout, enforceOrder: true)
         wait(for: [failedUserEmailFlagExpectation], timeout: expectationTimeout)
     }
@@ -370,7 +339,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: stubEvent)
+        try! realTime.reportEvent(event: stubEvent)
         wait(for: [
             userIdEventExpectation,
             userEmailEventExpectation,
@@ -429,9 +398,9 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: stubEventA)
-        realTime.reportEvent(event: stubEventB)
-        realTime.reportEvent(event: stubEventC)
+        try! realTime.reportEvent(event: stubEventA)
+        try! realTime.reportEvent(event: stubEventB)
+        try! realTime.reportEvent(event: stubEventC)
         wait(for: [
             stubEventAExpectation,
             stubEventBExpectation,
@@ -445,32 +414,6 @@ class RealTimeComponentTests: XCTestCase {
 
         // and
         let event = StubEvent()
-
-        // and
-        warehouse.addParameters(
-            [
-                OptimoveKeys.AdditionalAttributesKeys.eventDeviceType: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 8,
-                    optional: false
-                ),
-                OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 9,
-                    optional: false
-                ),
-                OptimoveKeys.AdditionalAttributesKeys.eventOs: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 10,
-                    optional: false
-                ),
-                OptimoveKeys.AdditionalAttributesKeys.eventPlatform: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 11,
-                    optional: false
-                )
-            ]
-        )
 
         // then
         let isDecoratedEvent: (RealtimeEvent) -> Bool = { (event) in
@@ -488,7 +431,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: event)
+        try! realTime.reportEvent(event: event)
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -515,7 +458,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: event)
+        try! realTime.reportEvent(event: event)
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -543,7 +486,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: event)
+        try! realTime.reportEvent(event: event)
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -565,7 +508,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: event)
+        try! realTime.reportEvent(event: event)
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -589,7 +532,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        realTime.reportEvent(event: event)
+        try! realTime.reportEvent(event: event)
         waitForExpectations(timeout: expectationTimeout)
     }
 
@@ -629,7 +572,7 @@ class RealTimeComponentTests: XCTestCase {
             eventExpectation.fulfill()
         }
         // when
-        realTime.reportEvent(event: StubEvent())
+        try! realTime.reportEvent(event: StubEvent())
         waitForExpectations(timeout: expectationTimeout)
     }
 }

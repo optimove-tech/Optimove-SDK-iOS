@@ -15,11 +15,6 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _warehouseProvider: EventsConfigWarehouseProvider = {
-        return EventsConfigWarehouseProvider()
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
     private lazy var _notificationListener: OptimoveNotificationHandler = {
         return OptimoveNotificationHandler(
             storage: storage(),
@@ -71,10 +66,6 @@ final class ServiceLocator {
         return NetworkClientImpl(configuration: .default)
     }
 
-    func warehouseProvider() -> EventsConfigWarehouseProvider {
-        return _warehouseProvider
-    }
-
     func deviceStateMonitor() -> OptimoveDeviceStateMonitor {
         return _deviceStateMonitor
     }
@@ -108,7 +99,6 @@ final class ServiceLocator {
         )
         return OptimoveSDKInitializer(
             deviceStateMonitor: deviceStateMonitor(),
-            warehouseProvider: warehouseProvider(),
             storage: storage(),
             networking: networkingFactory.createRemoteConfigurationNetworking(),
             configurationRepository: configurationRepository(),
