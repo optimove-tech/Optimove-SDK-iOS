@@ -1,0 +1,36 @@
+name: Optimove
+options:
+  xcodeVersion: 10.4
+  deploymentTarget: [iOS: 10]
+targets:
+  OptimoveSDK:
+    type: framework.static
+    platform: iOS
+    sources: [OptimoveSDK]
+    deploymentTarget:
+      iOS: 10.0
+    info:
+      path: OptimoveSDK/Info.plist
+      properties:
+        CFBundleIdentifier: com.optimove.sdk
+    dependencies: 
+      - carthage: MatomoTracker
+      - carthage: Reachability
+      - carthage: FirebaseMessagingBinary
+      - carthage: FirebaseAnalyticsBinary
+      - sdk: UIKit.framework
+      - sdk: UserNotifications.framework
+      - sdk: AdSupport.framework
+  OptimoveNotificationServiceExtension:
+    type: framework
+    platform: iOS
+    sources: [OptimoveNotificationServiceExtension]
+    deploymentTarget:
+      iOS: 10.0
+    info:
+      path: OptimoveNotificationServiceExtension/Info.plist
+      properties:
+        CFBundleIdentifier: com.optimove.sdk.extension.notificationservice
+    dependencies:
+      - sdk: UIKit.framework
+      - sdk: UserNotifications.framework
