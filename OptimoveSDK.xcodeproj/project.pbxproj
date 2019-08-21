@@ -147,6 +147,10 @@
 		46B2110B230BE2F600088D0B /* FirebaseCoreDiagnostics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46B210FC230BE2F600088D0B /* FirebaseCoreDiagnostics.framework */; };
 		46B2110C230BE2F600088D0B /* MatomoTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46B210FD230BE2F600088D0B /* MatomoTracker.framework */; };
 		46B2110D230BE2F600088D0B /* FIRAnalyticsConnector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46B210FE230BE2F600088D0B /* FIRAnalyticsConnector.framework */; };
+		46FB5424230D8E1200C47333 /* String+alphanumeric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FB5421230D8E1100C47333 /* String+alphanumeric.swift */; };
+		46FB5425230D8E1200C47333 /* String+isBlank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FB5422230D8E1100C47333 /* String+isBlank.swift */; };
+		46FB5426230D8E1200C47333 /* String+random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FB5423230D8E1100C47333 /* String+random.swift */; };
+		46FB5428230D8E2A00C47333 /* TrackerFlagsBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FB5427230D8E2A00C47333 /* TrackerFlagsBuilder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -293,6 +297,10 @@
 		46B210FC230BE2F600088D0B /* FirebaseCoreDiagnostics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FirebaseCoreDiagnostics.framework; path = Carthage/Build/iOS/FirebaseCoreDiagnostics.framework; sourceTree = "<group>"; };
 		46B210FD230BE2F600088D0B /* MatomoTracker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MatomoTracker.framework; path = Carthage/Build/iOS/MatomoTracker.framework; sourceTree = "<group>"; };
 		46B210FE230BE2F600088D0B /* FIRAnalyticsConnector.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FIRAnalyticsConnector.framework; path = Carthage/Build/iOS/FIRAnalyticsConnector.framework; sourceTree = "<group>"; };
+		46FB5421230D8E1100C47333 /* String+alphanumeric.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+alphanumeric.swift"; sourceTree = "<group>"; };
+		46FB5422230D8E1100C47333 /* String+isBlank.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+isBlank.swift"; sourceTree = "<group>"; };
+		46FB5423230D8E1100C47333 /* String+random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+random.swift"; sourceTree = "<group>"; };
+		46FB5427230D8E2A00C47333 /* TrackerFlagsBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackerFlagsBuilder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -489,6 +497,9 @@
 		4600307A230AFF900061DFB0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				46FB5421230D8E1100C47333 /* String+alphanumeric.swift */,
+				46FB5422230D8E1100C47333 /* String+isBlank.swift */,
+				46FB5423230D8E1100C47333 /* String+random.swift */,
 				4600307B230AFF900061DFB0 /* String+MongoDB.swift */,
 				4600307C230AFF900061DFB0 /* Dictionary+CompactMapKeys.swift */,
 				4600307D230AFF900061DFB0 /* String+Split.swift */,
@@ -704,6 +715,7 @@
 		460030D0230AFF900061DFB0 /* OptiTrack */ = {
 			isa = PBXGroup;
 			children = (
+				46FB5427230D8E2A00C47333 /* TrackerFlagsBuilder.swift */,
 				460030D1230AFF900061DFB0 /* OptiTrack.swift */,
 				460030D2230AFF900061DFB0 /* MatomoTracker */,
 				460030D5230AFF900061DFB0 /* Tracker.swift */,
@@ -953,6 +965,7 @@
 				46003177230AFF910061DFB0 /* CareService.swift in Sources */,
 				46003171230AFF910061DFB0 /* OptiPushConfigurator.swift in Sources */,
 				46003151230AFF910061DFB0 /* FirebaseMetaData.swift in Sources */,
+				46FB5424230D8E1200C47333 /* String+alphanumeric.swift in Sources */,
 				46003131230AFF910061DFB0 /* SdkPlatform.swift in Sources */,
 				46003139230AFF910061DFB0 /* CoreEventFactory.swift in Sources */,
 				46003170230AFF910061DFB0 /* Registrar.swift in Sources */,
@@ -1009,6 +1022,7 @@
 				46003143230AFF910061DFB0 /* SetUserEmailEvent.swift in Sources */,
 				4600314F230AFF910061DFB0 /* TenantConfig.swift in Sources */,
 				4600311E230AFF910061DFB0 /* ProcessInfo.swift in Sources */,
+				46FB5428230D8E2A00C47333 /* TrackerFlagsBuilder.swift in Sources */,
 				4600312C230AFF910061DFB0 /* OptiLoggerStreamsContainer.swift in Sources */,
 				4600317B230AFF910061DFB0 /* NetworkResponse.swift in Sources */,
 				46003108230AFF910061DFB0 /* State.swift in Sources */,
@@ -1028,8 +1042,10 @@
 				4600314D230AFF910061DFB0 /* OptipushMetaData.swift in Sources */,
 				46003166230AFF910061DFB0 /* RealTime.swift in Sources */,
 				46003148230AFF910061DFB0 /* OptimoveEventValidator.swift in Sources */,
+				46FB5426230D8E1200C47333 /* String+random.swift in Sources */,
 				46003142230AFF910061DFB0 /* SetUserAgent.swift in Sources */,
 				4600313A230AFF910061DFB0 /* OptimoveCoreEvent.swift in Sources */,
+				46FB5425230D8E1200C47333 /* String+isBlank.swift in Sources */,
 				4600312F230AFF910061DFB0 /* LogBody.swift in Sources */,
 				46003116230AFF910061DFB0 /* DateTimeProvider.swift in Sources */,
 				46003137230AFF910061DFB0 /* NetworkRequestFactory.swift in Sources */,

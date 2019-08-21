@@ -23,7 +23,7 @@ end
 ### Carthage
 
 ```OGDL
-github "optimove-tech/iOS-SDK-Integration-Guide" "carthage"
+github "optimove-tech/iOS-SDK-Integration-Guide"
 ```
 
 

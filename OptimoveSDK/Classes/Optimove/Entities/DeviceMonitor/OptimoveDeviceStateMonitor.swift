@@ -38,23 +38,26 @@ final class OptimoveDeviceStateMonitorImpl {
     private let fetcherFactory: DeviceRequirementFetcherFactory
     private var fetchers: [OptimoveDeviceRequirement: Fetchable] = [:]
     private var statuses: [OptimoveDeviceRequirement: Bool] = [:]
-    private var requests: [OptimoveDeviceRequirement: [ResultBlockWithBool]] = [:]  //cache any request from client
+    private var requests: [OptimoveDeviceRequirement: [ResultBlockWithBool]]
     
     init(fetcherFactory: DeviceRequirementFetcherFactory) {
         self.fetcherFactory = fetcherFactory
         accessQueue = DispatchQueue(label: "com.optimove.sdk.queue.deviceState", qos: .background)
+        requests = OptimoveDeviceRequirement.allCases.reduce(into: [:], { (result, next) in
+            result[next] = []
+        })
     }
 }
 
 extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
 
     func getStatus(for deviceRequirement: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool) {
-        accessQueue.sync {
-            if let status = statuses[deviceRequirement] {
+        accessQueue.async { [weak self] in
+            if let status = self?.statuses[deviceRequirement] {
                 completion(status)
                 return
             }
-            requestStatus(for: deviceRequirement, completion: completion)
+            self?.requestStatus(for: deviceRequirement, completion: completion)
         }
     }
     
@@ -88,23 +91,21 @@ private extension OptimoveDeviceStateMonitorImpl {
     func requestStatus(for requiredService: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool) {
         OptiLoggerMessages.logDeviceRequirementNil(requiredService: requiredService)
         OptiLoggerMessages.logRegisterToReceiveRequirementStatus(requiredService: requiredService)
-        if requests[requiredService] == nil {
-            requests[requiredService] = [completion]
-        } else {
-            requests[requiredService]?.append(completion)
-        }
+        requests[requiredService]?.append(completion)
         OptiLoggerMessages.logGetStatusOf(requiredService: requiredService)
         let fetcher = getFetcher(for: requiredService)
         fetcher.fetch { [weak self] (status) in
-            OptiLoggerMessages.logRequirementtatus(deviceRequirement: requiredService, status: status)
-            self?.handleFetcherResult(deviceRequirement: requiredService, status: status)
+            self?.accessQueue.async {
+                OptiLoggerMessages.logRequirementtatus(deviceRequirement: requiredService, status: status)
+                self?.handleFetcherResult(deviceRequirement: requiredService, status: status)
+            }
         }
     }
 
     func handleFetcherResult(deviceRequirement: OptimoveDeviceRequirement, status: Bool) {
         statuses[deviceRequirement] = status
         requests[deviceRequirement]?.forEach { $0(status) }
-        requests[deviceRequirement] = nil
+        requests[deviceRequirement]?.removeAll()
     }
 
     func getFetcher(for requirement: OptimoveDeviceRequirement) -> Fetchable {

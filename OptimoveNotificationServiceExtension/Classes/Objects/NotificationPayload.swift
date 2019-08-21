@@ -7,7 +7,7 @@ import Foundation
 struct NotificationPayload: Decodable {
     let title: String
     let content: String
-    let dynamicLinks: DynamicLinks
+    let dynamicLinks: DynamicLinks?
     let deepLinkPersonalization: DeeplinkPersonalization?
     let campaignDetails: CampaignDetails?
     let collapseKey: String?
@@ -80,8 +80,7 @@ struct DeeplinkPersonalization: Decodable {
 // MARK: - Dynamic links
 
 struct DynamicLinks: Decodable {
-    let ios: [String: URL]
-    let android: [String: URL]
+    let ios: [String: URL]?
 
     /// The custom decoder does preprocess before the primary decoder.
     init(firebaseFrom decoder: Decoder) throws {

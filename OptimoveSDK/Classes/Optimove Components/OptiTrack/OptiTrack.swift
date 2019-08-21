@@ -18,11 +18,11 @@ final class OptiTrack: OptimoveComponent {
     private let dateTimeProvider: DateTimeProvider
     private let statisticService: StatisticService
     private let eventReportingQueue = DispatchQueue(label: "com.optimove.optitrack", qos: .background)
+    private let optimoveCustomizePlugins: [String: String]
 
     // TODO: Make private after resolve construction lifecycle.
     var tracker: Tracker?
     private var lastReportedOpenApplicationTime: TimeInterval?
-    private var optimoveCustomizePlugins: [String: String] = [:]
 
     required init(
         deviceStateMonitor: OptimoveDeviceStateMonitor,
@@ -31,15 +31,16 @@ final class OptiTrack: OptimoveComponent {
         metaDataProvider: MetaDataProvider<OptitrackMetaData>,
         coreEventFactory: CoreEventFactory,
         dateTimeProvider: DateTimeProvider,
-        statisticService: StatisticService) {
+        statisticService: StatisticService,
+        trackerFlagsBuilder: TrackerFlagsBuilder) {
         self.warehouseProvider = warehouseProvider
         self.storage = storage
         self.metaDataProvider = metaDataProvider
         self.coreEventFactory = coreEventFactory
         self.dateTimeProvider = dateTimeProvider
         self.statisticService = statisticService
+        self.optimoveCustomizePlugins = (try? trackerFlagsBuilder.build()) ?? [:]
         super.init(deviceStateMonitor: deviceStateMonitor)
-        setupPluginFlags()
     }
 
     // MARK: - Internal Methods
@@ -155,19 +156,6 @@ extension OptiTrack {
             queue: .main
         ) { (_) in
             self.dispatchNow()
-        }
-    }
-
-    func setupPluginFlags() {
-        let pluginFlags = ["fla", "java", "dir", "qt", "realp", "pdf", "wma", "gears"]
-        guard let initialVisitorId: String = storage[.initialVisitorId] else { return }
-        let pluginValues = initialVisitorId.split(by: 2)
-            .map { Int($0, radix: 16)! / 2 }
-            .map { $0.description }
-        for i in 0..<pluginFlags.count {
-            let pluginFlag = pluginFlags[i]
-            let pluginValue = pluginValues[i]
-            self.optimoveCustomizePlugins[pluginFlag] = pluginValue
         }
     }
 
