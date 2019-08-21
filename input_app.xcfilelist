@@ -1,0 +1,2 @@
+$(SRCROOT)/Carthage/Build/iOS/MatomoTracker.framework
+$(SRCROOT)/Carthage/Build/iOS/Reachability.framework

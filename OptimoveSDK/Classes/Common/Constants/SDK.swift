@@ -26,7 +26,7 @@ final class SDK {
         return value
     }
 
-    static var version: String = "2.2.1"
+    static var version: String = "2.2.2"
 
     static var isStaging: Bool {
         let envvar = getEnvironmentVariable(for: Constants.Key.staging, defaultValue: Constants.Var.false)

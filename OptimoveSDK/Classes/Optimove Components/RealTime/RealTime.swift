@@ -171,7 +171,10 @@ private extension RealTime {
                 hanlder.handleOffline(context)
                 return
             }
-            realTimeQueue.async {
+            // The delay added as the temporary hotfix for the realtime race condition issue.
+            // Should be removed right after release a solution on a server side.
+            let delay: TimeInterval = 1
+            realTimeQueue.asyncAfter(deadline: .now() + delay, execute: {
                 do {
                     let realtimeEvent = try eventBuilder.createEvent(context: context)
                     try networking.report(event: realtimeEvent) { (result) in
@@ -185,7 +188,7 @@ private extension RealTime {
                 } catch {
                     hanlder.handleOnCatch(context, error: error)
                 }
-            }
+            })
         }
     }
 

@@ -65,7 +65,10 @@ final class ComponentFactory {
             metaDataProvider: serviceLocator.optitrackMetaDataProvider(),
             coreEventFactory: coreEventFactory,
             dateTimeProvider: serviceLocator.dateTimeProvider(),
-            statisticService: serviceLocator.statisticService()
+            statisticService: serviceLocator.statisticService(),
+            trackerFlagsBuilder: TrackerFlagsBuilder(
+                storage: serviceLocator.storage()
+            )
         )
     }
 
