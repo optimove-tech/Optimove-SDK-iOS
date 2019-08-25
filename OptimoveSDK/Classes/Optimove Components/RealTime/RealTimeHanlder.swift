@@ -1,12 +1,11 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 protocol RealTimeHanlder {
-    func handleOffline(_ context: RealTimeEventContext)
     func handleOnSuccess(_ context: RealTimeEventContext, json: String)
     func handleOnError(_ context: RealTimeEventContext, error: Error)
-    func handleOnCatch(_ context: RealTimeEventContext, error: Error)
 }
 
 final class RealTimeHanlderImpl {
@@ -21,18 +20,6 @@ final class RealTimeHanlderImpl {
 
 extension RealTimeHanlderImpl: RealTimeHanlder {
 
-    func handleOffline(_ context: RealTimeEventContext) {
-        context.onOffline()
-        switch context.type {
-        case .setUserID:
-            storage[.realtimeSetUserIdFailed] = true
-        case .setUserEmail:
-            storage[.realtimeSetEmailFailed] = true
-        default:
-            break
-        }
-    }
-
     func handleOnSuccess(_ context: RealTimeEventContext, json: String) {
         context.onSuccess(json)
         switch context.type {
@@ -46,7 +33,6 @@ extension RealTimeHanlderImpl: RealTimeHanlder {
     }
 
     func handleOnError(_ context: RealTimeEventContext, error: Error) {
-        context.onError(error)
         switch context.type {
         case .setUserID:
             self.storage[.realtimeSetUserIdFailed] = true
@@ -57,15 +43,4 @@ extension RealTimeHanlderImpl: RealTimeHanlder {
         }
     }
 
-    func handleOnCatch(_ context: RealTimeEventContext, error: Error) {
-        context.onEncodeError(error)
-        switch context.type {
-        case .setUserID:
-            storage[.realtimeSetUserIdFailed] = true
-        case .setUserEmail:
-            storage[.realtimeSetEmailFailed] = true
-        default:
-            break
-        }
-    }
 }

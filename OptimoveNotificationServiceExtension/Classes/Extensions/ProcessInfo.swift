@@ -1,9 +1,9 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
 
 extension ProcessInfo {
-    
+
     /// Return a string in format "A.B.C", where:
     /// A – major version,
     /// B – minor version,
@@ -14,7 +14,7 @@ extension ProcessInfo {
             operatingSystemVersion.majorVersion,
             operatingSystemVersion.minorVersion,
             operatingSystemVersion.patchVersion
-            ]
+        ]
             .map { String($0) }
             .joined(separator: ".")
     }

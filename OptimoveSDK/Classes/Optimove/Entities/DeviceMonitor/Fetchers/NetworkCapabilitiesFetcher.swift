@@ -1,3 +1,5 @@
+//  Copyright © 2019 Optimove. All rights reserved.
+
 import Reachability
 
 final class NetworkCapabilitiesFetcher: Fetchable {

@@ -1,6 +1,7 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 final class OptiPushServiceLocator {
 
@@ -14,20 +15,20 @@ final class OptiPushServiceLocator {
         return serviceLocator.storage()
     }
 
-    func registrar(metaData: OptipushMetaData) -> Registrable {
+    func registrar(configuration: OptipushConfig) -> Registrable {
         return Registrar(
             storage: storage(),
             modelFactory: MbaasModelFactory(
                 storage: storage(),
                 processInfo: ProcessInfo(),
-                device: Device.self,
+                device: SDKDevice.self,
                 bundle: Bundle.self
             ),
             networking: RegistrarNetworkingImpl(
                 networkClient: serviceLocator.networking(),
                 requestBuilder: RegistrarNetworkingRequestBuilder(
                     storage: storage(),
-                    metaData: metaData
+                    configuration: configuration
                 )
             ),
             backup: MbaasBackupImpl(

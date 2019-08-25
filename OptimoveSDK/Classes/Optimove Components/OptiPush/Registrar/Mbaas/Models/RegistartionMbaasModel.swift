@@ -1,6 +1,7 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 /// Used only for `MbaasOperation.registration`
 final class RegistartionMbaasModel: BaseMbaasModel {
@@ -29,7 +30,7 @@ final class RegistartionMbaasModel: BaseMbaasModel {
     }
 
     required init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy:  RuntimeCodingKey.self)
+        let container = try decoder.container(keyedBy: RuntimeCodingKey.self)
 
         /// Assume that each data should contain only one operation.
         let operationKey = try unwrap(RuntimeCodingKey(stringValue: MbaasOperation.registration.rawValue))

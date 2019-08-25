@@ -1,9 +1,10 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 protocol RealTimeRequestBuildable {
-    func createReportEventRequest(event: RealtimeEvent, metadata: RealtimeMetaData) throws -> NetworkRequest
+    func createReportEventRequest(event: RealtimeEvent, gateway: URL) throws -> NetworkRequest
 }
 
 final class RealTimeRequestBuilder {
@@ -17,21 +18,22 @@ final class RealTimeRequestBuilder {
 
     private func log(_ request: NetworkRequest) {
         do {
-            OptiLoggerMessages.logRealtimeReportEvent(
-                json: try cast(String(data: request.httpBody ?? Data(), encoding: .utf8))
+            let json = try unwrap(String(data: request.httpBody ?? Data(), encoding: .utf8))
+            Logger.debug(
+                "Realtime: Report event: \(json)"
             )
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 }
 
 extension RealTimeRequestBuilder: RealTimeRequestBuildable {
 
-    func createReportEventRequest(event: RealtimeEvent, metadata: RealtimeMetaData) throws -> NetworkRequest {
+    func createReportEventRequest(event: RealtimeEvent, gateway: URL) throws -> NetworkRequest {
         let request = try NetworkRequest(
             method: .post,
-            baseURL: metadata.realtimeGateway,
+            baseURL: gateway,
             path: Constants.Paths.reportEvent,
             body: event,
             timeoutInterval: Constants.timeoutInterval

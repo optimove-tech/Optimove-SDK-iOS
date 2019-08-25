@@ -1,15 +1,10 @@
-//
-//  FirebaseInteractor.swift
-//  OptimoveSDK
-//
-//  Created by Mobile Developer Optimove on 26/09/2017.
 //  Copyright © 2017 Optimove. All rights reserved.
-//
 
 import FirebaseCore
 import FirebaseMessaging
 import Foundation
 import os.log
+import OptimoveCore
 
 protocol OptimoveMbaasRegistrationHandling: class {
     func handleRegistrationTokenRefresh(token: String)
@@ -60,7 +55,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
         clientFirebaseMetaData: ClientsServiceProjectKeys,
         delegate: OptimoveMbaasRegistrationHandling
     ) {
-        OptiLoggerMessages.logSetupFirebase()
+        Logger.debug("OptiPush: Setup Firebase started.")
 
         self.delegate = delegate
         let appController = FirebaseOptionsBuilder(
@@ -89,7 +84,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
                 self.registerIfTokenChanged(updatedFcmToken: Messaging.messaging().fcmToken)
             }
         }
-        OptiLoggerMessages.logFirebaseStupFinished()
+        Logger.debug("OptiPush: Setup Firebase finished.")
     }
 
     func handleRegistration(token: Data) {
@@ -99,22 +94,21 @@ extension FirebaseInteractor: OptipushServiceInfra {
     func optimoveReceivedRegistrationToken(_ fcmToken: String) {
         if storage.isClientHasFirebase {
             guard storage.defaultFcmToken != fcmToken else {
-                OptiLoggerMessages.logFcmTokenNotNew()
-                OptiLoggerMessages.logFcmTokenForAppController(fcmToken: fcmToken)
+                Logger.debug("OptiPush: the FCM token is not new, no need to refresh.")
+                Logger.debug("OptiPush: 🚀 FCM token OLD: \(storage.fcmToken ?? "")")
                 return
             }
             guard let optimoveAppSenderId = self.appController?.gcmSenderID else {
-                OptiLoggerMessages.logAppControllerNotConfigure()
+                Logger.debug("OptiPush: App controller not configure.")
                 return
             }
-            OptiLoggerMessages.logOldFcmToken(token: String(describing: storage.fcmToken ?? ""))
             retreiveFcmToken(for: optimoveAppSenderId) { [weak self] (token) in
-                OptiLoggerMessages.logNewFcmToken(token: token)
+                Logger.debug("OptiPush: 🚀 FCM token NEW: \(token)")
                 self?.delegate?.handleRegistrationTokenRefresh(token: token)
                 self?.storage.defaultFcmToken = fcmToken
             }
         } else {
-            OptiLoggerMessages.logFcmTokenForAppController(fcmToken: fcmToken)
+            Logger.debug("OptiPush: 🚀 FCM token for app controller: \(fcmToken)")
             self.delegate?.handleRegistrationTokenRefresh(token: fcmToken)
         }
     }
@@ -131,7 +125,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
         } else {
             networking.subscribe(topic: topic) { (result) in
                 switch result {
-                case .success(_):
+                case .success:
                     os_log(
                         "Subscribed topic '%{private}@' successful.",
                         log: OSLog.firebaseInteractor,
@@ -141,7 +135,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
                     OptimoveTopicsUserDefaults.topics?.set(true, forKey: "optimove_\(topic)")
                     didSucceed?(true)
                 case let .failure(error):
-                    OptiLoggerMessages.logError(error: error)
+                    Logger.error(error.localizedDescription)
                     OptimoveTopicsUserDefaults.topics?.set(false, forKey: "optimove_\(topic)")
                     didSucceed?(false)
                 }
@@ -161,7 +155,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
         } else {
             networking.unsubscribe(topic: topic) { (result) in
                 switch result {
-                case .success(_):
+                case .success:
                     os_log(
                         "Unsubscribed topic '%{private}@' successful.",
                         log: OSLog.firebaseInteractor,
@@ -171,7 +165,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
                     OptimoveTopicsUserDefaults.topics?.removeObject(forKey: "optimove_\(topic)")
                     didSucceed?(true)
                 case let .failure(error):
-                    OptiLoggerMessages.logError(error: error)
+                    Logger.error(error.localizedDescription)
                     didSucceed?(false)
                 }
             }
@@ -196,14 +190,14 @@ private extension FirebaseInteractor {
 
     func setupAppController(_ appController: FirebaseOptions) {
         if FirebaseApp.app() != nil {
-            OptiLoggerMessages.logUserUseAutonomousFirebase(logModule: "OptiPush")
+            Logger.warn("OptiPush: Hosted Firebase detected.")
             FirebaseApp.configure(
                 name: "appController",
                 options: appController
             )
             storage.isClientHasFirebase = true
         } else {
-            OptiLoggerMessages.logUserNotUseOwnFirebase()
+            Logger.warn("OptiPush: Hosted Firebase not detected.")
             storage.isClientHasFirebase = false
             FirebaseApp.configure(options: appController)
         }
@@ -229,12 +223,13 @@ private extension FirebaseInteractor {
 
     func retreiveFcmToken(for senderId: String, completion: @escaping (String) -> Void) {
         Messaging.messaging().retrieveFCMToken(forSenderID: senderId) { (token, error) in
-            guard error == nil else {
-                OptiLoggerMessages.logFcmTOkenRetreiveError(errorDescription: error.debugDescription)
-                return
+            if let error = error {
+                Logger.error("OptiPush: could not retreive dedicated FCM token. Reason: \(error.localizedDescription).")
             }
             if let token = token {
                 completion(token)
+            } else {
+                Logger.error("OptiPush: Missed FCM token.")
             }
         }
     }

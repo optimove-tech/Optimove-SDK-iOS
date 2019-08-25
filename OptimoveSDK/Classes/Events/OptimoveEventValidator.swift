@@ -1,61 +1,63 @@
-//
-//  EventValidator.swift
-//  OptimoveSDKDev
-//
-//  Created by Mobile Developer Optimove on 05/09/2017.
 //  Copyright © 2017 Optimove. All rights reserved.
-//
 
 import Foundation
+import OptimoveCore
 
-class OptimoveEventValidator {
-    // MARK: - Internal Methods
-    func validate(event: OptimoveEvent, withConfig config: EventsConfig) -> OptimoveError? {
-        //Verify mandatory parameter exist
+final class OptimoveEventValidator {
+
+    private struct Constants {
+        static let string = "String"
+        static let number = "Number"
+        static let boolean = "Boolean"
+    }
+
+    /// Must pass the decorator in case some additional attributes become mandatory
+    ///
+    /// - Parameters:
+    ///   - event: Event for validation.
+    ///   - config: Required additional attributes.
+    /// - Throws: Throwed en error if validation failed.
+    static func validate(event: OptimoveEvent, withConfig config: EventsConfig) throws {
+        // Verify mandatory parameter exist
         for (name, paramConfigs) in config.parameters where paramConfigs.mandatory {
             if event.parameters[name] == nil {
-                return .mandatoryParameterMissing
+                throw OptimoveError.mandatoryParameterMissing
             }
         }
-        //Verify Type is as defined
+        // Verify Type is as defined
         for (name, value) in event.parameters {
             if let parameterConfiguration = config.parameters[name] {
                 switch parameterConfiguration.type {
-                case "Number":
+                case Constants.number:
                     guard let numberValue = value as? NSNumber else {
-                        OptiLoggerMessages.logParameterIsNotNumber(name: name)
-                        return .mismatchParamterType
+                        Logger.error("Parameter '\(name)' is not number type.")
+                        throw OptimoveError .mismatchParamterType
                     }
-                    if String(describing: numberValue).count > 255  // Verify parameter value
-                    {
-                        return .illegalParameterLength
+                    // Verify parameter value
+                    if String(describing: numberValue).count > 255 {
+                        throw OptimoveError .illegalParameterLength
                     }
 
-                case "String":
-                    guard let stringValue = value as? String
-                    else {
-                        OptiLoggerMessages.logParameterIsNotString(name: name)
-                        return .mismatchParamterType
-
+                case Constants.string:
+                    guard let stringValue = value as? String else {
+                        Logger.error("Parameter \(name) is not string type.")
+                        throw OptimoveError.mismatchParamterType
                     }
                     // Verify parameter value length
                     if stringValue.count > 255 {
-                        return .illegalParameterLength
+                        throw OptimoveError.illegalParameterLength
 
                     }
-                case "Boolean":
-                    guard let _ = value as? Bool
-                    else {
-                        OptiLoggerMessages.logParameterIsNotBoolean(name: name)
-                        return .mismatchParamterType
+                case Constants.boolean:
+                    guard value is Bool else {
+                        Logger.error("Parameter \(name) is not boolean type.")
+                        throw OptimoveError.mismatchParamterType
                     }
-
                 default:
-                    return .invalidEvent
+                    throw OptimoveError.invalidEvent
                 }
             }
         }
-        return nil
     }
 
 }

@@ -2,45 +2,56 @@
 
 import UIKit
 import UserNotifications
+import OptimoveCore
 
 protocol OptimoveEventReporting: class {
     func reportEvent(_ event: OptimoveEvent)
     func dispatchQueuedEventsNow()
 }
 
-/// The entry point of Optimove SDK.
-/// Initialize and configure Optimove using Optimove.sharedOptimove.configure.
+/// The entry point of Optimove.
+/// Initialize and configure SDK using `Optimove.shared.configure(for:)`.
 @objc public final class Optimove: NSObject {
 
-    // MARK: - Attributes
-
-    let optiPush: OptiPush
-    let optiTrack: OptiTrack
-    let realTime: RealTime
-
     private let serviceLocator: ServiceLocator
-    private let stateDelegateQueue = DispatchQueue(label: "com.optimove.sdk_state_delegates")
     private var storage: OptimoveStorage
-    private let networkingFactory: NetworkingFactory
+    private let components: ComponentsPool
 
-    private lazy var sdkInitializer: OptimoveSDKInitializer = { [unowned self, serviceLocator] in
-        return OptimoveSDKInitializer(
-            deviceStateMonitor: serviceLocator.deviceStateMonitor(),
-            configuratorFactory: ComponentConfiguratorFactory(
-                serviceLocator: serviceLocator,
-                optimoveInstance: self
-            ),
-            warehouseProvider: serviceLocator.warehouseProvider(),
-            storage: serviceLocator.storage(),
-            networking: networkingFactory.createRemoteConfigurationNetworking()
-        )
-    }()
-
+    private let stateDelegateQueue = DispatchQueue(label: "com.optimove.sdk_state_delegates")
     private static var swiftStateDelegates: [ObjectIdentifier: OptimoveSuccessStateListenerWrapper] = [:]
     private static var objcStateDelegate: [ObjectIdentifier: OptimoveSuccessStateDelegateWrapper] = [:]
 
-    private var optimoveTestTopic: String {
-        return "test_ios_\(Bundle.main.bundleIdentifier ?? "")"
+    // MARK: - Initializers
+
+    /// The shared instance of OptimoveSDK.
+    @objc public static let shared: Optimove = {
+        return Optimove()
+    }()
+
+    private override init() {
+        serviceLocator = ServiceLocator()
+        components = serviceLocator.componentsPool()
+        storage = serviceLocator.storage()
+        super.init()
+
+        setup()
+    }
+
+    /// The starting point of the Optimove SDK.
+    ///
+    /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
+    @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
+        shared.configureLogger()
+        Logger.warn("Optimove: Use tenant config \(tenantInfo.configName)")
+        shared.storeTenantInfo(tenantInfo)
+        Logger.debug("Optimove: configure started.")
+        shared.startNormalInitProcess { (sucess) in
+            guard sucess else {
+                Logger.error("Optimove: configure failed.")
+                return
+            }
+            Logger.info("Optimove: configure finished. ✅")
+        }
     }
 
     // MARK: - Deep Link
@@ -57,110 +68,6 @@ protocol OptimoveEventReporting: class {
             }
         }
     }
-
-    // MARK: - API
-
-    // MARK: - Initializers
-    /// The shared instance of optimove singleton
-    @objc public static let shared: Optimove = {
-        let serviceLocator = ServiceLocator()
-        let instance = Optimove(
-            serviceLocator: serviceLocator,
-            componentFactory: ComponentFactory(
-                serviceLocator: serviceLocator,
-                coreEventFactory: CoreEventFactoryImpl(
-                    storage: serviceLocator.storage(),
-                    dateTimeProvider: serviceLocator.dateTimeProvider()
-                )
-            )
-        )
-        return instance
-    }()
-
-    private init(
-        serviceLocator: ServiceLocator,
-        componentFactory: ComponentFactory) {
-        self.serviceLocator = serviceLocator
-        optiPush = componentFactory.createOptipushComponent()
-        optiTrack = componentFactory.createOptitrackComponent()
-        realTime = componentFactory.createRealtimeComponent()
-        storage = serviceLocator.storage()
-        networkingFactory = NetworkingFactory(
-            networkClient: NetworkClientImpl(),
-            requestBuilderFactory: NetworkRequestBuilderFactory(
-                serviceLocator: serviceLocator
-            )
-        )
-        super.init()
-
-        setup()
-    }
-
-    /// The starting point of the Optimove SDK
-    ///
-    /// - Parameter info: Basic client information received on the onboarding process with Optimove
-    @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
-        shared.configureLogger()
-        OptiLoggerMessages.logStartConfigureOptimoveSDK()
-        shared.storeTenantInfo(tenantInfo)
-        shared.startNormalInitProcess { (sucess) in
-            guard sucess else {
-                OptiLoggerMessages.logNormalInitFailed()
-                return
-            }
-            OptiLoggerMessages.logNormalInitSuccess()
-        }
-    }
-
-    // MARK: - Private Methods
-
-    /// stores the user information that was provided during configuration
-    ///
-    /// - Parameter info: user unique info
-    private func storeTenantInfo(_ info: OptimoveTenantInfo) {
-        storage.tenantToken = info.tenantToken
-        storage.version = info.configName
-        storage.configurationEndPoint = info.url.last == "/" ? info.url : "\(info.url)/"
-
-        OptiLoggerMessages.logStoreUserInfo(
-            tenantToken: info.tenantToken,
-            tenantVersion: info.configName,
-            tenantUrl: info.url
-        )
-
-    }
-
-    private func configureLogger() {
-        let consoleStream = OptiLoggerConsoleStream()
-        OptiLoggerStreamsContainer.add(stream: consoleStream)
-        if SDK.isStaging {
-            let tenantID: Int = storage.siteID ?? -1
-            OptiLoggerStreamsContainer.add(
-                stream: MobileLogServiceLoggerStream(tenantId: tenantID)
-            )
-        }
-    }
-
-    private func setup() {
-        setUserAgent()
-        setVisitorIdIfNeeded()
-    }
-
-    private func setUserAgent() {
-        let userAgent = Device.evaluateUserAgent()
-        storage.set(value: userAgent, key: .userAgent)
-    }
-
-    private func setVisitorIdIfNeeded() {
-        if storage.visitorID == nil {
-            let uuid = UUID().uuidString
-            let sanitizedUUID = uuid.replacingOccurrences(of: "-", with: "")
-            let start = sanitizedUUID.startIndex
-            let end = sanitizedUUID.index(start, offsetBy: 16)
-            storage.initialVisitorId = String(sanitizedUUID[start..<end]).lowercased()
-            storage.visitorID = storage.initialVisitorId
-        }
-    }
 }
 
 // MARK: - Initialization API
@@ -168,33 +75,38 @@ protocol OptimoveEventReporting: class {
 extension Optimove {
 
     func startNormalInitProcess(didSucceed: @escaping ResultBlockWithBool) {
-        OptiLoggerMessages.logStartInitFromRemote()
+        Logger.info("Start Optimove component initialization from remote.")
         if RunningFlagsIndication.isSdkRunning {
-            OptiLoggerMessages.logSkipNormalInitSinceRunning()
+            Logger.debug("Skip normal initializtion since SDK already running")
             didSucceed(true)
             return
         }
-        sdkInitializer.initializeFromRemoteServer { [sdkInitializer] success in
-            guard success else {
-                sdkInitializer.initializeFromLocalConfigs {
-                    success in
+        let initializer = serviceLocator.initializer()
+        initializer.initializeFromRemoteServer { [initializer] success in
+            if success {
+                didSucceed(success)
+                self.didFinishInitializationSuccessfully()
+            } else {
+                initializer.initializeFromLocalConfigs { success in
                     didSucceed(success)
                 }
-                return
             }
-            didSucceed(success)
         }
     }
 
     func startUrgentInitProcess(didSucceed: @escaping ResultBlockWithBool) {
-        OptiLoggerMessages.logStartUrgentInitProcess()
+        Logger.info("Start Optimove urgent initiazlition process")
         if RunningFlagsIndication.isSdkRunning {
-            OptiLoggerMessages.logSkipUrgentInitSinceRunning()
+            Logger.debug("Skip urgent initializtion since SDK already running")
             didSucceed(true)
             return
         }
-        sdkInitializer.initializeFromLocalConfigs { success in
+        let initializer = serviceLocator.initializer()
+        initializer.initializeFromLocalConfigs { success in
             didSucceed(success)
+            if success {
+                self.didFinishInitializationSuccessfully()
+            }
         }
     }
 
@@ -202,11 +114,6 @@ extension Optimove {
         RunningFlagsIndication.isInitializerRunning = false
         RunningFlagsIndication.isSdkRunning = true
 
-        if let clientApnsToken = storage.apnsToken,
-            RunningFlagsIndication.isComponentRunning(.optiPush) {
-            optiPush.application(didRegisterForRemoteNotificationsWithDeviceToken: clientApnsToken)
-            storage.apnsToken = nil
-        }
         let missingPermissions = serviceLocator.deviceStateMonitor().getMissingPermissions()
         let missingPermissionsObjc = missingPermissions.map { $0.rawValue }
         Optimove.swiftStateDelegates.values.forEach { (wrapper) in
@@ -219,6 +126,7 @@ extension Optimove {
 }
 
 // MARK: - SDK state observing
+
 //TODO: expose to  @objc
 extension Optimove {
 
@@ -231,9 +139,7 @@ extension Optimove {
             return
         }
         stateDelegateQueue.async {
-            Optimove.swiftStateDelegates[ObjectIdentifier(listener)] = OptimoveSuccessStateListenerWrapper(
-                observer: listener
-            )
+            Optimove.swiftStateDelegates[ObjectIdentifier(listener)] = OptimoveSuccessStateListenerWrapper(observer: listener)
         }
     }
 
@@ -278,7 +184,7 @@ extension Optimove {
         userInfo: [AnyHashable: Any],
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
         ) -> Bool {
-        OptiLoggerMessages.logReceiveRemoteNotification()
+        Logger.info("Receive remote notification.")
         guard userInfo[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true" else {
             return false
         }
@@ -293,10 +199,10 @@ extension Optimove {
         notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
         ) -> Bool {
-        OptiLoggerMessages.logReceiveNotificationInForeground()
+        Logger.info("Received notification in foreground mode.")
         guard notification.request.content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true"
             else {
-                OptiLoggerMessages.logNotificationShouldNotHandleByOptimove()
+                Logger.debug("Notification should not be handled by optimove")
                 return false
         }
         completionHandler([.alert, .sound, .badge])
@@ -312,12 +218,10 @@ extension Optimove {
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
-        guard
-            response.notification.request.content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String
-                == "true"
-            else {
-                OptiLoggerMessages.logNotificationResponse()
-                return false
+        let userInfo = response.notification.request.content.userInfo
+        guard userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true" else {
+            Logger.debug("User respond to non optimove notification")
+            return false
         }
         serviceLocator.notificationListener().didReceive(
             response: response,
@@ -329,15 +233,22 @@ extension Optimove {
 
 // MARK: - OptiPush related API
 extension Optimove {
+
     /// Request to handle APNS <-> FCM regisration process
     ///
     /// - Parameter deviceToken: A token that was received in the appDelegate callback
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        if RunningFlagsIndication.isComponentRunning(.optiPush) {
-            optiPush.application(didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
-        } else {
+        components.application(didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+
+        // TODO: It unneccessary to keep a device token after state-listener will go out,
+        // and an internal buffer will be introduced.
+        if !RunningFlagsIndication.isComponentRunning(.optiPush) {
             storage.apnsToken = deviceToken
         }
+    }
+
+    private var optimoveTestTopic: String {
+        return "test_ios_\(Bundle.main.bundleIdentifier ?? "")"
     }
 
     /// Request to subscribe to test campaign topics
@@ -353,25 +264,19 @@ extension Optimove {
     /// Request to register to topic
     ///
     /// - Parameter topic: The topic name
-    func registerToOptipushTopic(_ topic: String, didSucceed: ((Bool) -> Void)? = nil) {
-        if RunningFlagsIndication.isComponentRunning(.optiPush) {
-            optiPush.subscribeToTopic(topic: topic, didSucceed: didSucceed)
-        }
+    func registerToOptipushTopic(_ topic: String) {
+        components.subscribeToTopic(topic: topic)
     }
 
     /// Request to unregister from topic
     ///
     /// - Parameter topic: The topic name
-    func unregisterFromOptipushTopic(_ topic: String, didSucceed: ((Bool) -> Void)? = nil) {
-        if RunningFlagsIndication.isComponentRunning(.optiPush) {
-            optiPush.unsubscribeFromTopic(topic: topic, didSucceed: didSucceed)
-        }
+    func unregisterFromOptipushTopic(_ topic: String) {
+        components.unsubscribeFromTopic(topic: topic)
     }
 
     func performRegistration() {
-        if RunningFlagsIndication.isComponentRunning(.optiPush) {
-            optiPush.performRegistration()
-        }
+        components.performRegistration()
     }
 }
 
@@ -392,65 +297,42 @@ extension Optimove: OptimoveDeepLinkResponding {
 }
 
 extension Optimove: OptimoveEventReporting {
+
     func dispatchQueuedEventsNow() {
-        if RunningFlagsIndication.isSdkRunning {
-            optiTrack.dispatchNow()
-        }
+        components.dispatchNow()
     }
+
 }
 
-// MARK: - optiTrack related API
+// MARK: - OptiTrack related API
+
 extension Optimove {
-    /// validate the permissions of the client to use optitrack component and if permit sends the report to the apropriate handler
+
+    /// Validate the permissions of the client to use Optitrack component and if permit sends the
+    /// report to the appropriate handler.
     ///
     /// - Parameters:
     ///   - event: optimove event object
     @objc public func reportEvent(_ event: OptimoveEvent) {
-        let eventDecor = OptimoveEventDecoratorFactory.getEventDecorator(forEvent: event)
+        do {
+            try components.report(event: event)
 
-        guard let warehouse = try? serviceLocator.warehouseProvider().getWarehouse(),
-            let config = warehouse.getConfig(for: event) else {
-            OptiLoggerMessages.logConfigurationForEventMissing(eventName: eventDecor.name)
-            return
-        }
-        eventDecor.processEventConfig(config)
-
-        // Must pass the decorator in case some additional attributes become mandatory
-        if let eventValidationError = OptimoveEventValidator().validate(event: eventDecor, withConfig: config) {
-            OptiLoggerMessages.logReportEventFailed(
-                eventName: eventDecor.name,
-                eventValidationError: eventValidationError.localizedDescription
-            )
-            return
-        }
-
-        if RunningFlagsIndication.isComponentRunning(.optiTrack), config.supportedOnOptitrack {
-            OptiLoggerMessages.logOptitrackReport(event: eventDecor.name)
-            optiTrack.report(event: eventDecor, withConfigs: config)
-        } else {
-            OptiLoggerMessages.logOptiTrackNotRunning(eventName: eventDecor.name)
-        }
-
-        if RunningFlagsIndication.isComponentRunning(.realtime) {
-            if config.supportedOnRealTime {
-                OptiLoggerMessages.logRealtimeReportEvent(eventName: eventDecor.name)
-                realTime.report(event: eventDecor, config: config)
-            } else {
-                OptiLoggerMessages.logEventNotsupportedOnRealtime(eventName: eventDecor.name)
+            // FIXME: Handle it in a different way. If needed
+            if !RunningFlagsIndication.isComponentRunning(.realtime) {
+                if event.name == OptimoveKeys.Configuration.setUserId.rawValue {
+                    storage.realtimeSetUserIdFailed = true
+                } else if event.name == OptimoveKeys.Configuration.setEmail.rawValue {
+                    storage.realtimeSetEmailFailed = true
+                }
             }
-        } else {
-            OptiLoggerMessages.logRealtimeNotrunning(eventName: eventDecor.name)
-            if eventDecor.name == OptimoveKeys.Configuration.setUserId.rawValue {
-                storage.realtimeSetUserIdFailed = true
-            } else if eventDecor.name == OptimoveKeys.Configuration.setEmail.rawValue {
-                storage.realtimeSetEmailFailed = true
-            }
+        } catch {
+            Logger.error(error.localizedDescription)
         }
     }
 
     @objc public func reportEvent(name: String, parameters: [String: Any]) {
         let customEvent = SimpleCustomEvent(name: name, parameters: parameters)
-        self.reportEvent(customEvent)
+        reportEvent(customEvent)
     }
 
 }
@@ -466,11 +348,11 @@ extension Optimove {
     @objc public func setUserId(_ sdkId: String) {
         let userId = sdkId.trimmingCharacters(in: .whitespaces)
         guard isValid(userId: userId) else {
-            OptiLoggerMessages.logUserIdNotValid(userID: userId)
+            Logger.error("Optimove: User id '\(userId)' is not valid.")
             return
         }
 
-        //TODO: Move to Optipush
+        //TODO: Move to Optipush?
         if storage.customerID == nil {
             storage.isFirstConversion = true
         } else if userId != storage.customerID {
@@ -486,7 +368,7 @@ extension Optimove {
                 storage.isFirstConversion = false
             }
         } else {
-            OptiLoggerMessages.logUserIdNotNew(userId: userId)
+            Logger.warn("Optimove: User id '\(userId)' was already set in.")
             return
         }
         storage.isRegistrationSuccess = false
@@ -497,26 +379,14 @@ extension Optimove {
         storage.visitorID = updatedVisitorId
         storage.customerID = userId
 
-        if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            self.optiTrack.setUserId(userId)
-        } else {
-            OptiLoggerMessages.logOptitrackNotRunningForSetUserId()
-            //Retry done inside optitrack module
-        }
-
+        components.setUserId(userId)
         let setUserIdEvent = SetUserIdEvent(
             originalVistorId: initialVisitorId,
             userId: userId,
             updateVisitorId: storage.visitorID!
         )
         reportEvent(setUserIdEvent)
-
-        if RunningFlagsIndication.isComponentRunning(.optiPush) {
-            self.optiPush.performRegistration()
-        } else {
-            OptiLoggerMessages.logOptipushNOtRunningForRegistration()
-            // Retry handled inside optipush
-        }
+        components.performRegistration()
     }
 
     /// Produce a 16 characters string represents the visitor ID of the client
@@ -544,8 +414,8 @@ extension Optimove {
     ///   - sdkId: The user ID
     ///   - email: The user email
     @objc public func registerUser(sdkId: String, email: String) {
-        self.setUserId(sdkId)
-        self.setUserEmail(email: email)
+        setUserId(sdkId)
+        setUserEmail(email: email)
     }
 
     /// Call for the SDK to send the user email to its components
@@ -553,7 +423,7 @@ extension Optimove {
     /// - Parameter email: The user email
     @objc public func setUserEmail(email: String) {
         guard isValid(email: email) else {
-            OptiLoggerMessages.logEmailNotValid()
+            Logger.error("Optimove: Email is not valid")
             return
         }
         storage.userEmail = email
@@ -582,9 +452,9 @@ extension Optimove {
     // MARK: - Report screen visit
 
     @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
-        OptiLoggerMessages.logReportScreen()
+        Logger.debug("User ask to report screen event.")
         guard !screenTitle.trimmingCharacters(in: .whitespaces).isEmpty else {
-            OptiLoggerMessages.logReportScreenWithEmptyTitleError()
+            Logger.error("Trying to report screen visit with empty title")
             return
         }
         let path = screenPathArray.joined(separator: "/")
@@ -595,11 +465,11 @@ extension Optimove {
         let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
         var screenPath = screenPath.trimmingCharacters(in: .whitespaces)
         guard !screenTitle.isEmpty else {
-            OptiLoggerMessages.logReportScreenWithEmptyTitleError()
+            Logger.error("Trying to report screen visit with empty title")
             return
         }
         guard !screenPath.isEmpty else {
-            OptiLoggerMessages.logReportScreenWithEmptyScreenPath()
+            Logger.error("Trying to report screen visit with empty path")
             return
         }
 
@@ -614,21 +484,11 @@ extension Optimove {
 
             path = "\(Bundle.main.bundleIdentifier!)/\(path)".lowercased()
 
-            // TODO: Handle it
-            if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-                try? optiTrack.reportScreenEvent(
-                    screenTitle: screenTitle,
-                    screenPath: path, category:
-                    screenCategory
-                )
-            }
-            if RunningFlagsIndication.isComponentRunning(.realtime) {
-                try? realTime.reportScreenEvent(
-                    customURL: path,
-                    pageTitle: screenTitle,
-                    category: screenCategory
-                )
-            }
+            try? components.reportScreenEvent(
+                customURL: path,
+                pageTitle: screenTitle,
+                category: screenCategory
+            )
         }
     }
 
@@ -642,4 +502,55 @@ extension Optimove {
         }
         return result
     }
+}
+
+private extension Optimove {
+
+    // MARK: - Private Methods
+
+    /// Stores the user information that was provided during configuration.
+    ///
+    /// - Parameter info: user unique info
+    func storeTenantInfo(_ info: OptimoveTenantInfo) {
+        storage.tenantToken = info.tenantToken
+        storage.version = info.configName
+        storage.configurationEndPoint = Endpoints.Remote.TenantConfig.url
+
+        Logger.debug(
+            """
+            Stored user info in local storage:
+            token: \(info.tenantToken)
+            version: \(info.configName)
+            end point: \(Endpoints.Remote.TenantConfig.url.absoluteString)
+            """
+        )
+    }
+
+    func configureLogger() {
+        MultiplexLoggerStream.add(stream: ConsoleLoggerStream())
+        if SDK.isStaging {
+            MultiplexLoggerStream.add(stream: RemoteLoggerStream(tenantId: storage.siteID ?? -1))
+        }
+    }
+
+    func setup() {
+        setUserAgent()
+        setVisitorIdIfNeeded()
+    }
+
+    func setUserAgent() {
+        storage.userAgent = SDKDevice.evaluateUserAgent()
+    }
+
+    func setVisitorIdIfNeeded() {
+        if storage.visitorID == nil {
+            let uuid = UUID().uuidString
+            let sanitizedUUID = uuid.replacingOccurrences(of: "-", with: "")
+            let start = sanitizedUUID.startIndex
+            let end = sanitizedUUID.index(start, offsetBy: 16)
+            storage.initialVisitorId = String(sanitizedUUID[start..<end]).lowercased()
+            storage.visitorID = storage.initialVisitorId
+        }
+    }
+
 }

@@ -1,4 +1,7 @@
+//  Copyright © 2019 Optimove. All rights reserved.
+
 import FirebaseCore
+import OptimoveCore
 
 final class FirebaseOptionsBuilder {
 

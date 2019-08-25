@@ -1,4 +1,4 @@
-// Copiright 2017 Optimove
+//  Copyright © 2017 Optimove. All rights reserved.
 
 enum MbaasOperation: String, Codable, CaseIterable {
     case registration = "registration_data"

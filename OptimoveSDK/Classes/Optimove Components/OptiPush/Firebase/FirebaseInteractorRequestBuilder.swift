@@ -1,6 +1,7 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 final class FirebaseInteractorRequestBuilder {
 
@@ -10,18 +11,16 @@ final class FirebaseInteractorRequestBuilder {
     }
 
     private let storage: OptimoveStorage
-    private let metaDataProvider: MetaDataProvider<OptipushMetaData>
+    private let configuration: OptipushConfig
 
     init(storage: OptimoveStorage,
-         metaDataProvider: MetaDataProvider<OptipushMetaData>) {
+         configuration: OptipushConfig) {
         self.storage = storage
-        self.metaDataProvider = metaDataProvider
+        self.configuration = configuration
     }
 
-
     func createUnsubscribeRequest(topic: String) throws -> NetworkRequest {
-        let metaData = try metaDataProvider.getMetaData()
-        let baseURL = metaData.pushTopicsRegistrationEndpoint.appendingPathComponent(Path.unregister)
+        let baseURL = configuration.pushTopicsRegistrationEndpoint.appendingPathComponent(Path.unregister)
         let body = RequestBody(
             fcmToken: try storage.getFcmToken(),
             topics: [topic]
@@ -30,8 +29,7 @@ final class FirebaseInteractorRequestBuilder {
     }
 
     func createSubscribeRequest(topic: String) throws -> NetworkRequest {
-        let metaData = try metaDataProvider.getMetaData()
-        let baseURL = metaData.pushTopicsRegistrationEndpoint.appendingPathComponent(Path.register)
+        let baseURL = configuration.pushTopicsRegistrationEndpoint.appendingPathComponent(Path.register)
         let body = RequestBody(
             fcmToken: try storage.getFcmToken(),
             topics: [topic]

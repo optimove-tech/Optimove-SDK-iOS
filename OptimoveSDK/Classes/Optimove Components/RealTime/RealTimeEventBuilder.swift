@@ -1,21 +1,17 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 final class RealTimeEventBuilder {
 
-    private let metaDataProvider: MetaDataProvider<RealtimeMetaData>
     private let storage: OptimoveStorage
 
-    init(metaDataProvider: MetaDataProvider<RealtimeMetaData>,
-         storage: OptimoveStorage) {
-        self.metaDataProvider = metaDataProvider
+    init(storage: OptimoveStorage) {
         self.storage = storage
     }
 
-    func createEvent(context: RealTimeEventContext) throws -> RealtimeEvent {
-        let metaData = try metaDataProvider.getMetaData()
-        let realtimeToken: String = metaData.realtimeToken
+    func createEvent(context: RealTimeEventContext, realtimeToken: String) throws -> RealtimeEvent {
         let customerID: String? = storage[.customerID]
         let visitorID: String? = context.type == .setUserID ? storage[.initialVisitorId] : storage[.visitorID]
 

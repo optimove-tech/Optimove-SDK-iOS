@@ -1,4 +1,4 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
 
@@ -33,7 +33,7 @@ struct TrackerEvent: Codable {
 
     let dimensions: [CustomDimension]
 
-    let customTrackingParameters: [String:String]
+    let customTrackingParameters: [String: String]
 }
 
 extension TrackerEvent {

@@ -1,6 +1,7 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 protocol MbaasBackup {
     func backup<T: BaseMbaasModel>(_ model: T) throws
@@ -51,7 +52,7 @@ extension MbaasBackupImpl: MbaasBackup {
 
     func clearLast(for operation: MbaasOperation) throws {
         let path = getStoragePath(for: operation)
-        if try storage.isExist(fileName: path, shared: false) {
+        if storage.isExist(fileName: path, shared: false) {
             try storage.delete(fileName: path, shared: false)
         }
     }

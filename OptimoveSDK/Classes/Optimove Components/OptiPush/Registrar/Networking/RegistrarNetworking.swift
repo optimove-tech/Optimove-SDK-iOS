@@ -1,6 +1,7 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 protocol RegistrarNetworking {
     func sendToMbaas(model: BaseMbaasModel, completion: @escaping (Result<String, Error>) -> Void)
@@ -25,7 +26,7 @@ extension RegistrarNetworkingImpl: RegistrarNetworking {
         do {
             let request = try requestBuilder.createRequest(model: model)
             if let httpBody = request.httpBody, let json = String(data: httpBody, encoding: .utf8) {
-                OptiLoggerMessages.logSendMbaasRequest(url: request.baseURL, json: json)
+                Logger.debug("OptiPush: Send request \(model.operation.rawValue) to \(request.baseURL) payload \(json)")
             }
             networkClient.perform(request) { (result) in
                 completion(
@@ -33,15 +34,11 @@ extension RegistrarNetworkingImpl: RegistrarNetworking {
                         do {
                             let data = try result.get().unwrap()
                             let string: String = try cast(String(data: data, encoding: .utf8))
-                            OptiLoggerMessages.logMbaasResponse(
-                                mbaasRequestOperation: model.operation.rawValue,
-                                response: string
-                            )
+                            Logger.debug("OptiPush: Request \(model.operation.rawValue) success. Response: \(string)")
                             return string
                         } catch {
-                            OptiLoggerMessages.logMbaasRequestError(
-                                mbaasRequestOperation: model.operation.rawValue,
-                                errorDescription: error.localizedDescription
+                            Logger.error(
+                                "OptiPush: Request \(model.operation.rawValue) failed. Reason: \(error.localizedDescription)"
                             )
                             throw error
                         }

@@ -1,6 +1,7 @@
-//  Copyright © 2017 Optimove
+//  Copyright © 2017 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 protocol Registrable {
     func register()
@@ -25,10 +26,6 @@ final class Registrar {
         self.modelFactory = modelFactory
         self.networking = networking
         self.backup = backup
-
-        // WTF?
-        OptiLoggerMessages.logRegistrarInitializtionStart()
-        OptiLoggerMessages.logRegistrarInitializtionFinish()
     }
 
 }
@@ -74,30 +71,30 @@ private extension Registrar {
             let model = try modelFactory.createModel(for: operation)
             networking.sendToMbaas(model: model) { [weak self] (result) in
                 switch result {
-                case .success(_):
+                case .success:
                     self?.handleSuccessMbaasModel(model)
-                case .failure(_):
+                case .failure:
                     self?.handleFailedMbaasModel(model)
                 }
                 completion?()
             }
         } catch {
-            OptiLoggerMessages.logJsonBuildFailure(mbaasRequestOperation: error.localizedDescription)
+            Logger.error("OptiPush: Could not build JSON object. Reason: \(error.localizedDescription)")
         }
     }
 
     func retryFailedOperation(with model: BaseMbaasModel) {
         networking.sendToMbaas(model: model) { [weak self] (result) in
             switch result {
-            case .success(_):
+            case .success:
                 self?.handleSuccessMbaasModel(model)
 
                 /// Helps prevent to keeping an old fcm token at server side, only for retry.
                 if model.operation == .unregistration {
                     self?.register()
                 }
-            case .failure(_):
-                OptiLoggerMessages.logRetryFailed()
+            case let .failure(error):
+                Logger.error("OptiPush: Retry request failed. Reason: \(error.localizedDescription)")
             }
         }
     }
@@ -107,7 +104,7 @@ private extension Registrar {
             try backup.backup(model)
             setSuccesFlag(succeed: false, for: model.operation)
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 
@@ -119,7 +116,7 @@ private extension Registrar {
                 storage.isMbaasOptIn = true
             }
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 

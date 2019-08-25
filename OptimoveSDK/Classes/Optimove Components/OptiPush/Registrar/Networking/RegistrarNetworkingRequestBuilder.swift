@@ -1,6 +1,7 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 final class RegistrarNetworkingRequestBuilder {
 
@@ -19,13 +20,13 @@ final class RegistrarNetworkingRequestBuilder {
     }
 
     private let storage: OptimoveStorage
-    private let metaData: OptipushMetaData
+    private let configuration: OptipushConfig
     private let encoder: JSONEncoder
 
     init(storage: OptimoveStorage,
-         metaData: OptipushMetaData) {
+         configuration: OptipushConfig) {
         self.storage = storage
-        self.metaData = metaData
+        self.configuration = configuration
         self.encoder = JSONEncoder()
     }
 
@@ -43,22 +44,22 @@ final class RegistrarNetworkingRequestBuilder {
     private func createURL(_ model: BaseMbaasModel) -> URL {
         let suffix: String = {
             switch model.userIdPayload {
-            case .visitorID(_):
+            case .visitorID:
                 return Constants.Path.Suffix.visitor
-            case .customerID(_):
+            case .customerID:
                 return Constants.Path.Suffix.customer
             }
         }()
-        switch model.operation {
-        case .registration:
-            return metaData.registrationServiceRegistrationEndPoint
-                .appendingPathComponent(Constants.Path.Operation.register + suffix)
-        case .unregistration:
-            return metaData.registrationServiceOtherEndPoint
-                .appendingPathComponent(Constants.Path.Operation.unregister + suffix)
-        case .optIn, .optOut:
-            return metaData.registrationServiceOtherEndPoint
-                .appendingPathComponent(Constants.Path.Operation.optInOut + suffix)
-        }
+        let path: String = {
+            switch model.operation {
+            case .registration:
+                return Constants.Path.Operation.register
+            case .unregistration:
+                return Constants.Path.Operation.unregister
+            case .optIn, .optOut:
+                return Constants.Path.Operation.optInOut
+            }
+        }()
+        return configuration.registrationServiceEndpoint.appendingPathComponent(path + suffix)
     }
 }
