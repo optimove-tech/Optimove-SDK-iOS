@@ -15,6 +15,7 @@ final class TenantConfigurationDownloader: AsyncOperation {
     }
 
     override func main() {
+        guard !self.isCancelled else { return }
         state = .executing
         networking.getTenantConfiguration { (result) in
             do {

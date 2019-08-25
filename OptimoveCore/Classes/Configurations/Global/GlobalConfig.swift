@@ -4,7 +4,7 @@ import Foundation
 
 // MARK: - GlobalConfig
 
-public struct GlobalConfig: Codable {
+public struct GlobalConfig: Codable, Equatable {
     public let general: GlobalGeneralConfig
     public let optitrack: GlobalOptitrackConfig
     public let optipush: GlobalOptipushConfig
@@ -45,7 +45,7 @@ public struct GlobalConfig: Codable {
 }
 
 // MARK: - General
-public struct GlobalGeneralConfig: Codable {
+public struct GlobalGeneralConfig: Codable, Equatable {
     public let logsServiceEndpoint: URL
 
     public init(logsServiceEndpoint: URL) {
@@ -58,7 +58,7 @@ public struct GlobalGeneralConfig: Codable {
 }
 
 // MARK: - Optipush
-public struct GlobalOptipushConfig: Codable {
+public struct GlobalOptipushConfig: Codable, Equatable {
     public let registrationServiceEndpoint: URL
 
     public init(registrationServiceEndpoint: URL) {
@@ -71,7 +71,7 @@ public struct GlobalOptipushConfig: Codable {
 }
 
 // MARK: - Optitrack
-public struct GlobalOptitrackConfig: Codable {
+public struct GlobalOptitrackConfig: Codable, Equatable {
     public let eventCategoryName: String
     public let customDimensionIDs: CustomDimensionIDs
 
@@ -87,7 +87,7 @@ public struct GlobalOptitrackConfig: Codable {
 }
 
 // MARK: - CustomDimensionIDS
-public struct CustomDimensionIDs: Codable {
+public struct CustomDimensionIDs: Codable, Equatable {
     public let eventIDCustomDimensionID: Int
     public let eventNameCustomDimensionID: Int
     public let visitCustomDimensionsStartID: Int

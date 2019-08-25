@@ -1,7 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
-@testable import OptimoveCore
+import OptimoveCore
 
 final class TenantConfigFixture {
 
@@ -62,7 +62,7 @@ final class TenantConfigFixture {
     func createTenantEventFixture() -> [String: EventsConfig] {
         return [
             StubEvent.Constnats.name: EventsConfig(
-                id: 2_000,
+                id: StubEvent.Constnats.id,
                 supportedOnOptitrack: true,
                 supportedOnRealTime: true,
                 parameters: [
@@ -70,6 +70,26 @@ final class TenantConfigFixture {
                         type: "String",
                         optiTrackDimensionId: 20,
                         optional: false
+                    ),
+                    "event_platform": Parameter(
+                        type: "String",
+                        optiTrackDimensionId: 11,
+                        optional: true
+                    ),
+                    "event_device_type": Parameter(
+                        type: "String",
+                        optiTrackDimensionId: 12,
+                        optional: true
+                    ),
+                    "event_os": Parameter(
+                        type: "String",
+                        optiTrackDimensionId: 13,
+                        optional: true
+                    ),
+                    "event_native_mobile": Parameter(
+                        type: "Boolean",
+                        optiTrackDimensionId: 14,
+                        optional: true
                     )
                 ]
             )

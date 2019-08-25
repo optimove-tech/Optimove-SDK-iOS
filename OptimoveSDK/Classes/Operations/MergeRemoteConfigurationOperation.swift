@@ -12,6 +12,7 @@ public final class MergeRemoteConfigurationOperation: AsyncOperation {
     }
 
     public override func main() {
+        guard !self.isCancelled else { return }
         state = .executing
         do {
             let globalConfig = try repository.getGlobal()

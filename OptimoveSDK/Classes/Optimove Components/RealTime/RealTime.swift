@@ -10,7 +10,6 @@ final class RealTime {
     private let realTimeQueue: DispatchQueue
     private let networking: RealTimeNetworking
     private let hanlder: RealTimeHanlder
-    private let warehouse: EventsConfigWarehouseProvider
     private var storage: OptimoveStorage
     private let eventBuilder: RealTimeEventBuilder
     private let coreEventFactory: CoreEventFactory
@@ -22,7 +21,6 @@ final class RealTime {
         configuration: RealtimeConfig,
         storage: OptimoveStorage,
         networking: RealTimeNetworking,
-        warehouse: EventsConfigWarehouseProvider,
         deviceStateMonitor: OptimoveDeviceStateMonitor,
         eventBuilder: RealTimeEventBuilder,
         handler: RealTimeHanlder,
@@ -30,7 +28,6 @@ final class RealTime {
         self.configuration = configuration
         self.storage = storage
         self.networking = networking
-        self.warehouse = warehouse
         self.realTimeQueue = DispatchQueue(
             label: "com.optimove.queue.realtime",
             qos: .utility
@@ -68,8 +65,8 @@ extension RealTime: Eventable {
         try? reportUserId()
     }
 
-    func report(event: OptimoveEvent, config: EventsConfig) {
-        report(event: event, config: config, retryFailedEvents: true)
+    func report(event: OptimoveEvent) throws {
+        try reportEvent(event: event, retryFailedEvents: true)
     }
 
     func reportScreenEvent(customURL: String,
@@ -81,7 +78,7 @@ extension RealTime: Eventable {
                        category: category
             )
         )
-        reportEvent(event: event)
+        try reportEvent(event: event)
     }
 
     func dispatchNow() {
@@ -92,23 +89,24 @@ extension RealTime: Eventable {
 
 extension RealTime {
 
-    func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) {
-        let event = OptimoveEventDecorator(event: event)
-        guard let config = obtainConfiguration(for: event) else { return }
+    func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) throws {
+        let event = OptimoveEventDecoratorFactory.getEventDecorator(forEvent: event)
+        let config = try obtainConfiguration(for: event)
+        try OptimoveEventValidator.validate(event: event, withConfig: config)
         event.processEventConfig(config)
         report(event: event, config: config, retryFailedEvents: retryFailedEvents)
     }
 
     func reportUserId() throws {
         let event = try coreEventFactory.createEvent(.setUserId)
-        reportEvent(event: event, retryFailedEvents: false)
+        try reportEvent(event: event, retryFailedEvents: false)
     }
 
-    func reportUserEmail(_ email: String) {
+    func reportUserEmail(_ email: String) throws {
         let event = SetUserEmailEvent(
             email: email
         )
-        reportEvent(event: event, retryFailedEvents: false)
+        try reportEvent(event: event, retryFailedEvents: false)
     }
 
     func isAllowToSendReport(completion: @escaping (Bool) -> Void) {
@@ -132,11 +130,9 @@ private extension RealTime {
 
     // MARK: Transforming an event
 
-    func obtainConfiguration(for event: OptimoveEvent) -> EventsConfig? {
-        guard let warehouse = try? warehouse.getWarehouse(),
-            let config = warehouse.getConfig(for: event) else {
-                Logger.error("Configurations are missing for event \(event.name)")
-                return nil
+    func obtainConfiguration(for event: OptimoveEvent) throws -> EventsConfig {
+        guard let config = configuration.events[event.name] else {
+            throw GuardError.custom("Configurations are missing for event \(event.name)")
         }
         return config
     }
@@ -197,7 +193,7 @@ private extension RealTime {
 
     func retrySetUserEmailIfNeeded() throws {
         if storage[.realtimeSetEmailFailed] ?? false {
-            reportUserEmail(try cast(storage[.userEmail]))
+            try reportUserEmail(try cast(storage[.userEmail]))
         }
     }
 

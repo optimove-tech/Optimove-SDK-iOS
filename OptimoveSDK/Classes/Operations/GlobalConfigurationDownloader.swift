@@ -14,6 +14,7 @@ final class GlobalConfigurationDownloader: AsyncOperation {
     }
 
     override func main() {
+        guard !self.isCancelled else { return }
         state = .executing
         networking.getGlobalConfiguration { result in
             do {

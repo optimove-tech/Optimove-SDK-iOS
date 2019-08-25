@@ -4,6 +4,7 @@ import Foundation
 
 extension Bundle {
 
+    /// https://stackoverflow.com/a/27849695
     static func extractHostAppBundle() -> Bundle? {
         let mainBundle = Bundle.main
         if mainBundle.bundleURL.pathExtension == "appex" {

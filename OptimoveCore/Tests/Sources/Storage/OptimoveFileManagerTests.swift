@@ -17,32 +17,6 @@ final class MockedFileManager: FileManager {
                        in domainMask: FileManager.SearchPathDomainMask) -> [URL] {
         return [sharedURL]
     }
-//
-//    override func fileExists(atPath path: String) -> Bool {
-//        return state[path] != nil
-//    }
-//
-//    override func contents(atPath path: String) -> Data? {
-//        return state[path]
-//    }
-//
-//    override func createDirectory(at url: URL,
-//                                  withIntermediateDirectories createIntermediates: Bool,
-//                                  attributes: [FileAttributeKey : Any]? = nil) throws {
-//        // Do nothing
-//    }
-//
-//    override func createFile(atPath path: String,
-//                             contents data: Data?,
-//                             attributes attr: [FileAttributeKey : Any]? = nil) -> Bool {
-//        state[path] = data
-//        return true
-//    }
-//
-//    override func removeItem(at URL: URL) throws {
-//        state[URL.absoluteString] = nil
-//    }
-
 }
 
 class OptimoveFileManagerTests: XCTestCase {

@@ -5,7 +5,6 @@ import OptimoveCore
 
 final class OptimoveSDKInitializer {
 
-    private let warehouseProvider: EventsConfigWarehouseProvider
     private let deviceStateMonitor: OptimoveDeviceStateMonitor
     private let storage: OptimoveStorage
     private let networking: RemoteConfigurationNetworking
@@ -22,14 +21,12 @@ final class OptimoveSDKInitializer {
     // MARK: - Construction
 
     init(deviceStateMonitor: OptimoveDeviceStateMonitor,
-         warehouseProvider: EventsConfigWarehouseProvider,
          storage: OptimoveStorage,
          networking: RemoteConfigurationNetworking,
          configurationRepository: ConfigurationRepository,
          componentFactory: ComponentFactory,
          componentsPool: MutableComponentsPool) {
         self.deviceStateMonitor = deviceStateMonitor
-        self.warehouseProvider = warehouseProvider
         self.storage = storage
         self.networking = networking
         self.configurationRepository = configurationRepository

@@ -9,8 +9,6 @@ final class OptiTrackComponentTests: XCTestCase {
     var optitrack: OptiTrack!
     var tracker: MockTracker!
     var storage: MockOptimoveStorage!
-    var warehouseProvider: EventsConfigWarehouseProvider!
-    var warehouse: StubOptimoveEventConfigsWarehouse!
     var deviceStateMonitor: StubOptimoveDeviceStateMonitor!
     var dateProvider: MockDateTimeProvider!
     var statisticService: MockStatisticService!
@@ -20,8 +18,6 @@ final class OptiTrackComponentTests: XCTestCase {
 
         storage = MockOptimoveStorage()
         deviceStateMonitor = StubOptimoveDeviceStateMonitor()
-        warehouseProvider = EventsConfigWarehouseProvider()
-        warehouse = StubOptimoveEventConfigsWarehouse()
         tracker = MockTracker()
         dateProvider = MockDateTimeProvider()
         statisticService = MockStatisticService()
@@ -38,13 +34,6 @@ final class OptiTrackComponentTests: XCTestCase {
             statisticService: statisticService,
             tracker: tracker
         )
-        warehouse.config = EventsConfig(
-            id: Int(Int16.max),
-            supportedOnOptitrack: true,
-            supportedOnRealTime: false,
-            parameters: [:]
-        )
-        warehouseProvider.setWarehouse(warehouse)
     }
 
     override func tearDown() {
@@ -100,7 +89,7 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         // when
-        optitrack.report(event: stubEvent)
+        try! optitrack.report(event: stubEvent)
         wait(for: [trackEventExpectation], timeout: expectationTimeout, enforceOrder: true)
     }
 
@@ -218,52 +207,6 @@ final class OptiTrackComponentTests: XCTestCase {
         ]
 
         let expectedDimensions = sdkVersionDimensions.merging(coreParameters) { (current, _) in current }
-
-        // and
-        warehouse.addParameters(
-            [
-                MetaDataEvent.Constants.Key.sdkPlatform: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 8,
-                    optional: false
-                ),
-                MetaDataEvent.Constants.Key.sdkVersion: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 9,
-                    optional: false
-                ),
-                MetaDataEvent.Constants.Key.configFileURL: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 10,
-                    optional: false
-                ),
-                MetaDataEvent.Constants.Key.appNS: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 11,
-                    optional: false
-                ),
-                OptimoveKeys.AdditionalAttributesKeys.eventPlatform: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 12,
-                    optional: false
-                ),
-                OptimoveKeys.AdditionalAttributesKeys.eventDeviceType: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 13,
-                    optional: false
-                ),
-                OptimoveKeys.AdditionalAttributesKeys.eventOs: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 14,
-                    optional: false
-                ),
-                OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile: Parameter(
-                    type: StubVariables.string,
-                    optiTrackDimensionId: 15,
-                    optional: false
-                )
-            ]
-        )
 
         // then
         let trackEventExpectation = expectation(description: "SdkVersion report haven't expected count of dimensions.")

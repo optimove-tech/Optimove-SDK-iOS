@@ -37,9 +37,9 @@ extension ComponentsPoolImpl: Eventable {
         }
     }
 
-    func report(event: OptimoveEvent, config: EventsConfig) {
-        eventableComponents.forEach { component in
-            component.report(event: event, config: config)
+    func report(event: OptimoveEvent) throws {
+        try eventableComponents.forEach { component in
+            try component.report(event: event)
         }
         // TODO: Handle by checking `eventableComponents.isEmpty` after the logger refactoring will be completed.
         if !RunningFlagsIndication.isComponentRunning(.optiTrack) {

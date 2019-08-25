@@ -1,6 +1,6 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
-public struct TenantConfig: Codable {
+public struct TenantConfig: Codable, Equatable {
     public let realtime: TenantRealtimeConfig
     public var optitrack: TenantOptitrackConfig
     public let optipush: TenantOptipushConfig
