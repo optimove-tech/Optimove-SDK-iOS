@@ -19,12 +19,12 @@ public final class RemoteConfigurationRequestBuilder {
             .appendingPathComponent(tenantToken)
             .appendingPathComponent(version)
             .appendingPathExtension("json")
-        OptiLoggerMessages.logPathToRemoteConfiguration(path: url.absoluteString)
+        Logger.debug("Connect to \(url.absoluteString) to retreive configuration file.")
         return NetworkRequest(method: .get, baseURL: url)
     }
 
     public func createGlobalConfigurationsRequest() -> NetworkRequest {
-        return NetworkRequest(method: .get, baseURL: Endpoints.Remote.GlobalConfig.url(.prod))
+        return NetworkRequest(method: .get, baseURL: Endpoints.Remote.GlobalConfig.url(SDK.environment))
     }
 
 }

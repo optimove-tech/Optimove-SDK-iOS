@@ -15,13 +15,14 @@ final class TenantConfigurationDownloader: AsyncOperation {
     }
 
     override func main() {
+        guard !self.isCancelled else { return }
         state = .executing
         networking.getTenantConfiguration { (result) in
             do {
                 let tenant = try result.get()
                 try self.repository.saveTenant(tenant)
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
             self.state = .finished
         }

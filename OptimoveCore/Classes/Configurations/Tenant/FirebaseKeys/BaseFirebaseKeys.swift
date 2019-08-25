@@ -58,3 +58,15 @@ extension BaseFirebaseKeys {
         case clientsServiceProjectKeys
     }
 }
+
+extension BaseFirebaseKeys: Equatable {
+
+    public static func == (lhs: BaseFirebaseKeys, rhs: BaseFirebaseKeys) -> Bool {
+        return lhs.webApiKey == rhs.webApiKey &&
+            lhs.dbUrl == rhs.dbUrl &&
+            lhs.senderId == rhs.senderId &&
+            lhs.storageBucket == rhs.storageBucket &&
+            lhs.projectId == rhs.projectId
+    }
+
+}

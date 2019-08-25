@@ -96,6 +96,16 @@ public struct TriggeredNotificationCampaign: NotificationCampaign {
     public let actionID: Int
     public let templateID: Int
 
+    public init(
+        actionSerial: Int,
+        actionID: Int,
+        templateID: Int
+    ) {
+        self.actionSerial = actionSerial
+        self.actionID = actionID
+        self.templateID = templateID
+    }
+
     enum CodingKeys: String, CodingKey {
         case actionSerial = "action_serial"
         case actionID = "action_id"
@@ -118,6 +128,20 @@ public struct ScheduledNotificationCampaign: NotificationCampaign {
     public let templateID: Int
     public let engagementID: Int
     public let campaignType: Int
+
+    public init(
+        campaignID: Int,
+        actionSerial: Int,
+        templateID: Int,
+        engagementID: Int,
+        campaignType: Int
+    ) {
+        self.campaignID = campaignID
+        self.actionSerial = actionSerial
+        self.templateID = templateID
+        self.engagementID = engagementID
+        self.campaignType = campaignType
+    }
 
     enum CodingKeys: String, CodingKey {
         case campaignID = "campaign_id"

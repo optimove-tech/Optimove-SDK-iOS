@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import UserNotifications
+import OptimoveCore
 
 public enum OptimoveDeviceRequirement: Int, CaseIterable, CustomStringConvertible {
     case internet = 0
@@ -88,17 +89,15 @@ extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
 private extension OptimoveDeviceStateMonitorImpl {
 
     func requestStatus(for requiredService: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool) {
-        OptiLoggerMessages.logDeviceRequirementNil(requiredService: requiredService)
-        OptiLoggerMessages.logRegisterToReceiveRequirementStatus(requiredService: requiredService)
+        Logger.debug("Status for Device requirement '\(requiredService.description)' enqueued.")
         if requests[requiredService] == nil {
             requests[requiredService] = [completion]
         } else {
             requests[requiredService]?.append(completion)
         }
-        OptiLoggerMessages.logGetStatusOf(requiredService: requiredService)
         let fetcher = getFetcher(for: requiredService)
         fetcher.fetch { [weak self] (status) in
-            OptiLoggerMessages.logRequirementtatus(deviceRequirement: requiredService, status: status)
+            Logger.info("Device requirement '\(requiredService.description)', status: '\(status)'")
             self?.handleFetcherResult(deviceRequirement: requiredService, status: status)
         }
     }

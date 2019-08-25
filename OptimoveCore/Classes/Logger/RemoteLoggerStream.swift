@@ -2,22 +2,28 @@
 
 import Foundation
 
-final class RemoteLoggerStream: MutableLoggerStream {
+public final class RemoteLoggerStream: MutableLoggerStream {
 
-    var policy: LoggerStreamPolicy = .all
+    public var policy: LoggerStreamPolicy = .all
 
-    var tenantId: Int
-    var endpoint: URL = Endpoints.Logger.defaultEndpint
+    public var tenantId: Int
+    public var endpoint: URL = Endpoints.Logger.defaultEndpint
 
     private let appNs: String
     private let platform: SdkPlatform = .ios
 
-    init(tenantId: Int) {
+    public init(tenantId: Int) {
         self.tenantId = tenantId
         self.appNs = Bundle.main.bundleIdentifier!
     }
 
-    func log(level: LogLevel, fileName: String, methodName: String, logModule: String?, message: String) {
+    public func log(
+        level: LogLevelCore,
+        fileName: String,
+        methodName: String,
+        logModule: String?,
+        message: String
+    ) {
         let data = LogBody(
             tenantId: self.tenantId,
             appNs: self.appNs,

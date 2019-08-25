@@ -5,7 +5,6 @@ import OptimoveCore
 
 final class OptimoveSDKInitializer {
 
-    private let warehouseProvider: EventsConfigWarehouseProvider
     private let deviceStateMonitor: OptimoveDeviceStateMonitor
     private let storage: OptimoveStorage
     private let networking: RemoteConfigurationNetworking
@@ -22,27 +21,24 @@ final class OptimoveSDKInitializer {
     // MARK: - Construction
 
     init(deviceStateMonitor: OptimoveDeviceStateMonitor,
-         warehouseProvider: EventsConfigWarehouseProvider,
          storage: OptimoveStorage,
          networking: RemoteConfigurationNetworking,
          configurationRepository: ConfigurationRepository,
          componentFactory: ComponentFactory,
          componentsPool: MutableComponentsPool) {
-        OptiLoggerMessages.logInitializtionOfInsitalizerStart()
         self.deviceStateMonitor = deviceStateMonitor
-        self.warehouseProvider = warehouseProvider
         self.storage = storage
         self.networking = networking
         self.configurationRepository = configurationRepository
         self.componentFactory = componentFactory
         self.components = componentsPool
-        OptiLoggerMessages.logInitializerInitializtionFinish()
     }
 
     // MARK: - API
 
     func initializeFromRemoteServer(completion: @escaping ResultBlockWithBool) {
         warmupDeviceStateMonitor()
+        Logger.info("Start initializtion from remote configurations.")
         deviceStateMonitor.getStatus(for: .internet) { (available) in
             if available {
                 self.handleFetchConfigurationFromRemote(completion: completion)
@@ -55,7 +51,7 @@ final class OptimoveSDKInitializer {
     /// When the SDK is initialized by a push notification start the initialization from the local JSON file.
     func initializeFromLocalConfigs(completion: @escaping ResultBlockWithBool) {
         warmupDeviceStateMonitor()
-        OptiLoggerMessages.logStartOfLocalInitializtion()
+        Logger.info("Start initializtion from local configurations.")
         handleFetchConfigurationFromLocal(didComplete: completion)
     }
 
@@ -92,7 +88,7 @@ private extension OptimoveSDKInitializer {
                 let configuration = try self.configurationRepository.getConfiguration()
                 self.initialize(configuration, completion: completion)
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
                 completion(false)
             }
         }
@@ -109,12 +105,12 @@ private extension OptimoveSDKInitializer {
     func handleFetchConfigurationFromLocal(didComplete: @escaping ResultBlockWithBool) {
         do {
             let configuration = try configurationRepository.getConfiguration()
-            OptiLoggerMessages.logLocalConfigFileFetchSuccess()
-            OptiLoggerMessages.logSetupCopmponentsFromLocalConfiguraitonStart()
+            Logger.debug("Setup components from local configuration file.")
             initialize(configuration, completion: didComplete)
         } catch {
-            OptiLoggerMessages.logLocalFetchFailure()
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(
+                "Local configuration file could not be parsed. Reason: \(error.localizedDescription)"
+            )
             didComplete(false)
         }
     }
@@ -126,14 +122,14 @@ private extension OptimoveSDKInitializer {
 
     func setupOptimoveComponents(from config: Configuration, completion: @escaping ResultBlockWithBool) {
         guard RunningFlagsIndication.isSdkNeedInitializing() else {
-            OptiLoggerMessages.logSdkAlreadyRunning()
+            Logger.debug("SDK already running, skip initialization before lock.")
             return
         }
         RunningFlagsIndication.isInitializerRunning = true
         initializeOptitrack()
         initializeOptipush()
         initializeRealtime()
-        OptiLoggerMessages.logSuccessfulyFinishOfComponentsSetup()
+        Logger.info("All components setup finished.")
         completion(didFinishSdkInitializtionSucceesfully())
     }
 
@@ -142,7 +138,7 @@ private extension OptimoveSDKInitializer {
             components.addPushableComponent(try componentFactory.createOptipushComponent())
             RunningFlagsIndication.setComponentRunningFlag(component: .optiPush, state: true)
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 
@@ -151,7 +147,7 @@ private extension OptimoveSDKInitializer {
             components.addEventableComponent(try componentFactory.createOptitrackComponent())
             RunningFlagsIndication.setComponentRunningFlag(component: .optiTrack, state: true)
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 
@@ -160,7 +156,7 @@ private extension OptimoveSDKInitializer {
             components.addEventableComponent(try componentFactory.createRealtimeComponent())
             RunningFlagsIndication.setComponentRunningFlag(component: .realtime, state: true)
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 
@@ -183,11 +179,9 @@ extension OptimoveSDKInitializer {
     }
 
     func updateLoggerStreamContainers(_ config: Configuration) {
-        OptiLoggerStreamsContainer.outputStreams.values
-            .compactMap { $0 as? MutableOptiLoggerOutputStream }
-            .forEach { logger in
-                logger.tenantId = config.tenantID
-                logger.endpoint = config.logger.logServiceEndpoint
-            }
+        MultiplexLoggerStream.mutateStreams { logger in
+            logger.tenantId = config.tenantID
+            logger.endpoint = config.logger.logServiceEndpoint
+        }
     }
 }

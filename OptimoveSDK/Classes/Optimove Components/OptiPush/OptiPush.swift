@@ -107,7 +107,7 @@ extension OptiPush: OptimoveMbaasRegistrationHandling {
 private extension OptiPush {
 
     func handleFcmTokenReceivedForTheFirstTime(_ token: String) {
-        OptiLoggerMessages.logClientreceiveFcmTOkenForTheFirstTime()
+        Logger.debug("OptiPush: Client receive a token for the first time.")
         storage.fcmToken = token
         performRegistration()
         firebaseInteractor.subscribeToTopics(didSucceed: nil)
@@ -133,25 +133,21 @@ private extension OptiPush {
         }
     }
 
-    func handleNotificationAuthorizedAtFirstLaunch() {
-        OptiLoggerMessages.logUserOptOPutFirstTime()
-        storage.isMbaasOptIn = true
-    }
-
     func handleNotificationAuthorized() {
-        OptiLoggerMessages.logUserNotificationAuthorizedByUser()
+        Logger.info("OptiPush: User authorized notifications.")
         guard let isOptIn = storage.isMbaasOptIn else {  //Opt in on first launch
-            handleNotificationAuthorizedAtFirstLaunch()
+            Logger.debug("OptiPush: User authorized notifications for the first time.")
+            storage.isMbaasOptIn = true
             return
         }
         if !isOptIn {
-            OptiLoggerMessages.logOptinRequest()
+            Logger.debug("OptiPush: SDK make opt IN request.")
             registrar.optIn()
         }
     }
 
     func handleNotificationRejection() {
-        OptiLoggerMessages.logUserNotificationRejectedByUser()
+        Logger.warn("OptiPush: User UNauthorized notifications.")
 
         guard let isOptIn = storage.isMbaasOptIn else {
             //Opt out on first launch
@@ -159,14 +155,14 @@ private extension OptiPush {
             return
         }
         if isOptIn {
-            OptiLoggerMessages.logOptoutRequest()
+            Logger.debug("OptiPush: SDK make opt OUT request.")
             registrar.optOut()
             storage.isMbaasOptIn = false
         }
     }
 
     func handleNotificationRejectionAtFirstLaunch() {
-        OptiLoggerMessages.logOptOutFirstLaunch()
+        Logger.debug("OptiPush: User opt OUT at first launch.")
         guard storage.fcmToken != nil else {
             storage.isMbaasOptIn = false
             return

@@ -7,7 +7,7 @@ public struct LogBody {
     let appNs: String
     let sdkEnv: Environment
     let sdkPlatform: SdkPlatform
-    let level: LogLevel
+    let level: LogLevelCore
     let logModule: String?
     let logFileName: String?
     let logMethodName: String?
@@ -18,7 +18,7 @@ public struct LogBody {
         appNs: String,
         sdkEnv: Environment,
         sdkPlatform: SdkPlatform,
-        level: LogLevel,
+        level: LogLevelCore,
         logModule: String?,
         logFileName: String?,
         logMethodName: String?,

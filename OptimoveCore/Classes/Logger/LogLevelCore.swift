@@ -2,7 +2,7 @@
 
 import Foundation
 
-@objc public enum LogLevel: Int  {
+@objc public enum LogLevelCore: Int  {
 
     case debug = 0
     case info = 1
@@ -26,14 +26,14 @@ import Foundation
 
 }
 
-extension LogLevel: Comparable {
+extension LogLevelCore: Comparable {
 
-    public static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
+    public static func < (lhs: LogLevelCore, rhs: LogLevelCore) -> Bool {
         return lhs.rawValue < rhs.rawValue
     }
 }
 
-extension LogLevel: Codable {
+extension LogLevelCore: Codable {
 
     enum CodingKeys: String, CodingKey {
         case debug

@@ -14,13 +14,14 @@ final class GlobalConfigurationDownloader: AsyncOperation {
     }
 
     override func main() {
+        guard !self.isCancelled else { return }
         state = .executing
         networking.getGlobalConfiguration { result in
             do {
                 let global = try result.get()
                 try self.repository.saveGlobal(global)
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
             self.state = .finished
         }

@@ -57,7 +57,7 @@ final class OptiTrack {
             trackAppOpened()
             observeEnterToBackgroundMode()
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 }
@@ -65,11 +65,15 @@ final class OptiTrack {
 extension OptiTrack: Eventable {
 
     func setUserId(_ userId: String) {
-        OptiLoggerMessages.logOptitrackSetUserID(userId: userId)
+        Logger.info("OptiTrack: Set user id \(userId)")
         tracker.userId = userId
     }
 
-    func report(event: OptimoveEvent, config: EventsConfig) {
+    func report(event: OptimoveEvent) throws {
+        let event = OptimoveEventDecoratorFactory.getEventDecorator(forEvent: event)
+        let config = try obtainConfiguration(for: event)
+        try OptimoveEventValidator.validate(event: event, withConfig: config)
+        event.processEventConfig(config)
         guard config.supportedOnOptitrack else { return }
         eventReportingQueue.async {
             self.sendReport(event: event, config: config)
@@ -77,7 +81,7 @@ extension OptiTrack: Eventable {
     }
 
     func reportScreenEvent(customURL: String, pageTitle: String, category: String?) throws {
-        OptiLoggerMessages.logReportScreenEvent(screenTitle: pageTitle)
+        Logger.debug("OptiTrack: Report screen event: title='\(pageTitle)', path='\(customURL)'")
         tracker.track(view: [customURL], url: URL(string: "http://\(customURL)"))
 
         let event = try coreEventFactory.createEvent(
@@ -86,15 +90,15 @@ extension OptiTrack: Eventable {
                        category: category
             )
         )
-        report(event: event)
+        try report(event: event)
     }
 
     func dispatchNow() {
         if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            OptiLoggerMessages.logOptitrackDispatchRequest()
+            Logger.debug("OptiTrack: User asked to dispatch.")
             tracker.dispatch()
         } else {
-            OptiLoggerMessages.logOptitrackNotRunning()
+            Logger.error("OptiTrack: Unable to dispatch. Reason: Component is not running.")
         }
     }
 
@@ -104,21 +108,17 @@ extension OptiTrack {
 
     // MARK: - Report
 
-    func report(event: OptimoveEvent) {
-        let event = OptimoveEventDecorator(event: event)
+    func obtainConfiguration(for event: OptimoveEvent) throws -> EventsConfig {
         guard let config = configuration.events[event.name] else {
-            OptiLoggerMessages.logConfugurationForEventMissing(eventName: event.name)
-            return
+            throw GuardError.custom("Configurations are missing for event \(event.name)")
         }
-        OptiLoggerMessages.logOptitrackReport(event: event.name)
-        event.processEventConfig(config)
-        report(event: event, config: config)
+        return config
     }
 
     func reportScreenEvent(screenTitle: String,
                            screenPath: String,
                            category: String? = nil) throws {
-        OptiLoggerMessages.logReportScreenEvent(screenTitle: screenTitle)
+        Logger.debug("OptiTrack: Report screen event: title='\(screenTitle)', path='\(screenPath)'")
         tracker.track(view: [screenTitle], url: URL(string: "http://\(screenPath)"))
 
         let event = try coreEventFactory.createEvent(
@@ -127,7 +127,7 @@ extension OptiTrack {
                        category: category
             )
         )
-        report(event: event)
+        try report(event: event)
     }
 
 }
@@ -213,21 +213,21 @@ extension OptiTrack {
             guard isAllowed else { return }
             do {
                 let event = try coreEventFactory.createEvent(.setAdvertisingId)
-                self.report(event: event)
+                try self.report(event: event)
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
         }
     }
 
     func reportUserAgent() throws {
         let event = try coreEventFactory.createEvent(.setUserAgent)
-        report(event: event)
+        try report(event: event)
     }
 
     func reportMetaData() throws {
         let event = try coreEventFactory.createEvent(.metaData)
-        report(event: event)
+        try report(event: event)
     }
 
     func reportAppOpenedIfNeeded() throws {
@@ -250,15 +250,15 @@ extension OptiTrack {
             do {
                 if granted {
                     let event = try coreEventFactory.createEvent(.optipushOptIn)
-                    self.report(event: event)
+                    try self.report(event: event)
                     self.storage.isOptiTrackOptIn = true
                 } else {
                     let event = try coreEventFactory.createEvent(.optipushOptOut)
-                    self.report(event: event)
+                    try self.report(event: event)
                     self.storage.isOptiTrackOptIn = false
                 }
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
         }
     }
@@ -272,7 +272,7 @@ extension OptiTrack {
             do {
                 try self?.handleWillEnterForegroundNotification()
             } catch {
-                OptiLoggerMessages.logError(error: error)
+                Logger.error(error.localizedDescription)
             }
         }
     }
@@ -287,14 +287,12 @@ extension OptiTrack {
     }
 
     func reportPendingEvents() {
-        if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            tracker.dispathPendingEvents()
-        }
+        tracker.dispathPendingEvents()
     }
 
     func reportAppOpen() throws {
         let event = try coreEventFactory.createEvent(.appOpen)
-        report(event: event)
+        try report(event: event)
         statisticService.applicationOpenTime = dateTimeProvider.now.timeIntervalSince1970
     }
 }

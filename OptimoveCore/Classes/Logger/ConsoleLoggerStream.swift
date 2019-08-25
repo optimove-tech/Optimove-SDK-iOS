@@ -3,11 +3,13 @@
 import Foundation
 import os.log
 
-final class ConsoleLoggerStream: LoggerStream {
+public final class ConsoleLoggerStream: LoggerStream {
 
-    var policy: LoggerStreamPolicy = .userDefined
+    public var policy: LoggerStreamPolicy = .userDefined
 
-    func log(level: LogLevel, fileName: String, methodName: String, logModule: String?, message: String) {
+    public init() {}
+
+    public func log(level: LogLevelCore, fileName: String, methodName: String, logModule: String?, message: String) {
         os_log(
             "%{public}@ %{public}@ %{public}@",
             log: OSLog.consoleStream,
@@ -16,7 +18,7 @@ final class ConsoleLoggerStream: LoggerStream {
         )
     }
 
-    private func convert(logLevel: LogLevel) -> OSLogType {
+    private func convert(logLevel: LogLevelCore) -> OSLogType {
         switch logLevel {
         case .error:
             return .error

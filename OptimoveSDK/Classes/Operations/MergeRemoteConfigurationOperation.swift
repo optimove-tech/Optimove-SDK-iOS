@@ -12,11 +12,12 @@ public final class MergeRemoteConfigurationOperation: AsyncOperation {
     }
 
     public override func main() {
+        guard !self.isCancelled else { return }
         state = .executing
         do {
             let globalConfig = try repository.getGlobal()
             let tenantConfig = try repository.getTenant()
-            OptiLoggerMessages.logSetupComponentsFromRemote()
+            Logger.debug("Setup components from remote.")
 
             let builder = ConfigurationBuilder(globalConfig: globalConfig, tenantConfig: tenantConfig)
             let configuration = builder.build()
@@ -24,7 +25,7 @@ public final class MergeRemoteConfigurationOperation: AsyncOperation {
             // Set the Configuration type for the runtime usage.
             try repository.setConfiguration(configuration)
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
         self.state = .finished
     }

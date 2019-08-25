@@ -98,7 +98,7 @@ extension MatomoTrackerAdapter: Tracker {
                 tracker.track(event)
             }
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 
