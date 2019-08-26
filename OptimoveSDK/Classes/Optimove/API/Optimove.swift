@@ -42,15 +42,15 @@ protocol OptimoveEventReporting: class {
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
         shared.configureLogger()
-        Logger.warn("Optimove: Use tenant config \(tenantInfo.configName)")
+        Logger.warn("Tenant config \(tenantInfo.configName)")
         shared.storeTenantInfo(tenantInfo)
-        Logger.debug("Optimove: configure started.")
+        Logger.debug("Configure started.")
         shared.startNormalInitProcess { (sucess) in
             guard sucess else {
-                Logger.error("Optimove: configure failed.")
+                Logger.error("Configure failed.")
                 return
             }
-            Logger.info("Optimove: configure finished. ✅")
+            Logger.info("Configure finished. ✅")
         }
     }
 
@@ -75,9 +75,9 @@ protocol OptimoveEventReporting: class {
 extension Optimove {
 
     func startNormalInitProcess(didSucceed: @escaping ResultBlockWithBool) {
-        Logger.info("Start Optimove component initialization from remote.")
+        Logger.info("Start initialization from remote.")
         if RunningFlagsIndication.isSdkRunning {
-            Logger.debug("Skip normal initializtion since SDK already running")
+            Logger.debug("Skip normal initializtion since SDK already running.")
             didSucceed(true)
             return
         }
@@ -95,7 +95,7 @@ extension Optimove {
     }
 
     func startUrgentInitProcess(didSucceed: @escaping ResultBlockWithBool) {
-        Logger.info("Start Optimove urgent initiazlition process")
+        Logger.info("Start urgent initiazlition process.")
         if RunningFlagsIndication.isSdkRunning {
             Logger.debug("Skip urgent initializtion since SDK already running")
             didSucceed(true)
@@ -452,9 +452,9 @@ extension Optimove {
     // MARK: - Report screen visit
 
     @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
-        Logger.debug("User ask to report screen event.")
+        Logger.debug("Report screen event w/ title: \(screenTitle)")
         guard !screenTitle.trimmingCharacters(in: .whitespaces).isEmpty else {
-            Logger.error("Trying to report screen visit with empty title")
+            Logger.error("Failed to report screen visit. Reason: empty title")
             return
         }
         let path = screenPathArray.joined(separator: "/")
@@ -465,11 +465,11 @@ extension Optimove {
         let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
         var screenPath = screenPath.trimmingCharacters(in: .whitespaces)
         guard !screenTitle.isEmpty else {
-            Logger.error("Trying to report screen visit with empty title")
+            Logger.error("Failed to report screen visit. Reason: empty title")
             return
         }
         guard !screenPath.isEmpty else {
-            Logger.error("Trying to report screen visit with empty path")
+            Logger.error("Failed to report screen visit. Reason: empty path")
             return
         }
 
@@ -521,7 +521,7 @@ private extension Optimove {
             Stored user info in local storage:
             token: \(info.tenantToken)
             version: \(info.configName)
-            end point: \(Endpoints.Remote.TenantConfig.url.absoluteString)
+            endpoint: \(Endpoints.Remote.TenantConfig.url.absoluteString)
             """
         )
     }
