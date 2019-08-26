@@ -11,10 +11,10 @@ public final class ConsoleLoggerStream: LoggerStream {
 
     public func log(level: LogLevelCore, fileName: String, methodName: String, logModule: String?, message: String) {
         os_log(
-            "%{public}@ %{public}@ %{public}@",
+            "%{public}@",
             log: OSLog.consoleStream,
             type: convert(logLevel: level),
-            message, fileName, methodName
+            message
         )
     }
 
@@ -37,5 +37,5 @@ public extension OSLog {
 }
 
 extension OSLog {
-    static let consoleStream = OSLog(subsystem: subsystem, category: "ConsoleStream")
+    static let consoleStream = OSLog(subsystem: subsystem, category: "Optimove")
 }
