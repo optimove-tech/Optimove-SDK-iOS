@@ -1,3 +1,5 @@
+//  Copyright © 2019 Optimove. All rights reserved.
+
 import Foundation
 
 protocol DeviceRequirementFetcherFactory {
@@ -7,7 +9,7 @@ protocol DeviceRequirementFetcherFactory {
 final class DeviceRequirementFetcherFactoryImpl { }
 
 extension DeviceRequirementFetcherFactoryImpl: DeviceRequirementFetcherFactory {
-    
+
     func createFetcher(for requirement: OptimoveDeviceRequirement) -> Fetchable {
         switch requirement {
         case .advertisingId:

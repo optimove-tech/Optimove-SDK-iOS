@@ -1,6 +1,7 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 final class ServiceLocator {
 
@@ -11,26 +12,6 @@ final class ServiceLocator {
         return OptimoveDeviceStateMonitorImpl(
             fetcherFactory: DeviceRequirementFetcherFactoryImpl()
         )
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _warehouseProvider: EventsConfigWarehouseProvider = {
-        return EventsConfigWarehouseProvider()
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _realtimeMetaDataProvider: MetaDataProvider<RealtimeMetaData> = {
-        return MetaDataProvider<RealtimeMetaData>()
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _optitrackMetaData: MetaDataProvider<OptitrackMetaData> = {
-        return MetaDataProvider<OptitrackMetaData>()
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _optipushMetaData: MetaDataProvider<OptipushMetaData> = {
-        return MetaDataProvider<OptipushMetaData>()
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
@@ -46,20 +27,21 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _storage: OptimoveStorageFacade = {
-        guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
-            fatalError("The `CFBundleIdentifier` key is not defined in the bundle’s information property list.")
-        }
-        guard let groupStorage = UserDefaults(suiteName: "group.\(bundleIdentifier).optimove") else {
-            fatalError("If this line is crashing the client forgot to add the app group as described in the documentation.")
-        }
-        return OptimoveStorageFacade(
-            sharedStorage: UserDefaults.standard,
-            groupStorage: groupStorage,
-            fileStorage: OptimoveFileManager(
-                fileManager: .default
+    private lazy var _storage: StorageFacade = {
+        do {
+            let bundleIdentifier = try Bundle.getApplicationNameSpace()
+            let groupStorage = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
+            return StorageFacade(
+                groupedStorage: groupStorage,
+                sharedStorage: UserDefaults.standard,
+                fileStorage: try FileStorageImpl(
+                    bundleIdentifier: bundleIdentifier,
+                    fileManager: .default
+                )
             )
-        )
+        } catch {
+            fatalError(error.localizedDescription)
+        }
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
@@ -67,20 +49,14 @@ final class ServiceLocator {
         return StatisticServiceImpl()
     }()
 
+    /// Keeps as singleton in reason to share a session state between a service consumers.
+    private lazy var _componentsPool: MutableComponentsPool = {
+        return ComponentsPoolImpl(
+            componentFactory: componentFactory()
+        )
+    }()
 
     // MARK: - Functions
-
-    func realtimeMetaDataProvider() -> MetaDataProvider<RealtimeMetaData> {
-        return _realtimeMetaDataProvider
-    }
-
-    func optitrackMetaDataProvider() -> MetaDataProvider<OptitrackMetaData> {
-        return _optitrackMetaData
-    }
-
-    func optipushMetaDataProvider() -> MetaDataProvider<OptipushMetaData> {
-        return _optipushMetaData
-    }
 
     func storage() -> OptimoveStorage {
         return _storage
@@ -88,10 +64,6 @@ final class ServiceLocator {
 
     func networking() -> NetworkClient {
         return NetworkClientImpl(configuration: .default)
-    }
-
-    func warehouseProvider() -> EventsConfigWarehouseProvider {
-        return _warehouseProvider
     }
 
     func deviceStateMonitor() -> OptimoveDeviceStateMonitor {
@@ -112,6 +84,46 @@ final class ServiceLocator {
 
     func networkClient() -> NetworkClient {
         return NetworkClientImpl()
+    }
+
+    func configurationRepository() -> ConfigurationRepository {
+        return ConfigurationRepositoryImpl(storage: storage())
+    }
+
+    func initializer() -> OptimoveSDKInitializer {
+        let networkingFactory = NetworkingFactory(
+            networkClient: NetworkClientImpl(),
+            requestBuilderFactory: NetworkRequestBuilderFactory(
+                serviceLocator: self
+            )
+        )
+        return OptimoveSDKInitializer(
+            deviceStateMonitor: deviceStateMonitor(),
+            storage: storage(),
+            networking: networkingFactory.createRemoteConfigurationNetworking(),
+            configurationRepository: configurationRepository(),
+            componentFactory: componentFactory(),
+            componentsPool: mutableComponentsPool()
+        )
+    }
+
+    // FIXME: Move to Main factory
+    func componentFactory() -> ComponentFactory {
+        return ComponentFactory(
+            serviceLocator: self,
+            coreEventFactory: CoreEventFactoryImpl(
+                storage: storage(),
+                dateTimeProvider: dateTimeProvider()
+            )
+        )
+    }
+
+    func componentsPool() -> ComponentsPool {
+        return _componentsPool
+    }
+
+    func mutableComponentsPool() -> MutableComponentsPool {
+        return _componentsPool
     }
 
 }

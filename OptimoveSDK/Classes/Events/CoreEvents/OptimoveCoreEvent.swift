@@ -1,3 +1,5 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
+
+import OptimoveCore
 
 protocol OptimoveCoreEvent: OptimoveEvent { }

@@ -1,4 +1,8 @@
+//  Copyright © 2019 Optimove. All rights reserved.
+
 import Foundation
+
+import OptimoveCore
 
 protocol EventsConfigWarehouse {
     func getConfig(for event: OptimoveEvent) -> EventsConfig?
@@ -6,15 +10,13 @@ protocol EventsConfigWarehouse {
 
 struct OptimoveEventConfigsWarehouseImpl: EventsConfigWarehouse {
 
-    private let eventsConfigs: [String: EventsConfig]
+    private let events: [String: EventsConfig]
 
-    init(from tenantConfig: TenantConfig) {
-        OptiLoggerMessages.logEventsWarehouseInitializtionStart()
-        eventsConfigs = tenantConfig.events
-        OptiLoggerMessages.logEventsWarehouseInitializtionFinish()
+    init(events: [String: EventsConfig]) {
+        self.events = events
     }
 
     func getConfig(for event: OptimoveEvent) -> EventsConfig? {
-        return eventsConfigs[event.name]
+        return events[event.name]
     }
 }

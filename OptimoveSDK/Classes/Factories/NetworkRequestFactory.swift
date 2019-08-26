@@ -1,6 +1,7 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 // For creating concrete networking.
 final class NetworkingFactory {
@@ -13,7 +14,6 @@ final class NetworkingFactory {
         self.networkClient = networkClient
         self.requestBuilderFactory = requestBuilderFactory
     }
-
 
     func createRemoteConfigurationNetworking() -> RemoteConfigurationNetworking {
         return RemoteConfigurationNetworking(

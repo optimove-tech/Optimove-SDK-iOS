@@ -1,4 +1,7 @@
+//  Copyright © 2019 Optimove. All rights reserved.
+
 import UserNotifications
+import OptimoveCore
 
 public enum OptimoveDeviceRequirement: Int, CaseIterable, CustomStringConvertible {
     case internet = 0
@@ -24,22 +27,22 @@ public enum OptimoveDeviceRequirement: Int, CaseIterable, CustomStringConvertibl
 
 protocol OptimoveDeviceStateMonitor {
     func getStatus(for: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool)
-    
+
     func getStatuses(for: [OptimoveDeviceRequirement], completion: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void)
-    
+
     /// - Warning: Returning cached results.
     /// - ToDo: Change to `getMissingPermissions(completion: @escaping (Result<[OptimoveDeviceRequirement], Error> -> Void))`.
     func getMissingPermissions() -> [OptimoveDeviceRequirement]
 }
 
 final class OptimoveDeviceStateMonitorImpl {
-    
+
     private let accessQueue: DispatchQueue
     private let fetcherFactory: DeviceRequirementFetcherFactory
     private var fetchers: [OptimoveDeviceRequirement: Fetchable] = [:]
     private var statuses: [OptimoveDeviceRequirement: Bool] = [:]
     private var requests: [OptimoveDeviceRequirement: [ResultBlockWithBool]]
-    
+
     init(fetcherFactory: DeviceRequirementFetcherFactory) {
         self.fetcherFactory = fetcherFactory
         accessQueue = DispatchQueue(label: "com.optimove.sdk.queue.deviceState", qos: .background)
@@ -60,10 +63,10 @@ extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
             self?.requestStatus(for: deviceRequirement, completion: completion)
         }
     }
-    
+
     func getStatuses(for requirements: [OptimoveDeviceRequirement], completion: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void) {
         let group = DispatchGroup()
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .utility).async {
             requirements.forEach { (requirement) in
                 group.enter()
                 self.getStatus(for: requirement) { _ in
@@ -76,7 +79,7 @@ extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
             completion(statuses)
         }
     }
-    
+
     func getMissingPermissions() -> [OptimoveDeviceRequirement] {
         return accessQueue.sync {
             return statuses
@@ -87,16 +90,14 @@ extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
 }
 
 private extension OptimoveDeviceStateMonitorImpl {
-    
+
     func requestStatus(for requiredService: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool) {
-        OptiLoggerMessages.logDeviceRequirementNil(requiredService: requiredService)
-        OptiLoggerMessages.logRegisterToReceiveRequirementStatus(requiredService: requiredService)
+        Logger.debug("Status for Device requirement '\(requiredService.description)' enqueued.")
         requests[requiredService]?.append(completion)
-        OptiLoggerMessages.logGetStatusOf(requiredService: requiredService)
         let fetcher = getFetcher(for: requiredService)
         fetcher.fetch { [weak self] (status) in
             self?.accessQueue.async {
-                OptiLoggerMessages.logRequirementtatus(deviceRequirement: requiredService, status: status)
+                Logger.info("Device requirement \(requiredService.description) has status: \(status)")
                 self?.handleFetcherResult(deviceRequirement: requiredService, status: status)
             }
         }

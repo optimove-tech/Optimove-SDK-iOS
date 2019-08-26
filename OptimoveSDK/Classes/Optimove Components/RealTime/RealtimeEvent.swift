@@ -1,4 +1,7 @@
+//  Copyright © 2019 Optimove. All rights reserved.
+
 import Foundation
+import OptimoveCore
 
 final class RealtimeEvent: Encodable {
     var tid: String
@@ -25,7 +28,7 @@ final class RealtimeEvent: Encodable {
          firstVisitorDate: Int) {
         self.tid = tid
         self.visitorId = (cid != nil) ? nil : visitorId
-        self.cid = cid ?? nil
+        self.cid = cid
         self.eid = eid
         self.context = context
         self.firstVisitorDate = String(firstVisitorDate)

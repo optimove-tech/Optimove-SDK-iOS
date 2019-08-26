@@ -1,7 +1,8 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
 import MatomoTracker
+import OptimoveCore
 
 final class MatomoTrackerAdapter {
 
@@ -10,19 +11,19 @@ final class MatomoTrackerAdapter {
     }
 
     private let tracker: MatomoTracker
-    private let storage: OptimoveStorage
+    private var storage: OptimoveStorage
 
-    init(metaData: OptitrackMetaData,
-         storage: OptimoveStorage) throws {
+    init(configuration: OptitrackConfig,
+         storage: OptimoveStorage) {
         self.storage = storage
         let baseURL: URL = {
-            if !metaData.optitrackEndpoint.absoluteString.contains(Constants.piwikPath) {
-                return metaData.optitrackEndpoint.appendingPathComponent(Constants.piwikPath)
+            if !configuration.optitrackEndpoint.absoluteString.contains(Constants.piwikPath) {
+                return configuration.optitrackEndpoint.appendingPathComponent(Constants.piwikPath)
             }
-            return metaData.optitrackEndpoint
+            return configuration.optitrackEndpoint
         }()
         self.tracker = MatomoTracker(
-            siteId: String(metaData.siteId),
+            siteId: String(configuration.tenantID),
             queue: OptimoveQueue(
                 storage: storage
             ),
@@ -30,6 +31,13 @@ final class MatomoTrackerAdapter {
                 baseURL: baseURL
             )
         )
+        setupForNotificationExtension()
+    }
+
+    private func setupForNotificationExtension() {
+        let screenSize = Device.makeCurrentDevice().screenSize
+        storage.deviceResolutionHeight = Float(screenSize.height)
+        storage.deviceResolutionWidth = Float(screenSize.width)
     }
 
     private func convertToMatomoEvent(_ event: TrackerEvent) -> Event {
@@ -90,7 +98,7 @@ extension MatomoTrackerAdapter: Tracker {
                 tracker.track(event)
             }
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 

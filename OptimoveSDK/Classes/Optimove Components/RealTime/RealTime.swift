@@ -1,63 +1,72 @@
+//  Copyright © 2019 Optimove. All rights reserved.
+
 import Foundation
 
-final class RealTime: OptimoveComponent {
+import OptimoveCore
 
+final class RealTime {
+
+    private let configuration: RealtimeConfig
     private let realTimeQueue: DispatchQueue
     private let networking: RealTimeNetworking
     private let hanlder: RealTimeHanlder
-    private let warehouse: EventsConfigWarehouseProvider
     private var storage: OptimoveStorage
     private let eventBuilder: RealTimeEventBuilder
     private let coreEventFactory: CoreEventFactory
+    private let deviceStateMonitor: OptimoveDeviceStateMonitor
 
     // MARK: - Public
 
     required init(
+        configuration: RealtimeConfig,
         storage: OptimoveStorage,
         networking: RealTimeNetworking,
-        warehouse: EventsConfigWarehouseProvider,
         deviceStateMonitor: OptimoveDeviceStateMonitor,
         eventBuilder: RealTimeEventBuilder,
         handler: RealTimeHanlder,
         coreEventFactory: CoreEventFactory) {
+        self.configuration = configuration
         self.storage = storage
         self.networking = networking
-        self.warehouse = warehouse
         self.realTimeQueue = DispatchQueue(
             label: "com.optimove.queue.realtime",
-            qos: .userInitiated
+            qos: .utility
         )
         self.hanlder = handler
         self.eventBuilder = eventBuilder
         self.coreEventFactory = coreEventFactory
-        super.init(deviceStateMonitor: deviceStateMonitor)
+        self.deviceStateMonitor = deviceStateMonitor
+
+        performInitializationOperations()
     }
-    
-    override func performInitializationOperations() {
-        super.performInitializationOperations()
+
+    func performInitializationOperations() {
         setFirstTimeVisitIfNeeded()
     }
 
     func report(event: OptimoveEvent, config: EventsConfig, retryFailedEvents: Bool = true) {
+        guard config.supportedOnRealTime else {
+            Logger.warn("Realtime: Event \(event.name) is not supported.")
+            return
+        }
         do {
             let context = createEventContext(event: event, config: config)
             try report(context: context, retryFailedEvents: retryFailedEvents)
         } catch {
-            OptiLoggerMessages.logError(error: error)
+            Logger.error(error.localizedDescription)
         }
     }
 
 }
 
-// MARK: - Additional public API
+extension RealTime: Eventable {
 
-extension RealTime {
+    func setUserId(_ userId: String) {
+        try? reportUserId()
+    }
 
-    func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) {
-        let event = OptimoveEventDecorator(event: event)
-        guard let config = obtainConfiguration(for: event) else { return }
-        event.processEventConfig(config)
-        report(event: event, config: config, retryFailedEvents: retryFailedEvents)
+    func report(event: OptimoveEvent) throws {
+        try reportEvent(event: event, retryFailedEvents: true)
     }
 
     func reportScreenEvent(customURL: String,
@@ -69,19 +78,35 @@ extension RealTime {
                        category: category
             )
         )
-        reportEvent(event: event)
+        try reportEvent(event: event)
+    }
+
+    func dispatchNow() {
+        // Consciously do nothing.
+    }
+
+}
+
+extension RealTime {
+
+    func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) throws {
+        let event = OptimoveEventDecoratorFactory.getEventDecorator(forEvent: event)
+        let config = try obtainConfiguration(for: event)
+        try OptimoveEventValidator.validate(event: event, withConfig: config)
+        event.processEventConfig(config)
+        report(event: event, config: config, retryFailedEvents: retryFailedEvents)
     }
 
     func reportUserId() throws {
         let event = try coreEventFactory.createEvent(.setUserId)
-        reportEvent(event: event, retryFailedEvents: false)
+        try reportEvent(event: event, retryFailedEvents: false)
     }
 
-    func reportUserEmail(_ email: String) {
+    func reportUserEmail(_ email: String) throws {
         let event = SetUserEmailEvent(
             email: email
         )
-        reportEvent(event: event, retryFailedEvents: false)
+        try reportEvent(event: event, retryFailedEvents: false)
     }
 
     func isAllowToSendReport(completion: @escaping (Bool) -> Void) {
@@ -105,11 +130,9 @@ private extension RealTime {
 
     // MARK: Transforming an event
 
-    func obtainConfiguration(for event: OptimoveEvent) -> EventsConfig? {
-        guard let warehouse = try? warehouse.getWarehouse(),
-            let config = warehouse.getConfig(for: event) else {
-                OptiLoggerMessages.logConfigForEventMissing(eventName: event.name)
-                return nil
+    func obtainConfiguration(for event: OptimoveEvent) throws -> EventsConfig {
+        guard let config = configuration.events[event.name] else {
+            throw GuardError.custom("Configurations are missing for event \(event.name)")
         }
         return config
     }
@@ -117,11 +140,23 @@ private extension RealTime {
     func createEventContext(event: OptimoveEvent, config: EventsConfig) -> RealTimeEventContext {
         switch event.name {
         case OptimoveKeys.Configuration.setUserId.rawValue:
-            return SetUserIdEventContext(event: event, config: config)
+            return RealTimeEventContext(
+                event: event,
+                config: config,
+                type: .setUserID
+            )
         case OptimoveKeys.Configuration.setEmail.rawValue:
-            return SetUserEmailEventContext(event: event, config: config)
+            return RealTimeEventContext(
+                event: event,
+                config: config,
+                type: .setUserEmail
+            )
         default:
-            return RegularEventContext(event: event, config: config)
+            return RealTimeEventContext(
+                event: event,
+                config: config,
+                type: .regular
+            )
         }
     }
 
@@ -156,19 +191,19 @@ private extension RealTime {
         }
     }
 
-
     func retrySetUserEmailIfNeeded() throws {
         if storage[.realtimeSetEmailFailed] ?? false {
-            reportUserEmail(try cast(storage[.userEmail]))
+            try reportUserEmail(try cast(storage[.userEmail]))
         }
     }
 
     // MARK: Send report
-    
+
     func sentReportEvent(context: RealTimeEventContext) {
+        let realtimeToken = configuration.realtimeToken
         isAllowToSendReport { [realTimeQueue, hanlder, networking, eventBuilder] (allow) in
             guard allow else {
-                hanlder.handleOffline(context)
+                hanlder.handleOnError(context, error: RealTimeError.deviceOffline)
                 return
             }
             // The delay added as the temporary hotfix for the realtime race condition issue.
@@ -176,7 +211,7 @@ private extension RealTime {
             let delay: TimeInterval = 1
             realTimeQueue.asyncAfter(deadline: .now() + delay, execute: {
                 do {
-                    let realtimeEvent = try eventBuilder.createEvent(context: context)
+                    let realtimeEvent = try eventBuilder.createEvent(context: context, realtimeToken: realtimeToken)
                     try networking.report(event: realtimeEvent) { (result) in
                         switch result {
                         case let .success(json):
@@ -186,7 +221,7 @@ private extension RealTime {
                         }
                     }
                 } catch {
-                    hanlder.handleOnCatch(context, error: error)
+                    hanlder.handleOnError(context, error: error)
                 }
             })
         }
@@ -196,11 +231,14 @@ private extension RealTime {
 
 enum RealTimeError: LocalizedError {
     case eitherCustomerOrVisitorIdIsNil
+    case deviceOffline
 
     var errorDescription: String? {
         switch self {
         case .eitherCustomerOrVisitorIdIsNil:
             return "Either a CustomerID or a VisitorID should not be nil."
+        case .deviceOffline:
+            return "Device is offline."
         }
     }
 }

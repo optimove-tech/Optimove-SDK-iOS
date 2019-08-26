@@ -1,4 +1,4 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 final class PingEvent: OptimoveCoreEvent {
 
@@ -10,7 +10,7 @@ final class PingEvent: OptimoveCoreEvent {
             static let visitorId = OptimoveKeys.Configuration.visitorId.rawValue
         }
     }
-    
+
     let name: String = Constants.name
     let parameters: [String: Any]
 

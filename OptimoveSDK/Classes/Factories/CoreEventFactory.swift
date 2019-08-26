@@ -1,6 +1,7 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 enum CoreEventType {
     case appOpen
@@ -24,7 +25,7 @@ import AdSupport
 final class CoreEventFactoryImpl {
 
     private let storage: OptimoveStorage
-    private let deviceId: String = Device.uuid
+    private let deviceId: String = SDKDevice.uuid
     private let dateTimeProvider: DateTimeProvider
     private var timestamp: TimeInterval {
         return dateTimeProvider.now.timeIntervalSince1970
@@ -98,7 +99,11 @@ private extension CoreEventFactoryImpl {
             let configurationEndPoint = try storage.getConfigurationEndPoint()
             let tenantToken = try storage.getTenantToken()
             let version = try storage.getVersion()
-            return configurationEndPoint + tenantToken + "/" + version + ".json"
+            return configurationEndPoint
+                .appendingPathComponent(tenantToken)
+                .appendingPathComponent(version)
+                .appendingPathExtension("json")
+                .absoluteString
         }
         let configUrl = try getFullConfigurationPath()
         let tenantBundle = try getApplicationNamespace()
@@ -112,7 +117,7 @@ private extension CoreEventFactoryImpl {
 
     func createSetUserAgentEvent() throws -> SetUserAgent {
         return SetUserAgent(
-            userAgent: Device.evaluateUserAgent()
+            userAgent: SDKDevice.evaluateUserAgent()
         )
     }
 
@@ -163,7 +168,7 @@ private extension CoreEventFactoryImpl {
     }
 
     func getSdkVersion() -> String {
-        return SDK.version
+        return SDKVersion
     }
 
 }

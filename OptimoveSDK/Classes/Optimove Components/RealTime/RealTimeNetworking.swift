@@ -1,6 +1,7 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 protocol RealTimeNetworking {
     func report(event: RealtimeEvent, completion: @escaping (Result<String, Error>) -> Void) throws
@@ -10,14 +11,14 @@ final class RealTimeNetworkingImpl {
 
     private let networkClient: NetworkClient
     private let realTimeRequestBuildable: RealTimeRequestBuildable
-    private let metaDataProvider: MetaDataProvider<RealtimeMetaData>
+    private let configuration: RealtimeConfig
 
     init(networkClient: NetworkClient,
          realTimeRequestBuildable: RealTimeRequestBuildable,
-         metaDataProvider: MetaDataProvider<RealtimeMetaData>) {
+         configuration: RealtimeConfig) {
         self.networkClient = networkClient
         self.realTimeRequestBuildable = realTimeRequestBuildable
-        self.metaDataProvider = metaDataProvider
+        self.configuration = configuration
     }
 
 }
@@ -26,8 +27,10 @@ extension RealTimeNetworkingImpl: RealTimeNetworking {
 
     func report(event: RealtimeEvent,
                 completion: @escaping (Result<String, Error>) -> Void) throws {
-        let metadata = try metaDataProvider.getMetaData()
-        let request = try realTimeRequestBuildable.createReportEventRequest(event: event, metadata: metadata)
+        let request = try realTimeRequestBuildable.createReportEventRequest(
+            event: event,
+            gateway: configuration.realtimeGateway
+        )
         networkClient.perform(request) { (result) in
             completion(
                 Result {

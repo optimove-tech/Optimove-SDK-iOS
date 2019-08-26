@@ -1,17 +1,18 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 final class MbaasModelFactory {
 
     private let storage: OptimoveStorage
     private let processInfo: ProcessInfo
-    private let device: Device.Type
+    private let device: SDKDevice.Type
     private let bundle: Bundle.Type
 
     init(storage: OptimoveStorage,
          processInfo: ProcessInfo,
-         device: Device.Type,
+         device: SDKDevice.Type,
          bundle: Bundle.Type) {
         self.storage = storage
         self.processInfo = processInfo

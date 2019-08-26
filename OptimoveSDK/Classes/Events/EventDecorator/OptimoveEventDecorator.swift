@@ -1,4 +1,7 @@
+//  Copyright © 2019 Optimove. All rights reserved.
+
 import Foundation
+import OptimoveCore
 
 /// Adjust event entity to satisfy Optimove's business logic before dispatch
 class OptimoveEventDecorator: OptimoveEvent {

@@ -1,4 +1,4 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 final class PageVisitEvent: OptimoveCoreEvent {
 
@@ -10,7 +10,7 @@ final class PageVisitEvent: OptimoveCoreEvent {
             static let category = "category"
         }
     }
-    
+
     let name: String = Constants.name
     let parameters: [String: Any]
 
