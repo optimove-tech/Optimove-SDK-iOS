@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveCore'
-  s.version          = '2.2.10'
+  s.version          = '2.3.0'
   s.summary          = 'Official Optimove SDK for iOS to access Optimove core features.'
   s.description      = <<-DESC
 The Optimove SDK for iOS Core framework provides:
