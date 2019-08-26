@@ -1,5 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
+import Foundation
+
 public final class MultiplexLoggerStream {
 
     private struct Constants {
