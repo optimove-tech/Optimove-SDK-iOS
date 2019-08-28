@@ -99,7 +99,7 @@ private extension OptimoveSDKInitializer {
             operationQueue.addOperation($0)
         }
         // The completion operation is performing on the current queue.
-        OperationQueue.current?.addOperation(completionOperation)
+        operationQueue.addOperation(completionOperation)
     }
 
     func handleFetchConfigurationFromLocal(didComplete: @escaping ResultBlockWithBool) {
