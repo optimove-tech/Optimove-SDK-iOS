@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1030"
+   LastUpgradeVersion = "1020"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "46002EBF230AFBAF0061DFB0"
-               BuildableName = "OptimoveSDK.framework"
-               BlueprintName = "OptimoveSDK"
-               ReferencedContainer = "container:OptimoveSDK.xcodeproj">
+               BlueprintIdentifier = "43B4740CB2055B0FBF0587A0"
+               BuildableName = "OptimoveNotificationServiceExtension.framework"
+               BlueprintName = "OptimoveNotificationServiceExtension"
+               ReferencedContainer = "container:Optimove.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,9 +28,32 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2B74709896BBDCB01D227E99"
+               BuildableName = "OptimoveNotificationServiceExtension-Unit.xctest"
+               BlueprintName = "OptimoveNotificationServiceExtension-Unit"
+               ReferencedContainer = "container:Optimove.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "43B4740CB2055B0FBF0587A0"
+            BuildableName = "OptimoveNotificationServiceExtension.framework"
+            BlueprintName = "OptimoveNotificationServiceExtension"
+            ReferencedContainer = "container:Optimove.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+      <CommandLineArguments>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
+      <CodeCoverageTargets>
+      </CodeCoverageTargets>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -45,12 +68,14 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "46002EBF230AFBAF0061DFB0"
-            BuildableName = "OptimoveSDK.framework"
-            BlueprintName = "OptimoveSDK"
-            ReferencedContainer = "container:OptimoveSDK.xcodeproj">
+            BlueprintIdentifier = "43B4740CB2055B0FBF0587A0"
+            BuildableName = "OptimoveNotificationServiceExtension.framework"
+            BlueprintName = "OptimoveNotificationServiceExtension"
+            ReferencedContainer = "container:Optimove.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
+      <CommandLineArguments>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -60,15 +85,18 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "46002EBF230AFBAF0061DFB0"
-            BuildableName = "OptimoveSDK.framework"
-            BlueprintName = "OptimoveSDK"
-            ReferencedContainer = "container:OptimoveSDK.xcodeproj">
+            BlueprintIdentifier = "43B4740CB2055B0FBF0587A0"
+            BuildableName = "OptimoveNotificationServiceExtension.framework"
+            BlueprintName = "OptimoveNotificationServiceExtension"
+            ReferencedContainer = "container:Optimove.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
