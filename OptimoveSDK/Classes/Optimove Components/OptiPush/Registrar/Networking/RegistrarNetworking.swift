@@ -26,7 +26,7 @@ extension RegistrarNetworkingImpl: RegistrarNetworking {
         do {
             let request = try requestBuilder.createRequest(model: model)
             if let httpBody = request.httpBody, let json = String(data: httpBody, encoding: .utf8) {
-                Logger.debug("OptiPush: Send request \(model.operation.rawValue) to \(request.baseURL) payload \(json)")
+                Logger.debug("OptiPush: Send request \(model.operation.rawValue) \nurl: \(request.baseURL)\npayload: \(json)")
             }
             networkClient.perform(request) { (result) in
                 completion(

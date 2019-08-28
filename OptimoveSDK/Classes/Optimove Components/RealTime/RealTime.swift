@@ -38,6 +38,7 @@ final class RealTime {
         self.deviceStateMonitor = deviceStateMonitor
 
         performInitializationOperations()
+        Logger.debug("RealTime initialized.")
     }
 
     func performInitializationOperations() {

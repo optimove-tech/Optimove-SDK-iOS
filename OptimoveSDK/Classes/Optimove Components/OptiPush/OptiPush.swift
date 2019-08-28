@@ -48,6 +48,7 @@ final class OptiPush {
         )
 
         performInitializationOperations()
+        Logger.debug("OptiPush initialized.")
     }
 
     func performInitializationOperations() {

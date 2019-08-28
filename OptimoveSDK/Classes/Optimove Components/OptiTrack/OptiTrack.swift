@@ -41,6 +41,7 @@ final class OptiTrack {
         optimoveCustomizePlugins = createPluginFlags()
 
         performInitializationOperations()
+        Logger.debug("OptiTrack initialized.")
     }
 
     // MARK: - Internal Methods

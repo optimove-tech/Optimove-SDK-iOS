@@ -518,10 +518,10 @@ private extension Optimove {
 
         Logger.debug(
             """
-            Stored user info in local storage:
+            Stored user info in local storage. Source:
+            endpoint: \(Endpoints.Remote.TenantConfig.url.absoluteString)
             token: \(info.tenantToken)
             version: \(info.configName)
-            endpoint: \(Endpoints.Remote.TenantConfig.url.absoluteString)
             """
         )
     }
