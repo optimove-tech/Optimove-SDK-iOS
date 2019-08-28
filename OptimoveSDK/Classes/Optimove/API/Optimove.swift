@@ -47,7 +47,7 @@ protocol OptimoveEventReporting: class {
         Logger.debug("Configure started.")
         shared.startNormalInitProcess { (sucess) in
             guard sucess else {
-                Logger.error("Configure failed.")
+                Logger.error("Configure failed. 🛑")
                 return
             }
             Logger.info("Configure finished. ✅")
