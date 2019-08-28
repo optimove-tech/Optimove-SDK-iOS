@@ -20,7 +20,8 @@ final class RemoteConfigurationNetworking {
             networkClient.perform(request) { (result) in
                 completion(
                     Result {
-                        return try result.get().decode(to: TenantConfig.self)
+                        let data = try result.get()
+                        return try data.decode(to: TenantConfig.self)
                     }
                 )
             }
@@ -34,7 +35,8 @@ final class RemoteConfigurationNetworking {
         networkClient.perform(request) { (result) in
             completion(
                 Result {
-                    return try result.get().decode(to: GlobalConfig.self)
+                    let data = try result.get()
+                    return try data.decode(to: GlobalConfig.self)
                 }
             )
         }
