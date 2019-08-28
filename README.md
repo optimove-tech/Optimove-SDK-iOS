@@ -23,7 +23,7 @@ end
 ### Carthage
 
 ```
-github "optimove-tech/Optimove-SDK-iOS"
+github "optimove-tech/Optimove-SDK-iOS" ~> 2.0
 ```
 
 
