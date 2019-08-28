@@ -20,7 +20,7 @@ more details and additional installation methods.
 * Create or update a Cartfile
 
 ```
-github "optimove-tech/iOS-SDK-Integration-Guide"
+github "optimove-tech/Optimove-SDK-iOS"
 ```
 
 * Run `carthage update`.
