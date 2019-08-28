@@ -18,6 +18,8 @@ targets:
     scheme:
       testTargets:
         - OptimoveCore-Unit
+    settings:
+      APPLICATION_EXTENSION_API_ONLY: YES
     dependencies:
       - sdk: Foundation.framework
 
@@ -73,6 +75,8 @@ targets:
     scheme:
       testTargets:
         - OptimoveNotificationServiceExtension-Unit
+    settings:
+      APPLICATION_EXTENSION_API_ONLY: YES
     dependencies:
       - target: OptimoveCore
       - sdk: UIKit.framework

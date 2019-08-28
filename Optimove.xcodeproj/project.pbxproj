@@ -1838,21 +1838,21 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		"TEMP_0D59042C-985C-4C54-BA70-796868AADBEC" /* Tests */ = {
+		"TEMP_97CF4C91-3067-448D-98CD-70EF8373F26C" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_69C03371-7F8A-41B9-A220-572780DCC395" /* Tests */ = {
+		"TEMP_AE7CD1B6-B44A-4D54-A69F-CC6393A86EA9" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_C4143D15-481F-4A09-9291-1E406EB9AFB6" /* Tests */ = {
+		"TEMP_E2C31874-9967-4DE4-B3F9-1C991CB094E5" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -2434,6 +2434,7 @@
 		2F66E3E6464749EB491DBF7E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -2463,6 +2464,7 @@
 		4A27E1E9D26058C86424147C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -2502,6 +2504,7 @@
 		637E5E27537E8A4E1D8359F4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -2622,6 +2625,7 @@
 		B0F2997F877D21FFF64C1DC7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
