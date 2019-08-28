@@ -22,10 +22,11 @@ end
 
 ### Carthage
 
-```OGDL
+```
 github "optimove-tech/iOS-SDK-Integration-Guide"
 ```
 
+Instructions for the Carthage distribution are at [Carthage](https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/Carthage.md).
 
 ## Integration guide
 
