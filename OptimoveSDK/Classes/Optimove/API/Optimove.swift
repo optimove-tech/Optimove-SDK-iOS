@@ -47,7 +47,7 @@ protocol OptimoveEventReporting: class {
         Logger.debug("Configure started.")
         shared.startNormalInitProcess { (sucess) in
             guard sucess else {
-                Logger.error("Configure failed.")
+                Logger.error("Configure failed. 🛑")
                 return
             }
             Logger.info("Configure finished. ✅")
@@ -356,13 +356,7 @@ extension Optimove {
         if storage.customerID == nil {
             storage.isFirstConversion = true
         } else if userId != storage.customerID {
-            OptiLoggerStreamsContainer.log(
-                level: .debug,
-                fileName: #file,
-                methodName: #function,
-                logModule: "Optimove",
-                "user id changed from '\(storage.customerID ?? "nil")' to '\(userId)'"
-            )
+            Logger.debug("user id changed from '\(storage.customerID ?? "nil")' to '\(userId)'")
             if storage.isRegistrationSuccess == true {
                 // send the first_conversion flag only if no previous registration has succeeded
                 storage.isFirstConversion = false
@@ -386,6 +380,7 @@ extension Optimove {
             updateVisitorId: storage.visitorID!
         )
         reportEvent(setUserIdEvent)
+        // TODO: Move `performRegistration` to OptiPush component
         components.performRegistration()
     }
 

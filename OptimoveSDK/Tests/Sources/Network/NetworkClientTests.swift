@@ -11,7 +11,7 @@ class NetworkClientTests: XCTestCase {
         Mocker.register(
             Mock(
                 url: StubVariables.url,
-                dataType: .json,
+                contentType: .json,
                 statusCode: 200,
                 data: [.get: Data()]
             )
@@ -37,7 +37,7 @@ class NetworkClientTests: XCTestCase {
         }
 
         // then
-        wait(for: [success], timeout: expectationTimeout)
+        wait(for: [success], timeout: defaultTimeout)
     }
 
     func test_post_request() {
@@ -46,7 +46,7 @@ class NetworkClientTests: XCTestCase {
         Mocker.register(
             Mock(
                 url: StubVariables.url,
-                dataType: .json,
+                contentType: .json,
                 statusCode: 200,
                 data: [.post: Data()]
             )
@@ -72,6 +72,6 @@ class NetworkClientTests: XCTestCase {
         }
 
         // then
-        wait(for: [success], timeout: expectationTimeout)
+        wait(for: [success], timeout: defaultTimeout)
     }
 }

@@ -76,7 +76,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         XCTAssertNoThrow(try optitrack.reportScreenEvent(screenTitle: screenTitle, screenPath: screenPath, category: category))
-        wait(for: [trackViewExpectation, trackEventExpectation], timeout: expectationTimeout, enforceOrder: true)
+        wait(for: [trackViewExpectation, trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
     func test_event_report() {
@@ -93,7 +93,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         try! optitrack.report(event: stubEvent)
-        wait(for: [trackEventExpectation], timeout: expectationTimeout, enforceOrder: true)
+        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
     func test_dispatch_now() {
@@ -108,7 +108,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         optitrack.dispatchNow()
-        wait(for: [trackDispatchExpectation], timeout: expectationTimeout, enforceOrder: true)
+        wait(for: [trackDispatchExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
     func test_dispatch_now_if_component_disabled() {
@@ -124,7 +124,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         optitrack.dispatchNow()
-        wait(for: [trackDispatchExpectation], timeout: expectationTimeout, enforceOrder: true)
+        wait(for: [trackDispatchExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
     // MARK: - Tests for private methods
@@ -185,7 +185,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         optitrack.reportIdfaIfAllowed()
-        wait(for: [trackEventExpectation], timeout: expectationTimeout)
+        wait(for: [trackEventExpectation], timeout: defaultTimeout)
     }
 
     func test_reportSdkVersion() {
@@ -230,7 +230,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         XCTAssertNoThrow(try optitrack.reportMetaData())
-        wait(for: [trackEventExpectation], timeout: expectationTimeout, enforceOrder: true)
+        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
     func test_reportOptInOutIfNeeded_optIn() {
@@ -256,7 +256,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         optitrack.reportOptInOutIfNeeded()
-        wait(for: [trackEventExpectation, flagExpectation], timeout: expectationTimeout)
+        wait(for: [trackEventExpectation, flagExpectation], timeout: defaultTimeout)
     }
 
     func test_reportOptInOutIfNeeded_optOut() {
@@ -287,7 +287,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         optitrack.reportOptInOutIfNeeded()
-        wait(for: [trackEventExpectation, flagExpectation], timeout: expectationTimeout)
+        wait(for: [trackEventExpectation, flagExpectation], timeout: defaultTimeout)
     }
 
     func test_reportOptInOutIfNeeded_noNeed() {
@@ -309,7 +309,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         optitrack.reportOptInOutIfNeeded()
-        wait(for: [trackEventExpectation, flagExpectation], timeout: expectationTimeout)
+        wait(for: [trackEventExpectation, flagExpectation], timeout: defaultTimeout)
     }
 
     func test_handleWillEnterForegroundNotification() {
@@ -333,7 +333,7 @@ final class OptiTrackComponentTests: XCTestCase {
             trackEventExpectation.fulfill()
         }
         XCTAssertNoThrow(try optitrack.handleWillEnterForegroundNotification())
-        wait(for: [trackEventExpectation], timeout: expectationTimeout, enforceOrder: true)
+        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
     func test_willEnterForegroundNotification_action_throttled() {
@@ -358,7 +358,7 @@ final class OptiTrackComponentTests: XCTestCase {
             trackEventExpectation.fulfill()
         }
         XCTAssertNoThrow(try optitrack.handleWillEnterForegroundNotification())
-        wait(for: [trackEventExpectation], timeout: expectationTimeout, enforceOrder: true)
+        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
     func test_reportPendingEvents() {
@@ -370,7 +370,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         optitrack.reportPendingEvents()
-        wait(for: [trackEventExpectation], timeout: expectationTimeout, enforceOrder: true)
+        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
     func test_reportAppOpen() {
@@ -387,6 +387,6 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         XCTAssertNoThrow(try optitrack.reportAppOpen())
-        wait(for: [trackEventExpectation], timeout: expectationTimeout, enforceOrder: true)
+        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 }
