@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveSDK'
-  s.version          = '2.1.19'
+  s.version          = '2.1.20'
   s.summary          = 'Official Optimove SDK for iOS.'
   s.description      = 'The Optimove SDK framework is used for reporting events and receive push notifications.'
   s.homepage         = 'https://github.com/optimove-tech/Optimove-SDK-iOS'
