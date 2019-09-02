@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.homepage         = 'https://github.com/optimove-tech/Optimove-SDK-iOS'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Mobius Solutions' => 'mobile@optimove.com' }
-  s.source           = { :git => 'https://github.com/optimove-tech/Optimove-SDK-iOS.git', :tag => 'SDK/' + s.version.to_s }
+  s.source           = { :git => 'https://github.com/optimove-tech/Optimove-SDK-iOS.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/Optimove'
   s.platform = 'ios'
   s.ios.deployment_target = '10.0'
