@@ -23,7 +23,7 @@ end
 ### Carthage
 
 ```
-github "optimove-tech/Optimove-SDK-iOS"
+github "optimove-tech/Optimove-SDK-iOS" ~> 2.0
 ```
 
 Instructions for the Carthage distribution are at [Carthage](https://github.com/optimove-tech/iOS-SDK-Integration-Guide/blob/master/Carthage.md).
