@@ -48,49 +48,6 @@ class OptimoveDeviceStateMonitorTests: XCTestCase {
         wait(for: expectations, timeout: 1)
     }
 
-    func testThatGetStatusesImplWorks() {
-        // given
-        let requirements: [OptimoveDeviceRequirement] = [
-            .advertisingId,
-            .internet,
-            .userNotification
-        ]
-
-        // when
-        let statusesExpectation = expectation(description: "statuses")
-        deviceStateMonitor.getStatuses(for: requirements) { (results) in
-            results.forEach({ (result) in
-                // then
-                XCTAssert(result.value)
-            })
-            statusesExpectation.fulfill()
-        }
-        waitForExpectations(timeout: 1, handler: nil)
-    }
-
-    // ELI: DeviceStateMonitor in current implementation should execute getStatuses/getStatus
-    // at least once for cache statuses.
-    // FIXME: Dont use cached values.
-//    func test_missing_parameters() {
-//        // given
-//        let requirements = OptimoveDeviceRequirement.allCases
-//        let disabledRequirments: [OptimoveDeviceRequirement] = OptimoveDeviceRequirement.userDependentPermissions
-//        let enabledRequirments: [OptimoveDeviceRequirement] = Array(Set(requirements).subtracting(disabledRequirments))
-//
-//        // and
-//        fetchers = {
-//            return disabledRequirments.map { MockDeviceRequirementFetcher(type: $0, isEnabled: false) } +
-//            enabledRequirments.map { MockDeviceRequirementFetcher(type: $0, isEnabled: true) }
-//        }
-//
-//        // when
-//        let missingPermissions = deviceStateMonitor.getMissingPermissions()
-//
-//        // then
-//        XCTAssert(disabledRequirments == missingPermissions,
-//                  "Expected \(disabledRequirments). Actual \(missingPermissions)")
-//    }
-
 }
 
 class MockDeviceRequirementFetcherFactory: DeviceRequirementFetcherFactory {

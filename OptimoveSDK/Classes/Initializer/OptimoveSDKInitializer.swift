@@ -37,7 +37,6 @@ final class OptimoveSDKInitializer {
     // MARK: - API
 
     func initializeFromRemoteServer(completion: @escaping ResultBlockWithBool) {
-        warmupDeviceStateMonitor()
         Logger.info("Start initializtion from remote configurations.")
         deviceStateMonitor.getStatus(for: .internet) { (available) in
             if available {
@@ -50,7 +49,6 @@ final class OptimoveSDKInitializer {
 
     /// When the SDK is initialized by a push notification start the initialization from the local JSON file.
     func initializeFromLocalConfigs(completion: @escaping ResultBlockWithBool) {
-        warmupDeviceStateMonitor()
         Logger.info("Start initializtion from local configurations.")
         handleFetchConfigurationFromLocal(didComplete: completion)
     }
@@ -169,9 +167,6 @@ private extension OptimoveSDKInitializer {
 
 extension OptimoveSDKInitializer {
 
-    func warmupDeviceStateMonitor() {
-        deviceStateMonitor.getStatuses(for: OptimoveDeviceRequirement.allCases) { _ in }
-    }
 
     func updateEnvironment(_ config: Configuration) {
         updateLoggerStreamContainers(config)

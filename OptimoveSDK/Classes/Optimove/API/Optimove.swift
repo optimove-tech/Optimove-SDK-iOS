@@ -17,10 +17,6 @@ protocol OptimoveEventReporting: class {
     private var storage: OptimoveStorage
     private let components: ComponentsPool
 
-    private let stateDelegateQueue = DispatchQueue(label: "com.optimove.sdk_state_delegates")
-    private static var swiftStateDelegates: [ObjectIdentifier: OptimoveSuccessStateListenerWrapper] = [:]
-    private static var objcStateDelegate: [ObjectIdentifier: OptimoveSuccessStateDelegateWrapper] = [:]
-
     // MARK: - Initializers
 
     /// The shared instance of OptimoveSDK.
@@ -113,15 +109,6 @@ extension Optimove {
     func didFinishInitializationSuccessfully() {
         RunningFlagsIndication.isInitializerRunning = false
         RunningFlagsIndication.isSdkRunning = true
-
-        let missingPermissions = serviceLocator.deviceStateMonitor().getMissingPermissions()
-        let missingPermissionsObjc = missingPermissions.map { $0.rawValue }
-        Optimove.swiftStateDelegates.values.forEach { (wrapper) in
-            wrapper.observer?.optimove(self, didBecomeActiveWithMissingPermissions: missingPermissions)
-        }
-        Optimove.objcStateDelegate.values.forEach { (wrapper) in
-            wrapper.observer.optimove(self, didBecomeActiveWithMissingPermissions: missingPermissionsObjc)
-        }
     }
 }
 
@@ -130,47 +117,16 @@ extension Optimove {
 //TODO: expose to  @objc
 extension Optimove {
 
+    @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
     public func registerSuccessStateListener(_ listener: OptimoveSuccessStateListener) {
-        if RunningFlagsIndication.isSdkRunning {
-            listener.optimove(
-                self,
-                didBecomeActiveWithMissingPermissions: serviceLocator.deviceStateMonitor().getMissingPermissions()
-            )
-            return
-        }
-        stateDelegateQueue.async {
-            Optimove.swiftStateDelegates[ObjectIdentifier(listener)] = OptimoveSuccessStateListenerWrapper(observer: listener)
-        }
+
     }
 
+    @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
     public func unregisterSuccessStateListener(_ delegate: OptimoveSuccessStateListener) {
-        stateDelegateQueue.async {
-            Optimove.swiftStateDelegates[ObjectIdentifier(delegate)] = nil
-        }
+
     }
 
-    @available(swift, obsoleted: 1.0)
-    @objc public func registerSuccessStateDelegate(_ delegate: OptimoveSuccessStateDelegate) {
-        if RunningFlagsIndication.isSdkRunning {
-            delegate.optimove(
-                self,
-                didBecomeActiveWithMissingPermissions: serviceLocator.deviceStateMonitor().getMissingPermissions().map { $0.rawValue }
-            )
-            return
-        }
-        stateDelegateQueue.async {
-            Optimove.objcStateDelegate[ObjectIdentifier(delegate)] = OptimoveSuccessStateDelegateWrapper(
-                observer: delegate
-            )
-        }
-    }
-
-    @available(swift, obsoleted: 1.0)
-    @objc public func unregisterSuccessStateDelegate(_ delegate: OptimoveSuccessStateDelegate) {
-        stateDelegateQueue.async {
-            Optimove.objcStateDelegate[ObjectIdentifier(delegate)] = nil
-        }
-    }
 }
 
 // MARK: - Notification related API

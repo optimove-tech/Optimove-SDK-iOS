@@ -26,13 +26,9 @@ public enum OptimoveDeviceRequirement: Int, CaseIterable, CustomStringConvertibl
 }
 
 protocol OptimoveDeviceStateMonitor {
+
     func getStatus(for: OptimoveDeviceRequirement, completion: @escaping ResultBlockWithBool)
 
-    func getStatuses(for: [OptimoveDeviceRequirement], completion: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void)
-
-    /// - Warning: Returning cached results.
-    /// - ToDo: Change to `getMissingPermissions(completion: @escaping (Result<[OptimoveDeviceRequirement], Error> -> Void))`.
-    func getMissingPermissions() -> [OptimoveDeviceRequirement]
 }
 
 final class OptimoveDeviceStateMonitorImpl {
@@ -45,7 +41,7 @@ final class OptimoveDeviceStateMonitorImpl {
 
     init(fetcherFactory: DeviceRequirementFetcherFactory) {
         self.fetcherFactory = fetcherFactory
-        accessQueue = DispatchQueue(label: "com.optimove.sdk.queue.deviceState", qos: .background)
+        accessQueue = DispatchQueue(label: "com.optimove.sdk.queue.deviceState", qos: .utility)
         requests = OptimoveDeviceRequirement.allCases.reduce(into: [:], { (result, next) in
             result[next] = []
         })
@@ -61,30 +57,6 @@ extension OptimoveDeviceStateMonitorImpl: OptimoveDeviceStateMonitor {
                 return
             }
             self?.requestStatus(for: deviceRequirement, completion: completion)
-        }
-    }
-
-    func getStatuses(for requirements: [OptimoveDeviceRequirement], completion: @escaping ([OptimoveDeviceRequirement: Bool]) -> Void) {
-        let group = DispatchGroup()
-        DispatchQueue.global(qos: .utility).async {
-            requirements.forEach { (requirement) in
-                group.enter()
-                self.getStatus(for: requirement) { _ in
-                    group.leave()
-                }
-            }
-        }
-        group.notify(queue: accessQueue) {
-            let statuses = self.statuses
-            completion(statuses)
-        }
-    }
-
-    func getMissingPermissions() -> [OptimoveDeviceRequirement] {
-        return accessQueue.sync {
-            return statuses
-                .filter { $0.value == false }
-                .compactMap { $0.key.isUserDependentPermissions ? $0.key : nil }
         }
     }
 }

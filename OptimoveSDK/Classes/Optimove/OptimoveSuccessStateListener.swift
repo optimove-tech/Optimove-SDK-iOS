@@ -2,25 +2,11 @@
 
 import Foundation
 
-struct OptimoveSuccessStateListenerWrapper {
-    weak var observer: OptimoveSuccessStateListener?
-}
-
+// TODO: Delete the protocol declaration after SDK version 2.3.0
+@available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
 public protocol OptimoveSuccessStateListener: class {
     func optimove(
         _ optimove: Optimove,
         didBecomeActiveWithMissingPermissions missingPermissions: [OptimoveDeviceRequirement]
     )
-}
-
-final class OptimoveSuccessStateDelegateWrapper {
-    var observer: OptimoveSuccessStateDelegate
-
-    init(observer: OptimoveSuccessStateDelegate) {
-        self.observer = observer
-    }
-}
-
-@objc public protocol OptimoveSuccessStateDelegate: class {
-    @objc func optimove(_ optimove: Optimove, didBecomeActiveWithMissingPermissions missingPermissions: [Int])
 }
