@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import OptimoveCore
+import Foundation
 
 protocol Component {
 
