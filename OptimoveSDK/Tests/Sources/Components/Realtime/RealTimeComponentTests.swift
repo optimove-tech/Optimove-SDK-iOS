@@ -66,7 +66,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: StubEvent())
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
     func test_that_realtimeEvent_has_a_correct_visitorId() {
@@ -87,7 +87,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: StubEvent())
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
     /// The event that is reported by name would become an RTE with its correct ID as defined in the config file.
@@ -106,7 +106,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: stubEvent)
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
     /// All parameters that exist in the OptimoveEvent are converted to Context inside the RTEvent
@@ -140,7 +140,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: stubEvent)
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
     /// If the storage contains a firstTimeVisit timestamp, it will not change the RTEvent would contain it
@@ -162,7 +162,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: StubEvent())
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
 // MARK: - Sending Regular Events
@@ -182,7 +182,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
     /// If an event is reported to the Realtime component and there is no internet connection, you will receive an indication that the event is skipped.
@@ -199,7 +199,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: StubEvent())
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
     /// If the storage contains a flag that SetUserID event failed when a regular event is reported the SetUserID event will be reported first
@@ -239,8 +239,8 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: stubEvent)
-        wait(for: [userIdEventExpectation, regularEventExpectation], timeout: expectationTimeout, enforceOrder: true)
-        wait(for: [failedUserIdFlagExpectation], timeout: expectationTimeout)
+        wait(for: [userIdEventExpectation, regularEventExpectation], timeout: timeoutForRealtime, enforceOrder: true)
+        wait(for: [failedUserIdFlagExpectation], timeout: timeoutForRealtime)
     }
 
     /// If the storage contains a flag that SetUserEmail event failed when a regular event is reported the SetUserEmail event will be reported first
@@ -284,8 +284,8 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: stubEvent)
-        wait(for: [userEmailEventExpectation, regularEventExpectation], timeout: expectationTimeout, enforceOrder: true)
-        wait(for: [failedUserEmailFlagExpectation], timeout: expectationTimeout)
+        wait(for: [userEmailEventExpectation, regularEventExpectation], timeout: timeoutForRealtime, enforceOrder: true)
+        wait(for: [failedUserEmailFlagExpectation], timeout: defaultTimeout)
     }
 
     /// If the storage contains a flag that SetUserID and SetUserEmail events failed, when a regular event is reported the SetUserId event will be reported first, then the SetUserEmail and finally the regular event.
@@ -344,11 +344,11 @@ class RealTimeComponentTests: XCTestCase {
             userIdEventExpectation,
             userEmailEventExpectation,
             regularEventExpectation
-        ], timeout: expectationTimeout, enforceOrder: true)
+        ], timeout: timeoutForRealtime, enforceOrder: true)
         wait(for: [
             failedUserIdFlagExpectation,
             failedUserEmailFlagExpectation
-        ], timeout: expectationTimeout, enforceOrder: true
+        ], timeout: timeoutForRealtime, enforceOrder: true
         )
     }
 
@@ -405,7 +405,7 @@ class RealTimeComponentTests: XCTestCase {
             stubEventAExpectation,
             stubEventBExpectation,
             stubEventCExpectation
-        ], timeout: expectationTimeout, enforceOrder: true)
+        ], timeout: timeoutForRealtime, enforceOrder: true)
     }
 
     func test_decoration_invoke() {
@@ -432,7 +432,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: timeoutForRealtime)
     }
 
 // MARK: - Sending SetUserID/SetEmail Events
@@ -459,7 +459,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
     /// When a SetUserID event is reported and there is no internet connection, the storage flag for the failedSetUserId event should be true at the end of the flow.
@@ -487,7 +487,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
     /// When a SetUserEmail event is reported and there is an internet connection, the storage flag for the failedSetUserEmail event should be false at the end of the flow.
@@ -509,7 +509,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: timeoutForRealtime)
     }
 
     /// When a SetUserEmail event is reported and there is no internet connection, the storage flag for the failedSetUserEmail event should be true at the end of the flow.
@@ -533,7 +533,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
     func test_report_screen_event() {
@@ -560,7 +560,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: defaultTimeout)
     }
 
     func test_report_without_customerID_and_visitorID() {
@@ -573,7 +573,7 @@ class RealTimeComponentTests: XCTestCase {
         }
         // when
         try! realTime.reportEvent(event: StubEvent())
-        waitForExpectations(timeout: expectationTimeout)
+        waitForExpectations(timeout: timeoutForRealtime)
     }
 }
 

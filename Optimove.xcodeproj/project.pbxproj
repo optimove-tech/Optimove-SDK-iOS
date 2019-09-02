@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		009575694F6C4F5E857EDAAA /* RegistartionMbaasModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B3F489ED285497C224F9600 /* RegistartionMbaasModelTests.swift */; };
-		041602C8D91BA328D9D0E14E /* Eventable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A10B15635AB8A683D3899C /* Eventable.swift */; };
 		04B351D1EFFA33FBD8A9D3CB /* GlobalConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF221484A7B1A433DB7FAD1 /* GlobalConfigTests.swift */; };
 		0697957F7C6A9A94C723E8B3 /* RemoteConfigurationRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF7F8DB2BB53F5D18E6845C /* RemoteConfigurationRequestBuilder.swift */; };
 		06F4CB3912239AD7928756DC /* MbaasModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A7AC20B0DFA891146DFB42 /* MbaasModelTests.swift */; };
@@ -16,7 +15,6 @@
 		084300991314506F27733F1B /* Dictionary+CompactMapKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9382B5FEF3C50C307CD562 /* Dictionary+CompactMapKeys.swift */; };
 		087680719E883B0B1304CF14 /* OptimoveDeviceStateMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8976553A380B581E98A6CA /* OptimoveDeviceStateMonitor.swift */; };
 		09EEECBD19FC2CE320766E51 /* ServiceLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 065E634989F7A3BB12F51DAE /* ServiceLocator.swift */; };
-		0A14689EE1B1B2E8F28D1E96 /* Pushable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1C142BD25B92550592655C /* Pushable.swift */; };
 		0A85B1B6F533719A316DABE4 /* RealtimeEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B77198F471FD2BF1133183 /* RealtimeEvent.swift */; };
 		0A8C0C45C4CCEA94902DC9FA /* RealTimeComponentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40D8512B3C3471E83BEC766 /* RealTimeComponentTests.swift */; };
 		0AD6BEFCC27FB59D99ACBD6D /* notificationWithDeepLinkPersonalizationValues.json in Resources */ = {isa = PBXBuildFile; fileRef = 895B87C7AB14141916C00840 /* notificationWithDeepLinkPersonalizationValues.json */; };
@@ -569,7 +567,6 @@
 		C59CCCF5E4837D57A4C7A7E3 /* RealTimeNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTimeNetworking.swift; sourceTree = "<group>"; };
 		C5A2928DDD25C92FD262C764 /* CoreEventFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreEventFactory.swift; sourceTree = "<group>"; };
 		C7200FEC7324CD23FA92B707 /* Registrar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Registrar.swift; sourceTree = "<group>"; };
-		C7A10B15635AB8A683D3899C /* Eventable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Eventable.swift; sourceTree = "<group>"; };
 		C7A3DE0895587BC6C442D525 /* OptimoveTopicsUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveTopicsUserDefaults.swift; sourceTree = "<group>"; };
 		C81A844C0F84A3D7674D7B6C /* NetworkRequestFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequestFactory.swift; sourceTree = "<group>"; };
 		C8411A92C5ADEF8363F217CD /* PageVisitEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageVisitEventTests.swift; sourceTree = "<group>"; };
@@ -599,7 +596,6 @@
 		DCC5B57C77C5203E22481D64 /* RealTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTime.swift; sourceTree = "<group>"; };
 		DCD4DEFD23225D3D5FDDAF5B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DE0D16D34EAA14578617D5D6 /* MockOptimoveStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockOptimoveStorage.swift; sourceTree = "<group>"; };
-		DE1C142BD25B92550592655C /* Pushable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pushable.swift; sourceTree = "<group>"; };
 		DEF011FCE58EC7E3A1DB7E1A /* SimpleCustomEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleCustomEvent.swift; sourceTree = "<group>"; };
 		DF11C1F350A50E1C03B30E26 /* FirebaseInteractorRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseInteractorRequestBuilder.swift; sourceTree = "<group>"; };
 		DF36736BC7A524DE5B84B60D /* RealtimeEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealtimeEventTests.swift; sourceTree = "<group>"; };
@@ -1612,8 +1608,6 @@
 			children = (
 				07E9A725FF1B2D5E98852E22 /* Component.swift */,
 				A62F78D2B266D526AACB799C /* ComponentsPool.swift */,
-				C7A10B15635AB8A683D3899C /* Eventable.swift */,
-				DE1C142BD25B92550592655C /* Pushable.swift */,
 			);
 			path = ComponentsPool;
 			sourceTree = "<group>";
@@ -1838,21 +1832,21 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		"TEMP_97CF4C91-3067-448D-98CD-70EF8373F26C" /* Tests */ = {
+		"TEMP_112B006C-A730-4FE2-B861-8DB516AB5F17" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_AE7CD1B6-B44A-4D54-A69F-CC6393A86EA9" /* Tests */ = {
+		"TEMP_80B6065F-110B-49EE-B1C2-34124E4BCF1E" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_E2C31874-9967-4DE4-B3F9-1C991CB094E5" /* Tests */ = {
+		"TEMP_F79DA852-D948-4C3A-91FB-7758CC27EB7E" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -2108,7 +2102,6 @@
 				0BF9565F3B4EC1A9087FDA87 /* DeviceReuirementFetcherFactory.swift in Sources */,
 				084300991314506F27733F1B /* Dictionary+CompactMapKeys.swift in Sources */,
 				C46A3EB9902A7F8E4E766CCE /* DynamicLinkParser.swift in Sources */,
-				041602C8D91BA328D9D0E14E /* Eventable.swift in Sources */,
 				1F2300DB4A1242180AFDD332 /* EventsConfigWarehouse.swift in Sources */,
 				63E925526DF886203CD84740 /* Fetchable.swift in Sources */,
 				1BAEEF70393CB10F498ECF5D /* FirebaseInteractor.swift in Sources */,
@@ -2162,7 +2155,6 @@
 				25CA2AAB3740CFA19F8F060B /* PageVisitEvent.swift in Sources */,
 				1429E36448F6EA7F9F76E069 /* PingEvent.swift in Sources */,
 				CFDCBD47B6F317025BFA460A /* ProcessInfo.swift in Sources */,
-				0A14689EE1B1B2E8F28D1E96 /* Pushable.swift in Sources */,
 				D33DD7D1A4AF71F72BCC246D /* RealTime.swift in Sources */,
 				6BEFF03BD900E1F3014F3D8F /* RealTimeEventBuilder.swift in Sources */,
 				1E51B3CC68D59E8999018A2F /* RealTimeEventContext.swift in Sources */,
