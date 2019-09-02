@@ -1832,21 +1832,21 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		"TEMP_038A8391-4C9C-4A86-8264-EF82AEDA9CDE" /* Tests */ = {
+		"TEMP_0AEA7375-4A9B-4416-9D71-08246585EAAB" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_5A6D4515-1114-4017-8EA5-4099D13681A4" /* Tests */ = {
+		"TEMP_C1DCB4D7-8021-4D22-84D4-DD7258D9F27A" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_921981E3-D3C1-4338-9AAF-7B5528340A54" /* Tests */ = {
+		"TEMP_CAF9F20B-C640-45CA-A7F5-F7466AE01061" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
