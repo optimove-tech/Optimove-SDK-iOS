@@ -18,9 +18,9 @@ extension ComponentsPoolImpl: ComponentsPool { }
 
 extension ComponentsPoolImpl: EventableComponent {
 
-    func handleEventable(_ operation: EventableOperation) throws {
+    func handleEventable(_ context: EventableOperationContext) throws {
         eventableComponents.forEach { component in
-            try? component.handleEventable(operation)
+            try? component.handleEventable(context)
         }
 
         // TODO: Check if still needed after buffer introduction.
@@ -40,9 +40,9 @@ extension ComponentsPoolImpl: EventableComponent {
 
 extension ComponentsPoolImpl: PushableComponent {
 
-    func handlePushable(_ operation: PushableOperation) throws {
+    func handlePushable(_ context: PushableOperationContext) throws {
         pushableComponents.forEach { component in
-            try? component.handlePushable(operation)
+            try? component.handlePushable(context)
         }
 
         // TODO: Check if still needed after buffer introduction.

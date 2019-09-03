@@ -4,20 +4,20 @@ import Foundation
 
 final class InMemoryEventableBuffer: EventableHandler {
 
-    private var buffer = RingBuffer<EventableOperation>(count: 100)
+    private var buffer = RingBuffer<EventableOperationContext>(count: 100)
 
-    override func handle(_ operation: EventableOperation) throws {
+    override func handle(_ context: EventableOperationContext) throws {
         if nextHandler == nil {
-            buffer.write(operation)
+            buffer.write(context)
         } else {
             dispatchBuffer()
-            try nextHandler?.handle(operation)
+            try nextHandler?.handle(context)
         }
     }
 
     func dispatchBuffer() {
-        while let operation = buffer.read() {
-            try? nextHandler?.handle(operation)
+        while let context = buffer.read() {
+            try? nextHandler?.handle(context)
         }
     }
 
@@ -25,20 +25,21 @@ final class InMemoryEventableBuffer: EventableHandler {
 
 final class InMemoryPushableBuffer: PushableHandler {
 
-    private var buffer = RingBuffer<PushableOperation>(count: 100)
+    private var buffer = RingBuffer<PushableOperationContext>(count: 100)
 
-    override func handle(_ operation: PushableOperation) throws {
+    override func handle(_ context: PushableOperationContext) throws {
         if nextHandler == nil {
-            buffer.write(operation)
+            context.isBuffered = true
+            buffer.write(context)
         } else {
             dispatchBuffer()
-            try nextHandler?.handle(operation)
+            try nextHandler?.handle(context)
         }
     }
 
     func dispatchBuffer() {
-        while let operation = buffer.read() {
-            try? nextHandler?.handle(operation)
+        while let context = buffer.read() {
+            try? nextHandler?.handle(context)
         }
     }
 

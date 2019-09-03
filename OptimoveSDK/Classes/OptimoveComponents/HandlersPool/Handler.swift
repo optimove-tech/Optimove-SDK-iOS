@@ -18,7 +18,7 @@ protocol Handler {
     var nextHandler: HandlerInstance? { get set }
     @discardableResult
     mutating func setNext(_: HandlerInstance) -> HandlerInstance
-    associatedtype HandlerOperation: ComponentOperation
+    associatedtype HandlerOperation: OperationContext
     func handle(_: HandlerOperation) throws
 }
 
@@ -32,11 +32,11 @@ extension Handler {
 
 class EventableHandler: Handler {
     typealias HandlerInstance = EventableHandler
-    typealias HandlerOperation = EventableOperation
+    typealias HandlerOperation = EventableOperationContext
 
     var nextHandler: EventableHandler?
 
-    func handle(_: EventableOperation) throws {
+    func handle(_: EventableOperationContext) throws {
         fatalError("No implementation. Expect to be implemented by inheretance.")
     }
 
@@ -44,11 +44,11 @@ class EventableHandler: Handler {
 
 class PushableHandler: Handler {
     typealias HandlerInstance = PushableHandler
-    typealias HandlerOperation = PushableOperation
+    typealias HandlerOperation = PushableOperationContext
 
     var nextHandler: PushableHandler?
 
-    func handle(_: PushableOperation) throws {
+    func handle(_: PushableOperationContext) throws {
         fatalError("No implementation. Expect to be implemented by inheretance.")
     }
 }

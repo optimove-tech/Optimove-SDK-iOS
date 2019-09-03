@@ -61,8 +61,9 @@ final class RealTime {
 
 extension RealTime: EventableComponent {
 
-    func handleEventable(_ operation: EventableOperation) throws {
-        switch operation {
+    func handleEventable(_ context: EventableOperationContext) throws {
+        guard !context.isBuffered else { return }
+        switch context.operation {
         case .setUserId(userId: _):
             try? reportUserId()
         case let .report(event: event):

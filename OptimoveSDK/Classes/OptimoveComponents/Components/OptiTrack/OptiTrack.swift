@@ -67,8 +67,8 @@ final class OptiTrack {
 
 extension OptiTrack: EventableComponent {
 
-    func handleEventable(_ operation: EventableOperation) throws {
-        switch operation {
+    func handleEventable(_ context: EventableOperationContext) throws {
+        switch context.operation {
         case let .setUserId(userId: userId):
             setUserId(userId)
         case let .report(event: event):

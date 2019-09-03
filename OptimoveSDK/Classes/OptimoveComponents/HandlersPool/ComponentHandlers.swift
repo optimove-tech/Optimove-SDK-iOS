@@ -11,8 +11,8 @@ class ComponentEventableHandler: EventableHandler {
 
     // MARK: - EventableHandler
 
-    override func handle(_ operation: EventableOperation) throws {
-        try component.handleEventable(operation)
+    override func handle(_ context: EventableOperationContext) throws {
+        try component.handleEventable(context)
     }
 
 }
@@ -26,8 +26,8 @@ class ComponentPushableHandler: PushableHandler {
 
     // MARK: - EventableHandler
 
-    override func handle(_ operation: PushableOperation) throws {
-        try component.handlePushable(operation)
+    override func handle(_ context: PushableOperationContext) throws {
+        try component.handlePushable(context)
     }
 
 }

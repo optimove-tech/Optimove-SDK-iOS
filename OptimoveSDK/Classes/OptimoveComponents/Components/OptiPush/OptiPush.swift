@@ -67,8 +67,8 @@ final class OptiPush {
 
 extension OptiPush: PushableComponent {
 
-    func handlePushable(_ operation: PushableOperation) throws {
-        switch operation {
+    func handlePushable(_ context: PushableOperationContext) throws {
+        switch context.operation {
         case let .deviceToken(token: data):
             application(didRegisterForRemoteNotificationsWithDeviceToken: data)
         case let  .subscribeToTopic(topic: topic):

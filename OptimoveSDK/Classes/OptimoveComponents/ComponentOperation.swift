@@ -5,6 +5,22 @@ import OptimoveCore
 
 protocol ComponentOperation: Equatable { }
 
+protocol OperationContext {
+    var isBuffered: Bool { get set }
+    associatedtype Operation: ComponentOperation
+    var operation: Operation { get set }
+}
+
+final class EventableOperationContext: OperationContext {
+    var isBuffered: Bool = false
+    var operation: EventableOperation
+
+    init(_ operation: EventableOperation) {
+        self.operation = operation
+    }
+
+}
+
 enum EventableOperation: ComponentOperation {
     case setUserId(userId: String)
     case report(event: OptimoveEvent)
@@ -25,6 +41,16 @@ enum EventableOperation: ComponentOperation {
             return false
         }
     }
+}
+
+final class PushableOperationContext: OperationContext {
+    var isBuffered: Bool = false
+    var operation: PushableOperation
+
+    init(_ operation: PushableOperation) {
+        self.operation = operation
+    }
+
 }
 
 enum PushableOperation: ComponentOperation {

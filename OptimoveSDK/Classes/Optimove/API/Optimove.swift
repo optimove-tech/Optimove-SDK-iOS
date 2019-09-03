@@ -189,7 +189,7 @@ extension Optimove {
     ///
     /// - Parameter deviceToken: A token that was received in the appDelegate callback
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        try? handlers.pushableHandler.handle(.deviceToken(token: deviceToken))
+        try? handlers.pushableHandler.handle(PushableOperationContext(.deviceToken(token: deviceToken)))
 
         // TODO: It unneccessary to keep a device token after state-listener will go out,
         // and an internal buffer will be introduced.
@@ -216,18 +216,18 @@ extension Optimove {
     ///
     /// - Parameter topic: The topic name
     func registerToOptipushTopic(_ topic: String) {
-        try? handlers.pushableHandler.handle(.subscribeToTopic(topic: topic))
+        try? handlers.pushableHandler.handle(PushableOperationContext(.subscribeToTopic(topic: topic)))
     }
 
     /// Request to unregister from topic
     ///
     /// - Parameter topic: The topic name
     func unregisterFromOptipushTopic(_ topic: String) {
-        try? handlers.pushableHandler.handle(.unsubscribeFromTopic(topic: topic))
+        try? handlers.pushableHandler.handle(PushableOperationContext(.unsubscribeFromTopic(topic: topic)))
     }
 
     func performRegistration() {
-        try? handlers.pushableHandler.handle(.performRegistration)
+        try? handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
     }
 }
 
@@ -259,7 +259,7 @@ extension Optimove {
     ///   - event: optimove event object
     @objc public func reportEvent(_ event: OptimoveEvent) {
         do {
-            try handlers.eventableHandler.handle(.report(event: event))
+            try handlers.eventableHandler.handle(EventableOperationContext(.report(event: event)))
 
             // FIXME: Handle it in a different way. If needed
             if !RunningFlagsIndication.isComponentRunning(.realtime) {
@@ -280,7 +280,7 @@ extension Optimove {
     }
 
     func dispatchQueuedEventsNow() {
-        try? handlers.eventableHandler.handle(.dispatchNow)
+        try? handlers.eventableHandler.handle(EventableOperationContext(.dispatchNow))
     }
 
 }
@@ -321,7 +321,7 @@ extension Optimove {
         storage.visitorID = updatedVisitorId
         storage.customerID = userId
 
-        try? handlers.eventableHandler.handle(.setUserId(userId: userId))
+        try? handlers.eventableHandler.handle(EventableOperationContext(.setUserId(userId: userId)))
         let setUserIdEvent = SetUserIdEvent(
             originalVistorId: initialVisitorId,
             userId: userId,
@@ -329,7 +329,7 @@ extension Optimove {
         )
         reportEvent(setUserIdEvent)
         // TODO: Move `performRegistration` to OptiPush component
-        try? handlers.pushableHandler.handle(.performRegistration)
+        try? handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
     }
 
     /// Produce a 16 characters string represents the visitor ID of the client
@@ -417,10 +417,12 @@ extension Optimove {
             path = "\(Bundle.main.bundleIdentifier!)/\(path)".lowercased()
 
             try? handlers.eventableHandler.handle(
-                .reportScreenEvent(
-                    customURL: path,
-                    pageTitle: screenTitle,
-                    category: screenCategory
+                EventableOperationContext(
+                    .reportScreenEvent(
+                        customURL: path,
+                        pageTitle: screenTitle,
+                        category: screenCategory
+                    )
                 )
             )
         }

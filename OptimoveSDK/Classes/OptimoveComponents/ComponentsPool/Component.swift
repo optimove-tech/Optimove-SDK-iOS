@@ -6,9 +6,9 @@ import OptimoveCore
 protocol Component { }
 
 protocol EventableComponent: Component {
-    func handleEventable(_ operation: EventableOperation) throws
+    func handleEventable(_: EventableOperationContext) throws
 }
 
 protocol PushableComponent: Component {
-    func handlePushable(_ operation: PushableOperation) throws
+    func handlePushable(_: PushableOperationContext) throws
 }
