@@ -4,6 +4,15 @@ import UserNotifications
 import UIKit
 
 protocol OptimoveNotificationHandling {
+
+    func isOptimoveSdkCommand(userInfo: [AnyHashable: Any]) -> Bool
+    func isOptipush(notification: UNNotification) -> Bool
+
+    func willPresent(
+        notification: UNNotification,
+        withCompletionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    )
+
     func didReceiveRemoteNotification(
         userInfo: [AnyHashable: Any],
         didComplete: @escaping (UIBackgroundFetchResult) -> Void

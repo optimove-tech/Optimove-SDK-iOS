@@ -126,61 +126,68 @@ extension Optimove {
 
 }
 
-// MARK: - Notification related API
 extension Optimove {
-    /// Validate user notification permissions and sends the payload to the message handler
+
+    /// Tells the Optimove SDK that a remote notification arrived that indicates there is data to be fetched.
     ///
     /// - Parameters:
-    ///   - userInfo: the data payload as sends by the the server
-    ///   - completionHandler: an indication to the OS that the data is ready to be presented by the system as a notification
+    ///   - userInfo: A dictionary that contains information related to the remote notification.
+    ///   - completionHandler: The block to execute when the download operation is complete.
+    /// - Returns: Returns `true` if the Optimove SDK could handle a notification.
     @objc public func didReceiveRemoteNotification(
         userInfo: [AnyHashable: Any],
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
         ) -> Bool {
         Logger.info("Receive remote notification.")
-        guard userInfo[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true" else {
-            return false
+        let notificationListener = serviceLocator.notificationListener()
+        let result = notificationListener.isOptimoveSdkCommand(userInfo: userInfo)
+        if result {
+            serviceLocator.notificationListener().didReceiveRemoteNotification(
+                userInfo: userInfo,
+                didComplete: didComplete
+            )
         }
-        serviceLocator.notificationListener().didReceiveRemoteNotification(
-            userInfo: userInfo,
-            didComplete: didComplete
-        )
-        return true
+        return result
     }
 
+    /// Asks the Optimove SDK how to handle a notification that arrived while the app was running in the foreground.
+    ///
+    /// - Parameters:
+    ///   - notification: The notification that is about to be delivered.
+    ///   - completionHandler: The block to execute when the download operation is complete.
+    /// - Returns: Returns `true` if the Optimove SDK could handle a notification.
     @objc public func willPresent(
         notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
         ) -> Bool {
         Logger.info("Received notification in foreground mode.")
-        guard notification.request.content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true"
-            else {
-                Logger.debug("Notification should not be handled by optimove")
-                return false
+        let notificationListener = serviceLocator.notificationListener()
+        let result = notificationListener.isOptipush(notification: notification)
+        if result {
+            notificationListener.willPresent(notification: notification, withCompletionHandler: completionHandler)
         }
-        completionHandler([.alert, .sound, .badge])
-        return true
+        return result
     }
 
-    /// Report user response to optimove notifications and send the client the related deep link to open
+    /// Asks the Optimove SDK to process the user's response to a delivered notification.
     ///
     /// - Parameters:
-    ///   - response: The user response
-    ///   - completionHandler: Indication about the process ending
+    ///   - response: The user’s response to the notification.
+    ///   - completionHandler: The block to execute when you have finished processing the user’s response.
+    /// - Returns: Returns `true` if the Optimove SDK could handle a notification.
     @objc public func didReceive(
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
-        let userInfo = response.notification.request.content.userInfo
-        guard userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true" else {
-            Logger.debug("User respond to non optimove notification")
-            return false
+        let notificationListener = serviceLocator.notificationListener()
+        let result = notificationListener.isOptipush(notification: response.notification)
+        if result {
+            serviceLocator.notificationListener().didReceive(
+                response: response,
+                withCompletionHandler: completionHandler
+            )
         }
-        serviceLocator.notificationListener().didReceive(
-            response: response,
-            withCompletionHandler: completionHandler
-        )
-        return true
+        return result
     }
 }
 

@@ -165,6 +165,21 @@ private extension OptimoveNotificationHandler {
 
 extension OptimoveNotificationHandler: OptimoveNotificationHandling {
 
+    func isOptimoveSdkCommand(userInfo: [AnyHashable: Any]) -> Bool {
+        return userInfo[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true"
+    }
+
+    func isOptipush(notification: UNNotification) -> Bool {
+        return notification.request.content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true"
+    }
+
+    func willPresent(
+        notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+        ) {
+        completionHandler([.alert, .sound, .badge])
+    }
+
     func didReceiveRemoteNotification(
         userInfo: [AnyHashable: Any],
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
@@ -176,7 +191,7 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
             }
             Logger.info("Urgent Initialization success")
 
-            guard userInfo[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true" else {
+            guard self.isOptimoveSdkCommand(userInfo: userInfo) else {
                 Logger.debug("The notification do not contains SDK command.")
                 didComplete(.newData)
                 return
