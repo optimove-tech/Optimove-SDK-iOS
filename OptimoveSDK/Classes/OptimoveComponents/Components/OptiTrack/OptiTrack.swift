@@ -62,9 +62,27 @@ final class OptiTrack {
             Logger.error(error.localizedDescription)
         }
     }
+
 }
 
-extension OptiTrack: Eventable {
+extension OptiTrack: EventableComponent {
+
+    func handleEventable(_ operation: EventableOperation) throws {
+        switch operation {
+        case let .setUserId(userId: userId):
+            setUserId(userId)
+        case let .report(event: event):
+            try report(event: event)
+        case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
+            try reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
+        case .dispatchNow:
+            dispatchNow()
+        }
+    }
+
+}
+
+private extension OptiTrack {
 
     func setUserId(_ userId: String) {
         Logger.info("OptiTrack: Set user id \(userId)")
@@ -84,7 +102,7 @@ extension OptiTrack: Eventable {
 
     func reportScreenEvent(customURL: String, pageTitle: String, category: String?) throws {
         Logger.debug("OptiTrack: Report screen event: title='\(pageTitle)', path='\(customURL)'")
-        tracker.track(view: [customURL], url: URL(string: "http://\(customURL)"))
+        tracker.track(view: [pageTitle], url: URL(string: "http://\(customURL)"))
 
         let event = try coreEventFactory.createEvent(
             .pageVisit(screenPath: customURL.sha1(),
@@ -104,10 +122,6 @@ extension OptiTrack: Eventable {
         }
     }
 
-}
-
-extension OptiTrack {
-
     // MARK: - Report
 
     func obtainConfiguration(for event: OptimoveEvent) throws -> EventsConfig {
@@ -115,21 +129,6 @@ extension OptiTrack {
             throw GuardError.custom("Configurations are missing for event \(event.name)")
         }
         return config
-    }
-
-    func reportScreenEvent(screenTitle: String,
-                           screenPath: String,
-                           category: String? = nil) throws {
-        Logger.debug("OptiTrack: Report screen event: title='\(screenTitle)', path='\(screenPath)'")
-        tracker.track(view: [screenTitle], url: URL(string: "http://\(screenPath)"))
-
-        let event = try coreEventFactory.createEvent(
-            .pageVisit(screenPath: screenPath.sha1(),
-                       screenTitle: screenTitle,
-                       category: category
-            )
-        )
-        try report(event: event)
     }
 
 }

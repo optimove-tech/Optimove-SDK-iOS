@@ -65,7 +65,23 @@ final class OptiPush {
 
 }
 
-extension OptiPush: Pushable {
+extension OptiPush: PushableComponent {
+
+    func handlePushable(_ operation: PushableOperation) throws {
+        switch operation {
+        case let .deviceToken(token: data):
+            application(didRegisterForRemoteNotificationsWithDeviceToken: data)
+        case let  .subscribeToTopic(topic: topic):
+            subscribeToTopic(topic: topic)
+        case let .unsubscribeFromTopic(topic: topic):
+            unsubscribeFromTopic(topic: topic)
+        case .performRegistration:
+            performRegistration()
+        }
+    }
+}
+
+private extension OptiPush {
 
     func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         firebaseInteractor.handleRegistration(token: deviceToken)

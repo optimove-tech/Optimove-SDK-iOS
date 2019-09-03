@@ -20,13 +20,13 @@ public final class RemoteConfigurationRequestBuilder {
             .appendingPathComponent(version)
             .appendingPathExtension("json")
         Logger.debug("Connect to \(url.absoluteString) to retreive configuration file.")
-        return NetworkRequest(method: .get, baseURL: url)
+        return NetworkRequest(method: .get, baseURL: url, timeoutInterval: 5)
     }
 
     public func createGlobalConfigurationsRequest() -> NetworkRequest {
         let url = Endpoints.Remote.GlobalConfig.url(SDK.environment)
         Logger.debug("Connect to \(url.absoluteString) to retreive global file.")
-        return NetworkRequest(method: .get, baseURL: url)
+        return NetworkRequest(method: .get, baseURL: url, timeoutInterval: 5)
     }
 
 }

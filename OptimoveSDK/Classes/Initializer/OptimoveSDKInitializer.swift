@@ -11,6 +11,7 @@ final class OptimoveSDKInitializer {
     private let configurationRepository: ConfigurationRepository
     private let componentFactory: ComponentFactory
     private let components: MutableComponentsPool
+    private let handlersPool: HandlersPool
 
     private lazy var operationQueue: OperationQueue = {
         let queue = OperationQueue()
@@ -25,13 +26,15 @@ final class OptimoveSDKInitializer {
          networking: RemoteConfigurationNetworking,
          configurationRepository: ConfigurationRepository,
          componentFactory: ComponentFactory,
-         componentsPool: MutableComponentsPool) {
+         componentsPool: MutableComponentsPool,
+         handlersPool: HandlersPool) {
         self.deviceStateMonitor = deviceStateMonitor
         self.storage = storage
         self.networking = networking
         self.configurationRepository = configurationRepository
         self.componentFactory = componentFactory
         self.components = componentsPool
+        self.handlersPool = handlersPool
     }
 
     // MARK: - API
@@ -125,15 +128,17 @@ private extension OptimoveSDKInitializer {
         }
         RunningFlagsIndication.isInitializerRunning = true
         initializeOptitrack()
-        initializeOptipush()
         initializeRealtime()
+        handlersPool.addNextEventableHandler(ComponentEventableHandler(component: components))
+        initializeOptipush()
+        handlersPool.addNextPushableHandler(ComponentPushableHandler(component: components))
         Logger.info("All components setup finished.")
         completion(didFinishSdkInitializtionSucceesfully())
     }
 
     func initializeOptipush() {
         do {
-            components.addPushableComponent(try componentFactory.createOptipushComponent())
+            components.addComponent(try componentFactory.createOptipushComponent())
             RunningFlagsIndication.setComponentRunningFlag(component: .optiPush, state: true)
         } catch {
             Logger.error(error.localizedDescription)
@@ -142,7 +147,7 @@ private extension OptimoveSDKInitializer {
 
     func initializeOptitrack() {
         do {
-            components.addEventableComponent(try componentFactory.createOptitrackComponent())
+            components.addComponent(try componentFactory.createOptitrackComponent())
             RunningFlagsIndication.setComponentRunningFlag(component: .optiTrack, state: true)
         } catch {
             Logger.error(error.localizedDescription)
@@ -151,7 +156,7 @@ private extension OptimoveSDKInitializer {
 
     func initializeRealtime() {
         do {
-            components.addEventableComponent(try componentFactory.createRealtimeComponent())
+            components.addComponent(try componentFactory.createRealtimeComponent())
             RunningFlagsIndication.setComponentRunningFlag(component: .realtime, state: true)
         } catch {
             Logger.error(error.localizedDescription)

@@ -75,7 +75,7 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         // when
-        XCTAssertNoThrow(try optitrack.reportScreenEvent(screenTitle: screenTitle, screenPath: screenPath, category: category))
+        XCTAssertNoThrow(try optitrack.handleEventable(.reportScreenEvent(customURL: screenPath, pageTitle: screenTitle, category: category)))
         wait(for: [trackViewExpectation, trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
@@ -92,7 +92,7 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         // when
-        try! optitrack.report(event: stubEvent)
+        try! optitrack.handleEventable(.report(event: stubEvent))
         wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
@@ -107,7 +107,7 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         // when
-        optitrack.dispatchNow()
+        try! optitrack.handleEventable(.dispatchNow)
         wait(for: [trackDispatchExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
@@ -123,7 +123,7 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         // when
-        optitrack.dispatchNow()
+        try! optitrack.handleEventable(.dispatchNow)
         wait(for: [trackDispatchExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 

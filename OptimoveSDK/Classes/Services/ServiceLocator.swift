@@ -51,8 +51,14 @@ final class ServiceLocator {
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
     private lazy var _componentsPool: MutableComponentsPool = {
-        return ComponentsPoolImpl(
-            componentFactory: componentFactory()
+        return ComponentsPoolImpl()
+    }()
+
+    /// Keeps as singleton in reason to share a session state between a service consumers.
+    private lazy var _handlersPool: HandlersPool = {
+        return HandlersPool(
+            eventableHandler: InMemoryEventableBuffer(),
+            pushableHandler: InMemoryPushableBuffer()
         )
     }()
 
@@ -103,7 +109,8 @@ final class ServiceLocator {
             networking: networkingFactory.createRemoteConfigurationNetworking(),
             configurationRepository: configurationRepository(),
             componentFactory: componentFactory(),
-            componentsPool: mutableComponentsPool()
+            componentsPool: mutableComponentsPool(),
+            handlersPool: handlersPool()
         )
     }
 
@@ -120,6 +127,10 @@ final class ServiceLocator {
 
     func componentsPool() -> ComponentsPool {
         return _componentsPool
+    }
+
+    func handlersPool() -> HandlersPool {
+        return _handlersPool
     }
 
     func mutableComponentsPool() -> MutableComponentsPool {

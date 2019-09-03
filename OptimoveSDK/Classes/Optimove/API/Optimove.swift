@@ -4,18 +4,13 @@ import UIKit
 import UserNotifications
 import OptimoveCore
 
-protocol OptimoveEventReporting: class {
-    func reportEvent(_ event: OptimoveEvent)
-    func dispatchQueuedEventsNow()
-}
-
 /// The entry point of Optimove.
 /// Initialize and configure SDK using `Optimove.shared.configure(for:)`.
 @objc public final class Optimove: NSObject {
 
     private let serviceLocator: ServiceLocator
     private var storage: OptimoveStorage
-    private let components: ComponentsPool
+    private let handlers: HandlersPool
 
     // MARK: - Initializers
 
@@ -26,7 +21,7 @@ protocol OptimoveEventReporting: class {
 
     private override init() {
         serviceLocator = ServiceLocator()
-        components = serviceLocator.componentsPool()
+        handlers = serviceLocator.handlersPool()
         storage = serviceLocator.storage()
         super.init()
 
@@ -194,7 +189,7 @@ extension Optimove {
     ///
     /// - Parameter deviceToken: A token that was received in the appDelegate callback
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        components.application(didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+        try? handlers.pushableHandler.handle(.deviceToken(token: deviceToken))
 
         // TODO: It unneccessary to keep a device token after state-listener will go out,
         // and an internal buffer will be introduced.
@@ -221,22 +216,23 @@ extension Optimove {
     ///
     /// - Parameter topic: The topic name
     func registerToOptipushTopic(_ topic: String) {
-        components.subscribeToTopic(topic: topic)
+        try? handlers.pushableHandler.handle(.subscribeToTopic(topic: topic))
     }
 
     /// Request to unregister from topic
     ///
     /// - Parameter topic: The topic name
     func unregisterFromOptipushTopic(_ topic: String) {
-        components.unsubscribeFromTopic(topic: topic)
+        try? handlers.pushableHandler.handle(.unsubscribeFromTopic(topic: topic))
     }
 
     func performRegistration() {
-        components.performRegistration()
+        try? handlers.pushableHandler.handle(.performRegistration)
     }
 }
 
 extension Optimove: OptimoveDeepLinkResponding {
+
     @objc public func register(deepLinkResponder responder: OptimoveDeepLinkResponder) {
         if let dlc = self.deepLinkComponents {
             responder.didReceive(deepLinkComponent: dlc)
@@ -252,14 +248,6 @@ extension Optimove: OptimoveDeepLinkResponding {
     }
 }
 
-extension Optimove: OptimoveEventReporting {
-
-    func dispatchQueuedEventsNow() {
-        components.dispatchNow()
-    }
-
-}
-
 // MARK: - OptiTrack related API
 
 extension Optimove {
@@ -271,7 +259,7 @@ extension Optimove {
     ///   - event: optimove event object
     @objc public func reportEvent(_ event: OptimoveEvent) {
         do {
-            try components.report(event: event)
+            try handlers.eventableHandler.handle(.report(event: event))
 
             // FIXME: Handle it in a different way. If needed
             if !RunningFlagsIndication.isComponentRunning(.realtime) {
@@ -289,6 +277,10 @@ extension Optimove {
     @objc public func reportEvent(name: String, parameters: [String: Any]) {
         let customEvent = SimpleCustomEvent(name: name, parameters: parameters)
         reportEvent(customEvent)
+    }
+
+    func dispatchQueuedEventsNow() {
+        try? handlers.eventableHandler.handle(.dispatchNow)
     }
 
 }
@@ -329,7 +321,7 @@ extension Optimove {
         storage.visitorID = updatedVisitorId
         storage.customerID = userId
 
-        components.setUserId(userId)
+        try? handlers.eventableHandler.handle(.setUserId(userId: userId))
         let setUserIdEvent = SetUserIdEvent(
             originalVistorId: initialVisitorId,
             userId: userId,
@@ -337,7 +329,7 @@ extension Optimove {
         )
         reportEvent(setUserIdEvent)
         // TODO: Move `performRegistration` to OptiPush component
-        components.performRegistration()
+        try? handlers.pushableHandler.handle(.performRegistration)
     }
 
     /// Produce a 16 characters string represents the visitor ID of the client
@@ -346,17 +338,6 @@ extension Optimove {
     /// - Returns: THe generated visitor ID
     private func getVisitorId(from userId: String) -> String {
         return userId.sha1().prefix(16).description.lowercased()
-    }
-
-    /// Send the sdk id and the user email
-    ///
-    /// - Parameters:
-    ///   - email: The user email
-    ///   - sdkId: The user ID
-
-    @available(*, deprecated, renamed: "registerUser(sdkId:email:)")
-    @objc public func registerUser(email: String, sdkId: String) {
-        registerUser(sdkId: sdkId, email: email)
     }
 
     /// Send the sdk id and the user email
@@ -435,10 +416,12 @@ extension Optimove {
 
             path = "\(Bundle.main.bundleIdentifier!)/\(path)".lowercased()
 
-            try? components.reportScreenEvent(
-                customURL: path,
-                pageTitle: screenTitle,
-                category: screenCategory
+            try? handlers.eventableHandler.handle(
+                .reportScreenEvent(
+                    customURL: path,
+                    pageTitle: screenTitle,
+                    category: screenCategory
+                )
             )
         }
     }

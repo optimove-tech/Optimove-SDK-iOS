@@ -36,7 +36,6 @@ final class RealTime {
         self.eventBuilder = eventBuilder
         self.coreEventFactory = coreEventFactory
         self.deviceStateMonitor = deviceStateMonitor
-
         performInitializationOperations()
         Logger.debug("RealTime initialized.")
     }
@@ -60,30 +59,27 @@ final class RealTime {
 
 }
 
-extension RealTime: Eventable {
+extension RealTime: EventableComponent {
 
-    func setUserId(_ userId: String) {
-        try? reportUserId()
-    }
-
-    func report(event: OptimoveEvent) throws {
-        try reportEvent(event: event, retryFailedEvents: true)
-    }
-
-    func reportScreenEvent(customURL: String,
-                           pageTitle: String,
-                           category: String?) throws {
-        let event = try coreEventFactory.createEvent(
-            .pageVisit(screenPath: customURL,
-                       screenTitle: pageTitle,
-                       category: category
+    func handleEventable(_ operation: EventableOperation) throws {
+        switch operation {
+        case .setUserId(userId: _):
+            try? reportUserId()
+        case let .report(event: event):
+            try reportEvent(event: event, retryFailedEvents: true)
+        case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
+            try reportEvent(
+                event: try coreEventFactory.createEvent(
+                    .pageVisit(screenPath: customURL,
+                               screenTitle: pageTitle,
+                               category: category
+                    )
+                )
             )
-        )
-        try reportEvent(event: event)
-    }
-
-    func dispatchNow() {
-        // Consciously do nothing.
+        case .dispatchNow:
+            // Consciously do nothing.
+            break
+        }
     }
 
 }
