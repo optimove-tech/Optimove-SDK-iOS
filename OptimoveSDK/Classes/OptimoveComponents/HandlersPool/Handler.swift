@@ -18,8 +18,8 @@ protocol Handler {
     var nextHandler: HandlerInstance? { get set }
     @discardableResult
     mutating func setNext(_: HandlerInstance) -> HandlerInstance
-    associatedtype HandlerOperation: OperationContext
-    func handle(_: HandlerOperation) throws
+    associatedtype HandlerOperationContext: OperationContext
+    func handle(_ handler: HandlerOperationContext) throws
 }
 
 extension Handler {
@@ -32,7 +32,7 @@ extension Handler {
 
 class EventableHandler: Handler {
     typealias HandlerInstance = EventableHandler
-    typealias HandlerOperation = EventableOperationContext
+    typealias HandlerOperationContext = EventableOperationContext
 
     var nextHandler: EventableHandler?
 
@@ -44,7 +44,7 @@ class EventableHandler: Handler {
 
 class PushableHandler: Handler {
     typealias HandlerInstance = PushableHandler
-    typealias HandlerOperation = PushableOperationContext
+    typealias HandlerOperationContext = PushableOperationContext
 
     var nextHandler: PushableHandler?
 
