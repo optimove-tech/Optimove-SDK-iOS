@@ -151,7 +151,7 @@
 		79E7501ECFBEED252EC19F7D /* SetUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6DCAB94B445EF8F77AE031 /* SetUserAgent.swift */; };
 		7C0D0BBDC240FA93F9CCA122 /* RealTimeNetworkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F696B86DB679832FF66901 /* RealTimeNetworkingTests.swift */; };
 		7CAF4566492123A582434AD8 /* core_events.json in Resources */ = {isa = PBXBuildFile; fileRef = 0FA5B03E91EC1B9C8B7A921A /* core_events.json */; };
-		7CB96F7D515FBEA3A0B70325 /* OptimoveSuccessStateListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D2133E755CD4240BD1A4751 /* OptimoveSuccessStateListener.swift */; };
+		7CB96F7D515FBEA3A0B70325 /* DeprecatedStateListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D2133E755CD4240BD1A4751 /* DeprecatedStateListener.swift */; };
 		7F6A202D4C9541D3DFE79119 /* SetAdvertisingIdEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9601883B48B328BEA00024 /* SetAdvertisingIdEventTests.swift */; };
 		805DB74E1DA415F9C2585829 /* notificationWithTriggeredCampaign.json in Resources */ = {isa = PBXBuildFile; fileRef = 458897EAB1CC463D34F58C56 /* notificationWithTriggeredCampaign.json */; };
 		80C273417755BE17F1814D30 /* notificationWithTriggeredCampaign.json in Resources */ = {isa = PBXBuildFile; fileRef = 458897EAB1CC463D34F58C56 /* notificationWithTriggeredCampaign.json */; };
@@ -414,7 +414,7 @@
 		2915AF27922E8E3E608009FA /* StubOptimoveDeviceStateMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubOptimoveDeviceStateMonitor.swift; sourceTree = "<group>"; };
 		29BB9D0821A0E76F73FF6251 /* NetworkCapabilitiesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkCapabilitiesFetcher.swift; sourceTree = "<group>"; };
 		29DA49C7AED4B66B4668A504 /* DynamicLinkParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicLinkParser.swift; sourceTree = "<group>"; };
-		2D2133E755CD4240BD1A4751 /* OptimoveSuccessStateListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveSuccessStateListener.swift; sourceTree = "<group>"; };
+		2D2133E755CD4240BD1A4751 /* DeprecatedStateListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeprecatedStateListener.swift; sourceTree = "<group>"; };
 		2D3F073CCF354AB5D248504D /* OptimoveCustomEventDecorator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveCustomEventDecorator.swift; sourceTree = "<group>"; };
 		2D899640997A8E3DD93E6BBF /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		2F3ED80EF1D8ED5F8C9755F7 /* String+alphanumeric.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+alphanumeric.swift"; sourceTree = "<group>"; };
@@ -1711,7 +1711,7 @@
 		D6D87077D78BFFA0FAF3D13A /* Optimove */ = {
 			isa = PBXGroup;
 			children = (
-				2D2133E755CD4240BD1A4751 /* OptimoveSuccessStateListener.swift */,
+				2D2133E755CD4240BD1A4751 /* DeprecatedStateListener.swift */,
 				1B4DD470DAD4B3512153C28F /* OptimoveTenantInfo.swift */,
 				B4539E9891113690DBD3FD35 /* API */,
 				BC57DD64EE8C1BEF6BA20DDA /* DeepLink */,
@@ -2174,7 +2174,7 @@
 				9E48C88E04393F25355F9FF9 /* OptimoveQueue.swift in Sources */,
 				E1C5947057072EF818298DD8 /* OptimoveSDKInitializer.swift in Sources */,
 				EA096B39608581A557A31DD7 /* OptimoveSdkCommand.swift in Sources */,
-				7CB96F7D515FBEA3A0B70325 /* OptimoveSuccessStateListener.swift in Sources */,
+				7CB96F7D515FBEA3A0B70325 /* DeprecatedStateListener.swift in Sources */,
 				2F6396F107465112E8A3267E /* OptimoveTenantInfo.swift in Sources */,
 				95E071B47A8905EE121E20A2 /* OptimoveTopicsUserDefaults.swift in Sources */,
 				25CA2AAB3740CFA19F8F060B /* PageVisitEvent.swift in Sources */,

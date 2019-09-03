@@ -11,6 +11,7 @@ import OptimoveCore
     private let serviceLocator: ServiceLocator
     private var storage: OptimoveStorage
     private let handlers: HandlersPool
+    private let stateListener: DeprecatedStateListener
 
     // MARK: - Initializers
 
@@ -23,6 +24,7 @@ import OptimoveCore
         serviceLocator = ServiceLocator()
         handlers = serviceLocator.handlersPool()
         storage = serviceLocator.storage()
+        stateListener = DeprecatedStateListener()
         super.init()
 
         setup()
@@ -104,6 +106,7 @@ extension Optimove {
     func didFinishInitializationSuccessfully() {
         RunningFlagsIndication.isInitializerRunning = false
         RunningFlagsIndication.isSdkRunning = true
+        stateListener.onInitializationSuccessfully(self)
     }
 }
 
@@ -114,12 +117,12 @@ extension Optimove {
 
     @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
     public func registerSuccessStateListener(_ listener: OptimoveSuccessStateListener) {
-
+        stateListener.registerSuccessStateListener(optimove: self, listener: listener)
     }
 
     @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
-    public func unregisterSuccessStateListener(_ delegate: OptimoveSuccessStateListener) {
-
+    public func unregisterSuccessStateListener(_ listener: OptimoveSuccessStateListener) {
+        stateListener.unregisterSuccessStateListener(optimove: self, listener: listener)
     }
 
 }
