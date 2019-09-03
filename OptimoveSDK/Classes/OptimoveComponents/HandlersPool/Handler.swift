@@ -15,17 +15,17 @@ enum HandlerType: Equatable {
 
 protocol Handler {
     associatedtype HandlerInstance: Handler
-    var nextHandler: HandlerInstance? { get set }
+    var next: HandlerInstance? { get set }
     @discardableResult
     mutating func setNext(_: HandlerInstance) -> HandlerInstance
     associatedtype HandlerOperationContext: OperationContext
-    func handle(_ handler: HandlerOperationContext) throws
+    func handle(_: HandlerOperationContext) throws
 }
 
 extension Handler {
     @discardableResult
     mutating func setNext(_ handler: HandlerInstance) -> HandlerInstance {
-        nextHandler = handler
+        next = handler
         return handler
     }
 }
@@ -34,7 +34,7 @@ class EventableHandler: Handler {
     typealias HandlerInstance = EventableHandler
     typealias HandlerOperationContext = EventableOperationContext
 
-    var nextHandler: EventableHandler?
+    var next: EventableHandler?
 
     func handle(_: EventableOperationContext) throws {
         fatalError("No implementation. Expect to be implemented by inheretance.")
@@ -46,7 +46,7 @@ class PushableHandler: Handler {
     typealias HandlerInstance = PushableHandler
     typealias HandlerOperationContext = PushableOperationContext
 
-    var nextHandler: PushableHandler?
+    var next: PushableHandler?
 
     func handle(_: PushableOperationContext) throws {
         fatalError("No implementation. Expect to be implemented by inheretance.")
