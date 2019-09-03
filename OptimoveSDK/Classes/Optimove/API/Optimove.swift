@@ -112,7 +112,6 @@ extension Optimove {
 
 // MARK: - SDK state observing
 
-//TODO: expose to  @objc
 extension Optimove {
 
     @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")

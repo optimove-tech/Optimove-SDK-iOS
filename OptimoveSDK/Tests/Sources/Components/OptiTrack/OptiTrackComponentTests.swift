@@ -14,8 +14,6 @@ final class OptiTrackComponentTests: XCTestCase {
     var statisticService: MockStatisticService!
 
     override func setUp() {
-        RunningFlagsIndication.setComponentRunningFlag(component: .optiTrack, state: true)
-
         storage = MockOptimoveStorage()
         deviceStateMonitor = StubOptimoveDeviceStateMonitor()
         tracker = MockTracker()
@@ -75,7 +73,7 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         // when
-        XCTAssertNoThrow(try optitrack.handleEventable(.reportScreenEvent(customURL: screenPath, pageTitle: screenTitle, category: category)))
+        XCTAssertNoThrow(try optitrack.handleEventable(EventableOperationContext(.reportScreenEvent(customURL: screenPath, pageTitle: screenTitle, category: category))))
         wait(for: [trackViewExpectation, trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
@@ -92,14 +90,11 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         // when
-        try! optitrack.handleEventable(.report(event: stubEvent))
+        try! optitrack.handleEventable(EventableOperationContext(.report(event: stubEvent)))
         wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
     func test_dispatch_now() {
-        // given
-        RunningFlagsIndication.setComponentRunningFlag(component: .optiTrack, state: true)
-
         // then
         let trackDispatchExpectation = expectation(description: "dispatch now haven't been invoked.")
         tracker.dispatchAssertFunction = {
@@ -107,23 +102,7 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         // when
-        try! optitrack.handleEventable(.dispatchNow)
-        wait(for: [trackDispatchExpectation], timeout: defaultTimeout, enforceOrder: true)
-    }
-
-    func test_dispatch_now_if_component_disabled() {
-        // given
-        RunningFlagsIndication.setComponentRunningFlag(component: .optiTrack, state: false)
-
-        // then
-        let trackDispatchExpectation = expectation(description: "dispatch now event was invoked when component have been disabled.")
-        trackDispatchExpectation.isInverted = true
-        tracker.dispatchAssertFunction = {
-            trackDispatchExpectation.fulfill()
-        }
-
-        // when
-        try! optitrack.handleEventable(.dispatchNow)
+        try! optitrack.handleEventable(EventableOperationContext(.dispatchNow))
         wait(for: [trackDispatchExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 

@@ -559,7 +559,7 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        try! realTime.handleEventable(.reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category))
+        try! realTime.handleEventable(EventableOperationContext(.reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)))
         waitForExpectations(timeout: defaultTimeout)
     }
 

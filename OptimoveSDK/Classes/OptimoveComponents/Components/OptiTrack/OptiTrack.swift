@@ -38,7 +38,7 @@ final class OptiTrack {
         self.statisticService = statisticService
         self.deviceStateMonitor = deviceStateMonitor
         self.tracker = tracker
-        optimoveCustomizePlugins = createPluginFlags()
+        self.optimoveCustomizePlugins = (try? trackerFlagsBuilder.build()) ?? [:]
 
         performInitializationOperations()
         Logger.debug("OptiTrack initialized.")
@@ -154,16 +154,6 @@ extension OptiTrack {
         ) { (_) in
             self.dispatchNow()
         }
-    }
-
-    func createPluginFlags() -> [String: String] {
-        guard let initialVisitorId: String = storage[.initialVisitorId] else { return [:] }
-        let pluginFlags = ["fla", "java", "dir", "qt", "realp", "pdf", "wma", "gears"]
-        let pluginValues = initialVisitorId.split(by: 2)
-            .map { Int($0, radix: 16)! / 2 }
-            .map { $0.description }
-
-        return Dictionary(uniqueKeysWithValues: zip(pluginFlags, pluginValues))
     }
 
     func sendReport(event: OptimoveEvent, config: EventsConfig) {
