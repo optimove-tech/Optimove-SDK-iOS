@@ -14,14 +14,12 @@ final class HandlersPool {
         self.pushableHandler = pushableHandler
     }
 
-    @discardableResult
-    func addNextEventableHandler(_ nextHandler: EventableHandler) -> EventableHandler {
-        return eventableHandler.setNext(nextHandler)
+    func addNextEventableHandler(_ next: EventableHandler) {
+        eventableHandler.next = next
     }
 
-    @discardableResult
-    func addNextPushableHandler(_ nextHandler: PushableHandler) -> PushableHandler {
-        return pushableHandler.setNext(nextHandler)
+    func addNextPushableHandler(_ next: PushableHandler) {
+        pushableHandler.next = next
     }
 
 }
