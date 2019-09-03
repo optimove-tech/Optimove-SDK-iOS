@@ -47,7 +47,6 @@ final class OptiTrack {
     // MARK: - Internal Methods
 
     func performInitializationOperations() {
-        guard RunningFlagsIndication.isComponentRunning(.optiTrack) else { return }
         do {
             injectVisitorAndUserIdToMatomo()
             reportPendingEvents()
@@ -114,12 +113,8 @@ private extension OptiTrack {
     }
 
     func dispatchNow() {
-        if RunningFlagsIndication.isComponentRunning(.optiTrack) {
-            Logger.debug("OptiTrack: User asked to dispatch.")
-            tracker.dispatch()
-        } else {
-            Logger.error("OptiTrack: Unable to dispatch. Reason: Component is not running.")
-        }
+        Logger.debug("OptiTrack: User asked to dispatch.")
+        tracker.dispatch()
     }
 
     // MARK: - Report

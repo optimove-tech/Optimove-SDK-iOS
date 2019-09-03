@@ -57,8 +57,12 @@ final class ServiceLocator {
     /// Keeps as singleton in reason to share a session state between a service consumers.
     private lazy var _handlersPool: HandlersPool = {
         return HandlersPool(
-            eventableHandler: InMemoryEventableBuffer(),
-            pushableHandler: InMemoryPushableBuffer()
+            eventableHandler: InMemoryEventableBuffer(
+                storage: storage()
+            ),
+            pushableHandler: InMemoryPushableBuffer(
+                storage: storage()
+            )
         )
     }()
 

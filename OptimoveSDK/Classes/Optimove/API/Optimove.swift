@@ -190,12 +190,6 @@ extension Optimove {
     /// - Parameter deviceToken: A token that was received in the appDelegate callback
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         try? handlers.pushableHandler.handle(PushableOperationContext(.deviceToken(token: deviceToken)))
-
-        // TODO: It unneccessary to keep a device token after state-listener will go out,
-        // and an internal buffer will be introduced.
-        if !RunningFlagsIndication.isComponentRunning(.optiPush) {
-            storage.apnsToken = deviceToken
-        }
     }
 
     private var optimoveTestTopic: String {
@@ -260,15 +254,6 @@ extension Optimove {
     @objc public func reportEvent(_ event: OptimoveEvent) {
         do {
             try handlers.eventableHandler.handle(EventableOperationContext(.report(event: event)))
-
-            // FIXME: Handle it in a different way. If needed
-            if !RunningFlagsIndication.isComponentRunning(.realtime) {
-                if event.name == OptimoveKeys.Configuration.setUserId.rawValue {
-                    storage.realtimeSetUserIdFailed = true
-                } else if event.name == OptimoveKeys.Configuration.setEmail.rawValue {
-                    storage.realtimeSetEmailFailed = true
-                }
-            }
         } catch {
             Logger.error(error.localizedDescription)
         }
@@ -288,19 +273,25 @@ extension Optimove {
 // MARK: - set user id API
 extension Optimove {
 
-    /// validate the permissions of the client to use optitrack component and if permit validate the sdkId content and sends:
-    /// - conversion request to the DB
-    /// - new customer registraion to the registration end point
-    ///
-    /// - Parameter sdkId: the client unique identifier
-    @objc public func setUserId(_ sdkId: String) {
-        let userId = sdkId.trimmingCharacters(in: .whitespaces)
+    enum UserIdValidationResult {
+        case valid
+        case notValid
+        case alreadySetIn
+    }
+
+    private func validateNewUserID(_ userId: String) -> UserIdValidationResult {
         guard isValid(userId: userId) else {
             Logger.error("Optimove: User id '\(userId)' is not valid.")
-            return
+            return .notValid
         }
+        guard userId != storage.customerID else {
+            Logger.warn("Optimove: User id '\(userId)' was already set in.")
+            return .alreadySetIn
+        }
+        return .valid
+    }
 
-        //TODO: Move to Optipush?
+    private func updateStorage(userId: String) {
         if storage.customerID == nil {
             storage.isFirstConversion = true
         } else if userId != storage.customerID {
@@ -309,28 +300,38 @@ extension Optimove {
                 // send the first_conversion flag only if no previous registration has succeeded
                 storage.isFirstConversion = false
             }
-        } else {
-            Logger.warn("Optimove: User id '\(userId)' was already set in.")
-            return
         }
         storage.isRegistrationSuccess = false
-        //
-
-        let initialVisitorId = storage.initialVisitorId!
-        let updatedVisitorId = getVisitorId(from: userId)
-        storage.visitorID = updatedVisitorId
+        storage.visitorID = userId.sha1().prefix(16).description.lowercased()
         storage.customerID = userId
-
-        try? handlers.eventableHandler.handle(EventableOperationContext(.setUserId(userId: userId)))
-        let setUserIdEvent = SetUserIdEvent(
-            originalVistorId: initialVisitorId,
-            userId: userId,
-            updateVisitorId: storage.visitorID!
-        )
-        reportEvent(setUserIdEvent)
-        // TODO: Move `performRegistration` to OptiPush component
-        try? handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
     }
+
+    /// validate the permissions of the client to use optitrack component and if permit validate the sdkId content and sends:
+    /// - conversion request to the DB
+    /// - new customer registraion to the registration end point
+    ///
+    /// - Parameter sdkId: the client unique identifier
+    @objc public func setUserId(_ sdkId: String) {
+        let userId = sdkId.trimmingCharacters(in: .whitespaces)
+        let validationResult = validateNewUserID(userId)
+        guard validationResult == .valid else { return }
+        updateStorage(userId: userId)
+        do {
+            try handlers.eventableHandler.handle(EventableOperationContext(.setUserId(userId: userId)))
+            let setUserIdEvent = SetUserIdEvent(
+                originalVistorId: try storage.getInitialVisitorId(),
+                userId: userId,
+                updateVisitorId: try storage.getVisitorID()
+            )
+            reportEvent(setUserIdEvent)
+
+            try handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
+    }
+
+
 
     /// Produce a 16 characters string represents the visitor ID of the client
     ///

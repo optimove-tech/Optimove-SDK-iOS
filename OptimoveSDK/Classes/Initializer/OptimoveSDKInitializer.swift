@@ -127,45 +127,29 @@ private extension OptimoveSDKInitializer {
             return
         }
         RunningFlagsIndication.isInitializerRunning = true
-        initializeOptitrack()
-        initializeRealtime()
-        handlersPool.addNextEventableHandler(ComponentEventableHandler(component: components))
-        initializeOptipush()
-        handlersPool.addNextPushableHandler(ComponentPushableHandler(component: components))
-        Logger.info("All components setup finished.")
-        completion(didFinishSdkInitializtionSucceesfully())
-    }
-
-    func initializeOptipush() {
         do {
-            components.addComponent(try componentFactory.createOptipushComponent())
-            RunningFlagsIndication.setComponentRunningFlag(component: .optiPush, state: true)
+            try initializeOptitrack()
+            try initializeRealtime()
+            handlersPool.addNextEventableHandler(ComponentEventableHandler(component: components))
+            try initializeOptipush()
+            handlersPool.addNextPushableHandler(ComponentPushableHandler(component: components))
+            Logger.info("All components setup finished.")
+            completion(true)
         } catch {
-            Logger.error(error.localizedDescription)
+            completion(false)
         }
     }
 
-    func initializeOptitrack() {
-        do {
-            components.addComponent(try componentFactory.createOptitrackComponent())
-            RunningFlagsIndication.setComponentRunningFlag(component: .optiTrack, state: true)
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
+    func initializeOptipush() throws {
+        components.addComponent(try componentFactory.createOptipushComponent())
     }
 
-    func initializeRealtime() {
-        do {
-            components.addComponent(try componentFactory.createRealtimeComponent())
-            RunningFlagsIndication.setComponentRunningFlag(component: .realtime, state: true)
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
+    func initializeOptitrack() throws {
+        components.addComponent(try componentFactory.createOptitrackComponent())
     }
 
-    // Returns a merged state of all component's states with the logical operator OR.
-    func didFinishSdkInitializtionSucceesfully() -> Bool {
-        return RunningFlagsIndication.componentsRunningStates.values.contains(true)
+    func initializeRealtime() throws {
+        components.addComponent(try componentFactory.createRealtimeComponent())
     }
 
 }

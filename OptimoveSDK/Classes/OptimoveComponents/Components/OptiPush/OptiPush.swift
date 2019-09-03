@@ -52,14 +52,12 @@ final class OptiPush {
     }
 
     func performInitializationOperations() {
-        if RunningFlagsIndication.isComponentRunning(.optiPush) {
-            self.retryFailedMbaasOperations()
-            self.optInOutIfNeeded()
-            firebaseInteractor.subscribeToTopics(didSucceed: nil)
-            if let clientApnsToken = storage.apnsToken {
-                application(didRegisterForRemoteNotificationsWithDeviceToken: clientApnsToken)
-                storage.apnsToken = nil
-            }
+        self.retryFailedMbaasOperations()
+        self.optInOutIfNeeded()
+        firebaseInteractor.subscribeToTopics(didSucceed: nil)
+        if let clientApnsToken = storage.apnsToken {
+            application(didRegisterForRemoteNotificationsWithDeviceToken: clientApnsToken)
+            storage.apnsToken = nil
         }
     }
 
