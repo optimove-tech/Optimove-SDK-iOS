@@ -47,20 +47,39 @@ import OptimoveCore
         }
     }
 
-    // MARK: - Deep Link
+}
+
+final class DeeplinkService {
 
     private var deepLinkResponders = [OptimoveDeepLinkResponder]()
+    private var deepLinkComponents: OptimoveDeepLinkComponents? = nil
 
-    var deepLinkComponents: OptimoveDeepLinkComponents? {
-        didSet {
-            guard let dlc = deepLinkComponents else {
-                return
-            }
-            for responder in deepLinkResponders {
-                responder.didReceive(deepLinkComponent: dlc)
-            }
+    func setDeepLinkComponents(_ component: OptimoveDeepLinkComponents) {
+        self.deepLinkComponents = component
+        deepLinkResponders.forEach { responder in
+            responder.didReceive(deepLinkComponent: component)
         }
     }
+
+}
+
+extension DeeplinkService: OptimoveDeepLinkResponding {
+
+    func register(deepLinkResponder responder: OptimoveDeepLinkResponder) {
+        if let deepLinkComponents = deepLinkComponents {
+            responder.didReceive(deepLinkComponent: deepLinkComponents)
+        } else {
+            deepLinkResponders.append(responder)
+        }
+    }
+
+    func unregister(deepLinkResponder responder: OptimoveDeepLinkResponder) {
+        if let index = self.deepLinkResponders.firstIndex(of: responder) {
+            deepLinkResponders.remove(at: index)
+        }
+    }
+
+
 }
 
 // MARK: - Initialization API
@@ -142,10 +161,13 @@ extension Optimove {
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptimoveSdkCommand(userInfo: userInfo)
         if result {
-            serviceLocator.notificationListener().didReceiveRemoteNotification(
-                userInfo: userInfo,
-                didComplete: didComplete
-            )
+            startUrgentInitProcess { (success) in
+                guard success else { return }
+                notificationListener.didReceiveRemoteNotification(
+                    userInfo: userInfo,
+                    didComplete: didComplete
+                )
+            }
         }
         return result
     }
@@ -182,10 +204,13 @@ extension Optimove {
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: response.notification)
         if result {
-            serviceLocator.notificationListener().didReceive(
-                response: response,
-                withCompletionHandler: completionHandler
-            )
+            startUrgentInitProcess { (success) in
+                guard success else { return }
+                notificationListener.didReceive(
+                    response: response,
+                    withCompletionHandler: completionHandler
+                )
+            }
         }
         return result
     }
@@ -237,17 +262,11 @@ extension Optimove {
 extension Optimove: OptimoveDeepLinkResponding {
 
     @objc public func register(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-        if let dlc = self.deepLinkComponents {
-            responder.didReceive(deepLinkComponent: dlc)
-        } else {
-            deepLinkResponders.append(responder)
-        }
+        serviceLocator.deeplinkService().register(deepLinkResponder: responder)
     }
 
     @objc public func unregister(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-        if let index = self.deepLinkResponders.firstIndex(of: responder) {
-            deepLinkResponders.remove(at: index)
-        }
+       serviceLocator.deeplinkService().unregister(deepLinkResponder: responder)
     }
 }
 

@@ -9,15 +9,18 @@ final class OptimoveNotificationHandler {
 
     private let storage: OptimoveStorage
     private let coreEventFactory: CoreEventFactory
-    private let optimove: Optimove
+    private let handlersPool: HandlersPool
+    private let deeplinkService: DeeplinkService
 
     required init(
         storage: OptimoveStorage,
         coreEventFactory: CoreEventFactory,
-        optimove: Optimove) {
+        handlersPool: HandlersPool,
+        deeplinkService: DeeplinkService) {
         self.storage = storage
         self.coreEventFactory = coreEventFactory
-        self.optimove = optimove
+        self.handlersPool = handlersPool
+        self.deeplinkService = deeplinkService
     }
 }
 
@@ -44,8 +47,8 @@ private extension OptimoveNotificationHandler {
         case .reregister:
             Logger.debug("Request to reregister.")
             let bgtask = UIApplication.shared.beginBackgroundTask(withName: "reregister")
-            DispatchQueue.global().async { [optimove] in
-                optimove.performRegistration()
+            DispatchQueue.global().async { [handlersPool] in
+                try? handlersPool.pushableHandler.handle(PushableOperationContext(.performRegistration))
                 let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 2.0)
                 DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
                     completion(.newData)
@@ -57,10 +60,10 @@ private extension OptimoveNotificationHandler {
             Logger.debug("Request to ping.")
             do {
                 let event = try coreEventFactory.createEvent(.ping)
-                optimove.reportEvent(event)
+                try handlersPool.eventableHandler.handle(EventableOperationContext(.report(event: event)))
                 let bgtask = UIApplication.shared.beginBackgroundTask(withName: "ping")
-                DispatchQueue.global().async { [optimove] in
-                    optimove.dispatchQueuedEventsNow()
+                DispatchQueue.global().async { [handlersPool] in
+                    try? handlersPool.eventableHandler.handle(EventableOperationContext(.dispatchNow))
                     let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 3.0)
                     DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
                         completion(.newData)
@@ -110,8 +113,8 @@ private extension OptimoveNotificationHandler {
             let task = UIApplication.shared.beginBackgroundTask(withName: "Handling a notification reponse")
             switch response.actionIdentifier {
             case UNNotificationDefaultActionIdentifier:
-                optimove.reportEvent(event)
-                optimove.dispatchQueuedEventsNow()
+                try handlersPool.eventableHandler.handle(EventableOperationContext(.report(event: event)))
+                try handlersPool.eventableHandler.handle(EventableOperationContext(.dispatchNow))
                 let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 2.0)
                 DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
                     UIApplication.shared.endBackgroundTask(task)
@@ -152,10 +155,12 @@ private extension OptimoveNotificationHandler {
             let params: [String: String]? = urlComp.queryItems?.reduce(into: [String: String](), { (result, next) in
                 result.updateValue(next.value ?? "", forKey: next.name)
             })
-            optimove.deepLinkComponents = OptimoveDeepLinkComponents(
-                screenName: String(urlComp.path.dropFirst()),
-                parameters: params
-            )  // The dropFirst() is to eliminate the "/" prefix of the path
+            deeplinkService.setDeepLinkComponents(
+                OptimoveDeepLinkComponents(
+                    screenName: String(urlComp.path.dropFirst()),
+                    parameters: params
+                )  // The dropFirst() is to eliminate the "/" prefix of the path
+            )
         } catch {
             Logger.error(error.localizedDescription)
         }
@@ -173,6 +178,21 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
         return notification.request.content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true"
     }
 
+    func didReceiveRemoteNotification(
+        userInfo: [AnyHashable: Any],
+        didComplete: @escaping (UIBackgroundFetchResult) -> Void
+    ) {
+        do {
+            let data = try JSONSerialization.data(withJSONObject: userInfo)
+            let decoder = JSONDecoder()
+            let command = try decoder.decode(OptimoveSdkCommand.self, from: data)
+            self.handleSdkCommand(command: command, completionHandler: didComplete)
+        } catch {
+            Logger.error("Could not parse SDK command. Reason: \(error.localizedDescription)")
+            didComplete(.newData)
+        }
+    }
+
     func willPresent(
         notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
@@ -180,51 +200,15 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
         completionHandler([.alert, .sound, .badge])
     }
 
-    func didReceiveRemoteNotification(
-        userInfo: [AnyHashable: Any],
-        didComplete: @escaping (UIBackgroundFetchResult) -> Void
-    ) {
-        optimove.startUrgentInitProcess { (success) in
-            guard success else {
-                Logger.error("Urgent initializtion failed")
-                return
-            }
-            Logger.info("Urgent Initialization success")
-
-            guard self.isOptimoveSdkCommand(userInfo: userInfo) else {
-                Logger.debug("The notification do not contains SDK command.")
-                didComplete(.newData)
-                return
-            }
-            do {
-                let data = try JSONSerialization.data(withJSONObject: userInfo)
-                let decoder = JSONDecoder()
-                let command = try decoder.decode(OptimoveSdkCommand.self, from: data)
-                self.handleSdkCommand(command: command, completionHandler: didComplete)
-            } catch {
-                Logger.error("Could not parse SDK command. Reason: \(error.localizedDescription)")
-                didComplete(.newData)
-            }
-        }
-    }
-
     func didReceive(
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping ResultBlock
     ) {
-        optimove.startUrgentInitProcess { (success) in
-            guard success else {
-                Logger.error("Urgent initializtion failed")
-                return
-            }
-            Logger.info("Urgent Initialization success")
-
-            self.reportNotification(response: response)
-            if self.isNotificationOpened(response: response) {
-                self.handleDeepLinkDelegation(response)
-            }
-            completionHandler()
+        reportNotification(response: response)
+        if isNotificationOpened(response: response) {
+            handleDeepLinkDelegation(response)
         }
+        completionHandler()
     }
 }
 

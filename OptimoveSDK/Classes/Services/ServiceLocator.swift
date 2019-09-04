@@ -15,6 +15,11 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
+    private lazy var _deeplinkService: DeeplinkService = {
+        return DeeplinkService()
+    }()
+
+    /// Keeps as singleton in reason to share a session state between a service consumers.
     private lazy var _notificationListener: OptimoveNotificationHandler = {
         return OptimoveNotificationHandler(
             storage: storage(),
@@ -22,7 +27,8 @@ final class ServiceLocator {
                 storage: storage(),
                 dateTimeProvider: dateTimeProvider()
             ),
-            optimove: Optimove.shared
+            handlersPool: handlersPool(),
+            deeplinkService: deeplinkService()
         )
     }()
 
@@ -116,6 +122,10 @@ final class ServiceLocator {
             componentsPool: mutableComponentsPool(),
             handlersPool: handlersPool()
         )
+    }
+
+    func deeplinkService() -> DeeplinkService {
+        return _deeplinkService
     }
 
     // FIXME: Move to Main factory
