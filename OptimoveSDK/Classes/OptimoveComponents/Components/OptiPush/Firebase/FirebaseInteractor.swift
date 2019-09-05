@@ -12,12 +12,12 @@ protocol OptimoveMbaasRegistrationHandling: class {
 
 final class FirebaseInteractor: NSObject {
 
-    weak var delegate: OptimoveMbaasRegistrationHandling?
-    var appController: FirebaseOptions?
-    var clientServiceOptions: FirebaseOptions?
-
-    private var storage: OptimoveStorage
     private let networking: FirebaseInteractorNetworking
+    private var storage: OptimoveStorage
+    private var appController: FirebaseOptions?
+    private var clientServiceOptions: FirebaseOptions?
+    private var APNSToken: Data?
+    private weak var delegate: OptimoveMbaasRegistrationHandling?
 
     init(storage: OptimoveStorage,
          networking: FirebaseInteractorNetworking) {
@@ -73,22 +73,21 @@ extension FirebaseInteractor: OptipushServiceInfra {
         setupAppController(appController)
         setupSdkController(clientServiceOptions)
 
+        Messaging.messaging().delegate = self
+
         if let token = Messaging.messaging().fcmToken {
             registerIfTokenChanged(updatedFcmToken: token)
-        } else {
-            NotificationCenter.default.addObserver(
-                forName: NSNotification.Name.MessagingRegistrationTokenRefreshed,
-                object: nil,
-                queue: .main
-            ) { (_) in
-                self.registerIfTokenChanged(updatedFcmToken: Messaging.messaging().fcmToken)
-            }
         }
         Logger.debug("OptiPush: Setup Firebase finished.")
     }
 
     func handleRegistration(token: Data) {
-        Messaging.messaging().apnsToken = token
+        if  Messaging.messaging().fcmToken == nil {
+            APNSToken = token
+        } else {
+            Messaging.messaging().apnsToken = token
+            APNSToken = nil
+        }
     }
 
     func optimoveReceivedRegistrationToken(_ fcmToken: String) {
@@ -176,13 +175,17 @@ extension FirebaseInteractor: OptipushServiceInfra {
 
 extension FirebaseInteractor: MessagingDelegate {
 
-//    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-//
-//    }
-//
-//    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
-//
-//    }
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+        registerIfTokenChanged(updatedFcmToken: fcmToken)
+        if let token = APNSToken {
+            Messaging.messaging().apnsToken = token
+            APNSToken = nil
+        }
+    }
+
+    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
+
+    }
 
 }
 
@@ -207,10 +210,9 @@ private extension FirebaseInteractor {
         FirebaseApp.configure(name: "sdkController", options: clientServiceOptions)
     }
 
-    func registerIfTokenChanged(updatedFcmToken: String?) {
-        let isTokenNew = updatedFcmToken != nil && storage.fcmToken != updatedFcmToken
-        if isTokenNew {
-            optimoveReceivedRegistrationToken(updatedFcmToken!)
+    func registerIfTokenChanged(updatedFcmToken: String) {
+        if isNewFcmToken(receivedToken: updatedFcmToken) {
+            optimoveReceivedRegistrationToken(updatedFcmToken)
         }
     }
 
