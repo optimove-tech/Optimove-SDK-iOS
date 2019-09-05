@@ -117,7 +117,7 @@ private extension CoreEventFactoryImpl {
 
     func createSetUserAgentEvent() throws -> SetUserAgent {
         return SetUserAgent(
-            userAgent: SDKDevice.evaluateUserAgent()
+            userAgent: try storage.getUserAgent()
         )
     }
 

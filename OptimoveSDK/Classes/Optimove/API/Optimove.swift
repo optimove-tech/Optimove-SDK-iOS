@@ -504,7 +504,9 @@ private extension Optimove {
     }
 
     func setUserAgent() {
-        storage.userAgent = SDKDevice.evaluateUserAgent()
+        SDKDevice.evaluateUserAgent(completion: { [weak self] (userAgent) in
+            self?.storage.userAgent = userAgent
+        })
     }
 
     func setVisitorIdIfNeeded() {
