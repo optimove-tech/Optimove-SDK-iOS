@@ -217,8 +217,16 @@ extension OptiTrack {
     }
 
     func reportAppOpenedIfNeeded() throws {
-        if UIApplication.shared.applicationState != .background {
-            try reportAppOpen()
+        DispatchQueue.main.async {
+            if UIApplication.shared.applicationState != .background {
+                DispatchQueue.global().async { [weak self] in
+                    do {
+                        try self?.reportAppOpen()
+                    } catch {
+                        Logger.error(error.localizedDescription)
+                    }
+                }
+            }
         }
     }
 
