@@ -85,10 +85,12 @@ extension MatomoTrackerAdapter: Tracker {
     }
 
     func dispathPendingEvents() {
+        guard storage.isExist(fileName: TrackerConstants.pendingEventsFile,
+                              shared: TrackerConstants.isSharedStorage) else { return }
         do {
             let jsonEvents = try storage.load(
                 fileName: TrackerConstants.pendingEventsFile,
-                shared: false
+                shared: TrackerConstants.isSharedStorage
             )
             let decoder = JSONDecoder()
             let events = try decoder.decode([Event].self, from: jsonEvents)
