@@ -3,7 +3,6 @@
 import FirebaseCore
 import FirebaseMessaging
 import Foundation
-import os.log
 import OptimoveCore
 
 protocol OptimoveMbaasRegistrationHandling: class {
@@ -125,12 +124,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
             networking.subscribe(topic: topic) { (result) in
                 switch result {
                 case .success:
-                    os_log(
-                        "Subscribed topic '%{private}@' successful.",
-                        log: OSLog.firebaseInteractor,
-                        type: .info,
-                        topic
-                    )
+                    Logger.debug("Subscribed topic \(topic) successful.")
                     OptimoveTopicsUserDefaults.topics?.set(true, forKey: "optimove_\(topic)")
                     didSucceed?(true)
                 case let .failure(error):
@@ -155,12 +149,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
             networking.unsubscribe(topic: topic) { (result) in
                 switch result {
                 case .success:
-                    os_log(
-                        "Unsubscribed topic '%{private}@' successful.",
-                        log: OSLog.firebaseInteractor,
-                        type: .info,
-                        topic
-                    )
+                    Logger.debug("Unsubscribed topic \(topic) successful.")
                     OptimoveTopicsUserDefaults.topics?.removeObject(forKey: "optimove_\(topic)")
                     didSucceed?(true)
                 case let .failure(error):
@@ -239,8 +228,4 @@ private extension FirebaseInteractor {
     func getMongoTypeBundleId() -> String {
         return Bundle.main.bundleIdentifier?.setAsMongoKey() ?? ""
     }
-}
-
-extension OSLog {
-    static let firebaseInteractor = OSLog(subsystem: subsystem, category: "firebase_interactor")
 }
