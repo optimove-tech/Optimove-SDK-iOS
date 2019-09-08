@@ -321,23 +321,6 @@ extension Optimove {
 // MARK: - set user id API
 extension Optimove {
 
-    enum UserIdValidationResult {
-        case valid
-        case notValid
-        case alreadySetIn
-    }
-
-    private func validateNewUserID(_ userId: String) -> UserIdValidationResult {
-        guard isValid(userId: userId) else {
-            Logger.error("Optimove: User id '\(userId)' is not valid.")
-            return .notValid
-        }
-        guard userId != storage.customerID else {
-            Logger.warn("Optimove: User id '\(userId)' was already set in.")
-            return .alreadySetIn
-        }
-        return .valid
-    }
 
     private func updateStorage(userId: String) {
         if storage.customerID == nil {
@@ -350,7 +333,7 @@ extension Optimove {
             }
         }
         storage.isRegistrationSuccess = false
-        storage.visitorID = userId.sha1().prefix(16).description.lowercased()
+        storage.visitorID = getVisitorId(from: userId)
         storage.customerID = userId
     }
 
@@ -361,7 +344,7 @@ extension Optimove {
     /// - Parameter sdkId: the client unique identifier
     @objc public func setUserId(_ sdkId: String) {
         let userId = sdkId.trimmingCharacters(in: .whitespaces)
-        let validationResult = validateNewUserID(userId)
+        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userId)
         guard validationResult == .valid else { return }
         updateStorage(userId: userId)
         do {
@@ -372,7 +355,6 @@ extension Optimove {
                 updateVisitorId: try storage.getVisitorID()
             )
             reportEvent(setUserIdEvent)
-
             try handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
         } catch {
             Logger.error(error.localizedDescription)
@@ -403,28 +385,12 @@ extension Optimove {
     ///
     /// - Parameter email: The user email
     @objc public func setUserEmail(email: String) {
-        guard isValid(email: email) else {
+        guard EmailValidator.isValid(email) else {
             Logger.error("Optimove: Email is not valid")
             return
         }
         storage.userEmail = email
         reportEvent(SetUserEmailEvent(email: email))
-    }
-
-    /// Validate that the user id that provided by the client, feets with optimove conditions for valid user id
-    ///
-    /// - Parameter userId: the client user id
-    /// - Returns: An indication of the validation of the provided user id
-    private func isValid(userId: String) -> Bool {
-        return !userId.isEmpty && (userId != "none") && (userId != "undefined") && !userId.contains("undefine") && !(
-            userId == "null"
-        )
-    }
-
-    private func isValid(email: String) -> Bool {
-        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        let emailTest = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
-        return emailTest.evaluate(with: email)
     }
 }
 
