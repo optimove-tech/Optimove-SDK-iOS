@@ -35,7 +35,7 @@ import OptimoveCore
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
         shared.configureLogger()
-        Logger.warn("Tenant config \(tenantInfo.configName)")
+        Logger.info("Tenant config \(tenantInfo.configName)")
         shared.storeTenantInfo(tenantInfo)
         Logger.debug("Configure started.")
         shared.startNormalInitProcess { (sucess) in
@@ -107,6 +107,7 @@ extension Optimove {
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
+        Logger.info("Received notification in foreground mode.")
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: response.notification)
         if result {
@@ -168,16 +169,14 @@ extension Optimove {
 
 extension Optimove {
 
-    /// validate the permissions of the client to use optitrack component and if permit validate the sdkId content and sends:
-    /// - conversion request to the DB
-    /// - new customer registraion to the registration end point
+    /// Set a User ID value to Optimove SDK.
     ///
-    /// - Parameter sdkId: the client unique identifier
-    @objc public func setUserId(_ sdkId: String) {
-        let userId = sdkId.trimmingCharacters(in: .whitespaces)
-        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userId)
+    /// - Parameter userID: A client unique identifier
+    @objc public func setUserId(_ userID: String) {
+        let userID = userID.trimmingCharacters(in: .whitespaces)
+        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
         guard validationResult == .valid else { return }
-        updateStorage(userId: userId)
+        updateStorage(userId: userID)
         do {
             reportEvent(try mainFactory.coreEventFactory().createEvent(.setUserId))
             try handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
@@ -186,11 +185,11 @@ extension Optimove {
         }
     }
 
-    /// Send the sdk id and the user email
+    /// Set a User ID and the user email
     ///
     /// - Parameters:
-    ///   - sdkId: The user ID
-    ///   - email: The user email
+    ///   - sdkId: Aa client unique identifier
+    ///   - email: An user's email
     @objc public func registerUser(sdkId: String, email: String) {
         setUserId(sdkId)
         setUserEmail(email: email)
@@ -221,7 +220,7 @@ extension Optimove {
     @objc public func setScreenVisit(screenPath: String, screenTitle: String, screenCategory: String? = nil) {
         let screenPath = screenPath.trimmingCharacters(in: .whitespaces)
         let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
-        Logger.debug("Report screen event w/ title: \(screenTitle)")
+        Logger.info("Report screen event w/title: \(screenTitle)")
         let validationResult = ScreenVisitValidator.validate(screenPath: screenPath, screenTitle: screenTitle)
         guard validationResult == .valid else { return }
         do {
@@ -263,7 +262,7 @@ private extension Optimove {
     func startNormalInitProcess(didSucceed: @escaping ResultBlockWithBool) {
         Logger.info("Start initialization from remote.")
         if RunningFlagsIndication.isSdkRunning {
-            Logger.debug("Skip normal initializtion since SDK already running.")
+            Logger.info("Skip normal initializtion since SDK already running.")
             didSucceed(true)
             return
         }
@@ -283,7 +282,7 @@ private extension Optimove {
     func startUrgentInitProcess(didSucceed: @escaping ResultBlockWithBool) {
         Logger.info("Start urgent initiazlition process.")
         if RunningFlagsIndication.isSdkRunning {
-            Logger.debug("Skip urgent initializtion since SDK already running")
+            Logger.info("Skip urgent initializtion since SDK already running")
             didSucceed(true)
             return
         }
@@ -310,7 +309,7 @@ private extension Optimove {
         storage.version = info.configName
         storage.configurationEndPoint = Endpoints.Remote.TenantConfig.url
 
-        Logger.debug(
+        Logger.info(
             """
             Stored user info in local storage. Source:
             endpoint: \(Endpoints.Remote.TenantConfig.url.absoluteString)
@@ -378,7 +377,7 @@ private extension Optimove {
         if storage.customerID == nil {
             storage.isFirstConversion = true
         } else if userId != storage.customerID {
-            Logger.debug("user id changed from '\(storage.customerID ?? "nil")' to '\(userId)'")
+            Logger.info("user id changed from '\(storage.customerID ?? "nil")' to '\(userId)'")
             if storage.isRegistrationSuccess == true {
                 // send the first_conversion flag only if no previous registration has succeeded
                 storage.isFirstConversion = false
