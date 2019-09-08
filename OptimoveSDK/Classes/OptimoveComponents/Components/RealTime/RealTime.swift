@@ -65,7 +65,7 @@ extension RealTime: EventableComponent {
         guard !context.isBuffered else { return }
         switch context.operation {
         case .setUserId(userId: _):
-            try? reportUserId()
+            try reportUserId()
         case let .report(event: event):
             try reportEvent(event: event, retryFailedEvents: true)
         case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):

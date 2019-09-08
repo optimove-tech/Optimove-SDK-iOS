@@ -223,7 +223,11 @@ extension Optimove {
     ///
     /// - Parameter deviceToken: A token that was received in the appDelegate callback
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        try? handlers.pushableHandler.handle(PushableOperationContext(.deviceToken(token: deviceToken)))
+        do {
+            try handlers.pushableHandler.handle(PushableOperationContext(.deviceToken(token: deviceToken)))
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
     }
 
     private var optimoveTestTopic: String {
@@ -244,18 +248,30 @@ extension Optimove {
     ///
     /// - Parameter topic: The topic name
     func registerToOptipushTopic(_ topic: String) {
-        try? handlers.pushableHandler.handle(PushableOperationContext(.subscribeToTopic(topic: topic)))
+        do {
+            try handlers.pushableHandler.handle(PushableOperationContext(.subscribeToTopic(topic: topic)))
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
     }
 
     /// Request to unregister from topic
     ///
     /// - Parameter topic: The topic name
     func unregisterFromOptipushTopic(_ topic: String) {
-        try? handlers.pushableHandler.handle(PushableOperationContext(.unsubscribeFromTopic(topic: topic)))
+        do {
+            try handlers.pushableHandler.handle(PushableOperationContext(.unsubscribeFromTopic(topic: topic)))
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
     }
 
     func performRegistration() {
-        try? handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
+        do {
+            try handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
     }
 }
 
@@ -293,7 +309,11 @@ extension Optimove {
     }
 
     func dispatchQueuedEventsNow() {
-        try? handlers.eventableHandler.handle(EventableOperationContext(.dispatchNow))
+        do {
+            try handlers.eventableHandler.handle(EventableOperationContext(.dispatchNow))
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
     }
 
 }
@@ -445,15 +465,19 @@ extension Optimove {
 
             path = "\(Bundle.main.bundleIdentifier!)/\(path)".lowercased()
 
-            try? handlers.eventableHandler.handle(
-                EventableOperationContext(
-                    .reportScreenEvent(
-                        customURL: path,
-                        pageTitle: screenTitle,
-                        category: screenCategory
+            do {
+                try handlers.eventableHandler.handle(
+                    EventableOperationContext(
+                        .reportScreenEvent(
+                            customURL: path,
+                            pageTitle: screenTitle,
+                            category: screenCategory
+                        )
                     )
                 )
-            )
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
         }
     }
 

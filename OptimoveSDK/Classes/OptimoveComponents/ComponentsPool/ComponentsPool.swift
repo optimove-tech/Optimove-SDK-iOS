@@ -20,7 +20,11 @@ extension ComponentsPoolImpl: EventableComponent {
 
     func handleEventable(_ context: EventableOperationContext) throws {
         eventableComponents.forEach { component in
-            try? component.handleEventable(context)
+            do {
+                try component.handleEventable(context)
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
         }
     }
 
@@ -30,7 +34,11 @@ extension ComponentsPoolImpl: PushableComponent {
 
     func handlePushable(_ context: PushableOperationContext) throws {
         pushableComponents.forEach { component in
-            try? component.handlePushable(context)
+            do {
+                try component.handlePushable(context)
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
         }
     }
 

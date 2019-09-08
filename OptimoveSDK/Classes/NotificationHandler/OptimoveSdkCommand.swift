@@ -19,9 +19,9 @@ extension OptimoveSdkCommand {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        if let commonValue = try? container.decode(Common.self, forKey: .command) {
+        if let commonValue = try container.decodeIfPresent(Common.self, forKey: .command) {
             self = .common(commonValue)
-        } else if let argumentsValue = try? container.decode(Parameterized.Category.self, forKey: .command) {
+        } else if let argumentsValue = try container.decodeIfPresent(Parameterized.Category.self, forKey: .command) {
             self = .parameterized(.newNotificationCategory(argumentsValue))
         } else {
             throw DecodingError.dataCorrupted(

@@ -130,7 +130,11 @@ private extension OptiPush {
     }
 
     func retryFailedMbaasOperations() {
-        try? registrar.retryFailedOperationsIfExist()
+        do {
+            try registrar.retryFailedOperationsIfExist()
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
     }
 
     func optInOutIfNeeded() {

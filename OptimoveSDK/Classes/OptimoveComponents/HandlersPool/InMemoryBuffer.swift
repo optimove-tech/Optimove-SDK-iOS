@@ -29,7 +29,11 @@ final class InMemoryEventableBuffer: EventableHandler {
 
     func dispatchBuffer() {
         while let context = buffer.read() {
-            try? next?.handle(context)
+            do {
+                try next?.handle(context)
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
         }
     }
 
@@ -76,7 +80,11 @@ final class InMemoryPushableBuffer: PushableHandler {
 
     func dispatchBuffer() {
         while let context = buffer.read() {
-            try? next?.handle(context)
+            do {
+                try next?.handle(context)
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
         }
     }
 
