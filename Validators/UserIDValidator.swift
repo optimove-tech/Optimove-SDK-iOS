@@ -2,13 +2,13 @@
 
 import OptimoveCore
 
-enum UserIdValidationResult {
-    case valid
-    case notValid
-    case alreadySetIn
-}
-
 struct UserIDValidator {
+
+    enum Result {
+        case valid
+        case notValid
+        case alreadySetIn
+    }
 
     private let storage: OptimoveStorage
 
@@ -16,7 +16,7 @@ struct UserIDValidator {
         self.storage = storage
     }
 
-    func validateNewUserID(_ userId: String) -> UserIdValidationResult {
+    func validateNewUserID(_ userId: String) -> UserIDValidator.Result {
         guard UserIDValidator.isValid(userId) else {
             Logger.error("Optimove: User id '\(userId)' is not valid.")
             return .notValid

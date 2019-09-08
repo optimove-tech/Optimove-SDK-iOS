@@ -200,10 +200,8 @@ extension Optimove {
     ///
     /// - Parameter email: The user email
     @objc public func setUserEmail(email: String) {
-        guard EmailValidator.isValid(email) else {
-            Logger.error("Optimove: Email is not valid")
-            return
-        }
+        let validationResult = EmailValidator.isValid(email)
+        guard validationResult == .valid else { return }
         storage.userEmail = email
         reportEvent(SetUserEmailEvent(email: email))
     }
