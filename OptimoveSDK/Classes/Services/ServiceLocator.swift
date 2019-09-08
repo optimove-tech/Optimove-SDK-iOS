@@ -106,37 +106,8 @@ final class ServiceLocator {
         return ConfigurationRepositoryImpl(storage: storage())
     }
 
-    func initializer() -> OptimoveSDKInitializer {
-        let networkingFactory = NetworkingFactory(
-            networkClient: NetworkClientImpl(),
-            requestBuilderFactory: NetworkRequestBuilderFactory(
-                serviceLocator: self
-            )
-        )
-        return OptimoveSDKInitializer(
-            deviceStateMonitor: deviceStateMonitor(),
-            storage: storage(),
-            networking: networkingFactory.createRemoteConfigurationNetworking(),
-            configurationRepository: configurationRepository(),
-            componentFactory: componentFactory(),
-            componentsPool: mutableComponentsPool(),
-            handlersPool: handlersPool()
-        )
-    }
-
     func deeplinkService() -> DeeplinkService {
         return _deeplinkService
-    }
-
-    // FIXME: Move to Main factory
-    func componentFactory() -> ComponentFactory {
-        return ComponentFactory(
-            serviceLocator: self,
-            coreEventFactory: CoreEventFactoryImpl(
-                storage: storage(),
-                dateTimeProvider: dateTimeProvider()
-            )
-        )
     }
 
     func componentsPool() -> ComponentsPool {

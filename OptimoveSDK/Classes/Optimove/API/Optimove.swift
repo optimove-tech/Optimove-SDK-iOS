@@ -9,6 +9,7 @@ import OptimoveCore
 @objc public final class Optimove: NSObject {
 
     private let serviceLocator: ServiceLocator
+    private let mainFactory: MainFactory
     private var storage: OptimoveStorage
     private let handlers: HandlersPool
     private let stateListener: DeprecatedStateListener
@@ -22,6 +23,7 @@ import OptimoveCore
 
     private override init() {
         serviceLocator = ServiceLocator()
+        mainFactory = MainFactory(serviceLocator: serviceLocator)
         handlers = serviceLocator.handlersPool()
         storage = serviceLocator.storage()
         stateListener = DeprecatedStateListener()
@@ -93,7 +95,7 @@ extension Optimove {
             didSucceed(true)
             return
         }
-        let initializer = serviceLocator.initializer()
+        let initializer = mainFactory.initializer()
         initializer.initializeFromRemoteServer { [initializer] success in
             if success {
                 didSucceed(success)
@@ -113,7 +115,7 @@ extension Optimove {
             didSucceed(true)
             return
         }
-        let initializer = serviceLocator.initializer()
+        let initializer = mainFactory.initializer()
         initializer.initializeFromLocalConfigs { success in
             didSucceed(success)
             if success {
@@ -297,6 +299,7 @@ extension Optimove {
     ///   - event: optimove event object
     @objc public func reportEvent(_ event: OptimoveEvent) {
         do {
+            // TODO: Normilize event
             try handlers.eventableHandler.handle(EventableOperationContext(.report(event: event)))
         } catch {
             Logger.error(error.localizedDescription)
@@ -348,13 +351,7 @@ extension Optimove {
         guard validationResult == .valid else { return }
         updateStorage(userId: userId)
         do {
-            try handlers.eventableHandler.handle(EventableOperationContext(.setUserId(userId: userId)))
-            let setUserIdEvent = SetUserIdEvent(
-                originalVistorId: try storage.getInitialVisitorId(),
-                userId: userId,
-                updateVisitorId: try storage.getVisitorID()
-            )
-            reportEvent(setUserIdEvent)
+            reportEvent(try mainFactory.coreEventFactory().createEvent(.setUserId))
             try handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
         } catch {
             Logger.error(error.localizedDescription)
