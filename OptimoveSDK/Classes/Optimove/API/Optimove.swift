@@ -1,11 +1,11 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
-import UIKit
+import UIKit.UIApplication
 import UserNotifications
 import OptimoveCore
 
 /// The entry point of Optimove.
-/// Initialize and configure SDK using `Optimove.shared.configure(for:)`.
+/// Initialize and configure SDK using `Optimove.configure(for:)`.
 @objc public final class Optimove: NSObject {
 
     private let serviceLocator: ServiceLocator
@@ -98,21 +98,7 @@ extension Optimove {
     }
 }
 
-// MARK: - SDK state observing
-
-extension Optimove {
-
-    @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
-    public func registerSuccessStateListener(_ listener: OptimoveSuccessStateListener) {
-        stateListener.registerSuccessStateListener(optimove: self, listener: listener)
-    }
-
-    @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
-    public func unregisterSuccessStateListener(_ listener: OptimoveSuccessStateListener) {
-        stateListener.unregisterSuccessStateListener(optimove: self, listener: listener)
-    }
-
-}
+// MARK: - Notification API call
 
 extension Optimove {
 
@@ -185,73 +171,37 @@ extension Optimove {
     }
 }
 
-// MARK: - OptiPush related API
+// MARK: - OptiPush API call
+
 extension Optimove {
 
-    /// Request to handle APNS <-> FCM regisration process
+    /// Tells the Optimove SDK that the app successfully registered with Apple Push Notification service (APNs).
     ///
-    /// - Parameter deviceToken: A token that was received in the appDelegate callback
+    /// - Parameter deviceToken: A token that was received from the AppDelegate.
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        do {
-            try handlers.pushableHandler.handle(PushableOperationContext(.deviceToken(token: deviceToken)))
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
+        reportPushable(PushableOperationContext(.deviceToken(token: deviceToken)))
+    }
+
+    /// Request to subscribe to test campaign topics
+    @objc public func startTestMode() {
+        reportPushable(PushableOperationContext(.subscribeToTopic(topic: optimoveTestTopic)))
+    }
+
+    /// Request to unsubscribe from test campaign topics
+    @objc public func stopTestMode() {
+        reportPushable(PushableOperationContext(.unsubscribeFromTopic(topic: optimoveTestTopic)))
     }
 
     private var optimoveTestTopic: String {
         return "test_ios_\(Bundle.main.bundleIdentifier ?? "")"
     }
 
-    /// Request to subscribe to test campaign topics
-    @objc public func startTestMode() {
-        registerToOptipushTopic(optimoveTestTopic)
-    }
-
-    /// Request to unsubscribe from test campaign topics
-    @objc public func stopTestMode() {
-        unregisterFromOptipushTopic(optimoveTestTopic)
-    }
-
-    /// Request to register to topic
-    ///
-    /// - Parameter topic: The topic name
-    func registerToOptipushTopic(_ topic: String) {
+    private func reportPushable(_ context: PushableOperationContext) {
         do {
-            try handlers.pushableHandler.handle(PushableOperationContext(.subscribeToTopic(topic: topic)))
+            try handlers.pushableHandler.handle(context)
         } catch {
             Logger.error(error.localizedDescription)
         }
-    }
-
-    /// Request to unregister from topic
-    ///
-    /// - Parameter topic: The topic name
-    func unregisterFromOptipushTopic(_ topic: String) {
-        do {
-            try handlers.pushableHandler.handle(PushableOperationContext(.unsubscribeFromTopic(topic: topic)))
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
-
-    func performRegistration() {
-        do {
-            try handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
-}
-
-extension Optimove: OptimoveDeepLinkResponding {
-
-    @objc public func register(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-        serviceLocator.deeplinkService().register(deepLinkResponder: responder)
-    }
-
-    @objc public func unregister(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-       serviceLocator.deeplinkService().unregister(deepLinkResponder: responder)
     }
 }
 
@@ -343,7 +293,6 @@ extension Optimove {
         storage.customerID = userId
     }
 
-
 }
 
 // MARK: - ScreenVisit API call
@@ -379,9 +328,22 @@ extension Optimove {
 
 }
 
-private extension Optimove {
+// MARK: - OptimoveDeepLinkResponding
 
-    // MARK: - Private Methods
+extension Optimove: OptimoveDeepLinkResponding {
+
+    @objc public func register(deepLinkResponder responder: OptimoveDeepLinkResponder) {
+        serviceLocator.deeplinkService().register(deepLinkResponder: responder)
+    }
+
+    @objc public func unregister(deepLinkResponder responder: OptimoveDeepLinkResponder) {
+        serviceLocator.deeplinkService().unregister(deepLinkResponder: responder)
+    }
+}
+
+// MARK: - Private
+
+private extension Optimove {
 
     /// Stores the user information that was provided during configuration.
     ///
@@ -426,6 +388,22 @@ private extension Optimove {
             storage.initialVisitorId = VisitorIDPreprocessor.process(sanitizedUUID)
             storage.visitorID = storage.initialVisitorId
         }
+    }
+
+}
+
+// MARK: - Deprecated: SDK state observing
+
+extension Optimove {
+
+    @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
+    public func registerSuccessStateListener(_ listener: OptimoveSuccessStateListener) {
+        stateListener.registerSuccessStateListener(optimove: self, listener: listener)
+    }
+
+    @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
+    public func unregisterSuccessStateListener(_ listener: OptimoveSuccessStateListener) {
+        stateListener.unregisterSuccessStateListener(optimove: self, listener: listener)
     }
 
 }
