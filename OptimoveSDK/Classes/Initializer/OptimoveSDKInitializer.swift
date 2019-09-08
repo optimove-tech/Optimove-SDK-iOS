@@ -120,16 +120,17 @@ private extension OptimoveSDKInitializer {
 
 extension OptimoveSDKInitializer {
 
-
     func updateEnvironment(_ config: Configuration) {
         updateLoggerStreamContainers(config)
         storage.set(value: config.tenantID, key: .siteID)
     }
 
     func updateLoggerStreamContainers(_ config: Configuration) {
-        MultiplexLoggerStream.mutateStreams { logger in
-            logger.tenantId = config.tenantID
-            logger.endpoint = config.logger.logServiceEndpoint
-        }
+        MultiplexLoggerStream.mutateStreams(mutator: { (stream) in
+            stream.tenantId = config.tenantID
+            stream.endpoint = config.logger.logServiceEndpoint
+        })
+    }
+}
     }
 }

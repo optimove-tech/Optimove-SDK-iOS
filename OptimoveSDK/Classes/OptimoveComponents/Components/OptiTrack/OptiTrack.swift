@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import UIKit
+import UIKit.UIApplication
 import OptimoveCore
 
 final class OptiTrack {
@@ -17,7 +17,7 @@ final class OptiTrack {
     private let coreEventFactory: CoreEventFactory
     private let dateTimeProvider: DateTimeProvider
     private var statisticService: StatisticService
-    private let eventReportingQueue = DispatchQueue(label: "com.optimove.optitrack", qos: .background)
+    private let eventReportingQueue = DispatchQueue(label: "com.optimove.sdk.optitrack", qos: .background)
     private let deviceStateMonitor: OptimoveDeviceStateMonitor
     private var optimoveCustomizePlugins: [String: String] = [:]
     private var tracker: Tracker

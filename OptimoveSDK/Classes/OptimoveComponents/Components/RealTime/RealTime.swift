@@ -27,7 +27,7 @@ final class RealTime {
         self.storage = storage
         self.networking = networking
         self.realTimeQueue = DispatchQueue(
-            label: "com.optimove.queue.realtime",
+            label: "com.optimove.sdk.realtime",
             qos: .utility
         )
         self.hanlder = handler

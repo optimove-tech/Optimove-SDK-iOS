@@ -11,7 +11,7 @@ public final class MultiplexLoggerStream {
 
     static var outputStreams: [ObjectIdentifier: LoggerStream] = [:]
 
-    private static let logQueue = DispatchQueue(label: "com.optimove.sdk.log")
+    private static let logQueue = DispatchQueue(label: "com.optimove.sdk.logger")
 
     public static func log(
         level: LogLevelCore,
@@ -42,17 +42,23 @@ public final class MultiplexLoggerStream {
     }
 
     public static func add(stream: LoggerStream) {
-        outputStreams[ObjectIdentifier(stream)] = stream
+        logQueue.async {
+            outputStreams[ObjectIdentifier(stream)] = stream
+        }
     }
 
     public static func remove(stream: LoggerStream) {
-        outputStreams.removeValue(forKey: ObjectIdentifier(stream))
+        logQueue.async {
+            outputStreams.removeValue(forKey: ObjectIdentifier(stream))
+        }
     }
 
-    public static func mutateStreams(mutator: (MutableLoggerStream) -> Void) {
-        outputStreams
-            .values
-            .compactMap { $0 as? MutableLoggerStream }
-            .forEach (mutator)
+    public static func mutateStreams(mutator: @escaping (MutableLoggerStream) -> Void) {
+        logQueue.async {
+            outputStreams
+                .values
+                .compactMap { $0 as? MutableLoggerStream }
+                .forEach (mutator)
+        }
     }
 }

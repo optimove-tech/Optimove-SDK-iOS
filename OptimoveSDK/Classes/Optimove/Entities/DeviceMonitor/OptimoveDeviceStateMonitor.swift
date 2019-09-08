@@ -30,7 +30,7 @@ final class OptimoveDeviceStateMonitorImpl {
 
     init(fetcherFactory: DeviceRequirementFetcherFactory) {
         self.fetcherFactory = fetcherFactory
-        accessQueue = DispatchQueue(label: "com.optimove.sdk.queue.deviceState", qos: .utility)
+        accessQueue = DispatchQueue(label: "com.optimove.sdk.monitor.deviceState", qos: .utility)
         requests = OptimoveDeviceRequirement.allCases.reduce(into: [:], { (result, next) in
             result[next] = []
         })

@@ -48,17 +48,15 @@ private extension OptimoveNotificationHandler {
         case .reregister:
             Logger.debug("Request to reregister.")
             let bgtask = UIApplication.shared.beginBackgroundTask(withName: "reregister")
-            DispatchQueue.global().async { [handlersPool] in
-                do {
-                    try handlersPool.pushableHandler.handle(PushableOperationContext(.performRegistration))
-                } catch {
-                    Logger.error(error.localizedDescription)
-                }
-                let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 2.0)
-                DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
-                    completion(.newData)
-                    UIApplication.shared.endBackgroundTask(bgtask)
-                }
+            do {
+                try handlersPool.pushableHandler.handle(PushableOperationContext(.performRegistration))
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
+            let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 2.0)
+            DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+                completion(.newData)
+                UIApplication.shared.endBackgroundTask(bgtask)
             }
 
         case .ping:
@@ -67,17 +65,15 @@ private extension OptimoveNotificationHandler {
                 let event = try coreEventFactory.createEvent(.ping)
                 try handlersPool.eventableHandler.handle(EventableOperationContext(.report(event: event)))
                 let bgtask = UIApplication.shared.beginBackgroundTask(withName: "ping")
-                DispatchQueue.global().async { [handlersPool] in
-                    do {
-                        try handlersPool.eventableHandler.handle(EventableOperationContext(.dispatchNow))
-                    } catch {
-                        Logger.error(error.localizedDescription)
-                    }
-                    let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 3.0)
-                    DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
-                        completion(.newData)
-                        UIApplication.shared.endBackgroundTask(bgtask)
-                    }
+                do {
+                    try handlersPool.eventableHandler.handle(EventableOperationContext(.dispatchNow))
+                } catch {
+                    Logger.error(error.localizedDescription)
+                }
+                let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 3.0)
+                DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+                    completion(.newData)
+                    UIApplication.shared.endBackgroundTask(bgtask)
                 }
             } catch {
                 Logger.error(error.localizedDescription)

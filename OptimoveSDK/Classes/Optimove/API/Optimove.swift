@@ -9,9 +9,9 @@ import OptimoveCore
 @objc public final class Optimove: NSObject {
 
     private let serviceLocator: ServiceLocator
-    private let mainFactory: MainFactory
     private var storage: OptimoveStorage
     private let handlers: HandlersPool
+    private let queue: DispatchQueue
     private let stateListener: DeprecatedStateListener
 
     /// The shared instance of OptimoveSDK.
@@ -21,10 +21,10 @@ import OptimoveCore
 
     private override init() {
         serviceLocator = ServiceLocator()
-        mainFactory = MainFactory(serviceLocator: serviceLocator)
         handlers = serviceLocator.handlersPool()
         storage = serviceLocator.storage()
         stateListener = DeprecatedStateListener()
+        queue = DispatchQueue(label: "com.optimove.sdk", qos: .utility)
         super.init()
 
         setup()
@@ -34,9 +34,11 @@ import OptimoveCore
     ///
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
-        shared.configureLogger()
-        shared.storeTenantInfo(tenantInfo)
-        shared.startSDK { _ in }
+        shared.queue.async {
+            shared.configureLogger()
+            shared.storeTenantInfo(tenantInfo)
+            shared.startSDK { _ in }
+        }
     }
 
 }
@@ -59,12 +61,14 @@ extension Optimove {
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptimoveSdkCommand(userInfo: userInfo)
         if result {
-            startSDK { result in
-                guard result.isSuccessful else { return }
-                notificationListener.didReceiveRemoteNotification(
-                    userInfo: userInfo,
-                    didComplete: didComplete
-                )
+            queue.async {
+                self.startSDK { result in
+                    guard result.isSuccessful else { return }
+                    notificationListener.didReceiveRemoteNotification(
+                        userInfo: userInfo,
+                        didComplete: didComplete
+                    )
+                }
             }
         }
         return result
@@ -103,12 +107,14 @@ extension Optimove {
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: response.notification)
         if result {
-            startSDK { result in
-                guard result.isSuccessful else { return }
-                notificationListener.didReceive(
-                    response: response,
-                    withCompletionHandler: completionHandler
-                )
+            queue.async {
+                self.startSDK { result in
+                    guard result.isSuccessful else { return }
+                    notificationListener.didReceive(
+                        response: response,
+                        withCompletionHandler: completionHandler
+                    )
+                }
             }
         }
         return result
@@ -123,17 +129,23 @@ extension Optimove {
     ///
     /// - Parameter deviceToken: A token that was received from the AppDelegate.
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        reportPushable(PushableOperationContext(.deviceToken(token: deviceToken)))
+        queue.async {
+            self.reportPushable(PushableOperationContext(.deviceToken(token: deviceToken)))
+        }
     }
 
     /// Request to subscribe to test campaign topics
     @objc public func startTestMode() {
-        reportPushable(PushableOperationContext(.subscribeToTopic(topic: optimoveTestTopic)))
+        queue.async {
+            self.reportPushable(PushableOperationContext(.subscribeToTopic(topic: self.optimoveTestTopic)))
+        }
     }
 
     /// Request to unsubscribe from test campaign topics
     @objc public func stopTestMode() {
-        reportPushable(PushableOperationContext(.unsubscribeFromTopic(topic: optimoveTestTopic)))
+        queue.async {
+            self.reportPushable(PushableOperationContext(.unsubscribeFromTopic(topic: self.optimoveTestTopic)))
+        }
     }
 }
 
@@ -147,8 +159,10 @@ extension Optimove {
     ///   - name: Name of the event.
     ///   - parameters: The dictionary of attributes.
     @objc public func reportEvent(name: String, parameters: [String: Any]) {
-        let customEvent = SimpleCustomEvent(name: name, parameters: parameters)
-        reportEventable(context: EventableOperationContext(.report(event: customEvent)))
+        queue.async {
+            let customEvent = SimpleCustomEvent(name: name, parameters: parameters)
+            self.reportEventable(EventableOperationContext(.report(event: customEvent)))
+        }
     }
 
     /// Report the event to Optimove SDK.
@@ -156,7 +170,9 @@ extension Optimove {
     /// - Parameters:
     ///   - event: Instance of OptimoveEvent type.
     @objc public func reportEvent(_ event: OptimoveEvent) {
-        reportEventable(context: EventableOperationContext(.report(event: event)))
+        queue.async {
+            self.reportEventable(EventableOperationContext(.report(event: event)))
+        }
     }
 
 }
@@ -169,15 +185,13 @@ extension Optimove {
     ///
     /// - Parameter userID: A client unique identifier
     @objc public func setUserId(_ userID: String) {
-        let userID = userID.trimmingCharacters(in: .whitespaces)
-        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
-        guard validationResult == .valid else { return }
-        updateStorage(userId: userID)
-        do {
-            reportEvent(try mainFactory.coreEventFactory().createEvent(.setUserId))
-            try handlers.pushableHandler.handle(PushableOperationContext(.performRegistration))
-        } catch {
-            Logger.error(error.localizedDescription)
+        queue.async {
+            let userID = userID.trimmingCharacters(in: .whitespaces)
+            let validationResult = UserIDValidator(storage: self.storage).validateNewUserID(userID)
+            guard validationResult == .valid else { return }
+            self.updateStorage(userId: userID)
+            self.reportEventable(EventableOperationContext(.setUserId(userId: userID)))
+            self.reportPushable(PushableOperationContext(.performRegistration))
         }
     }
 
@@ -195,10 +209,12 @@ extension Optimove {
     ///
     /// - Parameter email: The user email
     @objc public func setUserEmail(email: String) {
-        let validationResult = EmailValidator.isValid(email)
-        guard validationResult == .valid else { return }
-        storage.userEmail = email
-        reportEvent(SetUserEmailEvent(email: email))
+        queue.async {
+            let validationResult = EmailValidator.isValid(email)
+            guard validationResult == .valid else { return }
+            self.storage.userEmail = email
+            self.reportEvent(SetUserEmailEvent(email: email))
+        }
     }
 
 }
@@ -214,23 +230,25 @@ extension Optimove {
     }
 
     @objc public func setScreenVisit(screenPath: String, screenTitle: String, screenCategory: String? = nil) {
-        let screenPath = screenPath.trimmingCharacters(in: .whitespaces)
-        let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
-        Logger.info("Report screen event w/title: \(screenTitle)")
-        let validationResult = ScreenVisitValidator.validate(screenPath: screenPath, screenTitle: screenTitle)
-        guard validationResult == .valid else { return }
-        do {
-            try handlers.eventableHandler.handle(
-                EventableOperationContext(
-                    .reportScreenEvent(
-                        customURL: try ScreenVisitPreprocessor.process(screenPath),
-                        pageTitle: screenTitle,
-                        category: screenCategory
+        queue.async {
+            let screenPath = screenPath.trimmingCharacters(in: .whitespaces)
+            let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
+            Logger.info("Report screen event w/title: \(screenTitle)")
+            let validationResult = ScreenVisitValidator.validate(screenPath: screenPath, screenTitle: screenTitle)
+            guard validationResult == .valid else { return }
+            do {
+                try self.handlers.eventableHandler.handle(
+                    EventableOperationContext(
+                        .reportScreenEvent(
+                            customURL: try ScreenVisitPreprocessor.process(screenPath),
+                            pageTitle: screenTitle,
+                            category: screenCategory
+                        )
                     )
                 )
-            )
-        } catch {
-            Logger.error(error.localizedDescription)
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
         }
     }
 
@@ -257,12 +275,12 @@ private extension Optimove {
 
     func startSDK(completion: @escaping (Result<Void, Error>) -> Void) {
         guard RunningFlagsIndication.isSdkNeedInitializing() else {
-            Logger.info("Skip normal initializtion since SDK already running.")
+            Logger.info("Skip initializtion since Optimove SDK already running.")
             completion(.success(()))
             return
         }
         RunningFlagsIndication.isInitializerRunning.toggle()
-        let initializer = mainFactory.initializer()
+        let initializer = MainFactory(serviceLocator: serviceLocator).initializer()
         initializer.initialize { result in
             switch result {
             case .success:
@@ -325,7 +343,7 @@ private extension Optimove {
 
     // MARK: OptiTrack private
 
-    private func reportEventable(context: EventableOperationContext) {
+    private func reportEventable(_ context: EventableOperationContext) {
         do {
             // TODO: Normilize event
             try handlers.eventableHandler.handle(context)
