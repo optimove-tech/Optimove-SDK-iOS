@@ -5,8 +5,6 @@
 final class StubOptimoveDeviceStateMonitor: OptimoveDeviceStateMonitor {
 
     var state: [OptimoveDeviceRequirement: Bool] = [
-        .internet: true,
-        .advertisingId: true,
         .userNotification: true
     ]
 

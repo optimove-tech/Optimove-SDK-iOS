@@ -41,13 +41,7 @@ final class OptimoveSDKInitializer {
 
     func initializeFromRemoteServer(completion: @escaping ResultBlockWithBool) {
         Logger.info("Start initializtion from remote configurations.")
-        deviceStateMonitor.getStatus(for: .internet) { (available) in
-            if available {
-                self.handleFetchConfigurationFromRemote(completion: completion)
-            } else {
-                completion(false)
-            }
-        }
+        handleFetchConfigurationFromRemote(completion: completion)
     }
 
     /// When the SDK is initialized by a push notification start the initialization from the local JSON file.
@@ -93,6 +87,8 @@ private extension OptimoveSDKInitializer {
                 completion(false)
             }
         }
+
+        // Combine the operations for an executing
         let operations = downloadOperations + [mergeOperation]
         operations.forEach {
             // Set the completion operation as dependent for all operations before they start executing.
@@ -121,35 +117,20 @@ private extension OptimoveSDKInitializer {
         setupOptimoveComponents(from: configuration, completion: completion)
     }
 
-    func setupOptimoveComponents(from config: Configuration, completion: @escaping ResultBlockWithBool) {
+    func setupOptimoveComponents(from configuration: Configuration, completion: @escaping ResultBlockWithBool) {
         guard RunningFlagsIndication.isSdkNeedInitializing() else {
             Logger.debug("SDK already running, skip initialization before lock.")
+            completion(false)
             return
         }
         RunningFlagsIndication.isInitializerRunning = true
-        do {
-            try initializeOptitrack()
-            try initializeRealtime()
-            handlersPool.addNextEventableHandler(ComponentEventableHandler(component: components))
-            try initializeOptipush()
-            handlersPool.addNextPushableHandler(ComponentPushableHandler(component: components))
-            Logger.info("All components setup finished.")
-            completion(true)
-        } catch {
-            completion(false)
-        }
-    }
-
-    func initializeOptipush() throws {
-        components.addComponent(try componentFactory.createOptipushComponent())
-    }
-
-    func initializeOptitrack() throws {
-        components.addComponent(try componentFactory.createOptitrackComponent())
-    }
-
-    func initializeRealtime() throws {
-        components.addComponent(try componentFactory.createRealtimeComponent())
+        components.addComponent(componentFactory.createOptitrackComponent(configuration: configuration))
+        components.addComponent(componentFactory.createRealtimeComponent(configuration: configuration))
+        handlersPool.addNextEventableHandler(ComponentEventableHandler(component: components))
+        components.addComponent(componentFactory.createOptipushComponent(configuration: configuration))
+        handlersPool.addNextPushableHandler(ComponentPushableHandler(component: components))
+        Logger.info("All components setup finished.")
+        completion(true)
     }
 
 }

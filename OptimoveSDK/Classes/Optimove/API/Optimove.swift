@@ -67,7 +67,7 @@ extension Optimove {
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptimoveSdkCommand(userInfo: userInfo)
         if result {
-            startUrgentInitProcess { (success) in
+            startNormalInitProcess { (success) in
                 guard success else { return }
                 notificationListener.didReceiveRemoteNotification(
                     userInfo: userInfo,
@@ -111,7 +111,7 @@ extension Optimove {
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: response.notification)
         if result {
-            startUrgentInitProcess { (success) in
+            startNormalInitProcess { (success) in
                 guard success else { return }
                 notificationListener.didReceive(
                     response: response,
@@ -279,27 +279,13 @@ private extension Optimove {
         }
     }
 
-    func startUrgentInitProcess(didSucceed: @escaping ResultBlockWithBool) {
-        Logger.info("Start urgent initiazlition process.")
-        if RunningFlagsIndication.isSdkRunning {
-            Logger.info("Skip urgent initializtion since SDK already running")
-            didSucceed(true)
-            return
-        }
-        let initializer = mainFactory.initializer()
-        initializer.initializeFromLocalConfigs { success in
-            didSucceed(success)
-            if success {
-                self.didFinishInitializationSuccessfully()
-            }
-        }
-    }
-
     func didFinishInitializationSuccessfully() {
         RunningFlagsIndication.isInitializerRunning = false
         RunningFlagsIndication.isSdkRunning = true
         stateListener.onInitializationSuccessfully(self)
     }
+
+    //  MARK: Configuration
 
     /// Stores the user information that was provided during configuration.
     ///

@@ -12,12 +12,8 @@ extension DeviceRequirementFetcherFactoryImpl: DeviceRequirementFetcherFactory {
 
     func createFetcher(for requirement: OptimoveDeviceRequirement) -> Fetchable {
         switch requirement {
-        case .advertisingId:
-            return AdvertisingIdPermissionFetcher()
         case .userNotification:
             return NotificationPermissionFetcher()
-        case .internet:
-            return NetworkCapabilitiesFetcher()
         }
     }
 }

@@ -9,8 +9,6 @@ class OptimoveDeviceStateMonitorTests: XCTestCase {
 
     var fetchers: FetchersGenerator = {
         return [
-            MockDeviceRequirementFetcher(type: .internet, isEnabled: true),
-            MockDeviceRequirementFetcher(type: .advertisingId, isEnabled: true),
             MockDeviceRequirementFetcher(type: .userNotification, isEnabled: true)
         ]
     }
@@ -29,8 +27,6 @@ class OptimoveDeviceStateMonitorTests: XCTestCase {
     func testThatGetStatusImplWorks() {
         // given
         let requirements: [OptimoveDeviceRequirement] = [
-            .advertisingId,
-            .internet,
             .userNotification
         ]
 

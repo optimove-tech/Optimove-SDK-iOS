@@ -20,6 +20,7 @@ public  enum StorageKey: String, CaseIterable {
     case userAgent
     case deviceResolutionWidth
     case deviceResolutionHeight
+    case advertisingIdentifier
 
     // MARK: Shared keys
 
@@ -57,6 +58,7 @@ public protocol StorageValue {
     var userAgent: String? { get set }
     var deviceResolutionWidth: Float? { get set }
     var deviceResolutionHeight: Float? { get set }
+    var advertisingIdentifier: String? { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -67,6 +69,7 @@ public protocol StorageValue {
     func getUserAgent() throws -> String
     func getDeviceResolutionWidth() throws -> Float
     func getDeviceResolutionHeight() throws -> Float
+    func getAdvertisingIdentifier() throws -> String
 
     // MARK: Shared values
 
@@ -117,7 +120,8 @@ public final class StorageFacade: OptimoveStorage {
         .version,
         .userAgent,
         .deviceResolutionWidth,
-        .deviceResolutionHeight
+        .deviceResolutionHeight,
+        .advertisingIdentifier
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.
@@ -320,6 +324,15 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
+    var advertisingIdentifier: String? {
+        get {
+            return self[.advertisingIdentifier]
+        }
+        set {
+            self[.advertisingIdentifier] = newValue
+        }
+    }
+
     func getConfigurationEndPoint() throws -> URL {
         guard let value = configurationEndPoint else {
             throw StorageError.noValue(.configurationEndPoint)
@@ -379,6 +392,13 @@ public extension KeyValueStorage where Self: StorageValue {
     func getDeviceResolutionHeight() throws -> Float {
         guard let value = deviceResolutionHeight else {
             throw StorageError.noValue(.deviceResolutionHeight)
+        }
+        return value
+    }
+
+    func getAdvertisingIdentifier() throws -> String {
+        guard let value = advertisingIdentifier else {
+            throw StorageError.noValue(.advertisingIdentifier)
         }
         return value
     }

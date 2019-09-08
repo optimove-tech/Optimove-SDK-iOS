@@ -24,7 +24,7 @@ import AdSupport
 
 final class CoreEventFactoryImpl {
 
-    private let storage: OptimoveStorage
+    private var storage: OptimoveStorage
     private let deviceId: String = SDKDevice.uuid
     private let dateTimeProvider: DateTimeProvider
     private var timestamp: TimeInterval {
@@ -127,6 +127,19 @@ private extension CoreEventFactoryImpl {
             deviceId: deviceId,
             appNs: try getApplicationNamespace()
         )
+    }
+
+    func getAdvertisingIdentifier() -> String {
+        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
+            return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+        }
+        if let storedAdvertisingIdentifier = storage.advertisingIdentifier {
+            return storedAdvertisingIdentifier
+        } else {
+            let newAdvertisingIdentifier =  UUID().uuidString
+            storage.advertisingIdentifier = newAdvertisingIdentifier
+            return newAdvertisingIdentifier
+        }
     }
 
     func createPageVisitEvent(screenPath: String, screenTitle: String, category: String?) -> PageVisitEvent {

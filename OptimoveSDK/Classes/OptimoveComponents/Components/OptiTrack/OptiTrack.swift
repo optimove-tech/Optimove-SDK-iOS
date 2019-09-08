@@ -185,24 +185,17 @@ extension OptiTrack {
 
         // ELI: TODO: Check this point out.
         if config.supportedOnRealTime {
-            self.deviceStateMonitor.getStatus(for: .internet) { (hasInternet) in
-                if hasInternet {
-                    self.dispatchNow()
-                }
-            }
+            self.dispatchNow()
         }
     }
 
     func reportIdfaIfAllowed() {
         guard configuration.enableAdvertisingIdReport == true else { return }
-        deviceStateMonitor.getStatus(for: .advertisingId) { [coreEventFactory] (isAllowed) in
-            guard isAllowed else { return }
-            do {
-                let event = try coreEventFactory.createEvent(.setAdvertisingId)
-                try self.report(event: event)
-            } catch {
-                Logger.error(error.localizedDescription)
-            }
+        do {
+            let event = try coreEventFactory.createEvent(.setAdvertisingId)
+            try self.report(event: event)
+        } catch {
+            Logger.error(error.localizedDescription)
         }
     }
 

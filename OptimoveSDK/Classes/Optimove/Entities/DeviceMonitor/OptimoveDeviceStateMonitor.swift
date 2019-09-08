@@ -4,21 +4,10 @@ import UserNotifications
 import OptimoveCore
 
 public enum OptimoveDeviceRequirement: Int, CaseIterable, CustomStringConvertible {
-    case internet = 0
-    case advertisingId = 1
     case userNotification = 2
-
-    static let userDependentPermissions: [OptimoveDeviceRequirement] = [.userNotification, .advertisingId]
-    var isUserDependentPermissions: Bool {
-        return OptimoveDeviceRequirement.userDependentPermissions.contains(self)
-    }
 
     public var description: String {
         switch self {
-        case .internet:
-            return "Internet"
-        case .advertisingId:
-            return "AdvertisingId"
         case .userNotification:
             return "UserNotification"
         }

@@ -9,14 +9,12 @@ class RealTimeComponentTests: XCTestCase {
     var realTime: RealTime!
     var storage: MockOptimoveStorage!
     var networking: MockRealTimeNetworking!
-    var deviceStateMonitor: StubOptimoveDeviceStateMonitor!
     var handler: RealTimeHanlderAssertionProxy!
     var dateProvider: MockDateTimeProvider!
 
     override func setUp() {
         storage = MockOptimoveStorage()
         networking = MockRealTimeNetworking()
-        deviceStateMonitor = StubOptimoveDeviceStateMonitor()
         handler = RealTimeHanlderAssertionProxy(
             target: RealTimeHanlderImpl(storage: storage)
         )
@@ -25,7 +23,6 @@ class RealTimeComponentTests: XCTestCase {
             configuration: ConfigurationFixture.build().realtime,
             storage: storage,
             networking: networking,
-            deviceStateMonitor: deviceStateMonitor,
             eventBuilder: RealTimeEventBuilder(
                 storage: storage
             ),
@@ -182,23 +179,6 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: defaultTimeout)
-    }
-
-    /// If an event is reported to the Realtime component and there is no internet connection, you will receive an indication that the event is skipped.
-    func test_that_event_skipped_without_internet_connection() {
-        // given
-        deviceStateMonitor.state[.internet] = false
-
-        // then
-        let expect = expectation(description: "Event was not generated.")
-        realTime.isAllowToSendReport { (isAllow) in
-            XCTAssert(isAllow == false)
-            expect.fulfill()
-        }
-
-        // when
-        try! realTime.reportEvent(event: StubEvent())
         waitForExpectations(timeout: defaultTimeout)
     }
 
@@ -467,14 +447,16 @@ class RealTimeComponentTests: XCTestCase {
         // given
         prefilledStorage()
 
-        // and
-        deviceStateMonitor.state[.internet] = false
-
         let event = SetUserIdEvent(
             originalVistorId: storage[.initialVisitorId]!,
             userId: storage[.customerID]!,
             updateVisitorId: storage[.visitorID]!
         )
+
+        // and
+        networking.assertFunction = { event in
+            return .failure(NetworkError.requestFailed)
+        }
 
         // then
         let expect = expectation(description: #function)
@@ -518,7 +500,9 @@ class RealTimeComponentTests: XCTestCase {
         prefilledStorage()
 
         // and
-        deviceStateMonitor.state[.internet] = false
+        networking.assertFunction = { event in
+            return .failure(NetworkError.requestFailed)
+        }
 
         let event = SetUserEmailEvent(email: storage[.userEmail]!)
 

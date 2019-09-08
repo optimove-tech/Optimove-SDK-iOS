@@ -13,7 +13,6 @@ final class RealTime {
     private var storage: OptimoveStorage
     private let eventBuilder: RealTimeEventBuilder
     private let coreEventFactory: CoreEventFactory
-    private let deviceStateMonitor: OptimoveDeviceStateMonitor
 
     // MARK: - Public
 
@@ -21,7 +20,6 @@ final class RealTime {
         configuration: RealtimeConfig,
         storage: OptimoveStorage,
         networking: RealTimeNetworking,
-        deviceStateMonitor: OptimoveDeviceStateMonitor,
         eventBuilder: RealTimeEventBuilder,
         handler: RealTimeHanlder,
         coreEventFactory: CoreEventFactory) {
@@ -35,7 +33,6 @@ final class RealTime {
         self.hanlder = handler
         self.eventBuilder = eventBuilder
         self.coreEventFactory = coreEventFactory
-        self.deviceStateMonitor = deviceStateMonitor
         performInitializationOperations()
         Logger.debug("RealTime initialized.")
     }
@@ -105,12 +102,6 @@ extension RealTime {
             email: email
         )
         try reportEvent(event: event, retryFailedEvents: false)
-    }
-
-    func isAllowToSendReport(completion: @escaping (Bool) -> Void) {
-        deviceStateMonitor.getStatus(for: .internet) { (online) in
-            completion(online)
-        }
     }
 
 }
@@ -199,30 +190,24 @@ private extension RealTime {
 
     func sentReportEvent(context: RealTimeEventContext) {
         let realtimeToken = configuration.realtimeToken
-        isAllowToSendReport { [realTimeQueue, hanlder, networking, eventBuilder] (allow) in
-            guard allow else {
-                hanlder.handleOnError(context, error: RealTimeError.deviceOffline)
-                return
-            }
-            // The delay added as the temporary hotfix for the realtime race condition issue.
-            // Should be removed right after release a solution on a server side.
-            let delay: TimeInterval = 1
-            realTimeQueue.asyncAfter(deadline: .now() + delay, execute: {
-                do {
-                    let realtimeEvent = try eventBuilder.createEvent(context: context, realtimeToken: realtimeToken)
-                    try networking.report(event: realtimeEvent) { (result) in
-                        switch result {
-                        case let .success(json):
-                            hanlder.handleOnSuccess(context, json: json)
-                        case let .failure(error):
-                            hanlder.handleOnError(context, error: error)
-                        }
+        // The delay added as the temporary hotfix for the realtime race condition issue.
+        // Should be removed right after release a solution on a server side.
+        let delay: TimeInterval = 1
+        realTimeQueue.asyncAfter(deadline: .now() + delay, execute: { [eventBuilder, networking, hanlder] in
+            do {
+                let realtimeEvent = try eventBuilder.createEvent(context: context, realtimeToken: realtimeToken)
+                try networking.report(event: realtimeEvent) { (result) in
+                    switch result {
+                    case let .success(json):
+                        hanlder.handleOnSuccess(context, json: json)
+                    case let .failure(error):
+                        hanlder.handleOnError(context, error: error)
                     }
-                } catch {
-                    hanlder.handleOnError(context, error: error)
                 }
-            })
-        }
+            } catch {
+                hanlder.handleOnError(context, error: error)
+            }
+        })
     }
 
 }
