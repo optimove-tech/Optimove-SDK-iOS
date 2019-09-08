@@ -49,6 +49,7 @@ extension NetworkClientImpl: NetworkClient {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = request.method.rawValue
         urlRequest.httpBody = request.httpBody
+        urlRequest.timeoutInterval = request.timeoutInterval
 
         request.headers?.forEach { urlRequest.addValue($0.value, forHTTPHeaderField: $0.field) }
 
