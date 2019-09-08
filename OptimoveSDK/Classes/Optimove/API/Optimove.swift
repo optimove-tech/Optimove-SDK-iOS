@@ -255,9 +255,14 @@ extension Optimove: OptimoveDeepLinkResponding {
     }
 }
 
-// MARK: - OptiTrack related API
+// MARK: - Event API call
 
 extension Optimove {
+
+    @objc public func reportEvent(name: String, parameters: [String: Any]) {
+        let customEvent = SimpleCustomEvent(name: name, parameters: parameters)
+        reportEventable(context: EventableOperationContext(.report(event: customEvent)))
+    }
 
     /// Validate the permissions of the client to use Optitrack component and if permit sends the
     /// report to the appropriate handler.
@@ -265,22 +270,13 @@ extension Optimove {
     /// - Parameters:
     ///   - event: optimove event object
     @objc public func reportEvent(_ event: OptimoveEvent) {
+        reportEventable(context: EventableOperationContext(.report(event: event)))
+    }
+
+    private func reportEventable(context: EventableOperationContext) {
         do {
             // TODO: Normilize event
-            try handlers.eventableHandler.handle(EventableOperationContext(.report(event: event)))
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
-
-    @objc public func reportEvent(name: String, parameters: [String: Any]) {
-        let customEvent = SimpleCustomEvent(name: name, parameters: parameters)
-        reportEvent(customEvent)
-    }
-
-    func dispatchQueuedEventsNow() {
-        do {
-            try handlers.eventableHandler.handle(EventableOperationContext(.dispatchNow))
+            try handlers.eventableHandler.handle(context)
         } catch {
             Logger.error(error.localizedDescription)
         }
@@ -288,7 +284,8 @@ extension Optimove {
 
 }
 
-// MARK: - set user id API
+// MARK: - SetUserID API call
+
 extension Optimove {
 
     /// validate the permissions of the client to use optitrack component and if permit validate the sdkId content and sends:
@@ -349,69 +346,37 @@ extension Optimove {
 
 }
 
+// MARK: - ScreenVisit API call
+
 extension Optimove {
 
-    // MARK: - Report screen visit
-
     @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
-        Logger.debug("Report screen event w/ title: \(screenTitle)")
-        guard !screenTitle.trimmingCharacters(in: .whitespaces).isEmpty else {
-            Logger.error("Failed to report screen visit. Reason: empty title")
-            return
-        }
-        let path = screenPathArray.joined(separator: "/")
-        setScreenVisit(screenPath: path, screenTitle: screenTitle, screenCategory: screenCategory)
+        setScreenVisit(screenPath: screenPathArray.joined(separator: "/"),
+                       screenTitle: screenTitle,
+                       screenCategory: screenCategory)
     }
 
     @objc public func setScreenVisit(screenPath: String, screenTitle: String, screenCategory: String? = nil) {
+        let screenPath = screenPath.trimmingCharacters(in: .whitespaces)
         let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
-        var screenPath = screenPath.trimmingCharacters(in: .whitespaces)
-        guard !screenTitle.isEmpty else {
-            Logger.error("Failed to report screen visit. Reason: empty title")
-            return
-        }
-        guard !screenPath.isEmpty else {
-            Logger.error("Failed to report screen visit. Reason: empty path")
-            return
-        }
-
-        if screenPath.starts(with: "/") {
-            screenPath = String(screenPath[screenPath.index(after: screenPath.startIndex)...])
-        }
-        if let customUrl = removeUrlProtocol(path: screenPath)
-            .lowercased()
-            .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) {
-
-            var path = customUrl.last != "/" ? "\(customUrl)/" : "\(customUrl)"
-
-            path = "\(Bundle.main.bundleIdentifier!)/\(path)".lowercased()
-
-            do {
-                try handlers.eventableHandler.handle(
-                    EventableOperationContext(
-                        .reportScreenEvent(
-                            customURL: path,
-                            pageTitle: screenTitle,
-                            category: screenCategory
-                        )
+        Logger.debug("Report screen event w/ title: \(screenTitle)")
+        let validationResult = ScreenVisitValidator.validate(screenPath: screenPath, screenTitle: screenTitle)
+        guard validationResult == .valid else { return }
+        do {
+            try handlers.eventableHandler.handle(
+                EventableOperationContext(
+                    .reportScreenEvent(
+                        customURL: try ScreenVisitPreprocessor.process(screenPath),
+                        pageTitle: screenTitle,
+                        category: screenCategory
                     )
                 )
-            } catch {
-                Logger.error(error.localizedDescription)
-            }
+            )
+        } catch {
+            Logger.error(error.localizedDescription)
         }
     }
 
-    private func removeUrlProtocol(path: String) -> String {
-        var result = path
-        for prefix in ["https://www.", "http://www.", "https://", "http://"] {
-            if result.hasPrefix(prefix) {
-                result.removeFirst(prefix.count)
-                break
-            }
-        }
-        return result
-    }
 }
 
 private extension Optimove {
