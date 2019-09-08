@@ -66,7 +66,6 @@ final class InMemoryPushableBuffer: PushableHandler {
     }
 
     override func handle(_ context: PushableOperationContext) throws {
-        handleSpecialCases(context)
         if next == nil {
             context.isBuffered = true
             buffer.write(context)
@@ -78,17 +77,6 @@ final class InMemoryPushableBuffer: PushableHandler {
     func dispatchBuffer() {
         while let context = buffer.read() {
             try? next?.handle(context)
-        }
-    }
-
-    func handleSpecialCases(_ context: PushableOperationContext) {
-        switch context.operation {
-        case let .deviceToken(token: token):
-            if next == nil {
-                storage.apnsToken = token
-            }
-        default:
-            break
         }
     }
 

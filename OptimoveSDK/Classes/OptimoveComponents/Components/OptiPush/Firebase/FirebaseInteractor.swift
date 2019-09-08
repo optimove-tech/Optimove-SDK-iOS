@@ -15,7 +15,6 @@ final class FirebaseInteractor: NSObject {
     private var storage: OptimoveStorage
     private var appController: FirebaseOptions?
     private var clientServiceOptions: FirebaseOptions?
-    private var APNSToken: Data?
     private weak var delegate: OptimoveMbaasRegistrationHandling?
 
     init(storage: OptimoveStorage,
@@ -81,12 +80,7 @@ extension FirebaseInteractor: OptipushServiceInfra {
     }
 
     func handleRegistration(token: Data) {
-        if  Messaging.messaging().fcmToken == nil {
-            APNSToken = token
-        } else {
-            Messaging.messaging().apnsToken = token
-            APNSToken = nil
-        }
+        storage.apnsToken = token
     }
 
     func optimoveReceivedRegistrationToken(_ fcmToken: String) {
@@ -166,9 +160,9 @@ extension FirebaseInteractor: MessagingDelegate {
 
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
         registerIfTokenChanged(updatedFcmToken: fcmToken)
-        if let token = APNSToken {
+        if let token = storage.apnsToken {
             Messaging.messaging().apnsToken = token
-            APNSToken = nil
+            storage.apnsToken = nil
         }
     }
 

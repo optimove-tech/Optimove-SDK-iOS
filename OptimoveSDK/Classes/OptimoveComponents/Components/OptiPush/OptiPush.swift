@@ -55,10 +55,6 @@ final class OptiPush {
         self.retryFailedMbaasOperations()
         self.optInOutIfNeeded()
         firebaseInteractor.subscribeToTopics(didSucceed: nil)
-        if let clientApnsToken = storage.apnsToken {
-            application(didRegisterForRemoteNotificationsWithDeviceToken: clientApnsToken)
-            storage.apnsToken = nil
-        }
     }
 
 }
