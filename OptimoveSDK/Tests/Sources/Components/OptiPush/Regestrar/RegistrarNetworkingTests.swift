@@ -36,7 +36,7 @@ class RegistrarNetworkingTests: XCTestCase {
             Mock(
                 url: url
                     .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.register + RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.visitor),
-                dataType: .json,
+                contentType: .json,
                 statusCode: 200,
                 data: [.post: Data()]
             )
@@ -77,7 +77,7 @@ class RegistrarNetworkingTests: XCTestCase {
             Mock(
                 url: url
                     .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.unregister + RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.customer),
-                dataType: .json,
+                contentType: .json,
                 statusCode: 200,
                 data: [.post: Data()]
             )
