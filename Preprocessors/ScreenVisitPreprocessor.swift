@@ -27,7 +27,7 @@ private extension ScreenVisitPreprocessor {
 
     static func processPrefix(_ input: String) -> String {
         var input = input
-        if !input.hasPrefix(Constants.suffix) {
+        if input.hasPrefix(Constants.suffix) {
             input.removeFirst(Constants.suffix.count)
         }
         return removeUrlProtocol(input)
@@ -46,7 +46,7 @@ private extension ScreenVisitPreprocessor {
 
     static func processSuffixes(_ input: String) -> String {
         var input = input
-        if !input.hasSuffix(Constants.suffix) {
+        if input.hasSuffix(Constants.suffix) {
             input.append(Constants.suffix)
         }
         return input
