@@ -14,8 +14,6 @@ import OptimoveCore
     private let handlers: HandlersPool
     private let stateListener: DeprecatedStateListener
 
-    // MARK: - Initializers
-
     /// The shared instance of OptimoveSDK.
     @objc public static let shared: Optimove = {
         return Optimove()
@@ -49,53 +47,6 @@ import OptimoveCore
         }
     }
 
-}
-
-// MARK: - Initialization API
-
-extension Optimove {
-
-    func startNormalInitProcess(didSucceed: @escaping ResultBlockWithBool) {
-        Logger.info("Start initialization from remote.")
-        if RunningFlagsIndication.isSdkRunning {
-            Logger.debug("Skip normal initializtion since SDK already running.")
-            didSucceed(true)
-            return
-        }
-        let initializer = mainFactory.initializer()
-        initializer.initializeFromRemoteServer { [initializer] success in
-            if success {
-                didSucceed(success)
-                self.didFinishInitializationSuccessfully()
-            } else {
-                initializer.initializeFromLocalConfigs { success in
-                    didSucceed(success)
-                }
-            }
-        }
-    }
-
-    func startUrgentInitProcess(didSucceed: @escaping ResultBlockWithBool) {
-        Logger.info("Start urgent initiazlition process.")
-        if RunningFlagsIndication.isSdkRunning {
-            Logger.debug("Skip urgent initializtion since SDK already running")
-            didSucceed(true)
-            return
-        }
-        let initializer = mainFactory.initializer()
-        initializer.initializeFromLocalConfigs { success in
-            didSucceed(success)
-            if success {
-                self.didFinishInitializationSuccessfully()
-            }
-        }
-    }
-
-    func didFinishInitializationSuccessfully() {
-        RunningFlagsIndication.isInitializerRunning = false
-        RunningFlagsIndication.isSdkRunning = true
-        stateListener.onInitializationSuccessfully(self)
-    }
 }
 
 // MARK: - Notification API call
@@ -191,18 +142,6 @@ extension Optimove {
     @objc public func stopTestMode() {
         reportPushable(PushableOperationContext(.unsubscribeFromTopic(topic: optimoveTestTopic)))
     }
-
-    private var optimoveTestTopic: String {
-        return "test_ios_\(Bundle.main.bundleIdentifier ?? "")"
-    }
-
-    private func reportPushable(_ context: PushableOperationContext) {
-        do {
-            try handlers.pushableHandler.handle(context)
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
 }
 
 // MARK: - Event API call
@@ -221,15 +160,6 @@ extension Optimove {
     ///   - event: optimove event object
     @objc public func reportEvent(_ event: OptimoveEvent) {
         reportEventable(context: EventableOperationContext(.report(event: event)))
-    }
-
-    private func reportEventable(context: EventableOperationContext) {
-        do {
-            // TODO: Normilize event
-            try handlers.eventableHandler.handle(context)
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
     }
 
 }
@@ -276,21 +206,6 @@ extension Optimove {
         }
         storage.userEmail = email
         reportEvent(SetUserEmailEvent(email: email))
-    }
-
-    private func updateStorage(userId: String) {
-        if storage.customerID == nil {
-            storage.isFirstConversion = true
-        } else if userId != storage.customerID {
-            Logger.debug("user id changed from '\(storage.customerID ?? "nil")' to '\(userId)'")
-            if storage.isRegistrationSuccess == true {
-                // send the first_conversion flag only if no previous registration has succeeded
-                storage.isFirstConversion = false
-            }
-        }
-        storage.isRegistrationSuccess = false
-        storage.visitorID = VisitorIDPreprocessor.process(userId)
-        storage.customerID = userId
     }
 
 }
@@ -345,6 +260,50 @@ extension Optimove: OptimoveDeepLinkResponding {
 
 private extension Optimove {
 
+    // MARK: Initialization
+
+    func startNormalInitProcess(didSucceed: @escaping ResultBlockWithBool) {
+        Logger.info("Start initialization from remote.")
+        if RunningFlagsIndication.isSdkRunning {
+            Logger.debug("Skip normal initializtion since SDK already running.")
+            didSucceed(true)
+            return
+        }
+        let initializer = mainFactory.initializer()
+        initializer.initializeFromRemoteServer { [initializer] success in
+            if success {
+                didSucceed(success)
+                self.didFinishInitializationSuccessfully()
+            } else {
+                initializer.initializeFromLocalConfigs { success in
+                    didSucceed(success)
+                }
+            }
+        }
+    }
+
+    func startUrgentInitProcess(didSucceed: @escaping ResultBlockWithBool) {
+        Logger.info("Start urgent initiazlition process.")
+        if RunningFlagsIndication.isSdkRunning {
+            Logger.debug("Skip urgent initializtion since SDK already running")
+            didSucceed(true)
+            return
+        }
+        let initializer = mainFactory.initializer()
+        initializer.initializeFromLocalConfigs { success in
+            didSucceed(success)
+            if success {
+                self.didFinishInitializationSuccessfully()
+            }
+        }
+    }
+
+    func didFinishInitializationSuccessfully() {
+        RunningFlagsIndication.isInitializerRunning = false
+        RunningFlagsIndication.isSdkRunning = true
+        stateListener.onInitializationSuccessfully(self)
+    }
+
     /// Stores the user information that was provided during configuration.
     ///
     /// - Parameter info: user unique info
@@ -388,6 +347,48 @@ private extension Optimove {
             storage.initialVisitorId = VisitorIDPreprocessor.process(sanitizedUUID)
             storage.visitorID = storage.initialVisitorId
         }
+    }
+
+    // MARK: OptiTrack private
+
+    private func reportEventable(context: EventableOperationContext) {
+        do {
+            // TODO: Normilize event
+            try handlers.eventableHandler.handle(context)
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
+    }
+
+    // MARK: OptiPush private
+
+    private var optimoveTestTopic: String {
+        return "test_ios_\(Bundle.main.bundleIdentifier ?? "")"
+    }
+
+    private func reportPushable(_ context: PushableOperationContext) {
+        do {
+            try handlers.pushableHandler.handle(context)
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
+    }
+
+    // MARK: SetUsetID private
+
+    private func updateStorage(userId: String) {
+        if storage.customerID == nil {
+            storage.isFirstConversion = true
+        } else if userId != storage.customerID {
+            Logger.debug("user id changed from '\(storage.customerID ?? "nil")' to '\(userId)'")
+            if storage.isRegistrationSuccess == true {
+                // send the first_conversion flag only if no previous registration has succeeded
+                storage.isFirstConversion = false
+            }
+        }
+        storage.isRegistrationSuccess = false
+        storage.visitorID = VisitorIDPreprocessor.process(userId)
+        storage.customerID = userId
     }
 
 }
