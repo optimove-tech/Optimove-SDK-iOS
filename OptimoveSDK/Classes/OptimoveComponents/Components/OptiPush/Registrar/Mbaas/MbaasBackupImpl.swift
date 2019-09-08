@@ -12,6 +12,7 @@ protocol MbaasBackup {
 final class MbaasBackupImpl {
 
     private struct File {
+        static let isShared = false
         static let registration = "register_data.json"
         static let unregistration = "unregister_data.json"
         static let optInOut = "opt_in_out_data.json"
@@ -47,19 +48,19 @@ extension MbaasBackupImpl: MbaasBackup {
     func backup<T: BaseMbaasModel>(_ model: T) throws {
         let path = getStoragePath(for: model.operation)
         let json = try encoder.encode(model)
-        try storage.saveData(data: json, toFileName: path, shared: false)
+        try storage.saveData(data: json, toFileName: path, shared: File.isShared)
     }
 
     func clearLast(for operation: MbaasOperation) throws {
         let path = getStoragePath(for: operation)
-        if storage.isExist(fileName: path, shared: false) {
-            try storage.delete(fileName: path, shared: false)
+        if storage.isExist(fileName: path, shared: File.isShared) {
+            try storage.delete(fileName: path, shared: File.isShared)
         }
     }
 
     func restoreLast<T: BaseMbaasModel>(for operation: MbaasOperation) throws -> T {
         let path = getStoragePath(for: operation)
-        let data = try storage.load(fileName: path, shared: false)
+        let data = try storage.load(fileName: path, shared: File.isShared)
         return try decoder.decode(T.self, from: data)
     }
 }

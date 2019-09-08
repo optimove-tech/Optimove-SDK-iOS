@@ -503,9 +503,7 @@ private extension Optimove {
         if storage.visitorID == nil {
             let uuid = UUID().uuidString
             let sanitizedUUID = uuid.replacingOccurrences(of: "-", with: "")
-            let start = sanitizedUUID.startIndex
-            let end = sanitizedUUID.index(start, offsetBy: 16)
-            storage.initialVisitorId = String(sanitizedUUID[start..<end]).lowercased()
+            storage.initialVisitorId = getVisitorId(from: sanitizedUUID)
             storage.visitorID = storage.initialVisitorId
         }
     }
