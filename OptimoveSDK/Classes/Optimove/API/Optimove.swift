@@ -324,22 +324,6 @@ extension Optimove {
 // MARK: - set user id API
 extension Optimove {
 
-
-    private func updateStorage(userId: String) {
-        if storage.customerID == nil {
-            storage.isFirstConversion = true
-        } else if userId != storage.customerID {
-            Logger.debug("user id changed from '\(storage.customerID ?? "nil")' to '\(userId)'")
-            if storage.isRegistrationSuccess == true {
-                // send the first_conversion flag only if no previous registration has succeeded
-                storage.isFirstConversion = false
-            }
-        }
-        storage.isRegistrationSuccess = false
-        storage.visitorID = getVisitorId(from: userId)
-        storage.customerID = userId
-    }
-
     /// validate the permissions of the client to use optitrack component and if permit validate the sdkId content and sends:
     /// - conversion request to the DB
     /// - new customer registraion to the registration end point
@@ -356,16 +340,6 @@ extension Optimove {
         } catch {
             Logger.error(error.localizedDescription)
         }
-    }
-
-
-
-    /// Produce a 16 characters string represents the visitor ID of the client
-    ///
-    /// - Parameter userId: The user ID which is the source
-    /// - Returns: THe generated visitor ID
-    private func getVisitorId(from userId: String) -> String {
-        return userId.sha1().prefix(16).description.lowercased()
     }
 
     /// Send the sdk id and the user email
@@ -389,6 +363,23 @@ extension Optimove {
         storage.userEmail = email
         reportEvent(SetUserEmailEvent(email: email))
     }
+
+    private func updateStorage(userId: String) {
+        if storage.customerID == nil {
+            storage.isFirstConversion = true
+        } else if userId != storage.customerID {
+            Logger.debug("user id changed from '\(storage.customerID ?? "nil")' to '\(userId)'")
+            if storage.isRegistrationSuccess == true {
+                // send the first_conversion flag only if no previous registration has succeeded
+                storage.isFirstConversion = false
+            }
+        }
+        storage.isRegistrationSuccess = false
+        storage.visitorID = VisitorIDPreprocessor.process(userId)
+        storage.customerID = userId
+    }
+
+
 }
 
 extension Optimove {
@@ -500,7 +491,7 @@ private extension Optimove {
         if storage.visitorID == nil {
             let uuid = UUID().uuidString
             let sanitizedUUID = uuid.replacingOccurrences(of: "-", with: "")
-            storage.initialVisitorId = getVisitorId(from: sanitizedUUID)
+            storage.initialVisitorId = VisitorIDPreprocessor.process(sanitizedUUID)
             storage.visitorID = storage.initialVisitorId
         }
     }
