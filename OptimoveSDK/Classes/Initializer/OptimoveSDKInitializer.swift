@@ -39,22 +39,25 @@ final class OptimoveSDKInitializer {
 
     // MARK: - API
 
-    func initializeFromRemoteServer(completion: @escaping ResultBlockWithBool) {
-        Logger.info("Start initializtion from remote configurations.")
-        handleFetchConfigurationFromRemote(completion: completion)
-    }
-
-    /// When the SDK is initialized by a push notification start the initialization from the local JSON file.
-    func initializeFromLocalConfigs(completion: @escaping ResultBlockWithBool) {
-        Logger.info("Start initializtion from local configurations.")
-        handleFetchConfigurationFromLocal(didComplete: completion)
+    func initialize(completion: @escaping (Result<Void, Error>) -> Void) {
+        Logger.debug("Initialization started.")
+        handleFetchConfigurationFromRemote { (result) in
+            switch result {
+            case .success:
+                Logger.info("Initialization finished. ✅")
+            case let .failure(error):
+                Logger.error(error.localizedDescription)
+                Logger.error("Initialization failed. 🛑")
+            }
+            completion(result)
+        }
     }
 
 }
 
 private extension OptimoveSDKInitializer {
 
-    func handleFetchConfigurationFromRemote(completion: @escaping ResultBlockWithBool) {
+    func handleFetchConfigurationFromRemote(completion: @escaping (Result<Void, Error>) -> Void) {
         // Operations that execute asynchronously to fetch remote configs.
         let downloadOperations: [Operation] = [
             GlobalConfigurationDownloader(
@@ -79,13 +82,13 @@ private extension OptimoveSDKInitializer {
 
         // Set the completion operation for aline two asynchronous operations together.
         let completionOperation = BlockOperation {
-            do {
-                let configuration = try self.configurationRepository.getConfiguration()
-                self.initialize(configuration, completion: completion)
-            } catch {
-                Logger.error(error.localizedDescription)
-                completion(false)
-            }
+            // If there no configuration file either downloaded or stored, the SDK cannot be initialized.
+            completion(
+                Result(catching: {
+                    let configuration = try self.configurationRepository.getConfiguration()
+                    self.finishInitialization(configuration)
+                })
+            )
         }
 
         // Combine the operations for an executing
@@ -99,38 +102,18 @@ private extension OptimoveSDKInitializer {
         operationQueue.addOperation(completionOperation)
     }
 
-    func handleFetchConfigurationFromLocal(didComplete: @escaping ResultBlockWithBool) {
-        do {
-            let configuration = try configurationRepository.getConfiguration()
-            Logger.debug("Setup components from local configuration file.")
-            initialize(configuration, completion: didComplete)
-        } catch {
-            Logger.error(
-                "Local configuration file could not be parsed. Reason: \(error.localizedDescription)"
-            )
-            didComplete(false)
-        }
-    }
-
-    func initialize(_ configuration: Configuration, completion: @escaping ResultBlockWithBool) {
+    func finishInitialization(_ configuration: Configuration) {
         updateEnvironment(configuration)
-        setupOptimoveComponents(from: configuration, completion: completion)
+        setupOptimoveComponents(configuration)
     }
 
-    func setupOptimoveComponents(from configuration: Configuration, completion: @escaping ResultBlockWithBool) {
-        guard RunningFlagsIndication.isSdkNeedInitializing() else {
-            Logger.debug("SDK already running, skip initialization before lock.")
-            completion(false)
-            return
-        }
-        RunningFlagsIndication.isInitializerRunning = true
+    func setupOptimoveComponents(_ configuration: Configuration) {
         components.addComponent(componentFactory.createOptitrackComponent(configuration: configuration))
         components.addComponent(componentFactory.createRealtimeComponent(configuration: configuration))
         handlersPool.addNextEventableHandler(ComponentEventableHandler(component: components))
         components.addComponent(componentFactory.createOptipushComponent(configuration: configuration))
         handlersPool.addNextPushableHandler(ComponentPushableHandler(component: components))
         Logger.info("All components setup finished.")
-        completion(true)
     }
 
 }

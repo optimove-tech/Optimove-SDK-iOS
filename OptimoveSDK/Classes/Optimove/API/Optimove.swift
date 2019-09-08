@@ -35,16 +35,8 @@ import OptimoveCore
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
         shared.configureLogger()
-        Logger.info("Tenant config \(tenantInfo.configName)")
         shared.storeTenantInfo(tenantInfo)
-        Logger.debug("Configure started.")
-        shared.startNormalInitProcess { (sucess) in
-            guard sucess else {
-                Logger.error("Configure failed. 🛑")
-                return
-            }
-            Logger.info("Configure finished. ✅")
-        }
+        shared.startSDK { _ in }
     }
 
 }
@@ -67,8 +59,8 @@ extension Optimove {
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptimoveSdkCommand(userInfo: userInfo)
         if result {
-            startNormalInitProcess { (success) in
-                guard success else { return }
+            startSDK { result in
+                guard result.isSuccessful else { return }
                 notificationListener.didReceiveRemoteNotification(
                     userInfo: userInfo,
                     didComplete: didComplete
@@ -111,8 +103,8 @@ extension Optimove {
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: response.notification)
         if result {
-            startNormalInitProcess { (success) in
-                guard success else { return }
+            startSDK { result in
+                guard result.isSuccessful else { return }
                 notificationListener.didReceive(
                     response: response,
                     withCompletionHandler: completionHandler
@@ -149,16 +141,20 @@ extension Optimove {
 
 extension Optimove {
 
+    /// Report the event to Optimove SDK.
+    ///
+    /// - Parameters:
+    ///   - name: Name of the event.
+    ///   - parameters: The dictionary of attributes.
     @objc public func reportEvent(name: String, parameters: [String: Any]) {
         let customEvent = SimpleCustomEvent(name: name, parameters: parameters)
         reportEventable(context: EventableOperationContext(.report(event: customEvent)))
     }
 
-    /// Validate the permissions of the client to use Optitrack component and if permit sends the
-    /// report to the appropriate handler.
+    /// Report the event to Optimove SDK.
     ///
     /// - Parameters:
-    ///   - event: optimove event object
+    ///   - event: Instance of OptimoveEvent type.
     @objc public func reportEvent(_ event: OptimoveEvent) {
         reportEventable(context: EventableOperationContext(.report(event: event)))
     }
@@ -259,30 +255,25 @@ private extension Optimove {
 
     // MARK: Initialization
 
-    func startNormalInitProcess(didSucceed: @escaping ResultBlockWithBool) {
-        Logger.info("Start initialization from remote.")
-        if RunningFlagsIndication.isSdkRunning {
+    func startSDK(completion: @escaping (Result<Void, Error>) -> Void) {
+        guard RunningFlagsIndication.isSdkNeedInitializing() else {
             Logger.info("Skip normal initializtion since SDK already running.")
-            didSucceed(true)
+            completion(.success(()))
             return
         }
+        RunningFlagsIndication.isInitializerRunning.toggle()
         let initializer = mainFactory.initializer()
-        initializer.initializeFromRemoteServer { [initializer] success in
-            if success {
-                didSucceed(success)
-                self.didFinishInitializationSuccessfully()
-            } else {
-                initializer.initializeFromLocalConfigs { success in
-                    didSucceed(success)
-                }
+        initializer.initialize { result in
+            switch result {
+            case .success:
+                RunningFlagsIndication.isInitializerRunning.toggle()
+                RunningFlagsIndication.isSdkRunning.toggle()
+                self.stateListener.onInitializationSuccessfully(self)
+            case .failure:
+                break
             }
+            completion(result)
         }
-    }
-
-    func didFinishInitializationSuccessfully() {
-        RunningFlagsIndication.isInitializerRunning = false
-        RunningFlagsIndication.isSdkRunning = true
-        stateListener.onInitializationSuccessfully(self)
     }
 
     //  MARK: Configuration
