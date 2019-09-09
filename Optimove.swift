@@ -57,7 +57,7 @@ extension Optimove {
         userInfo: [AnyHashable: Any],
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
         ) -> Bool {
-        Logger.info("Receive remote notification.")
+        Logger.info("Receive a remote notification.")
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptimoveSdkCommand(userInfo: userInfo)
         if result {
@@ -84,7 +84,7 @@ extension Optimove {
         notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
         ) -> Bool {
-        Logger.info("Received notification in foreground mode.")
+        Logger.info("Received a notification in foreground mode.")
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: notification)
         if result {
@@ -103,7 +103,7 @@ extension Optimove {
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
-        Logger.info("Received notification in foreground mode.")
+        Logger.info("User produce an response for a notificaiton.")
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: response.notification)
         if result {
@@ -233,7 +233,7 @@ extension Optimove {
         queue.async {
             let screenPath = screenPath.trimmingCharacters(in: .whitespaces)
             let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
-            Logger.info("Report screen event w/title: \(screenTitle)")
+            Logger.info("Report a screen event w/title: \(screenTitle)")
             let validationResult = ScreenVisitValidator.validate(screenPath: screenPath, screenTitle: screenTitle)
             guard validationResult == .valid else { return }
             do {
@@ -306,10 +306,11 @@ private extension Optimove {
 
         Logger.info(
             """
-            Stored user info in local storage. Source:
-            endpoint: \(Endpoints.Remote.TenantConfig.url.absoluteString)
-            token: \(info.tenantToken)
-            version: \(info.configName)
+            Stored user info in local storage.
+            Source:
+                endpoint: \(Endpoints.Remote.TenantConfig.url.absoluteString)
+                token: \(info.tenantToken)
+                version: \(info.configName)
             """
         )
     }
