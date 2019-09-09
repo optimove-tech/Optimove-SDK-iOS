@@ -5,11 +5,11 @@ import OptimoveCore
 
 final class HandlersPool {
 
-    private(set) var eventableHandler: EventableHandler
-    private(set) var pushableHandler: PushableHandler
+    private(set) var eventableHandler: Handler<EventableOperationContext>
+    private(set) var pushableHandler: Handler<PushableOperationContext>
 
-    init(eventableHandler: EventableHandler,
-         pushableHandler: PushableHandler) {
+    init(eventableHandler: Handler<EventableOperationContext>,
+         pushableHandler: Handler<PushableOperationContext>) {
         self.eventableHandler = eventableHandler
         self.pushableHandler = pushableHandler
     }

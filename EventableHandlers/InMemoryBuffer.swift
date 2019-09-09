@@ -3,74 +3,24 @@
 import Foundation
 import OptimoveCore
 
-final class InMemoryEventableBuffer: EventableHandler {
+final class InMemoryBuffer<OC: OperationContext>: Handler<OC> {
 
-    private var buffer = RingBuffer<EventableOperationContext>(count: 100)
+    private var buffer = RingBuffer<OC>(count: 100)
     private var storage: OptimoveStorage
 
-    override var next: EventableHandler? {
+    init(storage: OptimoveStorage) {
+        self.storage = storage
+    }
+
+    override var next: Handler<OC>? {
         didSet {
             dispatchBuffer()
         }
     }
 
-    init(storage: OptimoveStorage) {
-        self.storage = storage
-    }
-
-    override func handle(_ context: EventableOperationContext) throws {
-        handleSpecialCases(context)
+    override func handle(_ context: OC) throws {
         if next == nil {
-            buffer.write(context)
-        } else {
-            try next?.handle(context)
-        }
-    }
-
-    func dispatchBuffer() {
-        while let context = buffer.read() {
-            do {
-                try next?.handle(context)
-            } catch {
-                Logger.error(error.localizedDescription)
-            }
-        }
-    }
-
-    func handleSpecialCases(_ context: EventableOperationContext) {
-        switch context.operation {
-        case let .report(event: event):
-            if next == nil {
-                if event.name == OptimoveKeys.Configuration.setUserId.rawValue {
-                    storage.realtimeSetUserIdFailed = true
-                } else if event.name == OptimoveKeys.Configuration.setEmail.rawValue {
-                    storage.realtimeSetEmailFailed = true
-                }
-            }
-        default:
-            break
-        }
-    }
-
-}
-
-final class InMemoryPushableBuffer: PushableHandler {
-
-    private var buffer = RingBuffer<PushableOperationContext>(count: 100)
-    private var storage: OptimoveStorage
-
-    init(storage: OptimoveStorage) {
-        self.storage = storage
-    }
-
-    func setNext(_ handler: PushableHandler) -> PushableHandler {
-        self.next = handler
-        dispatchBuffer()
-        return handler
-    }
-
-    override func handle(_ context: PushableOperationContext) throws {
-        if next == nil {
+            var context = context
             context.isBuffered = true
             buffer.write(context)
         } else {
@@ -78,7 +28,7 @@ final class InMemoryPushableBuffer: PushableHandler {
         }
     }
 
-    func dispatchBuffer() {
+    private func dispatchBuffer() {
         while let context = buffer.read() {
             do {
                 try next?.handle(context)
