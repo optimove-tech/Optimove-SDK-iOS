@@ -7,18 +7,15 @@ final class OptimoveSDKInitializer {
 
     private let storage: OptimoveStorage
     private let componentFactory: ComponentFactory
-    private let components: MutableComponentsPool
     private let handlersPool: HandlersPool
 
     // MARK: - Construction
 
     init(storage: OptimoveStorage,
          componentFactory: ComponentFactory,
-         componentsPool: MutableComponentsPool,
          handlersPool: HandlersPool) {
         self.storage = storage
         self.componentFactory = componentFactory
-        self.components = componentsPool
         self.handlersPool = handlersPool
     }
 
@@ -35,26 +32,35 @@ private extension OptimoveSDKInitializer {
     func setupOptimoveComponents(_ configuration: Configuration) {
 
         // MARK: Setup Eventable chain of responsibility.
-        components.addComponent(componentFactory.createOptitrackComponent(configuration: configuration))
-        components.addComponent(componentFactory.createRealtimeComponent(configuration: configuration))
 
-        // 1
+        // 1 responder
         let normalizer = ParametersNormalizer(configuration: configuration)
 
-        // 2
+        // 2 responder
         let decorator = ParametersDecorator(configuration: configuration)
 
-        // 3
-        let componentHanlder = ComponentEventableHandler(component: components)
+        // 3 responder
+        let componentHanlder = ComponentEventableHandler(
+            components: [
+                componentFactory.createOptitrackComponent(configuration: configuration),
+                componentFactory.createRealtimeComponent(configuration: configuration)
+            ]
+        )
 
         normalizer.next = decorator
         decorator.next = componentHanlder
-
         handlersPool.addNextEventableHandler(normalizer)
 
         // MARK: Setup Pushable chain of responsibility.
-        components.addComponent(componentFactory.createOptipushComponent(configuration: configuration))
-        handlersPool.addNextPushableHandler(ComponentPushableHandler(component: components))
+
+        // 1 responder
+        let componentHandler = ComponentPushableHandler(
+            components: [
+                componentFactory.createOptipushComponent(configuration: configuration)
+            ]
+        )
+
+        handlersPool.addNextPushableHandler(componentHandler)
 
         Logger.info("All components setup finished.")
     }

@@ -20,7 +20,8 @@ final class ParametersNormalizer: EventableHandler {
                 return EventableOperationContext(
                     .report(event:
                         try event.normilize(configuration.events)
-                    )
+                    ),
+                    isBuffered: context.isBuffered
                 )
             default:
                 return context

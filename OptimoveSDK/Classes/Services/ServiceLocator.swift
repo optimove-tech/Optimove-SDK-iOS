@@ -56,11 +56,6 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _componentsPool: MutableComponentsPool = {
-        return ComponentsPoolImpl()
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
     private lazy var _handlersPool: HandlersPool = {
         return HandlersPool(
             eventableHandler: InMemoryEventableBuffer(
@@ -110,16 +105,8 @@ final class ServiceLocator {
         return _deeplinkService
     }
 
-    func componentsPool() -> ComponentsPool {
-        return _componentsPool
-    }
-
     func handlersPool() -> HandlersPool {
         return _handlersPool
-    }
-
-    func mutableComponentsPool() -> MutableComponentsPool {
-        return _componentsPool
     }
 
     func configurationFetcher(operationFactory: OperationFactory) -> ConfigurationFetcher {
@@ -133,7 +120,6 @@ final class ServiceLocator {
         return OptimoveSDKInitializer(
             storage: storage(),
             componentFactory: componentFactory,
-            componentsPool: mutableComponentsPool(),
             handlersPool: handlersPool()
         )
     }

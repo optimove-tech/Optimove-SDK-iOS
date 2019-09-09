@@ -1,33 +1,46 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 class ComponentEventableHandler: EventableHandler {
-    private let component: EventableComponent
+    private let components: [EventableComponent]
 
-    init(component: EventableComponent) {
-        self.component = component
+    init(components: [EventableComponent]) {
+        self.components = components
     }
 
     // MARK: - EventableHandler
 
     override func handle(_ context: EventableOperationContext) throws {
-        try component.handleEventable(context)
+        components.forEach { component in
+            do {
+                try component.handleEventable(context)
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
+        }
     }
 
 }
 
 class ComponentPushableHandler: PushableHandler {
-    private let component: PushableComponent
+    private let components: [PushableComponent]
 
-    init(component: PushableComponent) {
-        self.component = component
+    init(components: [PushableComponent]) {
+        self.components = components
     }
 
     // MARK: - EventableHandler
 
     override func handle(_ context: PushableOperationContext) throws {
-        try component.handlePushable(context)
+        components.forEach { component in
+            do {
+                try component.handlePushable(context)
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
+        }
     }
 
 }

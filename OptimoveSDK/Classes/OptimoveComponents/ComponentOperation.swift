@@ -12,11 +12,12 @@ protocol OperationContext {
 }
 
 final class EventableOperationContext: OperationContext {
-    var isBuffered: Bool = false
+    var isBuffered: Bool
     var operation: EventableOperation
 
-    init(_ operation: EventableOperation) {
+    init(_ operation: EventableOperation, isBuffered: Bool = false) {
         self.operation = operation
+        self.isBuffered = isBuffered
     }
 
 }
@@ -29,11 +30,12 @@ enum EventableOperation: ComponentOperation {
 }
 
 final class PushableOperationContext: OperationContext {
-    var isBuffered: Bool = false
+    var isBuffered: Bool
     var operation: PushableOperation
 
-    init(_ operation: PushableOperation) {
+    init(_ operation: PushableOperation, isBuffered: Bool = false) {
         self.operation = operation
+        self.isBuffered = isBuffered
     }
 
 }

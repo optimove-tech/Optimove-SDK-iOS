@@ -21,7 +21,8 @@ final class ParametersDecorator: EventableHandler {
                             event: event,
                             config: try event.matchConfiguration(with: configuration.events)
                         )
-                    )
+                    ),
+                    isBuffered: context.isBuffered
                 )
             default:
                 return context
