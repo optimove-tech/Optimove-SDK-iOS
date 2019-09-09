@@ -9,13 +9,13 @@ struct ScreenVisitPreprocessor {
     }
 
     enum Error: Swift.Error {
-        case leftEmptyStringEncoding
+        case leftEmptyStringAfterEncoding
     }
 
     static func process(_ input: String) throws -> String {
         let input = processPrefix(input).lowercased().addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
         guard input != nil else {
-            throw Error.leftEmptyStringEncoding
+            throw Error.leftEmptyStringAfterEncoding
         }
         let result = processSuffixes(input!)
         let appNameSpace = try Bundle.getApplicationNameSpace()
