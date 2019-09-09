@@ -15,10 +15,12 @@ final class ParametersDecorator: EventableHandler {
         let decorationFunction = { [configuration] () -> EventableOperationContext in
             switch context.operation {
             case let .report(event: event):
-                let pair = try event.matchConfiguration(with: configuration.events)
                 return EventableOperationContext(
                     .report(event:
-                        OptimoveEventDecorator(event: pair.event, config: pair.config)
+                        OptimoveEventDecorator(
+                            event: event,
+                            config: try event.matchConfiguration(with: configuration.events)
+                        )
                     )
                 )
             default:

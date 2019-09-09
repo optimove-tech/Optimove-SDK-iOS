@@ -5,11 +5,11 @@ import OptimoveCore
 
 extension OptimoveEvent {
 
-    func matchConfiguration(with events: [String: EventsConfig]) throws -> (event: OptimoveEvent, config: EventsConfig) {
+    func matchConfiguration(with events: [String: EventsConfig]) throws -> EventsConfig {
         guard let eventConfig = events[self.name] else {
             throw GuardError.custom("Configurations are missing for event \(self.name)")
         }
-        return (self, eventConfig)
+        return eventConfig
     }
 
 }

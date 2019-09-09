@@ -89,10 +89,15 @@ private extension OptiTrack {
     }
 
     func report(event: OptimoveEvent) throws {
-        let pair = try event.matchConfiguration(with: configuration.events)
-        guard pair.config.supportedOnOptitrack else { return }
+        let config = try event.matchConfiguration(with: configuration.events)
+        guard config.supportedOnOptitrack else { return }
         eventReportingQueue.async {
-            self.sendReport(event: OptimoveEventDecorator(event: pair.event, config: pair.config), config: pair.config)
+            self.sendReport(
+                event: OptimoveEventDecorator(
+                    event: event,
+                    config: config),
+                config: config
+            )
         }
     }
 

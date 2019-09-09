@@ -72,15 +72,15 @@ extension RealTime: EventableComponent {
 extension RealTime {
 
     func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) throws {
-        let pair = try event.matchConfiguration(with: configuration.events)
-        guard pair.config.supportedOnRealTime else {
+        let config = try event.matchConfiguration(with: configuration.events)
+        guard config.supportedOnRealTime else {
             Logger.warn("Realtime: Event \(event.name) is not supported.")
             return
         }
         do {
             let context = createEventContext(
-                event: OptimoveEventDecorator(event: pair.event, config: pair.config),
-                config: pair.config
+                event: OptimoveEventDecorator(event: event, config: config),
+                config: config
             )
             try report(context: context, retryFailedEvents: retryFailedEvents)
         } catch {
