@@ -124,4 +124,16 @@ final class ServiceLocator {
         )
     }
 
+    func loggerInitializator() -> LoggerInitializator {
+        return LoggerInitializator(storage: storage())
+    }
+
+    func newTenantInfoHandler() -> NewTenantInfoHandler {
+        return NewTenantInfoHandler(storage: storage())
+    }
+
+    func newVisitorIdGenerator() -> NewVisitorIdGenerator {
+        return NewVisitorIdGenerator(storage: storage())
+    }
+
 }

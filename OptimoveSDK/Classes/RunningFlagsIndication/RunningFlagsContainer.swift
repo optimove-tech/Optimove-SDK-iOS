@@ -3,12 +3,9 @@
 import Foundation
 
 final class RunningFlagsIndication {
-
     static var isSdkRunning = false
     static var isInitializerRunning = false
-
-    static func isSdkNeedInitializing() -> Bool {
+    static var isSdkNeedInitializing: Bool {
         return !(isSdkRunning || isInitializerRunning)
     }
-
 }

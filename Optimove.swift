@@ -35,8 +35,8 @@ import OptimoveCore
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
         shared.queue.async {
-            shared.configureLogger()
-            NewTenantInfoHandler(storage: shared.storage).handle(tenantInfo)
+            shared.serviceLocator.loggerInitializator().initialize()
+            shared.serviceLocator.newTenantInfoHandler().handle(tenantInfo)
             shared.startSDK { _ in }
         }
     }
@@ -137,14 +137,24 @@ extension Optimove {
     /// Request to subscribe to test campaign topics
     @objc public func startTestMode() {
         queue.async {
-            self.reportPushable(PushableOperationContext(.subscribeToTopic(topic: self.optimoveTestTopic)))
+            do {
+                let testTopic = OptimoveKeys.testTopicPrefix + (try Bundle.getApplicationNameSpace())
+                self.reportPushable(PushableOperationContext(.subscribeToTopic(topic: testTopic)))
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
         }
     }
 
     /// Request to unsubscribe from test campaign topics
     @objc public func stopTestMode() {
         queue.async {
-            self.reportPushable(PushableOperationContext(.unsubscribeFromTopic(topic: self.optimoveTestTopic)))
+            do {
+                let testTopic = OptimoveKeys.testTopicPrefix + (try Bundle.getApplicationNameSpace())
+                self.reportPushable(PushableOperationContext(.unsubscribeFromTopic(topic: testTopic)))
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
         }
     }
 }
@@ -274,7 +284,7 @@ private extension Optimove {
     // MARK: Initialization
 
     func startSDK(completion: @escaping (Result<Void, Error>) -> Void) {
-        guard RunningFlagsIndication.isSdkNeedInitializing() else {
+        guard RunningFlagsIndication.isSdkNeedInitializing else {
             Logger.info("Skip initializtion since Optimove SDK already running.")
             completion(.success(()))
             return
@@ -304,31 +314,13 @@ private extension Optimove {
 
     //  MARK: Configuration
 
-    func configureLogger() {
-        MultiplexLoggerStream.add(stream: ConsoleLoggerStream())
-        if SDK.isStaging {
-            MultiplexLoggerStream.add(stream: RemoteLoggerStream(tenantId: storage.siteID ?? -1))
-        }
-    }
-
     func setup() {
-        setUserAgent()
-        setVisitorIdIfNeeded()
-    }
-
-    func setUserAgent() {
         SDKDevice.evaluateUserAgent(completion: { (userAgent) in
             self.storage.userAgent = userAgent
         })
+        serviceLocator.newVisitorIdGenerator().generate()
     }
 
-    func setVisitorIdIfNeeded() {
-        guard storage.visitorID == nil else { return }
-        let uuid = UUID().uuidString
-        let sanitizedUUID = uuid.replacingOccurrences(of: "-", with: "")
-        storage.initialVisitorId = VisitorIDPreprocessor.process(sanitizedUUID)
-        storage.visitorID = storage.initialVisitorId
-    }
 
     // MARK: OptiTrack private
 
@@ -341,10 +333,6 @@ private extension Optimove {
     }
 
     // MARK: OptiPush private
-
-    private var optimoveTestTopic: String {
-        return "test_ios_\(Bundle.main.bundleIdentifier ?? "")"
-    }
 
     private func reportPushable(_ context: PushableOperationContext) {
         do {
