@@ -81,8 +81,13 @@ final class ServiceLocator {
         return _deviceStateMonitor
     }
 
-    func notificationListener() -> OptimoveNotificationHandling {
-        return _notificationListener
+    func notificationListener(coreEventFactory: CoreEventFactory) -> OptimoveNotificationHandling {
+        return OptimoveNotificationHandler(
+            storage: storage(),
+            coreEventFactory: coreEventFactory,
+            handlersPool: handlersPool(),
+            deeplinkService: deeplinkService()
+        )
     }
 
     func dateTimeProvider() -> DateTimeProvider {
@@ -134,6 +139,28 @@ final class ServiceLocator {
 
     func newVisitorIdGenerator() -> NewVisitorIdGenerator {
         return NewVisitorIdGenerator(storage: storage())
+    }
+
+    func deviceStateObserver(coreEventFactory: CoreEventFactory) -> DeviceStateObserver {
+        return DeviceStateObserver(
+            observers: [
+                ResignActiveObserver(
+                    handlers: handlersPool()
+                ),
+                OptInOutObserver(
+                    handlers: handlersPool(),
+                    deviceStateMonitor: deviceStateMonitor(),
+                    coreEventFactory: coreEventFactory,
+                    storage: storage()
+                ),
+                EnterForegroundObserver(
+                    handlers: handlersPool(),
+                    statisticService: statisticService(),
+                    dateTimeProvider: dateTimeProvider(),
+                    coreEventFactory: coreEventFactory
+                )
+            ]
+        )
     }
 
 }

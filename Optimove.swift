@@ -11,6 +11,7 @@ import OptimoveCore
     private let serviceLocator: ServiceLocator
     private var storage: OptimoveStorage
     private let handlers: HandlersPool
+    private let factory: MainFactory
     private let queue: DispatchQueue
     private let stateListener: DeprecatedStateListener
 
@@ -21,6 +22,7 @@ import OptimoveCore
 
     private override init() {
         serviceLocator = ServiceLocator()
+        factory = MainFactory(serviceLocator: serviceLocator)
         handlers = serviceLocator.handlersPool()
         storage = serviceLocator.storage()
         stateListener = DeprecatedStateListener()
@@ -58,7 +60,9 @@ extension Optimove {
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
         ) -> Bool {
         Logger.info("Receive a remote notification.")
-        let notificationListener = serviceLocator.notificationListener()
+        let notificationListener = serviceLocator.notificationListener(
+            coreEventFactory: factory.coreEventFactory()
+        )
         let result = notificationListener.isOptimoveSdkCommand(userInfo: userInfo)
         if result {
             queue.async {
@@ -85,7 +89,9 @@ extension Optimove {
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
         ) -> Bool {
         Logger.info("Received a notification in foreground mode.")
-        let notificationListener = serviceLocator.notificationListener()
+        let notificationListener = serviceLocator.notificationListener(
+            coreEventFactory: factory.coreEventFactory()
+        )
         let result = notificationListener.isOptipush(notification: notification)
         if result {
             notificationListener.willPresent(notification: notification, withCompletionHandler: completionHandler)
@@ -104,7 +110,9 @@ extension Optimove {
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
         Logger.info("User produce a response for a notificaiton.")
-        let notificationListener = serviceLocator.notificationListener()
+        let notificationListener = serviceLocator.notificationListener(
+            coreEventFactory: factory.coreEventFactory()
+        )
         let result = notificationListener.isOptipush(notification: response.notification)
         if result {
             queue.async {
@@ -290,17 +298,12 @@ private extension Optimove {
             return
         }
         RunningFlagsIndication.isInitializerRunning.toggle()
-        let factory = MainFactory(serviceLocator: serviceLocator)
         let configurationFetcher = serviceLocator.configurationFetcher(operationFactory: factory.operationFactory())
         configurationFetcher.fetch { result in
             self.queue.async {
                 switch result {
                 case let .success(configuration):
-                    let initializer = self.serviceLocator.initializer(componentFactory: factory.componentFactory())
-                    initializer.initialize(with: configuration)
-                    RunningFlagsIndication.isInitializerRunning.toggle()
-                    RunningFlagsIndication.isSdkRunning.toggle()
-                    self.stateListener.onInitializationSuccessfully(self)
+                    self.initialize(with: configuration)
                     Logger.info("Initialization finished. ✅")
                     completion(.success(()))
                 case let .failure(error):
@@ -321,6 +324,15 @@ private extension Optimove {
         serviceLocator.newVisitorIdGenerator().generate()
     }
 
+    func initialize(with configuration: Configuration) {
+        let initializer = serviceLocator.initializer(
+            componentFactory: factory.componentFactory()
+        )
+        initializer.initialize(with: configuration)
+        RunningFlagsIndication.isInitializerRunning.toggle()
+        RunningFlagsIndication.isSdkRunning.toggle()
+        stateListener.onInitializationSuccessfully(self)
+    }
 
     // MARK: OptiTrack private
 

@@ -5,20 +5,10 @@ import OptimoveCore
 
 final class OptiTrack {
 
-    struct Constants {
-        struct AppOpen {
-            // The threshold used for throttling emits an AppOpen event.
-            static let throttlingThreshold: TimeInterval = 1_800 // 30 minutes.
-        }
-    }
-
     private let configuration: OptitrackConfig
     private var storage: OptimoveStorage
     private let coreEventFactory: CoreEventFactory
-    private let dateTimeProvider: DateTimeProvider
-    private var statisticService: StatisticService
-    private let eventReportingQueue = DispatchQueue(label: "com.optimove.sdk.optitrack", qos: .background)
-    private let deviceStateMonitor: OptimoveDeviceStateMonitor
+    private let eventReportingQueue: DispatchQueue
     private var optimoveCustomizePlugins: [String: String] = [:]
     private var tracker: Tracker
 
@@ -27,17 +17,13 @@ final class OptiTrack {
         deviceStateMonitor: OptimoveDeviceStateMonitor,
         storage: OptimoveStorage,
         coreEventFactory: CoreEventFactory,
-        dateTimeProvider: DateTimeProvider,
-        statisticService: StatisticService,
         trackerFlagsBuilder: TrackerFlagsBuilder,
         tracker: Tracker) {
         self.configuration = configuration
         self.storage = storage
         self.coreEventFactory = coreEventFactory
-        self.dateTimeProvider = dateTimeProvider
-        self.statisticService = statisticService
-        self.deviceStateMonitor = deviceStateMonitor
         self.tracker = tracker
+        self.eventReportingQueue = DispatchQueue(label: "com.optimove.sdk.optitrack", qos: .background)
         self.optimoveCustomizePlugins = (try? trackerFlagsBuilder.build()) ?? [:]
 
         performInitializationOperations()
@@ -47,19 +33,8 @@ final class OptiTrack {
     // MARK: - Internal Methods
 
     func performInitializationOperations() {
-        do {
-            injectVisitorAndUserIdToMatomo()
-            reportPendingEvents()
-            try reportMetaData()
-            reportIdfaIfAllowed()
-            try reportUserAgent()
-            reportOptInOutIfNeeded()
-            try reportAppOpenedIfNeeded()
-            trackAppOpened()
-            observeEnterToBackgroundMode()
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
+        injectVisitorAndUserIdToMatomo()
+        tracker.dispathPendingEvents()
     }
 
 }
@@ -119,18 +94,8 @@ private extension OptiTrack {
         tracker.dispatch()
     }
 
-    // MARK: - Report
-
-    func obtainConfiguration(for event: OptimoveEvent) throws -> EventsConfig {
-        guard let config = configuration.events[event.name] else {
-            throw GuardError.custom("Configurations are missing for event \(event.name)")
-        }
-        return config
-    }
-
 }
 
-// ELI: Changed access level for extension for tests purposes.
 extension OptiTrack {
 
     func injectVisitorAndUserIdToMatomo() {
@@ -145,16 +110,6 @@ extension OptiTrack {
             if localUserID != globalUserID {
                 setUserId(globalUserID)
             }
-        }
-    }
-
-    func observeEnterToBackgroundMode() {
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.willResignActiveNotification,
-            object: self,
-            queue: .main
-        ) { (_) in
-            self.dispatchNow()
         }
     }
 
@@ -184,104 +139,6 @@ extension OptiTrack {
             customTrackingParameters: self.optimoveCustomizePlugins
         )
         tracker.track(event)
-
-        // ELI: TODO: Check this point out.
-        if config.supportedOnRealTime {
-            self.dispatchNow()
-        }
     }
 
-    func reportIdfaIfAllowed() {
-        guard configuration.enableAdvertisingIdReport == true else { return }
-        do {
-            let event = try coreEventFactory.createEvent(.setAdvertisingId)
-            try self.report(event: event)
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
-
-    func reportUserAgent() throws {
-        let event = try coreEventFactory.createEvent(.setUserAgent)
-        try report(event: event)
-    }
-
-    func reportMetaData() throws {
-        let event = try coreEventFactory.createEvent(.metaData)
-        try report(event: event)
-    }
-
-    func reportAppOpenedIfNeeded() throws {
-        DispatchQueue.main.async {
-            if UIApplication.shared.applicationState != .background {
-                DispatchQueue.global().async { [weak self] in
-                    do {
-                        try self?.reportAppOpen()
-                    } catch {
-                        Logger.error(error.localizedDescription)
-                    }
-                }
-            }
-        }
-    }
-
-    func isOptStateChanged(with newState: Bool) -> Bool {
-        let isOptiTrackOptIn: Bool = storage.isOptiTrackOptIn
-        return newState != isOptiTrackOptIn
-    }
-
-    func reportOptInOutIfNeeded() {
-        deviceStateMonitor.getStatus(for: .userNotification) { [coreEventFactory] (granted) in
-            guard self.isOptStateChanged(with: granted) else {
-                // An OptIn/OptOut state was not changed.
-                return
-            }
-            do {
-                if granted {
-                    let event = try coreEventFactory.createEvent(.optipushOptIn)
-                    try self.report(event: event)
-                    self.storage.isOptiTrackOptIn = true
-                } else {
-                    let event = try coreEventFactory.createEvent(.optipushOptOut)
-                    try self.report(event: event)
-                    self.storage.isOptiTrackOptIn = false
-                }
-            } catch {
-                Logger.error(error.localizedDescription)
-            }
-        }
-    }
-
-    func trackAppOpened() {
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.willEnterForegroundNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] (_) in
-            do {
-                try self?.handleWillEnterForegroundNotification()
-            } catch {
-                Logger.error(error.localizedDescription)
-            }
-        }
-    }
-
-    func handleWillEnterForegroundNotification() throws {
-        let threshold: TimeInterval = Constants.AppOpen.throttlingThreshold
-        let now = dateTimeProvider.now.timeIntervalSince1970
-        let appOpenTime = statisticService.applicationOpenTime
-        if (now - appOpenTime) > threshold {
-            try reportAppOpen()
-        }
-    }
-
-    func reportPendingEvents() {
-        tracker.dispathPendingEvents()
-    }
-
-    func reportAppOpen() throws {
-        let event = try coreEventFactory.createEvent(.appOpen)
-        try report(event: event)
-        statisticService.applicationOpenTime = dateTimeProvider.now.timeIntervalSince1970
-    }
 }

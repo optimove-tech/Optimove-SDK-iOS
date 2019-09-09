@@ -63,8 +63,6 @@ final class ComponentFactory {
             deviceStateMonitor: serviceLocator.deviceStateMonitor(),
             storage: serviceLocator.storage(),
             coreEventFactory: coreEventFactory,
-            dateTimeProvider: serviceLocator.dateTimeProvider(),
-            statisticService: serviceLocator.statisticService(),
             trackerFlagsBuilder: TrackerFlagsBuilder(
                 storage: serviceLocator.storage()
             ),
