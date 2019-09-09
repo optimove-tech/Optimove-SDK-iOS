@@ -122,4 +122,20 @@ final class ServiceLocator {
         return _componentsPool
     }
 
+    func configurationFetcher(operationFactory: OperationFactory) -> ConfigurationFetcher {
+        return ConfigurationFetcher(
+            operationFactory: operationFactory,
+            configurationRepository: configurationRepository()
+        )
+    }
+
+    func initializer(componentFactory: ComponentFactory) -> OptimoveSDKInitializer {
+        return OptimoveSDKInitializer(
+            storage: storage(),
+            componentFactory: componentFactory,
+            componentsPool: mutableComponentsPool(),
+            handlersPool: handlersPool()
+        )
+    }
+
 }

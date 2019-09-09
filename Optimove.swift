@@ -103,7 +103,7 @@ extension Optimove {
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
-        Logger.info("User produce an response for a notificaiton.")
+        Logger.info("User produce a response for a notificaiton.")
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: response.notification)
         if result {
@@ -280,17 +280,25 @@ private extension Optimove {
             return
         }
         RunningFlagsIndication.isInitializerRunning.toggle()
-        let initializer = MainFactory(serviceLocator: serviceLocator).initializer()
-        initializer.initialize { result in
-            switch result {
-            case .success:
-                RunningFlagsIndication.isInitializerRunning.toggle()
-                RunningFlagsIndication.isSdkRunning.toggle()
-                self.stateListener.onInitializationSuccessfully(self)
-            case .failure:
-                break
+        let factory = MainFactory(serviceLocator: serviceLocator)
+        let configurationFetcher = serviceLocator.configurationFetcher(operationFactory: factory.operationFactory())
+        configurationFetcher.fetch { result in
+            self.queue.async {
+                switch result {
+                case let .success(configuration):
+                    let initializer = self.serviceLocator.initializer(componentFactory: factory.componentFactory())
+                    initializer.initialize(with: configuration)
+                    RunningFlagsIndication.isInitializerRunning.toggle()
+                    RunningFlagsIndication.isSdkRunning.toggle()
+                    self.stateListener.onInitializationSuccessfully(self)
+                    Logger.info("Initialization finished. ✅")
+                    completion(.success(()))
+                case let .failure(error):
+                    Logger.error(error.localizedDescription)
+                    Logger.error("Initialization failed. 🛑")
+                    completion(.failure(error))
+                }
             }
-            completion(result)
         }
     }
 

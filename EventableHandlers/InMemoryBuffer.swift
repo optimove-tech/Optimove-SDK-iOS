@@ -8,14 +8,14 @@ final class InMemoryEventableBuffer: EventableHandler {
     private var buffer = RingBuffer<EventableOperationContext>(count: 100)
     private var storage: OptimoveStorage
 
-    init(storage: OptimoveStorage) {
-        self.storage = storage
+    override var next: EventableHandler? {
+        didSet {
+            dispatchBuffer()
+        }
     }
 
-    func setNext(_ handler: EventableHandler) -> EventableHandler {
-        self.next = handler
-        dispatchBuffer()
-        return handler
+    init(storage: OptimoveStorage) {
+        self.storage = storage
     }
 
     override func handle(_ context: EventableOperationContext) throws {

@@ -33,15 +33,11 @@ final class MainFactory {
         )
     }
 
-    func initializer() -> OptimoveSDKInitializer {
-        return OptimoveSDKInitializer(
-            deviceStateMonitor: serviceLocator.deviceStateMonitor(),
-            storage: serviceLocator.storage(),
-            networking: networkingFactory().createRemoteConfigurationNetworking(),
+    func operationFactory() -> OperationFactory {
+        return OperationFactory(
             configurationRepository: serviceLocator.configurationRepository(),
-            componentFactory: componentFactory(),
-            componentsPool: serviceLocator.mutableComponentsPool(),
-            handlersPool: serviceLocator.handlersPool()
+            networking: networkingFactory().createRemoteConfigurationNetworking()
         )
     }
+
 }
