@@ -36,7 +36,7 @@ import OptimoveCore
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
         shared.queue.async {
             shared.configureLogger()
-            shared.storeTenantInfo(tenantInfo)
+            NewTenantInfoHandler(storage: shared.storage).handle(tenantInfo)
             shared.startSDK { _ in }
         }
     }
@@ -189,7 +189,7 @@ extension Optimove {
             let userID = userID.trimmingCharacters(in: .whitespaces)
             let validationResult = UserIDValidator(storage: self.storage).validateNewUserID(userID)
             guard validationResult == .valid else { return }
-            self.updateStorage(userId: userID)
+            NewUserIDHandler(storage: self.storage).handle(userID: userID)
             self.reportEventable(EventableOperationContext(.setUserId(userId: userID)))
             self.reportPushable(PushableOperationContext(.performRegistration))
         }
@@ -304,25 +304,6 @@ private extension Optimove {
 
     //  MARK: Configuration
 
-    /// Stores the user information that was provided during configuration.
-    ///
-    /// - Parameter info: user unique info
-    func storeTenantInfo(_ info: OptimoveTenantInfo) {
-        storage.tenantToken = info.tenantToken
-        storage.version = info.configName
-        storage.configurationEndPoint = Endpoints.Remote.TenantConfig.url
-
-        Logger.info(
-            """
-            Stored user info in local storage.
-            Source:
-                endpoint: \(Endpoints.Remote.TenantConfig.url.absoluteString)
-                token: \(info.tenantToken)
-                version: \(info.configName)
-            """
-        )
-    }
-
     func configureLogger() {
         MultiplexLoggerStream.add(stream: ConsoleLoggerStream())
         if SDK.isStaging {
@@ -336,25 +317,23 @@ private extension Optimove {
     }
 
     func setUserAgent() {
-        SDKDevice.evaluateUserAgent(completion: { [weak self] (userAgent) in
-            self?.storage.userAgent = userAgent
+        SDKDevice.evaluateUserAgent(completion: { (userAgent) in
+            self.storage.userAgent = userAgent
         })
     }
 
     func setVisitorIdIfNeeded() {
-        if storage.visitorID == nil {
-            let uuid = UUID().uuidString
-            let sanitizedUUID = uuid.replacingOccurrences(of: "-", with: "")
-            storage.initialVisitorId = VisitorIDPreprocessor.process(sanitizedUUID)
-            storage.visitorID = storage.initialVisitorId
-        }
+        guard storage.visitorID == nil else { return }
+        let uuid = UUID().uuidString
+        let sanitizedUUID = uuid.replacingOccurrences(of: "-", with: "")
+        storage.initialVisitorId = VisitorIDPreprocessor.process(sanitizedUUID)
+        storage.visitorID = storage.initialVisitorId
     }
 
     // MARK: OptiTrack private
 
     private func reportEventable(_ context: EventableOperationContext) {
         do {
-            // TODO: Normilize event
             try handlers.eventableHandler.handle(context)
         } catch {
             Logger.error(error.localizedDescription)
@@ -373,23 +352,6 @@ private extension Optimove {
         } catch {
             Logger.error(error.localizedDescription)
         }
-    }
-
-    // MARK: SetUsetID private
-
-    private func updateStorage(userId: String) {
-        if storage.customerID == nil {
-            storage.isFirstConversion = true
-        } else if userId != storage.customerID {
-            Logger.info("user id changed from '\(storage.customerID ?? "nil")' to '\(userId)'")
-            if storage.isRegistrationSuccess == true {
-                // send the first_conversion flag only if no previous registration has succeeded
-                storage.isFirstConversion = false
-            }
-        }
-        storage.isRegistrationSuccess = false
-        storage.visitorID = VisitorIDPreprocessor.process(userId)
-        storage.customerID = userId
     }
 
 }
