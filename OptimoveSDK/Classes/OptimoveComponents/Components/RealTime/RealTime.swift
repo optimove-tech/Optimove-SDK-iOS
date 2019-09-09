@@ -41,19 +41,6 @@ final class RealTime {
         setFirstTimeVisitIfNeeded()
     }
 
-    func report(event: OptimoveEvent, config: EventsConfig, retryFailedEvents: Bool = true) {
-        guard config.supportedOnRealTime else {
-            Logger.warn("Realtime: Event \(event.name) is not supported.")
-            return
-        }
-        do {
-            let context = createEventContext(event: event, config: config)
-            try report(context: context, retryFailedEvents: retryFailedEvents)
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
-
 }
 
 extension RealTime: EventableComponent {
@@ -85,11 +72,20 @@ extension RealTime: EventableComponent {
 extension RealTime {
 
     func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) throws {
-        let event = OptimoveEventDecoratorFactory.getEventDecorator(forEvent: event)
-        let config = try obtainConfiguration(for: event)
-        try OptimoveEventValidator.validate(event: event, withConfig: config)
-        event.processEventConfig(config)
-        report(event: event, config: config, retryFailedEvents: retryFailedEvents)
+        let pair = try event.matchConfiguration(with: configuration.events)
+        guard pair.config.supportedOnRealTime else {
+            Logger.warn("Realtime: Event \(event.name) is not supported.")
+            return
+        }
+        do {
+            let context = createEventContext(
+                event: OptimoveEventDecorator(event: pair.event, config: pair.config),
+                config: pair.config
+            )
+            try report(context: context, retryFailedEvents: retryFailedEvents)
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
     }
 
     func reportUserId() throws {
@@ -98,9 +94,7 @@ extension RealTime {
     }
 
     func reportUserEmail(_ email: String) throws {
-        let event = SetUserEmailEvent(
-            email: email
-        )
+        let event = SetUserEmailEvent(email: email)
         try reportEvent(event: event, retryFailedEvents: false)
     }
 
@@ -118,13 +112,6 @@ private extension RealTime {
     }
 
     // MARK: Transforming an event
-
-    func obtainConfiguration(for event: OptimoveEvent) throws -> EventsConfig {
-        guard let config = configuration.events[event.name] else {
-            throw GuardError.custom("Configurations are missing for event \(event.name)")
-        }
-        return config
-    }
 
     func createEventContext(event: OptimoveEvent, config: EventsConfig) -> RealTimeEventContext {
         switch event.name {

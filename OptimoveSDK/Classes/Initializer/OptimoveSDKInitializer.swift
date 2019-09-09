@@ -112,8 +112,19 @@ private extension OptimoveSDKInitializer {
         // MARK: Setup Eventable chain of responsibility.
         components.addComponent(componentFactory.createOptitrackComponent(configuration: configuration))
         components.addComponent(componentFactory.createRealtimeComponent(configuration: configuration))
+
+        // 1
         let normalizer = ParametersNormalizer(configuration: configuration)
-        normalizer.next = ComponentEventableHandler(component: components)
+
+        // 2
+        let decorator = ParametersDecorator(configuration: configuration)
+
+        // 3
+        let componentHanlder = ComponentEventableHandler(component: components)
+
+        normalizer.next = decorator
+        decorator.next = componentHanlder
+
         handlersPool.addNextEventableHandler(normalizer)
 
         // MARK: Setup Pushable chain of responsibility.
@@ -221,4 +232,42 @@ private extension String {
             .trimmingCharacters(in: .whitespaces)
             .replacingOccurrences(of: Constants.spaceCharacter, with: replacement)
     }
+}
+
+final class ParametersDecorator: EventableHandler {
+
+    private let configuration: Configuration
+
+    init(configuration: Configuration) {
+        self.configuration = configuration
+    }
+
+    override func handle(_ context: EventableOperationContext) throws {
+        let decorationFunction = { [configuration] () -> EventableOperationContext in
+            switch context.operation {
+            case let .report(event: event):
+                let pair = try event.matchConfiguration(with: configuration.events)
+                return EventableOperationContext(
+                    .report(event:
+                        OptimoveEventDecorator(event: pair.event, config: pair.config)
+                    )
+                )
+            default:
+                return context
+            }
+        }
+        try next?.handle(decorationFunction())
+    }
+
+}
+
+extension OptimoveEvent {
+
+    func matchConfiguration(with events: [String: EventsConfig]) throws -> (event: OptimoveEvent, config: EventsConfig) {
+        guard let eventConfig = events[self.name] else {
+            throw GuardError.custom("Configurations are missing for event \(self.name)")
+        }
+        return (self, eventConfig)
+    }
+
 }

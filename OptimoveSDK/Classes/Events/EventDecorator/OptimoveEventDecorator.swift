@@ -4,7 +4,23 @@ import Foundation
 import OptimoveCore
 
 /// Adjust event entity to satisfy Optimove's business logic before dispatch
-class OptimoveEventDecorator: OptimoveEvent {
+final class OptimoveEventDecorator: OptimoveEvent {
+
+    struct Constants {
+        struct Key {
+            static let eventDeviceType = OptimoveKeys.AdditionalAttributesKeys.eventDeviceType
+            static let eventNativeMobile = OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile
+            static let eventOs = OptimoveKeys.AdditionalAttributesKeys.eventOs
+            static let eventPlatform = OptimoveKeys.AdditionalAttributesKeys.eventPlatform
+        }
+        struct Value {
+            static let eventDeviceType = OptimoveKeys.AddtionalAttributesValues.eventDeviceType
+            static let eventNativeMobile = OptimoveKeys.AddtionalAttributesValues.eventNativeMobile
+            static let eventOs = OptimoveKeys.AddtionalAttributesValues.eventOs
+            static let eventPlatform = OptimoveKeys.AddtionalAttributesValues.eventPlatform
+        }
+    }
+
     var name: String
     var parameters: [String: Any]
 
@@ -20,47 +36,25 @@ class OptimoveEventDecorator: OptimoveEvent {
     ///   - config: The config of the event as provided by the config file
     convenience init(event: OptimoveEvent, config: EventsConfig) {
         self.init(event: event)
-        self.processEventConfig(config)
+        self.decorate(config)
     }
 
     /// Add Additional attributes according to event configuration
     ///
     /// - Parameter config: The event configurations as provided in file
-    func processEventConfig(_ config: EventsConfig) {
-        if config.parameters[OptimoveKeys.AdditionalAttributesKeys.eventDeviceType] != nil {
-            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventDeviceType]
-                = OptimoveKeys.AddtionalAttributesValues.eventDeviceType
+    func decorate(_ config: EventsConfig) {
+        if config.parameters[Constants.Key.eventDeviceType] != nil {
+            self.parameters[Constants.Key.eventDeviceType] = Constants.Value.eventDeviceType
         }
-        if config.parameters[OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile] != nil {
-            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile]
-                = OptimoveKeys.AddtionalAttributesValues.eventNativeMobile
+        if config.parameters[Constants.Key.eventNativeMobile] != nil {
+            self.parameters[Constants.Key.eventNativeMobile] = Constants.Value.eventNativeMobile
         }
-        if config.parameters[OptimoveKeys.AdditionalAttributesKeys.eventOs] != nil {
-            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventOs]
-                = OptimoveKeys.AddtionalAttributesValues.eventOs
+        if config.parameters[Constants.Key.eventOs] != nil {
+            self.parameters[Constants.Key.eventOs] = Constants.Value.eventOs
         }
-        if config.parameters[OptimoveKeys.AdditionalAttributesKeys.eventPlatform] != nil {
-            self.parameters[OptimoveKeys.AdditionalAttributesKeys.eventPlatform]
-                = OptimoveKeys.AddtionalAttributesValues.eventPlatform
+        if config.parameters[Constants.Key.eventPlatform] != nil {
+            self.parameters[Constants.Key.eventPlatform] = Constants.Value.eventPlatform
         }
-
-        normalizeParameters(config)
     }
 
-    /// For core events, where the naming conventions is satisfy by the event source, just normalize the parameter type if necessary
-    ///
-    /// - Parameter config: The configuration of the event as provided from the config file
-    func normalizeParameters(_ config: EventsConfig) {
-        var normalizedParameters = [String: Any]()
-        for (key, value) in parameters {
-            if let numValue = value as? NSNumber, config.parameters[key]?.type == "Boolean" {
-                normalizedParameters[key] = Bool(truncating: numValue)
-            } else if let strValue = value as? String {
-                normalizedParameters[key] = strValue.trimmingCharacters(in: .whitespacesAndNewlines)
-            } else {
-                normalizedParameters[key] = value
-            }
-        }
-        self.parameters = normalizedParameters
-    }
 }
