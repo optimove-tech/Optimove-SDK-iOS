@@ -160,7 +160,7 @@ extension Optimove {
     ///   - parameters: The dictionary of attributes.
     @objc public func reportEvent(name: String, parameters: [String: Any]) {
         queue.async {
-            let customEvent = SimpleCustomEvent(name: name, parameters: parameters)
+            let customEvent = CommonOptimoveEvent(name: name, parameters: parameters)
             self.reportEventable(EventableOperationContext(.report(event: customEvent)))
         }
     }

@@ -2,7 +2,7 @@
 
 import OptimoveCore
 
-class SimpleCustomEvent: OptimoveEvent {
+class CommonOptimoveEvent: OptimoveEvent {
     var name: String
     var parameters: [String: Any]
 

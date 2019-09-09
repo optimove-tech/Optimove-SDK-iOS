@@ -108,11 +108,18 @@ private extension OptimoveSDKInitializer {
     }
 
     func setupOptimoveComponents(_ configuration: Configuration) {
+
+        // MARK: Setup Eventable chain of responsibility.
         components.addComponent(componentFactory.createOptitrackComponent(configuration: configuration))
         components.addComponent(componentFactory.createRealtimeComponent(configuration: configuration))
-        handlersPool.addNextEventableHandler(ComponentEventableHandler(component: components))
+        let normalizer = ParametersNormalizer(configuration: configuration)
+        normalizer.next = ComponentEventableHandler(component: components)
+        handlersPool.addNextEventableHandler(normalizer)
+
+        // MARK: Setup Pushable chain of responsibility.
         components.addComponent(componentFactory.createOptipushComponent(configuration: configuration))
         handlersPool.addNextPushableHandler(ComponentPushableHandler(component: components))
+
         Logger.info("All components setup finished.")
     }
 
@@ -132,5 +139,86 @@ extension OptimoveSDKInitializer {
         })
     }
 }
+
+final class ParametersNormalizer: EventableHandler {
+
+    private let configuration: Configuration
+
+    init(configuration: Configuration) {
+        self.configuration = configuration
+    }
+
+    // MARK: - EventableHandler
+
+    override func handle(_ context: EventableOperationContext) throws {
+        let normilizeFunction = { [configuration] () -> EventableOperationContext in
+            switch context.operation {
+            case let .report(event: event):
+                return EventableOperationContext(
+                    .report(event:
+                        try event.normilize(configuration.events)
+                    )
+                )
+            default:
+                return context
+            }
+        }
+        try next?.handle(normilizeFunction())
+    }
+
+}
+
+private struct Constants {
+    static let boolean = "Boolean"
+}
+
+extension OptimoveEvent {
+
+    /// The normalization process contains next steps:
+    /// - Replacing all spaces in a key with underscore character.
+    /// - Handling Boolean type correctly.
+    /// - Clean up an value of an non-normilized key.
+    ///
+    /// - Parameter event: The event for normilization.
+    /// - Returns: Normilized event
+    /// - Throws: Throw an error if an event configuration are missing.
+    func normilize(_ events: [String: EventsConfig]) throws -> OptimoveEvent {
+        guard let eventConfig = events[self.name] else {
+            throw GuardError.custom("Configurations are missing for event \(self.name)")
+        }
+        let normalizedParameters = self.parameters.reduce(into: [String: Any]()) { (result, next) in
+            // Replacing all spaces in a key with underscore character.
+            let normalizedKey = next.key.replaceSpaces()
+
+            // Handling Boolean type correctly.
+            if let number = next.value as? NSNumber, eventConfig.parameters[normalizedKey]?.type == Constants.boolean {
+                result[normalizedKey] = Bool(truncating: number)
+            } else if let string = next.value as? String {
+                result[normalizedKey] = string.trimmingCharacters(in: .whitespacesAndNewlines)
+            } else {
+                result[normalizedKey] = next.value
+            }
+
+            // Clean up an value of an non-normilized key.
+            if normalizedKey != next.key {
+                result[next.key] = nil
+            }
+        }
+        return CommonOptimoveEvent(name: self.name, parameters: normalizedParameters)
+    }
+
+}
+
+private extension String {
+
+    private struct Constants {
+        static let spaceCharacter = " "
+        static let underscoreCharacter = "_"
+    }
+
+    func replaceSpaces(with replacement: String = Constants.underscoreCharacter) -> String {
+        return self.lowercased()
+            .trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: Constants.spaceCharacter, with: replacement)
     }
 }
