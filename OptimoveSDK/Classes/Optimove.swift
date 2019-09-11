@@ -14,6 +14,7 @@ import OptimoveCore
     private let factory: MainFactory
     private let queue: DispatchQueue
     private let stateListener: DeprecatedStateListener
+    private let deviceStateObserver: DeviceStateObserver
 
     /// The shared instance of OptimoveSDK.
     @objc public static let shared: Optimove = {
@@ -26,6 +27,7 @@ import OptimoveCore
         handlers = serviceLocator.handlersPool()
         storage = serviceLocator.storage()
         stateListener = DeprecatedStateListener()
+        deviceStateObserver = serviceLocator.deviceStateObserver(coreEventFactory: factory.coreEventFactory())
         queue = DispatchQueue(label: "com.optimove.sdk", qos: .utility)
         super.init()
 
@@ -39,6 +41,7 @@ import OptimoveCore
         shared.queue.async {
             shared.serviceLocator.loggerInitializator().initialize()
             shared.serviceLocator.newTenantInfoHandler().handle(tenantInfo)
+            shared.deviceStateObserver.start()
             shared.startSDK { _ in }
         }
     }
