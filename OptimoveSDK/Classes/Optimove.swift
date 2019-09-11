@@ -27,11 +27,11 @@ import OptimoveCore
         handlers = serviceLocator.handlersPool()
         storage = serviceLocator.storage()
         stateListener = DeprecatedStateListener()
-        deviceStateObserver = serviceLocator.deviceStateObserver(coreEventFactory: factory.coreEventFactory())
+        deviceStateObserver = serviceLocator.deviceStateObserver(
+            coreEventFactory: factory.coreEventFactory()
+        )
         queue = DispatchQueue(label: "com.optimove.sdk", qos: .utility)
         super.init()
-
-        setup()
     }
 
     /// The starting point of the Optimove SDK.
@@ -93,7 +93,10 @@ extension Optimove {
         let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: notification)
         if result {
-            notificationListener.willPresent(notification: notification, withCompletionHandler: completionHandler)
+            notificationListener.willPresent(
+                notification: notification,
+                withCompletionHandler: completionHandler
+            )
         }
         return result
     }
@@ -294,7 +297,12 @@ private extension Optimove {
             completion(.success(()))
             return
         }
-        generateAndSendOnStartEvents()
+        let onStartEventGenerator = OnStartEventGenerator(
+            coreEventFactory: factory.coreEventFactory(),
+            handler: handlers,
+            storage: storage
+        )
+        onStartEventGenerator.generate()
         RunningFlagsIndication.isInitializerRunning.toggle()
         let configurationFetcher = serviceLocator.configurationFetcher(operationFactory: factory.operationFactory())
         configurationFetcher.fetch { result in
@@ -313,25 +321,7 @@ private extension Optimove {
         }
     }
 
-    func generateAndSendOnStartEvents() {
-        do {
-            try OnStartEventGenerator(coreEventFactory: factory.coreEventFactory()).generate().forEach { event in
-                try handlers.eventableHandler.handle(.init(.report(event: event)))
-            }
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
-
     //  MARK: Configuration
-
-    func setup() {
-        SDKDevice.evaluateUserAgent(completion: { (userAgent) in
-            self.storage.userAgent = userAgent
-        })
-        serviceLocator.newVisitorIdGenerator().generate()
-        serviceLocator.firstTimeVisitGenerator().generate()
-    }
 
     func initialize(with configuration: Configuration) {
         let initializer = serviceLocator.initializer(

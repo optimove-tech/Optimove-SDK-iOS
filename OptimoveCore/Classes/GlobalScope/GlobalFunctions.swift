@@ -53,7 +53,7 @@ public enum GuardError: LocalizedError {
     }
 }
 
-public func tryCatch(_ function: @autoclosure () throws -> Void) -> Void {
+public let tryCatch: (() throws -> Void) -> Void = { function in
     return {
         do {
             try function()

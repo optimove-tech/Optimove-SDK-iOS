@@ -105,7 +105,7 @@ extension OptiTrack {
         if let globalUserID = storage.customerID {
             let localUserID: String? = tracker.userId
             if localUserID != globalUserID {
-                tryCatch(try setUserId(globalUserID))
+                tryCatch { try setUserId(globalUserID) }
             }
         }
     }

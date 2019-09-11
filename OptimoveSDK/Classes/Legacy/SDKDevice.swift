@@ -12,11 +12,13 @@ struct SDKDevice {
     private static let webView = WKWebView(frame: .zero)
 
     static func evaluateUserAgent(completion: @escaping (String) -> Void) {
-        webView.evaluateJavaScript("navigator.userAgent") { (result, error) in
-            if let error = error {
-                Logger.error(error.localizedDescription)
+        DispatchQueue.main.async {
+            webView.evaluateJavaScript("navigator.userAgent") { (result, error) in
+                if let error = error {
+                    Logger.error(error.localizedDescription)
+                }
+                completion((result as? String) ?? "user_agent_placeholder")
             }
-            completion((result as? String) ?? "user_agent_placeholder")
         }
     }
 

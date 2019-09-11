@@ -2,34 +2,40 @@
 
 import Foundation
 import OptimoveCore
-import UIKit.UIApplication
 
 final class OnStartEventGenerator {
 
     private let coreEventFactory: CoreEventFactory
+    private let handler: HandlersPool
+    private let storage: OptimoveStorage
 
-    init(coreEventFactory: CoreEventFactory) {
+    init(coreEventFactory: CoreEventFactory,
+         handler: HandlersPool,
+         storage: OptimoveStorage) {
         self.coreEventFactory = coreEventFactory
+        self.handler = handler
+        self.storage = storage
     }
 
-    func generate() throws -> [OptimoveEvent] {
-        return [
-            try coreEventFactory.createEvent(.setUserAgent),
-            try coreEventFactory.createEvent(.metaData),
-            try coreEventFactory.createEvent(.setAdvertisingId),
-            reportAppOpened()
-        ].compactMap { $0 }
-    }
-
-    func reportAppOpened() -> OptimoveEvent? {
-        guard UIApplication.shared.applicationState != .background else { return nil }
-        do {
-            return try coreEventFactory.createEvent(.appOpen)
-        } catch {
-            Logger.error(error.localizedDescription)
-            return nil
+    func generate() {
+        tryCatch {
+            let events = [
+                try coreEventFactory.createEvent(.metaData),
+                try coreEventFactory.createEvent(.setAdvertisingId),
+            ].compactMap { $0 }
+            try events.forEach { event in
+                try handler.eventableHandler.handle(.init(.report(event: event)))
+            }
         }
+        UserAgentGenerator(
+            storage: storage,
+            handler: handler,
+            coreEventFactory: coreEventFactory
+        ).generate()
+        AppOpenOnStartGenerator(
+            handler: handler,
+            coreEventFactory: coreEventFactory
+        ).generate()
     }
 
 }
-
