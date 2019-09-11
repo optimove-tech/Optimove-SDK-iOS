@@ -2,6 +2,7 @@
 
 import Foundation
 import OptimoveCore
+import UIKit.UIApplication
 
 final class ResignActiveObserver: DeviceStateObservable {
 
