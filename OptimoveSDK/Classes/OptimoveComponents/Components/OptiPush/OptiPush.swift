@@ -53,7 +53,6 @@ final class OptiPush {
 
     func performInitializationOperations() {
         self.retryFailedMbaasOperations()
-        self.optInOutIfNeeded()
         firebaseInteractor.subscribeToTopics(didSucceed: nil)
     }
 
@@ -71,6 +70,10 @@ extension OptiPush: PushableComponent {
             unsubscribeFromTopic(topic: topic)
         case .performRegistration:
             performRegistration()
+        case .optIn:
+            registrar.optIn()
+        case .optOut:
+            registrar.optOut()
         }
     }
 }
@@ -107,7 +110,7 @@ extension OptiPush: OptimoveMbaasRegistrationHandling {
 
         registrar.unregister {
             //The order of the following operations matter
-            self.updateFcmTokenWith(token)
+            self.storage.fcmToken = token
             self.performRegistration()
             self.firebaseInteractor.subscribeToTopics(didSucceed: nil)
         }
@@ -124,10 +127,6 @@ private extension OptiPush {
         firebaseInteractor.subscribeToTopics(didSucceed: nil)
     }
 
-    func updateFcmTokenWith(_ fcmToken: String) {
-        storage.fcmToken = fcmToken
-
-    }
 
     func retryFailedMbaasOperations() {
         do {
@@ -137,55 +136,4 @@ private extension OptiPush {
         }
     }
 
-    func optInOutIfNeeded() {
-        guard storage.isOptRequestSuccess else { return }
-        deviceStateMonitor.getStatus(for: .userNotification) { (granted) in
-            if granted {
-                self.handleNotificationAuthorized()
-            } else {
-                self.handleNotificationRejection()
-            }
-        }
-    }
-
-    func handleNotificationAuthorized() {
-        Logger.info("OptiPush: User authorized notifications.")
-        guard let isOptIn = storage.isMbaasOptIn else {  //Opt in on first launch
-            Logger.debug("OptiPush: User authorized notifications for the first time.")
-            storage.isMbaasOptIn = true
-            return
-        }
-        if !isOptIn {
-            Logger.debug("OptiPush: SDK make opt IN request.")
-            registrar.optIn()
-        }
-    }
-
-    func handleNotificationRejection() {
-        Logger.warn("OptiPush: User UNauthorized notifications.")
-
-        guard let isOptIn = storage.isMbaasOptIn else {
-            //Opt out on first launch
-            handleNotificationRejectionAtFirstLaunch()
-            return
-        }
-        if isOptIn {
-            Logger.debug("OptiPush: SDK make opt OUT request.")
-            registrar.optOut()
-            storage.isMbaasOptIn = false
-        }
-    }
-
-    func handleNotificationRejectionAtFirstLaunch() {
-        Logger.debug("OptiPush: User opt OUT at first launch.")
-        guard storage.fcmToken != nil else {
-            storage.isMbaasOptIn = false
-            return
-        }
-
-        if storage.isRegistrationSuccess {
-            storage.isMbaasOptIn = false
-            registrar.optOut()
-        }
-    }
 }

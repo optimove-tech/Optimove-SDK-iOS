@@ -5,6 +5,7 @@ import UserNotifications
 import os.log
 import OptimoveCore
 
+#warning("Solve using of DeeplinkExtracter")
 final class DeeplinkExtracter: AsyncOperation {
 
     private struct Constants {

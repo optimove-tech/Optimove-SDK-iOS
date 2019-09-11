@@ -45,4 +45,6 @@ enum PushableOperation: ComponentOperation {
     case performRegistration
     case unsubscribeFromTopic(topic: String)
     case subscribeToTopic(topic: String)
+    case optIn
+    case optOut
 }
