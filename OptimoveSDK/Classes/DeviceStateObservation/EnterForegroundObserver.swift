@@ -13,16 +13,16 @@ final class EnterForegroundObserver {
         }
     }
 
-    private let handlers: HandlersPool
+    private let synchronizer: Synchronizer
     private var statisticService: StatisticService
     private let dateTimeProvider: DateTimeProvider
     private let coreEventFactory: CoreEventFactory
 
-    init(handlers: HandlersPool,
+    init(synchronizer: Synchronizer,
          statisticService: StatisticService,
          dateTimeProvider: DateTimeProvider,
          coreEventFactory: CoreEventFactory) {
-        self.handlers = handlers
+        self.synchronizer = synchronizer
         self.statisticService = statisticService
         self.dateTimeProvider = dateTimeProvider
         self.coreEventFactory = coreEventFactory
@@ -34,7 +34,7 @@ final class EnterForegroundObserver {
         let appOpenTime = statisticService.applicationOpenTime
         if (now - appOpenTime) > threshold {
             let event = try coreEventFactory.createEvent(.appOpen)
-            try handlers.eventableHandler.handle(EventableOperationContext(.report(event: event)))
+            synchronizer.handle(.report(event: event))
             statisticService.applicationOpenTime = dateTimeProvider.now.timeIntervalSince1970
         }
     }

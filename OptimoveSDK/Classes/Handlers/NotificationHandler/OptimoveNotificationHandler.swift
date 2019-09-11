@@ -8,12 +8,12 @@ import FirebaseMessaging
 
 final class OptimoveNotificationHandler {
 
-    private let handlersPool: HandlersPool
+    private let synchronizer: Synchronizer
     private let deeplinkService: DeeplinkService
 
-    init(handlersPool: HandlersPool,
+    init(synchronizer: Synchronizer,
          deeplinkService: DeeplinkService) {
-        self.handlersPool = handlersPool
+        self.synchronizer = synchronizer
         self.deeplinkService = deeplinkService
     }
 }
@@ -28,7 +28,7 @@ private extension OptimoveNotificationHandler {
             let task = UIApplication.shared.beginBackgroundTask(withName: "Handling a notification reponse")
             switch response.actionIdentifier {
             case UNNotificationDefaultActionIdentifier:
-                try handlersPool.eventableHandler.handle(EventableOperationContext(.report(event: event)))
+                synchronizer.handle(.report(event: event))
                 let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 2.0)
                 DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
                     UIApplication.shared.endBackgroundTask(task)

@@ -6,14 +6,14 @@ import OptimoveCore
 final class UserAgentGenerator {
 
     private var storage: OptimoveStorage
-    private let handler: HandlersPool
+    private let synchronizer: Synchronizer
     private let coreEventFactory: CoreEventFactory
 
     init(storage: OptimoveStorage,
-         handler: HandlersPool,
+         synchronizer: Synchronizer,
          coreEventFactory: CoreEventFactory) {
         self.storage = storage
-        self.handler = handler
+        self.synchronizer = synchronizer
         self.coreEventFactory = coreEventFactory
     }
 
@@ -21,9 +21,7 @@ final class UserAgentGenerator {
         SDKDevice.evaluateUserAgent(completion: { (userAgent) in
             self.storage.userAgent = userAgent
             tryCatch {
-                try self.handler.eventableHandler.handle(
-                    EventableOperationContext(.report(event: try self.coreEventFactory.createEvent(.setUserAgent)))
-                )
+                self.synchronizer.handle(.report(event: try self.coreEventFactory.createEvent(.setUserAgent)))
             }
         })
     }

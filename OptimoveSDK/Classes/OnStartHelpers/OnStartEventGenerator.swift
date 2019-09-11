@@ -6,14 +6,14 @@ import OptimoveCore
 final class OnStartEventGenerator {
 
     private let coreEventFactory: CoreEventFactory
-    private let handler: HandlersPool
+    private let synchronizer: Synchronizer
     private let storage: OptimoveStorage
 
     init(coreEventFactory: CoreEventFactory,
-         handler: HandlersPool,
+         synchronizer: Synchronizer,
          storage: OptimoveStorage) {
         self.coreEventFactory = coreEventFactory
-        self.handler = handler
+        self.synchronizer = synchronizer
         self.storage = storage
     }
 
@@ -24,16 +24,16 @@ final class OnStartEventGenerator {
                 try coreEventFactory.createEvent(.setAdvertisingId),
             ].compactMap { $0 }
             try events.forEach { event in
-                try handler.eventableHandler.handle(.init(.report(event: event)))
+                synchronizer.handle(.report(event: event))
             }
         }
         UserAgentGenerator(
             storage: storage,
-            handler: handler,
+            synchronizer: synchronizer,
             coreEventFactory: coreEventFactory
         ).generate()
         AppOpenOnStartGenerator(
-            handler: handler,
+            synchronizer: synchronizer,
             coreEventFactory: coreEventFactory
         ).generate()
     }

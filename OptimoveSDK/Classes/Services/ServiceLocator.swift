@@ -70,7 +70,9 @@ final class ServiceLocator {
 
     func notificationListener() -> OptimoveNotificationHandling {
         return OptimoveNotificationHandler(
-            handlersPool: handlersPool(),
+            synchronizer: Synchronizer(
+                handler: _handlersPool
+            ),
             deeplinkService: deeplinkService()
         )
     }
@@ -95,8 +97,8 @@ final class ServiceLocator {
         return _deeplinkService
     }
 
-    func handlersPool() -> HandlersPool {
-        return _handlersPool
+    func synchronizer() -> Synchronizer {
+        return Synchronizer(handler: _handlersPool)
     }
 
     func configurationFetcher(operationFactory: OperationFactory) -> ConfigurationFetcher {
@@ -110,7 +112,7 @@ final class ServiceLocator {
         return OptimoveSDKInitializer(
             storage: storage(),
             componentFactory: componentFactory,
-            handlersPool: handlersPool()
+            handlersPool: _handlersPool
         )
     }
 
@@ -134,16 +136,16 @@ final class ServiceLocator {
         return DeviceStateObserver(
             observers: [
                 ResignActiveObserver(
-                    subscriber: handlersPool()
+                    subscriber: _handlersPool
                 ),
                 OptInOutObserver(
-                    handlers: handlersPool(),
+                    synchronizer: synchronizer(),
                     deviceStateMonitor: deviceStateMonitor(),
                     coreEventFactory: coreEventFactory,
                     storage: storage()
                 ),
                 EnterForegroundObserver(
-                    handlers: handlersPool(),
+                    synchronizer: synchronizer(),
                     statisticService: statisticService(),
                     dateTimeProvider: dateTimeProvider(),
                     coreEventFactory: coreEventFactory

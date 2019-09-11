@@ -5,16 +5,16 @@ import OptimoveCore
 
 final class OptInOutObserver: DeviceStateObservable {
 
-    private let handlers: HandlersPool
+    private let synchronizer: Synchronizer
     private let deviceStateMonitor: OptimoveDeviceStateMonitor
     private let coreEventFactory: CoreEventFactory
     private var storage: OptimoveStorage
 
-    init(handlers: HandlersPool,
+    init(synchronizer: Synchronizer,
          deviceStateMonitor: OptimoveDeviceStateMonitor,
          coreEventFactory: CoreEventFactory,
          storage: OptimoveStorage) {
-        self.handlers = handlers
+        self.synchronizer = synchronizer
         self.deviceStateMonitor = deviceStateMonitor
         self.coreEventFactory = coreEventFactory
         self.storage = storage
@@ -22,10 +22,8 @@ final class OptInOutObserver: DeviceStateObservable {
 
     func observe() {
         deviceStateMonitor.getStatus(for: .userNotification) { (granted) in
-            do {
+            tryCatch {
                 try self.executeReportOptInOut(notificationsPermissionsGranted: granted)
-            } catch {
-                Logger.error(error.localizedDescription)
             }
         }
     }
@@ -38,24 +36,16 @@ final class OptInOutObserver: DeviceStateObservable {
             return
         }
         if notificationsPermissionsGranted {
-            try handlers.eventableHandler.handle(
-                EventableOperationContext(
-                    .report(event: try coreEventFactory.createEvent(.optipushOptIn))
-                )
-            )
+            synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptIn)))
             storage.isOptiTrackOptIn = true
             if storage.isOptRequestSuccess {
-                try handleNotificationAuthorized()
+                handleNotificationAuthorized()
             }
         } else {
-            try handlers.eventableHandler.handle(
-                EventableOperationContext(
-                    .report(event: try coreEventFactory.createEvent(.optipushOptOut))
-                )
-            )
+            synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptOut)))
             storage.isOptiTrackOptIn = false
             if storage.isOptRequestSuccess {
-                try handleNotificationRejection()
+                handleNotificationRejection()
             }
         }
     }
@@ -67,7 +57,7 @@ final class OptInOutObserver: DeviceStateObservable {
 
     // MARK: Pushable logic
 
-    func handleNotificationAuthorized() throws {
+    func handleNotificationAuthorized() {
         Logger.info("OptiPush: User authorized notifications.")
         guard let isOptIn = storage.isMbaasOptIn else {  //Opt in on first launch
             Logger.debug("OptiPush: User authorized notifications for the first time.")
@@ -76,26 +66,26 @@ final class OptInOutObserver: DeviceStateObservable {
         }
         if !isOptIn {
             Logger.debug("OptiPush: SDK make opt IN request.")
-            try handlers.pushableHandler.handle(.init(.optIn))
+            synchronizer.handle(.optIn)
         }
     }
 
-    func handleNotificationRejection() throws {
+    func handleNotificationRejection() {
         Logger.warn("OptiPush: User UNauthorized notifications.")
 
         guard let isOptIn = storage.isMbaasOptIn else {
             //Opt out on first launch
-            try handleNotificationRejectionAtFirstLaunch()
+            handleNotificationRejectionAtFirstLaunch()
             return
         }
         if isOptIn {
             Logger.debug("OptiPush: SDK make opt OUT request.")
-            try handlers.pushableHandler.handle(.init(.optOut))
+            synchronizer.handle(.optOut)
             storage.isMbaasOptIn = false
         }
     }
 
-    func handleNotificationRejectionAtFirstLaunch() throws {
+    func handleNotificationRejectionAtFirstLaunch() {
         Logger.debug("OptiPush: User opt OUT at first launch.")
         guard storage.fcmToken != nil else {
             storage.isMbaasOptIn = false
@@ -104,7 +94,7 @@ final class OptInOutObserver: DeviceStateObservable {
 
         if storage.isRegistrationSuccess {
             storage.isMbaasOptIn = false
-            try handlers.pushableHandler.handle(.init(.optOut))
+            synchronizer.handle(.optOut)
         }
     }
 }
