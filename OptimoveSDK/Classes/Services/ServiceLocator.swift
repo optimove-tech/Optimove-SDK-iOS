@@ -141,6 +141,10 @@ final class ServiceLocator {
         return NewVisitorIdGenerator(storage: storage())
     }
 
+    func firstTimeVisitGenerator() -> FirstTimeVisitGenerator {
+        return FirstTimeVisitGenerator(storage: storage())
+    }
+
     func deviceStateObserver(coreEventFactory: CoreEventFactory) -> DeviceStateObserver {
         return DeviceStateObserver(
             observers: [

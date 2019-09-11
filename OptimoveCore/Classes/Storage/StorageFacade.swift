@@ -85,7 +85,7 @@ public protocol StorageValue {
     var defaultFcmToken: String? { get set }
     var fcmToken: String? { get set }
     var isOptiTrackOptIn: Bool { get set }
-    var firstVisitTimestamp: Int? { get set }
+    var firstVisitTimestamp: Int64? { get set }
     var isSetUserIdSucceed: Bool { get set }
     var realtimeSetUserIdFailed: Bool { get set }
     var realtimeSetEmailFailed: Bool { get set }
@@ -96,7 +96,7 @@ public protocol StorageValue {
     func getIsMbaasOptIn() throws -> Bool
     func getDefaultFcmToken() throws -> String
     func getFcmToken() throws -> String
-    func getFirstVisitTimestamp() throws -> Int
+    func getFirstVisitTimestamp() throws -> Int64
 }
 
 /// The protocol used for convenience implementation of any storage technology below this protocol.
@@ -517,7 +517,7 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var firstVisitTimestamp: Int? {
+    var firstVisitTimestamp: Int64? {
         get {
             return self[.firstVisitTimestamp]
         }
@@ -595,7 +595,7 @@ public extension KeyValueStorage where Self: StorageValue {
         return value
     }
 
-    func getFirstVisitTimestamp() throws -> Int {
+    func getFirstVisitTimestamp() throws -> Int64 {
         guard let value = firstVisitTimestamp else {
             throw StorageError.noValue(.firstVisitTimestamp)
         }

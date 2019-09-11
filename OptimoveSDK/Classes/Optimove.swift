@@ -336,6 +336,7 @@ private extension Optimove {
             self.storage.userAgent = userAgent
         })
         serviceLocator.newVisitorIdGenerator().generate()
+        serviceLocator.firstTimeVisitGenerator().generate()
     }
 
     func initialize(with configuration: Configuration) {

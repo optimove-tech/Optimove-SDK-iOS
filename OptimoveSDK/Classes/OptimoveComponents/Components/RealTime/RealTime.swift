@@ -26,19 +26,11 @@ final class RealTime {
         self.configuration = configuration
         self.storage = storage
         self.networking = networking
-        self.realTimeQueue = DispatchQueue(
-            label: "com.optimove.sdk.realtime",
-            qos: .utility
-        )
+        self.realTimeQueue = DispatchQueue(label: "com.optimove.sdk.realtime", qos: .utility)
         self.hanlder = handler
         self.eventBuilder = eventBuilder
         self.coreEventFactory = coreEventFactory
-        performInitializationOperations()
         Logger.debug("RealTime initialized.")
-    }
-
-    func performInitializationOperations() {
-        setFirstTimeVisitIfNeeded()
     }
 
 }
@@ -103,13 +95,6 @@ extension RealTime {
 // MARK: - Private
 
 private extension RealTime {
-
-    func setFirstTimeVisitIfNeeded() {
-        if storage[.firstVisitTimestamp] == nil {
-            // Realtime server asked to get it in seconds
-            storage[.firstVisitTimestamp] = Int64(Date().timeIntervalSince1970)
-        }
-    }
 
     // MARK: Transforming an event
 
