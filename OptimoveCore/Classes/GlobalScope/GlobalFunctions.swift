@@ -52,3 +52,13 @@ public enum GuardError: LocalizedError {
         }
     }
 }
+
+public func tryCatch(_ function: @autoclosure () throws -> Void) -> Void {
+    return {
+        do {
+            try function()
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
+    }()
+}

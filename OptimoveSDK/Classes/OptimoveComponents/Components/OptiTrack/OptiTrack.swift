@@ -38,7 +38,7 @@ extension OptiTrack: EventableComponent {
     func handleEventable(_ context: EventableOperationContext) throws {
         switch context.operation {
         case let .setUserId(userId: userId):
-            setUserId(userId)
+            try setUserId(userId)
         case let .report(event: event):
             try report(event: event)
         case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
@@ -52,9 +52,10 @@ extension OptiTrack: EventableComponent {
 
 private extension OptiTrack {
 
-    func setUserId(_ userId: String) {
+    func setUserId(_ userId: String) throws {
         Logger.info("OptiTrack: Set user id \(userId)")
         tracker.userId = userId
+        try report(event: try coreEventFactory.createEvent(.setUserId))
     }
 
     func report(event: OptimoveEvent) throws {
@@ -64,7 +65,8 @@ private extension OptiTrack {
             self.sendReport(
                 event: OptimoveEventDecorator(
                     event: event,
-                    config: config),
+                    config: config
+                ),
                 config: config
             )
         }
@@ -75,9 +77,10 @@ private extension OptiTrack {
         tracker.track(view: [pageTitle], url: URL(string: "http://\(customURL)"))
 
         let event = try coreEventFactory.createEvent(
-            .pageVisit(screenPath: customURL.sha1(),
-                       screenTitle: pageTitle,
-                       category: category
+            .pageVisit(
+                screenPath: customURL.sha1(),
+                screenTitle: pageTitle,
+                category: category
             )
         )
         try report(event: event)
@@ -102,7 +105,7 @@ extension OptiTrack {
         if let globalUserID = storage.customerID {
             let localUserID: String? = tracker.userId
             if localUserID != globalUserID {
-                setUserId(globalUserID)
+                tryCatch(try setUserId(globalUserID))
             }
         }
     }
