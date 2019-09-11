@@ -14,13 +14,14 @@ targets:
     info:
       path: OptimoveCore/Info.plist
       properties:
-        CFBundleIdentifier: com.optimove.sdk.core
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
     scheme:
       testTargets:
         - OptimoveCore-Unit
       gatherCoverageData: true
     settings:
       APPLICATION_EXTENSION_API_ONLY: YES
+      PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.core
     dependencies:
       - sdk: Foundation.framework
 
@@ -34,7 +35,7 @@ targets:
     info:
       path: OptimoveSDK/Info.plist
       properties:
-        CFBundleIdentifier: com.optimove.sdk
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
     scheme:
       testTargets:
         - OptimoveSDK-Unit
@@ -42,6 +43,7 @@ targets:
     settings:
       OTHER_LDFLAGS: -ObjC
       MACH_O_TYPE: staticlib
+      PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk
     dependencies: 
       - target: OptimoveCore
       - carthage: MatomoTracker
@@ -73,13 +75,14 @@ targets:
     info:
       path: OptimoveNotificationServiceExtension/Info.plist
       properties:
-        CFBundleIdentifier: com.optimove.sdk.extension.notificationservice
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
     scheme:
       testTargets:
         - OptimoveNotificationServiceExtension-Unit
       gatherCoverageData: true
     settings:
       APPLICATION_EXTENSION_API_ONLY: YES
+      PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.extension.notificationservice
     dependencies:
       - target: OptimoveCore
       - sdk: UIKit.framework
