@@ -300,6 +300,7 @@ private extension Optimove {
             completion(.success(()))
             return
         }
+        generateAndSendOnStartEvents()
         RunningFlagsIndication.isInitializerRunning.toggle()
         let configurationFetcher = serviceLocator.configurationFetcher(operationFactory: factory.operationFactory())
         configurationFetcher.fetch { result in
@@ -315,6 +316,16 @@ private extension Optimove {
                     completion(.failure(error))
                 }
             }
+        }
+    }
+
+    func generateAndSendOnStartEvents() {
+        do {
+            try OnStartEventGenerator(coreEventFactory: factory.coreEventFactory()).generate().forEach { event in
+                try handlers.eventableHandler.handle(.init(.report(event: event)))
+            }
+        } catch {
+            Logger.error(error.localizedDescription)
         }
     }
 
