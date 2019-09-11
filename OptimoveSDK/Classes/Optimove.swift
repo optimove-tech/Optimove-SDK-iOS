@@ -227,7 +227,7 @@ extension Optimove {
         queue.async {
             let validationResult = EmailValidator.isValid(email)
             guard validationResult == .valid else { return }
-            self.storage.userEmail = email
+            NewEmailHandler(storage: self.storage).handle(email: email)
             self.reportEvent(SetUserEmailEvent(email: email))
         }
     }

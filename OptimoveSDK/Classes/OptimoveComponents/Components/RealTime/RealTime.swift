@@ -1,7 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
-
 import OptimoveCore
 
 final class RealTime {
@@ -85,8 +84,8 @@ extension RealTime {
         try reportEvent(event: event, retryFailedEvents: false)
     }
 
-    func reportUserEmail(_ email: String) throws {
-        let event = SetUserEmailEvent(email: email)
+    func reportUserEmail() throws {
+        let event = try coreEventFactory.createEvent(.setUserEmail)
         try reportEvent(event: event, retryFailedEvents: false)
     }
 
@@ -147,14 +146,14 @@ private extension RealTime {
     }
 
     func retrySetUserIdEventIfNeeded() throws {
-        if storage[.realtimeSetUserIdFailed] ?? false {
+        if storage.customerID != storage.realtimeLastSuccessfulSentUserID {
             try reportUserId()
         }
     }
 
     func retrySetUserEmailIfNeeded() throws {
-        if storage[.realtimeSetEmailFailed] ?? false {
-            try reportUserEmail(try cast(storage[.userEmail]))
+        if storage.userEmail != storage.realtimeLastSuccessfulSentEmail {
+            try reportUserEmail()
         }
     }
 

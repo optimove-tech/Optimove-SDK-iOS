@@ -38,8 +38,8 @@ public  enum StorageKey: String, CaseIterable {
     case isOptiTrackOptIn
     case firstVisitTimestamp
     case isSetUserIdSucceed
-    case realtimeSetUserIdFailed
-    case realtimeSetEmailFailed
+    case realtimeLastSuccessfulSentUserID
+    case realtimeLastSuccessfulSentEmail
 }
 
 // MARK: - StorageValue
@@ -87,8 +87,8 @@ public protocol StorageValue {
     var isOptiTrackOptIn: Bool { get set }
     var firstVisitTimestamp: Int64? { get set }
     var isSetUserIdSucceed: Bool { get set }
-    var realtimeSetUserIdFailed: Bool { get set }
-    var realtimeSetEmailFailed: Bool { get set }
+    var realtimeLastSuccessfulSentUserID: String? { get set }
+    var realtimeLastSuccessfulSentEmail: String? { get set }
 
     func getUserEmail() throws -> String
     func getApnsToken() throws -> Data
@@ -141,8 +141,8 @@ public final class StorageFacade: OptimoveStorage {
         .isOptiTrackOptIn,
         .firstVisitTimestamp,
         .isSetUserIdSucceed,
-        .realtimeSetUserIdFailed,
-        .realtimeSetEmailFailed
+        .realtimeLastSuccessfulSentUserID,
+        .realtimeLastSuccessfulSentEmail
     ]
 
     private let fileStorage: FileStorage
@@ -535,21 +535,21 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var realtimeSetUserIdFailed: Bool {
+    var realtimeLastSuccessfulSentUserID: String? {
         get {
-            return self[.realtimeSetUserIdFailed] ?? false
+            return self[.realtimeLastSuccessfulSentUserID]
         }
         set {
-            self[.realtimeSetUserIdFailed] = newValue
+            self[.realtimeLastSuccessfulSentUserID] = newValue
         }
     }
 
-    var realtimeSetEmailFailed: Bool {
+    var realtimeLastSuccessfulSentEmail: String? {
         get {
-            return self[.realtimeSetEmailFailed] ?? false
+            return self[.realtimeLastSuccessfulSentEmail]
         }
         set {
-            self[.realtimeSetEmailFailed] = newValue
+            self[.realtimeLastSuccessfulSentEmail] = newValue
         }
     }
 
