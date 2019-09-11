@@ -7,12 +7,29 @@ import OptimoveCore
 final class OptimoveQueue {
 
     private let storage: OptimoveStorage
+    private var cachedEvents = [Event]()
 
     init(storage: OptimoveStorage) {
         self.storage = storage
+
+        cachedEvents = loadEventFromStorageToMemory()
     }
 
-    private var cachedEvents = [Event]()
+    private func loadEventFromStorageToMemory() -> [Event] {
+        guard storage.isExist(fileName: TrackerConstants.pendingEventsFile,
+                              shared: TrackerConstants.isSharedStorage) else { return [] }
+        do {
+            let jsonEvents = try storage.load(
+                fileName: TrackerConstants.pendingEventsFile,
+                shared: TrackerConstants.isSharedStorage
+            )
+            let decoder = JSONDecoder()
+            return try decoder.decode([Event].self, from: jsonEvents)
+        } catch {
+            Logger.error(error.localizedDescription)
+            return []
+        }
+    }
 
 }
 

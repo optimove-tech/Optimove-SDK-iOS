@@ -15,7 +15,6 @@ protocol Tracker {
     func track(view: [String], url: URL?)
 
     func dispatch()
-    func dispathPendingEvents()
 }
 
 extension Tracker {

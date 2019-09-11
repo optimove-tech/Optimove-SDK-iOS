@@ -23,3 +23,15 @@ final class HandlersPool {
     }
 
 }
+
+extension HandlersPool: ResignActiveSubscriber {
+
+    func onResignActive() {
+        do {
+            try eventableHandler.handle(.init(.dispatchNow))
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
+    }
+
+}

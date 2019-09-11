@@ -1,15 +1,18 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
-import OptimoveCore
 import UIKit.UIApplication
+
+protocol ResignActiveSubscriber {
+    func onResignActive()
+}
 
 final class ResignActiveObserver: DeviceStateObservable {
 
-    private let handlers: HandlersPool
+    private let subscriber: ResignActiveSubscriber
 
-    init(handlers: HandlersPool) {
-        self.handlers = handlers
+    init(subscriber: ResignActiveSubscriber) {
+        self.subscriber = subscriber
     }
 
     func observe() {
@@ -17,12 +20,8 @@ final class ResignActiveObserver: DeviceStateObservable {
             forName: UIApplication.willResignActiveNotification,
             object: self,
             queue: .main
-        ) { [handlers] (_) in
-            do {
-                try handlers.eventableHandler.handle(EventableOperationContext(.dispatchNow))
-            } catch {
-                Logger.error(error.localizedDescription)
-            }
+        ) { [subscriber] (_) in
+            subscriber.onResignActive()
         }
     }
 

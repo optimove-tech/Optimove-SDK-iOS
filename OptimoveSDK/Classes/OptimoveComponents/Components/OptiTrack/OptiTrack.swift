@@ -26,15 +26,9 @@ final class OptiTrack {
         self.eventReportingQueue = DispatchQueue(label: "com.optimove.sdk.optitrack", qos: .background)
         self.optimoveCustomizePlugins = (try? trackerFlagsBuilder.build()) ?? [:]
 
-        performInitializationOperations()
         Logger.debug("OptiTrack initialized.")
-    }
-
-    // MARK: - Internal Methods
-
-    func performInitializationOperations() {
-        injectVisitorAndUserIdToMatomo()
-        tracker.dispathPendingEvents()
+        syncVisitorAndUserIdToMatomo()
+        dispatchNow()
     }
 
 }
@@ -98,7 +92,7 @@ private extension OptiTrack {
 
 extension OptiTrack {
 
-    func injectVisitorAndUserIdToMatomo() {
+    func syncVisitorAndUserIdToMatomo() {
         if let globalVisitorID = storage.visitorID {
             let localVisitorID: String? = tracker.forcedVisitorId
             if localVisitorID != globalVisitorID {

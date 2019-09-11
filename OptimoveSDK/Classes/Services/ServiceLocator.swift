@@ -20,19 +20,6 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _notificationListener: OptimoveNotificationHandler = {
-        return OptimoveNotificationHandler(
-            storage: storage(),
-            coreEventFactory: CoreEventFactoryImpl(
-                storage: storage(),
-                dateTimeProvider: dateTimeProvider()
-            ),
-            handlersPool: handlersPool(),
-            deeplinkService: deeplinkService()
-        )
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
     private lazy var _storage: StorageFacade = {
         do {
             let bundleIdentifier = try Bundle.getApplicationNameSpace()
@@ -81,10 +68,8 @@ final class ServiceLocator {
         return _deviceStateMonitor
     }
 
-    func notificationListener(coreEventFactory: CoreEventFactory) -> OptimoveNotificationHandling {
+    func notificationListener() -> OptimoveNotificationHandling {
         return OptimoveNotificationHandler(
-            storage: storage(),
-            coreEventFactory: coreEventFactory,
             handlersPool: handlersPool(),
             deeplinkService: deeplinkService()
         )
@@ -149,7 +134,7 @@ final class ServiceLocator {
         return DeviceStateObserver(
             observers: [
                 ResignActiveObserver(
-                    handlers: handlersPool()
+                    subscriber: handlersPool()
                 ),
                 OptInOutObserver(
                     handlers: handlersPool(),

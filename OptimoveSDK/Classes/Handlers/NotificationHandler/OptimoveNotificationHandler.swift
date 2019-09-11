@@ -8,18 +8,11 @@ import FirebaseMessaging
 
 final class OptimoveNotificationHandler {
 
-    private let storage: OptimoveStorage
-    private let coreEventFactory: CoreEventFactory
     private let handlersPool: HandlersPool
     private let deeplinkService: DeeplinkService
 
-    required init(
-        storage: OptimoveStorage,
-        coreEventFactory: CoreEventFactory,
-        handlersPool: HandlersPool,
-        deeplinkService: DeeplinkService) {
-        self.storage = storage
-        self.coreEventFactory = coreEventFactory
+    init(handlersPool: HandlersPool,
+         deeplinkService: DeeplinkService) {
         self.handlersPool = handlersPool
         self.deeplinkService = deeplinkService
     }
@@ -27,89 +20,6 @@ final class OptimoveNotificationHandler {
 
 // MARK: - Private Methods
 private extension OptimoveNotificationHandler {
-
-    func handleSdkCommand(
-        command: OptimoveSdkCommand,
-        completionHandler: @escaping (UIBackgroundFetchResult) -> Void
-    ) {
-        switch command {
-        case let .common(common):
-            handleCommonCommand(common, completion: completionHandler)
-        case let .parameterized(parameter):
-            handleParametrizedCommand(parameter, completion: completionHandler)
-        }
-    }
-
-    func handleCommonCommand(
-        _ common: (OptimoveSdkCommand.Common),
-        completion: @escaping (UIBackgroundFetchResult) -> Void
-    ) {
-        switch common {
-        case .reregister:
-            Logger.debug("Request to reregister.")
-            let bgtask = UIApplication.shared.beginBackgroundTask(withName: "reregister")
-            do {
-                try handlersPool.pushableHandler.handle(PushableOperationContext(.performRegistration))
-            } catch {
-                Logger.error(error.localizedDescription)
-            }
-            let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 2.0)
-            DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
-                completion(.newData)
-                UIApplication.shared.endBackgroundTask(bgtask)
-            }
-
-        case .ping:
-            Logger.debug("Request to ping.")
-            do {
-                let event = try coreEventFactory.createEvent(.ping)
-                try handlersPool.eventableHandler.handle(EventableOperationContext(.report(event: event)))
-                let bgtask = UIApplication.shared.beginBackgroundTask(withName: "ping")
-                do {
-                    try handlersPool.eventableHandler.handle(EventableOperationContext(.dispatchNow))
-                } catch {
-                    Logger.error(error.localizedDescription)
-                }
-                let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 3.0)
-                DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
-                    completion(.newData)
-                    UIApplication.shared.endBackgroundTask(bgtask)
-                }
-            } catch {
-                Logger.error(error.localizedDescription)
-            }
-        }
-    }
-
-    func handleParametrizedCommand(
-        _ parameter: OptimoveSdkCommand.Parameterized,
-        completion: @escaping (UIBackgroundFetchResult) -> Void
-    ) {
-        switch parameter {
-        case let .newNotificationCategory(newCategory):
-            let actions = newCategory.actions.map { action in
-                return UNNotificationAction(
-                    identifier: action.identifier,
-                    title: action.title
-                )
-            }
-            let category = UNNotificationCategory(
-                identifier: newCategory.categoryIdentifier,
-                actions: actions,
-                intentIdentifiers: [],
-                options: [.customDismissAction]
-            )
-            let notificationCenter = UNUserNotificationCenter.current()
-            notificationCenter.setNotificationCategories([category])
-            notificationCenter.getNotificationCategories { (categories) in
-                categories.forEach({ (categoty) in
-                    Logger.debug("Category registred: \(categoty.identifier)")
-                })
-                Logger.debug("User actions successfully added.")
-                completion(.newData)
-            }
-        }
-    }
 
     func reportNotification(response: UNNotificationResponse) {
         Logger.info("User react '\(response.actionIdentifier)' to a notification.")
@@ -119,7 +29,6 @@ private extension OptimoveNotificationHandler {
             switch response.actionIdentifier {
             case UNNotificationDefaultActionIdentifier:
                 try handlersPool.eventableHandler.handle(EventableOperationContext(.report(event: event)))
-                try handlersPool.eventableHandler.handle(EventableOperationContext(.dispatchNow))
                 let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 2.0)
                 DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
                     UIApplication.shared.endBackgroundTask(task)
@@ -176,7 +85,7 @@ private extension OptimoveNotificationHandler {
 extension OptimoveNotificationHandler: OptimoveNotificationHandling {
 
     func isOptimoveSdkCommand(userInfo: [AnyHashable: Any]) -> Bool {
-        return userInfo[OptimoveKeys.Notification.isOptimoveSdkCommand.rawValue] as? String == "true"
+        return false
     }
 
     func isOptipush(notification: UNNotification) -> Bool {
@@ -187,15 +96,10 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
         userInfo: [AnyHashable: Any],
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
     ) {
-        do {
-            let data = try JSONSerialization.data(withJSONObject: userInfo)
-            let decoder = JSONDecoder()
-            let command = try decoder.decode(OptimoveSdkCommand.self, from: data)
-            self.handleSdkCommand(command: command, completionHandler: didComplete)
-        } catch {
-            Logger.error("Could not parse SDK command. Reason: \(error.localizedDescription)")
-            didComplete(.newData)
-        }
+        #warning("Delete log")
+        os_log("didReceiveRemoteNotification")
+        Messaging.messaging().appDidReceiveMessage(userInfo)
+        didComplete(.noData)
     }
 
     func willPresent(

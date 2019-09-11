@@ -63,9 +63,7 @@ extension Optimove {
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
         ) -> Bool {
         Logger.info("Receive a remote notification.")
-        let notificationListener = serviceLocator.notificationListener(
-            coreEventFactory: factory.coreEventFactory()
-        )
+        let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptimoveSdkCommand(userInfo: userInfo)
         if result {
             queue.async {
@@ -92,9 +90,7 @@ extension Optimove {
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
         ) -> Bool {
         Logger.info("Received a notification in foreground mode.")
-        let notificationListener = serviceLocator.notificationListener(
-            coreEventFactory: factory.coreEventFactory()
-        )
+        let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: notification)
         if result {
             notificationListener.willPresent(notification: notification, withCompletionHandler: completionHandler)
@@ -113,9 +109,7 @@ extension Optimove {
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
         Logger.info("User produce a response for a notificaiton.")
-        let notificationListener = serviceLocator.notificationListener(
-            coreEventFactory: factory.coreEventFactory()
-        )
+        let notificationListener = serviceLocator.notificationListener()
         let result = notificationListener.isOptipush(notification: response.notification)
         if result {
             queue.async {
