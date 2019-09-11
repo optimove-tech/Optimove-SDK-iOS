@@ -71,10 +71,18 @@ extension FirebaseInteractor: OptipushServiceInfra {
         setupAppController(appController)
         setupSdkController(clientServiceOptions)
 
-        Messaging.messaging().delegate = self
-
         if let token = Messaging.messaging().fcmToken {
             registerIfTokenChanged(updatedFcmToken: token)
+        } else {
+            NotificationCenter.default.addObserver(
+                forName: NSNotification.Name.MessagingRegistrationTokenRefreshed,
+                object: nil,
+                queue: .main
+            ) { (_) in
+                if let token = Messaging.messaging().fcmToken {
+                    self.registerIfTokenChanged(updatedFcmToken: token)
+                }
+            }
         }
         Logger.debug("OptiPush: Setup Firebase finished.")
     }
@@ -159,15 +167,11 @@ extension FirebaseInteractor: OptipushServiceInfra {
 extension FirebaseInteractor: MessagingDelegate {
 
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-        registerIfTokenChanged(updatedFcmToken: fcmToken)
-        if let token = storage.apnsToken {
-            Messaging.messaging().apnsToken = token
-            storage.apnsToken = nil
-        }
+        // Don't use delegation to avoid conflict with a tenant setup.
     }
 
     func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
-
+        // Don't use delegation to avoid conflict with a tenant setup.
     }
 
 }
@@ -191,6 +195,14 @@ private extension FirebaseInteractor {
 
     func setupSdkController(_ clientServiceOptions: FirebaseOptions) {
         FirebaseApp.configure(name: "sdkController", options: clientServiceOptions)
+    }
+
+    func onTokenRenew(token: String) {
+        registerIfTokenChanged(updatedFcmToken: token)
+        if let token = storage.apnsToken {
+            Messaging.messaging().apnsToken = token
+            storage.apnsToken = nil
+        }
     }
 
     func registerIfTokenChanged(updatedFcmToken: String) {
@@ -218,6 +230,7 @@ private extension FirebaseInteractor {
             }
         }
     }
+
 
     func getMongoTypeBundleId() -> String {
         return Bundle.main.bundleIdentifier?.setAsMongoKey() ?? ""
