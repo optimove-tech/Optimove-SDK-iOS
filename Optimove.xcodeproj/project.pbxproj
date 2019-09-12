@@ -98,6 +98,14 @@
 		46103354232A5AA600452422 /* OptInOutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46103351232A511400452422 /* OptInOutObserverTests.swift */; };
 		46103355232A6E7700452422 /* OnStartEventGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4610334D232A3FEA00452422 /* OnStartEventGeneratorTests.swift */; };
 		46103357232A8EA400452422 /* MockNotificationPermissionFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46103356232A8EA400452422 /* MockNotificationPermissionFetcher.swift */; };
+		4610335A232A909800452422 /* NewEmailHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46103359232A909800452422 /* NewEmailHandlerTests.swift */; };
+		4610335D232A918500452422 /* VisitorIDPreprocessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4610335C232A918500452422 /* VisitorIDPreprocessorTests.swift */; };
+		46103360232A92A900452422 /* EnterForegroundObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4610335F232A92A900452422 /* EnterForegroundObserverTests.swift */; };
+		46103362232A98A200452422 /* KVOExpectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46103361232A98A200452422 /* KVOExpectation.swift */; };
+		46103365232A994A00452422 /* UserIDValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46103364232A994A00452422 /* UserIDValidatorTests.swift */; };
+		46103367232A9B2B00452422 /* TriggeredNotificationOpenedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46103366232A9B2B00452422 /* TriggeredNotificationOpenedTests.swift */; };
+		46103369232A9FB900452422 /* NewTenantInfoHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46103368232A9FB900452422 /* NewTenantInfoHandlerTests.swift */; };
+		4610336B232AA2B300452422 /* NewUserIDHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4610336A232AA2B300452422 /* NewUserIDHandlerTests.swift */; };
 		4645B0F456ECFA252FF0106B /* OptimoveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36431D53BDFBA478421BFF57 /* OptimoveError.swift */; };
 		469CA9B3232963C300E5858A /* AppOpenOnStartGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CA9B2232963C300E5858A /* AppOpenOnStartGenerator.swift */; };
 		46AECE8EC60CCDC39F64E019 /* NewEmailHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F005265A246C548A772A2A10 /* NewEmailHandler.swift */; };
@@ -475,6 +483,14 @@
 		4610334F232A401000452422 /* MockSynchronizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSynchronizer.swift; sourceTree = "<group>"; };
 		46103351232A511400452422 /* OptInOutObserverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptInOutObserverTests.swift; sourceTree = "<group>"; };
 		46103356232A8EA400452422 /* MockNotificationPermissionFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNotificationPermissionFetcher.swift; sourceTree = "<group>"; };
+		46103359232A909800452422 /* NewEmailHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEmailHandlerTests.swift; sourceTree = "<group>"; };
+		4610335C232A918500452422 /* VisitorIDPreprocessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitorIDPreprocessorTests.swift; sourceTree = "<group>"; };
+		4610335F232A92A900452422 /* EnterForegroundObserverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterForegroundObserverTests.swift; sourceTree = "<group>"; };
+		46103361232A98A200452422 /* KVOExpectation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KVOExpectation.swift; sourceTree = "<group>"; };
+		46103364232A994A00452422 /* UserIDValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserIDValidatorTests.swift; sourceTree = "<group>"; };
+		46103366232A9B2B00452422 /* TriggeredNotificationOpenedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggeredNotificationOpenedTests.swift; sourceTree = "<group>"; };
+		46103368232A9FB900452422 /* NewTenantInfoHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTenantInfoHandlerTests.swift; sourceTree = "<group>"; };
+		4610336A232AA2B300452422 /* NewUserIDHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewUserIDHandlerTests.swift; sourceTree = "<group>"; };
 		466D1FECB424AC5355B96F95 /* ConfigurationBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationBuilder.swift; sourceTree = "<group>"; };
 		469CA9B2232963C300E5858A /* AppOpenOnStartGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenOnStartGenerator.swift; sourceTree = "<group>"; };
 		46A0BE7F5E33EDAA7CC5CC4E /* NetworkRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequest.swift; sourceTree = "<group>"; };
@@ -859,6 +875,7 @@
 				799B1ECA74F09CE9EFDCC893 /* SetUserAgentEventTests.swift */,
 				B90E69482E5CEF73C23265A7 /* SetUserEmailEventTests.swift */,
 				7709EE79BECC8179B83190A3 /* SetUserIdEventTests.swift */,
+				46103366232A9B2B00452422 /* TriggeredNotificationOpenedTests.swift */,
 			);
 			path = CoreEvents;
 			sourceTree = "<group>";
@@ -1149,8 +1166,35 @@
 		46103358232A905E00452422 /* Handlers */ = {
 			isa = PBXGroup;
 			children = (
+				46103359232A909800452422 /* NewEmailHandlerTests.swift */,
+				46103368232A9FB900452422 /* NewTenantInfoHandlerTests.swift */,
+				4610336A232AA2B300452422 /* NewUserIDHandlerTests.swift */,
 			);
 			path = Handlers;
+			sourceTree = "<group>";
+		};
+		4610335B232A917600452422 /* Preprocessor */ = {
+			isa = PBXGroup;
+			children = (
+				4610335C232A918500452422 /* VisitorIDPreprocessorTests.swift */,
+			);
+			path = Preprocessor;
+			sourceTree = "<group>";
+		};
+		4610335E232A929D00452422 /* Observers */ = {
+			isa = PBXGroup;
+			children = (
+				4610335F232A92A900452422 /* EnterForegroundObserverTests.swift */,
+			);
+			path = Observers;
+			sourceTree = "<group>";
+		};
+		46103363232A993200452422 /* Validator */ = {
+			isa = PBXGroup;
+			children = (
+				46103364232A994A00452422 /* UserIDValidatorTests.swift */,
+			);
+			path = Validator;
 			sourceTree = "<group>";
 		};
 		4C46E5E7FF3426E1DE9E9405 /* Extensions */ = {
@@ -1580,6 +1624,9 @@
 		B31CC3B308E42CCE7765FA3B /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				46103363232A993200452422 /* Validator */,
+				4610335E232A929D00452422 /* Observers */,
+				4610335B232A917600452422 /* Preprocessor */,
 				46103358232A905E00452422 /* Handlers */,
 				D0E47D0A199ACC4968A9683B /* OptimoveTestCase.swift */,
 				1ABA1417B2D66EECF3AD47FA /* Components */,
@@ -1591,6 +1638,7 @@
 				FC3095C5C64830371BF0A4DE /* Operations */,
 				4610334D232A3FEA00452422 /* OnStartEventGeneratorTests.swift */,
 				46103351232A511400452422 /* OptInOutObserverTests.swift */,
+				46103361232A98A200452422 /* KVOExpectation.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -2082,7 +2130,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4610335D232A918500452422 /* VisitorIDPreprocessorTests.swift in Sources */,
 				46103355232A6E7700452422 /* OnStartEventGeneratorTests.swift in Sources */,
+				46103365232A994A00452422 /* UserIDValidatorTests.swift in Sources */,
 				2D5CC37EBB1EFCC1DAB9C396 /* AppOpenEventTests.swift in Sources */,
 				24AB2C2FB4F38FB0FFA4F61F /* ConfigurationFixture.swift in Sources */,
 				B0B632040ED242B1CFAB93E2 /* CoreEventFactoryTests.swift in Sources */,
@@ -2095,6 +2145,8 @@
 				D9E82D512D6810F3203A98D4 /* MergeRemoteConfigurationOperationTests.swift in Sources */,
 				19FAAD1B5B8F3A83CCE1681A /* MockConfigurationRepository.swift in Sources */,
 				1EC0331B7F3631CAFF5B4BE7 /* MockDateTimeProvider.swift in Sources */,
+				46103367232A9B2B00452422 /* TriggeredNotificationOpenedTests.swift in Sources */,
+				4610336B232AA2B300452422 /* NewUserIDHandlerTests.swift in Sources */,
 				A6D704D18C74065D0101020A /* MockOptimoveStorage.swift in Sources */,
 				A0F04EF654F238AD6B9E210B /* MockRealTimeHanlder.swift in Sources */,
 				A9A4D5458D0EABD85596985C /* MockRealTimeNetworking.swift in Sources */,
@@ -2106,11 +2158,14 @@
 				96C277514F2D6A69BC694013 /* OptimoveTestCase.swift in Sources */,
 				C583A32CD2FF19094977AE40 /* OptipushOptInEventTests.swift in Sources */,
 				8286C87E53134DC1A18286A1 /* OptipushOptOutEventTests.swift in Sources */,
+				46103369232A9FB900452422 /* NewTenantInfoHandlerTests.swift in Sources */,
+				4610335A232A909800452422 /* NewEmailHandlerTests.swift in Sources */,
 				34F891B25C0607047E535D8D /* PageVisitEventTests.swift in Sources */,
 				DC321205BCD114E279667537 /* PingEventTests.swift in Sources */,
 				0A8C0C45C4CCEA94902DC9FA /* RealTimeComponentTests.swift in Sources */,
 				7C0D0BBDC240FA93F9CCA122 /* RealTimeNetworkingTests.swift in Sources */,
 				B624E386E0AEFCCA5F31F95B /* RealTimeRequestBuilderTests.swift in Sources */,
+				46103360232A92A900452422 /* EnterForegroundObserverTests.swift in Sources */,
 				144B035082BBFA8505473A40 /* RealtimeEventTests.swift in Sources */,
 				009575694F6C4F5E857EDAAA /* RegistartionMbaasModelTests.swift in Sources */,
 				5D5E6AEF8411592FBBDBE0B9 /* RegistrarNetworkingRequestBuilderTests.swift in Sources */,
@@ -2128,6 +2183,7 @@
 				6AE6747FCF19E211146D3E1C /* StubEvent.swift in Sources */,
 				370BDBC6F608BEE16E9B7439 /* StubVariables.swift in Sources */,
 				9CF7237135A4CC033D355E3F /* TenantConfigFixture.swift in Sources */,
+				46103362232A98A200452422 /* KVOExpectation.swift in Sources */,
 				A5B65BA10A3B356CAACADB8D /* TenantConfigurationDownloaderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
