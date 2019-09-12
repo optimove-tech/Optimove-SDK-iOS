@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		009575694F6C4F5E857EDAAA /* RegistartionMbaasModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B3F489ED285497C224F9600 /* RegistartionMbaasModelTests.swift */; };
 		03A0EF2C5FC5685AD5CA7954 /* ScreenVisitPreprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 767781DC1F87A977CBB04979 /* ScreenVisitPreprocessor.swift */; };
-		03AA6CEEB213F1D134143905 /* DeeplinkExtracter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D782B144CB9906A555B0DB7 /* DeeplinkExtracter.swift */; };
 		04B351D1EFFA33FBD8A9D3CB /* GlobalConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF221484A7B1A433DB7FAD1 /* GlobalConfigTests.swift */; };
 		0697957F7C6A9A94C723E8B3 /* RemoteConfigurationRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF7F8DB2BB53F5D18E6845C /* RemoteConfigurationRequestBuilder.swift */; };
 		06F4CB3912239AD7928756DC /* MbaasModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A7AC20B0DFA891146DFB42 /* MbaasModelTests.swift */; };
@@ -106,6 +105,8 @@
 		46103367232A9B2B00452422 /* TriggeredNotificationOpenedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46103366232A9B2B00452422 /* TriggeredNotificationOpenedTests.swift */; };
 		46103369232A9FB900452422 /* NewTenantInfoHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46103368232A9FB900452422 /* NewTenantInfoHandlerTests.swift */; };
 		4610336B232AA2B300452422 /* NewUserIDHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4610336A232AA2B300452422 /* NewUserIDHandlerTests.swift */; };
+		4610336C232AA5B800452422 /* DeeplinkExtracter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D782B144CB9906A555B0DB7 /* DeeplinkExtracter.swift */; };
+		4610336D232AA5B800452422 /* DynamicLinkParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3982C9F780FFCB023945EB79 /* DynamicLinkParser.swift */; };
 		4645B0F456ECFA252FF0106B /* OptimoveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36431D53BDFBA478421BFF57 /* OptimoveError.swift */; };
 		469CA9B3232963C300E5858A /* AppOpenOnStartGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CA9B2232963C300E5858A /* AppOpenOnStartGenerator.swift */; };
 		46AECE8EC60CCDC39F64E019 /* NewEmailHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F005265A246C548A772A2A10 /* NewEmailHandler.swift */; };
@@ -310,7 +311,6 @@
 		F57FB9CD58CF90DA4996EC92 /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBEE1C8B9EEE059A2D664AD /* RingBuffer.swift */; };
 		F60FADD518179820AA5BA325 /* CommonOptimoveEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC3C9200D601E704FB6F1E0 /* CommonOptimoveEvent.swift */; };
 		F6B190F646F11100B211E288 /* CoreEventFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A2928DDD25C92FD262C764 /* CoreEventFactory.swift */; };
-		F754C503632FBF0EEEEF84A6 /* DynamicLinkParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3982C9F780FFCB023945EB79 /* DynamicLinkParser.swift */; };
 		F7EF35FFE31E8D1B8C459E7F /* SDKDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69486A8AAA97D56729890ECD /* SDKDevice.swift */; };
 		FBF7FCEDC3C74BAF5E02523E /* Registrar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC58D10186CBFF34CA5BDDAC /* Registrar.swift */; };
 		FC65BAEE1F3EBED5DDE10733 /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDCF4300A6E6BD15C06B263 /* Tracker.swift */; };
@@ -1227,6 +1227,7 @@
 				F4346A1B2C197D938EAC1C49 /* MediaAttachmentDownloader.swift */,
 				778592CA2BE82D19B84F3947 /* NotificationDeliveryReporter.swift */,
 				B813E529E5CE0239F5E5A625 /* OptitrackNSE.swift */,
+				06C4FC2EB2591E8857E28E32 /* DeeplinkExtracter */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -1596,7 +1597,6 @@
 			children = (
 				7B50D3570A77AB652EA2AEB3 /* OptiPush.swift */,
 				D72DAA2BD3F82CA33BF9ED86 /* OptiPushServiceLocator.swift */,
-				06C4FC2EB2591E8857E28E32 /* DeeplinkExtracter */,
 				1EE8A30B414406B6F4C4051B /* Firebase */,
 				44D1EE90BDE2F4FE5ADA1249 /* Registrar */,
 			);
@@ -2203,12 +2203,10 @@
 				1EED990118B83387D01ED397 /* ConfigurationFetcher.swift in Sources */,
 				F6B190F646F11100B211E288 /* CoreEventFactory.swift in Sources */,
 				209F124E823FA7267B24BFF5 /* DateTimeProvider.swift in Sources */,
-				03AA6CEEB213F1D134143905 /* DeeplinkExtracter.swift in Sources */,
 				498CFF8767E01101FA0176E5 /* DeeplinkService.swift in Sources */,
 				141989F488306453C53C7D7D /* DeprecatedStateListener.swift in Sources */,
 				E20FDBD133FF07932E1A5507 /* DeviceStateObserver.swift in Sources */,
 				084300991314506F27733F1B /* Dictionary+CompactMapKeys.swift in Sources */,
-				F754C503632FBF0EEEEF84A6 /* DynamicLinkParser.swift in Sources */,
 				DE457BEB9AAE8BE5BE295D88 /* EmailValidator.swift in Sources */,
 				4610334C232A37D200452422 /* Syncronizer.swift in Sources */,
 				DEC8EDCCC88631BF09AA531F /* EnterForegroundObserver.swift in Sources */,
@@ -2347,6 +2345,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4610336D232AA5B800452422 /* DynamicLinkParser.swift in Sources */,
 				EBECFEFF63099C8CEF2BBB2F /* Bundle.swift in Sources */,
 				20C8B6D967AFFF4F5504C3DC /* DateFormatter.swift in Sources */,
 				22C83F1ADA7DCE37831037BE /* Global.swift in Sources */,
@@ -2358,6 +2357,7 @@
 				798F57B984E0AF265190A5CA /* ProcessInfo.swift in Sources */,
 				214A09E708B92424469FEC8E /* ScheduledNotificationDelivered.swift in Sources */,
 				85BE5B02AC11DB079A2B9A17 /* String.swift in Sources */,
+				4610336C232AA5B800452422 /* DeeplinkExtracter.swift in Sources */,
 				BCFDFF22AC278181D47FE86B /* TriggeredNotificationRecieved.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
