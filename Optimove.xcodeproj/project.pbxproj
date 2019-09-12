@@ -498,7 +498,7 @@
 		63BEAB0D43B18837A6C1E571 /* Locale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locale.swift; sourceTree = "<group>"; };
 		63BEFDC2A507732039C5F009 /* MockRealTimeHanlder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRealTimeHanlder.swift; sourceTree = "<group>"; };
 		63C7EC2263685823B37EC99A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
-		64AAD2B0BFFF64DCB3907ECE /* OptimoveCore-Unit.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "OptimoveCore-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		64AAD2B0BFFF64DCB3907ECE /* OptimoveCore-Unit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OptimoveCore-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6561EF78FCF4E3FA2DFA675E /* NetworkResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkResponse.swift; sourceTree = "<group>"; };
 		65CE5453334832B2F87641CB /* GlobalConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConfig.swift; sourceTree = "<group>"; };
 		66C7E1BD5435FBCB27E96FEF /* UserDefaults+Optimove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Optimove.swift"; sourceTree = "<group>"; };
@@ -2580,6 +2580,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2594,6 +2595,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

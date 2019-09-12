@@ -11,7 +11,7 @@ class NetworkClientTests: XCTestCase {
         Mocker.register(
             Mock(
                 url: StubVariables.url,
-                contentType: .json,
+                dataType: .json,
                 statusCode: 200,
                 data: [.get: Data()]
             )
@@ -46,7 +46,7 @@ class NetworkClientTests: XCTestCase {
         Mocker.register(
             Mock(
                 url: StubVariables.url,
-                contentType: .json,
+                dataType: .json,
                 statusCode: 200,
                 data: [.post: Data()]
             )
