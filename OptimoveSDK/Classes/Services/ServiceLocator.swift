@@ -8,13 +8,6 @@ final class ServiceLocator {
     // MARK: - Singletons
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _deviceStateMonitor: OptimoveDeviceStateMonitor = {
-        return OptimoveDeviceStateMonitorImpl(
-            fetcherFactory: DeviceRequirementFetcherFactoryImpl()
-        )
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
     private lazy var _deeplinkService: DeeplinkService = {
         return DeeplinkService()
     }()
@@ -62,10 +55,6 @@ final class ServiceLocator {
 
     func networking() -> NetworkClient {
         return NetworkClientImpl(configuration: .default)
-    }
-
-    func deviceStateMonitor() -> OptimoveDeviceStateMonitor {
-        return _deviceStateMonitor
     }
 
     func notificationListener() -> OptimoveNotificationHandling {
@@ -138,7 +127,7 @@ final class ServiceLocator {
                 ),
                 OptInOutObserver(
                     synchronizer: synchronizer(),
-                    deviceStateMonitor: deviceStateMonitor(),
+                    notificationPermissionFetcher: NotificationPermissionFetcherImpl(),
                     coreEventFactory: coreEventFactory,
                     storage: storage()
                 ),

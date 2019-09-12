@@ -2,6 +2,10 @@
 
 import Foundation
 
+public enum OptimoveDeviceRequirement: Int, CaseIterable {
+    case userNotification = 2
+}
+
 struct OptimoveSuccessStateListenerWrapper {
     weak var observer: OptimoveSuccessStateListener?
 }

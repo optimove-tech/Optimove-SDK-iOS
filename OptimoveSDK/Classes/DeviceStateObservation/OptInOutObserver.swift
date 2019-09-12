@@ -3,38 +3,44 @@
 import Foundation
 import OptimoveCore
 
-final class OptInOutObserver: DeviceStateObservable {
+final class OptInOutObserver {
 
     private let synchronizer: Synchronizer
-    private let deviceStateMonitor: OptimoveDeviceStateMonitor
+    private let notificationPermissionFetcher: NotificationPermissionFetcher
     private let coreEventFactory: CoreEventFactory
     private var storage: OptimoveStorage
 
     init(synchronizer: Synchronizer,
-         deviceStateMonitor: OptimoveDeviceStateMonitor,
+         notificationPermissionFetcher: NotificationPermissionFetcher,
          coreEventFactory: CoreEventFactory,
          storage: OptimoveStorage) {
         self.synchronizer = synchronizer
-        self.deviceStateMonitor = deviceStateMonitor
+        self.notificationPermissionFetcher = notificationPermissionFetcher
         self.coreEventFactory = coreEventFactory
         self.storage = storage
     }
 
+}
+
+extension OptInOutObserver: DeviceStateObservable {
+
     func observe() {
-        deviceStateMonitor.getStatus(for: .userNotification) { (granted) in
+        notificationPermissionFetcher.fetch { (permitted) in
             tryCatch {
-                try self.executeReportOptInOut(notificationsPermissionsGranted: granted)
+                try self.executeReportOptInOut(notificationsPermissionsGranted: permitted)
             }
         }
     }
 
+}
+
+private extension OptInOutObserver {
+
     // MARK: Eventable logic
 
-    private func executeReportOptInOut(notificationsPermissionsGranted: Bool) throws {
-        guard isOptStateChanged(with: notificationsPermissionsGranted) else {
-            // An OptIn/OptOut state was not changed.
-            return
-        }
+    func executeReportOptInOut(notificationsPermissionsGranted: Bool) throws {
+        // Check if an OptIn/OptOut state was changed. If not do nothing.
+        guard isOptStateChanged(with: notificationsPermissionsGranted) else { return }
         if notificationsPermissionsGranted {
             synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptIn)))
             storage.isOptiTrackOptIn = true
@@ -50,7 +56,7 @@ final class OptInOutObserver: DeviceStateObservable {
         }
     }
 
-    private func isOptStateChanged(with newState: Bool) -> Bool {
+    func isOptStateChanged(with newState: Bool) -> Bool {
         let isOptiTrackOptIn: Bool = storage.isOptiTrackOptIn
         return newState != isOptiTrackOptIn
     }
@@ -72,7 +78,6 @@ final class OptInOutObserver: DeviceStateObservable {
 
     func handleNotificationRejection() {
         Logger.warn("OptiPush: User UNauthorized notifications.")
-
         guard let isOptIn = storage.isMbaasOptIn else {
             //Opt out on first launch
             handleNotificationRejectionAtFirstLaunch()

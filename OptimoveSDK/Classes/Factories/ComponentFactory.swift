@@ -39,7 +39,6 @@ final class ComponentFactory {
     func createOptipushComponent(configuration: Configuration) -> OptiPush {
         return OptiPush(
             configuration: configuration.optipush,
-            deviceStateMonitor: serviceLocator.deviceStateMonitor(),
             infrastructure: FirebaseInteractor(
                 storage: serviceLocator.storage(),
                 networking: FirebaseInteractorNetworkingImpl(
@@ -60,7 +59,6 @@ final class ComponentFactory {
     func createOptitrackComponent(configuration: Configuration) -> OptiTrack {
         return OptiTrack(
             configuration: configuration.optitrack,
-            deviceStateMonitor: serviceLocator.deviceStateMonitor(),
             storage: serviceLocator.storage(),
             coreEventFactory: coreEventFactory,
             trackerFlagsBuilder: TrackerFlagsBuilder(

@@ -1,7 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import XCTest
-import OptimoveCore
 @testable import OptimoveSDK
 
 final class OnStartEventGeneratorTests: XCTestCase {
@@ -68,85 +67,6 @@ final class OnStartEventGeneratorTests: XCTestCase {
             timeout: 5
         )
     }
-
-    //    func test_reportOptInOutIfNeeded_optIn() {
-    //        // given
-    //        storage.isOptiTrackOptIn = false
-    //
-    //        // then
-    //        let trackEventExpectation = expectation(description: "OptIn events haven't been generated.")
-    //        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-    //            XCTAssert(event.action == OptimoveKeys.Configuration.optipushOptIn.rawValue,
-    //                      "Expect \(OptimoveKeys.Configuration.optipushOptIn.rawValue). Actual \(event.action)")
-    //            trackEventExpectation.fulfill()
-    //        }
-    //
-    //        let flagExpectation = expectation(description: "OptIn flag haven't been changed.")
-    //        storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-    //            if key == .isOptiTrackOptIn {
-    //                XCTAssert(value as? Bool == true,
-    //                          "Expect true. Actual \(String(describing: value as? Bool))")
-    //                flagExpectation.fulfill()
-    //            }
-    //        }
-    //
-    //        // when
-    //        optitrack.reportOptInOutIfNeeded()
-    //        wait(for: [trackEventExpectation, flagExpectation], timeout: defaultTimeout)
-    //    }
-
-    //    func test_reportOptInOutIfNeeded_optOut() {
-    //        // given
-    //        storage.isOptiTrackOptIn = true
-    //        deviceStateMonitor.state  = [
-    //            .userNotification: false
-    //        ]
-    //
-    //        // then
-    //        let trackEventExpectation = expectation(description: "OptIn events haven't been generated.")
-    //        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-    //            let expected = OptimoveKeys.Configuration.optipushOptOut.rawValue
-    //            XCTAssert(event.action == expected,
-    //                      "Expect \(expected). Actual \(event.action)")
-    //            trackEventExpectation.fulfill()
-    //        }
-    //
-    //        let flagExpectation = expectation(description: "OptIn flag haven't been changed.")
-    //        storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-    //            if key == .isOptiTrackOptIn {
-    //                let expected = false
-    //                XCTAssert(value as? Bool == expected,
-    //                          "Expect \(String(expected)). Actual \(String(describing: value as? Bool))")
-    //                flagExpectation.fulfill()
-    //            }
-    //        }
-    //
-    //        // when
-    //        optitrack.reportOptInOutIfNeeded()
-    //        wait(for: [trackEventExpectation, flagExpectation], timeout: defaultTimeout)
-    //    }
-
-    //    func test_reportOptInOutIfNeeded_noNeed() {
-    //        // given
-    //        storage.isOptiTrackOptIn = true
-    //
-    //        // then
-    //        let trackEventExpectation = expectation(description: "OptIn events have been generated but should not")
-    //        trackEventExpectation.isInverted = true
-    //        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-    //            trackEventExpectation.fulfill()
-    //        }
-    //
-    //        let flagExpectation = expectation(description: "OptIn flag have been changed but should not")
-    //        flagExpectation.isInverted = true
-    //        storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-    //            flagExpectation.fulfill()
-    //        }
-    //
-    //        // when
-    //        optitrack.reportOptInOutIfNeeded()
-    //        wait(for: [trackEventExpectation, flagExpectation], timeout: defaultTimeout)
-    //    }
 
     //    func test_handleWillEnterForegroundNotification() {
     //        // given

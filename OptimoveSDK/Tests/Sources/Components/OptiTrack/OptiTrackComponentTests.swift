@@ -9,20 +9,17 @@ final class OptiTrackComponentTests: XCTestCase {
     var optitrack: OptiTrack!
     var tracker: MockTracker!
     var storage: MockOptimoveStorage!
-    var deviceStateMonitor: StubOptimoveDeviceStateMonitor!
     var dateProvider: MockDateTimeProvider!
     var statisticService: MockStatisticService!
 
     override func setUp() {
         storage = MockOptimoveStorage()
-        deviceStateMonitor = StubOptimoveDeviceStateMonitor()
         tracker = MockTracker()
         dateProvider = MockDateTimeProvider()
         statisticService = MockStatisticService()
 
         optitrack = OptiTrack(
             configuration: ConfigurationFixture.build().optitrack,
-            deviceStateMonitor: deviceStateMonitor,
             storage: storage,
             coreEventFactory: CoreEventFactoryImpl(
                 storage: storage,

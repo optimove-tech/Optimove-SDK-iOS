@@ -76,16 +76,23 @@ public protocol StorageValue {
     var userEmail: String? { get set }
     var apnsToken: Data? { get set }
     var siteID: Int? { get set }
+    /// Default value is `false`
     var isClientHasFirebase: Bool { get set }
     var isMbaasOptIn: Bool? { get set }
+    /// Default value is `true`
     var isUnregistrationSuccess: Bool { get set }
+    /// Default value is `true`
     var isRegistrationSuccess: Bool { get set }
+    /// Default value is `true`
     var isOptRequestSuccess: Bool { get set }
+    /// Default value is `false`
     var isFirstConversion: Bool { get set }
     var defaultFcmToken: String? { get set }
     var fcmToken: String? { get set }
+    /// Default value is `false`
     var isOptiTrackOptIn: Bool { get set }
     var firstVisitTimestamp: Int64? { get set }
+    /// Default value is `false`
     var isSetUserIdSucceed: Bool { get set }
     var realtimeLastSuccessfulSentUserID: String? { get set }
     var realtimeLastSuccessfulSentEmail: String? { get set }

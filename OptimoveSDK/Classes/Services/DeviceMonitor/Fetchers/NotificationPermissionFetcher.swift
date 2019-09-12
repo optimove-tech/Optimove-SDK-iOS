@@ -3,7 +3,11 @@
 import Foundation
 import UserNotifications
 
-final class NotificationPermissionFetcher: Fetchable {
+protocol NotificationPermissionFetcher {
+    func fetch(completion: @escaping ResultBlockWithBool)
+}
+
+final class NotificationPermissionFetcherImpl: NotificationPermissionFetcher {
 
     func fetch(completion: @escaping ResultBlockWithBool) {
         UNUserNotificationCenter.current().getNotificationSettings { (settings) in

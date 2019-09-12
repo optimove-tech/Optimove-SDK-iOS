@@ -27,10 +27,8 @@ final class OptiPush {
     private let registrar: Registrable
     private var storage: OptimoveStorage
     private let serviceLocator: OptiPushServiceLocator
-    private let deviceStateMonitor: OptimoveDeviceStateMonitor
 
     init(configuration: OptipushConfig,
-         deviceStateMonitor: OptimoveDeviceStateMonitor,
          infrastructure: OptipushServiceInfra,
          storage: OptimoveStorage,
          localServiceLocator: OptiPushServiceLocator) {
@@ -38,7 +36,6 @@ final class OptiPush {
         self.firebaseInteractor = infrastructure
         self.storage = storage
         self.serviceLocator = localServiceLocator
-        self.deviceStateMonitor = deviceStateMonitor
 
         registrar = serviceLocator.registrar(configuration: configuration)
         firebaseInteractor.setupFirebase(

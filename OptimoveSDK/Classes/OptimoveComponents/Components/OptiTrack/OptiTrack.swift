@@ -14,7 +14,6 @@ final class OptiTrack {
 
     required init(
         configuration: OptitrackConfig,
-        deviceStateMonitor: OptimoveDeviceStateMonitor,
         storage: OptimoveStorage,
         coreEventFactory: CoreEventFactory,
         trackerFlagsBuilder: TrackerFlagsBuilder,
