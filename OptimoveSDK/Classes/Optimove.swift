@@ -265,12 +265,6 @@ private extension Optimove {
             completion(.success(()))
             return
         }
-        let onStartEventGenerator = OnStartEventGenerator(
-            coreEventFactory: factory.coreEventFactory(),
-            synchronizer: synchronizer,
-            storage: storage
-        )
-        onStartEventGenerator.generate()
         RunningFlagsIndication.isInitializerRunning.toggle()
         let configurationFetcher = serviceLocator.configurationFetcher(operationFactory: factory.operationFactory())
         configurationFetcher.fetch { result in
@@ -290,6 +284,12 @@ private extension Optimove {
     //  MARK: Configuration
 
     func initialize(with configuration: Configuration) {
+        let onStartEventGenerator = OnStartEventGenerator(
+            coreEventFactory: factory.coreEventFactory(),
+            synchronizer: synchronizer,
+            storage: storage
+        )
+        onStartEventGenerator.generate()
         let initializer = serviceLocator.initializer(
             componentFactory: factory.componentFactory()
         )

@@ -123,23 +123,10 @@ private extension CoreEventFactoryImpl {
 
     func createSetAdvertisingIdEvent() throws -> SetAdvertisingIdEvent {
         return SetAdvertisingIdEvent(
-            advertisingId: ASIdentifierManager.shared().advertisingIdentifier.uuidString,
+            advertisingId: getAdvertisingIdentifier(),
             deviceId: deviceId,
             appNs: try getApplicationNamespace()
         )
-    }
-
-    func getAdvertisingIdentifier() -> String {
-        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
-            return ASIdentifierManager.shared().advertisingIdentifier.uuidString
-        }
-        if let storedAdvertisingIdentifier = storage.advertisingIdentifier {
-            return storedAdvertisingIdentifier
-        } else {
-            let newAdvertisingIdentifier =  UUID().uuidString
-            storage.advertisingIdentifier = newAdvertisingIdentifier
-            return newAdvertisingIdentifier
-        }
     }
 
     func createPageVisitEvent(screenPath: String, screenTitle: String, category: String?) -> PageVisitEvent {
@@ -182,6 +169,19 @@ private extension CoreEventFactoryImpl {
 
     func getSdkVersion() -> String {
         return SDKVersion
+    }
+
+    func getAdvertisingIdentifier() -> String {
+        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
+            return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+        }
+        if let storedAdvertisingIdentifier = storage.advertisingIdentifier {
+            return storedAdvertisingIdentifier
+        } else {
+            let newAdvertisingIdentifier =  UUID().uuidString
+            storage.advertisingIdentifier = newAdvertisingIdentifier
+            return newAdvertisingIdentifier
+        }
     }
 
 }

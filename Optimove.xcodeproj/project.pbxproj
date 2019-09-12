@@ -94,6 +94,9 @@
 		4496EC1F47CEAAC946302325 /* OptiPush.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B50D3570A77AB652EA2AEB3 /* OptiPush.swift */; };
 		457AA55EC487D7F8F709E700 /* MbaasBackupImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F44A37E4BF7BFDA9819295 /* MbaasBackupImpl.swift */; };
 		45E8890FB696618F19DE0E1C /* OptimoveSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F195D6A74F16DC039009B692 /* OptimoveSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4610334C232A37D200452422 /* Syncronizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4610334B232A37D200452422 /* Syncronizer.swift */; };
+		4610334E232A3FEA00452422 /* OnStartEventGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4610334D232A3FEA00452422 /* OnStartEventGeneratorTests.swift */; };
+		46103350232A401000452422 /* MockSynchronizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4610334F232A401000452422 /* MockSynchronizer.swift */; };
 		4645B0F456ECFA252FF0106B /* OptimoveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36431D53BDFBA478421BFF57 /* OptimoveError.swift */; };
 		469CA9B3232963C300E5858A /* AppOpenOnStartGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CA9B2232963C300E5858A /* AppOpenOnStartGenerator.swift */; };
 		46AECE8EC60CCDC39F64E019 /* NewEmailHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F005265A246C548A772A2A10 /* NewEmailHandler.swift */; };
@@ -474,6 +477,9 @@
 		44F0DCFD3F00AA505DC781F4 /* OptimoveFileManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveFileManagerTests.swift; sourceTree = "<group>"; };
 		44FF0834723551EEAD3787A5 /* MockTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTracker.swift; sourceTree = "<group>"; };
 		458897EAB1CC463D34F58C56 /* notificationWithTriggeredCampaign.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = notificationWithTriggeredCampaign.json; sourceTree = "<group>"; };
+		4610334B232A37D200452422 /* Syncronizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Syncronizer.swift; sourceTree = "<group>"; };
+		4610334D232A3FEA00452422 /* OnStartEventGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnStartEventGeneratorTests.swift; sourceTree = "<group>"; };
+		4610334F232A401000452422 /* MockSynchronizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSynchronizer.swift; sourceTree = "<group>"; };
 		466D1FECB424AC5355B96F95 /* ConfigurationBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationBuilder.swift; sourceTree = "<group>"; };
 		469CA9B2232963C300E5858A /* AppOpenOnStartGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenOnStartGenerator.swift; sourceTree = "<group>"; };
 		46A0BE7F5E33EDAA7CC5CC4E /* NetworkRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequest.swift; sourceTree = "<group>"; };
@@ -1425,6 +1431,7 @@
 				5129D986A979B83D49BF7B96 /* OptiPush */,
 				508B24DD21F5F6ECAF8C4ED2 /* OptiTrack */,
 				BD586E4DA8D25221D6FE1217 /* Realtime */,
+				4610334F232A401000452422 /* MockSynchronizer.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -1496,6 +1503,7 @@
 				31F7B2B3D3C7A1EF5879485D /* NewUserIDHandler.swift */,
 				2B663013BA5979DCA72CA32A /* ChainOfResponibilityHandlers */,
 				ED92313F6F66D4917D09CB71 /* NotificationHandler */,
+				4610334B232A37D200452422 /* Syncronizer.swift */,
 			);
 			path = Handlers;
 			sourceTree = "<group>";
@@ -1587,6 +1595,7 @@
 				EEB9E0C6101B3951E6943A2F /* Network */,
 				FC3095C5C64830371BF0A4DE /* Operations */,
 				C50C59F97415DF1DD2B77F6D /* Stubs */,
+				4610334D232A3FEA00452422 /* OnStartEventGeneratorTests.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -2125,6 +2134,7 @@
 				1F0A3376596C3A8290383CD0 /* RemoteConfigurationRequestBuilderTests.swift in Sources */,
 				7F6A202D4C9541D3DFE79119 /* SetAdvertisingIdEventTests.swift in Sources */,
 				419EFD0DCB8F3A6D4017D32B /* SetUserAgentEventTests.swift in Sources */,
+				46103350232A401000452422 /* MockSynchronizer.swift in Sources */,
 				54B57794ADCCA618D003408C /* SetUserEmailEventTests.swift in Sources */,
 				C071798869C6349DEC23D89B /* SetUserIdEventTests.swift in Sources */,
 				7718B45F3E6F2D43C6A5ED3F /* StringSplitByLenghtExtensionsTests.swift in Sources */,
@@ -2160,6 +2170,7 @@
 				084300991314506F27733F1B /* Dictionary+CompactMapKeys.swift in Sources */,
 				F754C503632FBF0EEEEF84A6 /* DynamicLinkParser.swift in Sources */,
 				DE457BEB9AAE8BE5BE295D88 /* EmailValidator.swift in Sources */,
+				4610334C232A37D200452422 /* Syncronizer.swift in Sources */,
 				DEC8EDCCC88631BF09AA531F /* EnterForegroundObserver.swift in Sources */,
 				469CA9B3232963C300E5858A /* AppOpenOnStartGenerator.swift in Sources */,
 				CECB5C5800DA1C8BFA2E18C1 /* Fetchable.swift in Sources */,
@@ -2281,6 +2292,7 @@
 				F366378361753D8AC34D9449 /* ConfigurationFixture.swift in Sources */,
 				626B1AF99FD89EB1053D308D /* FileAccessible.swift in Sources */,
 				A7B58760AD7154C5D5616A52 /* GlobalConfigFixture.swift in Sources */,
+				4610334E232A3FEA00452422 /* OnStartEventGeneratorTests.swift in Sources */,
 				04B351D1EFFA33FBD8A9D3CB /* GlobalConfigTests.swift in Sources */,
 				69B4B6E228E5E2309F8FA445 /* KeyValueStorageTests.swift in Sources */,
 				EAEE293A4A4E489DB7C9E6AC /* MockOptimoveStorage.swift in Sources */,

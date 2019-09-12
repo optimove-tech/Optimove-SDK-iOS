@@ -70,9 +70,7 @@ final class ServiceLocator {
 
     func notificationListener() -> OptimoveNotificationHandling {
         return OptimoveNotificationHandler(
-            synchronizer: Synchronizer(
-                handler: _handlersPool
-            ),
+            synchronizer: synchronizer(),
             deeplinkService: deeplinkService()
         )
     }
@@ -98,7 +96,7 @@ final class ServiceLocator {
     }
 
     func synchronizer() -> Synchronizer {
-        return Synchronizer(handler: _handlersPool)
+        return SynchronizerImpl(handler: _handlersPool)
     }
 
     func configurationFetcher(operationFactory: OperationFactory) -> ConfigurationFetcher {

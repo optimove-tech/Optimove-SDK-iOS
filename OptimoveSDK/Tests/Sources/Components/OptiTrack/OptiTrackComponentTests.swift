@@ -28,8 +28,6 @@ final class OptiTrackComponentTests: XCTestCase {
                 storage: storage,
                 dateTimeProvider: dateProvider
             ),
-            dateTimeProvider: dateProvider,
-            statisticService: statisticService,
             trackerFlagsBuilder: TrackerFlagsBuilder(
                 storage: storage
             ),
@@ -114,7 +112,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         storage.visitorID = visitorID
-        optitrack.injectVisitorAndUserIdToMatomo()
+        optitrack.syncVisitorAndUserIdToMatomo()
 
         // then
         XCTAssertEqual(tracker.forcedVisitorId, visitorID,
@@ -127,7 +125,7 @@ final class OptiTrackComponentTests: XCTestCase {
 
         // when
         storage.customerID = customerID
-        optitrack.injectVisitorAndUserIdToMatomo()
+        optitrack.syncVisitorAndUserIdToMatomo()
 
         // then
         XCTAssert(tracker.userId == customerID,
@@ -142,230 +140,11 @@ final class OptiTrackComponentTests: XCTestCase {
         // when
         storage.visitorID = visitorID
         storage.customerID = customerID
-        optitrack.injectVisitorAndUserIdToMatomo()
+        optitrack.syncVisitorAndUserIdToMatomo()
 
         // then
         XCTAssert(tracker.userId == customerID,
                   "Expected value \(customerID). Actual: \(String(describing: tracker.userId))")
     }
 
-    func test_reportIdfaIfAllowed() {
-        // given
-
-        // The required value `enableAdvertisingIdReport` set to true in `setUp` method.
-
-        // then
-        let trackEventExpectation = expectation(description: "IDFA events haven't been generated.")
-        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-            XCTAssert(event.action == SetAdvertisingIdEvent.Constants.name,
-                      "Expect \(SetAdvertisingIdEvent.Constants.name). Actual \(event.action)")
-            trackEventExpectation.fulfill()
-        }
-
-        // when
-        optitrack.reportIdfaIfAllowed()
-        wait(for: [trackEventExpectation], timeout: defaultTimeout)
-    }
-
-    func test_reportSdkVersion() {
-        // given
-        storage.configurationEndPoint = StubVariables.url
-        storage.tenantToken = "tenantToken"
-        storage.version = "version"
-
-        // and
-        let sdkVersionDimensions: [Int: String] = [
-            8: MetaDataEvent.Constants.Key.sdkPlatform,
-            9: MetaDataEvent.Constants.Key.sdkVersion,
-            10: MetaDataEvent.Constants.Key.configFileURL,
-            11: MetaDataEvent.Constants.Key.appNS
-        ]
-
-        let coreParameters: [Int: String] = [
-            12: OptimoveKeys.AdditionalAttributesKeys.eventPlatform,
-            13: OptimoveKeys.AdditionalAttributesKeys.eventDeviceType,
-            14: OptimoveKeys.AdditionalAttributesKeys.eventOs,
-            15: OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile
-        ]
-
-        let expectedDimensions = sdkVersionDimensions.merging(coreParameters) { (current, _) in current }
-
-        // then
-        let trackEventExpectation = expectation(description: "SdkVersion report haven't expected count of dimensions.")
-        trackEventExpectation.expectedFulfillmentCount = expectedDimensions.count
-        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-            let expected = MetaDataEvent.Constants.name
-            XCTAssert(event.action == expected,
-                      "Expect \(expected). Actual \(event.action)")
-            expectedDimensions.forEach({ (expectedDimension) in
-                event.dimensions.forEach({ (actualDimension) in
-                    if expectedDimension.key == actualDimension.index {
-                        trackEventExpectation.fulfill()
-                    }
-                })
-
-            })
-        }
-
-        // when
-        XCTAssertNoThrow(try optitrack.reportMetaData())
-        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
-    }
-
-    func test_reportOptInOutIfNeeded_optIn() {
-        // given
-        storage.isOptiTrackOptIn = false
-
-        // then
-        let trackEventExpectation = expectation(description: "OptIn events haven't been generated.")
-        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-            XCTAssert(event.action == OptimoveKeys.Configuration.optipushOptIn.rawValue,
-                      "Expect \(OptimoveKeys.Configuration.optipushOptIn.rawValue). Actual \(event.action)")
-            trackEventExpectation.fulfill()
-        }
-
-        let flagExpectation = expectation(description: "OptIn flag haven't been changed.")
-        storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-            if key == .isOptiTrackOptIn {
-                XCTAssert(value as? Bool == true,
-                          "Expect true. Actual \(String(describing: value as? Bool))")
-                flagExpectation.fulfill()
-            }
-        }
-
-        // when
-        optitrack.reportOptInOutIfNeeded()
-        wait(for: [trackEventExpectation, flagExpectation], timeout: defaultTimeout)
-    }
-
-    func test_reportOptInOutIfNeeded_optOut() {
-        // given
-        storage.isOptiTrackOptIn = true
-        deviceStateMonitor.state  = [
-            .userNotification: false
-        ]
-
-        // then
-        let trackEventExpectation = expectation(description: "OptIn events haven't been generated.")
-        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-            let expected = OptimoveKeys.Configuration.optipushOptOut.rawValue
-            XCTAssert(event.action == expected,
-                      "Expect \(expected). Actual \(event.action)")
-            trackEventExpectation.fulfill()
-        }
-
-        let flagExpectation = expectation(description: "OptIn flag haven't been changed.")
-        storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-            if key == .isOptiTrackOptIn {
-                let expected = false
-                XCTAssert(value as? Bool == expected,
-                          "Expect \(String(expected)). Actual \(String(describing: value as? Bool))")
-                flagExpectation.fulfill()
-            }
-        }
-
-        // when
-        optitrack.reportOptInOutIfNeeded()
-        wait(for: [trackEventExpectation, flagExpectation], timeout: defaultTimeout)
-    }
-
-    func test_reportOptInOutIfNeeded_noNeed() {
-        // given
-        storage.isOptiTrackOptIn = true
-
-        // then
-        let trackEventExpectation = expectation(description: "OptIn events have been generated but should not")
-        trackEventExpectation.isInverted = true
-        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-            trackEventExpectation.fulfill()
-        }
-
-        let flagExpectation = expectation(description: "OptIn flag have been changed but should not")
-        flagExpectation.isInverted = true
-        storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-            flagExpectation.fulfill()
-        }
-
-        // when
-        optitrack.reportOptInOutIfNeeded()
-        wait(for: [trackEventExpectation, flagExpectation], timeout: defaultTimeout)
-    }
-
-    func test_handleWillEnterForegroundNotification() {
-        // given
-        storage.visitorID = StubVariables.visitorID
-
-        // and
-        let now = Date()
-        let throttlingThreshold = OptiTrack.Constants.AppOpen.throttlingThreshold
-        let applicationOpenTime = now.addingTimeInterval(-(throttlingThreshold + 1)).timeIntervalSince1970
-
-        // when
-        statisticService.applicationOpenTime = applicationOpenTime
-        dateProvider.mockedNow = now
-
-        // then
-        let trackEventExpectation = expectation(description: "track event haven't been generate.")
-        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-            XCTAssert(event.action == AppOpenEvent.Constants.name,
-                      "Expect \(AppOpenEvent.Constants.name). Actual \(event.action)")
-            trackEventExpectation.fulfill()
-        }
-        XCTAssertNoThrow(try optitrack.handleWillEnterForegroundNotification())
-        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
-    }
-
-    func test_willEnterForegroundNotification_action_throttled() {
-        // given
-        storage.visitorID = StubVariables.visitorID
-
-        // and
-        let now = Date()
-        // Application was opened 10 sec ago.
-        let applicationOpenTime = now.addingTimeInterval(-(10)).timeIntervalSince1970
-
-        // when
-        statisticService.applicationOpenTime = applicationOpenTime
-        dateProvider.mockedNow = now
-
-        // then
-        let trackEventExpectation = expectation(description: "track event haven't been generate.")
-        trackEventExpectation.isInverted = true
-        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-            XCTAssert(event.action == AppOpenEvent.Constants.name,
-                      "Expect \(AppOpenEvent.Constants.name). Actual \(event.action)")
-            trackEventExpectation.fulfill()
-        }
-        XCTAssertNoThrow(try optitrack.handleWillEnterForegroundNotification())
-        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
-    }
-
-    func test_reportPendingEvents() {
-        // then
-        let trackEventExpectation = expectation(description: "track dispath pending events haven't been generated.")
-        tracker.dispathPendingEventsAssertFunction = {
-            trackEventExpectation.fulfill()
-        }
-
-        // when
-        optitrack.reportPendingEvents()
-        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
-    }
-
-    func test_reportAppOpen() {
-        // given
-        storage.customerID = StubVariables.customerID
-
-        // then
-        let trackEventExpectation = expectation(description: "track event haven't been generate.")
-        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-            XCTAssert(event.action == AppOpenEvent.Constants.name,
-                      "Expect \(AppOpenEvent.Constants.name). Actual \(event.action)")
-            trackEventExpectation.fulfill()
-        }
-
-        // when
-        XCTAssertNoThrow(try optitrack.reportAppOpen())
-        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
-    }
 }

@@ -18,15 +18,15 @@ final class OnStartEventGenerator {
     }
 
     func generate() {
-        tryCatch {
-            let events = [
-                try coreEventFactory.createEvent(.metaData),
-                try coreEventFactory.createEvent(.setAdvertisingId),
-            ].compactMap { $0 }
-            try events.forEach { event in
-                synchronizer.handle(.report(event: event))
-            }
-        }
+        asyncGenerate()
+        [
+            try? coreEventFactory.createEvent(.metaData),
+            try? coreEventFactory.createEvent(.setAdvertisingId),
+        ].compactMap { $0 }
+        .forEach { synchronizer.handle(.report(event: $0)) }
+    }
+
+    private func asyncGenerate() {
         UserAgentGenerator(
             storage: storage,
             synchronizer: synchronizer,
