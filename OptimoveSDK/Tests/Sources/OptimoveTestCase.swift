@@ -3,7 +3,7 @@
 import XCTest
 @testable import OptimoveSDK
 
-let defaultTimeout: TimeInterval = 0.4
+let defaultTimeout: TimeInterval = 0.5
 
 // This special timeout was added to solve an failed tests since the realtime timeout was increased.
 // Should be a temporary solution related to a backed issue.
