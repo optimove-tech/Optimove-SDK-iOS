@@ -49,8 +49,7 @@ final class OptiPush {
     }
 
     func performInitializationOperations() {
-        self.retryFailedMbaasOperations()
-        firebaseInteractor.subscribeToTopics(didSucceed: nil)
+        retryFailedMbaasOperations()
     }
 
 }
