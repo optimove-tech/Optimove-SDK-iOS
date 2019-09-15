@@ -22,7 +22,7 @@ import OptimoveCore
 
     /// The convenience init will fetch the bundle identifier automatically.
     @objc public convenience override init() {
-        guard let bundleIdentifier = Bundle.extractHostAppBundle()?.bundleIdentifier else {
+        guard let bundleIdentifier = Bundle.hostAppBundle()?.bundleIdentifier else {
             fatalError("Unable to find a bundle identifier.")
         }
         self.init(bundleIdentifier: bundleIdentifier)

@@ -2,10 +2,10 @@
 
 import Foundation
 
-extension Bundle {
+public extension Bundle {
 
     /// https://stackoverflow.com/a/27849695
-    static func extractHostAppBundle() -> Bundle? {
+    static func hostAppBundle() -> Bundle? {
         let mainBundle = Bundle.main
         if mainBundle.bundleURL.pathExtension == "appex" {
             // Peel off two directory levels - SOME_APP.app/PlugIns/SOME_APP_EXTENSION.appex
@@ -14,7 +14,7 @@ extension Bundle {
                 return hostBundle
             }
         }
-        return nil
+        return mainBundle
     }
 
 }
