@@ -49,8 +49,18 @@ private extension OptitrackNSEImpl {
             config: try unwrap(configuration.events[event.name]),
             optitrack: configuration.optitrack
         )
+        let baseURL: URL = {
+            let piwikPath = "piwik.php"
+            if !configuration.optitrack.optitrackEndpoint.absoluteString.contains(piwikPath) {
+                return configuration.optitrack.optitrackEndpoint.appendingPathComponent(piwikPath)
+            }
+            return configuration.optitrack.optitrackEndpoint
+        }()
         var reportEventUrl = try unwrap(
-            URLComponents(url: configuration.optitrack.optitrackEndpoint, resolvingAgainstBaseURL: false)
+            URLComponents(
+                url: baseURL,
+                resolvingAgainstBaseURL: false
+            )
         )
         reportEventUrl.queryItems = queryItems.filter { $0.value != nil }
         return URLRequest(
