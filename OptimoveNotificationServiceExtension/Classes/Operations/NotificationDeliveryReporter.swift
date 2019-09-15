@@ -44,6 +44,7 @@ final class NotificationDeliveryReporter: AsyncOperation {
                 state = .finished
             }
         } catch {
+            os_log("Error: %{public}@", log: OSLog.reporter, type: .error, error.localizedDescription)
             state = .finished
         }
     }

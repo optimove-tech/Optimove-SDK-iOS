@@ -27,12 +27,12 @@ extension OptitrackNSEImpl: OptitrackNSE {
 
     func report(event: OptimoveEvent, completion: @escaping () -> Void) throws {
         let reportEventRequest = try buildRequest(event: event)
-        os_log("Sending a notification delivered event.", log: OSLog.reporter, type: .debug)
+        os_log("Sending a notification delivered event.", log: OSLog.optitrack, type: .debug)
         let task = URLSession.shared.dataTask(with: reportEventRequest, completionHandler: { (data, response, error) in
             if let error = error {
-                os_log("Error: %{PRIVATE}@", log: OSLog.reporter, type: .error, error.localizedDescription)
+                os_log("Error: %{PRIVATE}@", log: OSLog.optitrack, type: .error, error.localizedDescription)
             } else {
-                os_log("Sent the notification delivered event.", log: OSLog.reporter, type: .debug)
+                os_log("Sent the notification delivered event.", log: OSLog.optitrack, type: .debug)
             }
             completion()
         })
@@ -68,7 +68,7 @@ private extension OptitrackNSEImpl {
 
         let date = Date()
         let currentUserAgent = try storage.getUserAgent()
-        let userId = try storage.getCustomerID()
+        let userId = storage.customerID
         let visitorId = try storage.getVisitorID()
         let initialVisitorId = try storage.getInitialVisitorId()
 
@@ -91,7 +91,7 @@ private extension OptitrackNSEImpl {
                 )
             ),
             URLQueryItem(name: "e_c", value: optitrack.eventCategoryName),
-            URLQueryItem(name: "e_a", value: "notification_delivered"),
+            URLQueryItem(name: "e_a", value: event.name),
             URLQueryItem(
                 name: "dimension\(optitrack.customDimensionIDS.eventIDCustomDimensionID)",
                 value: config.id.description
