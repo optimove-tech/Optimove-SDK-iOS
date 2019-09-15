@@ -79,16 +79,19 @@ extension FirebaseInteractor: OptipushServiceInfra {
                 object: nil,
                 queue: .main
             ) { (_) in
-                if let token = Messaging.messaging().fcmToken {
-                    self.registerIfTokenChanged(updatedFcmToken: token)
+                if let fcmToken = Messaging.messaging().fcmToken {
+                    self.onTokenRenew(fcmToken: fcmToken)
                 }
             }
         }
         Logger.debug("OptiPush: Setup Firebase finished.")
     }
 
-    func handleRegistration(token: Data) {
-        storage.apnsToken = token
+    func handleRegistration(apnsToken: Data) {
+        storage.apnsToken = apnsToken
+        if let fcmToken = Messaging.messaging().fcmToken {
+            self.onTokenRenew(fcmToken: fcmToken)
+        }
     }
 
     func optimoveReceivedRegistrationToken(_ fcmToken: String) {
@@ -102,9 +105,9 @@ extension FirebaseInteractor: OptipushServiceInfra {
                 Logger.debug("OptiPush: App controller not configure.")
                 return
             }
-            retreiveFcmToken(for: optimoveAppSenderId) { [weak self] (token) in
-                Logger.debug("OptiPush: 🚀 FCM token NEW: \(token)")
-                self?.delegate?.handleRegistrationTokenRefresh(token: token)
+            retreiveFcmToken(for: optimoveAppSenderId) { [weak self] (fcmToken) in
+                Logger.debug("OptiPush: 🚀 FCM token NEW: \(fcmToken)")
+                self?.delegate?.handleRegistrationTokenRefresh(token: fcmToken)
                 self?.storage.defaultFcmToken = fcmToken
             }
         } else {
@@ -197,10 +200,10 @@ private extension FirebaseInteractor {
         FirebaseApp.configure(name: "sdkController", options: clientServiceOptions)
     }
 
-    func onTokenRenew(token: String) {
-        registerIfTokenChanged(updatedFcmToken: token)
-        if let token = storage.apnsToken {
-            Messaging.messaging().apnsToken = token
+    func onTokenRenew(fcmToken: String) {
+        registerIfTokenChanged(updatedFcmToken: fcmToken)
+        if let apnsToken = storage.apnsToken {
+            Messaging.messaging().apnsToken = apnsToken
             storage.apnsToken = nil
         }
     }

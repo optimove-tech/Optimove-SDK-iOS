@@ -96,9 +96,6 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
         userInfo: [AnyHashable: Any],
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
     ) {
-        #warning("Delete log")
-        os_log("didReceiveRemoteNotification")
-        Messaging.messaging().appDidReceiveMessage(userInfo)
         didComplete(.noData)
     }
 

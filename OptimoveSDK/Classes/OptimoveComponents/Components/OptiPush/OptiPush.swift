@@ -13,7 +13,7 @@ protocol OptipushServiceInfra {
         clientFirebaseMetaData: ClientsServiceProjectKeys,
         delegate: OptimoveMbaasRegistrationHandling
     )
-    func handleRegistration(token: Data)
+    func handleRegistration(apnsToken: Data)
     func optimoveReceivedRegistrationToken(_ fcmToken: String)
 
     func subscribeToTopic(topic: String, didSucceed: ((Bool) -> Void)?)
@@ -60,11 +60,11 @@ extension OptiPush: PushableComponent {
     func handlePushable(_ context: PushableOperationContext) throws {
         switch context.operation {
         case let .deviceToken(token: data):
-            application(didRegisterForRemoteNotificationsWithDeviceToken: data)
+            firebaseInteractor.handleRegistration(apnsToken: data)
         case let  .subscribeToTopic(topic: topic):
-            subscribeToTopic(topic: topic)
+            firebaseInteractor.subscribeToTopic(topic: topic, didSucceed: nil)
         case let .unsubscribeFromTopic(topic: topic):
-            unsubscribeFromTopic(topic: topic)
+            firebaseInteractor.unsubscribeFromTopic(topic: topic, didSucceed: nil)
         case .performRegistration:
             performRegistration()
         case .optIn:
@@ -73,26 +73,6 @@ extension OptiPush: PushableComponent {
             registrar.optOut()
         }
     }
-}
-
-private extension OptiPush {
-
-    func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        firebaseInteractor.handleRegistration(token: deviceToken)
-    }
-
-    func subscribeToTopic(topic: String) {
-        firebaseInteractor.subscribeToTopic(topic: topic, didSucceed: nil)
-    }
-
-    func unsubscribeFromTopic(topic: String) {
-        firebaseInteractor.unsubscribeFromTopic(topic: topic, didSucceed: nil)
-    }
-
-    func performRegistration() {
-        registrar.register()
-    }
-
 }
 
 extension OptiPush: OptimoveMbaasRegistrationHandling {
@@ -116,6 +96,10 @@ extension OptiPush: OptimoveMbaasRegistrationHandling {
 }
 
 private extension OptiPush {
+
+    func performRegistration() {
+        registrar.register()
+    }
 
     func handleFcmTokenReceivedForTheFirstTime(_ token: String) {
         Logger.debug("OptiPush: Client receive a token for the first time.")
