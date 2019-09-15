@@ -72,7 +72,11 @@ private extension OptiTrack {
     }
 
     func reportScreenEvent(customURL: String, pageTitle: String, category: String?) throws {
-        Logger.debug("OptiTrack: Report screen event: title='\(pageTitle)', path='\(customURL)'")
+        let categoryDescription: String = {
+            guard let category = category else { return "" }
+            return ", category: '\(category)'"
+        }()
+        Logger.debug("OptiTrack: Report screen event: title='\(pageTitle)', path='\(customURL)'\(categoryDescription)")
         tracker.track(view: [pageTitle], url: URL(string: "http://\(customURL)"))
 
         let event = try coreEventFactory.createEvent(
