@@ -3,6 +3,6 @@
 import Foundation
 @testable import OptimoveSDK
 
-final class MockStatisticService: StatisticService {
-    var applicationOpenTime: TimeInterval = Date().timeIntervalSinceNow
+final class MockStatisticService: NSObject, StatisticService {
+    @objc dynamic var applicationOpenTime: TimeInterval = Date().timeIntervalSinceNow
 }

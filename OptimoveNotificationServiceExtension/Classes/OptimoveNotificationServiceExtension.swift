@@ -47,7 +47,8 @@ import OptimoveCore
             let payload: NotificationPayload
             payload = try extractNotificationPayload(request)
             isHandledByOptimove = true
-            try unwrap(createBestAttemptBaseContent(request: request, payload: payload))
+            let bestAttemptContent = try unwrap(createBestAttemptBaseContent(request: request, payload: payload))
+            self.bestAttemptContent = bestAttemptContent
             self.contentHandler = contentHandler
             let storage = StorageFacade(
                 groupedStorage: try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier),
@@ -62,6 +63,7 @@ import OptimoveCore
                         storage: storage
                     )
                 ),
+                bestAttemptContent: bestAttemptContent,
                 contentHandler: contentHandler
             )
         } catch {
@@ -94,22 +96,28 @@ extension OptimoveNotificationServiceExtension {
     }
 
     func createBestAttemptBaseContent(request: UNNotificationRequest,
-                                      payload: NotificationPayload) {
+                                      payload: NotificationPayload) -> UNMutableNotificationContent? {
         guard let bestAttemptContent = request.content.mutableCopy() as? UNMutableNotificationContent else {
             os_log("Unable to copy content.", log: OSLog.notification, type: .fault)
-            return
+            return nil
         }
         bestAttemptContent.title = payload.title
         bestAttemptContent.body = payload.content
-        self.bestAttemptContent = bestAttemptContent
+        return bestAttemptContent
     }
 
     func handleNotification(
         payload: NotificationPayload,
         optitrack: OptitrackNSE,
+        bestAttemptContent: UNMutableNotificationContent,
         contentHandler: @escaping (UNNotificationContent) -> Void
     ) throws {
         let operationsToExecute: [Operation] = [
+            DeeplinkExtracter(
+                bundleIdentifier: bundleIdentifier,
+                notificationPayload: payload,
+                bestAttemptContent: bestAttemptContent
+            ),
             NotificationDeliveryReporter(
                 bundleIdentifier: bundleIdentifier,
                 notificationPayload: payload,
@@ -122,12 +130,8 @@ extension OptimoveNotificationServiceExtension {
         ]
         // The completion operation going to be executed right after all operations are finished.
         let completionOperation = BlockOperation {
-            do {
-                contentHandler(try unwrap(self.bestAttemptContent))
-                os_log("Operations were completed", log: OSLog.notification, type: .info)
-            } catch {
-                os_log("%{PUBLIC}@", log: OSLog.notification, type: .error, error.localizedDescription)
-            }
+            contentHandler(bestAttemptContent)
+            os_log("Operations were completed", log: OSLog.notification, type: .info)
         }
         os_log("Operations were scheduled", log: OSLog.notification, type: .info)
         operationsToExecute.forEach {

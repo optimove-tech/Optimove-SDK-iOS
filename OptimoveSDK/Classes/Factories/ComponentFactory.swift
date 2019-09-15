@@ -13,8 +13,7 @@ final class ComponentFactory {
         self.coreEventFactory = coreEventFactory
     }
 
-    func createRealtimeComponent() throws -> RealTime {
-        let configuration = try serviceLocator.configurationRepository().getConfiguration()
+    func createRealtimeComponent(configuration: Configuration) -> RealTime {
         let storage = serviceLocator.storage()
         return RealTime(
             configuration: configuration.realtime,
@@ -24,7 +23,6 @@ final class ComponentFactory {
                 realTimeRequestBuildable: RealTimeRequestBuilder(),
                 configuration: configuration.realtime
             ),
-            deviceStateMonitor: serviceLocator.deviceStateMonitor(),
             eventBuilder: RealTimeEventBuilder(
                 storage: storage
             ),
@@ -38,11 +36,9 @@ final class ComponentFactory {
         )
     }
 
-    func createOptipushComponent() throws -> OptiPush {
-        let configuration = try serviceLocator.configurationRepository().getConfiguration()
+    func createOptipushComponent(configuration: Configuration) -> OptiPush {
         return OptiPush(
             configuration: configuration.optipush,
-            deviceStateMonitor: serviceLocator.deviceStateMonitor(),
             infrastructure: FirebaseInteractor(
                 storage: serviceLocator.storage(),
                 networking: FirebaseInteractorNetworkingImpl(
@@ -60,15 +56,11 @@ final class ComponentFactory {
         )
     }
 
-    func createOptitrackComponent() throws -> OptiTrack {
-        let configuration = try serviceLocator.configurationRepository().getConfiguration()
+    func createOptitrackComponent(configuration: Configuration) -> OptiTrack {
         return OptiTrack(
             configuration: configuration.optitrack,
-            deviceStateMonitor: serviceLocator.deviceStateMonitor(),
             storage: serviceLocator.storage(),
             coreEventFactory: coreEventFactory,
-            dateTimeProvider: serviceLocator.dateTimeProvider(),
-            statisticService: serviceLocator.statisticService(),
             trackerFlagsBuilder: TrackerFlagsBuilder(
                 storage: serviceLocator.storage()
             ),

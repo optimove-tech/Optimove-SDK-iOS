@@ -230,7 +230,7 @@ class KeyValueStorageTests: XCTestCase {
 
     func test_firstVisitTimestamp() {
         // when
-        storage.firstVisitTimestamp = StubVariables.int
+        storage.firstVisitTimestamp = 42
 
         // then
         XCTAssertNoThrow(try storage.getFirstVisitTimestamp())
@@ -391,30 +391,30 @@ class KeyValueStorageTests: XCTestCase {
 
     func test_realtimeSetUserIdFailed() {
         // when
-        let value = StubVariables.bool
-        storage.realtimeSetUserIdFailed = value
+        let value = StubVariables.string
+        storage.realtimeLastSuccessfulSentUserID = value
 
         // then
-        XCTAssert(storage.realtimeSetUserIdFailed == value)
+        XCTAssert(storage.realtimeLastSuccessfulSentUserID == value)
     }
 
     func test_no_realtimeSetUserIdFailed() {
         // then
-        XCTAssert(storage.realtimeSetUserIdFailed == false)
+        XCTAssert(storage.realtimeLastSuccessfulSentUserID == nil)
     }
 
     func test_realtimeSetEmailFailed() {
         // when
-        let value = StubVariables.bool
-        storage.realtimeSetEmailFailed = value
+        let value = StubVariables.string
+        storage.realtimeLastSuccessfulSentEmail = value
 
         // then
-        XCTAssert(storage.realtimeSetEmailFailed == value)
+        XCTAssert(storage.realtimeLastSuccessfulSentEmail == value)
     }
 
     func test_no_realtimeSetEmailFailed() {
         // then
-        XCTAssert(storage.realtimeSetEmailFailed == false)
+        XCTAssert(storage.realtimeLastSuccessfulSentEmail == nil)
     }
 
 }

@@ -59,8 +59,7 @@ class RegistrarTests: OptimoveTestCase {
 
         // when
         registrable.register()
-
-        wait(for: [networkExpectation, successFlagExpectation, backupExpectation], timeout: expectationTimeout)
+        wait(for: [networkExpectation, successFlagExpectation, backupExpectation], timeout: defaultTimeout)
     }
 
     func test_unregister() {
@@ -99,7 +98,7 @@ class RegistrarTests: OptimoveTestCase {
         wait(for: [networkExpectation,
                    callbackExpectation,
                    successFlagExpectation,
-                   backupExpectation], timeout: expectationTimeout)
+                   backupExpectation], timeout: defaultTimeout)
     }
 
     func test_optIn() {
@@ -140,7 +139,7 @@ class RegistrarTests: OptimoveTestCase {
         wait(for: [networkExpectation,
                    optInFlagExpectation,
                    optSuccessFlagExpectation,
-                   backupExpectation], timeout: expectationTimeout)
+                   backupExpectation], timeout: defaultTimeout)
     }
 
     func test_optOut() {
@@ -175,7 +174,7 @@ class RegistrarTests: OptimoveTestCase {
         registrable.optOut()
         wait(for: [networkExpectation,
                    optSuccessFlagExpectation,
-                   backupExpectation], timeout: expectationTimeout)
+                   backupExpectation], timeout: defaultTimeout)
     }
 
     func test_retryFailedOperationsIfExist_unregistration_failed() {
@@ -230,7 +229,7 @@ class RegistrarTests: OptimoveTestCase {
                    unregesterExpectation,
                    unregistrationSuccessFlagExpectation,
                    optSuccessFlagExpectation,
-                   backupExpectation], timeout: expectationTimeout)
+                   backupExpectation], timeout: defaultTimeout)
     }
 
     func test_retryFailedOperationsIfExist_registration_failed() {
@@ -273,7 +272,7 @@ class RegistrarTests: OptimoveTestCase {
         try! registrable.retryFailedOperationsIfExist()
         wait(for: [regesterExpectation,
                    registrationSuccessFlagExpectation,
-                   backupExpectation], timeout: expectationTimeout)
+                   backupExpectation], timeout: defaultTimeout)
     }
 
     func test_retryFailedOperationsIfExist_isOptRequest_failed() {
@@ -316,7 +315,7 @@ class RegistrarTests: OptimoveTestCase {
         try! registrable.retryFailedOperationsIfExist()
         wait(for: [regesterExpectation,
                    registrationSuccessFlagExpectation,
-                   backupExpectation], timeout: expectationTimeout)
+                   backupExpectation], timeout: defaultTimeout)
     }
 
     func test_register_failure() {
@@ -349,8 +348,7 @@ class RegistrarTests: OptimoveTestCase {
 
         // when
         registrable.register()
-
-        wait(for: [networkExpectation, successFlagExpectation, backupExpectation], timeout: expectationTimeout)
+        wait(for: [networkExpectation, successFlagExpectation, backupExpectation], timeout: defaultTimeout)
     }
 }
 

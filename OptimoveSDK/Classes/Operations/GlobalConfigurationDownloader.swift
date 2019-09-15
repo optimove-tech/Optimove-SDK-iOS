@@ -20,6 +20,14 @@ final class GlobalConfigurationDownloader: AsyncOperation {
             do {
                 let global = try result.get()
                 try self.repository.saveGlobal(global)
+            } catch let DecodingError.dataCorrupted(context) {
+                Logger.error(context.debugDescription)
+            } catch let DecodingError.keyNotFound(key, context) {
+                Logger.error("Key '\(key)' not found: \(context.debugDescription)\ncodingPath: \(context.codingPath)")
+            } catch let DecodingError.valueNotFound(value, context) {
+                Logger.error("Value '\(value)' not found: \(context.debugDescription)\ncodingPath: \(context.codingPath)")
+            } catch let DecodingError.typeMismatch(type, context)  {
+                Logger.error("Type '\(type)' mismatch: \(context.debugDescription)\ncodingPath: \(context.codingPath)")
             } catch {
                 Logger.error(error.localizedDescription)
             }

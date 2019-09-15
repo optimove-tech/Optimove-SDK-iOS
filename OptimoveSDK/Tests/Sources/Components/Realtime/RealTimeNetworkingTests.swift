@@ -35,7 +35,7 @@ class RealTimeNetworkingTests: XCTestCase {
         Mocker.register(
             Mock(
                 url: url.appendingPathComponent(RealTimeRequestBuilder.Constants.Paths.reportEvent),
-                contentType: .json,
+                dataType: .json,
                 statusCode: 200,
                 data: [.post: Data()]
             )
@@ -53,7 +53,7 @@ class RealTimeNetworkingTests: XCTestCase {
         }
 
         // then
-        wait(for: [resultExpectation], timeout: expectationTimeout)
+        wait(for: [resultExpectation], timeout: defaultTimeout)
     }
 
 }

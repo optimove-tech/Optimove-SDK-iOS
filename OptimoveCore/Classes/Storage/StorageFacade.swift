@@ -20,6 +20,7 @@ public  enum StorageKey: String, CaseIterable {
     case userAgent
     case deviceResolutionWidth
     case deviceResolutionHeight
+    case advertisingIdentifier
 
     // MARK: Shared keys
 
@@ -37,8 +38,8 @@ public  enum StorageKey: String, CaseIterable {
     case isOptiTrackOptIn
     case firstVisitTimestamp
     case isSetUserIdSucceed
-    case realtimeSetUserIdFailed
-    case realtimeSetEmailFailed
+    case realtimeLastSuccessfulSentUserID
+    case realtimeLastSuccessfulSentEmail
 }
 
 // MARK: - StorageValue
@@ -57,6 +58,7 @@ public protocol StorageValue {
     var userAgent: String? { get set }
     var deviceResolutionWidth: Float? { get set }
     var deviceResolutionHeight: Float? { get set }
+    var advertisingIdentifier: String? { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -67,25 +69,33 @@ public protocol StorageValue {
     func getUserAgent() throws -> String
     func getDeviceResolutionWidth() throws -> Float
     func getDeviceResolutionHeight() throws -> Float
+    func getAdvertisingIdentifier() throws -> String
 
     // MARK: Shared values
 
     var userEmail: String? { get set }
     var apnsToken: Data? { get set }
     var siteID: Int? { get set }
+    /// Default value is `false`
     var isClientHasFirebase: Bool { get set }
     var isMbaasOptIn: Bool? { get set }
+    /// Default value is `true`
     var isUnregistrationSuccess: Bool { get set }
+    /// Default value is `true`
     var isRegistrationSuccess: Bool { get set }
+    /// Default value is `true`
     var isOptRequestSuccess: Bool { get set }
+    /// Default value is `false`
     var isFirstConversion: Bool { get set }
     var defaultFcmToken: String? { get set }
     var fcmToken: String? { get set }
+    /// Default value is `false`
     var isOptiTrackOptIn: Bool { get set }
-    var firstVisitTimestamp: Int? { get set }
+    var firstVisitTimestamp: Int64? { get set }
+    /// Default value is `false`
     var isSetUserIdSucceed: Bool { get set }
-    var realtimeSetUserIdFailed: Bool { get set }
-    var realtimeSetEmailFailed: Bool { get set }
+    var realtimeLastSuccessfulSentUserID: String? { get set }
+    var realtimeLastSuccessfulSentEmail: String? { get set }
 
     func getUserEmail() throws -> String
     func getApnsToken() throws -> Data
@@ -93,7 +103,7 @@ public protocol StorageValue {
     func getIsMbaasOptIn() throws -> Bool
     func getDefaultFcmToken() throws -> String
     func getFcmToken() throws -> String
-    func getFirstVisitTimestamp() throws -> Int
+    func getFirstVisitTimestamp() throws -> Int64
 }
 
 /// The protocol used for convenience implementation of any storage technology below this protocol.
@@ -117,7 +127,8 @@ public final class StorageFacade: OptimoveStorage {
         .version,
         .userAgent,
         .deviceResolutionWidth,
-        .deviceResolutionHeight
+        .deviceResolutionHeight,
+        .advertisingIdentifier
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.
@@ -137,8 +148,8 @@ public final class StorageFacade: OptimoveStorage {
         .isOptiTrackOptIn,
         .firstVisitTimestamp,
         .isSetUserIdSucceed,
-        .realtimeSetUserIdFailed,
-        .realtimeSetEmailFailed
+        .realtimeLastSuccessfulSentUserID,
+        .realtimeLastSuccessfulSentEmail
     ]
 
     private let fileStorage: FileStorage
@@ -320,6 +331,15 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
+    var advertisingIdentifier: String? {
+        get {
+            return self[.advertisingIdentifier]
+        }
+        set {
+            self[.advertisingIdentifier] = newValue
+        }
+    }
+
     func getConfigurationEndPoint() throws -> URL {
         guard let value = configurationEndPoint else {
             throw StorageError.noValue(.configurationEndPoint)
@@ -379,6 +399,13 @@ public extension KeyValueStorage where Self: StorageValue {
     func getDeviceResolutionHeight() throws -> Float {
         guard let value = deviceResolutionHeight else {
             throw StorageError.noValue(.deviceResolutionHeight)
+        }
+        return value
+    }
+
+    func getAdvertisingIdentifier() throws -> String {
+        guard let value = advertisingIdentifier else {
+            throw StorageError.noValue(.advertisingIdentifier)
         }
         return value
     }
@@ -497,7 +524,7 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var firstVisitTimestamp: Int? {
+    var firstVisitTimestamp: Int64? {
         get {
             return self[.firstVisitTimestamp]
         }
@@ -515,21 +542,21 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var realtimeSetUserIdFailed: Bool {
+    var realtimeLastSuccessfulSentUserID: String? {
         get {
-            return self[.realtimeSetUserIdFailed] ?? false
+            return self[.realtimeLastSuccessfulSentUserID]
         }
         set {
-            self[.realtimeSetUserIdFailed] = newValue
+            self[.realtimeLastSuccessfulSentUserID] = newValue
         }
     }
 
-    var realtimeSetEmailFailed: Bool {
+    var realtimeLastSuccessfulSentEmail: String? {
         get {
-            return self[.realtimeSetEmailFailed] ?? false
+            return self[.realtimeLastSuccessfulSentEmail]
         }
         set {
-            self[.realtimeSetEmailFailed] = newValue
+            self[.realtimeLastSuccessfulSentEmail] = newValue
         }
     }
 
@@ -575,7 +602,7 @@ public extension KeyValueStorage where Self: StorageValue {
         return value
     }
 
-    func getFirstVisitTimestamp() throws -> Int {
+    func getFirstVisitTimestamp() throws -> Int64 {
         guard let value = firstVisitTimestamp else {
             throw StorageError.noValue(.firstVisitTimestamp)
         }

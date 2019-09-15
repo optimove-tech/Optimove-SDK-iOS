@@ -47,7 +47,7 @@ class OptimoveNotificationServiceExtensionTests: XCTestCase, FileAccessible {
 
         // and
         // create best attempt content
-        notificationService.createBestAttemptBaseContent(
+        let bestAttemptContent = notificationService.createBestAttemptBaseContent(
             request: UNNotificationRequest(
                 identifier: "identifier",
                 content: UNNotificationContent(),
@@ -72,7 +72,10 @@ class OptimoveNotificationServiceExtensionTests: XCTestCase, FileAccessible {
         }
 
         // then
-        try! notificationService.handleNotification(payload: payload, optitrack: mock, contentHandler: contentHandler)
+        try! notificationService.handleNotification(payload: payload,
+                                                    optitrack: mock,
+                                                    bestAttemptContent: bestAttemptContent!,
+                                                    contentHandler: contentHandler)
         wait(for: [contentHandlerExpectation, optitrackExpectation], timeout: 1)
     }
 
