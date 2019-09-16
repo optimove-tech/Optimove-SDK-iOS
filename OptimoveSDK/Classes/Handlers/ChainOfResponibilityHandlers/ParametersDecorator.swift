@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class ParametersDecorator: EventableNode {
+final class ParametersDecorator: Node {
 
     private let configuration: Configuration
 
@@ -11,19 +11,26 @@ final class ParametersDecorator: EventableNode {
         self.configuration = configuration
     }
 
-    override func execute(_ context: EventableOperationContext) throws {
-        let decorationFunction = { [configuration] () -> EventableOperationContext in
+    override func execute(_ context: OperationContext) throws {
+        let decorationFunction = { [configuration] () -> OperationContext in
             switch context.operation {
-            case let .report(event: event):
-                return EventableOperationContext(
-                    .report(event:
-                        OptimoveEventDecorator(
-                            event: event,
-                            config: try event.matchConfiguration(with: configuration.events)
-                        )
-                    ),
-                    timestamp: context.timestamp
-                )
+            case let .eventable(eventableOperation):
+                switch eventableOperation {
+                case let .report(event: event):
+                    return OperationContext(
+                        operation: .eventable(
+                            .report(event:
+                                OptimoveEventDecorator(
+                                    event: event,
+                                    config: try event.matchConfiguration(with: configuration.events)
+                                )
+                            )
+                        ),
+                        timestamp: context.timestamp
+                    )
+                default:
+                    return context
+                }
             default:
                 return context
             }

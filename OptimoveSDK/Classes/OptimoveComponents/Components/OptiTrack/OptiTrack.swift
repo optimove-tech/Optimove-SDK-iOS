@@ -32,18 +32,23 @@ final class OptiTrack {
 
 }
 
-extension OptiTrack: EventableComponent {
+extension OptiTrack: Component {
 
-    func handleEventable(_ context: EventableOperationContext) throws {
+    func handle(_ context: OperationContext) throws {
         switch context.operation {
-        case let .setUserId(userId: userId):
-            try setUserId(userId)
-        case let .report(event: event):
-            try report(event: event)
-        case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
-            try reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
-        case .dispatchNow:
-            dispatchNow()
+        case let .eventable(operation):
+            switch operation {
+            case let .setUserId(userId: userId):
+                try setUserId(userId)
+            case let .report(event: event):
+                try report(event: event)
+            case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
+                try reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
+            case .dispatchNow:
+                dispatchNow()
+            }
+        default:
+            break
         }
     }
 

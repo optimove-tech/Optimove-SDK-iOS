@@ -3,25 +3,18 @@
 import Foundation
 import OptimoveCore
 
-final class InMemoryBuffer<OC: OperationContext>: Node<OC> {
+final class InMemoryBuffer: Node {
 
-    private var buffer = RingBuffer<OC>(count: 100)
-    private var storage: OptimoveStorage
+    private var buffer = RingBuffer<OperationContext>(count: 100)
 
-    init(storage: OptimoveStorage) {
-        self.storage = storage
-    }
-
-    override var next: Node<OC>? {
+    override var next: Node? {
         didSet {
             dispatchBuffer()
         }
     }
 
-    override func execute(_ context: OC) throws {
+    override func execute(_ context: OperationContext) throws {
         if next == nil {
-            var context = context
-            context.timestamp = Date().timeIntervalSince1970
             buffer.write(context)
         } else {
             try next?.execute(context)

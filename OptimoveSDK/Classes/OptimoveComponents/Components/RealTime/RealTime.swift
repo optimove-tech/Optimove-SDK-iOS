@@ -38,26 +38,31 @@ final class RealTime {
 
 }
 
-extension RealTime: EventableComponent {
+extension RealTime: Component {
 
-    func handleEventable(_ context: EventableOperationContext) throws {
+    func handle(_ context: OperationContext) throws {
         guard isAllowedEvent(context) else { return }
         switch context.operation {
-        case .setUserId(userId: _):
-            try reportUserId()
-        case let .report(event: event):
-            try reportEvent(event: event, retryFailedEvents: true)
-        case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
-            try reportEvent(
-                event: try coreEventFactory.createEvent(
-                    .pageVisit(screenPath: customURL,
-                               screenTitle: pageTitle,
-                               category: category
+        case let .eventable(operation):
+            switch operation {
+            case .setUserId(userId: _):
+                try reportUserId()
+            case let .report(event: event):
+                try reportEvent(event: event, retryFailedEvents: true)
+            case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
+                try reportEvent(
+                    event: try coreEventFactory.createEvent(
+                        .pageVisit(screenPath: customURL,
+                                   screenTitle: pageTitle,
+                                   category: category
+                        )
                     )
                 )
-            )
-        case .dispatchNow:
-            // Consciously do nothing.
+            case .dispatchNow:
+                // Consciously do nothing.
+                break
+            }
+        default:
             break
         }
     }
@@ -66,7 +71,7 @@ extension RealTime: EventableComponent {
 
 extension RealTime {
 
-    func isAllowedEvent(_ context: EventableOperationContext) -> Bool {
+    func isAllowedEvent(_ context: OperationContext) -> Bool {
         let now = Date().timeIntervalSince1970
         return (now - context.timestamp) < Constatnts.timeThresholdInSeconds
     }

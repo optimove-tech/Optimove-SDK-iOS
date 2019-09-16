@@ -3,24 +3,21 @@
 import Foundation
 import OptimoveCore
 
-final class ChainPool {
+final class Chain {
 
-    private(set) var eventableNode: Node<EventableOperationContext>
-    private(set) var pushableNode: Node<PushableOperationContext>
+    private(set) var next: Node
 
-    init(eventableNode: Node<EventableOperationContext>,
-         pushableNode: Node<PushableOperationContext>) {
-        self.eventableNode = eventableNode
-        self.pushableNode = pushableNode
+    init(next: Node) {
+        self.next = next
     }
 
 }
 
-extension ChainPool: ResignActiveSubscriber {
+extension Chain: ResignActiveSubscriber {
 
     func onResignActive() {
         do {
-            try eventableNode.execute(.init(.dispatchNow))
+            try next.execute(.init(.eventable(.dispatchNow)))
         } catch {
             Logger.error(error.localizedDescription)
         }

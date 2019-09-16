@@ -36,14 +36,9 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _chainPool: ChainPool = {
-        return ChainPool(
-            eventableNode: InMemoryBuffer<EventableOperationContext>(
-                storage: storage()
-            ),
-            pushableNode: InMemoryBuffer<PushableOperationContext>(
-                storage: storage()
-            )
+    private lazy var _chain: Chain = {
+        return Chain(
+            next: InMemoryBuffer()
         )
     }()
 
@@ -85,7 +80,7 @@ final class ServiceLocator {
     }
 
     func synchronizer() -> Synchronizer {
-        return SynchronizerImpl(chain: _chainPool)
+        return SynchronizerImpl(chain: _chain)
     }
 
     func configurationFetcher(operationFactory: OperationFactory) -> ConfigurationFetcher {
@@ -99,7 +94,7 @@ final class ServiceLocator {
         return SDKInitializer(
             storage: storage(),
             componentFactory: componentFactory,
-            chainPool: _chainPool
+            chain: _chain
         )
     }
 
@@ -123,7 +118,7 @@ final class ServiceLocator {
         return DeviceStateObserver(
             observers: [
                 ResignActiveObserver(
-                    subscriber: _chainPool
+                    subscriber: _chain
                 ),
                 OptInOutObserver(
                     synchronizer: synchronizer(),

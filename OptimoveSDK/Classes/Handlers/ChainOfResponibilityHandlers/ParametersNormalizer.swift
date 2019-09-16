@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class ParametersNormalizer: EventableNode {
+final class ParametersNormalizer: Node {
 
     private let configuration: Configuration
 
@@ -13,16 +13,23 @@ final class ParametersNormalizer: EventableNode {
 
     // MARK: - EventableHandler
 
-    override func execute(_ context: EventableOperationContext) throws {
-        let normilizeFunction = { [configuration] () -> EventableOperationContext in
+    override func execute(_ context: OperationContext) throws {
+        let normilizeFunction = { [configuration] () -> OperationContext in
             switch context.operation {
-            case let .report(event: event):
-                return EventableOperationContext(
-                    .report(event:
-                        try event.normilize(configuration.events)
-                    ),
-                    timestamp: context.timestamp
-                )
+            case let .eventable(eventableOperation):
+                switch eventableOperation {
+                case let .report(event: event):
+                    return OperationContext(
+                        operation: .eventable(
+                            .report(event:
+                                try event.normilize(configuration.events)
+                            )
+                        ),
+                        timestamp: context.timestamp
+                    )
+                default:
+                    return context
+                }
             default:
                 return context
             }

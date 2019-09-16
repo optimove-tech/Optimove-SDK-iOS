@@ -3,45 +3,35 @@
 import Foundation
 import OptimoveCore
 
-protocol ComponentOperation { }
-
-protocol OperationContext {
+final class OperationContext {
     /// The timestamp of a creation if this context.
-    var timestamp: TimeInterval { get set }
-    associatedtype Operation: ComponentOperation
-    var operation: Operation { get set }
-}
+    let timestamp: TimeInterval
+    let operation: Operation
 
-final class EventableOperationContext: OperationContext {
-    var timestamp: TimeInterval
-    var operation: EventableOperation
-
-    init(_ operation: EventableOperation, timestamp: TimeInterval = Date().timeIntervalSince1970) {
+    init(operation: Operation, timestamp: TimeInterval) {
         self.operation = operation
         self.timestamp = timestamp
     }
 
+    convenience init(_ operation: Operation) {
+        self.init(operation: operation, timestamp: Date().timeIntervalSince1970)
+    }
+
 }
 
-enum EventableOperation: ComponentOperation {
+enum Operation {
+    case eventable(EventableOperation)
+    case pushable(PushableOperation)
+}
+
+enum EventableOperation {
     case setUserId(userId: String)
     case report(event: OptimoveEvent)
     case reportScreenEvent(customURL: String, pageTitle: String, category: String?)
     case dispatchNow
 }
 
-final class PushableOperationContext: OperationContext {
-    var timestamp: TimeInterval
-    var operation: PushableOperation
-
-    init(_ operation: PushableOperation, timestamp: TimeInterval = Date().timeIntervalSince1970) {
-        self.operation = operation
-        self.timestamp = timestamp
-    }
-
-}
-
-enum PushableOperation: ComponentOperation {
+enum PushableOperation {
     case deviceToken(token: Data)
     case performRegistration
     case unsubscribeFromTopic(topic: String)

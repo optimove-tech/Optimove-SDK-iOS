@@ -19,7 +19,7 @@ final class ConfigurationFetcher {
 
     func fetch(completion: @escaping (Result<Configuration, Error>) -> Void) {
         // Operations that execute asynchronously to fetch remote configs.
-        let downloadOperations: [Operation] = [
+        let downloadOperations: [Foundation.Operation] = [
             operationFactory.globalConfigurationDownloader(),
             operationFactory.tenantConfigurationDownloader()
         ]

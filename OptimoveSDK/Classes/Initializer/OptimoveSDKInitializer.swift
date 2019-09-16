@@ -7,16 +7,16 @@ final class SDKInitializer {
 
     private let storage: OptimoveStorage
     private let componentFactory: ComponentFactory
-    private let chainPool: ChainPool
+    private let chain: Chain
 
     // MARK: - Construction
 
     init(storage: OptimoveStorage,
          componentFactory: ComponentFactory,
-         chainPool: ChainPool) {
+         chain: Chain) {
         self.storage = storage
         self.componentFactory = componentFactory
-        self.chainPool = chainPool
+        self.chain = chain
     }
 
     func initialize(with configuration: Configuration) {
@@ -40,27 +40,18 @@ private extension SDKInitializer {
         let decorator = ParametersDecorator(configuration: configuration)
 
         // 3 responder
-        let componentHanlder = ComponentEventableHandler(
+        let componentHanlder = ComponentHandler(
             components: [
                 componentFactory.createOptitrackComponent(configuration: configuration),
-                componentFactory.createRealtimeComponent(configuration: configuration)
+                componentFactory.createRealtimeComponent(configuration: configuration),
+                componentFactory.createOptipushComponent(configuration: configuration)
             ]
         )
 
         decorator.next = componentHanlder
         normalizer.next = decorator
-        chainPool.eventableNode.next = normalizer
 
-        // MARK: Setup Pushable chain of responsibility.
-
-        // 1 responder
-        let componentHandler = ComponentPushableHandler(
-            components: [
-                componentFactory.createOptipushComponent(configuration: configuration)
-            ]
-        )
-
-        chainPool.pushableNode.next = componentHandler
+        chain.next.next = normalizer
 
         Logger.info("All components setup finished.")
     }

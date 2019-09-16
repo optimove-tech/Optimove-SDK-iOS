@@ -54,22 +54,27 @@ final class OptiPush {
 
 }
 
-extension OptiPush: PushableComponent {
+extension OptiPush: Component {
 
-    func handlePushable(_ context: PushableOperationContext) throws {
+    func handle(_ context: OperationContext) throws {
         switch context.operation {
-        case let .deviceToken(token: data):
-            firebaseInteractor.handleRegistration(apnsToken: data)
-        case let  .subscribeToTopic(topic: topic):
-            firebaseInteractor.subscribeToTopic(topic: topic, didSucceed: nil)
-        case let .unsubscribeFromTopic(topic: topic):
-            firebaseInteractor.unsubscribeFromTopic(topic: topic, didSucceed: nil)
-        case .performRegistration:
-            performRegistration()
-        case .optIn:
-            registrar.optIn()
-        case .optOut:
-            registrar.optOut()
+        case let .pushable(operation):
+            switch operation {
+            case let .deviceToken(token: data):
+                firebaseInteractor.handleRegistration(apnsToken: data)
+            case let  .subscribeToTopic(topic: topic):
+                firebaseInteractor.subscribeToTopic(topic: topic, didSucceed: nil)
+            case let .unsubscribeFromTopic(topic: topic):
+                firebaseInteractor.unsubscribeFromTopic(topic: topic, didSucceed: nil)
+            case .performRegistration:
+                performRegistration()
+            case .optIn:
+                registrar.optIn()
+            case .optOut:
+                registrar.optOut()
+            }
+        default:
+            break
         }
     }
 }

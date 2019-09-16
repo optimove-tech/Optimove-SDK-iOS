@@ -3,40 +3,17 @@
 import Foundation
 import OptimoveCore
 
-class ComponentEventableHandler: EventableNode {
-    private let components: [EventableComponent]
+class ComponentHandler: Node {
+    private let components: [Component]
 
-    init(components: [EventableComponent]) {
+    init(components: [Component]) {
         self.components = components
     }
 
-    // MARK: - EventableHandler
-
-    override func execute(_ context: EventableOperationContext) throws {
+    override func execute(_ context: OperationContext) throws {
         components.forEach { component in
             do {
-                try component.handleEventable(context)
-            } catch {
-                Logger.error(error.localizedDescription)
-            }
-        }
-    }
-
-}
-
-class ComponentPushableHandler: PushableNode {
-    private let components: [PushableComponent]
-
-    init(components: [PushableComponent]) {
-        self.components = components
-    }
-
-    // MARK: - PushableHandler
-
-    override func execute(_ context: PushableOperationContext) throws {
-        components.forEach { component in
-            do {
-                try component.handlePushable(context)
+                try component.handle(context)
             } catch {
                 Logger.error(error.localizedDescription)
             }
