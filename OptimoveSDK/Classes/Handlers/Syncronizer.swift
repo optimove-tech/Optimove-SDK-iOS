@@ -11,10 +11,10 @@ protocol Synchronizer {
 final class SynchronizerImpl {
 
     private let queue: DispatchQueue
-    private let handler: HandlersPool
+    private let chain: ChainPool
 
-    init(handler: HandlersPool) {
-        self.handler = handler
+    init(chain: ChainPool) {
+        self.chain = chain
         queue = DispatchQueue(label: "com.optimove.sdk.synchronizer", qos: .utility)
     }
 }
@@ -22,17 +22,17 @@ final class SynchronizerImpl {
 extension SynchronizerImpl: Synchronizer {
 
     func handle(_ operation: EventableOperation) {
-        queue.async { [handler] in
+        queue.async { [chain] in
             tryCatch {
-                try handler.eventableHandler.handle(EventableOperationContext(operation))
+                try chain.eventableNode.execute(EventableOperationContext(operation))
             }
         }
     }
 
     func handle(_ operation: PushableOperation) {
-        queue.async { [handler] in
+        queue.async { [chain] in
             tryCatch {
-                try handler.pushableHandler.handle(PushableOperationContext(operation))
+                try chain.pushableNode.execute(PushableOperationContext(operation))
             }
         }
     }

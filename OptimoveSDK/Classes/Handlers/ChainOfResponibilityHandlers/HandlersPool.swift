@@ -3,32 +3,24 @@
 import Foundation
 import OptimoveCore
 
-final class HandlersPool {
+final class ChainPool {
 
-    private(set) var eventableHandler: Handler<EventableOperationContext>
-    private(set) var pushableHandler: Handler<PushableOperationContext>
+    private(set) var eventableNode: Node<EventableOperationContext>
+    private(set) var pushableNode: Node<PushableOperationContext>
 
-    init(eventableHandler: Handler<EventableOperationContext>,
-         pushableHandler: Handler<PushableOperationContext>) {
-        self.eventableHandler = eventableHandler
-        self.pushableHandler = pushableHandler
-    }
-
-    func addNextEventableHandler(_ next: EventableHandler) {
-        eventableHandler.next = next
-    }
-
-    func addNextPushableHandler(_ next: PushableHandler) {
-        pushableHandler.next = next
+    init(eventableNode: Node<EventableOperationContext>,
+         pushableNode: Node<PushableOperationContext>) {
+        self.eventableNode = eventableNode
+        self.pushableNode = pushableNode
     }
 
 }
 
-extension HandlersPool: ResignActiveSubscriber {
+extension ChainPool: ResignActiveSubscriber {
 
     func onResignActive() {
         do {
-            try eventableHandler.handle(.init(.dispatchNow))
+            try eventableNode.execute(.init(.dispatchNow))
         } catch {
             Logger.error(error.localizedDescription)
         }

@@ -1,13 +1,13 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-class Handler<OC: OperationContext> {
-    var next: Handler<OC>?
-    func handle(_: OC) throws {
+class Node<OC: OperationContext> {
+    var next: Node<OC>?
+    func execute(_: OC) throws {
         fatalError("No implementation. Expect to be implemented by inheretance.")
     }
 }
 
-class EventableHandler: Handler<EventableOperationContext> { }
+class EventableNode: Node<EventableOperationContext> { }
 
-class PushableHandler: Handler<PushableOperationContext> {}
+class PushableNode: Node<PushableOperationContext> {}
 

@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-class ComponentEventableHandler: EventableHandler {
+class ComponentEventableHandler: EventableNode {
     private let components: [EventableComponent]
 
     init(components: [EventableComponent]) {
@@ -12,7 +12,7 @@ class ComponentEventableHandler: EventableHandler {
 
     // MARK: - EventableHandler
 
-    override func handle(_ context: EventableOperationContext) throws {
+    override func execute(_ context: EventableOperationContext) throws {
         components.forEach { component in
             do {
                 try component.handleEventable(context)
@@ -24,16 +24,16 @@ class ComponentEventableHandler: EventableHandler {
 
 }
 
-class ComponentPushableHandler: PushableHandler {
+class ComponentPushableHandler: PushableNode {
     private let components: [PushableComponent]
 
     init(components: [PushableComponent]) {
         self.components = components
     }
 
-    // MARK: - EventableHandler
+    // MARK: - PushableHandler
 
-    override func handle(_ context: PushableOperationContext) throws {
+    override func execute(_ context: PushableOperationContext) throws {
         components.forEach { component in
             do {
                 try component.handlePushable(context)

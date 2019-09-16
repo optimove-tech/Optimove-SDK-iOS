@@ -79,16 +79,19 @@ extension OptiPush: OptimoveMbaasRegistrationHandling {
     // MARK: - Protocol conformance
 
     func handleRegistrationTokenRefresh(token: String) {
-        guard let _ = storage.fcmToken else {
-            handleFcmTokenReceivedForTheFirstTime(token)
-            return
-        }
-
-        registrar.unregister {
-            //The order of the following operations matter
-            self.storage.fcmToken = token
+        let registerToken: () -> Void = {
             self.performRegistration()
             self.firebaseInteractor.subscribeToTopics(didSucceed: nil)
+        }
+        if storage.fcmToken == token {
+            storage.fcmToken = token
+            registrar.unregister {
+                registerToken()
+            }
+        } else {
+            //The order of the following operations matter
+            storage.fcmToken = token
+            registerToken()
         }
     }
 
@@ -99,14 +102,6 @@ private extension OptiPush {
     func performRegistration() {
         registrar.register()
     }
-
-    func handleFcmTokenReceivedForTheFirstTime(_ token: String) {
-        Logger.debug("OptiPush: Client receive a token for the first time.")
-        storage.fcmToken = token
-        performRegistration()
-        firebaseInteractor.subscribeToTopics(didSucceed: nil)
-    }
-
 
     func retryFailedMbaasOperations() {
         do {

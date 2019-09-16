@@ -3,20 +3,20 @@
 import Foundation
 import OptimoveCore
 
-final class OptimoveSDKInitializer {
+final class SDKInitializer {
 
     private let storage: OptimoveStorage
     private let componentFactory: ComponentFactory
-    private let handlersPool: HandlersPool
+    private let chainPool: ChainPool
 
     // MARK: - Construction
 
     init(storage: OptimoveStorage,
          componentFactory: ComponentFactory,
-         handlersPool: HandlersPool) {
+         chainPool: ChainPool) {
         self.storage = storage
         self.componentFactory = componentFactory
-        self.handlersPool = handlersPool
+        self.chainPool = chainPool
     }
 
     func initialize(with configuration: Configuration) {
@@ -27,7 +27,7 @@ final class OptimoveSDKInitializer {
 
 }
 
-private extension OptimoveSDKInitializer {
+private extension SDKInitializer {
 
     func setupOptimoveComponents(_ configuration: Configuration) {
 
@@ -47,9 +47,9 @@ private extension OptimoveSDKInitializer {
             ]
         )
 
-        normalizer.next = decorator
         decorator.next = componentHanlder
-        handlersPool.addNextEventableHandler(normalizer)
+        normalizer.next = decorator
+        chainPool.eventableNode.next = normalizer
 
         // MARK: Setup Pushable chain of responsibility.
 
@@ -60,7 +60,7 @@ private extension OptimoveSDKInitializer {
             ]
         )
 
-        handlersPool.addNextPushableHandler(componentHandler)
+        chainPool.pushableNode.next = componentHandler
 
         Logger.info("All components setup finished.")
     }

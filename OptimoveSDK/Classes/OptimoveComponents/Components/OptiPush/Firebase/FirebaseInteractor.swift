@@ -105,10 +105,10 @@ extension FirebaseInteractor: OptipushServiceInfra {
                 Logger.debug("OptiPush: App controller not configure.")
                 return
             }
-            retreiveFcmToken(for: optimoveAppSenderId) { [weak self] (fcmToken) in
-                Logger.debug("OptiPush: 🚀 FCM token NEW: \(fcmToken)")
-                self?.delegate?.handleRegistrationTokenRefresh(token: fcmToken)
-                self?.storage.defaultFcmToken = fcmToken
+            retreiveFcmToken(for: optimoveAppSenderId) { [weak self] (optimoveFCMToken) in
+                Logger.debug("OptiPush: 🚀 FCM token NEW: \(optimoveFCMToken)")
+                self?.delegate?.handleRegistrationTokenRefresh(token: optimoveFCMToken)
+                self?.storage.defaultFcmToken = optimoveFCMToken
             }
         } else {
             Logger.debug("OptiPush: 🚀 FCM token for app controller: \(fcmToken)")
