@@ -5,6 +5,10 @@ import OptimoveCore
 
 final class RealTime {
 
+    private struct Constatnts {
+        static let timeThresholdInSeconds: TimeInterval = 1
+    }
+
     private let configuration: RealtimeConfig
     private let realTimeQueue: DispatchQueue
     private let networking: RealTimeNetworking
@@ -37,7 +41,7 @@ final class RealTime {
 extension RealTime: EventableComponent {
 
     func handleEventable(_ context: EventableOperationContext) throws {
-        guard !context.isBuffered else { return }
+        guard isAllowedEvent(context) else { return }
         switch context.operation {
         case .setUserId(userId: _):
             try reportUserId()
@@ -61,6 +65,11 @@ extension RealTime: EventableComponent {
 }
 
 extension RealTime {
+
+    func isAllowedEvent(_ context: EventableOperationContext) -> Bool {
+        let now = Date().timeIntervalSince1970
+        return (now - context.timestamp) < Constatnts.timeThresholdInSeconds
+    }
 
     func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) throws {
         let config = try event.matchConfiguration(with: configuration.events)

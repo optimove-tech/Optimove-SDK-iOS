@@ -21,7 +21,7 @@ final class InMemoryBuffer<OC: OperationContext>: Handler<OC> {
     override func handle(_ context: OC) throws {
         if next == nil {
             var context = context
-            context.isBuffered = true
+            context.timestamp = Date().timeIntervalSince1970
             buffer.write(context)
         } else {
             try next?.handle(context)

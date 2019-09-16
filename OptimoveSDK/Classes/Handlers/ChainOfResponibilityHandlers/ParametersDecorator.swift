@@ -22,7 +22,7 @@ final class ParametersDecorator: EventableHandler {
                             config: try event.matchConfiguration(with: configuration.events)
                         )
                     ),
-                    isBuffered: context.isBuffered
+                    timestamp: context.timestamp
                 )
             default:
                 return context

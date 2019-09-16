@@ -21,7 +21,7 @@ final class ParametersNormalizer: EventableHandler {
                     .report(event:
                         try event.normilize(configuration.events)
                     ),
-                    isBuffered: context.isBuffered
+                    timestamp: context.timestamp
                 )
             default:
                 return context

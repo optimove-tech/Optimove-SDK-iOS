@@ -6,18 +6,19 @@ import OptimoveCore
 protocol ComponentOperation { }
 
 protocol OperationContext {
-    var isBuffered: Bool { get set }
+    /// The timestamp of a creation if this context.
+    var timestamp: TimeInterval { get set }
     associatedtype Operation: ComponentOperation
     var operation: Operation { get set }
 }
 
 final class EventableOperationContext: OperationContext {
-    var isBuffered: Bool
+    var timestamp: TimeInterval
     var operation: EventableOperation
 
-    init(_ operation: EventableOperation, isBuffered: Bool = false) {
+    init(_ operation: EventableOperation, timestamp: TimeInterval = Date().timeIntervalSince1970) {
         self.operation = operation
-        self.isBuffered = isBuffered
+        self.timestamp = timestamp
     }
 
 }
@@ -30,12 +31,12 @@ enum EventableOperation: ComponentOperation {
 }
 
 final class PushableOperationContext: OperationContext {
-    var isBuffered: Bool
+    var timestamp: TimeInterval
     var operation: PushableOperation
 
-    init(_ operation: PushableOperation, isBuffered: Bool = false) {
+    init(_ operation: PushableOperation, timestamp: TimeInterval = Date().timeIntervalSince1970) {
         self.operation = operation
-        self.isBuffered = isBuffered
+        self.timestamp = timestamp
     }
 
 }
