@@ -11,7 +11,7 @@ public final class MultiplexLoggerStream {
 
     static var outputStreams: [ObjectIdentifier: LoggerStream] = [:]
 
-    private static let logQueue = DispatchQueue(label: "com.optimove.sdk.logger")
+    private static let logQueue = DispatchQueue(label: "com.optimove.sdk.logger", qos: .background)
 
     public static func log(
         level: LogLevelCore,
