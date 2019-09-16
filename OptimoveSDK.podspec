@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   base_dir = "OptimoveSDK/"
   s.source_files = base_dir +'Classes/**/*'
   s.dependency 'FirebaseMessaging', '~> 4.0'
-  s.dependency 'MatomoTracker', '~> 6.0'
+  s.dependency 'MatomoTracker', '~> 7.0'
   s.dependency 'OptimoveCore', '~> 2.0'
   s.frameworks = 'UIKit', 'SystemConfiguration', 'UserNotifications', 'AdSupport'
   s.test_spec 'unit' do |unit_tests|
