@@ -15,4 +15,12 @@ final class MockSynchronizer: Synchronizer {
         assertFunctionPushable?(op)
     }
 
+    func addNode(_: Node) {
+
+    }
+
+    func onResignActive() {
+
+    }
+
 }
