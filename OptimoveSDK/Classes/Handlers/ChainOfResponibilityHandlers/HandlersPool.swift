@@ -13,14 +13,6 @@ final class Chain {
 
 }
 
-extension Chain: ResignActiveSubscriber {
-
-    func onResignActive() {
-        do {
-            try next.execute(.init(.eventable(.dispatchNow)))
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
-
+protocol ChainMutator {
+    func addNode(_: Node)
 }

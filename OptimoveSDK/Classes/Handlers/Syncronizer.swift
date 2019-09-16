@@ -1,9 +1,10 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import Foundation
+import Dispatch
 import OptimoveCore
 
-protocol Synchronizer {
+/// Use for executing a internal operation flow with serial queue.
+protocol Synchronizer: ChainMutator, ResignActiveSubscriber {
     func handle(_: EventableOperation)
     func handle(_: PushableOperation)
 }
@@ -14,9 +15,10 @@ final class SynchronizerImpl {
     private let chain: Chain
 
     init(chain: Chain) {
+        queue = DispatchQueue(label: "com.optimove.sdk.serial", qos: .utility)
         self.chain = chain
-        queue = DispatchQueue(label: "com.optimove.sdk.synchronizer", qos: .utility)
     }
+
 }
 
 extension SynchronizerImpl: Synchronizer {
@@ -35,6 +37,24 @@ extension SynchronizerImpl: Synchronizer {
                 try chain.next.execute(.init(.pushable(operation)))
             }
         }
+    }
+
+}
+
+extension SynchronizerImpl: ChainMutator {
+
+    func addNode(_ node: Node) {
+        queue.async { [chain] in
+            chain.next.next = node
+        }
+    }
+
+}
+
+extension SynchronizerImpl: ResignActiveSubscriber {
+
+    func onResignActive() {
+        handle(.dispatchNow)
     }
 
 }

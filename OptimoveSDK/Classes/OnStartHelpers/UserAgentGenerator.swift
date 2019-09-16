@@ -21,7 +21,9 @@ final class UserAgentGenerator {
         SDKDevice.evaluateUserAgent(completion: { (userAgent) in
             self.storage.userAgent = userAgent
             tryCatch {
-                self.synchronizer.handle(.report(event: try self.coreEventFactory.createEvent(.setUserAgent)))
+                self.synchronizer.handle(
+                    .report(event: try self.coreEventFactory.createEvent(.setUserAgent))
+                )
             }
         })
     }

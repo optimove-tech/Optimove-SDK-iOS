@@ -7,16 +7,16 @@ final class SDKInitializer {
 
     private let storage: OptimoveStorage
     private let componentFactory: ComponentFactory
-    private let chain: Chain
+    private let chain: ChainMutator
 
     // MARK: - Construction
 
     init(storage: OptimoveStorage,
          componentFactory: ComponentFactory,
-         chain: Chain) {
+         chainMutator: ChainMutator) {
         self.storage = storage
         self.componentFactory = componentFactory
-        self.chain = chain
+        self.chain = chainMutator
     }
 
     func initialize(with configuration: Configuration) {
@@ -51,7 +51,7 @@ private extension SDKInitializer {
         decorator.next = componentHanlder
         normalizer.next = decorator
 
-        chain.next.next = normalizer
+        chain.addNode(normalizer)
 
         Logger.info("All components setup finished.")
     }
