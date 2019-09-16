@@ -79,15 +79,17 @@ private extension OptitrackNSEImpl {
         let date = Date()
         let currentUserAgent = try storage.getUserAgent()
         let userId = storage.customerID
-        let visitorId = try storage.getVisitorID()
+        let visitorID = try storage.getVisitorID()
         let initialVisitorId = try storage.getInitialVisitorId()
 
         var queryItems: [URLQueryItem] = [
             URLQueryItem(name: "idsite", value: String(describing: optitrack.tenantID)),
             URLQueryItem(name: "rec", value: "1"),
-            URLQueryItem(name: "api", value: "1"),
-            URLQueryItem(name: "_id", value: visitorId),
+
+            URLQueryItem(name: "_id", value: visitorID),
+            URLQueryItem(name: "cid", value: visitorID),
             URLQueryItem(name: "uid", value: userId),
+
             URLQueryItem(name: "lang", value: Locale.httpAcceptLanguage),
             URLQueryItem(name: "ua", value: currentUserAgent),
             URLQueryItem(name: "h", value: DateFormatter.hourDateFormatter.string(from: date)),
