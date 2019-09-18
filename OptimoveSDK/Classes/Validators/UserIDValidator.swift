@@ -33,8 +33,10 @@ struct UserIDValidator {
     /// - Parameter userId: the client user id
     /// - Returns: An indication of the validation of the provided user id
     private static func isValid(_ userId: String) -> Bool {
-        return !userId.isEmpty && (userId != "none") && (userId != "undefined") && !userId.contains("undefine") && !(
-            userId == "null"
-        )
+        return !userId.isBlank &&
+            (userId != "none") &&
+            (userId != "undefined") &&
+            (userId != "null") &&
+            !userId.contains("undefine")
     }
 }
