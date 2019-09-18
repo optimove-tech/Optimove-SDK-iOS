@@ -5,7 +5,7 @@ import OptimoveCore
 
 final class RealTime {
 
-    private struct Constatnts {
+    struct Constatnts {
         static let timeThresholdInSeconds: TimeInterval = 1
     }
 

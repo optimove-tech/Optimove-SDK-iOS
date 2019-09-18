@@ -591,6 +591,24 @@ class RealTimeComponentTests: XCTestCase {
         try! realTime.reportEvent(event: StubEvent())
         waitForExpectations(timeout: realtimeTimeout)
     }
+
+    func test_expired_report() {
+        // given
+        let timestamp = Date().timeIntervalSince1970 - RealTime.Constatnts.timeThresholdInSeconds
+        let operationContext = OperationContext(operation: .eventable(.setUserId(userId: "userId")), timestamp: timestamp)
+
+        // then
+        let eventExpectation = expectation(description: "An expired event unexpectable handled.")
+        eventExpectation.isInverted.toggle()
+        networking.assertFunction = { (event) -> Result<String, Error> in
+            eventExpectation.fulfill()
+            return .success("")
+        }
+
+        // when
+        try! realTime.handle(operationContext)
+        waitForExpectations(timeout: defaultTimeout)
+    }
 }
 
 extension StubEvent {
