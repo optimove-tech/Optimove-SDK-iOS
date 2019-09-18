@@ -391,30 +391,30 @@ class KeyValueStorageTests: XCTestCase {
 
     func test_realtimeSetUserIdFailed() {
         // when
-        let value = StubVariables.string
-        storage.realtimeLastSuccessfulSentUserID = value
+        let value = StubVariables.bool
+        storage.realtimeSetUserIdFailed = value
 
         // then
-        XCTAssert(storage.realtimeLastSuccessfulSentUserID == value)
+        XCTAssert(storage.realtimeSetUserIdFailed == value)
     }
 
     func test_no_realtimeSetUserIdFailed() {
         // then
-        XCTAssert(storage.realtimeLastSuccessfulSentUserID == nil)
+        XCTAssert(storage.realtimeSetUserIdFailed == false)
     }
 
     func test_realtimeSetEmailFailed() {
         // when
-        let value = StubVariables.string
-        storage.realtimeLastSuccessfulSentEmail = value
+        let value = StubVariables.bool
+        storage.realtimeSetEmailFailed = value
 
         // then
-        XCTAssert(storage.realtimeLastSuccessfulSentEmail == value)
+        XCTAssert(storage.realtimeSetEmailFailed == value)
     }
 
     func test_no_realtimeSetEmailFailed() {
         // then
-        XCTAssert(storage.realtimeLastSuccessfulSentEmail == nil)
+        XCTAssert(storage.realtimeSetEmailFailed == false)
     }
 
 }

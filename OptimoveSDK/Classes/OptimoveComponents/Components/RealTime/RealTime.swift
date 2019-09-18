@@ -161,13 +161,13 @@ private extension RealTime {
     }
 
     func retrySetUserIdEventIfNeeded() throws {
-        if storage.customerID != storage.realtimeLastSuccessfulSentUserID {
+        if storage.realtimeSetUserIdFailed {
             try reportUserId()
         }
     }
 
     func retrySetUserEmailIfNeeded() throws {
-        if storage.userEmail != storage.realtimeLastSuccessfulSentEmail {
+        if storage.realtimeSetEmailFailed {
             try reportUserEmail()
         }
     }

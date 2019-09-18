@@ -38,8 +38,8 @@ public  enum StorageKey: String, CaseIterable {
     case isOptiTrackOptIn
     case firstVisitTimestamp
     case isSetUserIdSucceed
-    case realtimeLastSuccessfulSentUserID
-    case realtimeLastSuccessfulSentEmail
+    case realtimeSetUserIdFailed
+    case realtimeSetEmailFailed
 }
 
 // MARK: - StorageValue
@@ -94,8 +94,8 @@ public protocol StorageValue {
     var firstVisitTimestamp: Int64? { get set }
     /// Default value is `false`
     var isSetUserIdSucceed: Bool { get set }
-    var realtimeLastSuccessfulSentUserID: String? { get set }
-    var realtimeLastSuccessfulSentEmail: String? { get set }
+    var realtimeSetUserIdFailed: Bool { get set }
+    var realtimeSetEmailFailed: Bool { get set }
 
     func getUserEmail() throws -> String
     func getApnsToken() throws -> Data
@@ -148,8 +148,8 @@ public final class StorageFacade: OptimoveStorage {
         .isOptiTrackOptIn,
         .firstVisitTimestamp,
         .isSetUserIdSucceed,
-        .realtimeLastSuccessfulSentUserID,
-        .realtimeLastSuccessfulSentEmail
+        .realtimeSetUserIdFailed,
+        .realtimeSetEmailFailed
     ]
 
     private let fileStorage: FileStorage
@@ -542,21 +542,21 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var realtimeLastSuccessfulSentUserID: String? {
+    var realtimeSetUserIdFailed: Bool {
         get {
-            return self[.realtimeLastSuccessfulSentUserID]
+            return self[.realtimeSetUserIdFailed] ?? false
         }
         set {
-            self[.realtimeLastSuccessfulSentUserID] = newValue
+            self[.realtimeSetUserIdFailed] = newValue
         }
     }
 
-    var realtimeLastSuccessfulSentEmail: String? {
+    var realtimeSetEmailFailed: Bool {
         get {
-            return self[.realtimeLastSuccessfulSentEmail]
+            return self[.realtimeSetEmailFailed] ?? false
         }
         set {
-            self[.realtimeLastSuccessfulSentEmail] = newValue
+            self[.realtimeSetEmailFailed] = newValue
         }
     }
 

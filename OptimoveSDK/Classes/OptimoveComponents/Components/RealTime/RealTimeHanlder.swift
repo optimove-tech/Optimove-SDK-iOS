@@ -24,16 +24,23 @@ extension RealTimeHanlderImpl: RealTimeHanlder {
         context.onSuccess(json)
         switch context.type {
         case .setUserID:
-            storage.realtimeLastSuccessfulSentUserID = context.event.parameters[SetUserIdEvent.Constants.Key.userId] as? String
+            self.storage.realtimeSetUserIdFailed = false
         case .setUserEmail:
-            storage.realtimeLastSuccessfulSentEmail = context.event.parameters[SetUserEmailEvent.Constants.Key.email] as? String
+            self.storage.realtimeSetEmailFailed = false
         default:
             break
         }
     }
 
     func handleOnError(_ context: RealTimeEventContext, error: Error) {
-        // Do nothing
+        switch context.type {
+        case .setUserID:
+            self.storage.realtimeSetUserIdFailed = true
+        case .setUserEmail:
+            self.storage.realtimeSetEmailFailed = true
+        default:
+            break
+        }
     }
 
 }
