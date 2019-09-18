@@ -7,6 +7,7 @@ final class RealTime {
 
     struct Constatnts {
         static let timeThresholdInSeconds: TimeInterval = 1
+        static let timeout: UInt32 = 1
     }
 
     private let configuration: RealtimeConfig
@@ -175,10 +176,7 @@ private extension RealTime {
 
     func sentReportEvent(context: RealTimeEventContext) {
         let realtimeToken = configuration.realtimeToken
-        // The delay added as the temporary hotfix for the realtime race condition issue.
-        // Should be removed right after release a solution on a server side.
-        let delay: TimeInterval = 1
-        realTimeQueue.asyncAfter(deadline: .now() + delay, execute: { [eventBuilder, networking, hanlder] in
+        realTimeQueue.async { [eventBuilder, networking, hanlder] in
             do {
                 let realtimeEvent = try eventBuilder.createEvent(context: context, realtimeToken: realtimeToken)
                 try networking.report(event: realtimeEvent) { (result) in
@@ -192,7 +190,10 @@ private extension RealTime {
             } catch {
                 hanlder.handleOnError(context, error: error)
             }
-        })
+            // The delay added as the temporary hotfix for the realtime race condition issue.
+            // Should be removed right after release a solution on a server side.
+            sleep(Constatnts.timeout)
+        }
     }
 
 }
