@@ -25,7 +25,8 @@ class EnterForegroundObserverTests: XCTestCase {
 
     func test_app_open_threshold_should_invoke() {
         // given
-        let throttlingTimeGap = EnterForegroundObserver.Constants.AppOpen.throttlingThreshold + 1
+        /// Set the Last open time as Throttling time plus 10 sec.
+        let throttlingTimeGap = EnterForegroundObserver.Constants.AppOpen.throttlingThreshold + 10
         statisticService.applicationOpenTime = Date().addingTimeInterval(-throttlingTimeGap).timeIntervalSince1970
 
         // and
@@ -47,14 +48,17 @@ class EnterForegroundObserverTests: XCTestCase {
         let applicationOpenTimeExpectation = KVOExpectation(object: statisticService, keyPath: \.applicationOpenTime)
 
         // when
-        NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+        }
 
         wait(for: [appOpenEventExpectation, applicationOpenTimeExpectation], timeout: defaultTimeout)
     }
 
     func test_app_open_threshold_should_not_invoke() {
         // given
-        let throttlingTimeGap = EnterForegroundObserver.Constants.AppOpen.throttlingThreshold - 1
+        /// Set the Last open time as Throttling time minus 10 sec.
+        let throttlingTimeGap = EnterForegroundObserver.Constants.AppOpen.throttlingThreshold - 10
         statisticService.applicationOpenTime = Date().addingTimeInterval(-throttlingTimeGap).timeIntervalSince1970
 
         // and
