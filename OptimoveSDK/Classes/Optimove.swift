@@ -8,12 +8,12 @@ import OptimoveCore
 /// Initialize and configure SDK using `Optimove.configure(for:)`.
 @objc public final class Optimove: NSObject {
 
-    private let serviceLocator: ServiceLocator
-    private var storage: OptimoveStorage
-    private let factory: MainFactory
-    private let synchronizer: Synchronizer
-    private let stateListener: DeprecatedStateListener
     private let deviceStateObserver: DeviceStateObserver
+    private let factory: MainFactory
+    private let serviceLocator: ServiceLocator
+    private let stateListener: DeprecatedStateListener
+    private let synchronizer: Synchronizer
+    private var storage: OptimoveStorage
 
     /// The shared instance of OptimoveSDK.
     @objc public static let shared: Optimove = {
@@ -40,6 +40,97 @@ import OptimoveCore
         shared.serviceLocator.newTenantInfoHandler().handle(tenantInfo)
         shared.deviceStateObserver.start()
         shared.startSDK { _ in }
+    }
+
+}
+
+// MARK: - Event API call
+
+extension Optimove {
+
+    /// Report the event to Optimove SDK.
+    ///
+    /// - Parameters:
+    ///   - name: Name of the event.
+    ///   - parameters: The dictionary of attributes.
+    @objc public func reportEvent(name: String, parameters: [String: Any]) {
+        let customEvent = CommonOptimoveEvent(name: name, parameters: parameters)
+        synchronizer.handle(.report(event: customEvent))
+    }
+
+    /// Report the event to Optimove SDK.
+    ///
+    /// - Parameters:
+    ///   - event: Instance of OptimoveEvent type.
+    @objc public func reportEvent(_ event: OptimoveEvent) {
+        synchronizer.handle(.report(event: event))
+    }
+
+}
+
+// MARK: - ScreenVisit API call
+
+extension Optimove {
+
+    @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
+        setScreenVisit(screenPath: screenPathArray.joined(separator: "/"),
+                       screenTitle: screenTitle,
+                       screenCategory: screenCategory)
+    }
+
+    @objc public func setScreenVisit(screenPath: String, screenTitle: String, screenCategory: String? = nil) {
+        let screenPath = screenPath.trimmingCharacters(in: .whitespaces)
+        let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
+        Logger.info("Report a screen event w/title: \(screenTitle)")
+        let validationResult = ScreenVisitValidator.validate(screenPath: screenPath, screenTitle: screenTitle)
+        guard validationResult == .valid else { return }
+        tryCatch {
+            synchronizer.handle(
+                .reportScreenEvent(
+                    customURL: try ScreenVisitPreprocessor.process(screenPath),
+                    pageTitle: screenTitle,
+                    category: screenCategory
+                )
+            )
+        }
+    }
+
+}
+
+// MARK: - SetUserID API call
+
+extension Optimove {
+
+    /// Set a User ID value to Optimove SDK.
+    ///
+    /// - Parameter userID: A client unique identifier
+    @objc public func setUserId(_ userID: String) {
+        let userID = userID.trimmingCharacters(in: .whitespaces)
+        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
+        guard validationResult == .valid else { return }
+        NewUserIDHandler(storage: storage).handle(userID: userID)
+        synchronizer.handle(.setUserId(userId: userID))
+        synchronizer.handle(.performRegistration)
+    }
+
+    /// Set a User ID and the user email
+    ///
+    /// - Parameters:
+    ///   - sdkId: Aa client unique identifier
+    ///   - email: An user's email
+    @objc public func registerUser(sdkId: String, email: String) {
+        setUserId(sdkId)
+        setUserEmail(email: email)
+    }
+
+    /// Call for the SDK to send the user email to its components
+    ///
+    /// - Parameter email: The user email
+    @objc public func setUserEmail(email: String) {
+        let validationResult = EmailValidator(storage: storage).isValid(email)
+        guard validationResult == .valid else { return }
+        NewEmailHandler(storage: storage).handle(email: email)
+        reportEvent(SetUserEmailEvent(email: email))
     }
 
 }
@@ -147,97 +238,6 @@ extension Optimove {
             synchronizer.handle(.unsubscribeFromTopic(topic: testTopic))
         }
     }
-}
-
-// MARK: - Event API call
-
-extension Optimove {
-
-    /// Report the event to Optimove SDK.
-    ///
-    /// - Parameters:
-    ///   - name: Name of the event.
-    ///   - parameters: The dictionary of attributes.
-    @objc public func reportEvent(name: String, parameters: [String: Any]) {
-        let customEvent = CommonOptimoveEvent(name: name, parameters: parameters)
-        synchronizer.handle(.report(event: customEvent))
-    }
-
-    /// Report the event to Optimove SDK.
-    ///
-    /// - Parameters:
-    ///   - event: Instance of OptimoveEvent type.
-    @objc public func reportEvent(_ event: OptimoveEvent) {
-        synchronizer.handle(.report(event: event))
-    }
-
-}
-
-// MARK: - SetUserID API call
-
-extension Optimove {
-
-    /// Set a User ID value to Optimove SDK.
-    ///
-    /// - Parameter userID: A client unique identifier
-    @objc public func setUserId(_ userID: String) {
-        let userID = userID.trimmingCharacters(in: .whitespaces)
-        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
-        guard validationResult == .valid else { return }
-        NewUserIDHandler(storage: storage).handle(userID: userID)
-        synchronizer.handle(.setUserId(userId: userID))
-        synchronizer.handle(.performRegistration)
-    }
-
-    /// Set a User ID and the user email
-    ///
-    /// - Parameters:
-    ///   - sdkId: Aa client unique identifier
-    ///   - email: An user's email
-    @objc public func registerUser(sdkId: String, email: String) {
-        setUserId(sdkId)
-        setUserEmail(email: email)
-    }
-
-    /// Call for the SDK to send the user email to its components
-    ///
-    /// - Parameter email: The user email
-    @objc public func setUserEmail(email: String) {
-        let validationResult = EmailValidator(storage: storage).isValid(email)
-        guard validationResult == .valid else { return }
-        NewEmailHandler(storage: storage).handle(email: email)
-        reportEvent(SetUserEmailEvent(email: email))
-    }
-
-}
-
-// MARK: - ScreenVisit API call
-
-extension Optimove {
-
-    @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
-        setScreenVisit(screenPath: screenPathArray.joined(separator: "/"),
-                       screenTitle: screenTitle,
-                       screenCategory: screenCategory)
-    }
-
-    @objc public func setScreenVisit(screenPath: String, screenTitle: String, screenCategory: String? = nil) {
-        let screenPath = screenPath.trimmingCharacters(in: .whitespaces)
-        let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
-        Logger.info("Report a screen event w/title: \(screenTitle)")
-        let validationResult = ScreenVisitValidator.validate(screenPath: screenPath, screenTitle: screenTitle)
-        guard validationResult == .valid else { return }
-        tryCatch {
-            synchronizer.handle(
-                .reportScreenEvent(
-                    customURL: try ScreenVisitPreprocessor.process(screenPath),
-                    pageTitle: screenTitle,
-                    category: screenCategory
-                )
-            )
-        }
-    }
-
 }
 
 // MARK: - OptimoveDeepLinkResponding

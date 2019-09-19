@@ -37,9 +37,12 @@ private extension SDKInitializer {
         let normalizer = ParametersNormalizer(configuration: configuration)
 
         // 2 responder
-        let decorator = ParametersDecorator(configuration: configuration)
+        let validator = EventValidator(configuration: configuration)
 
         // 3 responder
+        let decorator = ParametersDecorator(configuration: configuration)
+
+        // 4 responder
         let componentHanlder = ComponentHandler(
             components: [
                 componentFactory.createOptitrackComponent(configuration: configuration),
@@ -49,7 +52,8 @@ private extension SDKInitializer {
         )
 
         decorator.next = componentHanlder
-        normalizer.next = decorator
+        validator.next = decorator
+        normalizer.next = validator
 
         chain.addNode(normalizer)
 
