@@ -18,12 +18,13 @@ extension OptimoveEvent {
     /// - Returns: Normilized event
     /// - Throws: Throw an error if an event configuration are missing.
     func normilize(_ events: [String: EventsConfig]) throws -> OptimoveEvent {
-        guard let eventConfig = events[self.name] else {
+        let normilizeName = self.name.normilizeKey()
+        guard let eventConfig = events[normilizeName] else {
             throw GuardError.custom("Configurations are missing for event \(self.name)")
         }
         let normalizedParameters = self.parameters.reduce(into: [String: Any]()) { (result, next) in
             // Replacing all spaces in a key with underscore character.
-            let normalizedKey = next.key.replaceSpaces()
+            let normalizedKey = next.key.normilizeKey()
 
             // Handling Boolean type correctly.
             if let number = next.value as? NSNumber, eventConfig.parameters[normalizedKey]?.type == Constants.boolean {
@@ -39,7 +40,7 @@ extension OptimoveEvent {
                 result[next.key] = nil
             }
         }
-        return CommonOptimoveEvent(name: self.name, parameters: normalizedParameters)
+        return CommonOptimoveEvent(name: normilizeName, parameters: normalizedParameters)
     }
 
 }
@@ -51,7 +52,7 @@ private extension String {
         static let underscoreCharacter = "_"
     }
 
-    func replaceSpaces(with replacement: String = Constants.underscoreCharacter) -> String {
+    func normilizeKey(with replacement: String = Constants.underscoreCharacter) -> String {
         return self.lowercased()
             .trimmingCharacters(in: .whitespaces)
             .replacingOccurrences(of: Constants.spaceCharacter, with: replacement)
