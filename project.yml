@@ -91,6 +91,24 @@ targets:
   
   # unit-test
 
+  # UnitTests:
+  #   type: bundle.unit-test
+  #   platform: iOS
+  #   sources: 
+  #     - path: OptimoveCore/Tests/
+  #       name: OptimoveCore-Unit
+  #     - path: OptimoveSDK/Tests/
+  #       name: OptimoveSDK-Unit
+  #     - path: OptimoveNotificationServiceExtension/Tests/
+  #       name: OptimoveNotificationServiceExtension-Unit
+  #     - path: Shared
+  #       name: Shared-Unit
+  #   dependencies:
+  #     - target: OptimoveCore
+  #     - target: OptimoveSDK
+  #     - target: OptimoveNotificationServiceExtension
+  #     - carthage: Mocker
+
   OptimoveCore-Unit:
     type: bundle.unit-test
     platform: iOS
