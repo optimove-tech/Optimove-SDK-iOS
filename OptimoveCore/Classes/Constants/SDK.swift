@@ -5,12 +5,8 @@ import Foundation
 public struct SDK {
 
     private struct Constants {
-        struct Bundle {
-            static let identifier = "com.optimove.sdk"
-        }
         struct Key {
             static let staging = "OPTIMOVE_CLIENT_STG_ENV"
-            static let environment = "OPTIMOVE_SDK_ENVIRONMENT"
         }
         struct Var {
             static let `true` = "true"
@@ -19,12 +15,7 @@ public struct SDK {
     }
 
     public static var environment: Environment {
-        guard let envvar = getEnvironmentVariable(for: Constants.Key.environment),
-              let value = Environment(rawValue: envvar)
-        else {
-            return .prod
-        }
-        return value
+        return isStaging ? .dev : .prod
     }
 
     public static var isStaging: Bool {
@@ -32,7 +23,7 @@ public struct SDK {
         return envvar == Constants.Var.true
     }
 
-    static func getEnvironmentVariable(for key: String, defaultValue: String) -> String {
+    private static func getEnvironmentVariable(for key: String, defaultValue: String) -> String {
         guard let envVarValue = getEnvironmentVariable(for: key), !envVarValue.isEmpty else {
             return defaultValue
         }
