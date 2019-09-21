@@ -41,7 +41,7 @@ class TenantConfigurationDownloaderTests: XCTestCase {
         Mocker.register(
             Mock(
                 url: expectedURL,
-                contentType: .json,
+                dataType: .json,
                 statusCode: 200,
                 data: [.get: try! JSONEncoder().encode(expectedConfig)]
             )

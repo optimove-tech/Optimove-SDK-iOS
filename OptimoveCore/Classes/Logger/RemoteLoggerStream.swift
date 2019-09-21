@@ -35,25 +35,25 @@ public final class RemoteLoggerStream: MutableLoggerStream {
             logMethodName: methodName,
             message: message
         )
-        if let request = self.buildLogRequest(data) {
+        do {
+            let request = try self.buildLogRequest(data)
             let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
                 // TODO: Add local logging.
             }
             task.resume()
+        } catch {
+            print(error.localizedDescription)
         }
     }
 
-    private func buildLogRequest(_ data: LogBody) -> URLRequest? {
-        if let logBody = try? JSONEncoder().encode(data) {
-            var request = URLRequest(url: self.endpoint)
-            request.httpBody = logBody
-            // FIXME: Move to local Constants.
-            request.httpMethod = "POST"
-            // FIXME: Move to local Constants.
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            return request
-        } else {
-            return nil
-        }
+    private func buildLogRequest(_ data: LogBody) throws -> URLRequest {
+        let logBody = try JSONEncoder().encode(data)
+        var request = URLRequest(url: self.endpoint)
+        request.httpBody = logBody
+        // FIXME: Move to local Constants.
+        request.httpMethod = "POST"
+        // FIXME: Move to local Constants.
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        return request
     }
 }

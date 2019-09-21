@@ -5,6 +5,10 @@ import OptimoveCore
 
 public final class RemoteConfigurationRequestBuilder {
 
+    private struct Constants {
+        static let timeout: TimeInterval = 30
+    }
+
     private let storage: OptimoveStorage
 
     public init(storage: OptimoveStorage) {
@@ -20,13 +24,13 @@ public final class RemoteConfigurationRequestBuilder {
             .appendingPathComponent(version)
             .appendingPathExtension("json")
         Logger.debug("Connect to \(url.absoluteString) to retreive configuration file.")
-        return NetworkRequest(method: .get, baseURL: url)
+        return NetworkRequest(method: .get, baseURL: url, timeoutInterval: Constants.timeout)
     }
 
     public func createGlobalConfigurationsRequest() -> NetworkRequest {
         let url = Endpoints.Remote.GlobalConfig.url(SDK.environment)
         Logger.debug("Connect to \(url.absoluteString) to retreive global file.")
-        return NetworkRequest(method: .get, baseURL: url)
+        return NetworkRequest(method: .get, baseURL: url, timeoutInterval: Constants.timeout)
     }
 
 }

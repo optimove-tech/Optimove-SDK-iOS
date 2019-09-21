@@ -230,7 +230,7 @@ class KeyValueStorageTests: XCTestCase {
 
     func test_firstVisitTimestamp() {
         // when
-        storage.firstVisitTimestamp = StubVariables.int
+        storage.firstVisitTimestamp = 42
 
         // then
         XCTAssertNoThrow(try storage.getFirstVisitTimestamp())

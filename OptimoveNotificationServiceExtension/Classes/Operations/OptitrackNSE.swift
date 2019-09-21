@@ -27,12 +27,12 @@ extension OptitrackNSEImpl: OptitrackNSE {
 
     func report(event: OptimoveEvent, completion: @escaping () -> Void) throws {
         let reportEventRequest = try buildRequest(event: event)
-        os_log("Sending a notification delivered event.", log: OSLog.reporter, type: .debug)
+        os_log("Sending a notification delivered event.", log: OSLog.optitrack, type: .debug)
         let task = URLSession.shared.dataTask(with: reportEventRequest, completionHandler: { (data, response, error) in
             if let error = error {
-                os_log("Error: %{PRIVATE}@", log: OSLog.reporter, type: .error, error.localizedDescription)
+                os_log("Error: %{PRIVATE}@", log: OSLog.optitrack, type: .error, error.localizedDescription)
             } else {
-                os_log("Sent the notification delivered event.", log: OSLog.reporter, type: .debug)
+                os_log("Sent the notification delivered event.", log: OSLog.optitrack, type: .debug)
             }
             completion()
         })
@@ -49,8 +49,18 @@ private extension OptitrackNSEImpl {
             config: try unwrap(configuration.events[event.name]),
             optitrack: configuration.optitrack
         )
+        let baseURL: URL = {
+            let piwikPath = "piwik.php"
+            if !configuration.optitrack.optitrackEndpoint.absoluteString.contains(piwikPath) {
+                return configuration.optitrack.optitrackEndpoint.appendingPathComponent(piwikPath)
+            }
+            return configuration.optitrack.optitrackEndpoint
+        }()
         var reportEventUrl = try unwrap(
-            URLComponents(url: configuration.optitrack.optitrackEndpoint, resolvingAgainstBaseURL: false)
+            URLComponents(
+                url: baseURL,
+                resolvingAgainstBaseURL: false
+            )
         )
         reportEventUrl.queryItems = queryItems.filter { $0.value != nil }
         return URLRequest(
@@ -68,21 +78,24 @@ private extension OptitrackNSEImpl {
 
         let date = Date()
         let currentUserAgent = try storage.getUserAgent()
-        let userId = try storage.getCustomerID()
-        let visitorId = try storage.getVisitorID()
+        let userId = storage.customerID
+        let visitorID = try storage.getVisitorID()
         let initialVisitorId = try storage.getInitialVisitorId()
 
         var queryItems: [URLQueryItem] = [
             URLQueryItem(name: "idsite", value: String(describing: optitrack.tenantID)),
             URLQueryItem(name: "rec", value: "1"),
-            URLQueryItem(name: "api", value: "1"),
-            URLQueryItem(name: "_id", value: visitorId),
+
+            URLQueryItem(name: "_id", value: visitorID),
+            URLQueryItem(name: "cid", value: visitorID),
             URLQueryItem(name: "uid", value: userId),
+
             URLQueryItem(name: "lang", value: Locale.httpAcceptLanguage),
             URLQueryItem(name: "ua", value: currentUserAgent),
             URLQueryItem(name: "h", value: DateFormatter.hourDateFormatter.string(from: date)),
             URLQueryItem(name: "m", value: DateFormatter.minuteDateFormatter.string(from: date)),
             URLQueryItem(name: "s", value: DateFormatter.secondsDateFormatter.string(from: date)),
+            URLQueryItem(name: "cdt", value: DateFormatter.iso8601DateFormatter.string(from: date)),
             URLQueryItem(
                 name: "res",
                 value: String(format: "%1.0fx%1.0f",
@@ -91,7 +104,7 @@ private extension OptitrackNSEImpl {
                 )
             ),
             URLQueryItem(name: "e_c", value: optitrack.eventCategoryName),
-            URLQueryItem(name: "e_a", value: "notification_delivered"),
+            URLQueryItem(name: "e_a", value: event.name),
             URLQueryItem(
                 name: "dimension\(optitrack.customDimensionIDS.eventIDCustomDimensionID)",
                 value: config.id.description

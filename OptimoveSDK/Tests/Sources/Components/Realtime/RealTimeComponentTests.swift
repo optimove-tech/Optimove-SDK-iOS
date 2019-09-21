@@ -9,14 +9,12 @@ class RealTimeComponentTests: XCTestCase {
     var realTime: RealTime!
     var storage: MockOptimoveStorage!
     var networking: MockRealTimeNetworking!
-    var deviceStateMonitor: StubOptimoveDeviceStateMonitor!
     var handler: RealTimeHanlderAssertionProxy!
     var dateProvider: MockDateTimeProvider!
 
     override func setUp() {
         storage = MockOptimoveStorage()
         networking = MockRealTimeNetworking()
-        deviceStateMonitor = StubOptimoveDeviceStateMonitor()
         handler = RealTimeHanlderAssertionProxy(
             target: RealTimeHanlderImpl(storage: storage)
         )
@@ -25,7 +23,6 @@ class RealTimeComponentTests: XCTestCase {
             configuration: ConfigurationFixture.build().realtime,
             storage: storage,
             networking: networking,
-            deviceStateMonitor: deviceStateMonitor,
             eventBuilder: RealTimeEventBuilder(
                 storage: storage
             ),
@@ -35,23 +32,24 @@ class RealTimeComponentTests: XCTestCase {
                 dateTimeProvider: dateProvider
             )
         )
-        // FIXME: `performInitializationOperations()` should be called from a related test.
-        realTime.performInitializationOperations()
     }
 
-    private func prefilledStorage() {
-        storage.customerID = StubVariables.customerID
+    private func prefilledVisitorStorage() {
         storage.visitorID = StubVariables.visitorID
-        storage.userEmail = StubVariables.userEmail
         storage.initialVisitorId = StubVariables.initialVisitorId
     }
+
 
 // MARK: - User Identifier
 
     func test_that_realtimeEvent_has_a_correct_customerID() {
         // given
-        let customerID = "customerID"
-        storage[.customerID] = customerID
+        prefilledVisitorStorage()
+
+        // and
+        let customerID = StubVariables.customerID
+        storage.customerID = customerID
+        storage.realtimeSetUserIdFailed = false
 
         // then
         let expect = expectation(description: "Event was not generated.")
@@ -66,7 +64,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: StubEvent())
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
     func test_that_realtimeEvent_has_a_correct_visitorId() {
@@ -87,13 +85,13 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: StubEvent())
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
     /// The event that is reported by name would become an RTE with its correct ID as defined in the config file.
     func test_that_realtimeEvent_has_a_correct_eventId() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
         let stubEvent = StubEvent()
 
         // then
@@ -106,13 +104,13 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: stubEvent)
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
     /// All parameters that exist in the OptimoveEvent are converted to Context inside the RTEvent
     func test_that_event_context_converted_successful() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
 
         // and
         let stubEvent = StubEvent()
@@ -140,13 +138,13 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: stubEvent)
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
     /// If the storage contains a firstTimeVisit timestamp, it will not change the RTEvent would contain it
     func test_that_first_time_visit_should_not_change_if_event_contains_it() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
 
         // and
         let timestamp = 123_456
@@ -162,7 +160,7 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: StubEvent())
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
 // MARK: - Sending Regular Events
@@ -170,7 +168,7 @@ class RealTimeComponentTests: XCTestCase {
     /// If an event is reported to the Realtime component and there is internet connection it must reach the HTTP client.
     func test_that_event_reach_networking() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
         let event = StubEvent()
 
         // then
@@ -182,31 +180,16 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: defaultTimeout)
-    }
-
-    /// If an event is reported to the Realtime component and there is no internet connection, you will receive an indication that the event is skipped.
-    func test_that_event_skipped_without_internet_connection() {
-        // given
-        deviceStateMonitor.state[.internet] = false
-
-        // then
-        let expect = expectation(description: "Event was not generated.")
-        realTime.isAllowToSendReport { (isAllow) in
-            XCTAssert(isAllow == false)
-            expect.fulfill()
-        }
-
-        // when
-        try! realTime.reportEvent(event: StubEvent())
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
     /// If the storage contains a flag that SetUserID event failed when a regular event is reported the SetUserID event will be reported first
     func test_that_failed_userid_flag_will_trigger_setUserIdEvent_before_regularEvent() {
         // given
-        prefilledStorage()
-        storage[.realtimeSetUserIdFailed] = true
+        prefilledVisitorStorage()
+        storage.realtimeSetUserIdFailed = true
+        let customerID = "abc"
+        storage.customerID = customerID
         let stubEvent = StubEvent()
 
         // then
@@ -217,7 +200,7 @@ class RealTimeComponentTests: XCTestCase {
             return stubEvent.isStubEvent(event)
         }
         let isUserIdEvent: (RealtimeEvent) -> Bool = { (event) in
-            return event.context[SetUserIdEvent.Constants.Key.userId] as? String == StubVariables.customerID
+            return event.context[SetUserIdEvent.Constants.Key.userId] as? String == customerID
         }
         networking.assertFunction = { (event) -> Result<String, Error> in
             if isRegularEvent(event) {
@@ -230,26 +213,26 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // and
-        let failedUserIdFlagExpectation = expectation(description: "failedUserIdFlag was not set")
+        let lastSuccessfulUserIdValueExpectation = expectation(description: "failedUserIdFlag was not set")
         storage.assertFunction = { (value, key) in
-            if key == .realtimeSetUserIdFailed, value as? Bool == false {
-                failedUserIdFlagExpectation.fulfill()
+            if key == .realtimeSetUserIdFailed, (value as? Bool) == false {
+                lastSuccessfulUserIdValueExpectation.fulfill()
             }
         }
 
         // when
         try! realTime.reportEvent(event: stubEvent)
-        wait(for: [userIdEventExpectation, regularEventExpectation], timeout: timeoutForRealtime, enforceOrder: true)
-        wait(for: [failedUserIdFlagExpectation], timeout: timeoutForRealtime)
+        wait(for: [userIdEventExpectation, regularEventExpectation], timeout: realtimeTimeout, enforceOrder: true)
+        wait(for: [lastSuccessfulUserIdValueExpectation], timeout: realtimeTimeout)
     }
 
     /// If the storage contains a flag that SetUserEmail event failed when a regular event is reported the SetUserEmail event will be reported first
     func test_that_failed_userEmailFlag_will_trigger_setUserEmailEvent_before_regularEvent() {
         // given
-        prefilledStorage()
-        storage[.realtimeSetEmailFailed] = true
+        prefilledVisitorStorage()
+        storage.realtimeSetEmailFailed = true
         let email = "aaa@bbb.com"
-        storage[.userEmail] = email
+        storage.userEmail = email
 
         // and
         let stubEvent = StubEvent()
@@ -277,28 +260,30 @@ class RealTimeComponentTests: XCTestCase {
         // and
         let failedUserEmailFlagExpectation = expectation(description: "failedUserEmailFlag was not set")
         storage.assertFunction = { (value, key) in
-            if key == .realtimeSetEmailFailed, value as? Bool == false {
+            if key == .realtimeSetEmailFailed, (value as? Bool) == false {
                 failedUserEmailFlagExpectation.fulfill()
             }
         }
 
         // when
         try! realTime.reportEvent(event: stubEvent)
-        wait(for: [userEmailEventExpectation, regularEventExpectation], timeout: timeoutForRealtime, enforceOrder: true)
-        wait(for: [failedUserEmailFlagExpectation], timeout: defaultTimeout)
+        wait(for: [userEmailEventExpectation, regularEventExpectation], timeout: realtimeTimeout, enforceOrder: true)
+        wait(for: [failedUserEmailFlagExpectation], timeout: realtimeTimeout)
     }
 
     /// If the storage contains a flag that SetUserID and SetUserEmail events failed, when a regular event is reported the SetUserId event will be reported first, then the SetUserEmail and finally the regular event.
     func test_FailedUserIdFlag_and_FailedUserEmailFlag_will_invoke_related_events_before_regular_one() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
         let email = "aaa@bbb.com"
-        storage[.userEmail] = email
+        storage.userEmail = email
+        let customerID = "abc"
+        storage.customerID = customerID
         let stubEvent = StubEvent()
 
         // and
-        storage[.realtimeSetEmailFailed] = true
-        storage[.realtimeSetUserIdFailed] = true
+        storage.realtimeSetUserIdFailed = true
+        storage.realtimeSetEmailFailed = true
 
         // then
         let userIdEventExpectation = expectation(description: "userIdEvent was not generated")
@@ -311,7 +296,7 @@ class RealTimeComponentTests: XCTestCase {
             return stubEvent.isStubEvent(event)
         }
         let isUserIdEvent: (RealtimeEvent) -> Bool = { (event) in
-            return event.context[SetUserIdEvent.Constants.Key.userId] as? String == StubVariables.customerID
+            return event.context[SetUserIdEvent.Constants.Key.userId] as? String == customerID
         }
         networking.assertFunction = { (event) -> Result<String, Error> in
             if isEmailEvent(event) {
@@ -327,35 +312,43 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // and
-        let failedUserIdFlagExpectation = expectation(description: "failedUserId was not set")
-        let failedUserEmailFlagExpectation = expectation(description: "failedUserEmailFlag was not set")
+        let lastSuccessfulUserIdExpectation = expectation(description: "failedUserId was not set")
+        let lastSuccessfulUserEmailExpectation = expectation(description: "failedUserEmailFlag was not set")
         storage.assertFunction = { (value, key) in
             if key == .realtimeSetUserIdFailed, value as? Bool == false {
-                failedUserIdFlagExpectation.fulfill()
+                lastSuccessfulUserIdExpectation.fulfill()
             }
             if key == .realtimeSetEmailFailed, value as? Bool == false {
-                failedUserEmailFlagExpectation.fulfill()
+                lastSuccessfulUserEmailExpectation.fulfill()
             }
         }
 
         // when
         try! realTime.reportEvent(event: stubEvent)
-        wait(for: [
+        let expectations = [
             userIdEventExpectation,
             userEmailEventExpectation,
             regularEventExpectation
-        ], timeout: timeoutForRealtime, enforceOrder: true)
-        wait(for: [
-            failedUserIdFlagExpectation,
-            failedUserEmailFlagExpectation
-        ], timeout: timeoutForRealtime, enforceOrder: true
+        ]
+        wait(
+            for: expectations,
+            timeout: realtimeTimeout * Double(expectations.count),
+            enforceOrder: true
+        )
+        wait(
+            for: [
+                lastSuccessfulUserIdExpectation,
+                lastSuccessfulUserEmailExpectation
+            ],
+            timeout: realtimeTimeout,
+            enforceOrder: true
         )
     }
 
     /// If more than 1 event is reported to the Realtime component and there is an internet connection, all the events reach the HTTP Client in the same order that they were reported.
     func test_more_than_1_event_report_order() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
 
         let key = "stub_name"
 
@@ -398,6 +391,12 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
+        let expectations = [
+            stubEventAExpectation,
+            stubEventBExpectation,
+            stubEventCExpectation
+        ]
+        let countOfEvents = expectations.count
         try! realTime.reportEvent(event: stubEventA)
         try! realTime.reportEvent(event: stubEventB)
         try! realTime.reportEvent(event: stubEventC)
@@ -405,12 +404,12 @@ class RealTimeComponentTests: XCTestCase {
             stubEventAExpectation,
             stubEventBExpectation,
             stubEventCExpectation
-        ], timeout: timeoutForRealtime, enforceOrder: true)
+        ], timeout: realtimeTimeout * Double(countOfEvents), enforceOrder: true)
     }
 
     func test_decoration_invoke() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
 
         // and
         let event = StubEvent()
@@ -432,113 +431,137 @@ class RealTimeComponentTests: XCTestCase {
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: timeoutForRealtime)
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
 // MARK: - Sending SetUserID/SetEmail Events
 
-    /// When a SetUserID event is reported and there is an internet connection, the storage flag for the failedSetUserId event should be false at the end of the flow.
-    func test_SetUserIdEvent_reported_with_internet_expect_failedSetUserId_flag_false() {
+    /// When a SetUserID event is reported and there is an internet connection,
+    /// the storage flag for the failedSetUserId event should be false at the end of the flow.
+    func test_SetUserIdEvent_reported_with_internet() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
+
+        let customerID = StubVariables.customerID
+        storage.customerID = customerID
 
         let event = SetUserIdEvent(
-            originalVistorId: storage[.initialVisitorId]!,
-            userId: storage[.customerID]!,
-            updateVisitorId: storage[.visitorID]!
+            originalVistorId: storage.initialVisitorId!,
+            userId: storage.customerID!,
+            updateVisitorId: storage.visitorID!
         )
 
         // then
-        let expect = expectation(description: #function)
+        let expect = expectation(description: "Last successful sent user id was not generated.")
         storage.assertFunction = { (value, key) in
-            if key == StorageKey.realtimeSetUserIdFailed, let value = value as? Bool {
-                XCTAssert(value == false)
+            if key == StorageKey.realtimeSetUserIdFailed {
+                XCTAssert(value as? Bool == false)
                 expect.fulfill()
             }
         }
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
-    /// When a SetUserID event is reported and there is no internet connection, the storage flag for the failedSetUserId event should be true at the end of the flow.
-    func test_SetUserIdEvent_reported_without_internet_expect_failedSetUserId_flag_true() {
+    /// When a SetUserID event is reported and there is no internet connection,
+    /// the storage flag for the failedSetUserId event should be true at the end of the flow.
+    func test_SetUserIdEvent_reported_without_internet() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
 
         // and
-        deviceStateMonitor.state[.internet] = false
+        let customerID = StubVariables.customerID
+        storage.customerID = customerID
+        storage.realtimeSetUserIdFailed = false
 
+        // and
         let event = SetUserIdEvent(
-            originalVistorId: storage[.initialVisitorId]!,
-            userId: storage[.customerID]!,
-            updateVisitorId: storage[.visitorID]!
+            originalVistorId: storage.initialVisitorId!,
+            userId: storage.customerID!,
+            updateVisitorId: storage.visitorID!
         )
 
+        // and
+        networking.assertFunction = { event in
+            return .failure(NetworkError.requestFailed)
+        }
+
         // then
-        let expect = expectation(description: #function)
+        let lastSuccessfulValueExpectation = expectation(description: "Last successful user id was generated.")
         storage.assertFunction = { (value, key) in
-            if key == StorageKey.realtimeSetUserIdFailed, let value = value as? Bool {
-                XCTAssert(value == true)
-                expect.fulfill()
+            if key == StorageKey.realtimeSetUserIdFailed {
+                XCTAssertEqual(value as? Bool, true)
+                lastSuccessfulValueExpectation.fulfill()
             }
         }
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
-    /// When a SetUserEmail event is reported and there is an internet connection, the storage flag for the failedSetUserEmail event should be false at the end of the flow.
-    func test_SetUserEmail_reported_with_internet_expect_failedSetUserEmail_flag_false() {
+    /// When a SetUserEmail event is reported and there is an internet connection,
+    /// the storage flag for the failedSetUserEmail event should be false at the end of the flow.
+    func test_SetUserEmail_reported_with_internet() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
 
         // and
+        let email = StubVariables.userEmail
+        storage.userEmail = email
+
+        // and
+        let event = SetUserEmailEvent(email: email)
+
+        // then
+        let lastSuccessfulSentEmailExpectation = expectation(description: "Last successful email was not generated")
+        storage.assertFunction = { (value, key) in
+            if key == StorageKey.realtimeSetEmailFailed {
+                XCTAssertEqual(value as? Bool, false)
+                lastSuccessfulSentEmailExpectation.fulfill()
+            }
+        }
+
+        // when
+        try! realTime.reportEvent(event: event)
+        waitForExpectations(timeout: realtimeTimeout)
+    }
+
+    /// When a SetUserEmail event is reported and there is no internet connection,
+    /// the storage flag for the failedSetUserEmail event should be true at the end of the flow.
+    func test_SetUserEmail_reported_without_internet() {
+        // given
+        prefilledVisitorStorage()
+
+        // and
+        let email = StubVariables.userEmail
+        storage.userEmail = email
+
+        // and
+        networking.assertFunction = { event in
+            return .failure(NetworkError.requestFailed)
+        }
+
         let event = SetUserEmailEvent(email: storage[.userEmail]!)
 
         // then
-        let expect = expectation(description: #function)
+        let lastSuccessfulSentEmailExpectation = expectation(description: "Last successful email was generated")
         storage.assertFunction = { (value, key) in
-            if key == StorageKey.realtimeSetEmailFailed, let value = value as? Bool {
-                XCTAssert(value == false)
-                expect.fulfill()
+            if key == StorageKey.realtimeSetEmailFailed {
+                lastSuccessfulSentEmailExpectation.fulfill()
             }
         }
 
         // when
         try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: timeoutForRealtime)
-    }
-
-    /// When a SetUserEmail event is reported and there is no internet connection, the storage flag for the failedSetUserEmail event should be true at the end of the flow.
-    func test_SetUserEmail_reported_without_internet_expect_failedSetUserEmail_flag_true() {
-        // given
-        prefilledStorage()
-
-        // and
-        deviceStateMonitor.state[.internet] = false
-
-        let event = SetUserEmailEvent(email: storage[.userEmail]!)
-
-        // then
-        let expect = expectation(description: #function)
-        storage.assertFunction = { (value, key) in
-            if key == StorageKey.realtimeSetEmailFailed, let value = value as? Bool {
-                XCTAssert(value == true)
-                expect.fulfill()
-            }
-        }
-
-        // when
-        try! realTime.reportEvent(event: event)
-        waitForExpectations(timeout: defaultTimeout)
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
     func test_report_screen_event() {
         // given
-        prefilledStorage()
+        prefilledVisitorStorage()
 
         let customURL = "customURL"
         let pageTitle = "pageTitle"
@@ -559,8 +582,14 @@ class RealTimeComponentTests: XCTestCase {
         }
 
         // when
-        try! realTime.reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
-        waitForExpectations(timeout: defaultTimeout)
+        try! realTime.handle(
+            OperationContext(
+                .eventable(
+                    .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
+                )
+            )
+        )
+        waitForExpectations(timeout: realtimeTimeout)
     }
 
     func test_report_without_customerID_and_visitorID() {
@@ -573,7 +602,25 @@ class RealTimeComponentTests: XCTestCase {
         }
         // when
         try! realTime.reportEvent(event: StubEvent())
-        waitForExpectations(timeout: timeoutForRealtime)
+        waitForExpectations(timeout: realtimeTimeout)
+    }
+
+    func test_expired_report() {
+        // given
+        let timestamp = Date().timeIntervalSince1970 - RealTime.Constatnts.timeThresholdInSeconds
+        let operationContext = OperationContext(operation: .eventable(.setUserId(userId: "userId")), timestamp: timestamp)
+
+        // then
+        let eventExpectation = expectation(description: "An expired event unexpectable handled.")
+        eventExpectation.isInverted.toggle()
+        networking.assertFunction = { (event) -> Result<String, Error> in
+            eventExpectation.fulfill()
+            return .success("")
+        }
+
+        // when
+        try! realTime.handle(operationContext)
+        waitForExpectations(timeout: defaultTimeout)
     }
 }
 

@@ -52,3 +52,13 @@ public enum GuardError: LocalizedError {
         }
     }
 }
+
+public let tryCatch: (() throws -> Void) -> Void = { function in
+    return {
+        do {
+            try function()
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
+    }()
+}

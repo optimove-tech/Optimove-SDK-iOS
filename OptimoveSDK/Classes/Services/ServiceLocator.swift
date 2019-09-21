@@ -8,22 +8,8 @@ final class ServiceLocator {
     // MARK: - Singletons
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _deviceStateMonitor: OptimoveDeviceStateMonitor = {
-        return OptimoveDeviceStateMonitorImpl(
-            fetcherFactory: DeviceRequirementFetcherFactoryImpl()
-        )
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _notificationListener: OptimoveNotificationHandler = {
-        return OptimoveNotificationHandler(
-            storage: storage(),
-            coreEventFactory: CoreEventFactoryImpl(
-                storage: storage(),
-                dateTimeProvider: dateTimeProvider()
-            ),
-            optimove: Optimove.shared
-        )
+    private lazy var _deeplinkService: DeeplinkService = {
+        return DeeplinkService()
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
@@ -50,9 +36,11 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _componentsPool: MutableComponentsPool = {
-        return ComponentsPoolImpl(
-            componentFactory: componentFactory()
+    private lazy var _synchronizer: Synchronizer = {
+        return SynchronizerImpl(
+            chain: Chain(
+                next: InMemoryBuffer()
+            )
         )
     }()
 
@@ -66,12 +54,11 @@ final class ServiceLocator {
         return NetworkClientImpl(configuration: .default)
     }
 
-    func deviceStateMonitor() -> OptimoveDeviceStateMonitor {
-        return _deviceStateMonitor
-    }
-
     func notificationListener() -> OptimoveNotificationHandling {
-        return _notificationListener
+        return OptimoveNotificationHandler(
+            synchronizer: synchronizer(),
+            deeplinkService: deeplinkService()
+        )
     }
 
     func dateTimeProvider() -> DateTimeProvider {
@@ -90,40 +77,65 @@ final class ServiceLocator {
         return ConfigurationRepositoryImpl(storage: storage())
     }
 
-    func initializer() -> OptimoveSDKInitializer {
-        let networkingFactory = NetworkingFactory(
-            networkClient: NetworkClientImpl(),
-            requestBuilderFactory: NetworkRequestBuilderFactory(
-                serviceLocator: self
-            )
+    func deeplinkService() -> DeeplinkService {
+        return _deeplinkService
+    }
+
+    func synchronizer() -> Synchronizer {
+        return _synchronizer
+    }
+
+    func configurationFetcher(operationFactory: OperationFactory) -> ConfigurationFetcher {
+        return ConfigurationFetcher(
+            operationFactory: operationFactory,
+            configurationRepository: configurationRepository()
         )
-        return OptimoveSDKInitializer(
-            deviceStateMonitor: deviceStateMonitor(),
+    }
+
+    func initializer(componentFactory: ComponentFactory) -> SDKInitializer {
+        return SDKInitializer(
             storage: storage(),
-            networking: networkingFactory.createRemoteConfigurationNetworking(),
-            configurationRepository: configurationRepository(),
-            componentFactory: componentFactory(),
-            componentsPool: mutableComponentsPool()
+            componentFactory: componentFactory,
+            chainMutator: _synchronizer
         )
     }
 
-    // FIXME: Move to Main factory
-    func componentFactory() -> ComponentFactory {
-        return ComponentFactory(
-            serviceLocator: self,
-            coreEventFactory: CoreEventFactoryImpl(
-                storage: storage(),
-                dateTimeProvider: dateTimeProvider()
-            )
+    func loggerInitializator() -> LoggerInitializator {
+        return LoggerInitializator(storage: storage())
+    }
+
+    func newTenantInfoHandler() -> NewTenantInfoHandler {
+        return NewTenantInfoHandler(storage: storage())
+    }
+
+    func newVisitorIdGenerator() -> NewVisitorIdGenerator {
+        return NewVisitorIdGenerator(storage: storage())
+    }
+
+    func firstTimeVisitGenerator() -> FirstTimeVisitGenerator {
+        return FirstTimeVisitGenerator(storage: storage())
+    }
+
+    func deviceStateObserver(coreEventFactory: CoreEventFactory) -> DeviceStateObserver {
+        return DeviceStateObserver(
+            observers: [
+                ResignActiveObserver(
+                    subscriber: _synchronizer
+                ),
+                OptInOutObserver(
+                    synchronizer: synchronizer(),
+                    notificationPermissionFetcher: NotificationPermissionFetcherImpl(),
+                    coreEventFactory: coreEventFactory,
+                    storage: storage()
+                ),
+                EnterForegroundObserver(
+                    synchronizer: synchronizer(),
+                    statisticService: statisticService(),
+                    dateTimeProvider: dateTimeProvider(),
+                    coreEventFactory: coreEventFactory
+                )
+            ]
         )
-    }
-
-    func componentsPool() -> ComponentsPool {
-        return _componentsPool
-    }
-
-    func mutableComponentsPool() -> MutableComponentsPool {
-        return _componentsPool
     }
 
 }

@@ -29,7 +29,7 @@ class GlobalConfigurationDownloaderTests: XCTestCase {
         Mocker.register(
             Mock(
                 url: Endpoints.Remote.GlobalConfig.url(SDK.environment),
-                contentType: .json,
+                dataType: .json,
                 statusCode: 200,
                 data: [.get: try! JSONEncoder().encode(expectedConfig)]
             )
