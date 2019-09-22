@@ -14,7 +14,7 @@ public struct LoggerSettings {
         if let minLogLevel = logLevel {
             return minLogLevel
         }
-        return SDK.isStaging ? LogLevelCore.info : LogLevelCore.warn
+        return SDK.isStaging ? LogLevelCore.debug : LogLevelCore.warn
     }()
 
     private static var logLevel: LogLevelCore? {
