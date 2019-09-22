@@ -29,10 +29,7 @@ struct TrackerEvent: Codable {
     /// Event tracking
     let category: String
     let action: String
-
     let dimensions: [CustomDimension]
-
-    let customTrackingParameters: [String: String]
 }
 
 extension TrackerEvent {

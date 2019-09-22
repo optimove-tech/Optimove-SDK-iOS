@@ -9,21 +9,18 @@ final class OptiTrack {
     private var storage: OptimoveStorage
     private let coreEventFactory: CoreEventFactory
     private let eventReportingQueue: DispatchQueue
-    private var optimoveCustomizePlugins: [String: String] = [:]
     private var tracker: Tracker
 
     required init(
         configuration: OptitrackConfig,
         storage: OptimoveStorage,
         coreEventFactory: CoreEventFactory,
-        trackerFlagsBuilder: TrackerFlagsBuilder,
         tracker: Tracker) {
         self.configuration = configuration
         self.storage = storage
         self.coreEventFactory = coreEventFactory
         self.tracker = tracker
         self.eventReportingQueue = DispatchQueue(label: "com.optimove.sdk.optitrack", qos: .background)
-        self.optimoveCustomizePlugins = (try? trackerFlagsBuilder.build()) ?? [:]
 
         Logger.debug("OptiTrack initialized.")
         syncVisitorAndUserIdToMatomo()
@@ -82,8 +79,6 @@ private extension OptiTrack {
             return ", category: '\(category)'"
         }()
         Logger.debug("OptiTrack: Report screen event: title='\(pageTitle)', path='\(customURL)'\(categoryDescription)")
-        tracker.track(view: [pageTitle], url: URL(string: "http://\(customURL)"))
-
         let event = try coreEventFactory.createEvent(
             .pageVisit(
                 screenPath: customURL.sha1(),
@@ -92,6 +87,7 @@ private extension OptiTrack {
             )
         )
         try report(event: event)
+        tracker.track(view: [pageTitle], url: URL(string: "http://\(customURL)"))
     }
 
     func dispatchNow() {
@@ -140,8 +136,7 @@ extension OptiTrack {
         let event = TrackerEvent(
             category: configuration.eventCategoryName,
             action: event.name,
-            dimensions: parameterDimensions + nameDimensions,
-            customTrackingParameters: self.optimoveCustomizePlugins
+            dimensions: parameterDimensions + nameDimensions
         )
         tracker.track(event)
     }

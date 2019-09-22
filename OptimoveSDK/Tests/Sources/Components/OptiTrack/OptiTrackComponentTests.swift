@@ -25,9 +25,6 @@ final class OptiTrackComponentTests: XCTestCase {
                 storage: storage,
                 dateTimeProvider: dateProvider
             ),
-            trackerFlagsBuilder: TrackerFlagsBuilder(
-                storage: storage
-            ),
             tracker: tracker
         )
     }
