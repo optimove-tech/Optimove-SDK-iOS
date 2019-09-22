@@ -10,15 +10,16 @@ protocol ResignActiveSubscriber {
 final class ResignActiveObserver: DeviceStateObservable {
 
     private let subscriber: ResignActiveSubscriber
+    private var willResignActiveToken: NSObjectProtocol?
 
     init(subscriber: ResignActiveSubscriber) {
         self.subscriber = subscriber
     }
 
     func observe() {
-        NotificationCenter.default.addObserver(
+        willResignActiveToken = NotificationCenter.default.addObserver(
             forName: UIApplication.willResignActiveNotification,
-            object: self,
+            object: nil,
             queue: .main
         ) { [subscriber] (_) in
             subscriber.onResignActive()
