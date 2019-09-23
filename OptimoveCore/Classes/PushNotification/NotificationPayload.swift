@@ -36,7 +36,7 @@ public struct NotificationPayload: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.title = try container.decode(String.self, forKey: .title)
         self.content = try container.decode(String.self, forKey: .content)
-        self.dynamicLinks = try DynamicLinks(firebaseFrom: decoder)
+        self.dynamicLinks = try? DynamicLinks(firebaseFrom: decoder)
         self.deepLinkPersonalization = try? DeeplinkPersonalization(firebaseFrom: decoder)
         self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder).campaign
         self.collapseKey = try container.decodeIfPresent(String.self, forKey: .collapseKey)

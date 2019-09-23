@@ -26,4 +26,14 @@ class NotificationCampaignTests: XCTestCase, FileAccessible {
             XCTAssertEqual(payload.campaign?.type, .scheduled)
         }
     }
+
+    func test_no_campaign() {
+        // given
+        fileName = "test_notification.json"
+
+        tryDecode {
+           let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
+           XCTAssertNil(payload.campaign)
+        }
+    }
 }
