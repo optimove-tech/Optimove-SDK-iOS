@@ -46,7 +46,6 @@ final class MatomoTrackerAdapter {
             action: [],
             eventCategory: event.category,
             eventAction: event.action,
-            customTrackingParameters: event.customTrackingParameters,
             dimensions: event.dimensions.map { CustomDimension(index: $0.index, value: $0.value) }
         )
     }

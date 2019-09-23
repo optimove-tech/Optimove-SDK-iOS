@@ -47,7 +47,6 @@ targets:
     dependencies: 
       - target: OptimoveCore
       - carthage: MatomoTracker
-      - carthage: Reachability
       - carthage: Firebase
         link: false
       - carthage: FIRAnalyticsConnector
@@ -85,29 +84,28 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.extension.notificationservice
     dependencies:
       - target: OptimoveCore
-      - sdk: UIKit.framework
       - sdk: UserNotifications.framework
       - sdk: Foundation.framework
   
   # unit-test
 
-  # UnitTests:
-  #   type: bundle.unit-test
-  #   platform: iOS
-  #   sources: 
-  #     - path: OptimoveCore/Tests/
-  #       name: OptimoveCore-Unit
-  #     - path: OptimoveSDK/Tests/
-  #       name: OptimoveSDK-Unit
-  #     - path: OptimoveNotificationServiceExtension/Tests/
-  #       name: OptimoveNotificationServiceExtension-Unit
-  #     - path: Shared
-  #       name: Shared-Unit
-  #   dependencies:
-  #     - target: OptimoveCore
-  #     - target: OptimoveSDK
-  #     - target: OptimoveNotificationServiceExtension
-  #     - carthage: Mocker
+  UnitTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: 
+      - path: OptimoveCore/Tests/
+        name: OptimoveCore-Unit
+      - path: OptimoveSDK/Tests/
+        name: OptimoveSDK-Unit
+      - path: OptimoveNotificationServiceExtension/Tests/
+        name: OptimoveNotificationServiceExtension-Unit
+      - path: Shared
+        name: Shared-Unit
+    dependencies:
+      - target: OptimoveCore
+      - target: OptimoveSDK
+      - target: OptimoveNotificationServiceExtension
+      - carthage: Mocker
 
   OptimoveCore-Unit:
     type: bundle.unit-test

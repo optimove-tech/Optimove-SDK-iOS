@@ -10,59 +10,44 @@ class NotificationPayloadTests: XCTestCase, FileAccessible {
     func test_decode_is_optipush_key() {
         fileName = "notificationWithCollapseKey.json"
 
-        do {
+        tryDecode {
             let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
             XCTAssert(payload.isOptipush == true)
-        } catch {
-            print(error)
-            XCTFail(error.localizedDescription)
         }
     }
 
     func test_decode_collapse_key() {
         fileName = "notificationWithCollapseKey.json"
 
-        do {
+        tryDecode {
             let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
             XCTAssert(payload.collapseKey != nil)
-        } catch {
-            print(error)
-            XCTFail(error.localizedDescription)
         }
     }
 
     func test_decode_campaign_details() {
         fileName = "notificationWithCampaignDetails.json"
 
-        do {
+        tryDecode {
             _ = try JSONDecoder().decode(NotificationPayload.self, from: data)
-        } catch {
-            print(error)
-            XCTFail(error.localizedDescription)
         }
     }
 
     func test_decode_deep_link_personalization_values() {
         fileName = "notificationWithDeepLinkPersonalizationValues.json"
 
-        do {
+        tryDecode {
             let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
             XCTAssert(payload.deepLinkPersonalization != nil)
-        } catch {
-            print(error)
-            XCTFail(error.localizedDescription)
         }
     }
 
     func test_decode_media() {
         fileName = "notificationWithMediaAttachment.json"
 
-        do {
+        tryDecode {
             let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
             XCTAssert(payload.media != nil)
-        } catch {
-            print(error)
-            XCTFail(error.localizedDescription)
         }
     }
 

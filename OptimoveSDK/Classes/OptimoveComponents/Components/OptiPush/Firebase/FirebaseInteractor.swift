@@ -95,6 +95,12 @@ extension FirebaseInteractor: OptipushServiceInfra {
     }
 
     func optimoveReceivedRegistrationToken(_ fcmToken: String) {
+        let setAPNsTokenToFirebase = { [weak self] in
+            if let apnsToken = self?.storage.apnsToken {
+                Messaging.messaging().apnsToken = apnsToken
+                self?.storage.apnsToken = nil
+            }
+        }
         if storage.isClientHasFirebase {
             guard storage.defaultFcmToken != fcmToken else {
                 Logger.debug("OptiPush: the FCM token is not new, no need to refresh.")
@@ -106,11 +112,13 @@ extension FirebaseInteractor: OptipushServiceInfra {
                 return
             }
             retreiveFcmToken(for: optimoveAppSenderId) { [weak self] (optimoveFCMToken) in
+                setAPNsTokenToFirebase()
                 Logger.debug("OptiPush: 🚀 FCM token NEW: \(optimoveFCMToken)")
                 self?.delegate?.handleRegistrationTokenRefresh(token: optimoveFCMToken)
                 self?.storage.defaultFcmToken = optimoveFCMToken
             }
         } else {
+            setAPNsTokenToFirebase()
             Logger.debug("OptiPush: 🚀 FCM token for app controller: \(fcmToken)")
             self.delegate?.handleRegistrationTokenRefresh(token: fcmToken)
         }
@@ -202,10 +210,6 @@ private extension FirebaseInteractor {
 
     func onTokenRenew(fcmToken: String) {
         registerIfTokenChanged(updatedFcmToken: fcmToken)
-        if let apnsToken = storage.apnsToken {
-            Messaging.messaging().apnsToken = apnsToken
-            storage.apnsToken = nil
-        }
     }
 
     func registerIfTokenChanged(updatedFcmToken: String) {
