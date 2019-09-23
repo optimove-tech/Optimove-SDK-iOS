@@ -13,7 +13,6 @@ public struct NotificationPayload: Decodable {
     public let collapseKey: String?
     public let isOptipush: Bool
     public let media: MediaAttachment?
-    public let userAction: UserAction?
 
     enum CodingKeys: String, CodingKey {
         case title
@@ -42,7 +41,6 @@ public struct NotificationPayload: Decodable {
         self.collapseKey = try container.decodeIfPresent(String.self, forKey: .collapseKey)
         self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
         self.media = try? MediaAttachment(firebaseFrom: decoder)
-        self.userAction = try? UserAction(firebaseFrom: decoder)
     }
 }
 
@@ -214,34 +212,6 @@ public struct MediaAttachment: Decodable {
         self = try JSONDecoder().decode(MediaAttachment.self, from: data)
     }
 
-}
-
-// MARK: - UserAction
-
-public struct UserAction: Decodable {
-    public let categoryIdentifier: String
-    public let actions: [Action]
-
-    enum CodingKeys: String, CodingKey {
-        case categoryIdentifier = "category_identifier"
-        case actions = "actions"
-    }
-
-    /// The custom decoder does preprocess before the primary decoder.
-    init(firebaseFrom decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
-        let string = try container.decode(String.self, forKey: .userAction)
-        let data: Data = try cast(string.data(using: .utf8))
-        self = try JSONDecoder().decode(UserAction.self, from: data)
-    }
-}
-
-// MARK: - Action
-
-public struct Action: Decodable {
-    public let identifier: String
-    public let title: String
-    public let deeplink: String?
 }
 
 /// https://stackoverflow.com/a/44596291
