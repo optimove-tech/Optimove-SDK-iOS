@@ -11,7 +11,6 @@ import OptimoveCore
     private let deviceStateObserver: DeviceStateObserver
     private let factory: MainFactory
     private let serviceLocator: ServiceLocator
-    private let stateListener: DeprecatedStateListener
     private let synchronizer: Synchronizer
     private var storage: OptimoveStorage
 
@@ -25,7 +24,6 @@ import OptimoveCore
         factory = MainFactory(serviceLocator: serviceLocator)
         storage = serviceLocator.storage()
         synchronizer = serviceLocator.synchronizer()
-        stateListener = DeprecatedStateListener()
         deviceStateObserver = serviceLocator.deviceStateObserver(
             coreEventFactory: factory.coreEventFactory()
         )
@@ -298,7 +296,6 @@ private extension Optimove {
         initializer.initialize(with: configuration)
         RunningFlagsIndication.isInitializerRunning.toggle()
         RunningFlagsIndication.isSdkRunning.toggle()
-        stateListener.onInitializationSuccessfully(self)
     }
 
 }
@@ -307,14 +304,12 @@ private extension Optimove {
 
 extension Optimove {
 
-    @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
+    @available(*, deprecated, message: "No need to register for lifecycle events. Use the SDK directly.")
     public func registerSuccessStateListener(_ listener: OptimoveSuccessStateListener) {
-        stateListener.registerSuccessStateListener(optimove: self, listener: listener)
+        listener.optimove(self, didBecomeActiveWithMissingPermissions: [])
     }
 
-    @available(*, deprecated, message: "This method will be deleted in the next version. Instead of subscribing as an listener use Optimove SDK directly.")
-    public func unregisterSuccessStateListener(_ listener: OptimoveSuccessStateListener) {
-        stateListener.unregisterSuccessStateListener(optimove: self, listener: listener)
-    }
+    @available(*, deprecated, message: "No need to unregister from lifecycle events anymore. Use the SDK directly.")
+    public func unregisterSuccessStateListener(_ listener: OptimoveSuccessStateListener) { }
 
 }
