@@ -2088,21 +2088,21 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		"TEMP_6ADD8B0B-49E0-478F-AA55-D83DF683B1F8" /* Tests */ = {
+		"TEMP_1374165B-702B-4BD5-9190-FA185394D227" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_A7D4CB6C-E111-414C-BDA0-36E257BDCF4A" /* Tests */ = {
+		"TEMP_9819D6DA-0E98-4C00-BAAE-5AD989AB3CEB" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_D28DAA7E-EA86-4FE0-94E7-5960DE17E0E2" /* Tests */ = {
+		"TEMP_B8686DB2-AD4A-4594-B3A6-DCB6289B7826" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
