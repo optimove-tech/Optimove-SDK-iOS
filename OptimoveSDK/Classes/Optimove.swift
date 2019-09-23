@@ -53,7 +53,7 @@ extension Optimove {
     /// - Parameters:
     ///   - name: Name of the event.
     ///   - parameters: The dictionary of attributes.
-    @objc public func reportEvent(name: String, parameters: [String: Any]) {
+    @objc public func reportEvent(name: String, parameters: [String: Any] = [:]) {
         let customEvent = CommonOptimoveEvent(name: name, parameters: parameters)
         synchronizer.handle(.report(event: customEvent))
     }
