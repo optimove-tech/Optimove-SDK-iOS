@@ -58,7 +58,10 @@ private extension OptimoveNotificationHandler {
             )
         default:
             throw GuardError.custom(
-                "The campaign of type \(notification.campaign?.type.rawValue ?? "nil") is not supported."
+                """
+                The campaign of type \(notification.campaign?.type.rawValue ?? "nil") is not supported.
+                Probably this is a test notification.
+                """
             )
         }
     }
