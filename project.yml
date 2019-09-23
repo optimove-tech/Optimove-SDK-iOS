@@ -1,7 +1,7 @@
 name: Optimove
 options:
-  xcodeVersion: 10.4
-  deploymentTarget: [iOS: 10]
+  deploymentTarget: 
+    iOS: "10"
 targets:
 
   OptimoveCore:

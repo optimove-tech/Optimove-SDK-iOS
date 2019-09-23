@@ -2088,21 +2088,21 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		"TEMP_662F2D4C-047B-4AE8-9217-FEE291AA0C04" /* Tests */ = {
+		"TEMP_6ADD8B0B-49E0-478F-AA55-D83DF683B1F8" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_6A2602DB-7012-4E36-AE77-FA7F0EEE06D2" /* Tests */ = {
+		"TEMP_A7D4CB6C-E111-414C-BDA0-36E257BDCF4A" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_6CB6E493-B4A5-49AF-85E5-9674499289C8" /* Tests */ = {
+		"TEMP_D28DAA7E-EA86-4FE0-94E7-5960DE17E0E2" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -2806,6 +2806,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2976,6 +2977,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
