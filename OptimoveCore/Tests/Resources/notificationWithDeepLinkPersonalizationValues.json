@@ -8,7 +8,7 @@
         },
         "mutable-content": "1"
     },
-    "campaign": "{\"triggered\": {\"action_serial\": 123, \"action_id\": 123, \"template_id\": 123 }}",
+    "triggered_campaign": "{\"action_serial\": 123, \"action_id\": 123, \"template_id\": 123 }",
     "campaign_id": "5",
     "action_serial": "1",
     "template_id": "1",

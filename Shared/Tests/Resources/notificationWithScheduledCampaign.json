@@ -8,7 +8,7 @@
         },
         "mutable-content": "1"
     },
-    "campaign": "{\"scheduled\": { \"campaign_id\": 456, \"action_serial\": 456, \"template_id\": 456, \"engagement_id\": 456, \"campaign_type\": 1 }}",
+    "scheduled_campaign": "{ \"campaign_id\": 456, \"action_serial\": 456, \"template_id\": 456, \"engagement_id\": 456, \"campaign_type\": 1 }",
     "is_optipush": "true",
     "dynamic_links": "{\"android\":{},\"ios\":{\"com_optimove_sdk_optimovemobileclientnofirebase\":\"https:\\/\\/x33fn.app.goo.gl\\/XjQ8AGSF77Nm4KwE6\"}}"
 }

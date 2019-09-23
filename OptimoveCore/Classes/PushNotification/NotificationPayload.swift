@@ -9,7 +9,7 @@ public struct NotificationPayload: Decodable {
     public let content: String
     public let dynamicLinks: DynamicLinks?
     public let deepLinkPersonalization: DeeplinkPersonalization?
-    public let campaign: NotificationCampaign
+    public let campaign: NotificationCampaign?
     public let collapseKey: String?
     public let isOptipush: Bool
     public let media: MediaAttachment?
@@ -38,7 +38,7 @@ public struct NotificationPayload: Decodable {
         self.content = try container.decode(String.self, forKey: .content)
         self.dynamicLinks = try DynamicLinks(firebaseFrom: decoder)
         self.deepLinkPersonalization = try? DeeplinkPersonalization(firebaseFrom: decoder)
-        self.campaign = try NotificationCampaignContainer(firebaseFrom: decoder).campaign
+        self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder).campaign
         self.collapseKey = try container.decodeIfPresent(String.self, forKey: .collapseKey)
         self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
         self.media = try? MediaAttachment(firebaseFrom: decoder)
@@ -49,32 +49,26 @@ public struct NotificationPayload: Decodable {
 // MARK: - Notification campaign
 
 public enum NotificationCampaignType: String, CodingKey, CaseIterable {
-    case scheduled
-    case triggered
+    case scheduled = "scheduled_campaign"
+    case triggered = "triggered_campaign"
 }
 
 public protocol NotificationCampaign: Decodable {
     var type: NotificationCampaignType { get }
 }
 
-struct NotificationCampaignContainer: Decodable {
+struct NotificationCampaignContainer {
     let campaign: NotificationCampaign
 
     init(firebaseFrom decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
-        let string = try container.decode(String.self, forKey: .campaign)
-        let data: Data = try cast(string.data(using: .utf8))
-        self = try JSONDecoder().decode(NotificationCampaignContainer.self, from: data)
-    }
-
-    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: NotificationCampaignType.self)
-        switch container.allKeys {
-        case [NotificationCampaignType.scheduled]:
-            campaign = try container.decode(ScheduledNotificationCampaign.self, forKey: .scheduled)
-        case [NotificationCampaignType.triggered]:
-            campaign = try container.decode(TriggeredNotificationCampaign.self, forKey: .triggered)
-        default:
+        let stringAndCampaignType: (string: String, type: NotificationCampaignType) = try {
+            if let string = try container.decodeIfPresent(String.self, forKey: .scheduled) {
+                return (string, .scheduled)
+            }
+            if let string = try container.decodeIfPresent(String.self, forKey: .triggered) {
+                return (string, .triggered)
+            }
             throw DecodingError.valueNotFound(
                 NotificationCampaign.self,
                 DecodingError.Context(
@@ -86,8 +80,16 @@ struct NotificationCampaignContainer: Decodable {
                     """
                 )
             )
+        }()
+        let data: Data = try cast(stringAndCampaignType.string.data(using: .utf8))
+        switch stringAndCampaignType.type {
+        case .scheduled:
+            self.campaign = try JSONDecoder().decode(ScheduledNotificationCampaign.self, from: data)
+        case .triggered:
+            self.campaign = try JSONDecoder().decode(TriggeredNotificationCampaign.self, from: data)
         }
     }
+
 }
 
 public struct TriggeredNotificationCampaign: NotificationCampaign {

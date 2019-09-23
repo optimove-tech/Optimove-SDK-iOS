@@ -11,12 +11,9 @@ class NotificationCampaignTests: XCTestCase, FileAccessible {
         // given
         fileName = "notificationWithTriggeredCampaign.json"
 
-        do {
+        tryDecode {
             let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
-            XCTAssert(payload.campaign.type == .triggered)
-        } catch {
-            print(error)
-            XCTFail(error.localizedDescription)
+            XCTAssertEqual(payload.campaign?.type, .triggered)
         }
     }
 
@@ -24,12 +21,9 @@ class NotificationCampaignTests: XCTestCase, FileAccessible {
         // given
         fileName = "notificationWithScheduledCampaign.json"
 
-        do {
+        tryDecode {
             let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
-            XCTAssert(payload.campaign.type == .scheduled)
-        } catch {
-            print(error)
-            XCTFail(error.localizedDescription)
+            XCTAssertEqual(payload.campaign?.type, .scheduled)
         }
     }
 }
