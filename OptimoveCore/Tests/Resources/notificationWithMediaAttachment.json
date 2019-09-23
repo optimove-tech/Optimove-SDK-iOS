@@ -1,0 +1,17 @@
+{
+    "title": "Ti [%EMAIL%] [%TEMPLATE_ID%]",
+    "content": "Body: \nF.N: [%FIRST_NAME%]\nL.N: [%LAST_NAME%]\nEm: [%EMAIL%]\nAdd_Days + 5:  [%CURRENT_DATE:ADD_DAYS(5):DATE_FORMAT%]",
+    "aps": {
+        "alert": {
+            "title": "Ti [%EMAIL%] [%TEMPLATE_ID%]",
+            "body": "Body: \nF.N: [%FIRST_NAME%]\nL.N: [%LAST_NAME%]\nEm: [%EMAIL%]\nAdd_Days + 5:  [%CURRENT_DATE:ADD_DAYS(5):DATE_FORMAT%]"
+        },
+        "mutable-content": "1"
+    },
+    "triggered_campaign": "{\"action_serial\": 123, \"action_id\": 123, \"template_id\": 123 }",
+    "is_optipush": "true",
+    "collapse_Key": "kukuka",
+    "dynamic_links": "{\"android\":{},\"ios\":{\"com_optimove_sdk_optimovemobileclientnofirebase\":\"https:\\/\\/x33fn.app.goo.gl\\/XjQ8AGSF77Nm4KwE6\"}}",
+    "media": "{\"url\": \"https:\\/\\/1s8lcx2foe0o2oxwuk1gp3pf-wpengine.netdna-ssl.com\\/wp-content\\/uploads\\/2016\\/11\\/Optimove_logo.svg\", \"media_type\": \"image\"}"
+}
+

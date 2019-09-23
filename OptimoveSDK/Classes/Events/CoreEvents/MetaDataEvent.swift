@@ -1,4 +1,4 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
 
 final class MetaDataEvent: OptimoveCoreEvent {
 
@@ -12,7 +12,7 @@ final class MetaDataEvent: OptimoveCoreEvent {
             static let appNS = "app_ns"
         }
     }
-    
+
     let name: String = Constants.name
     let parameters: [String: Any]
 

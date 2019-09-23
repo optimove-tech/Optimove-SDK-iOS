@@ -1,4 +1,6 @@
-// Copiright 2019 Optimove
+//  Copyright © 2019 Optimove. All rights reserved.
+
+import OptimoveCore
 
 final class ComponentFactory {
 
@@ -11,20 +13,17 @@ final class ComponentFactory {
         self.coreEventFactory = coreEventFactory
     }
 
-    func createRealtimeComponent() -> RealTime {
-        let metaDataProvider = serviceLocator.realtimeMetaDataProvider()
+    func createRealtimeComponent(configuration: Configuration) -> RealTime {
         let storage = serviceLocator.storage()
         return RealTime(
+            configuration: configuration.realtime,
             storage: storage,
             networking: RealTimeNetworkingImpl(
                 networkClient: serviceLocator.networking(),
                 realTimeRequestBuildable: RealTimeRequestBuilder(),
-                metaDataProvider: metaDataProvider
+                configuration: configuration.realtime
             ),
-            warehouse: serviceLocator.warehouseProvider(),
-            deviceStateMonitor: serviceLocator.deviceStateMonitor(),
             eventBuilder: RealTimeEventBuilder(
-                metaDataProvider: metaDataProvider,
                 storage: storage
             ),
             handler: RealTimeHanlderImpl(
@@ -37,16 +36,16 @@ final class ComponentFactory {
         )
     }
 
-    func createOptipushComponent() -> OptiPush {
+    func createOptipushComponent(configuration: Configuration) -> OptiPush {
         return OptiPush(
-            deviceStateMonitor: serviceLocator.deviceStateMonitor(),
+            configuration: configuration.optipush,
             infrastructure: FirebaseInteractor(
                 storage: serviceLocator.storage(),
                 networking: FirebaseInteractorNetworkingImpl(
                     networkClient: serviceLocator.networking(),
                     requestBuilder: FirebaseInteractorRequestBuilder(
                         storage: serviceLocator.storage(),
-                        metaDataProvider: serviceLocator.optipushMetaDataProvider()
+                        configuration: configuration.optipush
                     )
                 )
             ),
@@ -57,16 +56,13 @@ final class ComponentFactory {
         )
     }
 
-    func createOptitrackComponent() -> OptiTrack {
+    func createOptitrackComponent(configuration: Configuration) -> OptiTrack {
         return OptiTrack(
-            deviceStateMonitor: serviceLocator.deviceStateMonitor(),
-            warehouseProvider: serviceLocator.warehouseProvider(),
+            configuration: configuration.optitrack,
             storage: serviceLocator.storage(),
-            metaDataProvider: serviceLocator.optitrackMetaDataProvider(),
             coreEventFactory: coreEventFactory,
-            dateTimeProvider: serviceLocator.dateTimeProvider(),
-            statisticService: serviceLocator.statisticService(),
-            trackerFlagsBuilder: TrackerFlagsBuilder(
+            tracker: MatomoTrackerAdapter(
+                configuration: configuration.optitrack,
                 storage: serviceLocator.storage()
             )
         )

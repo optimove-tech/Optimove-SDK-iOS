@@ -1,0 +1,142 @@
+name: Optimove
+options:
+  xcodeVersion: 10.4
+  deploymentTarget: [iOS: 10]
+targets:
+
+  OptimoveCore:
+    type: framework
+    platform: iOS
+    sources: 
+      - path: OptimoveCore
+        excludes:
+          - "Tests/**/*"
+    info:
+      path: OptimoveCore/Info.plist
+      properties:
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+    scheme:
+      testTargets:
+        - OptimoveCore-Unit
+      gatherCoverageData: true
+    settings:
+      APPLICATION_EXTENSION_API_ONLY: YES
+      PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.core
+    dependencies:
+      - sdk: Foundation.framework
+
+  OptimoveSDK:
+    type: framework
+    platform: iOS
+    sources: 
+      - path: OptimoveSDK
+        excludes:
+          - "Tests/**/*"
+    info:
+      path: OptimoveSDK/Info.plist
+      properties:
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+    scheme:
+      testTargets:
+        - OptimoveSDK-Unit
+      gatherCoverageData: true
+    settings:
+      OTHER_LDFLAGS: -ObjC
+      MACH_O_TYPE: staticlib
+      PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk
+    dependencies: 
+      - target: OptimoveCore
+      - carthage: MatomoTracker
+      - carthage: Firebase
+        link: false
+      - carthage: FIRAnalyticsConnector
+      - carthage: FirebaseAnalytics
+      - carthage: FirebaseCore
+      - carthage: FirebaseCoreDiagnostics
+      - carthage: FirebaseInstanceID
+      - carthage: FirebaseMessaging
+      - carthage: GoogleAppMeasurement
+      - carthage: GoogleDataTransport
+      - carthage: GoogleDataTransportCCTSupport
+      - carthage: GoogleUtilities
+      - sdk: UIKit.framework
+      - sdk: UserNotifications.framework
+      - sdk: AdSupport.framework
+      - sdk: Foundation.framework
+
+  OptimoveNotificationServiceExtension:
+    type: framework
+    platform: iOS
+    sources: 
+      - path: OptimoveNotificationServiceExtension
+        excludes:
+          - "Tests/**/*"
+    info:
+      path: OptimoveNotificationServiceExtension/Info.plist
+      properties:
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+    scheme:
+      testTargets:
+        - OptimoveNotificationServiceExtension-Unit
+      gatherCoverageData: true
+    settings:
+      APPLICATION_EXTENSION_API_ONLY: YES
+      PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.extension.notificationservice
+    dependencies:
+      - target: OptimoveCore
+      - sdk: UserNotifications.framework
+      - sdk: Foundation.framework
+  
+  # unit-test
+
+  UnitTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: 
+      - path: OptimoveCore/Tests/
+        name: OptimoveCore-Unit
+      - path: OptimoveSDK/Tests/
+        name: OptimoveSDK-Unit
+      - path: OptimoveNotificationServiceExtension/Tests/
+        name: OptimoveNotificationServiceExtension-Unit
+      - path: Shared
+        name: Shared-Unit
+    dependencies:
+      - target: OptimoveCore
+      - target: OptimoveSDK
+      - target: OptimoveNotificationServiceExtension
+      - carthage: Mocker
+
+  OptimoveCore-Unit:
+    type: bundle.unit-test
+    platform: iOS
+    sources: 
+      - path: OptimoveCore/Tests/
+        name: OptimoveCore-Unit
+      - path: Shared
+        name: Shared-Unit
+    dependencies:
+      - target: OptimoveCore
+
+  OptimoveSDK-Unit:
+    type: bundle.unit-test
+    platform: iOS
+    sources: 
+      - path: OptimoveSDK/Tests/
+        name: OptimoveSDK-Unit
+      - path: Shared
+        name: Shared-Unit
+    dependencies:
+      - target: OptimoveSDK
+      - carthage: Mocker
+
+  OptimoveNotificationServiceExtension-Unit:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: OptimoveNotificationServiceExtension/Tests/
+        name: OptimoveNotificationServiceExtension-Unit
+      - path: Shared
+        name: Shared-Unit
+    dependencies:
+      - target: OptimoveNotificationServiceExtension

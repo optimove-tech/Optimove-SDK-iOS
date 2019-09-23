@@ -1,3 +1,5 @@
+//  Copyright © 2019 Optimove. All rights reserved.
+
 import Foundation
 
 extension DateFormatter {
@@ -18,4 +20,14 @@ extension DateFormatter {
         dateFormatter.dateFormat = "ss"
         return dateFormatter
     }()
+    static let iso8601DateFormatter: DateFormatterProtocol = {
+        return ISO8601DateFormatter()
+    }()
 }
+
+protocol DateFormatterProtocol {
+    func string(from date: Date) -> String
+    func date(from string: String) -> Date?
+}
+
+extension ISO8601DateFormatter: DateFormatterProtocol {}

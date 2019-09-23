@@ -1,0 +1,21 @@
+{
+    "title": "Ti [%EMAIL%] [%TEMPLATE_ID%]",
+    "content": "Body: \nF.N: [%FIRST_NAME%]\nL.N: [%LAST_NAME%]\nEm: [%EMAIL%]\nAdd_Days + 5:  [%CURRENT_DATE:ADD_DAYS(5):DATE_FORMAT%]",
+    "aps": {
+        "alert": {
+            "title": "Ti [%EMAIL%] [%TEMPLATE_ID%]",
+            "body": "Body: \nF.N: [%FIRST_NAME%]\nL.N: [%LAST_NAME%]\nEm: [%EMAIL%]\nAdd_Days + 5:  [%CURRENT_DATE:ADD_DAYS(5):DATE_FORMAT%]"
+        },
+        "mutable-content": "1"
+    },
+    "triggered_campaign": "{\"action_serial\": 123, \"action_id\": 123, \"template_id\": 123 }",
+    "campaign_id": "5",
+    "action_serial": "1",
+    "template_id": "1",
+    "engagement_id": "1",
+    "campaign_type": "1",
+    "collapse_Key": "kukuka",
+    "is_optipush": "true",
+    "dynamic_links": "{\"android\":{},\"ios\":{\"com_optimove_sdk_optimovemobileclientnofirebase\":\"https:\\/\\/x33fn.app.goo.gl\\/XjQ8AGSF77Nm4KwE6\"}}",
+    "deep_link_personalization_values": "{\"[%PVALUE1%]\": \"45%\",\"[%PVALUE2%]\": \"CERN\"}"
+}

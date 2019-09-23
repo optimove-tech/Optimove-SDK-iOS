@@ -1,6 +1,4 @@
-# Xcode
-#
-# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
+!.gitignore
 
 ## Build generated
 build/
@@ -58,6 +56,8 @@ Pods/
 # Carthage/Checkouts
 
 Carthage/Build
+Carthage
+Cartfile.resolved
 
 # fastlane
 #
@@ -71,6 +71,5 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 
-# Carthage
-Carthage
-Cartfile.resolved
+# Visual studio code
+.vscode
