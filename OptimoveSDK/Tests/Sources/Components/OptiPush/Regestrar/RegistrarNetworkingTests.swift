@@ -4,7 +4,7 @@ import XCTest
 import Mocker
 @testable import OptimoveSDK
 
-class RegistrarNetworkingTests: XCTestCase {
+class RegistrarNetworkingTests: OptimoveTestCase {
 
     var networking: RegistrarNetworking!
     let url = StubVariables.url
@@ -13,29 +13,31 @@ class RegistrarNetworkingTests: XCTestCase {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockingURLProtocol.self]
         let client = NetworkClientImpl(configuration: configuration)
+        let payloadBuilder = MbaasPayloadBuilder(
+            storage: storage,
+            device: SDKDevice.self,
+            bundle: Bundle.self
+        )
+        let requestFactory = RegistrarNetworkingRequestFactory(
+            storage: storage,
+            configuration: ConfigurationFixture.build().optipush,
+            payloadBuilder: payloadBuilder
+        )
         networking = RegistrarNetworkingImpl(
             networkClient: client,
-            requestBuilder: RegistrarNetworkingRequestBuilder(
-                storage: MockOptimoveStorage(),
-                configuration: ConfigurationFixture.build().optipush
-            )
+            requestFactory: requestFactory
         )
     }
 
-    func test_report_event_registration() {
+    func test_addOrUpdateUser() {
         // given
-        let model = MbaasModel(
-            deviceId: "deviceId",
-            appNs: "appNs",
-            operation: .registration,
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.visitorID("visitorID")
-        )
+        prefillStorageAsVisitor()
 
         Mocker.register(
             Mock(
                 url: url
-                    .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.register + RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.visitor),
+                    .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
+                    .appendingPathComponent(storage.visitorID!),
                 dataType: .json,
                 statusCode: 200,
                 data: [.post: Data()]
@@ -44,7 +46,7 @@ class RegistrarNetworkingTests: XCTestCase {
 
         // when
         let resultExpectation = expectation(description: "Result was not generated.")
-        networking.sendToMbaas(model: model) { (result) in
+        networking.sendToMbaas(operation: .addOrUpdateUser) { (result) in
             switch result {
             case .success:
                 resultExpectation.fulfill()
@@ -57,35 +59,24 @@ class RegistrarNetworkingTests: XCTestCase {
         wait(for: [resultExpectation], timeout: defaultTimeout)
     }
 
-    func test_report_event_unregistration() {
+    func test_migrate_user() {
         // given
-        let model = MbaasModel(
-            deviceId: "deviceId",
-            appNs: "appNs",
-            operation: .unregistration,
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.customerID(
-                BaseMbaasModel.UserIdPayload.CustomerIdPayload(
-                    customerID: "customerID",
-                    isConversion: false,
-                    initialVisitorId: "initialVisitorId"
-                )
-            )
-        )
+        prefillStorageAsCustomer()
 
         Mocker.register(
             Mock(
                 url: url
-                    .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.unregister + RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.customer),
+                    .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
+                    .appendingPathComponent(storage.customerID!),
                 dataType: .json,
                 statusCode: 200,
-                data: [.post: Data()]
+                data: [.put: Data()]
             )
         )
 
         // when
         let resultExpectation = expectation(description: "Result was not generated.")
-        networking.sendToMbaas(model: model) { (result) in
+        networking.sendToMbaas(operation: .migrateUser) { (result) in
             switch result {
             case .success:
                 resultExpectation.fulfill()

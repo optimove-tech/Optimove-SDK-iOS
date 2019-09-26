@@ -21,23 +21,17 @@ final class OptiPushServiceLocator {
     func registrar() -> Registrable {
         return Registrar(
             storage: storage(),
-            modelFactory: MbaasModelFactory(
-                storage: storage(),
-                processInfo: ProcessInfo(),
-                device: SDKDevice.self,
-                bundle: Bundle.self
-            ),
             networking: RegistrarNetworkingImpl(
                 networkClient: serviceLocator.networking(),
-                requestBuilder: RegistrarNetworkingRequestBuilder(
+                requestFactory: RegistrarNetworkingRequestFactory(
                     storage: storage(),
-                    configuration: optipushConfig
+                    configuration: optipushConfig,
+                    payloadBuilder: MbaasPayloadBuilder(
+                        storage: storage(),
+                        device: SDKDevice.self,
+                        bundle: Bundle.self
+                    )
                 )
-            ),
-            backup: MbaasBackupImpl(
-                storage: storage(),
-                encoder: JSONEncoder(),
-                decoder: JSONDecoder()
             )
         )
     }

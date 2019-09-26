@@ -4,255 +4,82 @@ import XCTest
 import Mocker
 @testable import OptimoveSDK
 
-class RegistrarNetworkingRequestBuilderTests: XCTestCase {
+class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
 
-    var storage: MockOptimoveStorage!
-    var builder: RegistrarNetworkingRequestBuilder!
+    var builder: RegistrarNetworkingRequestFactory!
+    var payloadBuilder: MbaasPayloadBuilder!
 
     override func setUp() {
-        storage = MockOptimoveStorage()
-        builder = RegistrarNetworkingRequestBuilder(
+        super.setUp()
+        payloadBuilder = MbaasPayloadBuilder(
             storage: storage,
-            configuration: ConfigurationFixture.build().optipush
+            device: SDKDevice.self,
+            bundle: Bundle.self
+        )
+        builder = RegistrarNetworkingRequestFactory(
+            storage: storage,
+            configuration: ConfigurationFixture.build().optipush,
+            payloadBuilder: payloadBuilder
         )
     }
 
-    func test_registration_model_request_for_visitor() {
+    func test_add_user_request_for_visitor() {
         // given
-        let model = RegistartionMbaasModel(
-            isMbaasOptIn: true,
-            fcmToken: "fcmToken",
-            osVersion: "osVersion",
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.visitorID("visitorID"),
-            deviceId: "deviceId",
-            appNs: "appNs"
-        )
+        prefillStorageAsVisitor()
 
         // when
-        let request = try! builder.createRequest(model: model)
+        let request = try! builder.createRequest(operation: .addOrUpdateUser)
 
         // then
         XCTAssert(request.baseURL == StubVariables.url
-            .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.register + RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.visitor)
+            .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
+            .appendingPathComponent(storage.visitorID!)
         )
         XCTAssert(request.method == .post)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(model)))
+        XCTAssert(request.httpBody == (try! JSONEncoder().encode(try! payloadBuilder.createAddOrUpdateUserPayload())))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
         }))
     }
 
-    func test_registration_model_request_for_customer() {
+    func test_add_user_request_for_customer() {
         // given
-        let model = RegistartionMbaasModel(
-            isMbaasOptIn: true,
-            fcmToken: "fcmToken",
-            osVersion: "osVersion",
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.customerID(
-                BaseMbaasModel.UserIdPayload.CustomerIdPayload(
-                    customerID: "customerID",
-                    isConversion: true,
-                    initialVisitorId: "initialVisitorId"
-                )
-            ),
-            deviceId: "deviceId",
-            appNs: "appNs"
-        )
+        prefillStorageAsCustomer()
 
         // when
-        let request = try! builder.createRequest(model: model)
+        let request = try! builder.createRequest(operation: .addOrUpdateUser)
 
         // then
         XCTAssert(request.baseURL == StubVariables.url
-            .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.register +
-                RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.customer)
+            .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
+            .appendingPathComponent(storage.customerID!)
         )
         XCTAssert(request.method == .post)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(model)))
+        XCTAssert(request.httpBody == (try! JSONEncoder().encode(try! payloadBuilder.createAddOrUpdateUserPayload())))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
         }))
     }
 
-    func test_optin_model_request_for_customer() {
+    func test_migrate_user_request() {
         // given
-        let model = MbaasModel(
-            deviceId: "deviceId",
-            appNs: "appNs",
-            operation: .optIn,
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.customerID(
-                BaseMbaasModel.UserIdPayload.CustomerIdPayload(
-                    customerID: "customerID",
-                    isConversion: true,
-                    initialVisitorId: "initialVisitorId"
-                )
-            )
-        )
+        prefillStorageAsCustomer()
 
         // when
-        let request = try! builder.createRequest(model: model)
+        let request = try! builder.createRequest(operation: .migrateUser)
 
         // then
         XCTAssert(request.baseURL == StubVariables.url
-            .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.optInOut +
-                RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.customer)
+            .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
+            .appendingPathComponent(storage.customerID!)
         )
-        XCTAssert(request.method == .post)
+        XCTAssert(request.method == .put)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(model)))
-        XCTAssert(request.headers!.contains(where: { (header) -> Bool in
-            return header.field == HTTPHeader.Fields.contentType.rawValue &&
-                header.value == HTTPHeader.Values.json.rawValue
-        }))
-    }
-
-    func test_optin_model_request_for_visitor() {
-        // given
-        let model = MbaasModel(
-            deviceId: "deviceId",
-            appNs: "appNs",
-            operation: .optIn,
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.visitorID("visitorID")
-        )
-
-        // when
-        let request = try! builder.createRequest(model: model)
-
-        // then
-        XCTAssert(request.baseURL == StubVariables.url
-            .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.optInOut + RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.visitor)
-        )
-        XCTAssert(request.method == .post)
-        XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(model)))
-        XCTAssert(request.headers!.contains(where: { (header) -> Bool in
-            return header.field == HTTPHeader.Fields.contentType.rawValue &&
-                header.value == HTTPHeader.Values.json.rawValue
-        }))
-    }
-
-    func test_optout_model_request_for_customer() {
-        // given
-        let model = MbaasModel(
-            deviceId: "deviceId",
-            appNs: "appNs",
-            operation: .optOut,
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.customerID(
-                BaseMbaasModel.UserIdPayload.CustomerIdPayload(
-                    customerID: "customerID",
-                    isConversion: true,
-                    initialVisitorId: "initialVisitorId"
-                )
-            )
-        )
-
-        // when
-        let request = try! builder.createRequest(model: model)
-
-        // then
-        XCTAssert(request.baseURL == StubVariables.url
-            .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.optInOut +
-                RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.customer)
-        )
-        XCTAssert(request.method == .post)
-        XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(model)))
-        XCTAssert(request.headers!.contains(where: { (header) -> Bool in
-            return header.field == HTTPHeader.Fields.contentType.rawValue &&
-                header.value == HTTPHeader.Values.json.rawValue
-        }))
-    }
-
-    func test_optout_model_request_for_visitor() {
-        // given
-        let model = MbaasModel(
-            deviceId: "deviceId",
-            appNs: "appNs",
-            operation: .optOut,
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.visitorID("visitorID")
-        )
-
-        // when
-        let request = try! builder.createRequest(model: model)
-
-        // then
-        XCTAssert(request.baseURL == StubVariables.url
-            .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.optInOut +
-                RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.visitor)
-        )
-        XCTAssert(request.method == .post)
-        XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(model)))
-        XCTAssert(request.headers!.contains(where: { (header) -> Bool in
-            return header.field == HTTPHeader.Fields.contentType.rawValue &&
-                header.value == HTTPHeader.Values.json.rawValue
-        }))
-    }
-
-    func test_unregistration_model_request_for_customer() {
-        // given
-        let model = MbaasModel(
-            deviceId: "deviceId",
-            appNs: "appNs",
-            operation: .unregistration,
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.customerID(
-                BaseMbaasModel.UserIdPayload.CustomerIdPayload(
-                    customerID: "customerID",
-                    isConversion: true,
-                    initialVisitorId: "initialVisitorId"
-                )
-            )
-        )
-
-        // when
-        let request = try! builder.createRequest(model: model)
-
-        // then
-        XCTAssert(request.baseURL == StubVariables.url
-            .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.unregister +
-                RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.customer)
-        )
-        XCTAssert(request.method == .post)
-        XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(model)))
-        XCTAssert(request.headers!.contains(where: { (header) -> Bool in
-            return header.field == HTTPHeader.Fields.contentType.rawValue &&
-                header.value == HTTPHeader.Values.json.rawValue
-        }))
-    }
-
-    func test_unregistration_model_request_for_visitor() {
-        // given
-        let model = MbaasModel(
-            deviceId: "deviceId",
-            appNs: "appNs",
-            operation: .unregistration,
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.visitorID("visitorID")
-        )
-
-        // when
-        let request = try! builder.createRequest(model: model)
-
-        // then
-        XCTAssert(request.baseURL == StubVariables.url
-            .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.unregister +
-                RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.visitor)
-        )
-        XCTAssert(request.method == .post)
-        XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(model)))
+        XCTAssert(request.httpBody == (try! JSONEncoder().encode(try! payloadBuilder.createMigrateUserPayload())))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue

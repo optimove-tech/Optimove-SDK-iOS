@@ -11,11 +11,7 @@ let realtimeTimeout: TimeInterval = defaultTimeout + 1
 
 class OptimoveTestCase: XCTestCase {
 
-    var storage: MockOptimoveStorage!
-
-    override func setUp() {
-        storage = MockOptimoveStorage()
-    }
+    var storage = MockOptimoveStorage()
 
     struct StubConstants {
         static let fcmToken = "fcmToken"
@@ -28,21 +24,20 @@ class OptimoveTestCase: XCTestCase {
     }
 
     func defaultStorage() {
-        storage.fcmToken = StubConstants.fcmToken
         storage.siteID = StubConstants.tenantID
-        storage.isMbaasOptIn = StubConstants.isMbaasOptIn
-    }
-
-    func prefillStorageAsCustomer() {
-        storage.customerID = StubConstants.customerID
-        storage.isFirstConversion = StubConstants.isFirstConversion
-        storage.initialVisitorId = StubConstants.initialVisitorId
-        defaultStorage()
     }
 
     func prefillStorageAsVisitor() {
-        storage.visitorID = StubConstants.visitorID
         defaultStorage()
+        storage.visitorID = StubConstants.visitorID
+    }
+
+    func prefillStorageAsCustomer() {
+        defaultStorage()
+        prefillStorageAsVisitor()
+        storage.customerID = StubConstants.customerID
+        storage.isFirstConversion = StubConstants.isFirstConversion
+        storage.initialVisitorId = StubConstants.initialVisitorId
     }
 
 }
@@ -54,4 +49,8 @@ extension String {
         return String((0..<length).map{ _ in letters.randomElement()! })
     }
 
+}
+
+enum StubError: Error {
+    case test
 }

@@ -33,9 +33,9 @@ enum EventableOperation {
 
 enum PushableOperation {
     case deviceToken(token: Data)
-    case performRegistration
-    case unsubscribeFromTopic(topic: String)
     case subscribeToTopic(topic: String)
+    case unsubscribeFromTopic(topic: String)
+    case migrateUser
     case optIn
     case optOut
 }

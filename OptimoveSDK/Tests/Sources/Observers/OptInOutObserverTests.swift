@@ -95,6 +95,7 @@ final class OptInOutObserverTests: XCTestCase {
         storage.isOptiTrackOptIn = true
         notificationPermissionFetcher.permitted = false
         storage.fcmToken = StubVariables.string
+        storage.isRegistrationSuccess = true
 
         let optOutEventExpectation = expectation(description: "OptOut event was not generated.")
         synchronizer.assertFunctionEventable = { operation in

@@ -108,7 +108,7 @@ extension Optimove {
         guard validationResult == .valid else { return }
         NewUserIDHandler(storage: storage).handle(userID: userID)
         synchronizer.handle(.setUserId(userId: userID))
-        synchronizer.handle(.performRegistration)
+        synchronizer.handle(.migrateUser)
     }
 
     /// Set a User ID and the user email
@@ -128,7 +128,9 @@ extension Optimove {
         let validationResult = EmailValidator(storage: storage).isValid(email)
         guard validationResult == .valid else { return }
         NewEmailHandler(storage: storage).handle(email: email)
-        reportEvent(SetUserEmailEvent(email: email))
+        tryCatch {
+            reportEvent(try factory.coreEventFactory().createEvent(.setUserEmail))
+        }
     }
 
 }

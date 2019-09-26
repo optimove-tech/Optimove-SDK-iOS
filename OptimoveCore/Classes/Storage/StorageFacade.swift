@@ -29,7 +29,7 @@ public  enum StorageKey: String, CaseIterable {
     case siteID
     case isClientHasFirebase
     case isMbaasOptIn
-    case unregistrationSuccess
+    case userMigrationSuccess
     case registrationSuccess
     case optSuccess
     case isFirstConversion
@@ -79,10 +79,8 @@ public protocol StorageValue {
     /// Default value is `false`
     var isClientHasFirebase: Bool { get set }
     var isMbaasOptIn: Bool? { get set }
-    /// Default value is `true`
-    var isUnregistrationSuccess: Bool { get set }
-    /// Default value is `true`
-    var isRegistrationSuccess: Bool { get set }
+    var isUserMigrationSuccess: Bool? { get set }
+    var isRegistrationSuccess: Bool? { get set }
     /// Default value is `true`
     var isOptRequestSuccess: Bool { get set }
     /// Default value is `false`
@@ -139,7 +137,7 @@ public final class StorageFacade: OptimoveStorage {
         .siteID,
         .isClientHasFirebase,
         .isMbaasOptIn,
-        .unregistrationSuccess,
+        .userMigrationSuccess,
         .registrationSuccess,
         .optSuccess,
         .isFirstConversion,
@@ -199,8 +197,8 @@ extension StorageFacade {
         }
     }
 
-// TODO: Should be supported in the future version of Swift. https://bugs.swift.org/browse/SR-238
-//    subscript<T>(key: UserDefaultsKey) -> () throws -> T {
+/// Should be supported in the future version of Swift. https://bugs.swift.org/browse/SR-238
+//    subscript<T>(key: StorageKey) -> () throws -> T {
 //        get {
 //            return { try cast(self.storage(for: key).value(forKey: key.rawValue)) }
 //        }
@@ -461,18 +459,18 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var isUnregistrationSuccess: Bool {
+    var isUserMigrationSuccess: Bool? {
         get {
-            return self[.unregistrationSuccess] ?? true
+            return self[.userMigrationSuccess]
         }
         set {
-            self[.unregistrationSuccess] = newValue
+            self[.userMigrationSuccess] = newValue
         }
     }
 
-    var isRegistrationSuccess: Bool {
+    var isRegistrationSuccess: Bool? {
         get {
-            return self[.registrationSuccess] ?? true
+            return self[.registrationSuccess]
         }
         set {
             return self[.registrationSuccess] = newValue

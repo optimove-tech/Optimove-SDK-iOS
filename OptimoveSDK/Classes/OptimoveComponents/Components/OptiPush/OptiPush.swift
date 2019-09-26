@@ -21,12 +21,8 @@ final class OptiPush {
         self.registrar = registrar
 
         self.serviceProvider.delegate = self
-        performInitializationOperations()
-        Logger.debug("OptiPush initialized.")
-    }
-
-    func performInitializationOperations() {
         retryFailedMbaasOperations()
+        Logger.debug("OptiPush initialized.")
     }
 
 }
@@ -37,18 +33,20 @@ extension OptiPush: Component {
         switch context.operation {
         case let .pushable(operation):
             switch operation {
-            case let .deviceToken(token: data):
-                serviceProvider.handleRegistration(apnsToken: data)
-            case let  .subscribeToTopic(topic: topic):
+            case let .deviceToken(token: token):
+                storage.apnsToken = token
+                registrar.handle(.addOrUpdateUser)
+                serviceProvider.handleRegistration(apnsToken: token)
+            case let .subscribeToTopic(topic: topic):
                 serviceProvider.subscribeToTopic(topic: topic)
             case let .unsubscribeFromTopic(topic: topic):
                 serviceProvider.unsubscribeFromTopic(topic: topic)
-            case .performRegistration:
-                performRegistration()
+            case .migrateUser:
+                registrar.handle(.migrateUser)
             case .optIn:
-                registrar.optIn()
+                registrar.handle(.addOrUpdateUser)
             case .optOut:
-                registrar.optOut()
+                registrar.handle(.addOrUpdateUser)
             }
         default:
             break
@@ -58,29 +56,12 @@ extension OptiPush: Component {
 
 extension OptiPush: PushServiceProviderDelegate {
 
-    // MARK: - Protocol conformance
-
     func onRefreshToken() {
-        let registerToken: () -> Void = {
-            self.performRegistration()
-            self.serviceProvider.subscribeToTopics()
-        }
-        if storage.isRegistrationSuccess {
-            registrar.unregister {
-                registerToken()
-            }
-        } else {
-            registerToken()
-        }
+        serviceProvider.subscribeToTopics()
     }
 
 }
-
 private extension OptiPush {
-
-    func performRegistration() {
-        registrar.register()
-    }
 
     func retryFailedMbaasOperations() {
         do {
