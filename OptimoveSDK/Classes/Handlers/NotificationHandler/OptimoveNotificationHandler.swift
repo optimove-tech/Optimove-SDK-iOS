@@ -114,7 +114,7 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
 
     func didReceive(
         response: UNNotificationResponse,
-        withCompletionHandler completionHandler: @escaping ResultBlock
+        withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         reportNotification(response: response)
         if isNotificationOpened(response: response) {

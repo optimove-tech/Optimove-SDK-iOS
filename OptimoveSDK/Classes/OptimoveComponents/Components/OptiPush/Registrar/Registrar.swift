@@ -5,7 +5,7 @@ import OptimoveCore
 
 protocol Registrable {
     func register()
-    func unregister(didComplete: @escaping ResultBlock)
+    func unregister(didComplete: @escaping () -> Void)
     func optIn()
     func optOut()
     func retryFailedOperationsIfExist() throws
@@ -36,7 +36,7 @@ extension Registrar: Registrable {
         sendToMbaasModel(for: .registration)
     }
 
-    func unregister(didComplete: @escaping ResultBlock) {
+    func unregister(didComplete: @escaping () -> Void) {
         sendToMbaasModel(for: .unregistration, completion: didComplete)
     }
 

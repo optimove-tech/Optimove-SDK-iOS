@@ -211,7 +211,6 @@
 		7F6A202D4C9541D3DFE79119 /* SetAdvertisingIdEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD9601883B48B328BEA00024 /* SetAdvertisingIdEventTests.swift */; };
 		805DB74E1DA415F9C2585829 /* notificationWithTriggeredCampaign.json in Resources */ = {isa = PBXBuildFile; fileRef = 458897EAB1CC463D34F58C56 /* notificationWithTriggeredCampaign.json */; };
 		80C273417755BE17F1814D30 /* notificationWithTriggeredCampaign.json in Resources */ = {isa = PBXBuildFile; fileRef = 458897EAB1CC463D34F58C56 /* notificationWithTriggeredCampaign.json */; };
-		8137923A699BD1C6F78FDE31 /* Results.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C550C6C1D1BCB4F63FB967 /* Results.swift */; };
 		8286C87E53134DC1A18286A1 /* OptipushOptOutEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08B74F65841BBD4AA9DEFF3 /* OptipushOptOutEventTests.swift */; };
 		82AF4F8D8E368EF308485B78 /* GlobalConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CE5453334832B2F87641CB /* GlobalConfig.swift */; };
 		836ED7EFB3A6021808BB8FC7 /* FirebaseOptionsBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705D65D4AD6F8B6213CFA31A /* FirebaseOptionsBuilder.swift */; };
@@ -682,7 +681,6 @@
 		7ED1777991FE84B0445AE09C /* OptimoveTenantInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveTenantInfo.swift; sourceTree = "<group>"; };
 		7FA7992B809E7A04095C16D7 /* TriggeredNotificationRecievedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggeredNotificationRecievedTests.swift; sourceTree = "<group>"; };
 		808FDA9CB667C21D93FE9163 /* OptimoveNotificationServiceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationServiceExtension.swift; sourceTree = "<group>"; };
-		80C550C6C1D1BCB4F63FB967 /* Results.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Results.swift; sourceTree = "<group>"; };
 		810A61C9CB21A839A4084A97 /* NotificationPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPayloadTests.swift; sourceTree = "<group>"; };
 		81A7AC20B0DFA891146DFB42 /* MbaasModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MbaasModelTests.swift; sourceTree = "<group>"; };
 		81BC45AB12DCB12A09904FB2 /* EnterForegroundObserverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterForegroundObserverTests.swift; sourceTree = "<group>"; };
@@ -997,7 +995,6 @@
 			children = (
 				C6512B3C17D017A2FA78689F /* DeprecatedStateListener.swift */,
 				F508BB8F8BD7981E512B0212 /* OptimoveTopicsUserDefaults.swift */,
-				80C550C6C1D1BCB4F63FB967 /* Results.swift */,
 				69486A8AAA97D56729890ECD /* SDKDevice.swift */,
 				BC1FF1AC9CD0BBAEA48E48F7 /* Logger */,
 			);
@@ -2479,7 +2476,6 @@
 				135DA4D6FA15247590446DE9 /* RemoteConfigurationNetworking.swift in Sources */,
 				0697957F7C6A9A94C723E8B3 /* RemoteConfigurationRequestBuilder.swift in Sources */,
 				8D4A3283886347F6EF036AD1 /* ResignActiveObserver.swift in Sources */,
-				8137923A699BD1C6F78FDE31 /* Results.swift in Sources */,
 				F57FB9CD58CF90DA4996EC92 /* RingBuffer.swift in Sources */,
 				24C4A7616652625931F6DC6E /* RunningFlagsContainer.swift in Sources */,
 				F7EF35FFE31E8D1B8C459E7F /* SDKDevice.swift in Sources */,

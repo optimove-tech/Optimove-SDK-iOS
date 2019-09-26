@@ -6,7 +6,7 @@ final class MockNotificationPermissionFetcher: NotificationPermissionFetcher {
 
     var permitted: Bool = true
 
-    func fetch(completion: @escaping ResultBlockWithBool) {
+    func fetch(completion: @escaping (Bool) -> Void) {
         completion(permitted)
     }
 
