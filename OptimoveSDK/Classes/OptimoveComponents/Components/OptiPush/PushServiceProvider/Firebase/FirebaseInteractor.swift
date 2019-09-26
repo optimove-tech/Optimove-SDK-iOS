@@ -70,7 +70,6 @@ final class FirebaseInteractor: NSObject, PushServiceProvider {
         let setAPNsTokenToFirebase = { [weak self] in
             if let apnsToken = self?.storage.apnsToken {
                 Messaging.messaging().apnsToken = apnsToken
-                self?.storage.apnsToken = nil
             }
         }
         if storage.isClientHasFirebase {
