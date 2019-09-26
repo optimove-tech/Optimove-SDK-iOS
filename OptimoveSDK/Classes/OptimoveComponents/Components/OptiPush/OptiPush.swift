@@ -4,46 +4,23 @@ import Foundation
 import UserNotifications
 import OptimoveCore
 
-protocol OptipushServiceInfra {
-    func subscribeToTopics(didSucceed: ((Bool) -> Void)?)
-    func unsubscribeFromTopics()
-
-    func setupFirebase(
-        from: FirebaseProjectKeys,
-        clientFirebaseMetaData: ClientsServiceProjectKeys,
-        delegate: OptimoveMbaasRegistrationHandling
-    )
-    func handleRegistration(apnsToken: Data)
-    func optimoveReceivedRegistrationToken(_ fcmToken: String)
-
-    func subscribeToTopic(topic: String, didSucceed: ((Bool) -> Void)?)
-    func unsubscribeFromTopic(topic: String, didSucceed: ((Bool) -> Void)?)
-}
-
 final class OptiPush {
 
     private let configuration: OptipushConfig
-    private let firebaseInteractor: OptipushServiceInfra
+    private var serviceProvider: PushServiceProvider
     private let registrar: Registrable
     private var storage: OptimoveStorage
-    private let serviceLocator: OptiPushServiceLocator
 
     init(configuration: OptipushConfig,
-         infrastructure: OptipushServiceInfra,
-         storage: OptimoveStorage,
-         localServiceLocator: OptiPushServiceLocator) {
+         serviceProvider: PushServiceProvider,
+         registrar: Registrable,
+         storage: OptimoveStorage) {
         self.configuration = configuration
-        self.firebaseInteractor = infrastructure
+        self.serviceProvider = serviceProvider
         self.storage = storage
-        self.serviceLocator = localServiceLocator
+        self.registrar = registrar
 
-        registrar = serviceLocator.registrar(configuration: configuration)
-        firebaseInteractor.setupFirebase(
-            from: configuration.firebaseProjectKeys,
-            clientFirebaseMetaData: configuration.clientsServiceProjectKeys,
-            delegate: self
-        )
-
+        self.serviceProvider.delegate = self
         performInitializationOperations()
         Logger.debug("OptiPush initialized.")
     }
@@ -61,11 +38,11 @@ extension OptiPush: Component {
         case let .pushable(operation):
             switch operation {
             case let .deviceToken(token: data):
-                firebaseInteractor.handleRegistration(apnsToken: data)
+                serviceProvider.handleRegistration(apnsToken: data)
             case let  .subscribeToTopic(topic: topic):
-                firebaseInteractor.subscribeToTopic(topic: topic, didSucceed: nil)
+                serviceProvider.subscribeToTopic(topic: topic)
             case let .unsubscribeFromTopic(topic: topic):
-                firebaseInteractor.unsubscribeFromTopic(topic: topic, didSucceed: nil)
+                serviceProvider.unsubscribeFromTopic(topic: topic)
             case .performRegistration:
                 performRegistration()
             case .optIn:
@@ -79,23 +56,20 @@ extension OptiPush: Component {
     }
 }
 
-extension OptiPush: OptimoveMbaasRegistrationHandling {
+extension OptiPush: PushServiceProviderDelegate {
 
     // MARK: - Protocol conformance
 
-    func handleRegistrationTokenRefresh(token: String) {
+    func onRefreshToken() {
         let registerToken: () -> Void = {
             self.performRegistration()
-            self.firebaseInteractor.subscribeToTopics(didSucceed: nil)
+            self.serviceProvider.subscribeToTopics()
         }
-        if storage.fcmToken == token {
-            storage.fcmToken = token
+        if storage.isRegistrationSuccess {
             registrar.unregister {
                 registerToken()
             }
         } else {
-            //The order of the following operations matter
-            storage.fcmToken = token
             registerToken()
         }
     }

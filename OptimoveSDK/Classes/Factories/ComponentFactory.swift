@@ -37,22 +37,15 @@ final class ComponentFactory {
     }
 
     func createOptipushComponent(configuration: Configuration) -> OptiPush {
+        let localServiceLocator = OptiPushServiceLocator(
+            serviceLocator: serviceLocator,
+            optipushConfig: configuration.optipush
+        )
         return OptiPush(
             configuration: configuration.optipush,
-            infrastructure: FirebaseInteractor(
-                storage: serviceLocator.storage(),
-                networking: FirebaseInteractorNetworkingImpl(
-                    networkClient: serviceLocator.networking(),
-                    requestBuilder: FirebaseInteractorRequestBuilder(
-                        storage: serviceLocator.storage(),
-                        configuration: configuration.optipush
-                    )
-                )
-            ),
-            storage: serviceLocator.storage(),
-            localServiceLocator: OptiPushServiceLocator(
-                serviceLocator: serviceLocator
-            )
+            serviceProvider: localServiceLocator.serviceProvider(),
+            registrar: localServiceLocator.registrar(),
+            storage: serviceLocator.storage()
         )
     }
 

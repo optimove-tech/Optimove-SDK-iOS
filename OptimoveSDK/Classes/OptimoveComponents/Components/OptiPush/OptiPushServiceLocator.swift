@@ -6,16 +6,19 @@ import OptimoveCore
 final class OptiPushServiceLocator {
 
     private let serviceLocator: ServiceLocator
+    private let optipushConfig: OptipushConfig
 
-    init(serviceLocator: ServiceLocator) {
+    init(serviceLocator: ServiceLocator,
+         optipushConfig: OptipushConfig) {
         self.serviceLocator = serviceLocator
+        self.optipushConfig = optipushConfig
     }
 
     func storage() -> OptimoveStorage {
         return serviceLocator.storage()
     }
 
-    func registrar(configuration: OptipushConfig) -> Registrable {
+    func registrar() -> Registrable {
         return Registrar(
             storage: storage(),
             modelFactory: MbaasModelFactory(
@@ -28,7 +31,7 @@ final class OptiPushServiceLocator {
                 networkClient: serviceLocator.networking(),
                 requestBuilder: RegistrarNetworkingRequestBuilder(
                     storage: storage(),
-                    configuration: configuration
+                    configuration: optipushConfig
                 )
             ),
             backup: MbaasBackupImpl(
@@ -36,6 +39,22 @@ final class OptiPushServiceLocator {
                 encoder: JSONEncoder(),
                 decoder: JSONDecoder()
             )
+        )
+    }
+
+    func serviceProvider() -> PushServiceProvider {
+        let requestBuilder = FirebaseInteractorRequestBuilder(
+            storage: serviceLocator.storage(),
+            configuration: optipushConfig
+        )
+        let networking = FirebaseInteractorNetworkingImpl(
+            networkClient: serviceLocator.networking(),
+            requestBuilder: requestBuilder
+        )
+        return FirebaseInteractor(
+            storage: storage(),
+            networking: networking,
+            optipush: optipushConfig
         )
     }
 
