@@ -1,7 +1,7 @@
 name: Optimove
 options:
-  xcodeVersion: 10.4
-  deploymentTarget: [iOS: 10]
+  deploymentTarget: 
+    iOS: "10"
 targets:
 
   OptimoveCore:
@@ -18,7 +18,6 @@ targets:
     scheme:
       testTargets:
         - OptimoveCore-Unit
-      gatherCoverageData: true
     settings:
       APPLICATION_EXTENSION_API_ONLY: YES
       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.core
@@ -39,7 +38,6 @@ targets:
     scheme:
       testTargets:
         - OptimoveSDK-Unit
-      gatherCoverageData: true
     settings:
       OTHER_LDFLAGS: -ObjC
       MACH_O_TYPE: staticlib
@@ -78,7 +76,6 @@ targets:
     scheme:
       testTargets:
         - OptimoveNotificationServiceExtension-Unit
-      gatherCoverageData: true
     settings:
       APPLICATION_EXTENSION_API_ONLY: YES
       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.extension.notificationservice
