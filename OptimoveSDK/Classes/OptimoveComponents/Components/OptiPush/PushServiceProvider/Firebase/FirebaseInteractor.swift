@@ -59,29 +59,6 @@ final class FirebaseInteractor: NSObject, PushServiceProvider {
 
     // MARK: - FirebaseProvider
 
-    weak var delegate: PushServiceProviderDelegate?
-
-    func subscribeToTopics() {
-        let dict = OptimoveTopicsUserDefaults.topics?.dictionaryRepresentation()
-        dict?.forEach { (key, _) in
-            if key.hasPrefix("optimove_") {
-                subscribeToTopic(topic: key.deletingPrefix("optimove_"))
-            }
-        }
-        subscribeToTopic(topic: "optipush_general")
-        subscribeToTopic(topic: "ios")
-        subscribeToTopic(topic: getMongoTypeBundleId())
-    }
-
-    func unsubscribeFromTopics() {
-        let dict = OptimoveTopicsUserDefaults.topics?.dictionaryRepresentation()
-        dict?.forEach { (key, _) in
-            if key.hasPrefix("optimove_") {
-                unsubscribeFromTopic(topic: key.deletingPrefix("optimove_"))
-            }
-        }
-    }
-
     func handleRegistration(apnsToken: Data) {
         storage.apnsToken = apnsToken
         if let fcmToken = Messaging.messaging().fcmToken {
@@ -110,14 +87,12 @@ final class FirebaseInteractor: NSObject, PushServiceProvider {
                 setAPNsTokenToFirebase()
                 Logger.debug("OptiPush: 🚀 FCM token NEW: \(optimoveFCMToken)")
                 self?.storage.fcmToken = optimoveFCMToken
-                self?.delegate?.onRefreshToken()
                 self?.storage.defaultFcmToken = optimoveFCMToken
             }
         } else {
             setAPNsTokenToFirebase()
             Logger.debug("OptiPush: 🚀 FCM token for app controller: \(fcmToken)")
             self.storage.fcmToken = fcmToken
-            self.delegate?.onRefreshToken()
         }
     }
 
@@ -231,8 +206,4 @@ private extension FirebaseInteractor {
         }
     }
 
-
-    func getMongoTypeBundleId() -> String {
-        return Bundle.main.bundleIdentifier?.setAsMongoKey() ?? ""
-    }
 }

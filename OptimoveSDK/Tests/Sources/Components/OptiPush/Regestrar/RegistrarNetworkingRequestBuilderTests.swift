@@ -31,13 +31,15 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         let request = try! builder.createRequest(operation: .addOrUpdateUser)
 
         // then
-        XCTAssert(request.baseURL == StubVariables.url
+        XCTAssertEqual(request.baseURL, RegistrarNetworkingRequestFactory.Constants.Endpoint.prod
             .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
             .appendingPathComponent(storage.visitorID!)
         )
-        XCTAssert(request.method == .post)
-        XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(try! payloadBuilder.createAddOrUpdateUserPayload())))
+        XCTAssertEqual(request.method, .post)
+        XCTAssertEqual(request.timeoutInterval, NetworkRequest.DefaultValue.timeoutInterval)
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        XCTAssertEqual(request.httpBody, try! encoder.encode(try! payloadBuilder.createAddOrUpdateUserPayload()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
@@ -52,13 +54,15 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         let request = try! builder.createRequest(operation: .addOrUpdateUser)
 
         // then
-        XCTAssert(request.baseURL == StubVariables.url
+        XCTAssertEqual(request.baseURL, RegistrarNetworkingRequestFactory.Constants.Endpoint.prod
             .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
             .appendingPathComponent(storage.customerID!)
         )
         XCTAssert(request.method == .post)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(try! payloadBuilder.createAddOrUpdateUserPayload())))
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        XCTAssertEqual(request.httpBody, try! encoder.encode(try! payloadBuilder.createAddOrUpdateUserPayload()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
@@ -73,13 +77,15 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         let request = try! builder.createRequest(operation: .migrateUser)
 
         // then
-        XCTAssert(request.baseURL == StubVariables.url
+        XCTAssertEqual(request.baseURL, RegistrarNetworkingRequestFactory.Constants.Endpoint.prod
             .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
             .appendingPathComponent(storage.customerID!)
         )
         XCTAssert(request.method == .put)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        XCTAssert(request.httpBody == (try! JSONEncoder().encode(try! payloadBuilder.createMigrateUserPayload())))
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        XCTAssertEqual(request.httpBody, try! encoder.encode(try! payloadBuilder.createMigrateUserPayload()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue

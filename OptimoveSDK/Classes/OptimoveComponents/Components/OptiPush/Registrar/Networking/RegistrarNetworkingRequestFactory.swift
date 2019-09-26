@@ -7,6 +7,10 @@ final class RegistrarNetworkingRequestFactory {
 
     struct Constants {
         static let path = "users"
+        struct Endpoint {
+            static let qa = URL(string: "https://mbaas-qa.optimove.net")!
+            static let prod = URL(string: "https://mbaas.optimove.net")!
+        }
     }
 
     private let storage: OptimoveStorage
@@ -21,6 +25,7 @@ final class RegistrarNetworkingRequestFactory {
         self.configuration = configuration
         self.payloadBuilder = payloadBuilder
         self.encoder = JSONEncoder()
+        self.encoder.keyEncodingStrategy = .convertToSnakeCase
     }
 
     func createRequest(operation: MbaasOperation) throws -> NetworkRequest {
@@ -45,7 +50,7 @@ final class RegistrarNetworkingRequestFactory {
 
     private func createURL() throws -> URL {
         let id = storage.customerID ?? storage.visitorID
-        return configuration.registrationServiceEndpoint
+        return (SDK.isStaging ? Constants.Endpoint.qa : Constants.Endpoint.prod)
             .appendingPathComponent(Constants.path)
             .appendingPathComponent(try unwrap(id))
     }

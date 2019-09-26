@@ -37,7 +37,7 @@ final class MbaasPayloadBuilder {
     func createAddOrUpdateUserPayload() throws -> AddOrUpdateUserPayload {
         return AddOrUpdateUserPayload(
             deviceID: device.uuid,
-            appNS: try bundle.getApplicationNameSpace().setAsMongoKey(),
+            appNS: try bundle.getApplicationNameSpace(),
             pushToken: storage.apnsToken?.map{ String(format: "%02.2hhx", $0) }.joined(),
             optIn: (try? storage.getIsMbaasOptIn()) ?? true
         )

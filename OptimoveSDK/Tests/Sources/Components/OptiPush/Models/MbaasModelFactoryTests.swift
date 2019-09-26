@@ -19,7 +19,7 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
     func test_add_user_without_token() {
         // given
         prefillStorageAsVisitor()
-        let expectedAppNs = (try! Bundle.getApplicationNameSpace()).setAsMongoKey()
+        let expectedAppNs = try! Bundle.getApplicationNameSpace()
 
         // when
         XCTAssertNoThrow(try factory.createAddOrUpdateUserPayload())
@@ -37,7 +37,7 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
     func test_add_user_with_token() {
         // given
         prefillStorageAsVisitor()
-        let expectedAppNs = (try! Bundle.getApplicationNameSpace()).setAsMongoKey()
+        let expectedAppNs = try! Bundle.getApplicationNameSpace()
 
         let expectedToken = Data(repeating: 42, count: 10)
         storage.apnsToken = expectedToken

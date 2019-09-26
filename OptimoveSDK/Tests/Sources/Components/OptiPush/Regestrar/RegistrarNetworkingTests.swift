@@ -7,7 +7,6 @@ import Mocker
 class RegistrarNetworkingTests: OptimoveTestCase {
 
     var networking: RegistrarNetworking!
-    let url = StubVariables.url
 
     override func setUp() {
         let configuration = URLSessionConfiguration.ephemeral
@@ -35,7 +34,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
 
         Mocker.register(
             Mock(
-                url: url
+                url: RegistrarNetworkingRequestFactory.Constants.Endpoint.prod
                     .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
                     .appendingPathComponent(storage.visitorID!),
                 dataType: .json,
@@ -65,7 +64,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
 
         Mocker.register(
             Mock(
-                url: url
+                url: RegistrarNetworkingRequestFactory.Constants.Endpoint.prod
                     .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
                     .appendingPathComponent(storage.customerID!),
                 dataType: .json,

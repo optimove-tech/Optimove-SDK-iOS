@@ -161,7 +161,6 @@
 		601A5E4975CF19EFFE2EC0DE /* EventValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9683C24A89EEA42DD8A0960 /* EventValidator.swift */; };
 		60291D99FF23A123D798CDE8 /* RegistrarNetworkingRequestBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D25EB6C661F60FE6CF3A0D20 /* RegistrarNetworkingRequestBuilderTests.swift */; };
 		6049F22CB6BBC8885C44E23B /* OptimoveKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 984C74BEBEA358EE00D923EA /* OptimoveKeys.swift */; };
-		60952EFC07DF927811E244FE /* String+MongoDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62BFBAE5240FEF1F625C1615 /* String+MongoDB.swift */; };
 		60F81DC69EF306A8F733337A /* GoogleDataTransport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 555CF06A0A6EE55F1650DA1C /* GoogleDataTransport.framework */; };
 		610CD697F86A71E8FB03D061 /* notificationWithScheduledCampaign.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F1A616BEF91523A37B96D95 /* notificationWithScheduledCampaign.json */; };
 		616B136802A56A176B15B835 /* DynamicLinkParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962F18D33551520DBEC49B67 /* DynamicLinkParser.swift */; };
@@ -627,7 +626,6 @@
 		5E760405052EC52CAE25E98C /* AppOpenOnStartGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenOnStartGenerator.swift; sourceTree = "<group>"; };
 		5FC57145A54E5033A5CECAF0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		601DADE02C17D7D64E050061 /* LogBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogBody.swift; sourceTree = "<group>"; };
-		62BFBAE5240FEF1F625C1615 /* String+MongoDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+MongoDB.swift"; sourceTree = "<group>"; };
 		63BEAB0D43B18837A6C1E571 /* Locale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locale.swift; sourceTree = "<group>"; };
 		63BEFDC2A507732039C5F009 /* MockRealTimeHanlder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRealTimeHanlder.swift; sourceTree = "<group>"; };
 		63C7EC2263685823B37EC99A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
@@ -961,7 +959,6 @@
 				D0BBB4A3B6E6B098413E2A12 /* String.swift */,
 				2F3ED80EF1D8ED5F8C9755F7 /* String+alphanumeric.swift */,
 				D1466680FB653D64DA0E6FE0 /* String+isBlank.swift */,
-				62BFBAE5240FEF1F625C1615 /* String+MongoDB.swift */,
 				D6D43164C87D968477E78109 /* String+random.swift */,
 				9D562B63D26D907AA3D9B8A8 /* String+Split.swift */,
 			);
@@ -2447,7 +2444,6 @@
 				E1A24DD42B057B5FABC44F33 /* SetUserEmailEvent.swift in Sources */,
 				315C0C36481750E18411BE5B /* SetUserIdEvent.swift in Sources */,
 				141EDFFE84E271DC9D009B7B /* StatisticService.swift in Sources */,
-				60952EFC07DF927811E244FE /* String+MongoDB.swift in Sources */,
 				AD0AAF9F9844790A9428F018 /* String+Split.swift in Sources */,
 				1A4B70345EF058F2C9602A27 /* String+alphanumeric.swift in Sources */,
 				58EF33A3A6CFDC6620D801A8 /* String+isBlank.swift in Sources */,

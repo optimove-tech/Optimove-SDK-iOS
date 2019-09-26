@@ -19,8 +19,6 @@ final class OptiPush {
         self.serviceProvider = serviceProvider
         self.storage = storage
         self.registrar = registrar
-
-        self.serviceProvider.delegate = self
         retryFailedMbaasOperations()
         Logger.debug("OptiPush initialized.")
     }
@@ -54,13 +52,6 @@ extension OptiPush: Component {
     }
 }
 
-extension OptiPush: PushServiceProviderDelegate {
-
-    func onRefreshToken() {
-        serviceProvider.subscribeToTopics()
-    }
-
-}
 private extension OptiPush {
 
     func retryFailedMbaasOperations() {
