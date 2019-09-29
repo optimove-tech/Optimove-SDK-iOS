@@ -25,7 +25,7 @@ enum Operation {
 }
 
 enum EventableOperation {
-    case setUserId(userId: String)
+    case setUserId
     case report(event: OptimoveEvent)
     case reportScreenEvent(customURL: String, pageTitle: String, category: String?)
     case dispatchNow

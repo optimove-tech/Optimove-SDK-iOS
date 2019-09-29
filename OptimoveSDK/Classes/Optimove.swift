@@ -107,7 +107,7 @@ extension Optimove {
         let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
         guard validationResult == .valid else { return }
         NewUserIDHandler(storage: storage).handle(userID: userID)
-        synchronizer.handle(.setUserId(userId: userID))
+        synchronizer.handle(.setUserId)
         synchronizer.handle(.migrateUser)
     }
 

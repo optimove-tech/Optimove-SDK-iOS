@@ -46,7 +46,7 @@ extension RealTime: Component {
         switch context.operation {
         case let .eventable(operation):
             switch operation {
-            case .setUserId(userId: _):
+            case .setUserId:
                 try reportUserId()
             case let .report(event: event):
                 try reportEvent(event: event, retryFailedEvents: true)
