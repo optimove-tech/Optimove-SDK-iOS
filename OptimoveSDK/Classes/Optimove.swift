@@ -220,7 +220,10 @@ extension Optimove {
     ///
     /// - Parameter deviceToken: A token that was received from the AppDelegate.
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        synchronizer.handle(.deviceToken(token: deviceToken))
+        let validationResult = APNsTokenValidator(storage: serviceLocator.storage())
+        if validationResult.validate(token: deviceToken) == .new {
+            synchronizer.handle(.deviceToken(token: deviceToken))
+        }
     }
 
     /// Request to subscribe to test campaign topics
@@ -259,6 +262,8 @@ private extension Optimove {
 
     // MARK: Initialization
 
+    /// The method use to fetch tenant config, initialize Optimove SDK and control this process.
+    /// - Parameter completion: A result of initializtion.
     func startSDK(completion: @escaping (Result<Void, Error>) -> Void) {
         guard RunningFlagsIndication.isSdkNeedInitializing else {
             Logger.info("Skip initializtion since Optimove SDK already running.")
@@ -285,6 +290,8 @@ private extension Optimove {
 
     //  MARK: Configuration
 
+    /// Initialization of SDK with a configuration.
+    /// - Parameter configuration: A `Configuration` filetype.
     func initialize(with configuration: Configuration) {
         let onStartEventGenerator = OnStartEventGenerator(
             coreEventFactory: factory.coreEventFactory(),
