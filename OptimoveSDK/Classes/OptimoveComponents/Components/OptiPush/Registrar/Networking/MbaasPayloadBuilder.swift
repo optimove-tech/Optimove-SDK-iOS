@@ -22,7 +22,7 @@ final class MbaasPayloadBuilder {
             deviceID: deviceID,
             appNS: appNamespace,
             os: AddMergeUser.Constants.os,
-            pushToken: storage.apnsToken?.map{ String(format: "%02.2hhx", $0) }.joined(),
+            deviceToken: storage.apnsToken?.map{ String(format: "%02.2hhx", $0) }.joined(),
             optIn: (try? storage.getIsMbaasOptIn()) ?? true
         )
     }
@@ -40,14 +40,14 @@ struct AddMergeUser: Codable {
         static let os = "ios"
     }
     let deviceID, appNS, os: String
-    let pushToken: String?
+    let deviceToken: String?
     let optIn: Bool
 
     enum CodingKeys: String, CodingKey {
         case deviceID = "device_id"
         case appNS = "app_ns"
         case os
-        case pushToken = "push_token"
+        case deviceToken = "device_token"
         case optIn = "opt_in"
     }
 }

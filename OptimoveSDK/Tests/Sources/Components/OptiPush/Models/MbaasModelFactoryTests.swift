@@ -28,7 +28,7 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
         XCTAssertEqual(payload.appNS, expectedAppNs)
         XCTAssertEqual(payload.os, AddMergeUser.Constants.os)
-        XCTAssertNil(payload.pushToken)
+        XCTAssertNil(payload.deviceToken)
         XCTAssertTrue(payload.optIn)
     }
 
@@ -47,8 +47,8 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
         XCTAssertEqual(payload.appNS, expectedAppNs)
         XCTAssertEqual(payload.os, AddMergeUser.Constants.os)
-        XCTAssertNotNil(payload.pushToken)
-        XCTAssertEqual(payload.pushToken!, expectedToken.map{ String(format: "%02.2hhx", $0) }.joined())
+        XCTAssertNotNil(payload.deviceToken)
+        XCTAssertEqual(payload.deviceToken!, expectedToken.map{ String(format: "%02.2hhx", $0) }.joined())
         XCTAssertTrue(payload.optIn)
     }
 
