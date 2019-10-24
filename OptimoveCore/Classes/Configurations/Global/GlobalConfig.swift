@@ -60,13 +60,17 @@ public struct GlobalGeneralConfig: Codable, Equatable {
 // MARK: - Optipush
 public struct GlobalOptipushConfig: Codable, Equatable {
     public let registrationServiceEndpoint: URL
+    public let mbaasEndpoint: URL
 
-    public init(registrationServiceEndpoint: URL) {
+    public init(registrationServiceEndpoint: URL,
+                mbaasEndpoint: URL) {
         self.registrationServiceEndpoint = registrationServiceEndpoint
+        self.mbaasEndpoint = mbaasEndpoint
     }
 
     enum CodingKeys: String, CodingKey {
         case registrationServiceEndpoint = "registration_service_endpoint"
+        case mbaasEndpoint = "mbaas_endpoint"
     }
 }
 

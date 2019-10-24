@@ -5,11 +5,11 @@ import Foundation
 
 final class MockRegistrarNetworking: RegistrarNetworking {
 
-    var assertFunction: ((BaseMbaasModel) -> Result<String, Error>) = { _ in
+    var assertFunction: ((MbaasOperation) -> Result<String, Error>) = { _ in
         return .success("")
     }
 
-    func sendToMbaas(model: BaseMbaasModel, completion: @escaping (Result<String, Error>) -> Void) {
+    func sendToMbaas(operation model: MbaasOperation, completion: @escaping (Result<String, Error>) -> Void) {
         completion(assertFunction(model))
     }
 

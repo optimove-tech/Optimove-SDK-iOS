@@ -3,62 +3,62 @@
 import Foundation
 import OptimoveCore
 
+/// Describe operations that could be sent to MBaaS.
+enum MbaasOperation: CustomStringConvertible {
+    /// Add a new or update an existed user.
+    case addOrUpdateUser
+    /// Migrate a visitor to a customer user.
+    case migrateUser
+
+    var description: String {
+        switch self {
+        case .addOrUpdateUser:
+            return "add_or_update_user"
+        case .migrateUser:
+            return "migrate_user"
+        }
+    }
+}
+
 protocol Registrable {
-    func register()
-    func unregister(didComplete: @escaping ResultBlock)
-    func optIn()
-    func optOut()
+    func handle(_: MbaasOperation)
     func retryFailedOperationsIfExist() throws
 }
 
 final class Registrar {
 
-    private let modelFactory: MbaasModelFactory
     private var storage: OptimoveStorage
     private let networking: RegistrarNetworking
-    private let backup: MbaasBackup
+    private let handler: Handler
 
     init(storage: OptimoveStorage,
-         modelFactory: MbaasModelFactory,
-         networking: RegistrarNetworking,
-         backup: MbaasBackup) {
+         networking: RegistrarNetworking) {
         self.storage = storage
-        self.modelFactory = modelFactory
         self.networking = networking
-        self.backup = backup
+        self.handler = Handler(storage: storage)
     }
 
 }
 
 extension Registrar: Registrable {
 
-    func register() {
-        sendToMbaasModel(for: .registration)
-    }
-
-    func unregister(didComplete: @escaping ResultBlock) {
-        sendToMbaasModel(for: .unregistration, completion: didComplete)
-    }
-
-    func optIn() {
-        sendToMbaasModel(for: .optIn)
-    }
-
-    func optOut() {
-        sendToMbaasModel(for: .optOut)
+    func handle(_ operation: MbaasOperation) {
+        networking.sendToMbaas(operation: operation) { [handler] (result) in
+            switch result {
+            case .success:
+                handler.handleSuccess(operation)
+            case .failure:
+                handler.handleFailed(operation)
+            }
+        }
     }
 
     func retryFailedOperationsIfExist() throws {
-        if !storage.isUnregistrationSuccess {
-            let model = try backup.restoreLast(for: .unregistration) as MbaasModel
-            retryFailedOperation(with: model)
-        } else if !storage.isRegistrationSuccess {
-            let model = try backup.restoreLast(for: .registration) as RegistartionMbaasModel
-            retryFailedOperation(with: model)
+        if let isRegistrationSuccess = storage.isRegistrationSuccess, isRegistrationSuccess == false {
+            handle(.addOrUpdateUser)
         }
-        if !storage.isOptRequestSuccess {
-            let model = try backup.restoreLast(for: .optIn) as MbaasModel
-            retryFailedOperation(with: model)
+        if let isUserMigrationSuccess = storage.isUserMigrationSuccess, isUserMigrationSuccess == false {
+            handle(.migrateUser)
         }
     }
 
@@ -66,68 +66,30 @@ extension Registrar: Registrable {
 
 private extension Registrar {
 
-    func sendToMbaasModel(for operation: MbaasOperation, completion: (() -> Void)? = nil) {
-        do {
-            let model = try modelFactory.createModel(for: operation)
-            networking.sendToMbaas(model: model) { [weak self] (result) in
-                switch result {
-                case .success:
-                    self?.handleSuccessMbaasModel(model)
-                case .failure:
-                    self?.handleFailedMbaasModel(model)
-                }
-                completion?()
-            }
-        } catch {
-            Logger.error("OptiPush: Could not build JSON object. Reason: \(error.localizedDescription)")
+    class Handler {
+
+        private var storage: OptimoveStorage
+
+        init(storage: OptimoveStorage) {
+            self.storage = storage
         }
-    }
 
-    func retryFailedOperation(with model: BaseMbaasModel) {
-        networking.sendToMbaas(model: model) { [weak self] (result) in
-            switch result {
-            case .success:
-                self?.handleSuccessMbaasModel(model)
-
-                /// Helps prevent to keeping an old fcm token at server side, only for retry.
-                if model.operation == .unregistration {
-                    self?.register()
-                }
-            case let .failure(error):
-                Logger.error("OptiPush: Retry request failed. Reason: \(error.localizedDescription)")
+        func handleFailed(_ operation: MbaasOperation) {
+           switch operation {
+            case .addOrUpdateUser:
+                storage.isRegistrationSuccess = false
+            case .migrateUser:
+                storage.isUserMigrationSuccess = false
             }
         }
-    }
 
-    func handleFailedMbaasModel(_ model: BaseMbaasModel) {
-        do {
-            try backup.backup(model)
-            setSuccesFlag(succeed: false, for: model.operation)
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
-
-    func handleSuccessMbaasModel(_ model: BaseMbaasModel) {
-        do {
-            try backup.clearLast(for: model.operation)
-            setSuccesFlag(succeed: true, for: model.operation)
-            if model.operation == .optIn {
-                storage.isMbaasOptIn = true
+        func handleSuccess(_ operation: MbaasOperation) {
+            switch operation {
+            case .addOrUpdateUser:
+                storage.isRegistrationSuccess = true
+            case .migrateUser:
+                storage.isUserMigrationSuccess = true
             }
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
-
-    func setSuccesFlag(succeed: Bool, for operation: MbaasOperation) {
-        switch operation {
-        case .optIn, .optOut:
-            storage.isOptRequestSuccess = succeed
-        case .registration:
-            storage.isRegistrationSuccess = succeed
-        case .unregistration:
-            storage.isUnregistrationSuccess = succeed
         }
     }
 

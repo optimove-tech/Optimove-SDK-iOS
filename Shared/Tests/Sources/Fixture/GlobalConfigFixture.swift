@@ -36,7 +36,8 @@ final class GlobalConfigFixture: FileAccessible {
 
     func optipushConfigFixture() -> GlobalOptipushConfig {
         return GlobalOptipushConfig(
-            registrationServiceEndpoint: StubVariables.url
+            registrationServiceEndpoint: StubVariables.url,
+            mbaasEndpoint: StubVariables.url
         )
     }
 

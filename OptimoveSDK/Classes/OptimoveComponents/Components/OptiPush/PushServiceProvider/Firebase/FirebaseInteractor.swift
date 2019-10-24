@@ -5,57 +5,26 @@ import FirebaseMessaging
 import Foundation
 import OptimoveCore
 
-protocol OptimoveMbaasRegistrationHandling: class {
-    func handleRegistrationTokenRefresh(token: String)
-}
-
-final class FirebaseInteractor: NSObject {
+final class FirebaseInteractor: PushServiceProvider {
 
     private let networking: FirebaseInteractorNetworking
     private var storage: OptimoveStorage
     private var appController: FirebaseOptions?
     private var clientServiceOptions: FirebaseOptions?
-    private weak var delegate: OptimoveMbaasRegistrationHandling?
 
     init(storage: OptimoveStorage,
-         networking: FirebaseInteractorNetworking) {
+         networking: FirebaseInteractorNetworking,
+         optipush: OptipushConfig) {
         self.storage = storage
         self.networking = networking
+        setup(optipush: optipush)
     }
 
-}
-
-extension FirebaseInteractor: OptipushServiceInfra {
-
-    func subscribeToTopics(didSucceed: ((Bool) -> Void)? = nil) {
-        let dict = OptimoveTopicsUserDefaults.topics?.dictionaryRepresentation()
-        dict?.forEach { (key, _) in
-            if key.hasPrefix("optimove_") {
-                subscribeToTopic(topic: key.deletingPrefix("optimove_"))
-            }
-        }
-        subscribeToTopic(topic: "optipush_general")
-        subscribeToTopic(topic: "ios")
-        subscribeToTopic(topic: getMongoTypeBundleId())
-    }
-
-    func unsubscribeFromTopics() {
-        let dict = OptimoveTopicsUserDefaults.topics?.dictionaryRepresentation()
-        dict?.forEach { (key, _) in
-            if key.hasPrefix("optimove_") {
-                unsubscribeFromTopic(topic: key.deletingPrefix("optimove_"))
-            }
-        }
-    }
-
-    func setupFirebase(
-        from firebaseMetaData: FirebaseProjectKeys,
-        clientFirebaseMetaData: ClientsServiceProjectKeys,
-        delegate: OptimoveMbaasRegistrationHandling
-    ) {
+    private func setup(optipush: OptipushConfig) {
         Logger.debug("OptiPush: Setup Firebase started.")
-
-        self.delegate = delegate
+        
+        let firebaseMetaData = optipush.firebaseProjectKeys
+        let clientFirebaseMetaData = optipush.clientsServiceProjectKeys
         let appController = FirebaseOptionsBuilder(
             provider: firebaseMetaData,
             bundleID: try! Bundle.getApplicationNameSpace()
@@ -87,6 +56,8 @@ extension FirebaseInteractor: OptipushServiceInfra {
         Logger.debug("OptiPush: Setup Firebase finished.")
     }
 
+    // MARK: - FirebaseProvider
+
     func handleRegistration(apnsToken: Data) {
         storage.apnsToken = apnsToken
         if let fcmToken = Messaging.messaging().fcmToken {
@@ -98,7 +69,6 @@ extension FirebaseInteractor: OptipushServiceInfra {
         let setAPNsTokenToFirebase = { [weak self] in
             if let apnsToken = self?.storage.apnsToken {
                 Messaging.messaging().apnsToken = apnsToken
-                self?.storage.apnsToken = nil
             }
         }
         if storage.isClientHasFirebase {
@@ -114,23 +84,23 @@ extension FirebaseInteractor: OptipushServiceInfra {
             retreiveFcmToken(for: optimoveAppSenderId) { [weak self] (optimoveFCMToken) in
                 setAPNsTokenToFirebase()
                 Logger.debug("OptiPush: 🚀 FCM token NEW: \(optimoveFCMToken)")
-                self?.delegate?.handleRegistrationTokenRefresh(token: optimoveFCMToken)
+                self?.storage.fcmToken = optimoveFCMToken
                 self?.storage.defaultFcmToken = optimoveFCMToken
             }
         } else {
             setAPNsTokenToFirebase()
             Logger.debug("OptiPush: 🚀 FCM token for app controller: \(fcmToken)")
-            self.delegate?.handleRegistrationTokenRefresh(token: fcmToken)
+            self.storage.fcmToken = fcmToken
         }
     }
 
-    func subscribeToTopic(topic: String, didSucceed: ((Bool) -> Void)? = nil) {
+    func subscribeToTopic(topic: String) {
         if !storage.isClientHasFirebase {
             Messaging.messaging().subscribe(toTopic: topic) { (error) in
-                if error != nil {
-                    didSucceed?(false)
+                if let error = error {
+                    Logger.error(error.localizedDescription)
                 } else {
-                    didSucceed?(true)
+                    Logger.debug("Subscribed topic \(topic) successful.")
                 }
             }
         } else {
@@ -139,23 +109,21 @@ extension FirebaseInteractor: OptipushServiceInfra {
                 case .success:
                     Logger.debug("Subscribed topic \(topic) successful.")
                     OptimoveTopicsUserDefaults.topics?.set(true, forKey: "optimove_\(topic)")
-                    didSucceed?(true)
                 case let .failure(error):
                     Logger.error(error.localizedDescription)
                     OptimoveTopicsUserDefaults.topics?.set(false, forKey: "optimove_\(topic)")
-                    didSucceed?(false)
                 }
             }
         }
     }
 
-    func unsubscribeFromTopic(topic: String, didSucceed: ((Bool) -> Void)? = nil) {
+    func unsubscribeFromTopic(topic: String) {
         if !storage.isClientHasFirebase {
             Messaging.messaging().unsubscribe(fromTopic: topic) { (error) in
-                if error != nil {
-                    didSucceed?(false)
+                if let error = error {
+                    Logger.error(error.localizedDescription)
                 } else {
-                    didSucceed?(true)
+                    Logger.debug("Unsubscribed topic \(topic) successful.")
                 }
             }
         } else {
@@ -164,25 +132,11 @@ extension FirebaseInteractor: OptipushServiceInfra {
                 case .success:
                     Logger.debug("Unsubscribed topic \(topic) successful.")
                     OptimoveTopicsUserDefaults.topics?.removeObject(forKey: "optimove_\(topic)")
-                    didSucceed?(true)
                 case let .failure(error):
                     Logger.error(error.localizedDescription)
-                    didSucceed?(false)
                 }
             }
         }
-    }
-
-}
-
-extension FirebaseInteractor: MessagingDelegate {
-
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-        // Don't use delegation to avoid conflict with a tenant setup.
-    }
-
-    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
-        // Don't use delegation to avoid conflict with a tenant setup.
     }
 
 }
@@ -238,8 +192,4 @@ private extension FirebaseInteractor {
         }
     }
 
-
-    func getMongoTypeBundleId() -> String {
-        return Bundle.main.bundleIdentifier?.setAsMongoKey() ?? ""
-    }
 }

@@ -35,8 +35,8 @@ extension OptiTrack: Component {
         switch context.operation {
         case let .eventable(operation):
             switch operation {
-            case let .setUserId(userId: userId):
-                try setUserId(userId)
+            case .setUserId:
+                try setUserId()
             case let .report(event: event):
                 try report(event: event)
             case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
@@ -53,9 +53,10 @@ extension OptiTrack: Component {
 
 private extension OptiTrack {
 
-    func setUserId(_ userId: String) throws {
-        Logger.info("OptiTrack: Set user id \(userId)")
-        tracker.userId = userId
+    func setUserId() throws {
+        let userID = try storage.getCustomerID()
+        Logger.info("OptiTrack: Set user id \(userID)")
+        tracker.userId = userID
         try report(event: try coreEventFactory.createEvent(.setUserId))
     }
 
@@ -109,7 +110,7 @@ extension OptiTrack {
         if let globalUserID = storage.customerID {
             let localUserID: String? = tracker.userId
             if localUserID != globalUserID {
-                tryCatch { try setUserId(globalUserID) }
+                tryCatch { try setUserId() }
             }
         }
     }
