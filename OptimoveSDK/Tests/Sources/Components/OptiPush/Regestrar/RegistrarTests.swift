@@ -15,8 +15,8 @@ class RegistrarTests: OptimoveTestCase {
         networking = MockRegistrarNetworking()
         modelFactory = MbaasPayloadBuilder(
             storage: storage,
-            device: SDKDevice.self,
-            bundle: Bundle.self
+            deviceID: SDKDevice.uuid,
+            appNamespace: try! Bundle.getApplicationNameSpace()
         )
         registrable = Registrar(
             storage: storage,

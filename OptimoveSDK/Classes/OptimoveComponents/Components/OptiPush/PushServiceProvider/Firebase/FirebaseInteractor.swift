@@ -5,7 +5,7 @@ import FirebaseMessaging
 import Foundation
 import OptimoveCore
 
-final class FirebaseInteractor: NSObject, PushServiceProvider {
+final class FirebaseInteractor: PushServiceProvider {
 
     private let networking: FirebaseInteractorNetworking
     private var storage: OptimoveStorage
@@ -17,7 +17,6 @@ final class FirebaseInteractor: NSObject, PushServiceProvider {
          optipush: OptipushConfig) {
         self.storage = storage
         self.networking = networking
-        super.init()
         setup(optipush: optipush)
     }
 
@@ -138,18 +137,6 @@ final class FirebaseInteractor: NSObject, PushServiceProvider {
                 }
             }
         }
-    }
-
-}
-
-extension FirebaseInteractor: MessagingDelegate {
-
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-        // Don't use delegation to avoid conflict with a tenant setup.
-    }
-
-    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
-        // Don't use delegation to avoid conflict with a tenant setup.
     }
 
 }

@@ -7,6 +7,7 @@ import Mocker
 class RegistrarNetworkingTests: OptimoveTestCase {
 
     var networking: RegistrarNetworking!
+    let config = ConfigurationFixture.build().optipush
 
     override func setUp() {
         let configuration = URLSessionConfiguration.ephemeral
@@ -14,13 +15,16 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         let client = NetworkClientImpl(configuration: configuration)
         let payloadBuilder = MbaasPayloadBuilder(
             storage: storage,
-            device: SDKDevice.self,
-            bundle: Bundle.self
+            deviceID: SDKDevice.uuid,
+            appNamespace: try! Bundle.getApplicationNameSpace()
         )
         let requestFactory = RegistrarNetworkingRequestFactory(
             storage: storage,
-            configuration: ConfigurationFixture.build().optipush,
-            payloadBuilder: payloadBuilder
+            payloadBuilder: payloadBuilder,
+            requestBuilder: ClientAPIRequestBuilder(
+                optipushConfig: config
+            ),
+            userService: UserService(storage: storage)
         )
         networking = RegistrarNetworkingImpl(
             networkClient: client,
@@ -34,9 +38,9 @@ class RegistrarNetworkingTests: OptimoveTestCase {
 
         Mocker.register(
             Mock(
-                url: RegistrarNetworkingRequestFactory.Constants.Endpoint.prod
-                    .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
-                    .appendingPathComponent(storage.visitorID!),
+                url: config.mbaasEndpoint
+                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.path)
+                    .appendingPathComponent(storage.initialVisitorId!),
                 dataType: .json,
                 statusCode: 200,
                 data: [.post: Data()]
@@ -64,9 +68,8 @@ class RegistrarNetworkingTests: OptimoveTestCase {
 
         Mocker.register(
             Mock(
-                url: RegistrarNetworkingRequestFactory.Constants.Endpoint.prod
-                    .appendingPathComponent(RegistrarNetworkingRequestFactory.Constants.path)
-                    .appendingPathComponent(storage.customerID!),
+                url: config.mbaasEndpoint
+                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.path),
                 dataType: .json,
                 statusCode: 200,
                 data: [.put: Data()]

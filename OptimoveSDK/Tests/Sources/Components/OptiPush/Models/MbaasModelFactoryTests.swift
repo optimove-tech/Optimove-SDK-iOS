@@ -11,8 +11,8 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         super.setUp()
         factory = MbaasPayloadBuilder(
             storage: storage,
-            device: SDKDevice.self,
-            bundle: Bundle.self
+            deviceID: SDKDevice.uuid,
+            appNamespace: try! Bundle.getApplicationNameSpace()
         )
     }
 
@@ -22,16 +22,14 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         let expectedAppNs = try! Bundle.getApplicationNameSpace()
 
         // when
-        XCTAssertNoThrow(try factory.createAddOrUpdateUserPayload())
-        let payload = try! factory.createAddOrUpdateUserPayload()
+        let payload = factory.createAddMergeUser()
 
         // then
         XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
         XCTAssertEqual(payload.appNS, expectedAppNs)
-        XCTAssertEqual(payload.os, AddOrUpdateUserPayload.Constants.os)
+        XCTAssertEqual(payload.os, AddMergeUser.Constants.os)
         XCTAssertNil(payload.pushToken)
-        XCTAssertNotNil(payload.optIn)
-        XCTAssertTrue(payload.optIn!)
+        XCTAssertTrue(payload.optIn)
     }
 
     func test_add_user_with_token() {
@@ -43,17 +41,15 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         storage.apnsToken = expectedToken
 
         // when
-        XCTAssertNoThrow(try factory.createAddOrUpdateUserPayload())
-        let payload = try! factory.createAddOrUpdateUserPayload()
+        let payload = factory.createAddMergeUser()
 
         // then
         XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
         XCTAssertEqual(payload.appNS, expectedAppNs)
-        XCTAssertEqual(payload.os, AddOrUpdateUserPayload.Constants.os)
+        XCTAssertEqual(payload.os, AddMergeUser.Constants.os)
         XCTAssertNotNil(payload.pushToken)
         XCTAssertEqual(payload.pushToken!, expectedToken.map{ String(format: "%02.2hhx", $0) }.joined())
-        XCTAssertNotNil(payload.optIn)
-        XCTAssertTrue(payload.optIn!)
+        XCTAssertTrue(payload.optIn)
     }
 
     func test_migrate_user() {
@@ -61,8 +57,8 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         prefillStorageAsCustomer()
 
         // when
-        XCTAssertNoThrow(try factory.createMigrateUserPayload())
-        let payload = try! factory.createMigrateUserPayload()
+        XCTAssertNoThrow(try factory.createMigrateUser())
+        let payload = try! factory.createMigrateUser()
 
         // then
         XCTAssertEqual(payload.newID, storage.customerID!)

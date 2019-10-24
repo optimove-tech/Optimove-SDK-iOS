@@ -5,62 +5,33 @@ import OptimoveCore
 
 final class RegistrarNetworkingRequestFactory {
 
-    struct Constants {
-        static let path = "users"
-        struct Endpoint {
-            static let qa = URL(string: "https://mbaas-qa.optimove.net")!
-            static let prod = URL(string: "https://mbaas.optimove.net")!
-        }
-    }
-
     private let storage: OptimoveStorage
-    private let configuration: OptipushConfig
-    private let encoder: JSONEncoder
     private let payloadBuilder: MbaasPayloadBuilder
+    private let requestBuilder: ClientAPIRequestBuilder
+    private let userService: UserService
 
     init(storage: OptimoveStorage,
-         configuration: OptipushConfig,
-         payloadBuilder: MbaasPayloadBuilder) {
+         payloadBuilder: MbaasPayloadBuilder,
+         requestBuilder: ClientAPIRequestBuilder,
+         userService: UserService) {
         self.storage = storage
-        self.configuration = configuration
         self.payloadBuilder = payloadBuilder
-        self.encoder = JSONEncoder()
-        self.encoder.keyEncodingStrategy = .convertToSnakeCase
+        self.requestBuilder = requestBuilder
+        self.userService = userService
     }
 
     func createRequest(operation: MbaasOperation) throws -> NetworkRequest {
-        return NetworkRequest(
-            method: method(for: operation),
-            baseURL: try createURL(),
-            headers: [
-                HTTPHeader(field: .contentType, value: .json)
-            ],
-            httpBody: try createBody(operation: operation)
-        )
-    }
-
-    private func method(for operation: MbaasOperation) -> HTTPMethod {
         switch operation {
         case .addOrUpdateUser:
-            return .post
+            return try requestBuilder.postAddMergeUser(
+                userID: try userService.getUserID(),
+                userDevice: payloadBuilder.createAddMergeUser()
+            )
         case .migrateUser:
-            return .put
+            return try requestBuilder.putMigrateUser(
+                try payloadBuilder.createMigrateUser()
+            )
         }
     }
 
-    private func createURL() throws -> URL {
-        let id = storage.customerID ?? storage.visitorID
-        return (SDK.isStaging ? Constants.Endpoint.qa : Constants.Endpoint.prod)
-            .appendingPathComponent(Constants.path)
-            .appendingPathComponent(try unwrap(id))
-    }
-
-    private func createBody(operation: MbaasOperation) throws -> Data? {
-        switch operation {
-        case .addOrUpdateUser:
-            return try encoder.encode(try payloadBuilder.createAddOrUpdateUserPayload())
-        case .migrateUser:
-            return try encoder.encode(try payloadBuilder.createMigrateUserPayload())
-        }
-    }
 }

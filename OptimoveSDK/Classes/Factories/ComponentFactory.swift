@@ -42,7 +42,6 @@ final class ComponentFactory {
             optipushConfig: configuration.optipush
         )
         return OptiPush(
-            configuration: configuration.optipush,
             serviceProvider: localServiceLocator.serviceProvider(),
             registrar: localServiceLocator.registrar(),
             storage: serviceLocator.storage()

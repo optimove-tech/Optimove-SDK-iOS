@@ -29,6 +29,7 @@ class OptimoveTestCase: XCTestCase {
 
     func prefillStorageAsVisitor() {
         defaultStorage()
+        storage.initialVisitorId = StubConstants.initialVisitorId
         storage.visitorID = StubConstants.visitorID
     }
 

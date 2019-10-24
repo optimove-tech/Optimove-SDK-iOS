@@ -608,7 +608,7 @@ class RealTimeComponentTests: XCTestCase {
     func test_expired_report() {
         // given
         let timestamp = Date().timeIntervalSince1970 - RealTime.Constatnts.timeThresholdInSeconds
-        let operationContext = OperationContext(operation: .eventable(.setUserId(userId: "userId")), timestamp: timestamp)
+        let operationContext = OperationContext(operation: .eventable(.setUserId), timestamp: timestamp)
 
         // then
         let eventExpectation = expectation(description: "An expired event unexpectable handled.")

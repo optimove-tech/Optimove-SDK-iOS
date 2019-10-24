@@ -6,16 +6,13 @@ import OptimoveCore
 
 final class OptiPush {
 
-    private let configuration: OptipushConfig
     private var serviceProvider: PushServiceProvider
     private let registrar: Registrable
     private var storage: OptimoveStorage
 
-    init(configuration: OptipushConfig,
-         serviceProvider: PushServiceProvider,
+    init(serviceProvider: PushServiceProvider,
          registrar: Registrable,
          storage: OptimoveStorage) {
-        self.configuration = configuration
         self.serviceProvider = serviceProvider
         self.storage = storage
         self.registrar = registrar
