@@ -308,15 +308,15 @@ class KeyValueStorageTests: XCTestCase {
     func test_isUnregistrationSuccess() {
         // when
         let value = StubVariables.bool
-        storage.isUnregistrationSuccess = value
+        storage.isUserMigrationSuccess = value
 
         // then
-        XCTAssert(storage.isUnregistrationSuccess == value)
+        XCTAssert(storage.isUserMigrationSuccess == value)
     }
 
     func test_no_isUnregistrationSuccess() {
         // then
-        XCTAssert(storage.isUnregistrationSuccess == true)
+        XCTAssertNil(storage.isUserMigrationSuccess)
     }
 
     func test_isRegistrationSuccess() {
@@ -330,7 +330,7 @@ class KeyValueStorageTests: XCTestCase {
 
     func test_no_isRegistrationSuccess() {
         // then
-        XCTAssert(storage.isRegistrationSuccess == true)
+        XCTAssertNil(storage.isRegistrationSuccess)
     }
 
     func test_isOptRequestSuccess() {

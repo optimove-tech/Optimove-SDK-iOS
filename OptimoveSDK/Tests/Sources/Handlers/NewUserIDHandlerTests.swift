@@ -46,6 +46,7 @@ class NewUserIDHandlerTests: XCTestCase {
 
     func test_second_login() {
         storage.customerID = "old_userID"
+        storage.isRegistrationSuccess = true
         let userID = "userID"
         let expectedVisitorID = "9ef8254d9456fc23"
         let expectedConversion = false

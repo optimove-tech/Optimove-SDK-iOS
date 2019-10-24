@@ -14,7 +14,8 @@
         }
     },
     "optipush": {
-        "registration_service_endpoint": "https://registartion-service-prod.optimove.net/"
+        "registration_service_endpoint": "https://registartion-service-prod.optimove.net/",
+        "mbaas_endpoint": "https://mbaas-qa.optimove.net"
     },
     "core_events": {
         "set_user_id_event": {
