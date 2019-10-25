@@ -12,7 +12,8 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         factory = MbaasPayloadBuilder(
             storage: storage,
             deviceID: SDKDevice.uuid,
-            appNamespace: try! Bundle.getApplicationNameSpace()
+            appNamespace: try! Bundle.getApplicationNameSpace(),
+            tenantID: StubConstants.tenantID
         )
     }
 

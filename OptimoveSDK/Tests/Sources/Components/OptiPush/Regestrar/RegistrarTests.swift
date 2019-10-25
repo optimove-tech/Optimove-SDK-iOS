@@ -16,7 +16,8 @@ class RegistrarTests: OptimoveTestCase {
         modelFactory = MbaasPayloadBuilder(
             storage: storage,
             deviceID: SDKDevice.uuid,
-            appNamespace: try! Bundle.getApplicationNameSpace()
+            appNamespace: try! Bundle.getApplicationNameSpace(),
+            tenantID: StubConstants.tenantID
         )
         registrable = Registrar(
             storage: storage,

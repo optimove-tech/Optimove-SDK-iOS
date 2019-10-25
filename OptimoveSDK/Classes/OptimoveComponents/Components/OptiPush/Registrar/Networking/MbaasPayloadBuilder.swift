@@ -8,13 +8,16 @@ final class MbaasPayloadBuilder {
     private let storage: OptimoveStorage
     private let deviceID: String
     private let appNamespace: String
+    private let tenantID: Int
 
     init(storage: OptimoveStorage,
          deviceID: String,
-         appNamespace: String) {
+         appNamespace: String,
+         tenantID: Int) {
         self.storage = storage
         self.deviceID = deviceID
         self.appNamespace = appNamespace
+        self.tenantID = tenantID
     }
 
     func createAddMergeUser() -> AddMergeUser {
@@ -22,6 +25,7 @@ final class MbaasPayloadBuilder {
             deviceID: deviceID,
             appNS: appNamespace,
             os: AddMergeUser.Constants.os,
+            tenantID: tenantID,
             deviceToken: storage.apnsToken?.map{ String(format: "%02.2hhx", $0) }.joined(),
             optIn: (try? storage.getIsMbaasOptIn()) ?? true
         )
@@ -40,6 +44,7 @@ struct AddMergeUser: Codable {
         static let os = "ios"
     }
     let deviceID, appNS, os: String
+    let tenantID: Int
     let deviceToken: String?
     let optIn: Bool
 
@@ -49,6 +54,7 @@ struct AddMergeUser: Codable {
         case os
         case deviceToken = "device_token"
         case optIn = "opt_in"
+        case tenantID = "tenant_id"
     }
 }
 

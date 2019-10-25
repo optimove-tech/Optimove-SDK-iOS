@@ -24,7 +24,8 @@ final class OptiPushServiceLocator {
             payloadBuilder: MbaasPayloadBuilder(
                 storage: storage(),
                 deviceID: SDKDevice.uuid,
-                appNamespace: try! Bundle.getApplicationNameSpace()
+                appNamespace: try! Bundle.getApplicationNameSpace(),
+                tenantID: optipushConfig.tenantID
             ),
             requestBuilder: ClientAPIRequestBuilder(
                 optipushConfig: optipushConfig

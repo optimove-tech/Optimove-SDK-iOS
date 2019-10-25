@@ -16,7 +16,8 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         let payloadBuilder = MbaasPayloadBuilder(
             storage: storage,
             deviceID: SDKDevice.uuid,
-            appNamespace: try! Bundle.getApplicationNameSpace()
+            appNamespace: try! Bundle.getApplicationNameSpace(),
+            tenantID: StubConstants.tenantID
         )
         let requestFactory = RegistrarNetworkingRequestFactory(
             storage: storage,
