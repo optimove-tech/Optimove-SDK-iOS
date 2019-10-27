@@ -22,14 +22,14 @@ final class RegistrarNetworkingRequestFactory {
 
     func createRequest(operation: MbaasOperation) throws -> NetworkRequest {
         switch operation {
-        case .addOrUpdateUser:
+        case .setUser:
             return try requestBuilder.postAddMergeUser(
                 userID: try userService.getUserID(),
-                userDevice: payloadBuilder.createAddMergeUser()
+                userDevice: payloadBuilder.createSetUser()
             )
-        case .migrateUser:
+        case .addUserAlias:
             return try requestBuilder.putMigrateUser(
-                try payloadBuilder.createMigrateUser()
+                try payloadBuilder.createAddUserAlias()
             )
         }
     }

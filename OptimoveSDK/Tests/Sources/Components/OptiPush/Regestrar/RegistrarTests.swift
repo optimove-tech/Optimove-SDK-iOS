@@ -17,7 +17,7 @@ class RegistrarTests: OptimoveTestCase {
             storage: storage,
             deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace(),
-            tenantID: StubConstants.tenantID
+            tenantID: String(StubConstants.tenantID)
         )
         registrable = Registrar(
             storage: storage,
@@ -32,7 +32,7 @@ class RegistrarTests: OptimoveTestCase {
         // then
         let networkExpectation = expectation(description: "Request was not generated.")
         networking.assertFunction = { (operation) in
-            XCTAssert(operation == .addOrUpdateUser)
+            XCTAssert(operation == .setUser)
             networkExpectation.fulfill()
             return .success("")
         }
@@ -40,14 +40,14 @@ class RegistrarTests: OptimoveTestCase {
         // and
         let successFlagExpectation = expectation(description: "Success flag was not updated.")
         storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-            if key == .registrationSuccess {
+            if key == .settingUserSuccess {
                 XCTAssert(value as? Bool == true)
                 successFlagExpectation.fulfill()
             }
         }
 
         // when
-        registrable.handle(.addOrUpdateUser)
+        registrable.handle(.setUser)
         wait(for: [networkExpectation, successFlagExpectation], timeout: defaultTimeout)
     }
 
@@ -58,7 +58,7 @@ class RegistrarTests: OptimoveTestCase {
         // then
         let networkExpectation = expectation(description: "Request was not generated.")
         networking.assertFunction = { (operation) in
-            XCTAssert(operation == .addOrUpdateUser)
+            XCTAssert(operation == .setUser)
             networkExpectation.fulfill()
             return .success("")
         }
@@ -66,14 +66,14 @@ class RegistrarTests: OptimoveTestCase {
         // and
         let successFlagExpectation = expectation(description: "Success flag was not updated.")
         storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-            if key == .registrationSuccess {
+            if key == .settingUserSuccess {
                 XCTAssert(value as? Bool == true)
                 successFlagExpectation.fulfill()
             }
         }
 
         // when
-        registrable.handle(.addOrUpdateUser)
+        registrable.handle(.setUser)
         wait(for: [networkExpectation, successFlagExpectation], timeout: defaultTimeout)
     }
 
@@ -84,7 +84,7 @@ class RegistrarTests: OptimoveTestCase {
         // then
         let networkExpectation = expectation(description: "Request was not generated.")
         networking.assertFunction = { (operation) in
-            XCTAssert(operation == .addOrUpdateUser)
+            XCTAssert(operation == .setUser)
             networkExpectation.fulfill()
             return .failure(StubError.test)
         }
@@ -92,26 +92,26 @@ class RegistrarTests: OptimoveTestCase {
         // and
         let successFlagExpectation = expectation(description: "Success flag was not updated.")
         storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-            if key == .registrationSuccess {
+            if key == .settingUserSuccess {
                 XCTAssert(value as? Bool == false)
                 successFlagExpectation.fulfill()
             }
         }
 
         // when
-        registrable.handle(.addOrUpdateUser)
+        registrable.handle(.setUser)
         wait(for: [networkExpectation, successFlagExpectation], timeout: defaultTimeout)
     }
 
     func test_retry_add_user() {
         // given
         prefillStorageAsCustomer()
-        storage.isRegistrationSuccess = false
+        storage.isSettingUserSuccess = false
 
         // then
         let networkExpectation = expectation(description: "Request was not generated.")
         networking.assertFunction = { (operation) in
-            XCTAssert(operation == .addOrUpdateUser)
+            XCTAssert(operation == .setUser)
             networkExpectation.fulfill()
             return .success("")
         }
@@ -119,7 +119,7 @@ class RegistrarTests: OptimoveTestCase {
         // and
         let successFlagExpectation = expectation(description: "Success flag was not updated.")
         storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-            if key == .registrationSuccess {
+            if key == .settingUserSuccess {
                 XCTAssert(value as? Bool == true)
                 successFlagExpectation.fulfill()
             }
@@ -133,12 +133,12 @@ class RegistrarTests: OptimoveTestCase {
     func test_retry_migrate_user() {
         // given
         prefillStorageAsCustomer()
-        storage.isUserMigrationSuccess = false
+        storage.isAddingUserAliasSuccess = false
 
         // then
         let networkExpectation = expectation(description: "Request was not generated.")
         networking.assertFunction = { (operation) in
-            XCTAssertEqual(operation, .migrateUser)
+            XCTAssertEqual(operation, .addUserAlias)
             networkExpectation.fulfill()
             return .success("")
         }
@@ -146,7 +146,7 @@ class RegistrarTests: OptimoveTestCase {
         // and
         let successFlagExpectation = expectation(description: "Success flag was not updated.")
         storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-            if key == .userMigrationSuccess {
+            if key == .addingUserAliasSuccess {
                 XCTAssert(value as? Bool == true)
                 successFlagExpectation.fulfill()
             }

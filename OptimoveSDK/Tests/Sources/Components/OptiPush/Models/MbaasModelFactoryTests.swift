@@ -13,7 +13,7 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
             storage: storage,
             deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace(),
-            tenantID: StubConstants.tenantID
+            tenantID: String(StubConstants.tenantID)
         )
     }
 
@@ -23,12 +23,12 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         let expectedAppNs = try! Bundle.getApplicationNameSpace()
 
         // when
-        let payload = factory.createAddMergeUser()
+        let payload = factory.createSetUser()
 
         // then
         XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
         XCTAssertEqual(payload.appNS, expectedAppNs)
-        XCTAssertEqual(payload.os, AddMergeUser.Constants.os)
+        XCTAssertEqual(payload.os, SetUser.Constants.os)
         XCTAssertNil(payload.deviceToken)
         XCTAssertTrue(payload.optIn)
     }
@@ -42,12 +42,12 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         storage.apnsToken = expectedToken
 
         // when
-        let payload = factory.createAddMergeUser()
+        let payload = factory.createSetUser()
 
         // then
         XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
         XCTAssertEqual(payload.appNS, expectedAppNs)
-        XCTAssertEqual(payload.os, AddMergeUser.Constants.os)
+        XCTAssertEqual(payload.os, SetUser.Constants.os)
         XCTAssertNotNil(payload.deviceToken)
         XCTAssertEqual(payload.deviceToken!, expectedToken.map{ String(format: "%02.2hhx", $0) }.joined())
         XCTAssertTrue(payload.optIn)
@@ -58,12 +58,12 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         prefillStorageAsCustomer()
 
         // when
-        XCTAssertNoThrow(try factory.createMigrateUser())
-        let payload = try! factory.createMigrateUser()
+        XCTAssertNoThrow(try factory.createAddUserAlias())
+        let payload = try! factory.createAddUserAlias()
 
         // then
-        XCTAssertEqual(payload.newID, storage.customerID!)
-        XCTAssertEqual(payload.oldID, storage.visitorID!)
+        XCTAssertEqual(payload.newAlias, storage.customerID!)
+        XCTAssertEqual(payload.currentAlias, storage.visitorID!)
     }
 
 }

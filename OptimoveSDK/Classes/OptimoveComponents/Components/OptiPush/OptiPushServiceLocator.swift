@@ -25,7 +25,7 @@ final class OptiPushServiceLocator {
                 storage: storage(),
                 deviceID: SDKDevice.uuid,
                 appNamespace: try! Bundle.getApplicationNameSpace(),
-                tenantID: optipushConfig.tenantID
+                tenantID: String(optipushConfig.tenantID)
             ),
             requestBuilder: ClientAPIRequestBuilder(
                 optipushConfig: optipushConfig

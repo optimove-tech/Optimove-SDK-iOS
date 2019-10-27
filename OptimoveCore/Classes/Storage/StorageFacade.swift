@@ -29,8 +29,8 @@ public  enum StorageKey: String, CaseIterable {
     case siteID
     case isClientHasFirebase
     case isMbaasOptIn
-    case userMigrationSuccess
-    case registrationSuccess
+    case addingUserAliasSuccess
+    case settingUserSuccess
     case optSuccess
     case isFirstConversion
     case defaultFcmToken
@@ -79,8 +79,8 @@ public protocol StorageValue {
     /// Default value is `false`
     var isClientHasFirebase: Bool { get set }
     var isMbaasOptIn: Bool? { get set }
-    var isUserMigrationSuccess: Bool? { get set }
-    var isRegistrationSuccess: Bool? { get set }
+    var isAddingUserAliasSuccess: Bool? { get set }
+    var isSettingUserSuccess: Bool? { get set }
     /// Default value is `true`
     var isOptRequestSuccess: Bool { get set }
     /// Default value is `false`
@@ -137,8 +137,8 @@ public final class StorageFacade: OptimoveStorage {
         .siteID,
         .isClientHasFirebase,
         .isMbaasOptIn,
-        .userMigrationSuccess,
-        .registrationSuccess,
+        .addingUserAliasSuccess,
+        .settingUserSuccess,
         .optSuccess,
         .isFirstConversion,
         .defaultFcmToken,
@@ -459,21 +459,21 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var isUserMigrationSuccess: Bool? {
+    var isAddingUserAliasSuccess: Bool? {
         get {
-            return self[.userMigrationSuccess]
+            return self[.addingUserAliasSuccess]
         }
         set {
-            self[.userMigrationSuccess] = newValue
+            self[.addingUserAliasSuccess] = newValue
         }
     }
 
-    var isRegistrationSuccess: Bool? {
+    var isSettingUserSuccess: Bool? {
         get {
-            return self[.registrationSuccess]
+            return self[.settingUserSuccess]
         }
         set {
-            return self[.registrationSuccess] = newValue
+            return self[.settingUserSuccess] = newValue
         }
     }
 

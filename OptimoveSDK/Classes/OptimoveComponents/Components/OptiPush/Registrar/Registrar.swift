@@ -5,17 +5,17 @@ import OptimoveCore
 
 /// Describe operations that could be sent to MBaaS.
 enum MbaasOperation: CustomStringConvertible {
-    /// Add a new or update an existed user.
-    case addOrUpdateUser
-    /// Migrate a visitor to a customer user.
-    case migrateUser
+    /// Set a new or update an existed user.
+    case setUser
+    /// Add ut a user additional alias, as a visitior or a customer ID.
+    case addUserAlias
 
     var description: String {
         switch self {
-        case .addOrUpdateUser:
-            return "add_or_update_user"
-        case .migrateUser:
-            return "migrate_user"
+        case .setUser:
+            return "set_user"
+        case .addUserAlias:
+            return "add_user_alias"
         }
     }
 }
@@ -54,11 +54,11 @@ extension Registrar: Registrable {
     }
 
     func retryFailedOperationsIfExist() throws {
-        if let isRegistrationSuccess = storage.isRegistrationSuccess, isRegistrationSuccess == false {
-            handle(.addOrUpdateUser)
+        if let isSettingUserSuccess = storage.isSettingUserSuccess, isSettingUserSuccess == false {
+            handle(.setUser)
         }
-        if let isUserMigrationSuccess = storage.isUserMigrationSuccess, isUserMigrationSuccess == false {
-            handle(.migrateUser)
+        if let isAddingUserAliasSuccess = storage.isAddingUserAliasSuccess, isAddingUserAliasSuccess == false {
+            handle(.addUserAlias)
         }
     }
 
@@ -76,19 +76,19 @@ private extension Registrar {
 
         func handleFailed(_ operation: MbaasOperation) {
            switch operation {
-            case .addOrUpdateUser:
-                storage.isRegistrationSuccess = false
-            case .migrateUser:
-                storage.isUserMigrationSuccess = false
+            case .setUser:
+                storage.isSettingUserSuccess = false
+            case .addUserAlias:
+                storage.isAddingUserAliasSuccess = false
             }
         }
 
         func handleSuccess(_ operation: MbaasOperation) {
             switch operation {
-            case .addOrUpdateUser:
-                storage.isRegistrationSuccess = true
-            case .migrateUser:
-                storage.isUserMigrationSuccess = true
+            case .setUser:
+                storage.isSettingUserSuccess = true
+            case .addUserAlias:
+                storage.isAddingUserAliasSuccess = true
             }
         }
     }

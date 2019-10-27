@@ -30,18 +30,18 @@ extension OptiPush: Component {
             switch operation {
             case let .deviceToken(token: token):
                 storage.apnsToken = token
-                registrar.handle(.addOrUpdateUser)
+                registrar.handle(.setUser)
                 serviceProvider.handleRegistration(apnsToken: token)
             case let .subscribeToTopic(topic: topic):
                 serviceProvider.subscribeToTopic(topic: topic)
             case let .unsubscribeFromTopic(topic: topic):
                 serviceProvider.unsubscribeFromTopic(topic: topic)
             case .migrateUser:
-                registrar.handle(.migrateUser)
+                registrar.handle(.addUserAlias)
             case .optIn:
-                registrar.handle(.addOrUpdateUser)
+                registrar.handle(.setUser)
             case .optOut:
-                registrar.handle(.addOrUpdateUser)
+                registrar.handle(.setUser)
             }
         default:
             break

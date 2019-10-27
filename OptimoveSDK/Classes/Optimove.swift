@@ -99,6 +99,16 @@ extension Optimove {
 
 extension Optimove {
 
+    /// Set a User ID and the user email
+    ///
+    /// - Parameters:
+    ///   - sdkId: Aa client unique identifier
+    ///   - email: An user's email
+    @objc public func registerUser(sdkId: String, email: String) {
+        setUserId(sdkId)
+        setUserEmail(email: email)
+    }
+
     /// Set a User ID value to Optimove SDK.
     ///
     /// - Parameter userID: A client unique identifier
@@ -109,16 +119,6 @@ extension Optimove {
         NewUserIDHandler(storage: storage).handle(userID: userID)
         synchronizer.handle(.setUserId)
         synchronizer.handle(.migrateUser)
-    }
-
-    /// Set a User ID and the user email
-    ///
-    /// - Parameters:
-    ///   - sdkId: Aa client unique identifier
-    ///   - email: An user's email
-    @objc public func registerUser(sdkId: String, email: String) {
-        setUserId(sdkId)
-        setUserEmail(email: email)
     }
 
     /// Call for the SDK to send the user email to its components

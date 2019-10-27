@@ -17,7 +17,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
             storage: storage,
             deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace(),
-            tenantID: StubConstants.tenantID
+            tenantID: String(StubConstants.tenantID)
         )
         let requestFactory = RegistrarNetworkingRequestFactory(
             storage: storage,
@@ -50,7 +50,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
 
         // when
         let resultExpectation = expectation(description: "Result was not generated.")
-        networking.sendToMbaas(operation: .addOrUpdateUser) { (result) in
+        networking.sendToMbaas(operation: .setUser) { (result) in
             switch result {
             case .success:
                 resultExpectation.fulfill()
@@ -79,7 +79,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
 
         // when
         let resultExpectation = expectation(description: "Result was not generated.")
-        networking.sendToMbaas(operation: .migrateUser) { (result) in
+        networking.sendToMbaas(operation: .addUserAlias) { (result) in
             switch result {
             case .success:
                 resultExpectation.fulfill()

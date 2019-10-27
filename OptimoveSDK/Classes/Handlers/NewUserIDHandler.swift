@@ -16,7 +16,7 @@ final class NewUserIDHandler {
             storage.isFirstConversion = true
         } else if userID != storage.customerID {
             Logger.info("user id changed from '\(storage.customerID ?? "nil")' to '\(userID)'")
-            if let isRegistrationSuccess = storage.isRegistrationSuccess, isRegistrationSuccess == true {
+            if let isSettingUserSuccess = storage.isSettingUserSuccess, isSettingUserSuccess == true {
                 // send the first_conversion flag only if no previous registration has succeeded
                 storage.isFirstConversion = false
             }

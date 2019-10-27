@@ -97,7 +97,7 @@ private extension OptInOutObserver {
             return
         }
 
-        if let isRegistrationSuccess = storage.isRegistrationSuccess, isRegistrationSuccess == true {
+        if let isSettingUserSuccess = storage.isSettingUserSuccess, isSettingUserSuccess == true {
             storage.isMbaasOptIn = false
             synchronizer.handle(.optOut)
         }

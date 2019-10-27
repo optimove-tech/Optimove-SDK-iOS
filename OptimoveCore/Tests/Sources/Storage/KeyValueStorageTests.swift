@@ -305,32 +305,32 @@ class KeyValueStorageTests: XCTestCase {
         XCTAssert(storage.isClientHasFirebase == false)
     }
 
-    func test_isUnregistrationSuccess() {
+    func test_isAddingUserAliasSuccess() {
         // when
         let value = StubVariables.bool
-        storage.isUserMigrationSuccess = value
+        storage.isAddingUserAliasSuccess = value
 
         // then
-        XCTAssert(storage.isUserMigrationSuccess == value)
+        XCTAssert(storage.isAddingUserAliasSuccess == value)
     }
 
-    func test_no_isUnregistrationSuccess() {
+    func test_no_isAddingUserAliasSuccess() {
         // then
-        XCTAssertNil(storage.isUserMigrationSuccess)
+        XCTAssertNil(storage.isAddingUserAliasSuccess)
     }
 
-    func test_isRegistrationSuccess() {
+    func test_isSettingUserSuccess() {
         // when
         let value = StubVariables.bool
-        storage.isRegistrationSuccess = value
+        storage.isSettingUserSuccess = value
 
         // then
-        XCTAssert(storage.isRegistrationSuccess == value)
+        XCTAssert(storage.isSettingUserSuccess == value)
     }
 
-    func test_no_isRegistrationSuccess() {
+    func test_no_isSettingUserSuccess() {
         // then
-        XCTAssertNil(storage.isRegistrationSuccess)
+        XCTAssertNil(storage.isSettingUserSuccess)
     }
 
     func test_isOptRequestSuccess() {

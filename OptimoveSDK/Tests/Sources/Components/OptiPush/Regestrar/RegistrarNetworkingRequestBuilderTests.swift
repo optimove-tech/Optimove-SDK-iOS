@@ -16,7 +16,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
             storage: storage,
             deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace(),
-            tenantID: StubConstants.tenantID
+            tenantID: String(StubConstants.tenantID)
         )
         builder = RegistrarNetworkingRequestFactory(
             storage: storage,
@@ -33,7 +33,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         prefillStorageAsVisitor()
 
         // when
-        let request = try! builder.createRequest(operation: .addOrUpdateUser)
+        let request = try! builder.createRequest(operation: .setUser)
 
         // then
         XCTAssertEqual(request.baseURL, config.registrationServiceEndpoint
@@ -44,7 +44,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         XCTAssertEqual(request.timeoutInterval, NetworkRequest.DefaultValue.timeoutInterval)
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
-        XCTAssertEqual(request.httpBody, try! encoder.encode(payloadBuilder.createAddMergeUser()))
+        XCTAssertEqual(request.httpBody, try! encoder.encode(payloadBuilder.createSetUser()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
@@ -56,7 +56,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         prefillStorageAsCustomer()
 
         // when
-        let request = try! builder.createRequest(operation: .addOrUpdateUser)
+        let request = try! builder.createRequest(operation: .setUser)
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
@@ -67,7 +67,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
-        XCTAssertEqual(request.httpBody, try! encoder.encode(payloadBuilder.createAddMergeUser()))
+        XCTAssertEqual(request.httpBody, try! encoder.encode(payloadBuilder.createSetUser()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
@@ -79,7 +79,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         prefillStorageAsCustomer()
 
         // when
-        let request = try! builder.createRequest(operation: .migrateUser)
+        let request = try! builder.createRequest(operation: .addUserAlias)
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
@@ -89,7 +89,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
-        XCTAssertEqual(request.httpBody, try! encoder.encode(try! payloadBuilder.createMigrateUser()))
+        XCTAssertEqual(request.httpBody, try! encoder.encode(try! payloadBuilder.createAddUserAlias()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue

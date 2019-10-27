@@ -15,7 +15,7 @@ final class ClientAPIRequestBuilder {
         self.optipushConfig = optipushConfig
     }
 
-    func postAddMergeUser(userID: String, userDevice: AddMergeUser) throws -> NetworkRequest {
+    func postAddMergeUser(userID: String, userDevice: SetUser) throws -> NetworkRequest {
         return try NetworkRequest(
             method: .post,
             baseURL: optipushConfig.mbaasEndpoint
@@ -25,7 +25,7 @@ final class ClientAPIRequestBuilder {
         )
 }
 
-    func putMigrateUser(_ model: MigrateUser) throws -> NetworkRequest {
+    func putMigrateUser(_ model: AddUserAlias) throws -> NetworkRequest {
         return try NetworkRequest(
             method: .put,
             baseURL: optipushConfig.mbaasEndpoint.appendingPathComponent(Constants.path),
