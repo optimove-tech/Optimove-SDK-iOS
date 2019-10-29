@@ -63,7 +63,7 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
 
         // then
         XCTAssertEqual(payload.newAlias, storage.customerID!)
-        XCTAssertEqual(payload.currentAlias, storage.visitorID!)
+        XCTAssertEqual(payload.currentAlias, storage.initialVisitorId!)
     }
 
 }
