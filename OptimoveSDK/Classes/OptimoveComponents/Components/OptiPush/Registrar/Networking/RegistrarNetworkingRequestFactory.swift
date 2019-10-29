@@ -24,7 +24,7 @@ final class RegistrarNetworkingRequestFactory {
         switch operation {
         case .setUser:
             return try requestBuilder.postAddMergeUser(
-                userID: try userService.getUserID(),
+                userID: try storage.getInitialVisitorId(),
                 userDevice: payloadBuilder.createSetUser()
             )
         case .addUserAlias:
