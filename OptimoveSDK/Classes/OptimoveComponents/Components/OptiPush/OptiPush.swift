@@ -4,52 +4,20 @@ import Foundation
 import UserNotifications
 import OptimoveCore
 
-protocol OptipushServiceInfra {
-    func subscribeToTopics(didSucceed: ((Bool) -> Void)?)
-    func unsubscribeFromTopics()
-
-    func setupFirebase(
-        from: FirebaseProjectKeys,
-        clientFirebaseMetaData: ClientsServiceProjectKeys,
-        delegate: OptimoveMbaasRegistrationHandling
-    )
-    func handleRegistration(apnsToken: Data)
-    func optimoveReceivedRegistrationToken(_ fcmToken: String)
-
-    func subscribeToTopic(topic: String, didSucceed: ((Bool) -> Void)?)
-    func unsubscribeFromTopic(topic: String, didSucceed: ((Bool) -> Void)?)
-}
-
 final class OptiPush {
 
-    private let configuration: OptipushConfig
-    private let firebaseInteractor: OptipushServiceInfra
+    private var serviceProvider: PushServiceProvider
     private let registrar: Registrable
     private var storage: OptimoveStorage
-    private let serviceLocator: OptiPushServiceLocator
 
-    init(configuration: OptipushConfig,
-         infrastructure: OptipushServiceInfra,
-         storage: OptimoveStorage,
-         localServiceLocator: OptiPushServiceLocator) {
-        self.configuration = configuration
-        self.firebaseInteractor = infrastructure
+    init(serviceProvider: PushServiceProvider,
+         registrar: Registrable,
+         storage: OptimoveStorage) {
+        self.serviceProvider = serviceProvider
         self.storage = storage
-        self.serviceLocator = localServiceLocator
-
-        registrar = serviceLocator.registrar(configuration: configuration)
-        firebaseInteractor.setupFirebase(
-            from: configuration.firebaseProjectKeys,
-            clientFirebaseMetaData: configuration.clientsServiceProjectKeys,
-            delegate: self
-        )
-
-        performInitializationOperations()
-        Logger.debug("OptiPush initialized.")
-    }
-
-    func performInitializationOperations() {
+        self.registrar = registrar
         retryFailedMbaasOperations()
+        Logger.debug("OptiPush initialized.")
     }
 
 }
@@ -60,18 +28,25 @@ extension OptiPush: Component {
         switch context.operation {
         case let .pushable(operation):
             switch operation {
-            case let .deviceToken(token: data):
-                firebaseInteractor.handleRegistration(apnsToken: data)
-            case let  .subscribeToTopic(topic: topic):
-                firebaseInteractor.subscribeToTopic(topic: topic, didSucceed: nil)
+            case let .deviceToken(token: token):
+                storage.apnsToken = token
+                registrar.handle(.setUser)
+                /// Alias`initialVisitorID` with `customerID` if the last one existed.
+                /// Keep actual DB connections between the client aliases and the latest token.
+                if (storage.customerID != nil) {
+                    registrar.handle(.addUserAlias)
+                }
+                serviceProvider.handleRegistration(apnsToken: token)
+            case let .subscribeToTopic(topic: topic):
+                serviceProvider.subscribeToTopic(topic: topic)
             case let .unsubscribeFromTopic(topic: topic):
-                firebaseInteractor.unsubscribeFromTopic(topic: topic, didSucceed: nil)
-            case .performRegistration:
-                performRegistration()
+                serviceProvider.unsubscribeFromTopic(topic: topic)
+            case .migrateUser:
+                registrar.handle(.addUserAlias)
             case .optIn:
-                registrar.optIn()
+                registrar.handle(.setUser)
             case .optOut:
-                registrar.optOut()
+                registrar.handle(.setUser)
             }
         default:
             break
@@ -79,34 +54,7 @@ extension OptiPush: Component {
     }
 }
 
-extension OptiPush: OptimoveMbaasRegistrationHandling {
-
-    // MARK: - Protocol conformance
-
-    func handleRegistrationTokenRefresh(token: String) {
-        let registerToken: () -> Void = {
-            self.performRegistration()
-            self.firebaseInteractor.subscribeToTopics(didSucceed: nil)
-        }
-        if storage.fcmToken == token {
-            storage.fcmToken = token
-            registrar.unregister {
-                registerToken()
-            }
-        } else {
-            //The order of the following operations matter
-            storage.fcmToken = token
-            registerToken()
-        }
-    }
-
-}
-
 private extension OptiPush {
-
-    func performRegistration() {
-        registrar.register()
-    }
 
     func retryFailedMbaasOperations() {
         do {

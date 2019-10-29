@@ -25,7 +25,7 @@ enum Operation {
 }
 
 enum EventableOperation {
-    case setUserId(userId: String)
+    case setUserId
     case report(event: OptimoveEvent)
     case reportScreenEvent(customURL: String, pageTitle: String, category: String?)
     case dispatchNow
@@ -33,9 +33,9 @@ enum EventableOperation {
 
 enum PushableOperation {
     case deviceToken(token: Data)
-    case performRegistration
-    case unsubscribeFromTopic(topic: String)
     case subscribeToTopic(topic: String)
+    case unsubscribeFromTopic(topic: String)
+    case migrateUser
     case optIn
     case optOut
 }

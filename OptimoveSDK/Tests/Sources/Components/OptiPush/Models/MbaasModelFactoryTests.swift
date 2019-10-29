@@ -3,134 +3,67 @@
 import XCTest
 @testable import OptimoveSDK
 
-class MbaasModelFactoryTests: OptimoveTestCase {
+class MbaasPayloadBuilderTests: OptimoveTestCase {
 
-    var factory: MbaasModelFactory!
+    var factory: MbaasPayloadBuilder!
 
     override func setUp() {
         super.setUp()
-        factory = MbaasModelFactory(
+        factory = MbaasPayloadBuilder(
             storage: storage,
-            processInfo: ProcessInfo(),
-            device: SDKDevice.self,
-            bundle: Bundle.self
+            deviceID: SDKDevice.uuid,
+            appNamespace: try! Bundle.getApplicationNameSpace(),
+            tenantID: String(StubConstants.tenantID)
         )
     }
 
-    func test_create_registration_for_visitor() {
+    func test_add_user_without_token() {
         // given
-        let operation: MbaasOperation = .registration
-        let expectedAppNs = (try! Bundle.getApplicationNameSpace()).setAsMongoKey()
-
-        // and
         prefillStorageAsVisitor()
+        let expectedAppNs = try! Bundle.getApplicationNameSpace()
 
         // when
-        XCTAssertNoThrow(try factory.createModel(for: operation))
-        let model = try! factory.createModel(for: operation) as! RegistartionMbaasModel
+        let payload = factory.createSetUser()
 
         // then
-        XCTAssert(model.isMbaasOptIn == StubConstants.isMbaasOptIn)
-        XCTAssert(model.tenantId == StubConstants.tenantID)
-        XCTAssert(model.fcmToken == StubConstants.fcmToken)
-        XCTAssert(model.osVersion == ProcessInfo().operatingSystemVersionOnlyString)
-        XCTAssert(model.userIdPayload == BaseMbaasModel.UserIdPayload.visitorID(StubConstants.visitorID))
-        XCTAssert(model.operation == operation)
-        XCTAssert(model.appNs == expectedAppNs)
-        XCTAssert(model.deviceId == SDKDevice.uuid)
+        XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
+        XCTAssertEqual(payload.appNS, expectedAppNs)
+        XCTAssertEqual(payload.os, SetUser.Constants.os)
+        XCTAssertNil(payload.deviceToken)
+        XCTAssertTrue(payload.optIn)
     }
 
-    func test_create_registration_for_customer() {
+    func test_add_user_with_token() {
         // given
-        let operation: MbaasOperation = .registration
-        let expectedAppNs = (try! Bundle.getApplicationNameSpace()).setAsMongoKey()
+        prefillStorageAsVisitor()
+        let expectedAppNs = try! Bundle.getApplicationNameSpace()
 
-        // and
+        let expectedToken = Data(repeating: 42, count: 10)
+        storage.apnsToken = expectedToken
+
+        // when
+        let payload = factory.createSetUser()
+
+        // then
+        XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
+        XCTAssertEqual(payload.appNS, expectedAppNs)
+        XCTAssertEqual(payload.os, SetUser.Constants.os)
+        XCTAssertNotNil(payload.deviceToken)
+        XCTAssertEqual(payload.deviceToken!, expectedToken.map{ String(format: "%02.2hhx", $0) }.joined())
+        XCTAssertTrue(payload.optIn)
+    }
+
+    func test_migrate_user() {
+        // given
         prefillStorageAsCustomer()
 
         // when
-        XCTAssertNoThrow(try factory.createModel(for: operation))
-        let model = try! factory.createModel(for: operation) as! RegistartionMbaasModel
+        XCTAssertNoThrow(try factory.createAddUserAlias())
+        let payload = try! factory.createAddUserAlias()
 
         // then
-        XCTAssert(model.isMbaasOptIn == StubConstants.isMbaasOptIn)
-        XCTAssert(model.tenantId == StubConstants.tenantID)
-        XCTAssert(model.fcmToken == StubConstants.fcmToken)
-        XCTAssert(model.osVersion == ProcessInfo().operatingSystemVersionOnlyString)
-        XCTAssert(model.userIdPayload == BaseMbaasModel.UserIdPayload.customerID(
-            BaseMbaasModel.UserIdPayload.CustomerIdPayload(
-                customerID: StubConstants.customerID,
-                isConversion: StubConstants.isFirstConversion,
-                initialVisitorId: StubConstants.initialVisitorId)
-            )
-        )
-        XCTAssert(model.operation == operation)
-        XCTAssert(model.appNs == expectedAppNs)
-        XCTAssert(model.deviceId == SDKDevice.uuid)
-    }
-
-    func test_create_unregistration_for_visitor() {
-        runDefaultModelAsVisitor(operation: .unregistration)
-    }
-
-    func test_create_unregistration_for_customer() {
-        runDefaultModelAsCustomer(operation: .unregistration)
-    }
-
-    func test_create_optIn_for_visitor() {
-        runDefaultModelAsVisitor(operation: .optIn)
-    }
-
-    func test_create_optIn_for_customer() {
-        runDefaultModelAsCustomer(operation: .optIn)
-    }
-
-    func test_create_optOut_for_visitor() {
-        runDefaultModelAsVisitor(operation: .optOut)
-    }
-
-    func test_create_optOut_for_customer() {
-        runDefaultModelAsCustomer(operation: .optOut)
-    }
-
-    private func runDefaultModelAsCustomer(operation: MbaasOperation) {
-        // and
-        prefillStorageAsCustomer()
-        let expectedAppNs = (try! Bundle.getApplicationNameSpace()).setAsMongoKey()
-
-        // when
-        XCTAssertNoThrow(try factory.createModel(for: operation))
-        let model = try! factory.createModel(for: operation) as! MbaasModel
-
-        // then
-        XCTAssert(model.tenantId == StubConstants.tenantID)
-        XCTAssert(model.userIdPayload == BaseMbaasModel.UserIdPayload.customerID(
-            BaseMbaasModel.UserIdPayload.CustomerIdPayload(
-                customerID: StubConstants.customerID,
-                isConversion: StubConstants.isFirstConversion,
-                initialVisitorId: StubConstants.initialVisitorId)
-            )
-        )
-        XCTAssert(model.operation == operation)
-        XCTAssert(model.appNs == expectedAppNs)
-        XCTAssert(model.deviceId == SDKDevice.uuid)
-    }
-
-    private func runDefaultModelAsVisitor(operation: MbaasOperation) {
-        // and
-        prefillStorageAsVisitor()
-        let expectedAppNs = (try! Bundle.getApplicationNameSpace()).setAsMongoKey()
-
-        // when
-        XCTAssertNoThrow(try factory.createModel(for: operation))
-        let model = try! factory.createModel(for: operation) as! MbaasModel
-
-        // then
-        XCTAssert(model.tenantId == StubConstants.tenantID)
-        XCTAssert(model.userIdPayload == BaseMbaasModel.UserIdPayload.visitorID(StubConstants.visitorID))
-        XCTAssert(model.operation == operation)
-        XCTAssert(model.appNs == expectedAppNs)
-        XCTAssert(model.deviceId == SDKDevice.uuid)
+        XCTAssertEqual(payload.newAlias, storage.customerID!)
+        XCTAssertEqual(payload.currentAlias, storage.initialVisitorId!)
     }
 
 }

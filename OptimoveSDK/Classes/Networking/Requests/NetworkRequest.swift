@@ -66,6 +66,7 @@ public enum HTTPMethod: String {
     case options = "OPTIONS"
     case trace = "TRACE"
     case connect = "CONNECT"
+    case patch = "PATCH"
 }
 
 public struct HTTPHeader {

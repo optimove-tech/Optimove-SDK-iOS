@@ -83,6 +83,7 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
 public struct OptipushConfig: Codable, TenantInfo {
     public let tenantID: Int
     public let registrationServiceEndpoint: URL
+    public let mbaasEndpoint: URL
     public let pushTopicsRegistrationEndpoint: URL
     public let firebaseProjectKeys: FirebaseProjectKeys
     public let clientsServiceProjectKeys: ClientsServiceProjectKeys
@@ -90,11 +91,13 @@ public struct OptipushConfig: Codable, TenantInfo {
     public init(
         tenantID: Int,
         registrationServiceEndpoint: URL,
+        mbaasEndpoint: URL,
         pushTopicsRegistrationEndpoint: URL,
         firebaseProjectKeys: FirebaseProjectKeys,
         clientsServiceProjectKeys: ClientsServiceProjectKeys) {
         self.tenantID = tenantID
         self.registrationServiceEndpoint = registrationServiceEndpoint
+        self.mbaasEndpoint = mbaasEndpoint
         self.pushTopicsRegistrationEndpoint = pushTopicsRegistrationEndpoint
         self.firebaseProjectKeys = firebaseProjectKeys
         self.clientsServiceProjectKeys = clientsServiceProjectKeys

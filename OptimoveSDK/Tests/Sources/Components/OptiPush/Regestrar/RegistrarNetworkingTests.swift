@@ -4,38 +4,43 @@ import XCTest
 import Mocker
 @testable import OptimoveSDK
 
-class RegistrarNetworkingTests: XCTestCase {
+class RegistrarNetworkingTests: OptimoveTestCase {
 
     var networking: RegistrarNetworking!
-    let url = StubVariables.url
+    let config = ConfigurationFixture.build().optipush
 
     override func setUp() {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockingURLProtocol.self]
         let client = NetworkClientImpl(configuration: configuration)
+        let payloadBuilder = MbaasPayloadBuilder(
+            storage: storage,
+            deviceID: SDKDevice.uuid,
+            appNamespace: try! Bundle.getApplicationNameSpace(),
+            tenantID: String(StubConstants.tenantID)
+        )
+        let requestFactory = RegistrarNetworkingRequestFactory(
+            storage: storage,
+            payloadBuilder: payloadBuilder,
+            requestBuilder: ClientAPIRequestBuilder(
+                optipushConfig: config
+            )
+        )
         networking = RegistrarNetworkingImpl(
             networkClient: client,
-            requestBuilder: RegistrarNetworkingRequestBuilder(
-                storage: MockOptimoveStorage(),
-                configuration: ConfigurationFixture.build().optipush
-            )
+            requestFactory: requestFactory
         )
     }
 
-    func test_report_event_registration() {
+    func test_addOrUpdateUser() {
         // given
-        let model = MbaasModel(
-            deviceId: "deviceId",
-            appNs: "appNs",
-            operation: .registration,
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.visitorID("visitorID")
-        )
+        prefillStorageAsVisitor()
 
         Mocker.register(
             Mock(
-                url: url
-                    .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.register + RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.visitor),
+                url: config.mbaasEndpoint
+                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.path)
+                    .appendingPathComponent(storage.initialVisitorId!),
                 dataType: .json,
                 statusCode: 200,
                 data: [.post: Data()]
@@ -44,7 +49,7 @@ class RegistrarNetworkingTests: XCTestCase {
 
         // when
         let resultExpectation = expectation(description: "Result was not generated.")
-        networking.sendToMbaas(model: model) { (result) in
+        networking.sendToMbaas(operation: .setUser) { (result) in
             switch result {
             case .success:
                 resultExpectation.fulfill()
@@ -57,35 +62,23 @@ class RegistrarNetworkingTests: XCTestCase {
         wait(for: [resultExpectation], timeout: defaultTimeout)
     }
 
-    func test_report_event_unregistration() {
+    func test_migrate_user() {
         // given
-        let model = MbaasModel(
-            deviceId: "deviceId",
-            appNs: "appNs",
-            operation: .unregistration,
-            tenantId: 100,
-            userIdPayload: BaseMbaasModel.UserIdPayload.customerID(
-                BaseMbaasModel.UserIdPayload.CustomerIdPayload(
-                    customerID: "customerID",
-                    isConversion: false,
-                    initialVisitorId: "initialVisitorId"
-                )
-            )
-        )
+        prefillStorageAsCustomer()
 
         Mocker.register(
             Mock(
-                url: url
-                    .appendingPathComponent(RegistrarNetworkingRequestBuilder.Constants.Path.Operation.unregister + RegistrarNetworkingRequestBuilder.Constants.Path.Suffix.customer),
+                url: config.mbaasEndpoint
+                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.path),
                 dataType: .json,
                 statusCode: 200,
-                data: [.post: Data()]
+                data: [.put: Data()]
             )
         )
 
         // when
         let resultExpectation = expectation(description: "Result was not generated.")
-        networking.sendToMbaas(model: model) { (result) in
+        networking.sendToMbaas(operation: .addUserAlias) { (result) in
             switch result {
             case .success:
                 resultExpectation.fulfill()
