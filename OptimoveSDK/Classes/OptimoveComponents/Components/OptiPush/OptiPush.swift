@@ -31,6 +31,11 @@ extension OptiPush: Component {
             case let .deviceToken(token: token):
                 storage.apnsToken = token
                 registrar.handle(.setUser)
+                /// Alias`initialVisitorID` with `customerID` if the last one existed.
+                /// Keep actual DB connections between the client aliases and the latest token.
+                if (storage.customerID != nil) {
+                    registrar.handle(.addUserAlias)
+                }
                 serviceProvider.handleRegistration(apnsToken: token)
             case let .subscribeToTopic(topic: topic):
                 serviceProvider.subscribeToTopic(topic: topic)
