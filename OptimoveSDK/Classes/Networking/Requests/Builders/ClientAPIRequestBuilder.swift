@@ -23,7 +23,7 @@ final class ClientAPIRequestBuilder {
                 .appendingPathComponent(userID),
             body: userDevice
         )
-}
+    }
 
     func putMigrateUser(_ model: AddUserAlias) throws -> NetworkRequest {
         return try NetworkRequest(
