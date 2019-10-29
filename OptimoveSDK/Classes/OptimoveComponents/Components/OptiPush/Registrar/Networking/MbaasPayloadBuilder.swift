@@ -35,7 +35,7 @@ final class MbaasPayloadBuilder {
     func createAddUserAlias() throws -> AddUserAlias {
         return AddUserAlias(
             tenantAlias: tenantID,
-            currentAlias: try storage.getVisitorID(),
+            currentAlias: try storage.getInitialVisitorId(),
             newAlias: try storage.getCustomerID()
         )
     }
