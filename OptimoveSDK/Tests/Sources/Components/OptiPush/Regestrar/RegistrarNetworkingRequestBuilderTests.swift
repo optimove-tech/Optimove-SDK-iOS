@@ -23,8 +23,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
             payloadBuilder: payloadBuilder,
             requestBuilder: ClientAPIRequestBuilder(
                 optipushConfig: config
-            ),
-            userService: UserService(storage: storage)
+            )
         )
     }
 
@@ -61,7 +60,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
             .appendingPathComponent(ClientAPIRequestBuilder.Constants.path)
-            .appendingPathComponent(storage.customerID!)
+            .appendingPathComponent(storage.initialVisitorId!)
         )
         XCTAssert(request.method == .post)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)

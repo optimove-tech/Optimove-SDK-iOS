@@ -24,8 +24,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
             payloadBuilder: payloadBuilder,
             requestBuilder: ClientAPIRequestBuilder(
                 optipushConfig: config
-            ),
-            userService: UserService(storage: storage)
+            )
         )
         networking = RegistrarNetworkingImpl(
             networkClient: client,

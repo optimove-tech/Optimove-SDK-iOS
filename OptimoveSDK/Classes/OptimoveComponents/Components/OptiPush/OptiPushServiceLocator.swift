@@ -29,9 +29,6 @@ final class OptiPushServiceLocator {
             ),
             requestBuilder: ClientAPIRequestBuilder(
                 optipushConfig: optipushConfig
-            ),
-            userService: UserService(
-                storage: storage()
             )
         )
         let networking = RegistrarNetworkingImpl(
