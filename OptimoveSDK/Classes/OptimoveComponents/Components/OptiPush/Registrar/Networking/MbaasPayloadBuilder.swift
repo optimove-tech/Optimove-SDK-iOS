@@ -27,7 +27,8 @@ final class MbaasPayloadBuilder {
             os: SetUser.Constants.os,
             tenantAlias: tenantID,
             deviceToken: storage.apnsToken?.map{ String(format: "%02.2hhx", $0) }.joined(),
-            optIn: (try? storage.getIsMbaasOptIn()) ?? true
+            optIn: (try? storage.getIsMbaasOptIn()) ?? true,
+            isDev: SDK.isDebugging
         )
     }
 
@@ -48,6 +49,7 @@ struct SetUser: Codable {
     let deviceID, appNS, os, tenantAlias: String
     let deviceToken: String?
     let optIn: Bool
+    let isDev: Bool
 
     enum CodingKeys: String, CodingKey {
         case deviceID = "device_id"
@@ -56,6 +58,7 @@ struct SetUser: Codable {
         case deviceToken = "device_token"
         case optIn = "opt_in"
         case tenantAlias = "tenant_alias"
+        case isDev = "is_dev"
     }
 }
 
