@@ -180,22 +180,6 @@ class KeyValueStorageTests: XCTestCase {
         XCTAssertThrowsError(try storage.getApnsToken())
     }
 
-    func test_isMbaasOptIn() {
-        // when
-        storage.isMbaasOptIn = StubVariables.bool
-
-        // then
-        XCTAssertNoThrow(try storage.getIsMbaasOptIn())
-    }
-
-    func test_no_isMbaasOptIn() {
-        // when
-        storage.apnsToken = nil
-
-        // then
-        XCTAssertThrowsError(try storage.getIsMbaasOptIn())
-    }
-
     func test_defaultFcmToken() {
         // when
         storage.defaultFcmToken = StubVariables.string
@@ -333,60 +317,18 @@ class KeyValueStorageTests: XCTestCase {
         XCTAssertNil(storage.isSettingUserSuccess)
     }
 
-    func test_isOptRequestSuccess() {
+    func test_optFlag_set() {
         // when
         let value = StubVariables.bool
-        storage.isOptRequestSuccess = value
+        storage.optFlag = value
 
         // then
-        XCTAssert(storage.isOptRequestSuccess == value)
+        XCTAssert(storage.optFlag == value)
     }
 
-    func test_no_isOptRequestSuccess() {
+    func test_optFlag_get() {
         // then
-        XCTAssert(storage.isOptRequestSuccess == true)
-    }
-
-    func test_isFirstConversion() {
-        // when
-        let value = StubVariables.bool
-        storage.isFirstConversion = value
-
-        // then
-        XCTAssert(storage.isFirstConversion == value)
-    }
-
-    func test_no_isFirstConversion() {
-        // then
-        XCTAssert(storage.isFirstConversion == false)
-    }
-
-    func test_isOptiTrackOptIn() {
-        // when
-        let value = StubVariables.bool
-        storage.isOptiTrackOptIn = value
-
-        // then
-        XCTAssert(storage.isOptiTrackOptIn == value)
-    }
-
-    func test_no_isOptiTrackOptIn() {
-        // then
-        XCTAssert(storage.isOptiTrackOptIn == false)
-    }
-
-    func test_isSetUserIdSucceed() {
-        // when
-        let value = StubVariables.bool
-        storage.isSetUserIdSucceed = value
-
-        // then
-        XCTAssert(storage.isSetUserIdSucceed == value)
-    }
-
-    func test_no_isSetUserIdSucceed() {
-        // then
-        XCTAssert(storage.isSetUserIdSucceed == false)
+        XCTAssert(storage.optFlag == true)
     }
 
     func test_realtimeSetUserIdFailed() {

@@ -27,7 +27,7 @@ final class MbaasPayloadBuilder {
             os: SetUser.Constants.os,
             tenantAlias: tenantID,
             deviceToken: storage.apnsToken?.map{ String(format: "%02.2hhx", $0) }.joined(),
-            optIn: (try? storage.getIsMbaasOptIn()) ?? true,
+            optIn: storage.optFlag,
             isDev: SDK.isDebugging
         )
     }

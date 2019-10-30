@@ -128,7 +128,7 @@ final class ServiceLocator {
                     coreEventFactory: coreEventFactory,
                     storage: storage()
                 ),
-                EnterForegroundObserver(
+                AppOpenObserver(
                     synchronizer: synchronizer(),
                     statisticService: statisticService(),
                     dateTimeProvider: dateTimeProvider(),

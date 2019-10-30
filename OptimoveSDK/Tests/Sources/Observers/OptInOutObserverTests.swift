@@ -25,12 +25,13 @@ final class OptInOutObserverTests: XCTestCase {
         )
     }
 
-    func test_optIn_process_for_the_first_time() {
+    func test_optFlag_process_for_the_first_time() {
         // given
-        storage.isOptiTrackOptIn = false
+        // storage.optFlag has default value `true`
         notificationPermissionFetcher.permitted = true
 
-        let optInEventExpectation = expectation(description: "OptIn event was not generated.")
+        let optInEventExpectation = expectation(description: "optFlag event was not generated.")
+        optInEventExpectation.isInverted.toggle()
         synchronizer.assertFunctionEventable = { operation in
             switch operation {
             case let .report(event: event):
@@ -45,16 +46,11 @@ final class OptInOutObserverTests: XCTestCase {
             }
         }
 
-        let optInStorageValueExpectation = expectation(description: "OptIn storage value change was not generated.")
-        let mbaasOptInStorageValueExpectation = expectation(description: "MBAAS optIn value change was not generated.")
+        let optFlagStorageValueExpectation = expectation(description: "optFlag storage value change was not generated.")
+        optFlagStorageValueExpectation.isInverted.toggle()
         storage.assertFunction = { (value, key) in
-            if key == .isOptiTrackOptIn {
-                XCTAssertEqual(value as? Bool, true)
-                optInStorageValueExpectation.fulfill()
-            }
-            if key == .isMbaasOptIn {
-                XCTAssertEqual(value as? Bool, true)
-                mbaasOptInStorageValueExpectation.fulfill()
+            if key == .optFlag {
+                optFlagStorageValueExpectation.fulfill()
             }
         }
 
@@ -65,45 +61,76 @@ final class OptInOutObserverTests: XCTestCase {
         wait(
             for: [
                 optInEventExpectation,
-                optInStorageValueExpectation,
-                mbaasOptInStorageValueExpectation
+                optFlagStorageValueExpectation,
             ],
             timeout: defaultTimeout
         )
     }
 
-    func test_no_optInOut_changes() {
+    func test_optFlag_after_disallow_notifications() {
         // given
-        storage.isOptiTrackOptIn = true
+        storage.optFlag = true
+        notificationPermissionFetcher.permitted = false
+
+        let optFlagEventExpectation = expectation(description: "OptOut event was not generated.")
+        synchronizer.assertFunctionEventable = { operation in
+            switch operation {
+            case let .report(event: event):
+                switch event.name {
+                case OptipushOptInEvent.Constants.optOutName:
+                    optFlagEventExpectation.fulfill()
+                default:
+                    break
+                }
+            default:
+                break
+            }
+        }
+
+        let optFlagStorageValueExpectation = expectation(description: "OptIn storage value change was not generated.")
+        storage.assertFunction = { (value, key) in
+            if key == .optFlag {
+                XCTAssertEqual(value as? Bool, false)
+                optFlagStorageValueExpectation.fulfill()
+            }
+        }
+
+        let optFlagOperationExpectation = expectation(description: "OptOut operation was not generated.")
+        synchronizer.assertFunctionPushable = { operation in
+            switch operation {
+            case .optOut:
+                optFlagOperationExpectation.fulfill()
+            default:
+                break
+            }
+        }
+
+        // when
+        observer.observe()
+
+        // then
+        wait(
+            for: [
+                optFlagEventExpectation,
+                optFlagStorageValueExpectation,
+                optFlagOperationExpectation
+            ],
+            timeout: defaultTimeout
+        )
+    }
+
+    func test_optFlag_after_allow_notifications() {
+        // given
+        storage.optFlag = false
         notificationPermissionFetcher.permitted = true
 
-        let pushableOperationExpectation = expectation(description: "Pushable  operation was generated.")
-        pushableOperationExpectation.isInverted.toggle()
-        synchronizer.assertFunctionPushable = { operation in
-            pushableOperationExpectation.fulfill()
-        }
-
-        // when
-        observer.observe()
-
-        // then
-        wait(for: [pushableOperationExpectation], timeout: defaultTimeout)
-    }
-
-    func test_optOut_after_disallow_notifications_for_the_first_time() {
-        // given
-        storage.isOptiTrackOptIn = true
-        notificationPermissionFetcher.permitted = false
-        storage.fcmToken = StubVariables.string
-        storage.isSettingUserSuccess = true
-
-        let optOutEventExpectation = expectation(description: "OptOut event was not generated.")
+        let optFlagEventExpectation = expectation(description: "OptOut event was not generated.")
         synchronizer.assertFunctionEventable = { operation in
             switch operation {
             case let .report(event: event):
                 switch event.name {
-                case OptipushOptInEvent.Constants.optOutName:
-                    optOutEventExpectation.fulfill()
+                case OptipushOptInEvent.Constants.optInName:
+                    optFlagEventExpectation.fulfill()
                 default:
                     break
                 }
@@ -112,24 +139,19 @@ final class OptInOutObserverTests: XCTestCase {
             }
         }
 
-        let optInStorageValueExpectation = expectation(description: "OptIn storage value change was not generated.")
-        let mbaasOptInStorageValueExpectation = expectation(description: "MBAAS optIn value change was not generated.")
+        let optFlagStorageValueExpectation = expectation(description: "OptIn storage value change was not generated.")
         storage.assertFunction = { (value, key) in
-            if key == .isOptiTrackOptIn {
-                XCTAssertEqual(value as? Bool, false)
-                optInStorageValueExpectation.fulfill()
-            }
-            if key == .isMbaasOptIn {
-                XCTAssertEqual(value as? Bool, false)
-                mbaasOptInStorageValueExpectation.fulfill()
+            if key == .optFlag {
+                XCTAssertEqual(value as? Bool, true)
+                optFlagStorageValueExpectation.fulfill()
             }
         }
 
-        let optOutOperationExpectation = expectation(description: "OptOut operation was not generated.")
+        let optFlagOperationExpectation = expectation(description: "OptOut operation was not generated.")
         synchronizer.assertFunctionPushable = { operation in
             switch operation {
-            case .optOut:
-                optOutOperationExpectation.fulfill()
+            case .optIn:
+                optFlagOperationExpectation.fulfill()
             default:
                 break
             }
@@ -141,70 +163,9 @@ final class OptInOutObserverTests: XCTestCase {
         // then
         wait(
             for: [
-                optOutEventExpectation,
-                optInStorageValueExpectation,
-                optOutOperationExpectation,
-                mbaasOptInStorageValueExpectation
-            ],
-            timeout: defaultTimeout
-        )
-    }
-
-    func test_optOut_after_disallow_notifications() {
-        // given
-        storage.isOptiTrackOptIn = true
-        storage.isMbaasOptIn = true
-        notificationPermissionFetcher.permitted = false
-        storage.fcmToken = StubVariables.string
-
-        let optOutEventExpectation = expectation(description: "OptOut event was not generated.")
-        synchronizer.assertFunctionEventable = { operation in
-            switch operation {
-            case let .report(event: event):
-                switch event.name {
-                case OptipushOptInEvent.Constants.optOutName:
-                    optOutEventExpectation.fulfill()
-                default:
-                    break
-                }
-            default:
-                break
-            }
-        }
-
-        let optInStorageValueExpectation = expectation(description: "OptIn storage value change was not generated.")
-        let mbaasOptInStorageValueExpectation = expectation(description: "MBAAS optIn value change was not generated.")
-        storage.assertFunction = { (value, key) in
-            if key == .isOptiTrackOptIn {
-                XCTAssertEqual(value as? Bool, false)
-                optInStorageValueExpectation.fulfill()
-            }
-            if key == .isMbaasOptIn {
-                XCTAssertEqual(value as? Bool, false)
-                mbaasOptInStorageValueExpectation.fulfill()
-            }
-        }
-
-        let optOutOperationExpectation = expectation(description: "OptOut operation was not generated.")
-        synchronizer.assertFunctionPushable = { operation in
-            switch operation {
-            case .optOut:
-                optOutOperationExpectation.fulfill()
-            default:
-                break
-            }
-        }
-
-        // when
-        observer.observe()
-
-        // then
-        wait(
-            for: [
-                optOutEventExpectation,
-                optInStorageValueExpectation,
-                optOutOperationExpectation,
-                mbaasOptInStorageValueExpectation
+                optFlagEventExpectation,
+                optFlagStorageValueExpectation,
+                optFlagOperationExpectation
             ],
             timeout: defaultTimeout
         )

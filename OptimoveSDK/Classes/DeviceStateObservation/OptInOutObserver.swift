@@ -2,6 +2,7 @@
 
 import Foundation
 import OptimoveCore
+import UIKit
 
 final class OptInOutObserver {
 
@@ -25,10 +26,13 @@ final class OptInOutObserver {
 extension OptInOutObserver: DeviceStateObservable {
 
     func observe() {
-        notificationPermissionFetcher.fetch { (permitted) in
-            tryCatch {
-                try self.executeReportOptInOut(notificationsPermissionsGranted: permitted)
-            }
+        checkSettings()
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] (_) in
+            self?.checkSettings()
         }
     }
 
@@ -36,70 +40,32 @@ extension OptInOutObserver: DeviceStateObservable {
 
 private extension OptInOutObserver {
 
-    // MARK: Eventable logic
-
-    func executeReportOptInOut(notificationsPermissionsGranted: Bool) throws {
-        // Check if an OptIn/OptOut state was changed. If not do nothing.
-        guard isOptStateChanged(with: notificationsPermissionsGranted) else { return }
-        if notificationsPermissionsGranted {
-            synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptIn)))
-            storage.isOptiTrackOptIn = true
-            if storage.isOptRequestSuccess {
-                handleNotificationAuthorized()
-            }
-        } else {
-            synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptOut)))
-            storage.isOptiTrackOptIn = false
-            if storage.isOptRequestSuccess {
-                handleNotificationRejection()
+    func checkSettings() {
+        notificationPermissionFetcher.fetch { (permitted) in
+            tryCatch {
+                /// Check if an OptIn/OptOut state was changed, or do nothing.
+                guard self.isOptStateChanged(with: permitted) else { return }
+                permitted ? try self.executeOptIn() : try self.executeOptOut()
             }
         }
     }
 
     func isOptStateChanged(with newState: Bool) -> Bool {
-        let isOptiTrackOptIn: Bool = storage.isOptiTrackOptIn
-        return newState != isOptiTrackOptIn
+        return newState != storage.optFlag
     }
 
-    // MARK: Pushable logic
-
-    func handleNotificationAuthorized() {
-        Logger.info("OptiPush: User authorized notifications.")
-        guard let isOptIn = storage.isMbaasOptIn else {  //Opt in on first launch
-            Logger.debug("OptiPush: User authorized notifications for the first time.")
-            storage.isMbaasOptIn = true
-            return
-        }
-        if !isOptIn {
-            Logger.debug("OptiPush: SDK make opt IN request.")
-            synchronizer.handle(.optIn)
-        }
+    func executeOptIn() throws {
+        Logger.warn("OptiPush: User AUTHORIZED notifications.")
+        storage.optFlag = true
+        synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptIn)))
+        synchronizer.handle(.optIn)
     }
 
-    func handleNotificationRejection() {
-        Logger.warn("OptiPush: User UNauthorized notifications.")
-        guard let isOptIn = storage.isMbaasOptIn else {
-            //Opt out on first launch
-            handleNotificationRejectionAtFirstLaunch()
-            return
-        }
-        if isOptIn {
-            Logger.debug("OptiPush: SDK make opt OUT request.")
-            synchronizer.handle(.optOut)
-            storage.isMbaasOptIn = false
-        }
+    func executeOptOut() throws {
+        Logger.warn("OptiPush: User UNAUTHORIZED notifications.")
+        storage.optFlag = false
+        synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptOut)))
+        synchronizer.handle(.optOut)
     }
 
-    func handleNotificationRejectionAtFirstLaunch() {
-        Logger.debug("OptiPush: User opt OUT at first launch.")
-        guard storage.fcmToken != nil else {
-            storage.isMbaasOptIn = false
-            return
-        }
-
-        if let isSettingUserSuccess = storage.isSettingUserSuccess, isSettingUserSuccess == true {
-            storage.isMbaasOptIn = false
-            synchronizer.handle(.optOut)
-        }
-    }
 }
