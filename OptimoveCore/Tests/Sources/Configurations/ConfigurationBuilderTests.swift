@@ -19,6 +19,4 @@ class ConfigurationBuilderTests: XCTestCase {
         XCTAssert(configuration.optitrack.eventCategoryName == globalConfig.optitrack.eventCategoryName)
     }
 
-    // TODO: Improve a configuration creation coverage.
-
 }

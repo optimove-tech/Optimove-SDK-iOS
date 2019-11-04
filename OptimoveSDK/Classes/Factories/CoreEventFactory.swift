@@ -13,7 +13,6 @@ enum CoreEventType {
     case setAdvertisingId
     case setUserId
     case pageVisit(screenPath: String, screenTitle: String, category: String?)
-    case ping
 }
 
 protocol CoreEventFactory {
@@ -55,8 +54,6 @@ extension CoreEventFactoryImpl: CoreEventFactory {
             return try createMetaDataEvent()
         case let .pageVisit(screenPath: sp, screenTitle: st, category: c):
             return createPageVisitEvent(screenPath: sp, screenTitle: st, category: c)
-        case .ping:
-            return try createPingEvent()
         case .setUserAgent:
             return try createSetUserAgentEvent()
         case .setAdvertisingId:
@@ -148,14 +145,6 @@ private extension CoreEventFactoryImpl {
     func createSetUserEmailEvent() throws -> SetUserEmailEvent {
         return SetUserEmailEvent(
             email: try storage.getUserEmail()
-        )
-    }
-
-    func createPingEvent() throws -> PingEvent {
-        return PingEvent(
-            visitorId: try storage.getVisitorID(),
-            deviceId: deviceId,
-            appNs: try getApplicationNamespace()
         )
     }
 

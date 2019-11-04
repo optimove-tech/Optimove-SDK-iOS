@@ -150,18 +150,7 @@ extension Optimove {
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
         ) -> Bool {
         Logger.info("Receive a remote notification.")
-        let notificationListener = serviceLocator.notificationListener()
-        let result = notificationListener.isOptimoveSdkCommand(userInfo: userInfo)
-        if result {
-            startSDK { result in
-                guard result.isSuccessful else { return }
-                notificationListener.didReceiveRemoteNotification(
-                    userInfo: userInfo,
-                    didComplete: didComplete
-                )
-            }
-        }
-        return result
+        return false
     }
 
     /// Asks the Optimove SDK how to handle a notification that arrived while the app was running in the foreground.

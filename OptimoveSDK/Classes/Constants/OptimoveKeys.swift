@@ -65,7 +65,6 @@ struct OptimoveKeys {
         case isOptipush = "is_optipush"
         case collapseId = "collapse_Key"
         case dynamikLink = "dynamic_link"
-        case isOptimoveSdkCommand = "is_optimove_sdk_command"
         case command = "command"
     }
 

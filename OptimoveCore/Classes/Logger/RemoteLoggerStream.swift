@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import os.log
 
 public final class RemoteLoggerStream: MutableLoggerStream {
 
@@ -18,6 +19,9 @@ public final class RemoteLoggerStream: MutableLoggerStream {
 
     private let appNs: String
     private let platform: SdkPlatform = .ios
+
+    private var category: String { String(describing: type(of: self)) }
+    private var log: OSLog { OSLog(subsystem: OSLog.subsystem, category: category) }
 
     public init(tenantId: Int) {
         self.tenantId = tenantId
@@ -44,8 +48,10 @@ public final class RemoteLoggerStream: MutableLoggerStream {
         )
         do {
             let request = try self.buildLogRequest(data)
-            let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-                // TODO: Add local logging.
+            let task = URLSession.shared.dataTask(with: request) { [log] (data, response, error) in
+                if error != nil {
+                    os_log("Logger: data task returns an error '%s'", log: log, type: .error, error!.localizedDescription)
+                }
             }
             task.resume()
         } catch {
