@@ -30,7 +30,7 @@ public final class RemoteLoggerStream: MutableLoggerStream {
             sdkEnv: SDK.environment,
             sdkPlatform: platform,
             level: level,
-            logModule: "",
+            logModule: nil,
             logFileName: fileName,
             logMethodName: methodName,
             message: message
