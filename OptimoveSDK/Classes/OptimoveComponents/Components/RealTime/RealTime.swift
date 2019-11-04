@@ -80,7 +80,7 @@ extension RealTime {
     func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) throws {
         let config = try event.matchConfiguration(with: configuration.events)
         guard config.supportedOnRealTime else {
-            Logger.warn("Realtime: Event \(event.name) is not supported.")
+            Logger.info("Realtime: Event \(event.name) is not supported.")
             return
         }
         do {
