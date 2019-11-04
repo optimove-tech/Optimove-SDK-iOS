@@ -17,13 +17,11 @@ final class ServiceLocator {
         do {
             let bundleIdentifier = try Bundle.getApplicationNameSpace()
             let groupStorage = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
+            let fileStorage = try FileStorageImpl(bundleIdentifier: bundleIdentifier, fileManager: .default)
             return StorageFacade(
                 groupedStorage: groupStorage,
                 sharedStorage: UserDefaults.standard,
-                fileStorage: try FileStorageImpl(
-                    bundleIdentifier: bundleIdentifier,
-                    fileManager: .default
-                )
+                fileStorage: fileStorage
             )
         } catch {
             fatalError(error.localizedDescription)
