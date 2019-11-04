@@ -222,6 +222,7 @@ extension Optimove {
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let validationResult = APNsTokenValidator(storage: serviceLocator.storage())
         if validationResult.validate(token: deviceToken) == .new {
+            Logger.debug("APNS token: \(deviceToken.map{ String(format: "%02.2hhx", $0) }.joined())")
             synchronizer.handle(.deviceToken(token: deviceToken))
         }
     }
