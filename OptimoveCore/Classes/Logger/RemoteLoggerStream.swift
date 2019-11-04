@@ -4,6 +4,13 @@ import Foundation
 
 public final class RemoteLoggerStream: MutableLoggerStream {
 
+    private struct Constants {
+        static let httpHeaders: [String : String] = [
+            "Content-Type": "application/json"
+        ]
+        static let httpMethod = "POST"
+    }
+
     public var policy: LoggerStreamPolicy = .all
 
     public var tenantId: Int
@@ -50,10 +57,10 @@ public final class RemoteLoggerStream: MutableLoggerStream {
         let logBody = try JSONEncoder().encode(data)
         var request = URLRequest(url: self.endpoint)
         request.httpBody = logBody
-        // FIXME: Move to local Constants.
-        request.httpMethod = "POST"
-        // FIXME: Move to local Constants.
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = Constants.httpMethod
+        Constants.httpHeaders.forEach { (header) in
+            request.setValue(header.value, forHTTPHeaderField: header.key)
+        }
         return request
     }
 }
