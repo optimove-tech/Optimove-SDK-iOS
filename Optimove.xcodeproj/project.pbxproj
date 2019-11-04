@@ -398,7 +398,6 @@
 		FCDDED6A4E919A79A86C688D /* MatomoTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDB0867845730F8D7C55EB70 /* MatomoTracker.framework */; };
 		FCFB66820EE4C52D8F9D43C7 /* FirebaseInstanceID.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD983AA63F099EA06F4F5E2 /* FirebaseInstanceID.framework */; };
 		FD236BD1178C587E498A4503 /* RealTimeRequestBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC28BA5971111A7AC297CC7C /* RealTimeRequestBuilderTests.swift */; };
-		FD37939BD7DC742359761471 /* CwlMutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244B5DD42F03A40799081E48 /* CwlMutex.swift */; };
 		FD55C26C7570E142859D7693 /* ClientAPIRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAC84C3F79228E6A71470B7 /* ClientAPIRequestBuilder.swift */; };
 		FD6B210141F97A6B47D3B50B /* MockOptimoveStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0D16D34EAA14578617D5D6 /* MockOptimoveStorage.swift */; };
 		FEA10A9AD3FB82102BF3CF96 /* ParametersDecorator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B38AB3E3600AC0A8D2E040 /* ParametersDecorator.swift */; };
@@ -573,7 +572,6 @@
 		223AAFF69F929BCCCB099CE0 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		23926F20C916CA0A6EB78D9D /* Bundle+Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Identifiers.swift"; sourceTree = "<group>"; };
 		23AE39D7C734B1924F5F277B /* OptimoveSDKInitializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveSDKInitializer.swift; sourceTree = "<group>"; };
-		244B5DD42F03A40799081E48 /* CwlMutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CwlMutex.swift; sourceTree = "<group>"; };
 		257209FCCF3E793174741093 /* PingEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingEvent.swift; sourceTree = "<group>"; };
 		261D38281C7EFF91CCFA2867 /* test_notification.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = test_notification.json; sourceTree = "<group>"; };
 		2753E31F77B0597250A5646D /* RunningFlagsContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningFlagsContainer.swift; sourceTree = "<group>"; };
@@ -1384,14 +1382,6 @@
 			path = Deeplink;
 			sourceTree = "<group>";
 		};
-		5E701ACA262E8DB04876B2D6 /* third_party */ = {
-			isa = PBXGroup;
-			children = (
-				244B5DD42F03A40799081E48 /* CwlMutex.swift */,
-			);
-			path = third_party;
-			sourceTree = "<group>";
-		};
 		5ED0EFDBF3B2E7ED27C80E3C /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -1764,7 +1754,6 @@
 				A0C710B18194FB5709450CCB /* PushNotification */,
 				534E24A6121ACFBC9BA3BC5B /* Repository */,
 				B53AAB90CAB3B7D389D21061 /* Storage */,
-				5E701ACA262E8DB04876B2D6 /* third_party */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -2531,7 +2520,6 @@
 				9577356996343F9486EC6F48 /* ConfigurationBuilder.swift in Sources */,
 				306D4EAB58967ED402AFF739 /* ConfigurationRepository.swift in Sources */,
 				A9C7FABDF92391066255A1D9 /* ConsoleLoggerStream.swift in Sources */,
-				FD37939BD7DC742359761471 /* CwlMutex.swift in Sources */,
 				B891F6D746147F992112D4B8 /* Endpoint.swift in Sources */,
 				6C8B79D16528E5E8B628CB82 /* Environment.swift in Sources */,
 				24105CA28662F067985CB3AC /* EventConfig.swift in Sources */,

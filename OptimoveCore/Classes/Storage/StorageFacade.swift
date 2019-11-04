@@ -223,9 +223,6 @@ extension StorageFacade {
 
 // MARK: - StorageValue
 
-/// TODO: Check necessity of this lock.
-private let lock = UnfairLock()
-
 public extension KeyValueStorage where Self: StorageValue {
 
     // MARK: Grouped values
