@@ -17,17 +17,12 @@ public struct Endpoints {
         }
 
         public struct GlobalConfig {
-            private static let version = "v1"
-            private static let globalBase = base
+            public static var url = URL(string: "https://sdk-cdn.optimove.net/configs/mobile")!
                 .appendingPathComponent("global")
-                .appendingPathComponent(version)
-            private static let fileName = "configs.json"
-
-            public static func url(_ env: Environment) -> URL {
-                return globalBase.appendingPathComponent(env.rawValue).appendingPathComponent(fileName)
-            }
+                .appendingPathComponent("v1")
+                .appendingPathComponent(SDK.getEnvironmentVariable(for: "OPTIMOVE_CONFIG_ENV_PATH") ?? "prod")
+                .appendingPathComponent("configs.json")
         }
 
-        private static let base = URL(string: "https://sdk-cdn.optimove.net/configs/mobile")!
     }
 }
