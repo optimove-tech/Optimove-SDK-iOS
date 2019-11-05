@@ -30,6 +30,7 @@ extension RealTimeHanlderImpl: RealTimeHanlder {
         default:
             break
         }
+        Logger.debug(json)
     }
 
     func handleOnError(_ context: RealTimeEventContext, error: Error) {
@@ -41,6 +42,7 @@ extension RealTimeHanlderImpl: RealTimeHanlder {
         default:
             break
         }
+        Logger.error(error.localizedDescription)
     }
 
 }
