@@ -20,17 +20,9 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
     func test_add_user_without_token() {
         // given
         prefillStorageAsVisitor()
-        let expectedAppNs = try! Bundle.getApplicationNameSpace()
 
         // when
-        let payload = factory.createSetUser()
-
-        // then
-        XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
-        XCTAssertEqual(payload.appNS, expectedAppNs)
-        XCTAssertEqual(payload.os, SetUser.Constants.os)
-        XCTAssertNil(payload.deviceToken)
-        XCTAssertTrue(payload.optIn)
+        XCTAssertThrowsError(try factory.createSetUser())
     }
 
     func test_add_user_with_token() {
@@ -42,15 +34,16 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         storage.apnsToken = expectedToken
 
         // when
-        let payload = factory.createSetUser()
+        XCTAssertNoThrow(try factory.createSetUser())
+        let payload = try! factory.createSetUser()
 
         // then
         XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
         XCTAssertEqual(payload.appNS, expectedAppNs)
         XCTAssertEqual(payload.os, SetUser.Constants.os)
         XCTAssertNotNil(payload.deviceToken)
-        XCTAssertEqual(payload.deviceToken!, expectedToken.map{ String(format: "%02.2hhx", $0) }.joined())
-        XCTAssertTrue(payload.optIn)
+        XCTAssertEqual(payload.deviceToken, expectedToken.map{ String(format: "%02.2hhx", $0) }.joined())
+        XCTAssertFalse(payload.optIn)
     }
 
     func test_migrate_user() {

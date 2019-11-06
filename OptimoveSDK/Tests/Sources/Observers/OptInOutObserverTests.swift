@@ -3,35 +3,36 @@
 import XCTest
 @testable import OptimoveSDK
 
-final class OptInOutObserverTests: XCTestCase {
+final class OptInOutObserverTests: OptimoveTestCase {
 
     var observer: OptInOutObserver!
     var synchronizer: MockSynchronizer!
     var notificationPermissionFetcher: MockNotificationPermissionFetcher!
-    var storage: MockOptimoveStorage!
 
     override func setUp() {
         synchronizer = MockSynchronizer()
         storage = MockOptimoveStorage()
         notificationPermissionFetcher = MockNotificationPermissionFetcher()
-        observer = OptInOutObserver(
+        let optInService = OptInService(
             synchronizer: synchronizer,
-            notificationPermissionFetcher: notificationPermissionFetcher,
             coreEventFactory: CoreEventFactoryImpl(
                 storage: storage,
                 dateTimeProvider: MockDateTimeProvider()
             ),
             storage: storage
         )
+        observer = OptInOutObserver(
+            optInService: optInService,
+            notificationPermissionFetcher: notificationPermissionFetcher
+        )
     }
 
     func test_optFlag_process_for_the_first_time() {
         // given
-        // storage.optFlag has default value `true`
+        prefillPushToken()
         notificationPermissionFetcher.permitted = true
 
         let optInEventExpectation = expectation(description: "optFlag event was not generated.")
-        optInEventExpectation.isInverted.toggle()
         synchronizer.assertFunctionEventable = { operation in
             switch operation {
             case let .report(event: event):
@@ -47,7 +48,6 @@ final class OptInOutObserverTests: XCTestCase {
         }
 
         let optFlagStorageValueExpectation = expectation(description: "optFlag storage value change was not generated.")
-        optFlagStorageValueExpectation.isInverted.toggle()
         storage.assertFunction = { (value, key) in
             if key == .optFlag {
                 optFlagStorageValueExpectation.fulfill()

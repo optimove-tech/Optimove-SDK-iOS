@@ -20,6 +20,7 @@ class OptimoveTestCase: XCTestCase {
         static let visitorID = StubVariables.visitorID
         static let customerID = StubVariables.customerID
         static let initialVisitorId = StubVariables.initialVisitorId
+        static let apnsToken = Data()
     }
 
     func defaultStorage() {
@@ -37,6 +38,10 @@ class OptimoveTestCase: XCTestCase {
         prefillStorageAsVisitor()
         storage.customerID = StubConstants.customerID
         storage.initialVisitorId = StubConstants.initialVisitorId
+    }
+
+    func prefillPushToken() {
+        storage.apnsToken = StubConstants.apnsToken
     }
 
 }

@@ -328,7 +328,7 @@ class KeyValueStorageTests: XCTestCase {
 
     func test_optFlag_get() {
         // then
-        XCTAssert(storage.optFlag == true)
+        XCTAssert(storage.optFlag == false)
     }
 
     func test_realtimeSetUserIdFailed() {
