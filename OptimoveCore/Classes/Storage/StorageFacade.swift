@@ -57,7 +57,6 @@ public protocol StorageValue {
     var deviceResolutionWidth: Float? { get set }
     var deviceResolutionHeight: Float? { get set }
     var advertisingIdentifier: String? { get set }
-    /// Default value is `true`
     var optFlag: Bool { get set }
 
     func getConfigurationEndPoint() throws -> URL
@@ -321,10 +320,9 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    /// Default value is `true`
     var optFlag: Bool {
         get {
-            return self[.optFlag] ?? true
+            return self[.optFlag] ?? false
         }
         set {
             self[.optFlag] = newValue
