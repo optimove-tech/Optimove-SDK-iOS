@@ -20,13 +20,14 @@ final class MbaasPayloadBuilder {
         self.tenantID = tenantID
     }
 
-    func createSetUser() -> SetUser {
+    func createSetUser() throws -> SetUser {
+        let token = try storage.getApnsToken()
         return SetUser(
             deviceID: deviceID,
             appNS: appNamespace,
             os: SetUser.Constants.os,
             tenantAlias: tenantID,
-            deviceToken: storage.apnsToken?.map{ String(format: "%02.2hhx", $0) }.joined(),
+            deviceToken: token.map{ String(format: "%02.2hhx", $0) }.joined(),
             optIn: storage.optFlag,
             isDev: SDK.isDebugging
         )
@@ -47,7 +48,7 @@ struct SetUser: Codable {
         static let os = "ios"
     }
     let deviceID, appNS, os, tenantAlias: String
-    let deviceToken: String?
+    let deviceToken: String
     let optIn: Bool
     let isDev: Bool
 
