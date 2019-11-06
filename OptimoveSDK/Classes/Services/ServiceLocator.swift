@@ -114,17 +114,23 @@ final class ServiceLocator {
         return FirstTimeVisitGenerator(storage: storage())
     }
 
+    func optInService(coreEventFactory: CoreEventFactory) -> OptInService {
+        return OptInService(
+            synchronizer: synchronizer(),
+            coreEventFactory: coreEventFactory,
+            storage: storage()
+        )
+    }
+
     func deviceStateObserver(coreEventFactory: CoreEventFactory) -> DeviceStateObserver {
         return DeviceStateObserver(
             observers: [
                 ResignActiveObserver(
-                    subscriber: _synchronizer
+                    subscriber: synchronizer()
                 ),
                 OptInOutObserver(
-                    synchronizer: synchronizer(),
-                    notificationPermissionFetcher: NotificationPermissionFetcherImpl(),
-                    coreEventFactory: coreEventFactory,
-                    storage: storage()
+                    optInService: optInService(coreEventFactory: coreEventFactory),
+                    notificationPermissionFetcher: NotificationPermissionFetcherImpl()
                 ),
                 AppOpenObserver(
                     synchronizer: synchronizer(),

@@ -216,6 +216,16 @@ extension Optimove {
         }
     }
 
+    /// User authorization is required for applications to notify the user using UNUserNotificationCenter via both local and remote notifications.
+    ///
+    /// - Parameter fromUserNotificationCenter: A response from
+    @objc public func didReceivePushAuthorization(fromUserNotificationCenter granted: Bool) {
+        tryCatch {
+            let optInService = serviceLocator.optInService(coreEventFactory: factory.coreEventFactory())
+            try optInService.didPushAuthorization(isGranted: granted)
+        }
+    }
+
     /// Request to subscribe to test campaign topics
     @objc public func startTestMode() {
         tryCatch {

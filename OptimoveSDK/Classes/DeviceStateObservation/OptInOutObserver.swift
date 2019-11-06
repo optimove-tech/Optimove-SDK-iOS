@@ -1,24 +1,17 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import Foundation
-import OptimoveCore
 import UIKit
+import OptimoveCore
 
 final class OptInOutObserver {
 
-    private let synchronizer: Synchronizer
+    private let optInService: OptInService
     private let notificationPermissionFetcher: NotificationPermissionFetcher
-    private let coreEventFactory: CoreEventFactory
-    private var storage: OptimoveStorage
 
-    init(synchronizer: Synchronizer,
-         notificationPermissionFetcher: NotificationPermissionFetcher,
-         coreEventFactory: CoreEventFactory,
-         storage: OptimoveStorage) {
-        self.synchronizer = synchronizer
+    init(optInService: OptInService,
+         notificationPermissionFetcher: NotificationPermissionFetcher) {
+        self.optInService = optInService
         self.notificationPermissionFetcher = notificationPermissionFetcher
-        self.coreEventFactory = coreEventFactory
-        self.storage = storage
     }
 
 }
@@ -41,31 +34,11 @@ extension OptInOutObserver: DeviceStateObservable {
 private extension OptInOutObserver {
 
     func checkSettings() {
-        notificationPermissionFetcher.fetch { (permitted) in
+        notificationPermissionFetcher.fetch { [optInService] (granted) in
             tryCatch {
-                /// Check if an OptIn/OptOut state was changed, or do nothing.
-                guard self.isOptStateChanged(with: permitted) else { return }
-                permitted ? try self.executeOptIn() : try self.executeOptOut()
+                try optInService.didPushAuthorization(isGranted: granted)
             }
         }
-    }
-
-    func isOptStateChanged(with newState: Bool) -> Bool {
-        return newState != storage.optFlag
-    }
-
-    func executeOptIn() throws {
-        Logger.warn("OptiPush: User AUTHORIZED notifications.")
-        storage.optFlag = true
-        synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptIn)))
-        synchronizer.handle(.optIn)
-    }
-
-    func executeOptOut() throws {
-        Logger.warn("OptiPush: User UNAUTHORIZED notifications.")
-        storage.optFlag = false
-        synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptOut)))
-        synchronizer.handle(.optOut)
     }
 
 }
