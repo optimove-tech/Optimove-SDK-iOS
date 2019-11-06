@@ -11,10 +11,12 @@ final class NotificationPermissionFetcherImpl: NotificationPermissionFetcher {
 
     func fetch(completion: @escaping (Bool) -> Void) {
         UNUserNotificationCenter.current().getNotificationSettings { (settings) in
-            if settings.authorizationStatus == .authorized || settings.authorizationStatus == .notDetermined {
-                completion(true)
+            if #available(iOS 12.0, *) {
+                let isAuthorized = settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional
+                completion(isAuthorized)
             } else {
-                completion(false)
+                let isAuthorized = settings.authorizationStatus == .authorized
+                completion(isAuthorized)
             }
         }
     }
