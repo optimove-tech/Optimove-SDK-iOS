@@ -134,6 +134,7 @@ class RegistrarTests: OptimoveTestCase {
         // given
         prefillStorageAsCustomer()
         storage.isAddingUserAliasSuccess = false
+        storage.failedCustomerIDs = ["a"]
 
         // then
         let networkExpectation = expectation(description: "Request was not generated.")
@@ -145,15 +146,28 @@ class RegistrarTests: OptimoveTestCase {
 
         // and
         let successFlagExpectation = expectation(description: "Success flag was not updated.")
+        let failedCustomeerIDsExpectation = expectation(description: "Failed CustomerIDs was not updated.")
         storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
             if key == .addingUserAliasSuccess {
                 XCTAssert(value as? Bool == true)
                 successFlagExpectation.fulfill()
             }
+            if key == .failedCustomerIDs {
+                XCTAssertEqual(try! JSONDecoder().decode(Set<String>.self, from: value as! Data), Set<String>([]))
+                failedCustomeerIDsExpectation.fulfill()
+            }
         }
 
         // when
         try! registrable.retryFailedOperationsIfExist()
-        wait(for: [networkExpectation, successFlagExpectation], timeout: defaultTimeout)
+        wait(
+            for:
+            [
+                networkExpectation,
+                successFlagExpectation,
+                failedCustomeerIDsExpectation
+            ],
+            timeout: defaultTimeout
+        )
     }
 }
