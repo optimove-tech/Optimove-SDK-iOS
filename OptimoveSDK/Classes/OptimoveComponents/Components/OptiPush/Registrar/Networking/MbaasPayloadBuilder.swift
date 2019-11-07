@@ -20,24 +20,27 @@ final class MbaasPayloadBuilder {
         self.tenantID = tenantID
     }
 
-    func createSetUser() -> SetUser {
+    func createSetUser() throws -> SetUser {
+        let token = try storage.getApnsToken()
         return SetUser(
             deviceID: deviceID,
             appNS: appNamespace,
             os: SetUser.Constants.os,
             tenantAlias: tenantID,
-            deviceToken: storage.apnsToken?.map{ String(format: "%02.2hhx", $0) }.joined(),
-            optIn: (try? storage.getIsMbaasOptIn()) ?? true,
+            deviceToken: token.map{ String(format: "%02.2hhx", $0) }.joined(),
+            optIn: storage.optFlag,
             isDev: SDK.isDebugging
         )
     }
 
     // Alias is a value, like id, that could identifier an object of user/tenant.
     func createAddUserAlias() throws -> AddUserAlias {
+        let customerID = try storage.getCustomerID()
+        let customerIDs = Set<String>([customerID]).union(storage.failedCustomerIDs)
         return AddUserAlias(
             tenantAlias: tenantID,
             currentAlias: try storage.getInitialVisitorId(),
-            newAlias: try storage.getCustomerID()
+            newAliases: Array(customerIDs)
         )
     }
 }
@@ -47,7 +50,7 @@ struct SetUser: Codable {
         static let os = "ios"
     }
     let deviceID, appNS, os, tenantAlias: String
-    let deviceToken: String?
+    let deviceToken: String
     let optIn: Bool
     let isDev: Bool
 
@@ -63,11 +66,12 @@ struct SetUser: Codable {
 }
 
 struct AddUserAlias: Codable {
-    let tenantAlias, currentAlias, newAlias: String
+    let tenantAlias, currentAlias: String
+    let newAliases: [String]
 
     enum CodingKeys: String, CodingKey {
         case tenantAlias = "tenant_alias"
         case currentAlias = "current_alias"
-        case newAlias = "new_alias"
+        case newAliases = "new_aliases"
     }
 }

@@ -89,10 +89,6 @@ private extension OptimoveNotificationHandler {
 
 extension OptimoveNotificationHandler: OptimoveNotificationHandling {
 
-    func isOptimoveSdkCommand(userInfo: [AnyHashable: Any]) -> Bool {
-        return false
-    }
-
     func isOptipush(notification: UNNotification) -> Bool {
         return notification.request.content.userInfo[OptimoveKeys.Notification.isOptipush.rawValue] as? String == "true"
     }

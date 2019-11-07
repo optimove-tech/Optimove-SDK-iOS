@@ -5,7 +5,6 @@ import UIKit
 
 protocol OptimoveNotificationHandling {
 
-    func isOptimoveSdkCommand(userInfo: [AnyHashable: Any]) -> Bool
     func isOptipush(notification: UNNotification) -> Bool
 
     func willPresent(

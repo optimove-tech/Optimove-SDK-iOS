@@ -150,18 +150,7 @@ extension Optimove {
         didComplete: @escaping (UIBackgroundFetchResult) -> Void
         ) -> Bool {
         Logger.info("Receive a remote notification.")
-        let notificationListener = serviceLocator.notificationListener()
-        let result = notificationListener.isOptimoveSdkCommand(userInfo: userInfo)
-        if result {
-            startSDK { result in
-                guard result.isSuccessful else { return }
-                notificationListener.didReceiveRemoteNotification(
-                    userInfo: userInfo,
-                    didComplete: didComplete
-                )
-            }
-        }
-        return result
+        return false
     }
 
     /// Asks the Optimove SDK how to handle a notification that arrived while the app was running in the foreground.
@@ -222,7 +211,18 @@ extension Optimove {
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let validationResult = APNsTokenValidator(storage: serviceLocator.storage())
         if validationResult.validate(token: deviceToken) == .new {
+            Logger.debug("APNS token: \(deviceToken.map{ String(format: "%02.2hhx", $0) }.joined())")
             synchronizer.handle(.deviceToken(token: deviceToken))
+        }
+    }
+
+    /// User authorization is required for applications to notify the user using UNUserNotificationCenter via both local and remote notifications.
+    ///
+    /// - Parameter fromUserNotificationCenter: A response from
+    @objc public func didReceivePushAuthorization(fromUserNotificationCenter granted: Bool) {
+        tryCatch {
+            let optInService = serviceLocator.optInService(coreEventFactory: factory.coreEventFactory())
+            try optInService.didPushAuthorization(isGranted: granted)
         }
     }
 

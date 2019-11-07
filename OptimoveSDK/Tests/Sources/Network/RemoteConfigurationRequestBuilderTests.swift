@@ -19,7 +19,7 @@ final class RemoteConfigurationRequestBuilderTests: XCTestCase {
     func test_global_config_request() {
         let request = requestBuilder.createGlobalConfigurationsRequest()
 
-        XCTAssertEqual(request.baseURL, Endpoints.Remote.GlobalConfig.url(SDK.environment))
+        XCTAssertEqual(request.baseURL, Endpoints.Remote.GlobalConfig.url)
         XCTAssertEqual(request.method, HTTPMethod.get)
     }
 

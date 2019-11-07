@@ -5,14 +5,14 @@ import XCTest
 
 class EnterForegroundObserverTests: XCTestCase {
 
-    var observer: EnterForegroundObserver!
+    var observer: AppOpenObserver!
     var storage = MockOptimoveStorage()
     var dateProvider = MockDateTimeProvider()
     var statisticService = MockStatisticService()
     var synchronizer = MockSynchronizer()
 
     override func setUp() {
-        observer = EnterForegroundObserver(
+        observer = AppOpenObserver(
             synchronizer: synchronizer,
             statisticService: statisticService,
             dateTimeProvider: dateProvider,
@@ -26,7 +26,7 @@ class EnterForegroundObserverTests: XCTestCase {
     func test_app_open_threshold_should_invoke() {
         // given
         /// Set the Last open time as Throttling time plus 10 sec.
-        let throttlingTimeGap = EnterForegroundObserver.Constants.AppOpen.throttlingThreshold + 10
+        let throttlingTimeGap = AppOpenObserver.Constants.AppOpen.throttlingThreshold + 10
         statisticService.applicationOpenTime = Date().addingTimeInterval(-throttlingTimeGap).timeIntervalSince1970
 
         // and
@@ -58,7 +58,7 @@ class EnterForegroundObserverTests: XCTestCase {
     func test_app_open_threshold_should_not_invoke() {
         // given
         /// Set the Last open time as Throttling time minus 10 sec.
-        let throttlingTimeGap = EnterForegroundObserver.Constants.AppOpen.throttlingThreshold - 10
+        let throttlingTimeGap = AppOpenObserver.Constants.AppOpen.throttlingThreshold - 10
         statisticService.applicationOpenTime = Date().addingTimeInterval(-throttlingTimeGap).timeIntervalSince1970
 
         // and

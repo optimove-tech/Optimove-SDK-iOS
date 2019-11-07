@@ -35,6 +35,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
     func test_addOrUpdateUser() {
         // given
         prefillStorageAsVisitor()
+        prefillPushToken()
 
         Mocker.register(
             Mock(

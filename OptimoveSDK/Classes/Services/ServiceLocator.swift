@@ -17,13 +17,11 @@ final class ServiceLocator {
         do {
             let bundleIdentifier = try Bundle.getApplicationNameSpace()
             let groupStorage = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
+            let fileStorage = try FileStorageImpl(bundleIdentifier: bundleIdentifier, fileManager: .default)
             return StorageFacade(
                 groupedStorage: groupStorage,
                 sharedStorage: UserDefaults.standard,
-                fileStorage: try FileStorageImpl(
-                    bundleIdentifier: bundleIdentifier,
-                    fileManager: .default
-                )
+                fileStorage: fileStorage
             )
         } catch {
             fatalError(error.localizedDescription)
@@ -116,19 +114,25 @@ final class ServiceLocator {
         return FirstTimeVisitGenerator(storage: storage())
     }
 
+    func optInService(coreEventFactory: CoreEventFactory) -> OptInService {
+        return OptInService(
+            synchronizer: synchronizer(),
+            coreEventFactory: coreEventFactory,
+            storage: storage()
+        )
+    }
+
     func deviceStateObserver(coreEventFactory: CoreEventFactory) -> DeviceStateObserver {
         return DeviceStateObserver(
             observers: [
                 ResignActiveObserver(
-                    subscriber: _synchronizer
+                    subscriber: synchronizer()
                 ),
                 OptInOutObserver(
-                    synchronizer: synchronizer(),
-                    notificationPermissionFetcher: NotificationPermissionFetcherImpl(),
-                    coreEventFactory: coreEventFactory,
-                    storage: storage()
+                    optInService: optInService(coreEventFactory: coreEventFactory),
+                    notificationPermissionFetcher: NotificationPermissionFetcherImpl()
                 ),
-                EnterForegroundObserver(
+                AppOpenObserver(
                     synchronizer: synchronizer(),
                     statisticService: statisticService(),
                     dateTimeProvider: dateTimeProvider(),

@@ -10,6 +10,7 @@ public typealias OptimoveStorage = KeyValueStorage & FileStorage & StorageValue
 public  enum StorageKey: String, CaseIterable {
 
     // MARK: Grouped keys
+    /// Placed in optimove group container
 
     case customerID
     case configurationEndPoint
@@ -21,23 +22,21 @@ public  enum StorageKey: String, CaseIterable {
     case deviceResolutionWidth
     case deviceResolutionHeight
     case advertisingIdentifier
+    case optFlag
+    case failedCustomerIDs
 
     // MARK: Shared keys
+    /// Placed in tenant container (legacy)
 
     case userEmail
     case apnsToken
     case siteID
     case isClientHasFirebase
-    case isMbaasOptIn
     case addingUserAliasSuccess
     case settingUserSuccess
-    case optSuccess
-    case isFirstConversion
     case defaultFcmToken
     case fcmToken
-    case isOptiTrackOptIn
     case firstVisitTimestamp
-    case isSetUserIdSucceed
     case realtimeSetUserIdFailed
     case realtimeSetEmailFailed
 }
@@ -59,6 +58,8 @@ public protocol StorageValue {
     var deviceResolutionWidth: Float? { get set }
     var deviceResolutionHeight: Float? { get set }
     var advertisingIdentifier: String? { get set }
+    var optFlag: Bool { get set }
+    var failedCustomerIDs: Set<String> { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -78,27 +79,17 @@ public protocol StorageValue {
     var siteID: Int? { get set }
     /// Default value is `false`
     var isClientHasFirebase: Bool { get set }
-    var isMbaasOptIn: Bool? { get set }
     var isAddingUserAliasSuccess: Bool? { get set }
     var isSettingUserSuccess: Bool? { get set }
-    /// Default value is `true`
-    var isOptRequestSuccess: Bool { get set }
-    /// Default value is `false`
-    var isFirstConversion: Bool { get set }
     var defaultFcmToken: String? { get set }
     var fcmToken: String? { get set }
-    /// Default value is `false`
-    var isOptiTrackOptIn: Bool { get set }
     var firstVisitTimestamp: Int64? { get set }
-    /// Default value is `false`
-    var isSetUserIdSucceed: Bool { get set }
     var realtimeSetUserIdFailed: Bool { get set }
     var realtimeSetEmailFailed: Bool { get set }
 
     func getUserEmail() throws -> String
     func getApnsToken() throws -> Data
     func getSiteID() throws -> Int
-    func getIsMbaasOptIn() throws -> Bool
     func getDefaultFcmToken() throws -> String
     func getFcmToken() throws -> String
     func getFirstVisitTimestamp() throws -> Int64
@@ -126,7 +117,9 @@ public final class StorageFacade: OptimoveStorage {
         .userAgent,
         .deviceResolutionWidth,
         .deviceResolutionHeight,
-        .advertisingIdentifier
+        .advertisingIdentifier,
+        .optFlag,
+        .failedCustomerIDs
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.
@@ -136,16 +129,11 @@ public final class StorageFacade: OptimoveStorage {
         .apnsToken,
         .siteID,
         .isClientHasFirebase,
-        .isMbaasOptIn,
         .addingUserAliasSuccess,
         .settingUserSuccess,
-        .optSuccess,
-        .isFirstConversion,
         .defaultFcmToken,
         .fcmToken,
-        .isOptiTrackOptIn,
         .firstVisitTimestamp,
-        .isSetUserIdSucceed,
         .realtimeSetUserIdFailed,
         .realtimeSetEmailFailed
     ]
@@ -236,9 +224,6 @@ extension StorageFacade {
 }
 
 // MARK: - StorageValue
-
-/// TODO: Check necessity of this lock.
-private let lock = UnfairLock()
 
 public extension KeyValueStorage where Self: StorageValue {
 
@@ -337,6 +322,33 @@ public extension KeyValueStorage where Self: StorageValue {
             self[.advertisingIdentifier] = newValue
         }
     }
+
+    var optFlag: Bool {
+        get {
+            return self[.optFlag] ?? false
+        }
+        set {
+            self[.optFlag] = newValue
+        }
+    }
+
+    var failedCustomerIDs: Set<String> {
+        get {
+            do {
+                guard let data: Data = self[.failedCustomerIDs] else { return [] }
+                return Set<String>(try JSONDecoder().decode([String].self, from: data))
+            } catch {
+                return []
+            }
+        }
+        set {
+            tryCatch {
+                self[.failedCustomerIDs] = try JSONEncoder().encode(newValue)
+            }
+        }
+    }
+
+    // MARK: Group values getters
 
     func getConfigurationEndPoint() throws -> URL {
         guard let value = configurationEndPoint else {
@@ -446,19 +458,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var isMbaasOptIn: Bool? {
-        get {
-            return lock.sync {
-                return self[.isMbaasOptIn]
-            }
-        }
-        set {
-            lock.sync {
-                self[.isMbaasOptIn] = newValue
-            }
-        }
-    }
-
     var isAddingUserAliasSuccess: Bool? {
         get {
             return self[.addingUserAliasSuccess]
@@ -474,24 +473,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             return self[.settingUserSuccess] = newValue
-        }
-    }
-
-    var isOptRequestSuccess: Bool {
-        get {
-            return self[.optSuccess] ?? true
-        }
-        set {
-            return self[.optSuccess] = newValue
-        }
-    }
-
-    var isFirstConversion: Bool {
-        get {
-            return self[.isFirstConversion] ?? false
-        }
-        set {
-            return self[.isFirstConversion] = newValue
         }
     }
 
@@ -513,15 +494,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var isOptiTrackOptIn: Bool {
-        get {
-            return self[.isOptiTrackOptIn] ?? false
-        }
-        set {
-            self[.isOptiTrackOptIn] = newValue
-        }
-    }
-
     var firstVisitTimestamp: Int64? {
         get {
             return self[.firstVisitTimestamp]
@@ -530,16 +502,7 @@ public extension KeyValueStorage where Self: StorageValue {
             self[.firstVisitTimestamp] = newValue
         }
     }
-
-    var isSetUserIdSucceed: Bool {
-        get {
-            return self[.isSetUserIdSucceed] ?? false
-        }
-        set {
-            self[.isSetUserIdSucceed] = newValue
-        }
-    }
-
+    
     var realtimeSetUserIdFailed: Bool {
         get {
             return self[.realtimeSetUserIdFailed] ?? false
@@ -558,6 +521,8 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
+    // MARK: Shared values getters
+
     func getUserEmail() throws -> String {
         guard let value = userEmail else {
             throw StorageError.noValue(.userEmail)
@@ -575,13 +540,6 @@ public extension KeyValueStorage where Self: StorageValue {
     func getSiteID() throws -> Int {
         guard let value = siteID else {
             throw StorageError.noValue(.siteID)
-        }
-        return value
-    }
-
-    func getIsMbaasOptIn() throws -> Bool {
-        guard let value = isMbaasOptIn else {
-            throw StorageError.noValue(.isMbaasOptIn)
         }
         return value
     }
