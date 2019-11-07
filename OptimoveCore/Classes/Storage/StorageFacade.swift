@@ -23,6 +23,7 @@ public  enum StorageKey: String, CaseIterable {
     case deviceResolutionHeight
     case advertisingIdentifier
     case optFlag
+    case failedCustomerIDs
 
     // MARK: Shared keys
     /// Placed in tenant container (legacy)
@@ -58,6 +59,7 @@ public protocol StorageValue {
     var deviceResolutionHeight: Float? { get set }
     var advertisingIdentifier: String? { get set }
     var optFlag: Bool { get set }
+    var failedCustomerIDs: Set<String> { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -116,7 +118,8 @@ public final class StorageFacade: OptimoveStorage {
         .deviceResolutionWidth,
         .deviceResolutionHeight,
         .advertisingIdentifier,
-        .optFlag
+        .optFlag,
+        .failedCustomerIDs
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.
@@ -326,6 +329,22 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             self[.optFlag] = newValue
+        }
+    }
+
+    var failedCustomerIDs: Set<String> {
+        get {
+            do {
+                guard let data: Data = self[.failedCustomerIDs] else { return [] }
+                return Set<String>(try JSONDecoder().decode([String].self, from: data))
+            } catch {
+                return []
+            }
+        }
+        set {
+            tryCatch {
+                self[.failedCustomerIDs] = try JSONEncoder().encode(newValue)
+            }
         }
     }
 
