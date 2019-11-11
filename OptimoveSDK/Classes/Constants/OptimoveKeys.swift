@@ -64,7 +64,7 @@ struct OptimoveKeys {
         case campaignType = "campaign_type"
         case isOptipush = "is_optipush"
         case collapseId = "collapse_Key"
-        case dynamikLink = "dynamic_link"
+        case dynamicLink = "dynamic_link"
         case command = "command"
     }
 
