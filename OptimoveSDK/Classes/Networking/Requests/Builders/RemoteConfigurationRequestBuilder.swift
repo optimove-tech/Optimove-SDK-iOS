@@ -28,7 +28,7 @@ public final class RemoteConfigurationRequestBuilder {
     }
 
     public func createGlobalConfigurationsRequest() -> NetworkRequest {
-        let url = Endpoints.Remote.GlobalConfig.url(SDK.environment)
+        let url = Endpoints.Remote.GlobalConfig.url
         Logger.debug("Connect to \(url.absoluteString) to retreive global file.")
         return NetworkRequest(method: .get, baseURL: url, timeoutInterval: Constants.timeout)
     }

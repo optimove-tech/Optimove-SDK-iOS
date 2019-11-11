@@ -30,6 +30,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
     func test_add_user_request_for_visitor() {
         // given
         prefillStorageAsVisitor()
+        prefillPushToken()
 
         // when
         let request = try! builder.createRequest(operation: .setUser)
@@ -53,7 +54,8 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
     func test_add_user_request_for_customer() {
         // given
         prefillStorageAsCustomer()
-
+        prefillPushToken()
+        
         // when
         let request = try! builder.createRequest(operation: .setUser)
 

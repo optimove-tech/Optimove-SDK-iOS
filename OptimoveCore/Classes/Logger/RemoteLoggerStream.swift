@@ -1,8 +1,16 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import os.log
 
 public final class RemoteLoggerStream: MutableLoggerStream {
+
+    private struct Constants {
+        static let httpHeaders: [String : String] = [
+            "Content-Type": "application/json"
+        ]
+        static let httpMethod = "POST"
+    }
 
     public var policy: LoggerStreamPolicy = .all
 
@@ -11,6 +19,9 @@ public final class RemoteLoggerStream: MutableLoggerStream {
 
     private let appNs: String
     private let platform: SdkPlatform = .ios
+
+    private var category: String { String(describing: type(of: self)) }
+    private var log: OSLog { OSLog(subsystem: OSLog.subsystem, category: category) }
 
     public init(tenantId: Int) {
         self.tenantId = tenantId
@@ -30,15 +41,17 @@ public final class RemoteLoggerStream: MutableLoggerStream {
             sdkEnv: SDK.environment,
             sdkPlatform: platform,
             level: level,
-            logModule: "",
+            logModule: nil,
             logFileName: fileName,
             logMethodName: methodName,
             message: message
         )
         do {
             let request = try self.buildLogRequest(data)
-            let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-                // TODO: Add local logging.
+            let task = URLSession.shared.dataTask(with: request) { [log] (data, response, error) in
+                if error != nil {
+                    os_log("Logger: data task returns an error '%s'", log: log, type: .error, error!.localizedDescription)
+                }
             }
             task.resume()
         } catch {
@@ -50,10 +63,10 @@ public final class RemoteLoggerStream: MutableLoggerStream {
         let logBody = try JSONEncoder().encode(data)
         var request = URLRequest(url: self.endpoint)
         request.httpBody = logBody
-        // FIXME: Move to local Constants.
-        request.httpMethod = "POST"
-        // FIXME: Move to local Constants.
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = Constants.httpMethod
+        Constants.httpHeaders.forEach { (header) in
+            request.setValue(header.value, forHTTPHeaderField: header.key)
+        }
         return request
     }
 }

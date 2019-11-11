@@ -4,7 +4,7 @@ import Foundation
 import OptimoveCore
 import UIKit.UIApplication
 
-final class EnterForegroundObserver {
+final class AppOpenObserver {
 
     struct Constants {
         struct AppOpen {
@@ -41,7 +41,7 @@ final class EnterForegroundObserver {
 
 }
 
-extension EnterForegroundObserver: DeviceStateObservable {
+extension AppOpenObserver: DeviceStateObservable {
 
     func observe() {
         NotificationCenter.default.addObserver(

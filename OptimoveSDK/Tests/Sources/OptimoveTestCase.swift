@@ -19,8 +19,8 @@ class OptimoveTestCase: XCTestCase {
         static let tenantID = 100
         static let visitorID = StubVariables.visitorID
         static let customerID = StubVariables.customerID
-        static let isFirstConversion = false
         static let initialVisitorId = StubVariables.initialVisitorId
+        static let apnsToken = Data()
     }
 
     func defaultStorage() {
@@ -37,8 +37,11 @@ class OptimoveTestCase: XCTestCase {
         defaultStorage()
         prefillStorageAsVisitor()
         storage.customerID = StubConstants.customerID
-        storage.isFirstConversion = StubConstants.isFirstConversion
         storage.initialVisitorId = StubConstants.initialVisitorId
+    }
+
+    func prefillPushToken() {
+        storage.apnsToken = StubConstants.apnsToken
     }
 
 }

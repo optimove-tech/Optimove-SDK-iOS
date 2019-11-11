@@ -80,6 +80,11 @@ private extension Registrar {
                 storage.isSettingUserSuccess = false
             case .addUserAlias:
                 storage.isAddingUserAliasSuccess = false
+                if let customerID = storage.customerID {
+                    var failedCustomerIDs: Set<String> = storage.failedCustomerIDs
+                    failedCustomerIDs.insert(customerID)
+                    storage.failedCustomerIDs = failedCustomerIDs
+                }
             }
         }
 
@@ -89,6 +94,7 @@ private extension Registrar {
                 storage.isSettingUserSuccess = true
             case .addUserAlias:
                 storage.isAddingUserAliasSuccess = true
+                storage.failedCustomerIDs = []
             }
         }
     }

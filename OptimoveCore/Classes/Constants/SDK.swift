@@ -29,7 +29,7 @@ public struct SDK {
         return envvar == Constants.Var.true
     }
 
-    private static func getEnvironmentVariable(for key: String, defaultValue: String) -> String {
+    static func getEnvironmentVariable(for key: String, defaultValue: String) -> String {
         guard let envVarValue = getEnvironmentVariable(for: key), !envVarValue.isEmpty else {
             return defaultValue
         }

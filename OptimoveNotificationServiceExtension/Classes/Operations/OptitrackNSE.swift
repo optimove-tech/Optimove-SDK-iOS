@@ -9,7 +9,8 @@ protocol OptitrackNSE {
     func report(event: OptimoveEvent, completion: @escaping () -> Void) throws
 }
 
-// TODO: Replace with the normal Optitrack component.
+/// This class created in order to reduce a memory consumption that produced by the general Optitrack component and its dependencies.
+/// The extension has a memory limitiation about 12 Mb. https://stackoverflow.com/a/53647318
 final class OptitrackNSEImpl {
 
     private let storage: OptimoveStorage
