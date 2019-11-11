@@ -17,6 +17,7 @@ final class RealTime {
     private var storage: OptimoveStorage
     private let eventBuilder: RealTimeEventBuilder
     private let coreEventFactory: CoreEventFactory
+    private let semaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
 
     // MARK: - Public
 
@@ -176,10 +177,15 @@ private extension RealTime {
 
     func sentReportEvent(context: RealTimeEventContext) {
         let realtimeToken = configuration.realtimeToken
-        realTimeQueue.async { [eventBuilder, networking, hanlder] in
+
+        realTimeQueue.async { [semaphore, eventBuilder, networking, hanlder] in
             do {
+                // The `semaphore.wait` added as the temporary solution for the realtime race condition issue.
+                // Should be removed right after release a solution on a server side.
+                semaphore.wait()
                 let realtimeEvent = try eventBuilder.createEvent(context: context, realtimeToken: realtimeToken)
                 try networking.report(event: realtimeEvent) { (result) in
+                    semaphore.signal()
                     switch result {
                     case let .success(json):
                         hanlder.handleOnSuccess(context, json: json)
@@ -190,9 +196,6 @@ private extension RealTime {
             } catch {
                 hanlder.handleOnError(context, error: error)
             }
-            // The delay added as the temporary hotfix for the realtime race condition issue.
-            // Should be removed right after release a solution on a server side.
-            sleep(Constatnts.timeout)
         }
     }
 
