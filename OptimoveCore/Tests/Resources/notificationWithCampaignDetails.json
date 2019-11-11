@@ -14,7 +14,6 @@
     "template_id": "1",
     "engagement_id": "1",
     "campaign_type": "1",
-    "collapse_Key": "kukuka",
     "is_optipush": "true",
     "dynamic_links": "{\"android\":{},\"ios\":{\"com_optimove_sdk_optimovemobileclientnofirebase\":\"https:\\/\\/x33fn.app.goo.gl\\/XjQ8AGSF77Nm4KwE6\"}}"
 }

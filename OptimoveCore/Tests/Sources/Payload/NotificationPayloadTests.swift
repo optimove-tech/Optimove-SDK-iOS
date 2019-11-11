@@ -8,20 +8,11 @@ class NotificationPayloadTests: XCTestCase, FileAccessible {
     var fileName: String = "Override this in a function."
 
     func test_decode_is_optipush_key() {
-        fileName = "notificationWithCollapseKey.json"
+        fileName = "notificationWithCampaignDetails.json"
 
         tryDecode {
             let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
             XCTAssert(payload.isOptipush == true)
-        }
-    }
-
-    func test_decode_collapse_key() {
-        fileName = "notificationWithCollapseKey.json"
-
-        tryDecode {
-            let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
-            XCTAssert(payload.collapseKey != nil)
         }
     }
 
