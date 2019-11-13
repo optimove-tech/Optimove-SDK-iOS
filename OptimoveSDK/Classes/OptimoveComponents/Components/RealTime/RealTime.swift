@@ -180,8 +180,7 @@ private extension RealTime {
 
         realTimeQueue.async { [semaphore, eventBuilder, networking, hanlder] in
             do {
-                // The `semaphore.wait` added as the temporary solution for the realtime race condition issue.
-                // Should be removed right after release a solution on a server side.
+                /// The `semaphore.wait` added as the way to keep order in realtime events without possible race conditions produced by a network handling.
                 semaphore.wait()
                 let realtimeEvent = try eventBuilder.createEvent(context: context, realtimeToken: realtimeToken)
                 try networking.report(event: realtimeEvent) { (result) in
