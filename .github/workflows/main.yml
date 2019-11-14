@@ -1,0 +1,19 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: macOS-10.14
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Fastlane Action
+      uses: maierj/fastlane-action@v0.9.0
+    - name: Bundler CLI
+      uses: CultureHQ/actions-bundler@v1.0.0
+    - run: bundle install || bundle update
+      name: Bundle install
+    - run: bundle exec fastlane test_all
+      name: Tests
