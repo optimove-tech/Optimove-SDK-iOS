@@ -1,0 +1,17 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: macOS-10.14
+
+    steps:
+    - uses: actions/checkout@v1
+    - run: carthage update --platform ios --cache-builds
+      name: Carthage
+    - run: xcodebuild build-for-testing -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11"
+      name: Build
+    - run: xcodebuild test-without-building -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11"
+      name: Test
