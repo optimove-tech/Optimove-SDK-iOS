@@ -67,9 +67,12 @@ private extension OptimoveNotificationHandler {
     }
 
     func handleDeepLinkDelegation(_ response: UNNotificationResponse) {
+        let userInfo = response.notification.request.content.userInfo
+        guard let dynamicLink = userInfo[OptimoveKeys.Notification.dynamicLink.rawValue] as? String else {
+            Logger.debug("Notification does not contain a dynamic link.")
+            return
+        }
         do {
-            let userInfo = response.notification.request.content.userInfo
-            let dynamicLink: String = try cast(userInfo[OptimoveKeys.Notification.dynamikLink.rawValue])
             let urlComp = try unwrap(URLComponents(string: dynamicLink))
             let params: [String: String]? = urlComp.queryItems?.reduce(into: [String: String](), { (result, next) in
                 result.updateValue(next.value ?? "", forKey: next.name)

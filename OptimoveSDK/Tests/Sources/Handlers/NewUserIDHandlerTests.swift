@@ -73,7 +73,6 @@ class NewUserIDHandlerTests: XCTestCase {
         storage.isSettingUserSuccess = false
         let userID = "userID"
         let expectedVisitorID = "9ef8254d9456fc23"
-        let expectedConversion = false
         let handler = NewUserIDHandler(storage: storage)
 
         let visitorIDExpectation = expectation(description: "visitorID was not generated")

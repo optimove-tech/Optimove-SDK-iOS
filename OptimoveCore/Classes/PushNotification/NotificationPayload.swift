@@ -10,7 +10,6 @@ public struct NotificationPayload: Decodable {
     public let dynamicLinks: DynamicLinks?
     public let deepLinkPersonalization: DeeplinkPersonalization?
     public let campaign: NotificationCampaign?
-    public let collapseKey: String?
     public let isOptipush: Bool
     public let media: MediaAttachment?
 
@@ -25,7 +24,6 @@ public struct NotificationPayload: Decodable {
         case templateID = "template_id"
         case engagementID = "engagement_id"
         case campaignType = "campaign_type"
-        case collapseKey = "collapse_Key"
         case isOptipush = "is_optipush"
         case media
         case userAction = "user_action"
@@ -38,7 +36,6 @@ public struct NotificationPayload: Decodable {
         self.dynamicLinks = try? DynamicLinks(firebaseFrom: decoder)
         self.deepLinkPersonalization = try? DeeplinkPersonalization(firebaseFrom: decoder)
         self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder).campaign
-        self.collapseKey = try container.decodeIfPresent(String.self, forKey: .collapseKey)
         self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
         self.media = try? MediaAttachment(firebaseFrom: decoder)
     }

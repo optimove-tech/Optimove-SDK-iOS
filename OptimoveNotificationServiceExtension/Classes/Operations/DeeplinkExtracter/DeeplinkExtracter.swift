@@ -26,7 +26,7 @@ final class DeeplinkExtracter: AsyncOperation {
     override func main() {
         state = .executing
 
-        let appKey = bundleIdentifier.replacingOccurrences(of: ".", with: "_")
+        let appKey = bundleIdentifier
         guard let url = notificationPayload.dynamicLinks?.ios?[appKey] else {
             os_log("Found no url for this app", log: OSLog.extracter, type: .error)
             state = .finished

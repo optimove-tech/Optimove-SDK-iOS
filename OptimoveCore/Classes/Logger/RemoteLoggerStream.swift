@@ -20,8 +20,8 @@ public final class RemoteLoggerStream: MutableLoggerStream {
     private let appNs: String
     private let platform: SdkPlatform = .ios
 
-    private var category: String { String(describing: type(of: self)) }
-    private var log: OSLog { OSLog(subsystem: OSLog.subsystem, category: category) }
+    private var category: String { return String(describing: type(of: self)) }
+    private var log: OSLog { return OSLog(subsystem: OSLog.subsystem, category: category) }
 
     public init(tenantId: Int) {
         self.tenantId = tenantId

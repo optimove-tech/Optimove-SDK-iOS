@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.swift_version = '5'
   base_dir = "OptimoveNotificationServiceExtension/"
   s.source_files = base_dir + 'Classes/**/*'
-  s.dependency 'OptimoveCore', '~> 2.0'
+  s.dependency 'OptimoveCore', s.version.to_s
   s.frameworks = 'UserNotifications', 'UIKit'
   s.test_spec 'unit' do |unit_tests|
     unit_tests.source_files = base_dir + 'Tests/Sources/**/*', 'Shared/Tests/Sources/**/*'
