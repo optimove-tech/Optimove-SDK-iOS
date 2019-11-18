@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.source_files = base_dir +'Classes/**/*'
   s.dependency 'FirebaseMessaging', '~> 4.0'
   s.dependency 'MatomoTracker', '~> 7.0'
-  s.dependency 'OptimoveCore', '~> 2.0'
+  s.dependency 'OptimoveCore', s.version.to_s
   s.frameworks = 'UIKit', 'SystemConfiguration', 'UserNotifications', 'AdSupport'
   s.test_spec 'unit' do |unit_tests|
     unit_tests.source_files = base_dir + 'Tests/Sources/**/*',  'Shared/Tests/Sources/**/*'
