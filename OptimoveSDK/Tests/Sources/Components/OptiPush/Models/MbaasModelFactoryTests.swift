@@ -12,8 +12,7 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         factory = MbaasPayloadBuilder(
             storage: storage,
             deviceID: SDKDevice.uuid,
-            appNamespace: try! Bundle.getApplicationNameSpace(),
-            tenantID: String(StubConstants.tenantID)
+            appNamespace: try! Bundle.getApplicationNameSpace()
         )
     }
 
@@ -56,7 +55,6 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
 
         // then
         XCTAssertEqual(payload.newAliases, [storage.customerID!])
-        XCTAssertEqual(payload.currentAlias, storage.initialVisitorId!)
     }
 
     func test_migrate_user_with_failed_payload() {
@@ -72,7 +70,6 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         // then
 
         XCTAssertEqual(Set(payload.newAliases), Set([storage.customerID!]).union(failedCustomerIDs))
-        XCTAssertEqual(payload.currentAlias, storage.initialVisitorId!)
     }
 
 }

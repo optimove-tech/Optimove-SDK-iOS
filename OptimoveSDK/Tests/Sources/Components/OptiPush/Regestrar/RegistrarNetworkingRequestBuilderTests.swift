@@ -15,8 +15,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         payloadBuilder = MbaasPayloadBuilder(
             storage: storage,
             deviceID: SDKDevice.uuid,
-            appNamespace: try! Bundle.getApplicationNameSpace(),
-            tenantID: String(StubConstants.tenantID)
+            appNamespace: try! Bundle.getApplicationNameSpace()
         )
         builder = RegistrarNetworkingRequestFactory(
             storage: storage,
@@ -36,8 +35,10 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         let request = try! builder.createRequest(operation: .setUser)
 
         // then
-        XCTAssertEqual(request.baseURL, config.registrationServiceEndpoint
-            .appendingPathComponent(ClientAPIRequestBuilder.Constants.path)
+        XCTAssertEqual(request.baseURL, config.mbaasEndpoint
+            .appendingPathComponent(ClientAPIRequestBuilder.Constants.tenantsPath)
+            .appendingPathComponent(String(config.tenantID))
+            .appendingPathComponent(ClientAPIRequestBuilder.Constants.usersPath)
             .appendingPathComponent(storage.initialVisitorId!)
         )
         XCTAssertEqual(request.method, .post)
@@ -61,7 +62,9 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
-            .appendingPathComponent(ClientAPIRequestBuilder.Constants.path)
+            .appendingPathComponent(ClientAPIRequestBuilder.Constants.tenantsPath)
+            .appendingPathComponent(String(config.tenantID))
+            .appendingPathComponent(ClientAPIRequestBuilder.Constants.usersPath)
             .appendingPathComponent(storage.initialVisitorId!)
         )
         XCTAssert(request.method == .post)
@@ -84,7 +87,10 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
-            .appendingPathComponent(ClientAPIRequestBuilder.Constants.path)
+            .appendingPathComponent(ClientAPIRequestBuilder.Constants.tenantsPath)
+            .appendingPathComponent(String(config.tenantID))
+            .appendingPathComponent(ClientAPIRequestBuilder.Constants.usersPath)
+            .appendingPathComponent(storage.initialVisitorId!)
         )
         XCTAssert(request.method == .put)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
