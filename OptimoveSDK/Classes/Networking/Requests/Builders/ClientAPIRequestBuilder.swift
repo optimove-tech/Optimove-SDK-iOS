@@ -6,7 +6,8 @@ import OptimoveCore
 final class ClientAPIRequestBuilder {
 
     struct Constants {
-        static let path = "users"
+        static let tenantsPath = "tenants"
+        static let usersPath = "users"
     }
 
     private let optipushConfig: OptipushConfig
@@ -15,20 +16,26 @@ final class ClientAPIRequestBuilder {
         self.optipushConfig = optipushConfig
     }
 
-    func postAddMergeUser(userID: String, userDevice: SetUser) throws -> NetworkRequest {
+    func postAddMergeUser(userID: String, model: SetUser) throws -> NetworkRequest {
         return try NetworkRequest(
             method: .post,
             baseURL: optipushConfig.mbaasEndpoint
-                .appendingPathComponent(Constants.path)
+                .appendingPathComponent(Constants.tenantsPath)
+                .appendingPathComponent(String(optipushConfig.tenantID))
+                .appendingPathComponent(Constants.usersPath)
                 .appendingPathComponent(userID),
-            body: userDevice
+            body: model
         )
     }
 
-    func putMigrateUser(_ model: AddUserAlias) throws -> NetworkRequest {
+    func putMigrateUser(userID: String, model: AddUserAlias) throws -> NetworkRequest {
         return try NetworkRequest(
             method: .put,
-            baseURL: optipushConfig.mbaasEndpoint.appendingPathComponent(Constants.path),
+            baseURL: optipushConfig.mbaasEndpoint
+                .appendingPathComponent(Constants.tenantsPath)
+                .appendingPathComponent(String(optipushConfig.tenantID))
+                .appendingPathComponent(Constants.usersPath)
+                .appendingPathComponent(userID),
             body: model
         )
     }

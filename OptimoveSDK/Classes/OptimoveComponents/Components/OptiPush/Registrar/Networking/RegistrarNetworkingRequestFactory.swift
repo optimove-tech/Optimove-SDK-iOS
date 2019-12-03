@@ -22,11 +22,12 @@ final class RegistrarNetworkingRequestFactory {
         case .setUser:
             return try requestBuilder.postAddMergeUser(
                 userID: try storage.getInitialVisitorId(),
-                userDevice: payloadBuilder.createSetUser()
+                model: payloadBuilder.createSetUser()
             )
         case .addUserAlias:
             return try requestBuilder.putMigrateUser(
-                try payloadBuilder.createAddUserAlias()
+                userID: try storage.getInitialVisitorId(),
+                model: try payloadBuilder.createAddUserAlias()
             )
         }
     }

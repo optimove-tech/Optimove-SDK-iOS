@@ -8,16 +8,13 @@ final class MbaasPayloadBuilder {
     private let storage: OptimoveStorage
     private let deviceID: String
     private let appNamespace: String
-    private let tenantID: String
 
     init(storage: OptimoveStorage,
          deviceID: String,
-         appNamespace: String,
-         tenantID: String) {
+         appNamespace: String) {
         self.storage = storage
         self.deviceID = deviceID
         self.appNamespace = appNamespace
-        self.tenantID = tenantID
     }
 
     func createSetUser() throws -> SetUser {
@@ -26,7 +23,6 @@ final class MbaasPayloadBuilder {
             deviceID: deviceID,
             appNS: appNamespace,
             os: SetUser.Constants.os,
-            tenantAlias: tenantID,
             deviceToken: token.map{ String(format: "%02.2hhx", $0) }.joined(),
             optIn: storage.optFlag,
             isDev: SDK.isDebugging
@@ -38,21 +34,19 @@ final class MbaasPayloadBuilder {
         let customerID = try storage.getCustomerID()
         let customerIDs = Set<String>([customerID]).union(storage.failedCustomerIDs)
         return AddUserAlias(
-            tenantAlias: tenantID,
-            currentAlias: try storage.getInitialVisitorId(),
             newAliases: Array(customerIDs)
         )
     }
 }
 
 struct SetUser: Codable {
+
     struct Constants {
         static let os = "ios"
     }
-    let deviceID, appNS, os, tenantAlias: String
-    let deviceToken: String
-    let optIn: Bool
-    let isDev: Bool
+
+    let deviceID, appNS, os, deviceToken: String
+    let optIn, isDev: Bool
 
     enum CodingKeys: String, CodingKey {
         case deviceID = "device_id"
@@ -60,18 +54,15 @@ struct SetUser: Codable {
         case os
         case deviceToken = "device_token"
         case optIn = "opt_in"
-        case tenantAlias = "tenant_alias"
         case isDev = "is_dev"
     }
 }
 
 struct AddUserAlias: Codable {
-    let tenantAlias, currentAlias: String
+
     let newAliases: [String]
 
     enum CodingKeys: String, CodingKey {
-        case tenantAlias = "tenant_alias"
-        case currentAlias = "current_alias"
         case newAliases = "new_aliases"
     }
 }
