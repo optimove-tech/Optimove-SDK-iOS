@@ -41,7 +41,7 @@ final class ScheduledNotificationDelivered: OptimoveEvent {
             Constants.Key.actionSerial: campaign.actionSerial,
             Constants.Key.templateID: campaign.templateID,
             Constants.Key.engagementID: campaign.engagementID,
-            Constants.Key.campaignType: campaign.campaignType,
+            Constants.Key.campaignType: campaign.campaignType ?? -1,
             Constants.Key.eventDeviceType: Constants.Value.deviceType,
             Constants.Key.eventPlatform: Constants.Value.platform,
             Constants.Key.eventOS: Constants.Value.os,

@@ -124,14 +124,14 @@ public struct ScheduledNotificationCampaign: NotificationCampaign {
     public let actionSerial: Int
     public let templateID: Int
     public let engagementID: Int
-    public let campaignType: Int
+    public let campaignType: Int?
 
     public init(
         campaignID: Int,
         actionSerial: Int,
         templateID: Int,
         engagementID: Int,
-        campaignType: Int
+        campaignType: Int?
     ) {
         self.campaignID = campaignID
         self.actionSerial = actionSerial
