@@ -1,5 +1,4 @@
 {
-    "title": "Ti [%EMAIL%] [%TEMPLATE_ID%]",
     "content": "Body: \nF.N: [%FIRST_NAME%]\nL.N: [%LAST_NAME%]\nEm: [%EMAIL%]\nAdd_Days + 5:  [%CURRENT_DATE:ADD_DAYS(5):DATE_FORMAT%]",
     "aps": {
         "alert": {

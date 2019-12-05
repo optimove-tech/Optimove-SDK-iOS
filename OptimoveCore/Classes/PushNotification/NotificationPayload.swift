@@ -5,7 +5,7 @@ import Foundation
 // MARK: - NotificationPayload
 
 public struct NotificationPayload: Decodable {
-    public let title: String
+    public let title: String?
     public let content: String
     public let dynamicLinks: DynamicLinks?
     public let deepLinkPersonalization: DeeplinkPersonalization?
@@ -31,7 +31,7 @@ public struct NotificationPayload: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.title = try container.decode(String.self, forKey: .title)
+        self.title = try container.decodeIfPresent(String.self, forKey: .title)
         self.content = try container.decode(String.self, forKey: .content)
         self.dynamicLinks = try? DynamicLinks(firebaseFrom: decoder)
         self.deepLinkPersonalization = try? DeeplinkPersonalization(firebaseFrom: decoder)
