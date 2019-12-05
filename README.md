@@ -4,6 +4,7 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/optimove-tech/Optimove-SDK-iOS/CI?style=flat-square)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
 ![GitHub](https://img.shields.io/github/license/optimove-tech/Optimove-SDK-iOS?style=flat-square)
+![Cocoapods platforms](https://img.shields.io/cocoapods/p/OptimoveSDK?style=flat-square)
 
 ## Integration Guide
 
