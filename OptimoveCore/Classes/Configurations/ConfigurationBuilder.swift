@@ -63,7 +63,6 @@ private extension ConfigurationBuilder {
     func buildOptipushConfig() -> OptipushConfig {
         return OptipushConfig(
             tenantID: tenantConfig.optitrack.siteId,
-            registrationServiceEndpoint: globalConfig.optipush.registrationServiceEndpoint,
             mbaasEndpoint: globalConfig.optipush.mbaasEndpoint,
             pushTopicsRegistrationEndpoint: tenantConfig.optipush.pushTopicsRegistrationEndpoint,
             firebaseProjectKeys: tenantConfig.firebaseProjectKeys,

@@ -29,7 +29,7 @@ final class ScheduledNotificationOpened: OptimoveCoreEvent {
             Constants.Key.actionSerial: campaign.actionSerial,
             Constants.Key.campignID: campaign.campaignID,
             Constants.Key.engagementID: campaign.engagementID,
-            Constants.Key.campaignType: campaign.campaignType
+            Constants.Key.campaignType: campaign.campaignType ?? -1
         ]
     }
 

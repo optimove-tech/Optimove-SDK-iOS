@@ -101,7 +101,9 @@ extension OptimoveNotificationServiceExtension {
             os_log("Unable to copy content.", log: OSLog.notification, type: .fault)
             return nil
         }
-        bestAttemptContent.title = payload.title
+        if let title = payload.title {
+            bestAttemptContent.title = title
+        }
         bestAttemptContent.body = payload.content
         return bestAttemptContent
     }

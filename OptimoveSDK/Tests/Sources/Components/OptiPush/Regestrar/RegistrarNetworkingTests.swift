@@ -16,8 +16,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         let payloadBuilder = MbaasPayloadBuilder(
             storage: storage,
             deviceID: SDKDevice.uuid,
-            appNamespace: try! Bundle.getApplicationNameSpace(),
-            tenantID: String(StubConstants.tenantID)
+            appNamespace: try! Bundle.getApplicationNameSpace()
         )
         let requestFactory = RegistrarNetworkingRequestFactory(
             storage: storage,
@@ -40,7 +39,9 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         Mocker.register(
             Mock(
                 url: config.mbaasEndpoint
-                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.path)
+                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.tenantsPath)
+                    .appendingPathComponent(String(config.tenantID))
+                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.usersPath)
                     .appendingPathComponent(storage.initialVisitorId!),
                 dataType: .json,
                 statusCode: 200,
@@ -70,7 +71,10 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         Mocker.register(
             Mock(
                 url: config.mbaasEndpoint
-                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.path),
+                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.tenantsPath)
+                    .appendingPathComponent(String(config.tenantID))
+                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.usersPath)
+                    .appendingPathComponent(storage.initialVisitorId!),
                 dataType: .json,
                 statusCode: 200,
                 data: [.put: Data()]
