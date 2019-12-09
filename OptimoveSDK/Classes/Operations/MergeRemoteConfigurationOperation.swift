@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-public final class MergeRemoteConfigurationOperation: AsyncOperation {
+internal final class MergeRemoteConfigurationOperation: AsyncOperation {
 
     private let repository: ConfigurationRepository
 
