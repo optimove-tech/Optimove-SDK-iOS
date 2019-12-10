@@ -27,10 +27,9 @@ class NotificationService: UNNotificationServiceExtension {
     override func serviceExtensionTimeWillExpire() {
         if optimoveNotificationServiceExtension.isHandledByOptimove {
             optimoveNotificationServiceExtension.serviceExtensionTimeWillExpire()
-        } else {
-            if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
-                contentHandler(bestAttemptContent)
-            }
+        }
+        if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
+            contentHandler(bestAttemptContent)
         }
     }
 }
