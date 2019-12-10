@@ -6,12 +6,20 @@ import OptimoveSDK
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
-    
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
-        // Initialize the Optimove SDK
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        /**
+         Prepare a tenant credentials.
+         */
         let info = OptimoveTenantInfo(tenantToken: "<YOUR_TENANT_TOKEN>",configName:"<YOUR_CONFIG_NAME>")
+
+        /**
+         IMPORTANT: If you have Firebase dependency, please initialize it before the Optimove SDK intialization call:
+         ```
+         Firebase.app()
+         Optimove.configure(for: info)
+         ```
+         */
         Optimove.configure(for: info)
         
         // Mandatory Remote Notification Registration
@@ -27,8 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     func application(_ application: UIApplication,
                      didReceiveRemoteNotification userInfo: [AnyHashable : Any],
-                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void)
-    {
+                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let isHandledByOptimove = Optimove.shared.didReceiveRemoteNotification(userInfo: userInfo, didComplete: completionHandler)
         if isHandledByOptimove { return }
         // The remote notification didn't originate from Optimove's servers, so the app must handle it. Below is the default implementation
@@ -36,8 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication,
-                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data)
-    {
+                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         Optimove.shared.application(didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
     }
 }
