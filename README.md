@@ -13,8 +13,6 @@ The official Optimove iOS integration frameworks are an iOS SDK for sending anal
 
 More about Optimove CDP (customer data platform) at [optimove.com](https://www.optimove.com)
 
-OptimoveSDK iOS can be used from Swift and Objective-C.
-
 ## Integration Guide
 
 In this guide we will discuss the steps necessary to implement the Optimove iOS SDK for your native application. It will go through the following steps necessary to have the basic & advanced SDK ready to track events on your native applicataion. 
