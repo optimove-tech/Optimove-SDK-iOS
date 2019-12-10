@@ -66,7 +66,7 @@ DEPENDENCIES:
   - OptimoveSDK (~> 2.0)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - FirebaseAnalyticsInterop
     - FirebaseCore
     - FirebaseCoreDiagnostics
@@ -100,6 +100,6 @@ SPEC CHECKSUMS:
   OptimoveSDK: 52c120aef6e5471d7fdd0779dc559c7524cf89cb
   Protobuf: 67fb42ba613def994e61854de2b3164f13790cc4
 
-PODFILE CHECKSUM: 836e403b2ea465e207d320b9527715428ebc7760
+PODFILE CHECKSUM: 721f8891d371da104629f54cb7d6b13a5a53b191
 
-COCOAPODS: 1.7.5
+COCOAPODS: 1.8.4

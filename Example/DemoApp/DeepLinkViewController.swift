@@ -1,7 +1,8 @@
-
 import UIKit
 import OptimoveSDK
+
 class DeepLinkViewController: UIViewController {
+
     @IBOutlet weak var deepLinkLabel: UILabel!
 
     var deepLinkComp: OptimoveDeepLinkComponents?
