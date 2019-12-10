@@ -6,6 +6,11 @@
 ![GitHub](https://img.shields.io/github/license/optimove-tech/Optimove-SDK-iOS?style=flat-square)
 ![Cocoapods platforms](https://img.shields.io/cocoapods/p/OptimoveSDK?style=flat-square)
 
+The official Optimove iOS integration framework is an iOS SDK for sending analytics to a Optimove server.
+OptimoveSDK iOS can be used from Swift and Objective-C.
+
+The Optimove CDP (customer data platform) autonomously transforms customer data into actionable insights that power thoughtful customer communications, at scale. More about Optimove CDP at [optimove.com](https://www.optimove.com/)
+
 ## Integration Guide
 
 In this guide we will discuss the steps necessary to implement the Optimove iOS SDK for your native application. It will go through the following steps necessary to have the basic & advanced SDK ready to track events on your native applicataion. 
@@ -25,3 +30,6 @@ In this guide we will discuss the steps necessary to implement the Optimove iOS 
 ### Optipush
 1. [Setup](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush%20-%20Setup)
 2. [Testing](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush%20-%20Testing)
+
+## License
+OptimoveSDK for iOS is available under the [MIT license](LICENSE).
