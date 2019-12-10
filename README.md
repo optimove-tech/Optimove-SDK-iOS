@@ -6,10 +6,14 @@
 ![GitHub](https://img.shields.io/github/license/optimove-tech/Optimove-SDK-iOS?style=flat-square)
 ![Cocoapods platforms](https://img.shields.io/cocoapods/p/OptimoveSDK?style=flat-square)
 
-The official Optimove iOS integration framework is an iOS SDK for sending analytics to a Optimove server.
-OptimoveSDK iOS can be used from Swift and Objective-C.
+The official Optimove iOS integration frameworks are an iOS SDK for sending analytics to an Optimove server, such as:
 
-The Optimove CDP (customer data platform) autonomously transforms customer data into actionable insights that power thoughtful customer communications, at scale. More about Optimove CDP at [optimove.com](https://www.optimove.com)
+- Track visitor and customer actions and events
+- Trigger Realtime campaigns
+
+More about Optimove CDP (customer data platform) at [optimove.com](https://www.optimove.com)
+
+OptimoveSDK iOS can be used from Swift and Objective-C.
 
 ## Integration Guide
 
