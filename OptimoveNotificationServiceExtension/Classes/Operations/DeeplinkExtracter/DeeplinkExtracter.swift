@@ -5,7 +5,7 @@ import UserNotifications
 import os.log
 import OptimoveCore
 
-final class DeeplinkExtracter: AsyncOperation {
+internal final class DeeplinkExtracter: AsyncOperation {
 
     private struct Constants {
         static let dynamicLinksKey = "dynamic_link"

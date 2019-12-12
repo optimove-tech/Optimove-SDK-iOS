@@ -8,6 +8,9 @@ import OptimoveCore
 /// Initialize and configure SDK using `Optimove.configure(for:)`.
 @objc public final class Optimove: NSObject {
 
+    /// The current OptimoveSDK version string value.
+    public static let version = SDKVersion
+
     private let deviceStateObserver: DeviceStateObserver
     private let factory: MainFactory
     private let serviceLocator: ServiceLocator

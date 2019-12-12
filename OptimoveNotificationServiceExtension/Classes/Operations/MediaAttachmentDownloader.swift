@@ -5,7 +5,7 @@ import UserNotifications
 import os.log
 import OptimoveCore
 
-final class MediaAttachmentDownloader: AsyncOperation {
+internal final class MediaAttachmentDownloader: AsyncOperation {
 
     private let notificationPayload: NotificationPayload
     private let bestAttemptContent: UNMutableNotificationContent

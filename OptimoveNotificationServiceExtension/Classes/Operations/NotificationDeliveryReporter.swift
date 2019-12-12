@@ -4,7 +4,7 @@ import Foundation
 import os.log
 import OptimoveCore
 
-final class NotificationDeliveryReporter: AsyncOperation {
+internal final class NotificationDeliveryReporter: AsyncOperation {
 
     private let bundleIdentifier: String
     private let notificationPayload: NotificationPayload
@@ -50,7 +50,7 @@ final class NotificationDeliveryReporter: AsyncOperation {
     }
 
     private func report(_ event: OptimoveEvent) throws {
-        try optitrack.report(
+try optitrack.report(
             event: event,
             completion: { [unowned self] in
                 self.state = .finished
