@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.7.0
+
+- **added** expose version number
+- **changed** access level for notification service operations.
+
 ## 2.6.0
 
 - **changed** API communication
