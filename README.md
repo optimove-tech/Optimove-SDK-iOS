@@ -33,8 +33,5 @@ In this guide we will discuss the steps necessary to implement the Optimove iOS 
 1. [Setup](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush%20-%20Setup)
 2. [Testing](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush%20-%20Testing)
 
-## Contributing
-Please read [CONTRIBUTING](CONTRIBUTING.md) for details.
-
 ## License
 OptimoveSDK for iOS is available under the [MIT license](LICENSE).
