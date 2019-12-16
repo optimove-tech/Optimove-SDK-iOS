@@ -13,13 +13,7 @@ public struct SDK {
             static let `false` = "false"
         }
     }
-
-    public static var isDebugging: Bool {
-        var skip: Bool = false
-        assert({ skip = true; return true }())
-        return skip
-    }
-
+    
     public static var environment: Environment {
         return isStaging ? .dev : .prod
     }

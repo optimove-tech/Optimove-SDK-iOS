@@ -11,6 +11,12 @@ import OptimoveCore
     /// The current OptimoveSDK version string value.
     public static let version = SDKVersion
 
+    /// A boolean indicating if the app going to start in Debug mode.
+    public static var isDebug: Bool {
+        get { return shared.storage.isDebug }
+        set { shared.storage.isDebug = newValue }
+    }
+
     private let deviceStateObserver: DeviceStateObserver
     private let factory: MainFactory
     private let serviceLocator: ServiceLocator
