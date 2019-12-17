@@ -11,7 +11,7 @@ public extension UserDefaults {
             throw GuardError.custom(
             """
             If this line is crashing the client forgot to add the app group as described in the documentation.
-            Link: ttps://tinyurl.com/y3kfnjw9
+            Link: https://tinyurl.com/vvz2bur
             """
             )
         }
