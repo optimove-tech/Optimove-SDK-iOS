@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8.0
+
+- **improve** an apns environment checking.
+
 ## 2.7.0
 
 - **added** expose version number
