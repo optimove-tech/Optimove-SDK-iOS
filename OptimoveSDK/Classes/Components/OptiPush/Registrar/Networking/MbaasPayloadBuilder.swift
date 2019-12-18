@@ -25,7 +25,7 @@ final class MbaasPayloadBuilder {
             os: SetUser.Constants.os,
             deviceToken: token.map{ String(format: "%02.2hhx", $0) }.joined(),
             optIn: storage.optFlag,
-            isDev: try MobileProvision.read().entitlements.apsEnvironment == .development
+            isDev: (try? MobileProvision.read().entitlements.apsEnvironment == .development) ?? true
         )
     }
 
