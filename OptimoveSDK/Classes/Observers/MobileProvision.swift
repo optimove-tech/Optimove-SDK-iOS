@@ -55,14 +55,20 @@ extension MobileProvision {
         return try decoder.decode(MobileProvision.self, from: plist)
     }
 
-    private static func scanPlistDataString(_ string: String) -> String? {
+    private static func scanPlistDataString(_ string: String) throws -> String {
         let scanner = Scanner(string: string)
+        let noStartPlistTagError = GuardError.custom("Not found tag \(Constants.startPlistTag)")
+        let noEndPlistTagError = GuardError.custom("Not found tag \(Constants.endPlistTag)")
         if #available(iOS 13.0, *) {
-            guard scanner.scanUpToString(Constants.startPlistTag) != nil else { return nil }
-            return scanner.scanUpToString(Constants.endPlistTag)
+            _ = try unwrap(scanner.scanUpToString(Constants.startPlistTag), error: noStartPlistTagError)
+            return try unwrap(scanner.scanUpToString(Constants.endPlistTag), error: noEndPlistTagError)
         } else {
-            // Fallback on earlier versions
+            _ = try unwrap(scanner.scanUpTo(Constants.startPlistTag, into: nil), error: noStartPlistTagError)
+            var extractedPlist: NSString?
+            guard scanner.scanUpTo(Constants.endPlistTag, into: &extractedPlist) != false else {
+                throw noEndPlistTagError
+            }
+            return String(try unwrap(extractedPlist))
         }
-
     }
 }
