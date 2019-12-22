@@ -41,7 +41,7 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         XCTAssertEqual(payload.appNS, expectedAppNs)
         XCTAssertEqual(payload.os, SetUser.Constants.os)
         XCTAssertNotNil(payload.deviceToken)
-        XCTAssertEqual(payload.deviceToken, expectedToken.map{ String(format: "%02.2hhx", $0) }.joined())
+        XCTAssertEqual(payload.deviceToken, expectedToken.map { String(format: "%02.2hhx", $0) }.joined())
         XCTAssertFalse(payload.optIn)
     }
 

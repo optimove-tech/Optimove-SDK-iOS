@@ -4,18 +4,14 @@ import UIKit.UIApplication
 import UserNotifications
 import OptimoveCore
 
-/// The entry point of Optimove.
-/// Initialize and configure SDK using `Optimove.configure(for:)`.
+/// The Optimove SDK for iOS - a realtime customer data platform.
+/// The integration guide: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki
+/// - WARNING:
+///  To initialize and configure SDK using `Optimove.configure(for:)` first.
 @objc public final class Optimove: NSObject {
 
     /// The current OptimoveSDK version string value.
     public static let version = SDKVersion
-
-    /// A boolean indicating if the app going to start in Debug mode.
-    public static var isDebug: Bool {
-        get { return shared.storage.isDebug }
-        set { shared.storage.isDebug = newValue }
-    }
 
     private let deviceStateObserver: DeviceStateObserver
     private let factory: MainFactory
@@ -23,7 +19,7 @@ import OptimoveCore
     private let synchronizer: Synchronizer
     private var storage: OptimoveStorage
 
-    /// The shared instance of OptimoveSDK.
+    /// The shared instance of Optimove SDK.
     @objc public static let shared: Optimove = {
         return Optimove()
     }()
@@ -79,12 +75,22 @@ extension Optimove {
 
 extension Optimove {
 
+    /// Report the screen visit event.
+    /// - Parameters:
+    ///   - screenPathArray: An array of breadcrumbs – an UI path to the screen.
+    ///   - screenTitle: The screen title.
+    ///   - screenCategory: The screen category.
     @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
         setScreenVisit(screenPath: screenPathArray.joined(separator: "/"),
                        screenTitle: screenTitle,
                        screenCategory: screenCategory)
     }
 
+    /// Report the screen visit event.
+    /// - Parameters:
+    ///   - screenPath: An UI path to the screen.
+    ///   - screenTitle: The screen title.
+    ///   - screenCategory: The screen category.
     @objc public func setScreenVisit(screenPath: String, screenTitle: String, screenCategory: String? = nil) {
         let screenPath = screenPath.trimmingCharacters(in: .whitespaces)
         let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
@@ -220,7 +226,7 @@ extension Optimove {
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let validationResult = APNsTokenValidator(storage: serviceLocator.storage())
         if validationResult.validate(token: deviceToken) == .new {
-            Logger.debug("APNS token: \(deviceToken.map{ String(format: "%02.2hhx", $0) }.joined())")
+            Logger.debug("New APNS token: \(deviceToken.map { String(format: "%02.2hhx", $0) }.joined())")
             synchronizer.handle(.deviceToken(token: deviceToken))
         }
     }
@@ -297,7 +303,7 @@ private extension Optimove {
         }
     }
 
-    //  MARK: Configuration
+    // MARK: Configuration
 
     /// Initialization of SDK with a configuration.
     /// - Parameter configuration: A `Configuration` filetype.

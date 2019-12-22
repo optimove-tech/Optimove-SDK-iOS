@@ -167,7 +167,7 @@ private extension CoreEventFactoryImpl {
         if let storedAdvertisingIdentifier = storage.advertisingIdentifier {
             return storedAdvertisingIdentifier
         } else {
-            let newAdvertisingIdentifier =  UUID().uuidString
+            let newAdvertisingIdentifier = UUID().uuidString
             storage.advertisingIdentifier = newAdvertisingIdentifier
             return newAdvertisingIdentifier
         }

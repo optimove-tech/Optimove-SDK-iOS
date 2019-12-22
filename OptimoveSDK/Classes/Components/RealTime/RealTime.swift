@@ -17,7 +17,7 @@ final class RealTime {
     private var storage: OptimoveStorage
     private let eventBuilder: RealTimeEventBuilder
     private let coreEventFactory: CoreEventFactory
-    private let semaphore: DispatchSemaphore = DispatchSemaphore(value: 1)
+    private let semaphore = DispatchSemaphore(value: 1)
 
     // MARK: - Public
 

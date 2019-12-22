@@ -22,7 +22,7 @@ final class FirebaseInteractor: PushServiceProvider {
 
     private func setup(optipush: OptipushConfig) {
         Logger.debug("OptiPush: Setup Firebase started.")
-        
+
         let firebaseMetaData = optipush.firebaseProjectKeys
         let clientFirebaseMetaData = optipush.clientsServiceProjectKeys
         let appController = FirebaseOptionsBuilder(

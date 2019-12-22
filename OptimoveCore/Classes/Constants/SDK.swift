@@ -13,7 +13,7 @@ public struct SDK {
             static let `false` = "false"
         }
     }
-    
+
     public static var environment: Environment {
         return isStaging ? .dev : .prod
     }

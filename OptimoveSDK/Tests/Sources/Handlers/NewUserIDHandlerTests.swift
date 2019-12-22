@@ -31,7 +31,7 @@ class NewUserIDHandlerTests: XCTestCase {
         wait(
             for: [
                 visitorIDExpectation,
-                customerIDExpectation,
+                customerIDExpectation
             ],
             timeout: defaultTimeout
         )
@@ -62,7 +62,7 @@ class NewUserIDHandlerTests: XCTestCase {
         wait(
             for: [
                 visitorIDExpectation,
-                customerIDExpectation,
+                customerIDExpectation
             ],
             timeout: defaultTimeout
         )
@@ -93,7 +93,7 @@ class NewUserIDHandlerTests: XCTestCase {
         wait(
             for: [
                 visitorIDExpectation,
-                customerIDExpectation,
+                customerIDExpectation
             ],
             timeout: defaultTimeout
         )

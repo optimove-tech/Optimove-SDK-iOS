@@ -11,7 +11,7 @@ let tryDecode: (() throws -> Void) -> Void = { function in
         XCTFail("Key '\(key)' not found: \(context.debugDescription)\ncodingPath: \(context.codingPath)")
     } catch let DecodingError.valueNotFound(value, context) {
         XCTFail("Value '\(value)' not found: \(context.debugDescription)\ncodingPath: \(context.codingPath)")
-    } catch let DecodingError.typeMismatch(type, context)  {
+    } catch let DecodingError.typeMismatch(type, context) {
         XCTFail("Type '\(type)' mismatch: \(context.debugDescription)\ncodingPath: \(context.codingPath)")
     } catch {
         XCTFail(error.localizedDescription)

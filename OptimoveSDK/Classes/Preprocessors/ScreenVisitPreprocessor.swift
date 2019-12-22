@@ -33,7 +33,6 @@ private extension ScreenVisitPreprocessor {
         return removeUrlProtocol(input)
     }
 
-
     static func removeUrlProtocol(_ input: String) -> String {
         var input = input
         for prefix in ["https://www.", "http://www.", "https://", "http://"] {

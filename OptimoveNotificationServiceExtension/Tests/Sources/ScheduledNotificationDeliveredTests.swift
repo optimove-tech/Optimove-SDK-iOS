@@ -24,7 +24,7 @@ class ScheduledNotificationDeliveredTests: XCTestCase {
                 engagementID: engagementID,
                 campaignType: campaignType
             ),
-            timestamp:  timestamp
+            timestamp: timestamp
         )
 
         XCTAssertEqual(ScheduledNotificationDelivered.Constants.name, event.name)
