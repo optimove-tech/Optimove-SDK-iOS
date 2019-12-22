@@ -12,14 +12,14 @@ import Foundation
 /// A responder wrapper for Objective-C.
 /// - NOTE: Remove in a future version.
 @objc public class OptimoveDeepLinkResponder: NSObject {
-    private let deepLinkCallback: OptimoveDeepLinkCallback
+    private weak var receiver: OptimoveDeepLinkCallback?
 
-    @objc public init(_ deepLinkCallback: OptimoveDeepLinkCallback) {
-        self.deepLinkCallback = deepLinkCallback
+    @objc public init(_ receiver: OptimoveDeepLinkCallback) {
+        self.receiver = receiver
     }
 
     @objc func didReceive(deepLinkComponent: OptimoveDeepLinkComponents) {
-        deepLinkCallback.didReceive(deepLink: deepLinkComponent)
+        receiver?.didReceive(deepLink: deepLinkComponent)
     }
 }
 

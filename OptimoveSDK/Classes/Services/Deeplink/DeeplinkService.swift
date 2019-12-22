@@ -2,8 +2,8 @@
 
 final class DeeplinkService {
 
-    private var deepLinkResponders = [OptimoveDeepLinkResponder]()
-    private var deepLinkComponents: OptimoveDeepLinkComponents? = nil
+    private var deepLinkResponders: [OptimoveDeepLinkResponder] = []
+    private var deepLinkComponents: OptimoveDeepLinkComponents?
 
     func setDeepLinkComponents(_ component: OptimoveDeepLinkComponents) {
         self.deepLinkComponents = component
@@ -25,7 +25,7 @@ extension DeeplinkService: OptimoveDeepLinkResponding {
     }
 
     func unregister(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-        if let index = self.deepLinkResponders.firstIndex(of: responder) {
+        if let index = deepLinkResponders.firstIndex(of: responder) {
             deepLinkResponders.remove(at: index)
         }
     }
