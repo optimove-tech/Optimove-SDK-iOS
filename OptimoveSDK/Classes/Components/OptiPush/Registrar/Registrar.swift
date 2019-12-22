@@ -77,10 +77,10 @@ private extension Registrar {
         func handleFailed(_ operation: MbaasOperation, _ error: Error) {
            switch operation {
             case .setUser:
-                Logger.error('Set User operation was failed. \(error.localizedDescription)')
+                Logger.error("Set User operation was failed. \(error.localizedDescription)")
                 storage.isSettingUserSuccess = false
             case .addUserAlias:
-                Logger.error('Add User Alias operation was failed. \(error.localizedDescription)')
+                Logger.error("Add User Alias operation was failed. \(error.localizedDescription)")
                 storage.isAddingUserAliasSuccess = false
                 if let customerID = storage.customerID {
                     var failedCustomerIDs: Set<String> = storage.failedCustomerIDs
