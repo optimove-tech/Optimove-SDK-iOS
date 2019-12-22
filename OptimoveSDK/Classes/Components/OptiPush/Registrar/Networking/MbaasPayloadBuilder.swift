@@ -26,7 +26,7 @@ final class MbaasPayloadBuilder {
             os: SetUser.Constants.os,
             deviceToken: token.map { String(format: tokenToStringFormat, $0) }.joined(),
             optIn: storage.optFlag,
-            isDev: Environment.isDevelopmentApn
+            isDev: AppEnvironment.isSandboxAps
         )
     }
 

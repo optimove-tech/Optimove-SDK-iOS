@@ -1,17 +1,18 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
+import Foundation
 import OptimoveCore
 
-struct Environment {
+struct AppEnvironment {
 
-    static var isDevelopmentApn: Bool {
+    static let isSandboxAps: Bool = {
         do {
             return try MobileProvision.read().entitlements.apsEnvironment == .development
         } catch {
-            Logger.error("Unable to read a mobileprovision profile. \(error.localizedDescription)")
-            // Return `false` as the most saftiest strategy for production.
+            Logger.warn("the app does not contain the embedded.mobileprovision")
+            /// If the app does not contain the embedded.mobileprovision which is stripped out by Apple when the app is submitted to store, then it is highly likely that it is from Apple Store.
             return false
         }
-    }
+    }()
 
 }
