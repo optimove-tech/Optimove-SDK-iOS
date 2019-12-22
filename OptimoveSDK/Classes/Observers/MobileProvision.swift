@@ -7,7 +7,7 @@ struct MobileProvision: Decodable {
 
     var entitlements: Entitlements
 
-    private enum CodingKeys : String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case entitlements = "Entitlements"
     }
 
@@ -33,7 +33,6 @@ struct MobileProvision: Decodable {
         }
     }
 }
-
 
 extension MobileProvision {
 

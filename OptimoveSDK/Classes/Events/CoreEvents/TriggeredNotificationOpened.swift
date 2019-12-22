@@ -17,7 +17,7 @@ final class TriggeredNotificationOpened: OptimoveCoreEvent {
     }
 
     let name: String = Constants.name
-    let parameters: [String : Any]
+    let parameters: [String: Any]
 
     init(bundleIdentifier: String, campaign: TriggeredNotificationCampaign, date: Date = Date()) {
         parameters = [

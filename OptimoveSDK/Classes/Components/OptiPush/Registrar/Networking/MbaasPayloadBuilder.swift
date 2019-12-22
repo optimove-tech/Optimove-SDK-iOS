@@ -24,7 +24,7 @@ final class MbaasPayloadBuilder {
             deviceID: deviceID,
             appNS: appNamespace,
             os: SetUser.Constants.os,
-            deviceToken: token.map{ String(format: tokenToStringFormat, $0) }.joined(),
+            deviceToken: token.map { String(format: tokenToStringFormat, $0) }.joined(),
             optIn: storage.optFlag,
             isDev: try MobileProvision.read().entitlements.apsEnvironment == .development
         )

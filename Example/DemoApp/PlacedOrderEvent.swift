@@ -3,18 +3,18 @@ import OptimoveSDK
 import OptimoveCore
 
 class PlacedOrderEvent: OptimoveEvent {
-    
+
     private let cartItems: [CartItem]
-    
+
     init(_ items: [CartItem]) {
         self.cartItems = items
     }
-    
+
     var name: String {
         return "placed_order"
     }
-    
-    var parameters: [String : Any] {
+
+    var parameters: [String: Any] {
         var params: [String: Any] = [:]
         var totalPrice = 0.0
         for i in 0..<self.cartItems.count {

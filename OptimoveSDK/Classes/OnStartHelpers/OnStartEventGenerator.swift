@@ -21,7 +21,7 @@ final class OnStartEventGenerator {
         asyncGenerate()
         [
             try? coreEventFactory.createEvent(.metaData),
-            try? coreEventFactory.createEvent(.setAdvertisingId),
+            try? coreEventFactory.createEvent(.setAdvertisingId)
         ].compactMap { $0 }
         .forEach { synchronizer.handle(.report(event: $0)) }
     }
