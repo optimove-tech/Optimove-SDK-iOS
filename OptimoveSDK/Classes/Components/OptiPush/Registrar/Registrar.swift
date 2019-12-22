@@ -47,8 +47,8 @@ extension Registrar: Registrable {
             switch result {
             case .success:
                 handler.handleSuccess(operation)
-            case .failure:
-                handler.handleFailed(operation)
+            case .failure(let error):
+                handler.handleFailed(operation, error)
             }
         }
     }
@@ -74,11 +74,13 @@ private extension Registrar {
             self.storage = storage
         }
 
-        func handleFailed(_ operation: MbaasOperation) {
+        func handleFailed(_ operation: MbaasOperation, _ error: Error) {
            switch operation {
             case .setUser:
+                Logger.error('Set User operation was failed. \(error.localizedDescription)')
                 storage.isSettingUserSuccess = false
             case .addUserAlias:
+                Logger.error('Add User Alias operation was failed. \(error.localizedDescription)')
                 storage.isAddingUserAliasSuccess = false
                 if let customerID = storage.customerID {
                     var failedCustomerIDs: Set<String> = storage.failedCustomerIDs

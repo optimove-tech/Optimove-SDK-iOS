@@ -19,13 +19,14 @@ final class MbaasPayloadBuilder {
 
     func createSetUser() throws -> SetUser {
         let token = try storage.getApnsToken()
+        let tokenToStringFormat = "%02.2hhx"
         return SetUser(
             deviceID: deviceID,
             appNS: appNamespace,
             os: SetUser.Constants.os,
-            deviceToken: token.map{ String(format: "%02.2hhx", $0) }.joined(),
+            deviceToken: token.map{ String(format: tokenToStringFormat, $0) }.joined(),
             optIn: storage.optFlag,
-            isDev: (try? MobileProvision.read().entitlements.apsEnvironment == .development) ?? true
+            isDev: try MobileProvision.read().entitlements.apsEnvironment == .development
         )
     }
 
