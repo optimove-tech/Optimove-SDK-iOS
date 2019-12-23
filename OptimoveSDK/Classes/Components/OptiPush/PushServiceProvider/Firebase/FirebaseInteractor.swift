@@ -144,17 +144,19 @@ final class FirebaseInteractor: PushServiceProvider {
 private extension FirebaseInteractor {
 
     func setupAppController(_ appController: FirebaseOptions) {
-        if FirebaseApp.app() != nil {
-            Logger.warn("OptiPush: Hosted Firebase detected.")
-            FirebaseApp.configure(
-                name: "appController",
-                options: appController
-            )
-            storage.isClientHasFirebase = true
-        } else {
-            Logger.warn("OptiPush: Hosted Firebase not detected.")
-            storage.isClientHasFirebase = false
-            FirebaseApp.configure(options: appController)
+        DispatchQueue.main.async {
+            if FirebaseApp.app() != nil {
+                Logger.warn("OptiPush: Hosted Firebase detected.")
+                FirebaseApp.configure(
+                    name: "appController",
+                    options: appController
+                )
+                self.storage.isClientHasFirebase = true
+            } else {
+                Logger.warn("OptiPush: Hosted Firebase not detected.")
+                self.storage.isClientHasFirebase = false
+                FirebaseApp.configure(options: appController)
+            }
         }
     }
 
