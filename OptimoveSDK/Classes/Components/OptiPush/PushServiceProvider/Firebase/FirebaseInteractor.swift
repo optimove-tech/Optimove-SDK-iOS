@@ -60,8 +60,10 @@ final class FirebaseInteractor: PushServiceProvider {
 
     func handleRegistration(apnsToken: Data) {
         storage.apnsToken = apnsToken
-        if let fcmToken = Messaging.messaging().fcmToken {
-            self.onTokenRenew(fcmToken: fcmToken)
+        DispatchQueue.main.async {
+            if let fcmToken = Messaging.messaging().fcmToken {
+                self.onTokenRenew(fcmToken: fcmToken)
+            }
         }
     }
 
@@ -96,11 +98,13 @@ final class FirebaseInteractor: PushServiceProvider {
 
     func subscribeToTopic(topic: String) {
         if !storage.isClientHasFirebase {
-            Messaging.messaging().subscribe(toTopic: topic) { (error) in
-                if let error = error {
-                    Logger.error(error.localizedDescription)
-                } else {
-                    Logger.debug("Subscribed topic \(topic) successful.")
+            DispatchQueue.main.async {
+                Messaging.messaging().subscribe(toTopic: topic) { (error) in
+                    if let error = error {
+                        Logger.error(error.localizedDescription)
+                    } else {
+                        Logger.debug("Subscribed topic \(topic) successful.")
+                    }
                 }
             }
         } else {
@@ -119,11 +123,13 @@ final class FirebaseInteractor: PushServiceProvider {
 
     func unsubscribeFromTopic(topic: String) {
         if !storage.isClientHasFirebase {
-            Messaging.messaging().unsubscribe(fromTopic: topic) { (error) in
-                if let error = error {
-                    Logger.error(error.localizedDescription)
-                } else {
-                    Logger.debug("Unsubscribed topic \(topic) successful.")
+            DispatchQueue.main.async {
+                Messaging.messaging().unsubscribe(fromTopic: topic) { (error) in
+                    if let error = error {
+                        Logger.error(error.localizedDescription)
+                    } else {
+                        Logger.debug("Unsubscribed topic \(topic) successful.")
+                    }
                 }
             }
         } else {
@@ -161,7 +167,9 @@ private extension FirebaseInteractor {
     }
 
     func setupSdkController(_ clientServiceOptions: FirebaseOptions) {
-        FirebaseApp.configure(name: "sdkController", options: clientServiceOptions)
+        DispatchQueue.main.async {
+            FirebaseApp.configure(name: "sdkController", options: clientServiceOptions)
+        }
     }
 
     func onTokenRenew(fcmToken: String) {
@@ -182,14 +190,16 @@ private extension FirebaseInteractor {
     }
 
     func retreiveFcmToken(for senderId: String, completion: @escaping (String) -> Void) {
-        Messaging.messaging().retrieveFCMToken(forSenderID: senderId) { (token, error) in
-            if let error = error {
-                Logger.error("OptiPush: could not retreive dedicated FCM token. Reason: \(error.localizedDescription).")
-            }
-            if let token = token {
-                completion(token)
-            } else {
-                Logger.error("OptiPush: Missed FCM token.")
+        DispatchQueue.main.async {
+            Messaging.messaging().retrieveFCMToken(forSenderID: senderId) { (token, error) in
+                if let error = error {
+                    Logger.error("OptiPush: could not retreive dedicated FCM token. Reason: \(error.localizedDescription).")
+                }
+                if let token = token {
+                    completion(token)
+                } else {
+                    Logger.error("OptiPush: Missed FCM token.")
+                }
             }
         }
     }
