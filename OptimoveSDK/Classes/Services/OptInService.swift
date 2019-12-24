@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import OptimoveCore
+import UIKit
 
 final class OptInService {
 
@@ -18,6 +19,7 @@ final class OptInService {
 
     /// Handle changing of UserNotificaiont authorization status.
     func didPushAuthorization(isGranted granted: Bool) throws {
+        requestTokenIfNeeded(pushAuthorizationGranted: granted)
         guard isOptStateChanged(with: granted) else { return }
         granted ? try executeOptIn() : try executeOptOut()
     }
@@ -43,6 +45,11 @@ private extension OptInService {
         storage.optFlag = false
         synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptOut)))
         synchronizer.handle(.optOut)
+    }
+
+    func requestTokenIfNeeded(pushAuthorizationGranted: Bool) {
+        guard pushAuthorizationGranted, storage.apnsToken == nil else { return }
+        UIApplication.shared.registerForRemoteNotifications()
     }
 
 }

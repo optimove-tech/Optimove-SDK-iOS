@@ -39,6 +39,7 @@ import OptimoveCore
     ///
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
+        /// FUTURE: To merge configure call with init.
         shared.serviceLocator.loggerInitializator().initialize()
         shared.serviceLocator.newTenantInfoHandler().handle(tenantInfo)
         shared.deviceStateObserver.start()
