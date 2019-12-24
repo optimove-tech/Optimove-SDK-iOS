@@ -5,7 +5,6 @@ import Foundation
 public struct LogBody {
     let tenantId: Int
     let appNs: String
-    let sdkEnv: Environment
     let sdkPlatform: SdkPlatform
     let level: LogLevelCore
     let logModule: String?
@@ -16,7 +15,6 @@ public struct LogBody {
     public init(
         tenantId: Int,
         appNs: String,
-        sdkEnv: Environment,
         sdkPlatform: SdkPlatform,
         level: LogLevelCore,
         logModule: String?,
@@ -26,7 +24,6 @@ public struct LogBody {
     ) {
         self.tenantId = tenantId
         self.appNs = appNs
-        self.sdkEnv = sdkEnv
         self.sdkPlatform = sdkPlatform
         self.level = level
         self.logModule = logModule
