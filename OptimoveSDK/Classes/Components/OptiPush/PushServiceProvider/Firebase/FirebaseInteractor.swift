@@ -60,8 +60,7 @@ final class FirebaseInteractor: PushServiceProvider {
 
     // MARK: - FirebaseProvider
 
-    func handleRegistration(apnsToken: Data) {
-        storage.apnsToken = apnsToken
+    func handleRegistration(apnsToken: Data) 
         DispatchQueue.main.async {
             if let fcmToken = Messaging.messaging().fcmToken {
                 self.onTokenRenew(fcmToken: fcmToken)
