@@ -20,7 +20,7 @@ public struct Endpoints {
             public static var url = URL(string: "https://sdk-cdn.optimove.net/configs/mobile")!
                 .appendingPathComponent("global")
                 .appendingPathComponent("v2")
-                .appendingPathComponent(SdkEnvironment.getEnvironmentVariable(for: "OPTIMOVE_CONFIG_ENV_PATH", defaultValue: "prod"))
+                .appendingPathComponent(SdkEnvironment.getBuildSetting(for: "OPTIMOVE_CONFIG_ENV_PATH", defaultValue: "prod"))
                 .appendingPathComponent("configs.json")
         }
 

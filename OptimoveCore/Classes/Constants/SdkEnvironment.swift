@@ -14,10 +14,16 @@ public struct SdkEnvironment {
         return ProcessInfo.processInfo.arguments.contains(Constants.Key.debugEnabled)
     }()
 
-    static func getEnvironmentVariable(for key: String, defaultValue: String) -> String {
-        guard let envVarValue = ProcessInfo.processInfo.environment[key], !envVarValue.isEmpty else {
+    static func getBuildSetting(for key: String, defaultValue: String) -> String {
+        guard let envVarValue = getBuildSetting(for: key), !envVarValue.isEmpty else {
             return defaultValue
         }
         return envVarValue
     }
+
+    static func getBuildSetting(for key: String) -> String? {
+        let envvarValue = Bundle.main.object(forInfoDictionaryKey: key) as? String
+        return envvarValue?.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
 }
