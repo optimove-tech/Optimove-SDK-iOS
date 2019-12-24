@@ -40,20 +40,22 @@ final class FirebaseInteractor: PushServiceProvider {
         setupAppController(appController)
         setupSdkController(clientServiceOptions)
 
-        if let token = Messaging.messaging().fcmToken {
-            registerIfTokenChanged(updatedFcmToken: token)
-        } else {
-            NotificationCenter.default.addObserver(
-                forName: NSNotification.Name.MessagingRegistrationTokenRefreshed,
-                object: nil,
-                queue: .main
-            ) { (_) in
-                if let fcmToken = Messaging.messaging().fcmToken {
-                    self.onTokenRenew(fcmToken: fcmToken)
+        DispatchQueue.main.async {
+            if let token = Messaging.messaging().fcmToken {
+                self.registerIfTokenChanged(updatedFcmToken: token)
+            } else {
+                NotificationCenter.default.addObserver(
+                    forName: NSNotification.Name.MessagingRegistrationTokenRefreshed,
+                    object: nil,
+                    queue: .main
+                ) { (_) in
+                    if let fcmToken = Messaging.messaging().fcmToken {
+                        self.onTokenRenew(fcmToken: fcmToken)
+                    }
                 }
             }
+            Logger.debug("OptiPush: Setup Firebase finished.")
         }
-        Logger.debug("OptiPush: Setup Firebase finished.")
     }
 
     // MARK: - FirebaseProvider
