@@ -20,7 +20,7 @@ class TriggeredNotificationRecievedTests: XCTestCase {
                 actionID: actionID,
                 templateID: templateID
             ),
-            timestamp:  timestamp
+            timestamp: timestamp
         )
 
         XCTAssertEqual(TriggeredNotificationRecieved.Constants.name, event.name)

@@ -2,7 +2,7 @@
 
 import Foundation
 
-@objc public enum LogLevelCore: Int  {
+@objc public enum LogLevelCore: Int {
 
     case debug = 0
     case info = 1

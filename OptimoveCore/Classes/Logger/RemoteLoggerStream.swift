@@ -6,7 +6,7 @@ import os.log
 public final class RemoteLoggerStream: MutableLoggerStream {
 
     private struct Constants {
-        static let httpHeaders: [String : String] = [
+        static let httpHeaders: [String: String] = [
             "Content-Type": "application/json"
         ]
         static let httpMethod = "POST"
@@ -38,7 +38,6 @@ public final class RemoteLoggerStream: MutableLoggerStream {
         let data = LogBody(
             tenantId: self.tenantId,
             appNs: self.appNs,
-            sdkEnv: SDK.environment,
             sdkPlatform: platform,
             level: level,
             logModule: nil,

@@ -9,15 +9,17 @@ struct SDKDevice {
         return UIDevice.current.identifierForVendor?.uuidString.sha1() ?? ""
     }
 
-    private static let webView = WKWebView(frame: .zero)
+    private static var webView: WKWebView?
 
     static func evaluateUserAgent(completion: @escaping (String) -> Void) {
         DispatchQueue.main.async {
-            webView.evaluateJavaScript("navigator.userAgent") { (result, error) in
+            webView = WKWebView(frame: .zero)
+            webView?.evaluateJavaScript("navigator.userAgent") { (result, error) in
                 if let error = error {
                     Logger.error(error.localizedDescription)
                 }
                 completion((result as? String) ?? "user_agent_placeholder")
+                webView = nil
             }
         }
     }

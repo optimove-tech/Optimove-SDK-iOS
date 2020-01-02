@@ -6,11 +6,11 @@ class NotificationService: UNNotificationServiceExtension {
     var contentHandler: ((UNNotificationContent) -> Void)?
     var bestAttemptContent: UNMutableNotificationContent?
 
-    var optimoveNotificationServiceExtension:OptimoveNotificationServiceExtension!
+    var optimoveNotificationServiceExtension: OptimoveNotificationServiceExtension!
 
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
         optimoveNotificationServiceExtension = OptimoveNotificationServiceExtension()
-        if optimoveNotificationServiceExtension.didReceive(request, withContentHandler:  contentHandler) {
+        if optimoveNotificationServiceExtension.didReceive(request, withContentHandler: contentHandler) {
             return
         }
         self.contentHandler = contentHandler
@@ -23,12 +23,12 @@ class NotificationService: UNNotificationServiceExtension {
             contentHandler(bestAttemptContent)
         }
     }
-    
+
     override func serviceExtensionTimeWillExpire() {
         if optimoveNotificationServiceExtension.isHandledByOptimove {
             optimoveNotificationServiceExtension.serviceExtensionTimeWillExpire()
         }
-        if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
+        if let contentHandler = contentHandler, let bestAttemptContent = bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
     }

@@ -2,14 +2,14 @@ import UIKit
 import OptimoveSDK
 
 class ViewController: UIViewController {
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Report screen visit like this
         Optimove.shared.setScreenVisit(screenPath: "Home/Store/Footwear/Boots", screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
         // OR
         Optimove.shared.setScreenVisit(screenPathArray: ["Home", "Store", "Footwear", "Boots"], screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
-        
+
         // Optipush Only
         Optimove.shared.register(deepLinkResponder: OptimoveDeepLinkResponder(self))
     }
@@ -26,7 +26,7 @@ class ViewController: UIViewController {
 // Mark - Optimove SDK Indentification
 
 extension ViewController {
-    
+
     func login(email: String) {
         // Some login logic through which the SDK ID is retrieved
         let sdkId = "aGVsbG93b3JsZA=="
@@ -54,7 +54,7 @@ extension ViewController {
 // Mark - Optimove SDK Events
 
 extension ViewController {
-    
+
     func reportSimpleEvent() {
         Optimove.shared.reportEvent(
             name: "signup",
@@ -67,7 +67,7 @@ extension ViewController {
             ]
         )
     }
-    
+
     func reportComplexEvent() {
         Optimove.shared.reportEvent(PlacedOrderEvent([CartItem]()))
     }
@@ -78,7 +78,7 @@ extension ViewController {
 extension ViewController: OptimoveDeepLinkCallback {
 
     func didReceive(deepLink: OptimoveDeepLinkComponents?) {
-        guard let deepLink = deepLink else {return}
+        guard let deepLink = deepLink else { return }
         guard let vc = storyboard?.instantiateViewController(withIdentifier: "deepLinkVc") as? DeepLinkViewController else { return }
         vc.deepLinkComp = deepLink
         present(vc, animated: true)

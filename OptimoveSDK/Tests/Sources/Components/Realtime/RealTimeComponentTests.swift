@@ -39,7 +39,6 @@ class RealTimeComponentTests: XCTestCase {
         storage.initialVisitorId = StubVariables.initialVisitorId
     }
 
-
 // MARK: - User Identifier
 
     func test_that_realtimeEvent_has_a_correct_customerID() {

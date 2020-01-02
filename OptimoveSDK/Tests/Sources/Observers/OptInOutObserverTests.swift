@@ -61,7 +61,7 @@ final class OptInOutObserverTests: OptimoveTestCase {
         wait(
             for: [
                 optInEventExpectation,
-                optFlagStorageValueExpectation,
+                optFlagStorageValueExpectation
             ],
             timeout: defaultTimeout
         )

@@ -56,7 +56,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         // given
         prefillStorageAsCustomer()
         prefillPushToken()
-        
+
         // when
         let request = try! builder.createRequest(operation: .setUser)
 

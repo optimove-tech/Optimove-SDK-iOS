@@ -502,7 +502,7 @@ public extension KeyValueStorage where Self: StorageValue {
             self[.firstVisitTimestamp] = newValue
         }
     }
-    
+
     var realtimeSetUserIdFailed: Bool {
         get {
             return self[.realtimeSetUserIdFailed] ?? false

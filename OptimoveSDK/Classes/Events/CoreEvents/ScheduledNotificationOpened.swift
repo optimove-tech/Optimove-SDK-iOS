@@ -19,7 +19,7 @@ final class ScheduledNotificationOpened: OptimoveCoreEvent {
     }
 
     let name: String = Constants.name
-    let parameters: [String : Any]
+    let parameters: [String: Any]
 
     init(bundleIdentifier: String, campaign: ScheduledNotificationCampaign) {
         parameters = [

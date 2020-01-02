@@ -3,6 +3,12 @@
 import Foundation
 
 @objc protocol OptimoveDeepLinkResponding {
+
+    /// The Deeplink subscription to receive a deep link from Optimove notification payload.
+    /// - Parameter responder: A deeplink responder.
     @objc func register(deepLinkResponder responder: OptimoveDeepLinkResponder)
+
+    /// Unsubscribe from the Deeplink subscription.
+    /// - Parameter responder: A responder that was going to be unregistered.
     @objc func unregister(deepLinkResponder responder: OptimoveDeepLinkResponder)
 }

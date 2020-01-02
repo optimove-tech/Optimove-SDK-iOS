@@ -27,7 +27,7 @@ final class TenantConfigurationDownloader: AsyncOperation {
                 Logger.error("Key '\(key)' not found: \(context.debugDescription)\ncodingPath: \(context.codingPath)")
             } catch let DecodingError.valueNotFound(value, context) {
                 Logger.error("Value '\(value)' not found: \(context.debugDescription)\ncodingPath: \(context.codingPath)")
-            } catch let DecodingError.typeMismatch(type, context)  {
+            } catch let DecodingError.typeMismatch(type, context) {
                 Logger.error("Type '\(type)' mismatch: \(context.debugDescription)\ncodingPath: \(context.codingPath)")
             } catch {
                 Logger.error(error.localizedDescription)

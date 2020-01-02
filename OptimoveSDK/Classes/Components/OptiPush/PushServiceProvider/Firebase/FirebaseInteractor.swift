@@ -22,7 +22,7 @@ final class FirebaseInteractor: PushServiceProvider {
 
     private func setup(optipush: OptipushConfig) {
         Logger.debug("OptiPush: Setup Firebase started.")
-        
+
         let firebaseMetaData = optipush.firebaseProjectKeys
         let clientFirebaseMetaData = optipush.clientsServiceProjectKeys
         let appController = FirebaseOptionsBuilder(
@@ -40,28 +40,31 @@ final class FirebaseInteractor: PushServiceProvider {
         setupAppController(appController)
         setupSdkController(clientServiceOptions)
 
-        if let token = Messaging.messaging().fcmToken {
-            registerIfTokenChanged(updatedFcmToken: token)
-        } else {
-            NotificationCenter.default.addObserver(
-                forName: NSNotification.Name.MessagingRegistrationTokenRefreshed,
-                object: nil,
-                queue: .main
-            ) { (_) in
-                if let fcmToken = Messaging.messaging().fcmToken {
-                    self.onTokenRenew(fcmToken: fcmToken)
+        DispatchQueue.main.async {
+            if let token = Messaging.messaging().fcmToken {
+                self.registerIfTokenChanged(updatedFcmToken: token)
+            } else {
+                NotificationCenter.default.addObserver(
+                    forName: NSNotification.Name.MessagingRegistrationTokenRefreshed,
+                    object: nil,
+                    queue: .main
+                ) { (_) in
+                    if let fcmToken = Messaging.messaging().fcmToken {
+                        self.onTokenRenew(fcmToken: fcmToken)
+                    }
                 }
             }
+            Logger.debug("OptiPush: Setup Firebase finished.")
         }
-        Logger.debug("OptiPush: Setup Firebase finished.")
     }
 
     // MARK: - FirebaseProvider
 
     func handleRegistration(apnsToken: Data) {
-        storage.apnsToken = apnsToken
-        if let fcmToken = Messaging.messaging().fcmToken {
-            self.onTokenRenew(fcmToken: fcmToken)
+        DispatchQueue.main.async {
+            if let fcmToken = Messaging.messaging().fcmToken {
+                self.onTokenRenew(fcmToken: fcmToken)
+            }
         }
     }
 
@@ -96,11 +99,13 @@ final class FirebaseInteractor: PushServiceProvider {
 
     func subscribeToTopic(topic: String) {
         if !storage.isClientHasFirebase {
-            Messaging.messaging().subscribe(toTopic: topic) { (error) in
-                if let error = error {
-                    Logger.error(error.localizedDescription)
-                } else {
-                    Logger.debug("Subscribed topic \(topic) successful.")
+            DispatchQueue.main.async {
+                Messaging.messaging().subscribe(toTopic: topic) { (error) in
+                    if let error = error {
+                        Logger.error(error.localizedDescription)
+                    } else {
+                        Logger.debug("Subscribed topic \(topic) successful.")
+                    }
                 }
             }
         } else {
@@ -119,11 +124,13 @@ final class FirebaseInteractor: PushServiceProvider {
 
     func unsubscribeFromTopic(topic: String) {
         if !storage.isClientHasFirebase {
-            Messaging.messaging().unsubscribe(fromTopic: topic) { (error) in
-                if let error = error {
-                    Logger.error(error.localizedDescription)
-                } else {
-                    Logger.debug("Unsubscribed topic \(topic) successful.")
+            DispatchQueue.main.async {
+                Messaging.messaging().unsubscribe(fromTopic: topic) { (error) in
+                    if let error = error {
+                        Logger.error(error.localizedDescription)
+                    } else {
+                        Logger.debug("Unsubscribed topic \(topic) successful.")
+                    }
                 }
             }
         } else {
@@ -144,22 +151,26 @@ final class FirebaseInteractor: PushServiceProvider {
 private extension FirebaseInteractor {
 
     func setupAppController(_ appController: FirebaseOptions) {
-        if FirebaseApp.app() != nil {
-            Logger.warn("OptiPush: Hosted Firebase detected.")
-            FirebaseApp.configure(
-                name: "appController",
-                options: appController
-            )
-            storage.isClientHasFirebase = true
-        } else {
-            Logger.warn("OptiPush: Hosted Firebase not detected.")
-            storage.isClientHasFirebase = false
-            FirebaseApp.configure(options: appController)
+        DispatchQueue.main.async {
+            if FirebaseApp.app() != nil {
+                Logger.warn("OptiPush: Hosted Firebase detected.")
+                FirebaseApp.configure(
+                    name: "appController",
+                    options: appController
+                )
+                self.storage.isClientHasFirebase = true
+            } else {
+                Logger.warn("OptiPush: Hosted Firebase not detected.")
+                self.storage.isClientHasFirebase = false
+                FirebaseApp.configure(options: appController)
+            }
         }
     }
 
     func setupSdkController(_ clientServiceOptions: FirebaseOptions) {
-        FirebaseApp.configure(name: "sdkController", options: clientServiceOptions)
+        DispatchQueue.main.async {
+            FirebaseApp.configure(name: "sdkController", options: clientServiceOptions)
+        }
     }
 
     func onTokenRenew(fcmToken: String) {
@@ -180,14 +191,16 @@ private extension FirebaseInteractor {
     }
 
     func retreiveFcmToken(for senderId: String, completion: @escaping (String) -> Void) {
-        Messaging.messaging().retrieveFCMToken(forSenderID: senderId) { (token, error) in
-            if let error = error {
-                Logger.error("OptiPush: could not retreive dedicated FCM token. Reason: \(error.localizedDescription).")
-            }
-            if let token = token {
-                completion(token)
-            } else {
-                Logger.error("OptiPush: Missed FCM token.")
+        DispatchQueue.main.async {
+            Messaging.messaging().retrieveFCMToken(forSenderID: senderId) { (token, error) in
+                if let error = error {
+                    Logger.error("OptiPush: could not retreive dedicated FCM token. Reason: \(error.localizedDescription).")
+                }
+                if let token = token {
+                    completion(token)
+                } else {
+                    Logger.error("OptiPush: Missed FCM token.")
+                }
             }
         }
     }
