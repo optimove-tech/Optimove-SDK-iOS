@@ -3,6 +3,8 @@
 ## 2.8.0
 
 - **improve** an apns environment checking.
+- **improve** updating for an actual token.
+- **fix** main-thread sanity warnings.
 
 ## 2.7.0
 
