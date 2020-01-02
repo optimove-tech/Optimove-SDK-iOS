@@ -11,7 +11,7 @@ public extension UserDefaults {
             throw GuardError.custom(
             """
             If this line is crashing the client forgot to add the app group as described in the documentation.
-            Link: https://tinyurl.com/vvz2bur
+            Link: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Setup#3-setting-up-capabilities
             """
             )
         }
