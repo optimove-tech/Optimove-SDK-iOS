@@ -132,6 +132,7 @@ extension OptimoveNotificationServiceExtension {
         ]
         // The completion operation going to be executed right after all operations are finished.
         let completionOperation = BlockOperation {
+            bestAttemptContent.userInfo[NotificationKey.wasHandledByOptimoveNSE] = true
             contentHandler(bestAttemptContent)
             os_log("Operations were completed", log: OSLog.notification, type: .info)
         }
