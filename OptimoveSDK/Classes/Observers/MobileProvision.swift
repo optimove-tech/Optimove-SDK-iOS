@@ -58,16 +58,11 @@ extension MobileProvision {
         let scanner = Scanner(string: string)
         let noStartPlistTagError = GuardError.custom("Not found tag \(Constants.startPlistTag)")
         let noEndPlistTagError = GuardError.custom("Not found tag \(Constants.endPlistTag)")
-        if #available(iOS 13.0, *) {
-            _ = try unwrap(scanner.scanUpToString(Constants.startPlistTag), error: noStartPlistTagError)
-            return try unwrap(scanner.scanUpToString(Constants.endPlistTag), error: noEndPlistTagError)
-        } else {
-            _ = try unwrap(scanner.scanUpTo(Constants.startPlistTag, into: nil), error: noStartPlistTagError)
-            var extractedPlist: NSString?
-            guard scanner.scanUpTo(Constants.endPlistTag, into: &extractedPlist) != false else {
-                throw noEndPlistTagError
-            }
-            return String(try unwrap(extractedPlist))
+        _ = try unwrap(scanner.scanUpTo(Constants.startPlistTag, into: nil), error: noStartPlistTagError)
+        var extractedPlist: NSString?
+        guard scanner.scanUpTo(Constants.endPlistTag, into: &extractedPlist) != false else {
+            throw noEndPlistTagError
         }
+        return String(try unwrap(extractedPlist))
     }
 }

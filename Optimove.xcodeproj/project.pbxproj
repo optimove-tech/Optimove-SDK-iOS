@@ -2013,21 +2013,21 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		"TEMP_234AE995-9EF2-415E-AF11-5E2EAE51D969" /* Tests */ = {
+		"TEMP_13EC913B-3ECC-4A58-8FC7-739FC18EE4A5" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_28A54749-B8FD-4A87-806B-39A4D0CC20CA" /* Tests */ = {
+		"TEMP_8436E596-2696-4F75-BE79-323A3FF5C17E" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_5A48AC28-1ACA-40DC-8BA6-217AE485CB5C" /* Tests */ = {
+		"TEMP_95D11BFF-9ADA-407E-B9CA-E43C46676B0C" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
