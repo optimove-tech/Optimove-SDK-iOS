@@ -6,11 +6,11 @@ import OptimoveCore
 final class RegistrarNetworkingRequestFactory {
 
     private let storage: OptimoveStorage
-    private let payloadBuilder: MbaasPayloadBuilder
+    private let payloadBuilder: ApiPayloadBuilder
     private let requestBuilder: ClientAPIRequestBuilder
 
     init(storage: OptimoveStorage,
-         payloadBuilder: MbaasPayloadBuilder,
+         payloadBuilder: ApiPayloadBuilder,
          requestBuilder: ClientAPIRequestBuilder) {
         self.storage = storage
         self.payloadBuilder = payloadBuilder

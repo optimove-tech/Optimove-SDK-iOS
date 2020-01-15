@@ -13,7 +13,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockingURLProtocol.self]
         let client = NetworkClientImpl(configuration: configuration)
-        let payloadBuilder = MbaasPayloadBuilder(
+        let payloadBuilder = ApiPayloadBuilder(
             storage: storage,
             deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace()

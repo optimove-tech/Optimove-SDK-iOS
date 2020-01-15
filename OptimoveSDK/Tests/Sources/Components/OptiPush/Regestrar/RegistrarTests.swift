@@ -8,12 +8,12 @@ class RegistrarTests: OptimoveTestCase {
 
     var registrable: Registrable!
     var networking: MockRegistrarNetworking!
-    var modelFactory: MbaasPayloadBuilder!
+    var modelFactory: ApiPayloadBuilder!
 
     override func setUp() {
         super.setUp()
         networking = MockRegistrarNetworking()
-        modelFactory = MbaasPayloadBuilder(
+        modelFactory = ApiPayloadBuilder(
             storage: storage,
             deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace()

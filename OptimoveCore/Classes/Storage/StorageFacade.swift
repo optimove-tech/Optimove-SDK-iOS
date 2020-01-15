@@ -7,7 +7,7 @@ public typealias OptimoveStorage = KeyValueStorage & FileStorage & StorageValue
 
 // MARK: - StorageKey
 
-public  enum StorageKey: String, CaseIterable {
+public enum StorageKey: String, CaseIterable {
 
     // MARK: Grouped keys
     /// Placed in optimove group container

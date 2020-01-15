@@ -5,11 +5,11 @@ import XCTest
 
 class MbaasPayloadBuilderTests: OptimoveTestCase {
 
-    var factory: MbaasPayloadBuilder!
+    var factory: ApiPayloadBuilder!
 
     override func setUp() {
         super.setUp()
-        factory = MbaasPayloadBuilder(
+        factory = ApiPayloadBuilder(
             storage: storage,
             deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace()
