@@ -5,10 +5,6 @@ import OptimoveCore
 
 struct SDKDevice {
 
-    static var uuid: String {
-        return UIDevice.current.identifierForVendor?.uuidString.sha1() ?? ""
-    }
-
     private static var webView: WKWebView?
 
     static func evaluateUserAgent(completion: @escaping (String) -> Void) {

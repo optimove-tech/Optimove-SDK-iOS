@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import XCTest
+import OptimoveCore
 @testable import OptimoveSDK
 
 let defaultTimeout: TimeInterval = 0.5
@@ -23,18 +24,19 @@ class OptimoveTestCase: XCTestCase {
         static let apnsToken = Data()
     }
 
-    func defaultStorage() {
+    func prefillStorageWithDefaultValues() {
+        storage.installationID = UUID().uuidString
         storage.siteID = StubConstants.tenantID
     }
 
     func prefillStorageAsVisitor() {
-        defaultStorage()
+        prefillStorageWithDefaultValues()
         storage.initialVisitorId = StubConstants.initialVisitorId
         storage.visitorID = StubConstants.visitorID
     }
 
     func prefillStorageAsCustomer() {
-        defaultStorage()
+        prefillStorageWithDefaultValues()
         prefillStorageAsVisitor()
         storage.customerID = StubConstants.customerID
         storage.initialVisitorId = StubConstants.initialVisitorId
@@ -43,6 +45,7 @@ class OptimoveTestCase: XCTestCase {
     func prefillPushToken() {
         storage.apnsToken = StubConstants.apnsToken
     }
+
 
 }
 

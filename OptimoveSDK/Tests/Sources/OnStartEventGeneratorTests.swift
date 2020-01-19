@@ -3,15 +3,13 @@
 import XCTest
 @testable import OptimoveSDK
 
-final class OnStartEventGeneratorTests: XCTestCase {
+final class OnStartEventGeneratorTests: OptimoveTestCase {
 
     var generator: OnStartEventGenerator!
-    var storage: MockOptimoveStorage!
     var dataProvider: MockDateTimeProvider!
     var synchronizer: MockSynchronizer!
 
     override func setUp() {
-        storage = MockOptimoveStorage()
         dataProvider = MockDateTimeProvider()
         synchronizer = MockSynchronizer()
         generator = OnStartEventGenerator(
@@ -26,6 +24,7 @@ final class OnStartEventGeneratorTests: XCTestCase {
 
     func test_event_generation() {
         // given
+        prefillStorageWithDefaultValues()
         storage.tenantToken = "tenantToken"
         storage.version = "configName"
         storage.configurationEndPoint = URL(string: "http://optimove.net")
@@ -57,6 +56,7 @@ final class OnStartEventGeneratorTests: XCTestCase {
 
         // when
         generator.generate()
+
         wait(
             for: [
                 ifdaEventExpectation,
@@ -64,7 +64,7 @@ final class OnStartEventGeneratorTests: XCTestCase {
                 userAgentEventExpectation,
                 appOpenEventExpectation
             ],
-            timeout: 5
+            timeout: defaultTimeout + 1
         )
     }
 

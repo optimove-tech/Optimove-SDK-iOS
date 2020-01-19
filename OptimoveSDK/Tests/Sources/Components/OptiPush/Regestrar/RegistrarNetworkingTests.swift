@@ -15,7 +15,6 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         let client = NetworkClientImpl(configuration: configuration)
         let payloadBuilder = ApiPayloadBuilder(
             storage: storage,
-            deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace()
         )
         let requestFactory = RegistrarNetworkingRequestFactory(

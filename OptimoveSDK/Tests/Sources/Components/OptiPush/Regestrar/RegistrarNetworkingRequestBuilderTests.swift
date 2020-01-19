@@ -14,7 +14,6 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         super.setUp()
         payloadBuilder = ApiPayloadBuilder(
             storage: storage,
-            deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace()
         )
         builder = RegistrarNetworkingRequestFactory(

@@ -15,7 +15,6 @@ class RegistrarTests: OptimoveTestCase {
         networking = MockRegistrarNetworking()
         modelFactory = ApiPayloadBuilder(
             storage: storage,
-            deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace()
         )
         registrable = Registrar(

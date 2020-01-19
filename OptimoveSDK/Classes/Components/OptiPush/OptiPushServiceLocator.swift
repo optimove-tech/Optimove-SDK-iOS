@@ -23,7 +23,6 @@ final class OptiPushServiceLocator {
             storage: storage(),
             payloadBuilder: ApiPayloadBuilder(
                 storage: storage(),
-                deviceID: SDKDevice.uuid,
                 appNamespace: try! Bundle.getApplicationNameSpace()
             ),
             requestBuilder: ClientAPIRequestBuilder(

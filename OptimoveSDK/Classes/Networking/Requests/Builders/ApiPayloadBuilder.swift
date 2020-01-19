@@ -6,14 +6,11 @@ import OptimoveCore
 final class ApiPayloadBuilder {
 
     private let storage: OptimoveStorage
-    private let deviceID: String
     private let appNamespace: String
 
     init(storage: OptimoveStorage,
-         deviceID: String,
          appNamespace: String) {
         self.storage = storage
-        self.deviceID = deviceID
         self.appNamespace = appNamespace
     }
 
@@ -21,7 +18,7 @@ final class ApiPayloadBuilder {
         let token = try storage.getApnsToken()
         let tokenToStringFormat = "%02.2hhx"
         return SetUser(
-            deviceID: deviceID,
+            deviceID: try storage.getInstallationID(),
             appNS: appNamespace,
             os: SetUser.Constants.os,
             deviceToken: token.map { String(format: tokenToStringFormat, $0) }.joined(),
