@@ -2025,21 +2025,21 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		"TEMP_6BD77743-7931-4A23-A966-9F9FB86C01C1" /* Tests */ = {
+		"TEMP_7588F590-69D0-4BBB-AF82-93C62B577057" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_93D73582-FF99-494E-B470-B7A871FF5A94" /* Tests */ = {
+		"TEMP_9948E872-574C-4B87-B479-2179DC9454C4" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_C76E7766-9EBC-46B3-8113-DE91AC32B868" /* Tests */ = {
+		"TEMP_D50BAD80-3EA5-41C9-B659-B7BD6EC5DFB7" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
