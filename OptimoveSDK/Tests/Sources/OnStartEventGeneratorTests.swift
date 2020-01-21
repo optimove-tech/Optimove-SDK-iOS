@@ -64,7 +64,7 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
                 userAgentEventExpectation,
                 appOpenEventExpectation
             ],
-            timeout: defaultTimeout + 5
+            timeout: defaultTimeout + 10
         )
     }
 
