@@ -27,9 +27,7 @@ final class UserAgentGenerator {
             return
         }
         webView = WKWebView(frame: .zero)
-        let start = Date()
         webView?.evaluateJavaScript("navigator.userAgent") { (result, error) in
-            print("WKWebView.evaluateJavaScript took \(DateInterval(start: start, end: Date()).duration) seconds.")
             if let error = error {
                 Logger.error(error.localizedDescription)
             }
