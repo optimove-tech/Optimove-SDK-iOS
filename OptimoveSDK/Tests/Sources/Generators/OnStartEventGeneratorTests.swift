@@ -24,7 +24,7 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
 
     func test_event_generation() {
         // given
-        prefillStorageWithDefaultValues()
+        prefillStorageWithTheFirstLaunch()
         storage.tenantToken = "tenantToken"
         storage.version = "configName"
         storage.configurationEndPoint = URL(string: "http://optimove.net")

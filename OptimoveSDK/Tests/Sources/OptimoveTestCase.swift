@@ -24,19 +24,23 @@ class OptimoveTestCase: XCTestCase {
         static let apnsToken = Data()
     }
 
-    func prefillStorageWithDefaultValues() {
-        storage.installationID = UUID().uuidString
+    func prefillStorageWithConfiguration() {
         storage.siteID = StubConstants.tenantID
     }
 
+    func prefillStorageWithTheFirstLaunch() {
+        prefillStorageWithConfiguration()
+        storage.installationID = UUID().uuidString
+    }
+
     func prefillStorageAsVisitor() {
-        prefillStorageWithDefaultValues()
+        prefillStorageWithTheFirstLaunch()
         storage.initialVisitorId = StubConstants.initialVisitorId
         storage.visitorID = StubConstants.visitorID
     }
 
     func prefillStorageAsCustomer() {
-        prefillStorageWithDefaultValues()
+        prefillStorageWithTheFirstLaunch()
         prefillStorageAsVisitor()
         storage.customerID = StubConstants.customerID
         storage.initialVisitorId = StubConstants.initialVisitorId
