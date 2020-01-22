@@ -19,6 +19,10 @@ final class OnStartEventGenerator {
 
     func generate() {
         asyncGenerate()
+        generateEvents()
+    }
+
+    private func generateEvents() {
         [
             try? coreEventFactory.createEvent(.metaData),
             try? coreEventFactory.createEvent(.setAdvertisingId)

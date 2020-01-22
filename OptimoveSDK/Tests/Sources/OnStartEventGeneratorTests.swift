@@ -64,7 +64,7 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
                 userAgentEventExpectation,
                 appOpenEventExpectation
             ],
-            timeout: defaultTimeout + 10
+            timeout: defaultTimeout + 10 // Additional seconds to complete async operations.
         )
     }
 
