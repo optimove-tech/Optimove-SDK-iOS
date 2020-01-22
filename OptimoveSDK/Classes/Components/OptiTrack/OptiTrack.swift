@@ -82,7 +82,7 @@ private extension OptiTrack {
         Logger.debug("OptiTrack: Report screen event: title='\(pageTitle)', path='\(customURL)'\(categoryDescription)")
         let event = try coreEventFactory.createEvent(
             .pageVisit(
-                screenPath: customURL.sha1(),
+                screenPath: customURL,
                 screenTitle: pageTitle,
                 category: category
             )
