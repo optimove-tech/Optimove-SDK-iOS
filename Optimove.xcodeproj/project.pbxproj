@@ -1151,11 +1151,9 @@
 		2753BDE8E48BD53D84830111 /* Builders */ = {
 			isa = PBXGroup;
 			children = (
-				7D44B1210F1FC33655D6C9C4 /* AddUserAlias.swift */,
 				26A24CB8EC53A41ADB0F8D4B /* ApiPayloadBuilder.swift */,
 				1EAC84C3F79228E6A71470B7 /* ClientAPIRequestBuilder.swift */,
 				8CF7F8DB2BB53F5D18E6845C /* RemoteConfigurationRequestBuilder.swift */,
-				113994EE75676359FC4956FC /* SetUser.swift */,
 			);
 			path = Builders;
 			sourceTree = "<group>";
@@ -1299,6 +1297,23 @@
 				3D02D367F307E274974EBEA5 /* SDKVersion.swift */,
 			);
 			path = Constants;
+			sourceTree = "<group>";
+		};
+		46ECB67323D8501900FC2A92 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				7D44B1210F1FC33655D6C9C4 /* AddUserAlias.swift */,
+				113994EE75676359FC4956FC /* SetUser.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		46ECB67423D850B600FC2A92 /* Provisioning */ = {
+			isa = PBXGroup;
+			children = (
+				4A1A411EDAB9869E95311A96 /* MobileProvision.swift */,
+			);
+			path = Provisioning;
 			sourceTree = "<group>";
 		};
 		4C46E5E7FF3426E1DE9E9405 /* Extensions */ = {
@@ -1642,12 +1657,10 @@
 			isa = PBXGroup;
 			children = (
 				1F2CAA6BA4B9221BEBC623C6 /* .gitkeep */,
-				75742A6A99BB187DC3DB46CB /* Environment.swift */,
-				DEAA22AF4C4FAEF58F9C8E85 /* Optimove.swift */,
-				C23325F18E095CA85A27DE89 /* OptimoveTenantInfo.swift */,
 				1D768021F104EBBD97A0ECDA /* Components */,
 				40A5249EBA97D94584DEDA2C /* Constants */,
 				62D208BCCC5F46A2B42114C9 /* DataStructs */,
+				75742A6A99BB187DC3DB46CB /* Environment.swift */,
 				EF0B87F47E469AA816873C62 /* Events */,
 				09A33A6115EBC9EAD955DCD0 /* Extensions */,
 				F817333FAE9A6227649E3628 /* Factories */,
@@ -1658,8 +1671,11 @@
 				F06540E26C1DBEDBAE5D0E93 /* Observers */,
 				8173B7A7B938927C1CBBFE42 /* OnStartHelpers */,
 				07F1AE57C4C0F0C131FFE978 /* Operations */,
+				DEAA22AF4C4FAEF58F9C8E85 /* Optimove.swift */,
+				C23325F18E095CA85A27DE89 /* OptimoveTenantInfo.swift */,
 				D2182DA45A1C03D46FCB7ECB /* Preprocessors */,
 				96F0916E6F6856BCEF5B0E20 /* Providers */,
+				46ECB67423D850B600FC2A92 /* Provisioning */,
 				353F2E511F256142B27D951F /* Services */,
 				0750BF67C98AC85F2774EA2F /* Syncronizer */,
 				7FE5501B4E454D9E1E9FA7D1 /* Validators */,
@@ -1858,6 +1874,7 @@
 			children = (
 				46A0BE7F5E33EDAA7CC5CC4E /* NetworkRequest.swift */,
 				2753BDE8E48BD53D84830111 /* Builders */,
+				46ECB67323D8501900FC2A92 /* Models */,
 			);
 			path = Requests;
 			sourceTree = "<group>";
@@ -1968,7 +1985,6 @@
 			children = (
 				09808887033FF1913E319449 /* AppOpenObserver.swift */,
 				DF16AC3F80B23E63CF062C4B /* DeviceStateObserver.swift */,
-				4A1A411EDAB9869E95311A96 /* MobileProvision.swift */,
 				44054EA38AD95E08CBE529D4 /* NotificationPermissionFetcher.swift */,
 				05D4CCCE4F3E543A2051DB78 /* OptInOutObserver.swift */,
 				053D986B6D9067C751BFC9EA /* ResignActiveObserver.swift */,
