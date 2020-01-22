@@ -68,7 +68,7 @@ class EnterForegroundObserverTests: XCTestCase {
         // then
         let appOpenEventExpectation = expectation(description: "AppOpenEvent was not generated.")
         appOpenEventExpectation.isInverted.toggle()
-        synchronizer.assertFunctionEventable = { operation in
+        synchronizer.assertFunction = { operation in
             switch operation {
             case let .report(event: event):
                 if event.name == AppOpenEvent.Constants.name {

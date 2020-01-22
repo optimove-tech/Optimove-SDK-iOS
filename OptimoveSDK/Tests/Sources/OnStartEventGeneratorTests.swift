@@ -34,7 +34,7 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
         let metaDataEventExpectation = expectation(description: "MetaDataEvent was not generated.")
         let userAgentEventExpectation = expectation(description: "SetUserAgent was not generated.")
         let appOpenEventExpectation = expectation(description: "AppOpenEvent was not generated.")
-        synchronizer.assertFunctionEventable = { (operation: EventableOperation) -> Void in
+        synchronizer.assertFunction = { operation in
             switch operation {
             case let .report(event: event):
                 switch event.name {

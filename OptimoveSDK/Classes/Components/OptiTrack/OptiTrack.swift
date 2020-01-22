@@ -33,17 +33,14 @@ extension OptiTrack: Component {
 
     func handle(_ context: OperationContext) throws {
         switch context.operation {
-        case let .eventable(operation):
-            switch operation {
-            case .setUserId:
-                try setUserId()
-            case let .report(event: event):
-                try report(event: event)
-            case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
-                try reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
-            case .dispatchNow:
-                dispatchNow()
-            }
+        case .setUserId:
+            try setUserId()
+        case let .report(event: event):
+            try report(event: event)
+        case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
+            try reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
+        case .dispatchNow:
+            dispatchNow()
         default:
             break
         }

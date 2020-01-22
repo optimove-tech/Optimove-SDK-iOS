@@ -583,9 +583,7 @@ class RealTimeComponentTests: XCTestCase {
         // when
         try! realTime.handle(
             OperationContext(
-                .eventable(
-                    .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
-                )
+                .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
             )
         )
         waitForExpectations(timeout: realtimeTimeout)
@@ -607,7 +605,7 @@ class RealTimeComponentTests: XCTestCase {
     func test_expired_report() {
         // given
         let timestamp = Date().timeIntervalSince1970 - RealTime.Constatnts.timeThresholdInSeconds
-        let operationContext = OperationContext(operation: .eventable(.setUserId), timestamp: timestamp)
+        let operationContext = OperationContext(operation: .setUserId, timestamp: timestamp)
 
         // then
         let eventExpectation = expectation(description: "An expired event unexpectable handled.")

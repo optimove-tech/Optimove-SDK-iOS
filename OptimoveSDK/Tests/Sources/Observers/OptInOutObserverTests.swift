@@ -34,7 +34,7 @@ final class OptInOutObserverTests: OptimoveTestCase {
         notificationPermissionFetcher.permitted = true
 
         let optInEventExpectation = expectation(description: "optFlag event was not generated.")
-        synchronizer.assertFunctionEventable = { operation in
+        synchronizer.assertFunction = { operation in
             switch operation {
             case let .report(event: event):
                 switch event.name {
@@ -75,8 +75,11 @@ final class OptInOutObserverTests: OptimoveTestCase {
         notificationPermissionFetcher.permitted = false
 
         let optFlagEventExpectation = expectation(description: "OptOut event was not generated.")
-        synchronizer.assertFunctionEventable = { operation in
+        let optFlagOperationExpectation = expectation(description: "OptOut operation was not generated.")
+        synchronizer.assertFunction = { operation in
             switch operation {
+            case .optOut:
+                optFlagOperationExpectation.fulfill()
             case let .report(event: event):
                 switch event.name {
                 case OptipushOptInEvent.Constants.optOutName:
@@ -94,16 +97,6 @@ final class OptInOutObserverTests: OptimoveTestCase {
             if key == .optFlag {
                 XCTAssertEqual(value as? Bool, false)
                 optFlagStorageValueExpectation.fulfill()
-            }
-        }
-
-        let optFlagOperationExpectation = expectation(description: "OptOut operation was not generated.")
-        synchronizer.assertFunctionPushable = { operation in
-            switch operation {
-            case .optOut:
-                optFlagOperationExpectation.fulfill()
-            default:
-                break
             }
         }
 
@@ -128,8 +121,11 @@ final class OptInOutObserverTests: OptimoveTestCase {
         notificationPermissionFetcher.permitted = true
 
         let optFlagEventExpectation = expectation(description: "OptOut event was not generated.")
-        synchronizer.assertFunctionEventable = { operation in
+        let optFlagOperationExpectation = expectation(description: "OptOut operation was not generated.")
+        synchronizer.assertFunction = { operation in
             switch operation {
+            case .optIn:
+                optFlagOperationExpectation.fulfill()
             case let .report(event: event):
                 switch event.name {
                 case OptipushOptInEvent.Constants.optInName:
@@ -147,16 +143,6 @@ final class OptInOutObserverTests: OptimoveTestCase {
             if key == .optFlag {
                 XCTAssertEqual(value as? Bool, true)
                 optFlagStorageValueExpectation.fulfill()
-            }
-        }
-
-        let optFlagOperationExpectation = expectation(description: "OptOut operation was not generated.")
-        synchronizer.assertFunctionPushable = { operation in
-            switch operation {
-            case .optIn:
-                optFlagOperationExpectation.fulfill()
-            default:
-                break
             }
         }
 

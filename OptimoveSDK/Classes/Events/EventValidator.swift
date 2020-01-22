@@ -40,15 +40,10 @@ final class EventValidator: Node {
     override func execute(_ context: OperationContext) throws {
         let validationFunction = { [configuration] () -> OperationContext in
             switch context.operation {
-            case let .eventable(eventableOperation):
-                switch eventableOperation {
-                case let .report(event: event):
-                    let eventConfig = try event.matchConfiguration(with: configuration.events)
-                    try self.validate(event: event, withConfig: eventConfig)
-                    return context
-                default:
-                    return context
-                }
+            case let .report(event: event):
+                let eventConfig = try event.matchConfiguration(with: configuration.events)
+                try self.validate(event: event, withConfig: eventConfig)
+                return context
             default:
                 return context
             }
