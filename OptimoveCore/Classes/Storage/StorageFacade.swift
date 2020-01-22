@@ -7,11 +7,12 @@ public typealias OptimoveStorage = KeyValueStorage & FileStorage & StorageValue
 
 // MARK: - StorageKey
 
-public  enum StorageKey: String, CaseIterable {
+public enum StorageKey: String, CaseIterable {
 
     // MARK: Grouped keys
     /// Placed in optimove group container
 
+    case installationID
     case customerID
     case configurationEndPoint
     case initialVisitorId
@@ -48,6 +49,7 @@ public protocol StorageValue {
 
     // MARK: Grouped values
 
+    var installationID: String? { get set }
     var customerID: String? { get set }
     var configurationEndPoint: URL? { get set }
     var initialVisitorId: String? { get set }
@@ -108,6 +110,7 @@ public final class StorageFacade: OptimoveStorage {
     // Use for constants that are used in the grouped "group.<bundle-main-id>.optimove" container.
     private let groupedStorage: KeyValueStorage
     private let groupKeys: Set<StorageKey> = [
+        .installationID,
         .customerID,
         .configurationEndPoint,
         .initialVisitorId,
@@ -228,6 +231,15 @@ extension StorageFacade {
 public extension KeyValueStorage where Self: StorageValue {
 
     // MARK: Grouped values
+
+    var installationID: String? {
+        get {
+            return self[.installationID]
+        }
+        set {
+            self[.installationID] = newValue
+        }
+    }
 
     var customerID: String? {
         get {
@@ -353,6 +365,13 @@ public extension KeyValueStorage where Self: StorageValue {
     func getConfigurationEndPoint() throws -> URL {
         guard let value = configurationEndPoint else {
             throw StorageError.noValue(.configurationEndPoint)
+        }
+        return value
+    }
+
+    func getInstallationID() throws -> String {
+        guard let value = installationID else {
+            throw StorageError.noValue(.installationID)
         }
         return value
     }

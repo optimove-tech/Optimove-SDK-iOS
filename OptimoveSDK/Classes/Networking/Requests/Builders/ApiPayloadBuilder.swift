@@ -3,17 +3,14 @@
 import Foundation
 import OptimoveCore
 
-final class MbaasPayloadBuilder {
+final class ApiPayloadBuilder {
 
     private let storage: OptimoveStorage
-    private let deviceID: String
     private let appNamespace: String
 
     init(storage: OptimoveStorage,
-         deviceID: String,
          appNamespace: String) {
         self.storage = storage
-        self.deviceID = deviceID
         self.appNamespace = appNamespace
     }
 
@@ -21,7 +18,7 @@ final class MbaasPayloadBuilder {
         let token = try storage.getApnsToken()
         let tokenToStringFormat = "%02.2hhx"
         return SetUser(
-            deviceID: deviceID,
+            deviceID: try storage.getInstallationID(),
             appNS: appNamespace,
             os: SetUser.Constants.os,
             deviceToken: token.map { String(format: tokenToStringFormat, $0) }.joined(),
@@ -37,33 +34,5 @@ final class MbaasPayloadBuilder {
         return AddUserAlias(
             newAliases: Array(customerIDs)
         )
-    }
-}
-
-struct SetUser: Codable {
-
-    struct Constants {
-        static let os = "ios"
-    }
-
-    let deviceID, appNS, os, deviceToken: String
-    let optIn, isDev: Bool
-
-    enum CodingKeys: String, CodingKey {
-        case deviceID = "device_id"
-        case appNS = "app_ns"
-        case os
-        case deviceToken = "device_token"
-        case optIn = "opt_in"
-        case isDev = "is_dev"
-    }
-}
-
-struct AddUserAlias: Codable {
-
-    let newAliases: [String]
-
-    enum CodingKeys: String, CodingKey {
-        case newAliases = "new_aliases"
     }
 }

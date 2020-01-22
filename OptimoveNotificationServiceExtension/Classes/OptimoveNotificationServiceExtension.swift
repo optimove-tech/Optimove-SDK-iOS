@@ -15,7 +15,9 @@ import OptimoveCore
     private var bestAttemptContent: UNMutableNotificationContent?
     private var contentHandler: ((UNNotificationContent) -> Void)?
 
-    @available(*, deprecated, message: "For automatically fetching the bundle identifier, please use convenience init()")
+    /// Initializer with a custom application bundle indentifier. Also, you can simply use the common init.
+    /// In this case Optimove will fetch the bundle identifier automatically.
+    /// - Parameter appBundleId: Bundle indentifier
     @objc public convenience init(appBundleId: String) {
         self.init(bundleIdentifier: appBundleId)
     }

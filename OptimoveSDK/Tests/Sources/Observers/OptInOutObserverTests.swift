@@ -29,6 +29,7 @@ final class OptInOutObserverTests: OptimoveTestCase {
 
     func test_optFlag_process_for_the_first_time() {
         // given
+        prefillStorageWithDefaultValues()
         prefillPushToken()
         notificationPermissionFetcher.permitted = true
 
@@ -69,6 +70,7 @@ final class OptInOutObserverTests: OptimoveTestCase {
 
     func test_optFlag_after_disallow_notifications() {
         // given
+        prefillStorageWithDefaultValues()
         storage.optFlag = true
         notificationPermissionFetcher.permitted = false
 
@@ -121,6 +123,7 @@ final class OptInOutObserverTests: OptimoveTestCase {
 
     func test_optFlag_after_allow_notifications() {
         // given
+        prefillStorageWithDefaultValues()
         storage.optFlag = false
         notificationPermissionFetcher.permitted = true
 

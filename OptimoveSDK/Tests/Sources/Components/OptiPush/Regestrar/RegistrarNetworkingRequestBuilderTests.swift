@@ -7,14 +7,13 @@ import Mocker
 class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
 
     var builder: RegistrarNetworkingRequestFactory!
-    var payloadBuilder: MbaasPayloadBuilder!
+    var payloadBuilder: ApiPayloadBuilder!
     let config = ConfigurationFixture.build().optipush
 
     override func setUp() {
         super.setUp()
-        payloadBuilder = MbaasPayloadBuilder(
+        payloadBuilder = ApiPayloadBuilder(
             storage: storage,
-            deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace()
         )
         builder = RegistrarNetworkingRequestFactory(

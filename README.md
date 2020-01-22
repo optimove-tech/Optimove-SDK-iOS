@@ -18,20 +18,25 @@ More about Optimove CDP (customer data platform) at [optimove.com](https://www.o
 In this guide we will discuss the steps necessary to implement the Optimove iOS SDK for your native application. It will go through the following steps necessary to have the basic & advanced SDK ready to track events on your native applicataion. 
 
 ### Basic Setup
+
 1. [Prerequisites](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Prerequisites)
-2. [Initializing the SDK](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Initializing%20the%20SDK)
-3. [Managing environments - during integration only](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Managing%20environments)
-4. [Tracking screen visits](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Tracking%20screen%20visits)
-5. [Customer stitching prerequisite](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Customer%20stitching%20prerequisite)
-6. [Tracking customers](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Tracking%20customers)
-7. [Submitting to the App Store](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Submitting%20to%20the%20App%20Store)
+2. [Initializing the SDK](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Initializing-the-SDK)
+3. [Managing environments - during integration only](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Managing-environments)
+4. [Tracking screen visits](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Tracking-screen-visits)
+5. [Customer stitching prerequisite](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Customer-stitching-prerequisite)
+6. [Tracking customers](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Tracking-customers)
+7. [Submitting to the App Store](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Submitting-to-the-App-Store)
 
 ### Advanced Setup
-8. [Tracking custom events](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Tracking%20custom%20events)
+
+8. [Tracking custom events](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Tracking-custom-events)
 
 ### Optipush
-1. [Setup](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush%20-%20Setup)
-2. [Testing](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush%20-%20Testing)
+
+1. [Setup](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Setup)
+2. [Testing](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Testing)
+3. [Deep links](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Deep-links)
 
 ## License
+
 OptimoveSDK for iOS is available under the [MIT license](LICENSE).
