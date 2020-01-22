@@ -29,12 +29,12 @@ final class OptInOutObserverTests: OptimoveTestCase {
 
     func test_optFlag_process_for_the_first_time() {
         // given
-        prefillStorageWithDefaultValues()
+        prefillStorageWithTheFirstLaunch()
         prefillPushToken()
         notificationPermissionFetcher.permitted = true
 
         let optInEventExpectation = expectation(description: "optFlag event was not generated.")
-        synchronizer.assertFunctionEventable = { operation in
+        synchronizer.assertFunction = { operation in
             switch operation {
             case let .report(event: event):
                 switch event.name {
@@ -70,13 +70,16 @@ final class OptInOutObserverTests: OptimoveTestCase {
 
     func test_optFlag_after_disallow_notifications() {
         // given
-        prefillStorageWithDefaultValues()
+        prefillStorageWithTheFirstLaunch()
         storage.optFlag = true
         notificationPermissionFetcher.permitted = false
 
         let optFlagEventExpectation = expectation(description: "OptOut event was not generated.")
-        synchronizer.assertFunctionEventable = { operation in
+        let optFlagOperationExpectation = expectation(description: "OptOut operation was not generated.")
+        synchronizer.assertFunction = { operation in
             switch operation {
+            case .optOut:
+                optFlagOperationExpectation.fulfill()
             case let .report(event: event):
                 switch event.name {
                 case OptipushOptInEvent.Constants.optOutName:
@@ -97,16 +100,6 @@ final class OptInOutObserverTests: OptimoveTestCase {
             }
         }
 
-        let optFlagOperationExpectation = expectation(description: "OptOut operation was not generated.")
-        synchronizer.assertFunctionPushable = { operation in
-            switch operation {
-            case .optOut:
-                optFlagOperationExpectation.fulfill()
-            default:
-                break
-            }
-        }
-
         // when
         observer.observe()
 
@@ -123,13 +116,16 @@ final class OptInOutObserverTests: OptimoveTestCase {
 
     func test_optFlag_after_allow_notifications() {
         // given
-        prefillStorageWithDefaultValues()
+        prefillStorageWithTheFirstLaunch()
         storage.optFlag = false
         notificationPermissionFetcher.permitted = true
 
         let optFlagEventExpectation = expectation(description: "OptOut event was not generated.")
-        synchronizer.assertFunctionEventable = { operation in
+        let optFlagOperationExpectation = expectation(description: "OptOut operation was not generated.")
+        synchronizer.assertFunction = { operation in
             switch operation {
+            case .optIn:
+                optFlagOperationExpectation.fulfill()
             case let .report(event: event):
                 switch event.name {
                 case OptipushOptInEvent.Constants.optInName:
@@ -147,16 +143,6 @@ final class OptInOutObserverTests: OptimoveTestCase {
             if key == .optFlag {
                 XCTAssertEqual(value as? Bool, true)
                 optFlagStorageValueExpectation.fulfill()
-            }
-        }
-
-        let optFlagOperationExpectation = expectation(description: "OptOut operation was not generated.")
-        synchronizer.assertFunctionPushable = { operation in
-            switch operation {
-            case .optIn:
-                optFlagOperationExpectation.fulfill()
-            default:
-                break
             }
         }
 

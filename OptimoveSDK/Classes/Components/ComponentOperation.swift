@@ -20,18 +20,10 @@ final class OperationContext {
 }
 
 enum Operation {
-    case eventable(EventableOperation)
-    case pushable(PushableOperation)
-}
-
-enum EventableOperation {
     case setUserId
     case report(event: OptimoveEvent)
     case reportScreenEvent(customURL: String, pageTitle: String, category: String?)
     case dispatchNow
-}
-
-enum PushableOperation {
     case deviceToken(token: Data)
     case subscribeToTopic(topic: String)
     case unsubscribeFromTopic(topic: String)

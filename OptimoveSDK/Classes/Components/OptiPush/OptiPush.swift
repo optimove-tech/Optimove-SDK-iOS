@@ -26,28 +26,25 @@ extension OptiPush: Component {
 
     func handle(_ context: OperationContext) throws {
         switch context.operation {
-        case let .pushable(operation):
-            switch operation {
-            case let .deviceToken(token: token):
-                storage.apnsToken = token
-                registrar.handle(.setUser)
-                /// Alias`initialVisitorID` with `customerID` if the last one existed.
-                /// Keep actual DB connections between the client aliases and the latest token.
-                if (storage.customerID != nil) {
-                    registrar.handle(.addUserAlias)
-                }
-                serviceProvider.handleRegistration(apnsToken: token)
-            case let .subscribeToTopic(topic: topic):
-                serviceProvider.subscribeToTopic(topic: topic)
-            case let .unsubscribeFromTopic(topic: topic):
-                serviceProvider.unsubscribeFromTopic(topic: topic)
-            case .migrateUser:
+        case let .deviceToken(token: token):
+            storage.apnsToken = token
+            registrar.handle(.setUser)
+            /// Alias`initialVisitorID` with `customerID` if the last one existed.
+            /// Keep actual DB connections between the client aliases and the latest token.
+            if (storage.customerID != nil) {
                 registrar.handle(.addUserAlias)
-            case .optIn:
-                registrar.handle(.setUser)
-            case .optOut:
-                registrar.handle(.setUser)
             }
+            serviceProvider.handleRegistration(apnsToken: token)
+        case let .subscribeToTopic(topic: topic):
+            serviceProvider.subscribeToTopic(topic: topic)
+        case let .unsubscribeFromTopic(topic: topic):
+            serviceProvider.unsubscribeFromTopic(topic: topic)
+        case .migrateUser:
+            registrar.handle(.addUserAlias)
+        case .optIn:
+            registrar.handle(.setUser)
+        case .optOut:
+            registrar.handle(.setUser)
         default:
             break
         }

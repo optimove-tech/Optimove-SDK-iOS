@@ -45,30 +45,26 @@ extension RealTime: Component {
     func handle(_ context: OperationContext) throws {
         guard isAllowedEvent(context) else { return }
         switch context.operation {
-        case let .eventable(operation):
-            switch operation {
-            case .setUserId:
-                try reportUserId()
-            case let .report(event: event):
-                try reportEvent(event: event, retryFailedEvents: true)
-            case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
-                try reportEvent(
-                    event: try coreEventFactory.createEvent(
-                        .pageVisit(screenPath: customURL,
-                                   screenTitle: pageTitle,
-                                   category: category
-                        )
+        case .setUserId:
+            try reportUserId()
+        case let .report(event: event):
+            try reportEvent(event: event, retryFailedEvents: true)
+        case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
+            try reportEvent(
+                event: try coreEventFactory.createEvent(
+                    .pageVisit(screenPath: customURL,
+                               screenTitle: pageTitle,
+                               category: category
                     )
                 )
-            case .dispatchNow:
-                // Consciously do nothing.
-                break
-            }
+            )
+        case .dispatchNow:
+            // Consciously do nothing.
+            break
         default:
             break
         }
     }
-
 }
 
 extension RealTime {
