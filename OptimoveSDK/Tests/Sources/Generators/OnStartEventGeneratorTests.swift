@@ -64,7 +64,8 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
                 userAgentEventExpectation,
                 appOpenEventExpectation
             ],
-            timeout: defaultTimeout + 1 // Additional second to complete async operations.
+            // Additional second to complete the async operation and prevent a flickering.
+            timeout: defaultTimeout + 3
         )
     }
 
