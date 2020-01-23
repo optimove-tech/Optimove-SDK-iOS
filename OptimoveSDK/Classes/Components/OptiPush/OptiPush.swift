@@ -40,10 +40,10 @@ extension OptiPush: Component {
         case let .unsubscribeFromTopic(topic: topic):
             serviceProvider.unsubscribeFromTopic(topic: topic)
         case .migrateUser:
+            guard storage.apnsToken != nil else { return }
             registrar.handle(.addUserAlias)
-        case .optIn:
-            registrar.handle(.setUser)
-        case .optOut:
+        case .optIn, .optOut:
+            guard storage.apnsToken != nil else { return }
             registrar.handle(.setUser)
         default:
             break
