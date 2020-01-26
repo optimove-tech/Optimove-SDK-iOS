@@ -6,7 +6,7 @@ import Mocker
 
 class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
 
-    var builder: RegistrarNetworkingRequestFactory!
+    var builder: ApiRequestFactory!
     var payloadBuilder: ApiPayloadBuilder!
     let config = ConfigurationFixture.build().optipush
 
@@ -16,7 +16,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
             storage: storage,
             appNamespace: try! Bundle.getApplicationNameSpace()
         )
-        builder = RegistrarNetworkingRequestFactory(
+        builder = ApiRequestFactory(
             storage: storage,
             payloadBuilder: payloadBuilder,
             requestBuilder: ClientAPIRequestBuilder(

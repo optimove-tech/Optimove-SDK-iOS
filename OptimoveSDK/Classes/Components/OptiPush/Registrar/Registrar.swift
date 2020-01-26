@@ -3,36 +3,19 @@
 import Foundation
 import OptimoveCore
 
-/// Describe operations that could be sent to MBaaS.
-enum MbaasOperation: CustomStringConvertible {
-    /// Set a new or update an existed user.
-    case setUser
-    /// Add ut a user additional alias, as a visitior or a customer ID.
-    case addUserAlias
-
-    var description: String {
-        switch self {
-        case .setUser:
-            return "set_user"
-        case .addUserAlias:
-            return "add_user_alias"
-        }
-    }
-}
-
 protocol Registrable {
-    func handle(_: MbaasOperation)
+    func handle(_: ApiOperation)
     func retryFailedOperationsIfExist() throws
 }
 
 final class Registrar {
 
     private var storage: OptimoveStorage
-    private let networking: RegistrarNetworking
+    private let networking: ApiNetworking
     private let handler: Handler
 
     init(storage: OptimoveStorage,
-         networking: RegistrarNetworking) {
+         networking: ApiNetworking) {
         self.storage = storage
         self.networking = networking
         self.handler = Handler(storage: storage)
@@ -42,7 +25,7 @@ final class Registrar {
 
 extension Registrar: Registrable {
 
-    func handle(_ operation: MbaasOperation) {
+    func handle(_ operation: ApiOperation) {
         networking.sendToMbaas(operation: operation) { [handler] (result) in
             switch result {
             case .success:
@@ -74,7 +57,7 @@ private extension Registrar {
             self.storage = storage
         }
 
-        func handleFailed(_ operation: MbaasOperation, _ error: Error) {
+        func handleFailed(_ operation: ApiOperation, _ error: Error) {
            switch operation {
             case .setUser:
                 Logger.error("Set User operation was failed. \(error.localizedDescription)")
@@ -90,7 +73,7 @@ private extension Registrar {
             }
         }
 
-        func handleSuccess(_ operation: MbaasOperation) {
+        func handleSuccess(_ operation: ApiOperation) {
             switch operation {
             case .setUser:
                 storage.isSettingUserSuccess = true

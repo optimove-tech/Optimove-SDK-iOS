@@ -5,7 +5,7 @@ import FirebaseMessaging
 import Foundation
 import OptimoveCore
 
-final class FirebaseInteractor: PushServiceProvider {
+final class FirebaseInteractor {
 
     private let networking: FirebaseInteractorNetworking
     private var storage: OptimoveStorage
@@ -57,6 +57,10 @@ final class FirebaseInteractor: PushServiceProvider {
             Logger.debug("OptiPush: Setup Firebase finished.")
         }
     }
+
+}
+
+extension FirebaseInteractor: PushServiceProvider {
 
     // MARK: - FirebaseProvider
 

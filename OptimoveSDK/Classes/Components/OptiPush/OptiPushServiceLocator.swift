@@ -19,7 +19,7 @@ final class OptiPushServiceLocator {
     }
 
     func registrar() -> Registrable {
-        let requestFactory = RegistrarNetworkingRequestFactory(
+        let requestFactory = ApiRequestFactory(
             storage: storage(),
             payloadBuilder: ApiPayloadBuilder(
                 storage: storage(),
@@ -29,7 +29,7 @@ final class OptiPushServiceLocator {
                 optipushConfig: optipushConfig
             )
         )
-        let networking = RegistrarNetworkingImpl(
+        let networking = ApiNetworkingImpl(
             networkClient: serviceLocator.networking(),
             requestFactory: requestFactory
         )

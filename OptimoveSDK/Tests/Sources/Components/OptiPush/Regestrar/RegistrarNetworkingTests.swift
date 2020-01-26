@@ -6,7 +6,7 @@ import Mocker
 
 class RegistrarNetworkingTests: OptimoveTestCase {
 
-    var networking: RegistrarNetworking!
+    var networking: ApiNetworking!
     let config = ConfigurationFixture.build().optipush
 
     override func setUp() {
@@ -17,14 +17,14 @@ class RegistrarNetworkingTests: OptimoveTestCase {
             storage: storage,
             appNamespace: try! Bundle.getApplicationNameSpace()
         )
-        let requestFactory = RegistrarNetworkingRequestFactory(
+        let requestFactory = ApiRequestFactory(
             storage: storage,
             payloadBuilder: payloadBuilder,
             requestBuilder: ClientAPIRequestBuilder(
                 optipushConfig: config
             )
         )
-        networking = RegistrarNetworkingImpl(
+        networking = ApiNetworkingImpl(
             networkClient: client,
             requestFactory: requestFactory
         )
