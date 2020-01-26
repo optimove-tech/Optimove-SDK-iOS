@@ -24,7 +24,6 @@ import AdSupport
 final class CoreEventFactoryImpl {
 
     private var storage: OptimoveStorage
-    private let deviceId: String = SDKDevice.uuid
     private let dateTimeProvider: DateTimeProvider
     private var timestamp: TimeInterval {
         return dateTimeProvider.now.timeIntervalSince1970
@@ -69,7 +68,7 @@ private extension CoreEventFactoryImpl {
     func createAppOpenEvent() throws -> AppOpenEvent {
         return AppOpenEvent(
             bundleIdentifier: try getApplicationNamespace(),
-            deviceID: deviceId,
+            deviceID: try storage.getInstallationID(),
             visitorID: storage.visitorID,
             customerID: storage.customerID
         )
@@ -79,7 +78,7 @@ private extension CoreEventFactoryImpl {
         return OptipushOptInEvent(
             timestamp: timestamp,
             applicationNameSpace: try getApplicationNamespace(),
-            deviceId: deviceId
+            deviceId: try storage.getInstallationID()
         )
     }
 
@@ -87,7 +86,7 @@ private extension CoreEventFactoryImpl {
         return OptipushOptOutEvent(
             timestamp: timestamp,
             applicationNameSpace: try getApplicationNamespace(),
-            deviceId: deviceId
+            deviceId: try storage.getInstallationID()
         )
     }
 
@@ -121,7 +120,7 @@ private extension CoreEventFactoryImpl {
     func createSetAdvertisingIdEvent() throws -> SetAdvertisingIdEvent {
         return SetAdvertisingIdEvent(
             advertisingId: getAdvertisingIdentifier(),
-            deviceId: deviceId,
+            deviceId: try storage.getInstallationID(),
             appNs: try getApplicationNamespace()
         )
     }

@@ -3,21 +3,21 @@
 import Foundation
 import OptimoveCore
 
-final class RegistrarNetworkingRequestFactory {
+final class ApiRequestFactory {
 
     private let storage: OptimoveStorage
-    private let payloadBuilder: MbaasPayloadBuilder
+    private let payloadBuilder: ApiPayloadBuilder
     private let requestBuilder: ClientAPIRequestBuilder
 
     init(storage: OptimoveStorage,
-         payloadBuilder: MbaasPayloadBuilder,
+         payloadBuilder: ApiPayloadBuilder,
          requestBuilder: ClientAPIRequestBuilder) {
         self.storage = storage
         self.payloadBuilder = payloadBuilder
         self.requestBuilder = requestBuilder
     }
 
-    func createRequest(operation: MbaasOperation) throws -> NetworkRequest {
+    func createRequest(operation: ApiOperation) throws -> NetworkRequest {
         switch operation {
         case .setUser:
             return try requestBuilder.postAddMergeUser(

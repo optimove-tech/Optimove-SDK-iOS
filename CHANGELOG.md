@@ -4,6 +4,7 @@
 
 - **improve** an apns environment checking.
 - **improve** updating for an actual token.
+- **change** enabling debug logging.
 - **fix** main-thread sanity warnings.
 
 ## 2.7.0

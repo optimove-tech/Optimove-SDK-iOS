@@ -68,12 +68,10 @@ final class OptiTrackComponentTests: XCTestCase {
         XCTAssertNoThrow(
             try optitrack.handle(
                 OperationContext(
-                    .eventable(
-                        .reportScreenEvent(
-                            customURL: screenPath,
-                            pageTitle: screenTitle,
-                            category: category
-                        )
+                    .reportScreenEvent(
+                        customURL: screenPath,
+                        pageTitle: screenTitle,
+                        category: category
                     )
                 )
             )
@@ -94,7 +92,7 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         // when
-        try! optitrack.handle(.init(.eventable(.report(event: stubEvent))))
+        try! optitrack.handle(.init(.report(event: stubEvent)))
         wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 
@@ -106,7 +104,7 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         // when
-        try! optitrack.handle(.init(.eventable(.dispatchNow)))
+        try! optitrack.handle(.init(.dispatchNow))
         wait(for: [trackDispatchExpectation], timeout: defaultTimeout, enforceOrder: true)
     }
 

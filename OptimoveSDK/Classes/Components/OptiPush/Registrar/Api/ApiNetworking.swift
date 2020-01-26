@@ -3,26 +3,26 @@
 import Foundation
 import OptimoveCore
 
-protocol RegistrarNetworking {
-    func sendToMbaas(operation: MbaasOperation, completion: @escaping (Result<String, Error>) -> Void)
+protocol ApiNetworking {
+    func sendToMbaas(operation: ApiOperation, completion: @escaping (Result<String, Error>) -> Void)
 }
 
-final class RegistrarNetworkingImpl {
+final class ApiNetworkingImpl {
 
     private let networkClient: NetworkClient
-    private let requestFactory: RegistrarNetworkingRequestFactory
+    private let requestFactory: ApiRequestFactory
 
     init(networkClient: NetworkClient,
-         requestFactory: RegistrarNetworkingRequestFactory) {
+         requestFactory: ApiRequestFactory) {
         self.networkClient = networkClient
         self.requestFactory = requestFactory
     }
 
 }
 
-extension RegistrarNetworkingImpl: RegistrarNetworking {
+extension ApiNetworkingImpl: ApiNetworking {
 
-    func sendToMbaas(operation: MbaasOperation, completion: @escaping (Result<String, Error>) -> Void) {
+    func sendToMbaas(operation: ApiOperation, completion: @escaping (Result<String, Error>) -> Void) {
         do {
             let request = try requestFactory.createRequest(operation: operation)
             networkClient.perform(request) { (result) in

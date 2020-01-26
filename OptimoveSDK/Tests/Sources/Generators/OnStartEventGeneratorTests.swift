@@ -3,15 +3,13 @@
 import XCTest
 @testable import OptimoveSDK
 
-final class OnStartEventGeneratorTests: XCTestCase {
+final class OnStartEventGeneratorTests: OptimoveTestCase {
 
     var generator: OnStartEventGenerator!
-    var storage: MockOptimoveStorage!
     var dataProvider: MockDateTimeProvider!
     var synchronizer: MockSynchronizer!
 
     override func setUp() {
-        storage = MockOptimoveStorage()
         dataProvider = MockDateTimeProvider()
         synchronizer = MockSynchronizer()
         generator = OnStartEventGenerator(
@@ -26,6 +24,7 @@ final class OnStartEventGeneratorTests: XCTestCase {
 
     func test_event_generation() {
         // given
+        prefillStorageWithTheFirstLaunch()
         storage.tenantToken = "tenantToken"
         storage.version = "configName"
         storage.configurationEndPoint = URL(string: "http://optimove.net")
@@ -35,7 +34,7 @@ final class OnStartEventGeneratorTests: XCTestCase {
         let metaDataEventExpectation = expectation(description: "MetaDataEvent was not generated.")
         let userAgentEventExpectation = expectation(description: "SetUserAgent was not generated.")
         let appOpenEventExpectation = expectation(description: "AppOpenEvent was not generated.")
-        synchronizer.assertFunctionEventable = { (operation: EventableOperation) -> Void in
+        synchronizer.assertFunction = { operation in
             switch operation {
             case let .report(event: event):
                 switch event.name {
@@ -57,6 +56,7 @@ final class OnStartEventGeneratorTests: XCTestCase {
 
         // when
         generator.generate()
+
         wait(
             for: [
                 ifdaEventExpectation,
@@ -64,7 +64,8 @@ final class OnStartEventGeneratorTests: XCTestCase {
                 userAgentEventExpectation,
                 appOpenEventExpectation
             ],
-            timeout: 5
+            // Additional second to complete the async operation and prevent a flickering.
+            timeout: defaultTimeout + 3
         )
     }
 

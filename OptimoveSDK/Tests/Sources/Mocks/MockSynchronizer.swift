@@ -4,15 +4,10 @@
 
 final class MockSynchronizer: Synchronizer {
 
-    var assertFunctionEventable: ((EventableOperation) -> Void)?
-    var assertFunctionPushable: ((PushableOperation) -> Void)?
+    var assertFunction: ((Operation) -> Void)?
 
-    func handle(_ op: EventableOperation) {
-        assertFunctionEventable?(op)
-    }
-
-    func handle(_ op: PushableOperation) {
-        assertFunctionPushable?(op)
+    func handle(_ op: Operation) {
+        assertFunction?(op)
     }
 
     func addNode(_: Node) {

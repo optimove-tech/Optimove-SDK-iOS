@@ -3,13 +3,13 @@
 import Foundation
 @testable import OptimoveSDK
 
-final class MockRegistrarNetworking: RegistrarNetworking {
+final class MockRegistrarNetworking: ApiNetworking {
 
-    var assertFunction: ((MbaasOperation) -> Result<String, Error>) = { _ in
+    var assertFunction: ((ApiOperation) -> Result<String, Error>) = { _ in
         return .success("")
     }
 
-    func sendToMbaas(operation model: MbaasOperation, completion: @escaping (Result<String, Error>) -> Void) {
+    func sendToMbaas(operation model: ApiOperation, completion: @escaping (Result<String, Error>) -> Void) {
         completion(assertFunction(model))
     }
 

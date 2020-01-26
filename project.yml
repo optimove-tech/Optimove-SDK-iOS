@@ -2,8 +2,22 @@ name: Optimove
 options:
   deploymentTarget: 
     iOS: "10"
-targets:
 
+schemes:
+  UnitTests:
+    build:
+      targets:
+        OptimoveCore-Unit: [test]
+        OptimoveSDK-Unit: [test]
+        OptimoveNotificationServiceExtension-Unit: [test]
+    test:
+      targets: 
+        - OptimoveCore-Unit
+        - OptimoveSDK-Unit
+        - OptimoveNotificationServiceExtension-Unit
+      parallelizeBuild: true
+
+targets:
   OptimoveCore:
     type: framework
     platform: iOS
@@ -48,6 +62,8 @@ targets:
       - carthage: Firebase
         link: false
       - carthage: FIRAnalyticsConnector
+      - carthage: FirebaseInstallations
+      - carthage: PromisesObjC
       - carthage: FirebaseAnalytics
       - carthage: FirebaseCore
       - carthage: FirebaseCoreDiagnostics
@@ -85,24 +101,6 @@ targets:
       - sdk: Foundation.framework
   
   # unit-test
-
-  UnitTests:
-    type: bundle.unit-test
-    platform: iOS
-    sources: 
-      - path: OptimoveCore/Tests/
-        name: OptimoveCore-Unit
-      - path: OptimoveSDK/Tests/
-        name: OptimoveSDK-Unit
-      - path: OptimoveNotificationServiceExtension/Tests/
-        name: OptimoveNotificationServiceExtension-Unit
-      - path: Shared
-        name: Shared-Unit
-    dependencies:
-      - target: OptimoveCore
-      - target: OptimoveSDK
-      - target: OptimoveNotificationServiceExtension
-      - carthage: Mocker
 
   OptimoveCore-Unit:
     type: bundle.unit-test

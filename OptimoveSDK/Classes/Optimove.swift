@@ -287,6 +287,7 @@ private extension Optimove {
             return
         }
         RunningFlagsIndication.isInitializerRunning.toggle()
+        serviceLocator.installationIdGenerator().generate()
         serviceLocator.newVisitorIdGenerator().generate()
         serviceLocator.firstTimeVisitGenerator().generate()
         let configurationFetcher = serviceLocator.configurationFetcher(operationFactory: factory.operationFactory())

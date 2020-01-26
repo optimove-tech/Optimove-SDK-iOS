@@ -16,15 +16,19 @@ final class AppOpenOnStartGenerator {
     }
 
     func generate() {
-        DispatchQueue.main.async {
-            guard UIApplication.shared.applicationState != .background else { return }
-            tryCatch {
-                self.synchronizer.handle(
-                    .report(
-                        event: try self.coreEventFactory.createEvent(.appOpen)
-                    )
-                )
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async {
+                self.generate()
             }
+            return
+        }
+        guard UIApplication.shared.applicationState != .background else { return }
+        tryCatch {
+            self.synchronizer.handle(
+                .report(
+                    event: try self.coreEventFactory.createEvent(.appOpen)
+                )
+            )
         }
     }
 

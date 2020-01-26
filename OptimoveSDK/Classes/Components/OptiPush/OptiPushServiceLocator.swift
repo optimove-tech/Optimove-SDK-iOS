@@ -19,18 +19,17 @@ final class OptiPushServiceLocator {
     }
 
     func registrar() -> Registrable {
-        let requestFactory = RegistrarNetworkingRequestFactory(
+        let requestFactory = ApiRequestFactory(
             storage: storage(),
-            payloadBuilder: MbaasPayloadBuilder(
+            payloadBuilder: ApiPayloadBuilder(
                 storage: storage(),
-                deviceID: SDKDevice.uuid,
                 appNamespace: try! Bundle.getApplicationNameSpace()
             ),
             requestBuilder: ClientAPIRequestBuilder(
                 optipushConfig: optipushConfig
             )
         )
-        let networking = RegistrarNetworkingImpl(
+        let networking = ApiNetworkingImpl(
             networkClient: serviceLocator.networking(),
             requestFactory: requestFactory
         )

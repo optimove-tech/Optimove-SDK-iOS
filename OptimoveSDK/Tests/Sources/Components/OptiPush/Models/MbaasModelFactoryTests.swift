@@ -3,15 +3,14 @@
 import XCTest
 @testable import OptimoveSDK
 
-class MbaasPayloadBuilderTests: OptimoveTestCase {
+class ApiPayloadBuilderTests: OptimoveTestCase {
 
-    var factory: MbaasPayloadBuilder!
+    var factory: ApiPayloadBuilder!
 
     override func setUp() {
         super.setUp()
-        factory = MbaasPayloadBuilder(
+        factory = ApiPayloadBuilder(
             storage: storage,
-            deviceID: SDKDevice.uuid,
             appNamespace: try! Bundle.getApplicationNameSpace()
         )
     }
@@ -28,6 +27,7 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         // given
         prefillStorageAsVisitor()
         let expectedAppNs = try! Bundle.getApplicationNameSpace()
+        let expectedDeviceId = try! storage.getInstallationID()
 
         let expectedToken = Data(repeating: 42, count: 10)
         storage.apnsToken = expectedToken
@@ -37,7 +37,7 @@ class MbaasPayloadBuilderTests: OptimoveTestCase {
         let payload = try! factory.createSetUser()
 
         // then
-        XCTAssertEqual(payload.deviceID, SDKDevice.uuid)
+        XCTAssertEqual(payload.deviceID, expectedDeviceId)
         XCTAssertEqual(payload.appNS, expectedAppNs)
         XCTAssertEqual(payload.os, SetUser.Constants.os)
         XCTAssertNotNil(payload.deviceToken)

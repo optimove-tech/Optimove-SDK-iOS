@@ -114,6 +114,10 @@ final class ServiceLocator {
         return FirstTimeVisitGenerator(storage: storage())
     }
 
+    func installationIdGenerator() -> InstallationIdGenerator {
+        return InstallationIdGenerator(storage: storage())
+    }
+
     func optInService(coreEventFactory: CoreEventFactory) -> OptInService {
         return OptInService(
             synchronizer: synchronizer(),
