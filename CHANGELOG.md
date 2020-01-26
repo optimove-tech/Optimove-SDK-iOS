@@ -1,5 +1,14 @@
 # Changelog
 
+# 2.9.0
+
+- **fix** carthage firebase dependency for version 6.15.
+- **fix** set_user_id issue if it calls before `configure`.
+
+# 2.8.1
+
+- **fix** xcode 10 build.
+
 ## 2.8.0
 
 - **improve** an apns environment checking.
