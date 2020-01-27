@@ -133,8 +133,7 @@ final class ServiceLocator {
                     subscriber: synchronizer()
                 ),
                 OptInOutObserver(
-                    optInService: optInService(coreEventFactory: coreEventFactory),
-                    notificationPermissionFetcher: NotificationPermissionFetcherImpl()
+                    optInService: optInService(coreEventFactory: coreEventFactory)
                 ),
                 AppOpenObserver(
                     synchronizer: synchronizer(),
