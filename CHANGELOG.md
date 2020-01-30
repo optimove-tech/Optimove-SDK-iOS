@@ -37,6 +37,9 @@
 * **added** new API `didReceivePushAuthorization(fromUserNotificationCenter: Bool)`.
 * **added** support for `UNAuthorizationStatus.provisional`.
 * **added** handling Notification authorization changes on an app lifecycle.
+* **BREAKING change** `OptimoveEvent` is now available under the `OptimoveCore` framework instead of the `OptimoveSDK`.
+
+> The Optimove SDK is following _semvar_. Exceptionally, this change is not considered a major release.
 
 ## 2.4.0
 
