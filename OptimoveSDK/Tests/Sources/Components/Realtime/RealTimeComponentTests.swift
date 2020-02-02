@@ -562,15 +562,13 @@ class RealTimeComponentTests: XCTestCase {
         // given
         prefilledVisitorStorage()
 
-        let customURL = "customURL"
-        let pageTitle = "pageTitle"
+        let title = "title"
         let category = "category"
 
         // then
         let screenVisitEventExpectation = expectation(description: "screen visit event was not generated")
         let isScreenVisitEvent: (RealtimeEvent) -> Bool = { (event) in
-            return event.context[PageVisitEvent.Constants.Key.customURL] as? String == customURL &&
-            event.context[PageVisitEvent.Constants.Key.pageTitle] as? String == pageTitle &&
+            return event.context[PageVisitEvent.Constants.Key.pageTitle] as? String == title &&
             event.context[PageVisitEvent.Constants.Key.category] as? String == category
         }
         networking.assertFunction = { (event) -> Result<String, Error> in
@@ -583,7 +581,7 @@ class RealTimeComponentTests: XCTestCase {
         // when
         try! realTime.handle(
             OperationContext(
-                .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
+                .reportScreenEvent(title: title, category: category)
             )
         )
         waitForExpectations(timeout: realtimeTimeout)

@@ -92,7 +92,7 @@ class CoreEventFactoryTests: XCTestCase {
     func test_create_pageVisit() {
         XCTAssertNoThrow({
             // when
-            let event = try self.factory.createEvent(.pageVisit(screenPath: "", screenTitle: "", category: ""))
+            let event = try self.factory.createEvent(.pageVisit(title: "", category: ""))
 
             // then
             XCTAssert(event.name == SetUserIdEvent.Constants.name)
