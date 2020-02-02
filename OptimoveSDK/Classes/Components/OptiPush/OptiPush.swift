@@ -35,10 +35,6 @@ extension OptiPush: Component {
                 registrar.handle(.addUserAlias)
             }
             serviceProvider.handleRegistration(apnsToken: token)
-        case let .subscribeToTopic(topic: topic):
-            serviceProvider.subscribeToTopic(topic: topic)
-        case let .unsubscribeFromTopic(topic: topic):
-            serviceProvider.unsubscribeFromTopic(topic: topic)
         case .migrateUser:
             guard storage.apnsToken != nil else { return }
             registrar.handle(.addUserAlias)

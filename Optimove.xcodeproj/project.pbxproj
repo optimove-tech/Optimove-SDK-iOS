@@ -23,7 +23,6 @@
 		0D33123F966A1CFB545338C5 /* NewUserIDHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB18F8F468B8926C9072035 /* NewUserIDHandler.swift */; };
 		0D7C1136886E7C4E2152EE14 /* FileStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455EE3084103D99378A43FF /* FileStorage.swift */; };
 		10215A2DBBDC91EA8C764C5B /* FirebaseProjectKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37978E1DB8C61F12F9607B6A /* FirebaseProjectKeys.swift */; };
-		103B03FB584BD8BF289CF2C4 /* FirebaseInteractorRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93604301FC3080DB06237FE5 /* FirebaseInteractorRequestBuilder.swift */; };
 		10B7A610E4480795AC1BAC3E /* MediaAttachmentDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4346A1B2C197D938EAC1C49 /* MediaAttachmentDownloader.swift */; };
 		111187D695021BA5A14B86B7 /* NetworkClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C144BEC27482E8328B8C4F6F /* NetworkClientTests.swift */; };
 		123098F456A170B2537F897B /* FirebaseCoreDiagnostics.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E34A122A2840BDF5FF74559B /* FirebaseCoreDiagnostics.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -292,7 +291,6 @@
 		EBFFD3C10BBB63D2BE067FE0 /* FirebaseInstanceID.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD983AA63F099EA06F4F5E2 /* FirebaseInstanceID.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EC6FCE53F6000850B92B2511 /* GlobalConfigurationDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF56D64273E803F0F9A6ACA /* GlobalConfigurationDownloaderTests.swift */; };
 		EC8157C51B383BD1B3BD9095 /* dev.tid.107.optipush.json in Resources */ = {isa = PBXBuildFile; fileRef = 0B00D121B7D35C23D9DE8B8E /* dev.tid.107.optipush.json */; };
-		EE914E181C5AC64FF68E7633 /* FirebaseInteractorNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F31F6A348F8D5C1D5CF7D98 /* FirebaseInteractorNetworking.swift */; };
 		EEA726E93CBE99DE605ECBC4 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C7EC2263685823B37EC99A /* UserNotifications.framework */; };
 		EF60D711929119DD2ECD7CFD /* AddUserAlias.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A60FFB5FBCDAB107FF539EC /* AddUserAlias.swift */; };
 		F0896993C660626712C2BAC8 /* SetAdvertisingIdEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DF500C4E8B8E4C6746B3D /* SetAdvertisingIdEvent.swift */; };
@@ -550,13 +548,11 @@
 		8C848179120653264AB8EDEA /* DeeplinkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeplinkService.swift; sourceTree = "<group>"; };
 		8CF7F8DB2BB53F5D18E6845C /* RemoteConfigurationRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationRequestBuilder.swift; sourceTree = "<group>"; };
 		8D8CADCE615623064BE53149 /* ComponentOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentOperation.swift; sourceTree = "<group>"; };
-		8F31F6A348F8D5C1D5CF7D98 /* FirebaseInteractorNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseInteractorNetworking.swift; sourceTree = "<group>"; };
 		90C9509F668ABF2A4746946D /* OptInOutObserverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptInOutObserverTests.swift; sourceTree = "<group>"; };
 		90E3A1462CC2D278C02D9DC7 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		91266ABE0D0487506DA080E0 /* RealTimeHanlder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTimeHanlder.swift; sourceTree = "<group>"; };
 		926CB4784BDFA967F9B33111 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		928DA41EE0B0E64B35B7CC7B /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
-		93604301FC3080DB06237FE5 /* FirebaseInteractorRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseInteractorRequestBuilder.swift; sourceTree = "<group>"; };
 		9415551DF59E320E55FC2A69 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		9455EE3084103D99378A43FF /* FileStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStorage.swift; sourceTree = "<group>"; };
 		962F18D33551520DBEC49B67 /* DynamicLinkParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicLinkParser.swift; sourceTree = "<group>"; };
@@ -1023,8 +1019,6 @@
 			isa = PBXGroup;
 			children = (
 				A3FE2A7732EBE834571965F9 /* FirebaseInteractor.swift */,
-				8F31F6A348F8D5C1D5CF7D98 /* FirebaseInteractorNetworking.swift */,
-				93604301FC3080DB06237FE5 /* FirebaseInteractorRequestBuilder.swift */,
 				F2CFA2A1EF68E448CFE428EE /* FirebaseOptionsBuilder.swift */,
 			);
 			path = Firebase;
@@ -2179,8 +2173,6 @@
 				34585E3170F52022E50A6F5F /* Environment.swift in Sources */,
 				601A5E4975CF19EFFE2EC0DE /* EventValidator.swift in Sources */,
 				F386208A45B5229489B933B9 /* FirebaseInteractor.swift in Sources */,
-				EE914E181C5AC64FF68E7633 /* FirebaseInteractorNetworking.swift in Sources */,
-				103B03FB584BD8BF289CF2C4 /* FirebaseInteractorRequestBuilder.swift in Sources */,
 				FE0DA834EF241DAC1342A017 /* FirebaseOptionsBuilder.swift in Sources */,
 				587679B4C18736B3BA7CD3FD /* FirstTimeVisitGenerator.swift in Sources */,
 				F363C4B08DCCE8434418F3D0 /* GlobalConfigurationDownloader.swift in Sources */,

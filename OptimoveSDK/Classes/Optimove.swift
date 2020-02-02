@@ -254,19 +254,14 @@ extension Optimove {
     }
 
     /// Request to subscribe to test campaign topics
+    @available(*, deprecated, message: "No need to calls start test mode.")
     @objc public func startTestMode() {
-        tryCatch {
-            let testTopic = OptimoveKeys.testTopicPrefix + (try Bundle.getApplicationNameSpace())
-            synchronizer.handle(.subscribeToTopic(topic: testTopic))
-        }
+
     }
 
     /// Request to unsubscribe from test campaign topics
     @objc public func stopTestMode() {
-        tryCatch {
-            let testTopic = OptimoveKeys.testTopicPrefix + (try Bundle.getApplicationNameSpace())
-            synchronizer.handle(.unsubscribeFromTopic(topic: testTopic))
-        }
+        
     }
 }
 

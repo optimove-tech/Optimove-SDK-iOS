@@ -40,17 +40,8 @@ final class OptiPushServiceLocator {
     }
 
     func serviceProvider() -> PushServiceProvider {
-        let requestBuilder = FirebaseInteractorRequestBuilder(
-            storage: serviceLocator.storage(),
-            configuration: optipushConfig
-        )
-        let networking = FirebaseInteractorNetworkingImpl(
-            networkClient: serviceLocator.networking(),
-            requestBuilder: requestBuilder
-        )
         return FirebaseInteractor(
             storage: storage(),
-            networking: networking,
             optipush: optipushConfig
         )
     }

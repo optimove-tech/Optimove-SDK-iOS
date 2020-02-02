@@ -7,16 +7,13 @@ import OptimoveCore
 
 final class FirebaseInteractor {
 
-    private let networking: FirebaseInteractorNetworking
     private var storage: OptimoveStorage
     private var appController: FirebaseOptions?
     private var clientServiceOptions: FirebaseOptions?
 
     init(storage: OptimoveStorage,
-         networking: FirebaseInteractorNetworking,
          optipush: OptipushConfig) {
         self.storage = storage
-        self.networking = networking
         setup(optipush: optipush)
     }
 
@@ -98,55 +95,6 @@ extension FirebaseInteractor: PushServiceProvider {
             setAPNsTokenToFirebase()
             Logger.debug("OptiPush: 🚀 FCM token for app controller: \(fcmToken)")
             self.storage.fcmToken = fcmToken
-        }
-    }
-
-    func subscribeToTopic(topic: String) {
-        if !storage.isClientHasFirebase {
-            DispatchQueue.main.async {
-                Messaging.messaging().subscribe(toTopic: topic) { (error) in
-                    if let error = error {
-                        Logger.error(error.localizedDescription)
-                    } else {
-                        Logger.debug("Subscribed topic \(topic) successful.")
-                    }
-                }
-            }
-        } else {
-            networking.subscribe(topic: topic) { (result) in
-                switch result {
-                case .success:
-                    Logger.debug("Subscribed topic \(topic) successful.")
-                    OptimoveTopicsUserDefaults.topics?.set(true, forKey: "optimove_\(topic)")
-                case let .failure(error):
-                    Logger.error(error.localizedDescription)
-                    OptimoveTopicsUserDefaults.topics?.set(false, forKey: "optimove_\(topic)")
-                }
-            }
-        }
-    }
-
-    func unsubscribeFromTopic(topic: String) {
-        if !storage.isClientHasFirebase {
-            DispatchQueue.main.async {
-                Messaging.messaging().unsubscribe(fromTopic: topic) { (error) in
-                    if let error = error {
-                        Logger.error(error.localizedDescription)
-                    } else {
-                        Logger.debug("Unsubscribed topic \(topic) successful.")
-                    }
-                }
-            }
-        } else {
-            networking.unsubscribe(topic: topic) { (result) in
-                switch result {
-                case .success:
-                    Logger.debug("Unsubscribed topic \(topic) successful.")
-                    OptimoveTopicsUserDefaults.topics?.removeObject(forKey: "optimove_\(topic)")
-                case let .failure(error):
-                    Logger.error(error.localizedDescription)
-                }
-            }
         }
     }
 
