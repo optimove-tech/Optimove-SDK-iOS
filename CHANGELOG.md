@@ -1,5 +1,14 @@
 # Changelog
 
+# 2.9.0
+
+- **fix** carthage firebase dependency for version 6.15.
+- **fix** set_user_id issue if it calls before `configure`.
+
+# 2.8.1
+
+- **fix** xcode 10 build.
+
 ## 2.8.0
 
 - **improve** an apns environment checking.
@@ -28,6 +37,9 @@
 * **added** new API `didReceivePushAuthorization(fromUserNotificationCenter: Bool)`.
 * **added** support for `UNAuthorizationStatus.provisional`.
 * **added** handling Notification authorization changes on an app lifecycle.
+* **BREAKING change** `OptimoveEvent` is now available under the `OptimoveCore` framework instead of the `OptimoveSDK`.
+
+> The Optimove SDK is following _semvar_. Exceptionally, this change is not considered a major release.
 
 ## 2.4.0
 
