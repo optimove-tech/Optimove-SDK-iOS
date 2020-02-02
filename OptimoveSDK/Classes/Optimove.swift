@@ -4,6 +4,8 @@ import UIKit.UIApplication
 import UserNotifications
 import OptimoveCore
 
+public typealias OptimoveEvent = OptimoveCore.OptimoveEvent
+
 /// The Optimove SDK for iOS - a realtime customer data platform.
 /// The integration guide: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki
 /// - WARNING:
