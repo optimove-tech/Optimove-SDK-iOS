@@ -80,13 +80,32 @@ extension Optimove {
 
     /// Report the screen visit event.
     /// - Parameters:
+    ///   - screenTitle: The screen title.
+    ///   - screenCategory: The screen category.
+    @objc public func setScreenVisit(screenTitle: String, screenCategory: String? = nil) {
+        let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
+        Logger.info("Report a screen event w/title: \(screenTitle)")
+        let validationResult = ScreenVisitValidator.validate(screenTitle: screenTitle)
+        guard validationResult == .valid else { return }
+        tryCatch {
+            synchronizer.handle(
+                .reportScreenEvent(
+                    title: screenTitle,
+                    category: screenCategory
+                )
+            )
+        }
+    }
+
+
+    /// Report the screen visit event.
+    /// - Parameters:
     ///   - screenPathArray: An array of breadcrumbs – an UI path to the screen.
     ///   - screenTitle: The screen title.
     ///   - screenCategory: The screen category.
+    @available(*, deprecated, renamed: "setScreenVisit(screenTitle:screenCategory:)")
     @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
-        setScreenVisit(screenPath: screenPathArray.joined(separator: "/"),
-                       screenTitle: screenTitle,
-                       screenCategory: screenCategory)
+        setScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
     }
 
     /// Report the screen visit event.
@@ -94,21 +113,11 @@ extension Optimove {
     ///   - screenPath: An UI path to the screen.
     ///   - screenTitle: The screen title.
     ///   - screenCategory: The screen category.
-    @objc public func setScreenVisit(screenPath: String, screenTitle: String, screenCategory: String? = nil) {
-        let screenPath = screenPath.trimmingCharacters(in: .whitespaces)
-        let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
-        Logger.info("Report a screen event w/title: \(screenTitle)")
-        let validationResult = ScreenVisitValidator.validate(screenPath: screenPath, screenTitle: screenTitle)
-        guard validationResult == .valid else { return }
-        tryCatch {
-            synchronizer.handle(
-                .reportScreenEvent(
-                    customURL: try ScreenVisitPreprocessor.process(screenPath),
-                    pageTitle: screenTitle,
-                    category: screenCategory
-                )
-            )
-        }
+    @available(*, deprecated, renamed: "setScreenVisit(screenTitle:screenCategory:)")
+    @objc public func setScreenVisit(screenPath: String,
+                                     screenTitle: String,
+                                     screenCategory: String? = nil) {
+        setScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
     }
 
 }

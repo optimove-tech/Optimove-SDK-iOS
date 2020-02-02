@@ -21,7 +21,7 @@ final class OperationContext {
 enum Operation {
     case setUserId
     case report(event: OptimoveEvent)
-    case reportScreenEvent(customURL: String, pageTitle: String, category: String?)
+    case reportScreenEvent(title: String, category: String?)
     case dispatchNow
     case deviceToken(token: Data)
     case subscribeToTopic(topic: String)

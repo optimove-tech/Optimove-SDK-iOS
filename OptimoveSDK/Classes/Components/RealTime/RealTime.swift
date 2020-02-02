@@ -49,13 +49,10 @@ extension RealTime: Component {
             try reportUserId()
         case let .report(event: event):
             try reportEvent(event: event, retryFailedEvents: true)
-        case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
+        case let .reportScreenEvent(title: title, category: category):
             try reportEvent(
                 event: try coreEventFactory.createEvent(
-                    .pageVisit(screenPath: customURL,
-                               screenTitle: pageTitle,
-                               category: category
-                    )
+                    .pageVisit(title: title, category: category)
                 )
             )
         case .dispatchNow:

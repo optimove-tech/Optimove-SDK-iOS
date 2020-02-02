@@ -37,8 +37,8 @@ extension OptiTrack: Component {
             try setUserId()
         case let .report(event: event):
             try report(event: event)
-        case let .reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category):
-            try reportScreenEvent(customURL: customURL, pageTitle: pageTitle, category: category)
+        case let .reportScreenEvent(title: pageTitle, category: category):
+            try reportScreenEvent(title: pageTitle, category: category)
         case .dispatchNow:
             dispatchNow()
         default:
@@ -71,21 +71,20 @@ private extension OptiTrack {
         }
     }
 
-    func reportScreenEvent(customURL: String, pageTitle: String, category: String?) throws {
+    func reportScreenEvent(title: String, category: String?) throws {
         let categoryDescription: String = {
             guard let category = category else { return "" }
             return ", category: '\(category)'"
         }()
-        Logger.debug("OptiTrack: Report screen event: title='\(pageTitle)', path='\(customURL)'\(categoryDescription)")
+        Logger.debug("OptiTrack: Report screen event: title='\(title)' \(categoryDescription)")
         let event = try coreEventFactory.createEvent(
             .pageVisit(
-                screenPath: customURL,
-                screenTitle: pageTitle,
+                title: title,
                 category: category
             )
         )
         try report(event: event)
-        tracker.track(view: [pageTitle], url: URL(string: "http://\(customURL)"))
+        tracker.track(view: [title])
     }
 
     func dispatchNow() {

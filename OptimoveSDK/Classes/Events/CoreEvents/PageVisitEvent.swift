@@ -5,7 +5,6 @@ final class PageVisitEvent: OptimoveCoreEvent {
     struct Constants {
         static let name = "set_page_visit"
         struct Key {
-            static let customURL = "customURL"
             static let pageTitle = "pageTitle"
             static let category = "category"
         }
@@ -14,10 +13,9 @@ final class PageVisitEvent: OptimoveCoreEvent {
     let name: String = Constants.name
     let parameters: [String: Any]
 
-    init(customURL: String, pageTitle: String?, category: String?) {
+    init(title: String?, category: String?) {
         self.parameters = [
-            Constants.Key.customURL: customURL,
-            Constants.Key.pageTitle: pageTitle,
+            Constants.Key.pageTitle: title,
             Constants.Key.category: category
         ].compactMapValues { $0 }
     }
