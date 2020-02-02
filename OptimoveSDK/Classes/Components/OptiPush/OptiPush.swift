@@ -6,14 +6,11 @@ import OptimoveCore
 
 final class OptiPush {
 
-    private var serviceProvider: PushServiceProvider
     private let registrar: Registrable
     private var storage: OptimoveStorage
 
-    init(serviceProvider: PushServiceProvider,
-         registrar: Registrable,
+    init(registrar: Registrable,
          storage: OptimoveStorage) {
-        self.serviceProvider = serviceProvider
         self.storage = storage
         self.registrar = registrar
         retryFailedMbaasOperations()
@@ -34,11 +31,6 @@ extension OptiPush: Component {
             if (storage.customerID != nil) {
                 registrar.handle(.addUserAlias)
             }
-            serviceProvider.handleRegistration(apnsToken: token)
-        case let .subscribeToTopic(topic: topic):
-            serviceProvider.subscribeToTopic(topic: topic)
-        case let .unsubscribeFromTopic(topic: topic):
-            serviceProvider.unsubscribeFromTopic(topic: topic)
         case .migrateUser:
             guard storage.apnsToken != nil else { return }
             registrar.handle(.addUserAlias)

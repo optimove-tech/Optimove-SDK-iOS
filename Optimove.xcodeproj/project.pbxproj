@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00BCD81CFE78C4D8156500A4 /* PromisesObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25C241270D3513A3819D70EA /* PromisesObjC.framework */; };
 		015CC2D9FE5E99EA508463D5 /* MobileProvision.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC30702AAA9307C47CDB37FB /* MobileProvision.swift */; };
 		03A06957E14DE9C264FD3BF4 /* EnterForegroundObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BC45AB12DCB12A09904FB2 /* EnterForegroundObserverTests.swift */; };
 		03A69DFE7F1DD71C20E728A4 /* Component.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F6EA9DDF57A650AF10F810 /* Component.swift */; };
@@ -22,8 +21,6 @@
 		0C2FD1ADD0C571CE4925672B /* RealTimeEventContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A29E49BAB7C3E3E38F73F2F /* RealTimeEventContext.swift */; };
 		0D33123F966A1CFB545338C5 /* NewUserIDHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB18F8F468B8926C9072035 /* NewUserIDHandler.swift */; };
 		0D7C1136886E7C4E2152EE14 /* FileStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455EE3084103D99378A43FF /* FileStorage.swift */; };
-		10215A2DBBDC91EA8C764C5B /* FirebaseProjectKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37978E1DB8C61F12F9607B6A /* FirebaseProjectKeys.swift */; };
-		103B03FB584BD8BF289CF2C4 /* FirebaseInteractorRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93604301FC3080DB06237FE5 /* FirebaseInteractorRequestBuilder.swift */; };
 		10B7A610E4480795AC1BAC3E /* MediaAttachmentDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4346A1B2C197D938EAC1C49 /* MediaAttachmentDownloader.swift */; };
 		111187D695021BA5A14B86B7 /* NetworkClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C144BEC27482E8328B8C4F6F /* NetworkClientTests.swift */; };
 		123098F456A170B2537F897B /* FirebaseCoreDiagnostics.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E34A122A2840BDF5FF74559B /* FirebaseCoreDiagnostics.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -70,7 +67,6 @@
 		2CA6402957C56BF0C4157D4C /* UserAgentGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 002B61582799A529E00817C0 /* UserAgentGenerator.swift */; };
 		2D5CC37EBB1EFCC1DAB9C396 /* AppOpenEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99FBF8FEACC0C375A4C64F59 /* AppOpenEventTests.swift */; };
 		2F9AC2CA18EA516392463F94 /* ApiPayloadBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A24CB8EC53A41ADB0F8D4B /* ApiPayloadBuilder.swift */; };
-		303D334D079FE7FB6755B1A9 /* FIRAnalyticsConnector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 820D85DCF67D8E3624927172 /* FIRAnalyticsConnector.framework */; };
 		306D4EAB58967ED402AFF739 /* ConfigurationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5059CF895C13C251861CD492 /* ConfigurationRepository.swift */; };
 		30C6DBF0FB38281DF31D31C2 /* NetworkResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6561EF78FCF4E3FA2DFA675E /* NetworkResponse.swift */; };
 		315C0C36481750E18411BE5B /* SetUserIdEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B42C3DAE05F538698B64A2 /* SetUserIdEvent.swift */; };
@@ -87,7 +83,6 @@
 		39ABA47D8DFC1BC247E0062B /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40420FB6AE56C1ED6342ED53 /* Configuration.swift */; };
 		3A758813E0D3A1DFD74286FB /* OptimoveFileManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F0DCFD3F00AA505DC781F4 /* OptimoveFileManagerTests.swift */; };
 		3F54CF2D1E410914F91E4918 /* Bundle+HostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2308349FC7E43ABB55613C3 /* Bundle+HostApp.swift */; };
-		400CD642EFEB6A61F898EE76 /* ClientsServiceProjectKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674AFC7DC9A68A479E3E5A99 /* ClientsServiceProjectKeys.swift */; };
 		40745C5D6447231E96262ACB /* FileAccessible.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FFBD8E3E3EC13859EAA9E9 /* FileAccessible.swift */; };
 		419EFD0DCB8F3A6D4017D32B /* SetUserAgentEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799B1ECA74F09CE9EFDCC893 /* SetUserAgentEventTests.swift */; };
 		41EA7187A0CC2284A48C5D02 /* NetworkingFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B612F2C61E492C437FDEB5A8 /* NetworkingFactory.swift */; };
@@ -102,7 +97,6 @@
 		4C3CB5745956D3CD31CD5FF3 /* OptEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F083B4B1A83960C04CEB3F4 /* OptEvent.swift */; };
 		4C6B006717D8BC284A11FC0A /* Handler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DCAEC111713142C682D3EF /* Handler.swift */; };
 		4D00A84B5E6DD748540A1DCF /* Mocker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4DD62415D8168FE58AAE959 /* Mocker.framework */; };
-		4D507BF8C51EBD844A80DA7D /* BaseFirebaseKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6FA050AE5116FBEF9D6520 /* BaseFirebaseKeys.swift */; };
 		4F924FFD11B17CD232AA3FEB /* OptiPush.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC85A382B4935F9B498E00D9 /* OptiPush.swift */; };
 		54B57794ADCCA618D003408C /* SetUserEmailEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B90E69482E5CEF73C23265A7 /* SetUserEmailEventTests.swift */; };
 		54D8311C796B9A101EE28828 /* DeeplinkExtracter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5DB63900E49CBB9B703F117 /* DeeplinkExtracter.swift */; };
@@ -131,7 +125,6 @@
 		601A5E4975CF19EFFE2EC0DE /* EventValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9683C24A89EEA42DD8A0960 /* EventValidator.swift */; };
 		6049F22CB6BBC8885C44E23B /* OptimoveKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 984C74BEBEA358EE00D923EA /* OptimoveKeys.swift */; };
 		60ED25FDAB4C377028564FB1 /* InstallationIdGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA67A77AB53C378E44C23CCF /* InstallationIdGenerator.swift */; };
-		60F81DC69EF306A8F733337A /* GoogleDataTransport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 555CF06A0A6EE55F1650DA1C /* GoogleDataTransport.framework */; };
 		610CD697F86A71E8FB03D061 /* notificationWithScheduledCampaign.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F1A616BEF91523A37B96D95 /* notificationWithScheduledCampaign.json */; };
 		616B136802A56A176B15B835 /* DynamicLinkParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962F18D33551520DBEC49B67 /* DynamicLinkParser.swift */; };
 		626B1AF99FD89EB1053D308D /* FileAccessible.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FFBD8E3E3EC13859EAA9E9 /* FileAccessible.swift */; };
@@ -147,8 +140,6 @@
 		70BB55393E1F2FE56ACDE0DC /* FileManager+Optimove.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6870CEA83093D4E8CAEB51C1 /* FileManager+Optimove.swift */; };
 		71001882DDCC6C39BD4C548B /* OptInOutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D4CCCE4F3E543A2051DB78 /* OptInOutObserver.swift */; };
 		71A1956CB429CD8608022B82 /* OptiTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F2C3113110DE37DA1333E3 /* OptiTrack.swift */; };
-		74B30452CB835699B34F603B /* FirebaseCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B40DB1490C64955E310706A5 /* FirebaseCore.framework */; };
-		74B5A5CB02654A8A7A0E7734 /* PushServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699785BBFC5D3E45F1248EED /* PushServiceProvider.swift */; };
 		74DB1A1839535E223C45DBDA /* MultiplexLoggerStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC90DEBD13F50CE8782BAA9 /* MultiplexLoggerStream.swift */; };
 		7718B45F3E6F2D43C6A5ED3F /* StringSplitByLenghtExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70EC39175948194604CEA34B /* StringSplitByLenghtExtensionsTests.swift */; };
 		794AABCA624F604F26CF9F78 /* MockNotificationPermissionFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CAE2FCEA5FEDA23AA726A0E /* MockNotificationPermissionFetcher.swift */; };
@@ -178,12 +169,9 @@
 		90484CE515563AFECEC49460 /* Parameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC03ED4AD4528B09932E2CD2 /* Parameter.swift */; };
 		916913275E3687296DEE4391 /* LoggerStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98825890B98C6DE693A77449 /* LoggerStream.swift */; };
 		921AEF350F6E77694AE1F9C5 /* TriggeredNotificationOpened.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E9263C3AC5D8A7700CE78DE /* TriggeredNotificationOpened.swift */; };
-		94059979EC4384F9ACD1058D /* GoogleDataTransportCCTSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF702DB1913A509DF838D355 /* GoogleDataTransportCCTSupport.framework */; };
 		9577356996343F9486EC6F48 /* ConfigurationBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466D1FECB424AC5355B96F95 /* ConfigurationBuilder.swift */; };
 		96C277514F2D6A69BC694013 /* OptimoveTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E47D0A199ACC4968A9683B /* OptimoveTestCase.swift */; };
-		97912939456D390FD06B87A8 /* FirebaseAnalytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF130D463EEB54FFD0945566 /* FirebaseAnalytics.framework */; };
 		9839623196598C955928FEA0 /* KVOExpectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2027ED43354F4EB835FA0AA0 /* KVOExpectation.swift */; };
-		986741E4BDA7647F506A5E6C /* FirebaseCoreDiagnostics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E34A122A2840BDF5FF74559B /* FirebaseCoreDiagnostics.framework */; };
 		99CD0E359DB3C2667AE9B79F /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928DA41EE0B0E64B35B7CC7B /* AsyncOperation.swift */; };
 		9BCE1816CC777FF4813F6601 /* NotificationPermissionFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44054EA38AD95E08CBE529D4 /* NotificationPermissionFetcher.swift */; };
 		9BD8961386A1CCFF99D050E5 /* RealtimeEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61CC98E26528C3309DB820D8 /* RealtimeEvent.swift */; };
@@ -226,7 +214,6 @@
 		BB1FD1EBEE15D429B12B2B91 /* NotificationDeliveryReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 778592CA2BE82D19B84F3947 /* NotificationDeliveryReporter.swift */; };
 		BB3ADC4111A38EA75CDCD879 /* MockTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FF0834723551EEAD3787A5 /* MockTracker.swift */; };
 		BB5053D4526C5835D4B5C796 /* OnStartEventGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE818CDC0AE7BFA721D8EA8F /* OnStartEventGenerator.swift */; };
-		BB647766BA2B08F1B76B9A63 /* OptiPushServiceLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE805D29744820540522178 /* OptiPushServiceLocator.swift */; };
 		BBDD429B240F431F39563A52 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32336252C2977A25229C3E56 /* Logger.swift */; };
 		BCFDFF22AC278181D47FE86B /* TriggeredNotificationRecieved.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A5CB8AD6BF256FBDFE653F7 /* TriggeredNotificationRecieved.swift */; };
 		BE042A8A64CD568521C7D1FD /* GoogleUtilities.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CB74A0CC1442CA008E3067A9 /* GoogleUtilities.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -239,7 +226,6 @@
 		C583A32CD2FF19094977AE40 /* OptipushOptInEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 784310CA6E46E1BAD767ACA4 /* OptipushOptInEventTests.swift */; };
 		C740C94C0FCF7955229FE27E /* OptitrackMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A454D5992FC3DB7B8F13C4 /* OptitrackMetaData.swift */; };
 		C88F3C71E66FF74C09C467F2 /* SetUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B0EE31629E2780050A5FC9 /* SetUser.swift */; };
-		CA0A81E5CDD35E7985185443 /* GoogleAppMeasurement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C5C6C2978FFE6127EEC8910 /* GoogleAppMeasurement.framework */; };
 		CA134C1B5065AC32B56B1CAD /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E4D45F4D079DABFFFB5B848 /* Tracker.swift */; };
 		CBA3D6BD2269778218266AD5 /* MockStatisticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C9108020CAF36768579AA7 /* MockStatisticService.swift */; };
 		CBB63F003160A7E1397BCAE6 /* TenantConfigurationDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9C23290123D0E24989F4BF /* TenantConfigurationDownloader.swift */; };
@@ -262,7 +248,6 @@
 		D73383EB2FB7DEA9BF737FD1 /* RegistrarNetworkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B37466FDED9BB6674CCDD83 /* RegistrarNetworkingTests.swift */; };
 		D768B18A5B6CEDF723BA0962 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A61B16F0E90FF2BF28B2CB25 /* AdSupport.framework */; };
 		D7F26C4990CB175F51361BF7 /* Mocker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D4DD62415D8168FE58AAE959 /* Mocker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D80D37683E6FBAA3C6DFBB39 /* GoogleUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB74A0CC1442CA008E3067A9 /* GoogleUtilities.framework */; };
 		D88E575BBA436CE7BD3ED0D3 /* GlobalConfigFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558B0FF7FB691AD7EF1BC356 /* GlobalConfigFixture.swift */; };
 		D95B85901F832DDDCF4FE3B6 /* ParametersNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6DFB1AF38279882AD8BB72 /* ParametersNormalizer.swift */; };
 		D98C34B03181D78AB95D4FBA /* LoggerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D662AD6EFE3E7F7E4F6703 /* LoggerSettings.swift */; };
@@ -272,7 +257,6 @@
 		DBD30A2BB7E616B60C01E5A7 /* RealTimeNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19114AFD2A4F49152873A211 /* RealTimeNetworking.swift */; };
 		DCD44AC661B1E3B072878F2C /* AppOpenEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D88004BE78A3C2AA9394E77 /* AppOpenEvent.swift */; };
 		DE457BEB9AAE8BE5BE295D88 /* EmailValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A24289178D2D3708CA09B12 /* EmailValidator.swift */; };
-		DE71DD9C0C7D6926DB844A17 /* FirebaseMessaging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 876BBDB4B772A097C2BF8B66 /* FirebaseMessaging.framework */; };
 		DE9B112EEB42AB0BD3D6E874 /* ScheduledNotificationDeliveredTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD66832F101F098129CD64BD /* ScheduledNotificationDeliveredTests.swift */; };
 		DFBFE8B289F51A514282B44A /* ConfigurationFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4268499EEA7348C481371C /* ConfigurationFixture.swift */; };
 		E15BF9809FA0B1981E2CDA12 /* NetworkRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A0BE7F5E33EDAA7CC5CC4E /* NetworkRequest.swift */; };
@@ -292,11 +276,9 @@
 		EBFFD3C10BBB63D2BE067FE0 /* FirebaseInstanceID.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD983AA63F099EA06F4F5E2 /* FirebaseInstanceID.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EC6FCE53F6000850B92B2511 /* GlobalConfigurationDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF56D64273E803F0F9A6ACA /* GlobalConfigurationDownloaderTests.swift */; };
 		EC8157C51B383BD1B3BD9095 /* dev.tid.107.optipush.json in Resources */ = {isa = PBXBuildFile; fileRef = 0B00D121B7D35C23D9DE8B8E /* dev.tid.107.optipush.json */; };
-		EE914E181C5AC64FF68E7633 /* FirebaseInteractorNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F31F6A348F8D5C1D5CF7D98 /* FirebaseInteractorNetworking.swift */; };
 		EEA726E93CBE99DE605ECBC4 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C7EC2263685823B37EC99A /* UserNotifications.framework */; };
 		EF60D711929119DD2ECD7CFD /* AddUserAlias.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A60FFB5FBCDAB107FF539EC /* AddUserAlias.swift */; };
 		F0896993C660626712C2BAC8 /* SetAdvertisingIdEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DF500C4E8B8E4C6746B3D /* SetAdvertisingIdEvent.swift */; };
-		F1C0E8ABA1672D2D417818D3 /* FirebaseInstallations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0EA14F5774987E8B7CF84CC /* FirebaseInstallations.framework */; };
 		F242C038B9843F95E9E34715 /* OptimoveTenantInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23325F18E095CA85A27DE89 /* OptimoveTenantInfo.swift */; };
 		F29AC3418BF8410E6B6281C0 /* GlobalFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FAD11F93E2B42F32EF6C4B /* GlobalFunctions.swift */; };
 		F3126544A621C567D22261B9 /* OperationFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04821EFC2355BECFB0FFBEDA /* OperationFactory.swift */; };
@@ -304,16 +286,13 @@
 		F366378361753D8AC34D9449 /* ConfigurationFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4268499EEA7348C481371C /* ConfigurationFixture.swift */; };
 		F373640C1B5A41A5E8544858 /* RealtimeMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1E8868A47FCE0C6022BAE5 /* RealtimeMetaData.swift */; };
 		F378930DB1BEC798F911210F /* NotificationPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9953B09B51C3C2CA8123DEE8 /* NotificationPayload.swift */; };
-		F386208A45B5229489B933B9 /* FirebaseInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3FE2A7732EBE834571965F9 /* FirebaseInteractor.swift */; };
 		F57FB9CD58CF90DA4996EC92 /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBEE1C8B9EEE059A2D664AD /* RingBuffer.swift */; };
 		F60FADD518179820AA5BA325 /* CommonOptimoveEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC3C9200D601E704FB6F1E0 /* CommonOptimoveEvent.swift */; };
 		F6B190F646F11100B211E288 /* CoreEventFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A2928DDD25C92FD262C764 /* CoreEventFactory.swift */; };
 		FC89BF0B0CA708A54DB82538 /* String+SHA1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 898FAFE14D5B0AD641B75A59 /* String+SHA1.swift */; };
 		FCDDED6A4E919A79A86C688D /* MatomoTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDB0867845730F8D7C55EB70 /* MatomoTracker.framework */; };
-		FCFB66820EE4C52D8F9D43C7 /* FirebaseInstanceID.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CD983AA63F099EA06F4F5E2 /* FirebaseInstanceID.framework */; };
 		FD55C26C7570E142859D7693 /* ClientAPIRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAC84C3F79228E6A71470B7 /* ClientAPIRequestBuilder.swift */; };
 		FD6B210141F97A6B47D3B50B /* MockOptimoveStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0D16D34EAA14578617D5D6 /* MockOptimoveStorage.swift */; };
-		FE0DA834EF241DAC1342A017 /* FirebaseOptionsBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CFA2A1EF68E448CFE428EE /* FirebaseOptionsBuilder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -420,7 +399,6 @@
 		0B00D121B7D35C23D9DE8B8E /* dev.tid.107.optipush.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = dev.tid.107.optipush.json; sourceTree = "<group>"; };
 		0C5351C31727563488889DE5 /* ConfigurationBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationBuilderTests.swift; sourceTree = "<group>"; };
 		0CD983AA63F099EA06F4F5E2 /* FirebaseInstanceID.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseInstanceID.framework; sourceTree = "<group>"; };
-		0D6FA050AE5116FBEF9D6520 /* BaseFirebaseKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseFirebaseKeys.swift; sourceTree = "<group>"; };
 		0DFD677BC622E0581B33129C /* OptimoveEvent+MatchConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OptimoveEvent+MatchConfiguration.swift"; sourceTree = "<group>"; };
 		0E1E54304B64D97CC42E8D49 /* NewTenantInfoHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTenantInfoHandlerTests.swift; sourceTree = "<group>"; };
 		0EE55E37BD44D2ABE713857C /* ConfigurationFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationFetcher.swift; sourceTree = "<group>"; };
@@ -455,7 +433,6 @@
 		313AF75BEDDE3C3411F01615 /* OptimoveSDK-Unit.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "OptimoveSDK-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		32336252C2977A25229C3E56 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		37761BF2D65D9274912A54F3 /* MergeRemoteConfigurationOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeRemoteConfigurationOperation.swift; sourceTree = "<group>"; };
-		37978E1DB8C61F12F9607B6A /* FirebaseProjectKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseProjectKeys.swift; sourceTree = "<group>"; };
 		38B42C3DAE05F538698B64A2 /* SetUserIdEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetUserIdEvent.swift; sourceTree = "<group>"; };
 		38D5D03A189D6E46D85E120B /* configs.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = configs.json; sourceTree = "<group>"; };
 		3A24289178D2D3708CA09B12 /* EmailValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailValidator.swift; sourceTree = "<group>"; };
@@ -505,12 +482,9 @@
 		6561EF78FCF4E3FA2DFA675E /* NetworkResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkResponse.swift; sourceTree = "<group>"; };
 		65CE5453334832B2F87641CB /* GlobalConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConfig.swift; sourceTree = "<group>"; };
 		66C7E1BD5435FBCB27E96FEF /* UserDefaults+Optimove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Optimove.swift"; sourceTree = "<group>"; };
-		674AFC7DC9A68A479E3E5A99 /* ClientsServiceProjectKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientsServiceProjectKeys.swift; sourceTree = "<group>"; };
 		679BC715321E8F0D9C9E5B01 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		6870CEA83093D4E8CAEB51C1 /* FileManager+Optimove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+Optimove.swift"; sourceTree = "<group>"; };
-		699785BBFC5D3E45F1248EED /* PushServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushServiceProvider.swift; sourceTree = "<group>"; };
 		69D662AD6EFE3E7F7E4F6703 /* LoggerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerSettings.swift; sourceTree = "<group>"; };
-		6BE805D29744820540522178 /* OptiPushServiceLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptiPushServiceLocator.swift; sourceTree = "<group>"; };
 		6C02AB7C05FA49C5C0C780D5 /* OptInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptInService.swift; sourceTree = "<group>"; };
 		6F083B4B1A83960C04CEB3F4 /* OptEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptEvent.swift; sourceTree = "<group>"; };
 		7050A2CF3DB846CC7A661501 /* VisitorIDPreprocessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitorIDPreprocessorTests.swift; sourceTree = "<group>"; };
@@ -550,13 +524,11 @@
 		8C848179120653264AB8EDEA /* DeeplinkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeplinkService.swift; sourceTree = "<group>"; };
 		8CF7F8DB2BB53F5D18E6845C /* RemoteConfigurationRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationRequestBuilder.swift; sourceTree = "<group>"; };
 		8D8CADCE615623064BE53149 /* ComponentOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentOperation.swift; sourceTree = "<group>"; };
-		8F31F6A348F8D5C1D5CF7D98 /* FirebaseInteractorNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseInteractorNetworking.swift; sourceTree = "<group>"; };
 		90C9509F668ABF2A4746946D /* OptInOutObserverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptInOutObserverTests.swift; sourceTree = "<group>"; };
 		90E3A1462CC2D278C02D9DC7 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		91266ABE0D0487506DA080E0 /* RealTimeHanlder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTimeHanlder.swift; sourceTree = "<group>"; };
 		926CB4784BDFA967F9B33111 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		928DA41EE0B0E64B35B7CC7B /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
-		93604301FC3080DB06237FE5 /* FirebaseInteractorRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseInteractorRequestBuilder.swift; sourceTree = "<group>"; };
 		9415551DF59E320E55FC2A69 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		9455EE3084103D99378A43FF /* FileStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileStorage.swift; sourceTree = "<group>"; };
 		962F18D33551520DBEC49B67 /* DynamicLinkParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicLinkParser.swift; sourceTree = "<group>"; };
@@ -575,7 +547,6 @@
 		A1FFBD8E3E3EC13859EAA9E9 /* FileAccessible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileAccessible.swift; sourceTree = "<group>"; };
 		A26824BEBF1B58B97F4D3BCD /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
 		A372300E83294BAA01DACAF3 /* Result+Successful.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Successful.swift"; sourceTree = "<group>"; };
-		A3FE2A7732EBE834571965F9 /* FirebaseInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseInteractor.swift; sourceTree = "<group>"; };
 		A4D0445351BA8E72B53C89A3 /* NewEmailHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEmailHandlerTests.swift; sourceTree = "<group>"; };
 		A5DB63900E49CBB9B703F117 /* DeeplinkExtracter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeplinkExtracter.swift; sourceTree = "<group>"; };
 		A61B16F0E90FF2BF28B2CB25 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
@@ -666,7 +637,6 @@
 		EF6A5ECF39324F0179E7A0AA /* VisitorIDPreprocessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitorIDPreprocessor.swift; sourceTree = "<group>"; };
 		EF702DB1913A509DF838D355 /* GoogleDataTransportCCTSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleDataTransportCCTSupport.framework; sourceTree = "<group>"; };
 		F195D6A74F16DC039009B692 /* OptimoveSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OptimoveSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F2CFA2A1EF68E448CFE428EE /* FirebaseOptionsBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseOptionsBuilder.swift; sourceTree = "<group>"; };
 		F3DD17AD4E56CB0C3C97F902 /* OptiTrackComponentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptiTrackComponentTests.swift; sourceTree = "<group>"; };
 		F4346A1B2C197D938EAC1C49 /* MediaAttachmentDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaAttachmentDownloader.swift; sourceTree = "<group>"; };
 		F508BB8F8BD7981E512B0212 /* OptimoveTopicsUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveTopicsUserDefaults.swift; sourceTree = "<group>"; };
@@ -719,18 +689,6 @@
 			files = (
 				5E053F49077A89C08CF54B5F /* OptimoveCore.framework in Frameworks */,
 				FCDDED6A4E919A79A86C688D /* MatomoTracker.framework in Frameworks */,
-				303D334D079FE7FB6755B1A9 /* FIRAnalyticsConnector.framework in Frameworks */,
-				F1C0E8ABA1672D2D417818D3 /* FirebaseInstallations.framework in Frameworks */,
-				00BCD81CFE78C4D8156500A4 /* PromisesObjC.framework in Frameworks */,
-				97912939456D390FD06B87A8 /* FirebaseAnalytics.framework in Frameworks */,
-				74B30452CB835699B34F603B /* FirebaseCore.framework in Frameworks */,
-				986741E4BDA7647F506A5E6C /* FirebaseCoreDiagnostics.framework in Frameworks */,
-				FCFB66820EE4C52D8F9D43C7 /* FirebaseInstanceID.framework in Frameworks */,
-				DE71DD9C0C7D6926DB844A17 /* FirebaseMessaging.framework in Frameworks */,
-				CA0A81E5CDD35E7985185443 /* GoogleAppMeasurement.framework in Frameworks */,
-				60F81DC69EF306A8F733337A /* GoogleDataTransport.framework in Frameworks */,
-				94059979EC4384F9ACD1058D /* GoogleDataTransportCCTSupport.framework in Frameworks */,
-				D80D37683E6FBAA3C6DFBB39 /* GoogleUtilities.framework in Frameworks */,
 				AC09D26D395648106E7CA59C /* UIKit.framework in Frameworks */,
 				EEA726E93CBE99DE605ECBC4 /* UserNotifications.framework in Frameworks */,
 				D768B18A5B6CEDF723BA0962 /* AdSupport.framework in Frameworks */,
@@ -761,8 +719,6 @@
 			isa = PBXGroup;
 			children = (
 				AC85A382B4935F9B498E00D9 /* OptiPush.swift */,
-				6BE805D29744820540522178 /* OptiPushServiceLocator.swift */,
-				EA9440DA974009B42D01C4C7 /* PushServiceProvider */,
 				973ADC532B33D5965BCC29BF /* Registrar */,
 			);
 			path = OptiPush;
@@ -1019,17 +975,6 @@
 			path = Builders;
 			sourceTree = "<group>";
 		};
-		28CFF366F976F7CBCE0DD726 /* Firebase */ = {
-			isa = PBXGroup;
-			children = (
-				A3FE2A7732EBE834571965F9 /* FirebaseInteractor.swift */,
-				8F31F6A348F8D5C1D5CF7D98 /* FirebaseInteractorNetworking.swift */,
-				93604301FC3080DB06237FE5 /* FirebaseInteractorRequestBuilder.swift */,
-				F2CFA2A1EF68E448CFE428EE /* FirebaseOptionsBuilder.swift */,
-			);
-			path = Firebase;
-			sourceTree = "<group>";
-		};
 		29B37896896681ECE543C846 /* Carthage */ = {
 			isa = PBXGroup;
 			children = (
@@ -1211,7 +1156,6 @@
 				AC03ED4AD4528B09932E2CD2 /* Parameter.swift */,
 				EA1E8868A47FCE0C6022BAE5 /* RealtimeMetaData.swift */,
 				75205033F94F67D4320BA5A7 /* TenantConfig.swift */,
-				81A1195F10C87A456DDAA432 /* FirebaseKeys */,
 			);
 			path = Tenant;
 			sourceTree = "<group>";
@@ -1402,16 +1346,6 @@
 				002B61582799A529E00817C0 /* UserAgentGenerator.swift */,
 			);
 			path = OnStartHelpers;
-			sourceTree = "<group>";
-		};
-		81A1195F10C87A456DDAA432 /* FirebaseKeys */ = {
-			isa = PBXGroup;
-			children = (
-				0D6FA050AE5116FBEF9D6520 /* BaseFirebaseKeys.swift */,
-				674AFC7DC9A68A479E3E5A99 /* ClientsServiceProjectKeys.swift */,
-				37978E1DB8C61F12F9607B6A /* FirebaseProjectKeys.swift */,
-			);
-			path = FirebaseKeys;
 			sourceTree = "<group>";
 		};
 		83B95874A3BCF31B5E3A8455 /* Mocks */ = {
@@ -1775,15 +1709,6 @@
 				F3DD17AD4E56CB0C3C97F902 /* OptiTrackComponentTests.swift */,
 			);
 			path = OptiTrack;
-			sourceTree = "<group>";
-		};
-		EA9440DA974009B42D01C4C7 /* PushServiceProvider */ = {
-			isa = PBXGroup;
-			children = (
-				699785BBFC5D3E45F1248EED /* PushServiceProvider.swift */,
-				28CFF366F976F7CBCE0DD726 /* Firebase */,
-			);
-			path = PushServiceProvider;
 			sourceTree = "<group>";
 		};
 		EB5E6BB87386A2A5E486F43E /* Operations */ = {
@@ -2178,10 +2103,6 @@
 				DE457BEB9AAE8BE5BE295D88 /* EmailValidator.swift in Sources */,
 				34585E3170F52022E50A6F5F /* Environment.swift in Sources */,
 				601A5E4975CF19EFFE2EC0DE /* EventValidator.swift in Sources */,
-				F386208A45B5229489B933B9 /* FirebaseInteractor.swift in Sources */,
-				EE914E181C5AC64FF68E7633 /* FirebaseInteractorNetworking.swift in Sources */,
-				103B03FB584BD8BF289CF2C4 /* FirebaseInteractorRequestBuilder.swift in Sources */,
-				FE0DA834EF241DAC1342A017 /* FirebaseOptionsBuilder.swift in Sources */,
 				587679B4C18736B3BA7CD3FD /* FirstTimeVisitGenerator.swift in Sources */,
 				F363C4B08DCCE8434418F3D0 /* GlobalConfigurationDownloader.swift in Sources */,
 				4C6B006717D8BC284A11FC0A /* Handler.swift in Sources */,
@@ -2216,7 +2137,6 @@
 				85078BC00A096751ABE56D73 /* OptiLoggerOutputStream.swift in Sources */,
 				A794B2AFAFA742B37ECFA7E7 /* OptiLoggerStreamsContainer.swift in Sources */,
 				4F924FFD11B17CD232AA3FEB /* OptiPush.swift in Sources */,
-				BB647766BA2B08F1B76B9A63 /* OptiPushServiceLocator.swift in Sources */,
 				71A1956CB429CD8608022B82 /* OptiTrack.swift in Sources */,
 				5E7B4840A4047FFF714D2F4B /* Optimove.swift in Sources */,
 				E90168330390B94A0AE06577 /* OptimoveCoreEvent.swift in Sources */,
@@ -2235,7 +2155,6 @@
 				E82DB2BB1E66E5C6790E4C3D /* ParametersDecorator.swift in Sources */,
 				D95B85901F832DDDCF4FE3B6 /* ParametersNormalizer.swift in Sources */,
 				CFDCBD47B6F317025BFA460A /* ProcessInfo.swift in Sources */,
-				74B5A5CB02654A8A7A0E7734 /* PushServiceProvider.swift in Sources */,
 				24C0B8C84B148221E0986672 /* RealTime.swift in Sources */,
 				E9D36ED695D16B5E34923028 /* RealTimeEventBuilder.swift in Sources */,
 				0C2FD1ADD0C571CE4925672B /* RealTimeEventContext.swift in Sources */,
@@ -2341,9 +2260,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				99CD0E359DB3C2667AE9B79F /* AsyncOperation.swift in Sources */,
-				4D507BF8C51EBD844A80DA7D /* BaseFirebaseKeys.swift in Sources */,
 				3F54CF2D1E410914F91E4918 /* Bundle+HostApp.swift in Sources */,
-				400CD642EFEB6A61F898EE76 /* ClientsServiceProjectKeys.swift in Sources */,
 				39ABA47D8DFC1BC247E0062B /* Configuration.swift in Sources */,
 				9577356996343F9486EC6F48 /* ConfigurationBuilder.swift in Sources */,
 				306D4EAB58967ED402AFF739 /* ConfigurationRepository.swift in Sources */,
@@ -2352,7 +2269,6 @@
 				24105CA28662F067985CB3AC /* EventConfig.swift in Sources */,
 				70BB55393E1F2FE56ACDE0DC /* FileManager+Optimove.swift in Sources */,
 				0D7C1136886E7C4E2152EE14 /* FileStorage.swift in Sources */,
-				10215A2DBBDC91EA8C764C5B /* FirebaseProjectKeys.swift in Sources */,
 				82AF4F8D8E368EF308485B78 /* GlobalConfig.swift in Sources */,
 				F29AC3418BF8410E6B6281C0 /* GlobalFunctions.swift in Sources */,
 				13E0825BCE2112D6D5C6C85D /* LogBody.swift in Sources */,

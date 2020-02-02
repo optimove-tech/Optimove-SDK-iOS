@@ -82,6 +82,4 @@ struct OptimoveKeys {
         static let eventOs = "event_os"
         static let eventNativeMobile = "event_native_mobile"
     }
-
-    static let testTopicPrefix = "test_ios_"
 }

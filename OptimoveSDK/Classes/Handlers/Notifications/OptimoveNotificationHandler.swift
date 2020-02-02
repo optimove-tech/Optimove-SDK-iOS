@@ -4,7 +4,6 @@ import UIKit
 import UserNotifications
 import os.log
 import OptimoveCore
-import FirebaseMessaging
 
 final class OptimoveNotificationHandler {
 
@@ -107,7 +106,6 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
         notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
         ) {
-        Messaging.messaging().appDidReceiveMessage(notification.request.content.userInfo)
         completionHandler([.alert, .sound, .badge])
     }
 

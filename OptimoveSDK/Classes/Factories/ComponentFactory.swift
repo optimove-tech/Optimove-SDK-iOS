@@ -36,14 +36,9 @@ final class ComponentFactory {
         )
     }
 
-func createOptipushComponent(configuration: Configuration) -> OptiPush {
-        let localServiceLocator = OptiPushServiceLocator(
-            serviceLocator: serviceLocator,
-            optipushConfig: configuration.optipush
-        )
+    func createOptipushComponent(configuration: Configuration) -> OptiPush {
         return OptiPush(
-            serviceProvider: localServiceLocator.serviceProvider(),
-            registrar: localServiceLocator.registrar(),
+            registrar: serviceLocator.registrar(configuration: configuration),
             storage: serviceLocator.storage()
         )
     }

@@ -146,4 +146,25 @@ final class ServiceLocator {
         )
     }
 
+    func registrar(configuration: Configuration) -> Registrable {
+        let requestFactory = ApiRequestFactory(
+            storage: storage(),
+            payloadBuilder: ApiPayloadBuilder(
+                storage: storage(),
+                appNamespace: try! Bundle.getApplicationNameSpace()
+            ),
+            requestBuilder: ClientAPIRequestBuilder(
+                optipushConfig: configuration.optipush
+            )
+        )
+        let apiNetworking = ApiNetworkingImpl(
+            networkClient: networking(),
+            requestFactory: requestFactory
+        )
+        return Registrar(
+            storage: storage(),
+            networking: apiNetworking
+        )
+    }
+
 }
