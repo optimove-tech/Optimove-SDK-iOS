@@ -49,9 +49,7 @@ private extension OptInService {
 
     func requestTokenIfNeeded(pushAuthorizationGranted: Bool) {
         guard pushAuthorizationGranted, storage.apnsToken == nil else { return }
-        DispatchQueue.main.async {
-            UIApplication.shared.registerForRemoteNotifications()
-        }
+        UIApplication.shared.registerForRemoteNotifications()
     }
 
 }

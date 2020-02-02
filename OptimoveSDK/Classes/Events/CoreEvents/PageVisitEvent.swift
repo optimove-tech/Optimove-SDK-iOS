@@ -9,15 +9,19 @@ final class PageVisitEvent: OptimoveCoreEvent {
             static let pageTitle = "pageTitle"
             static let category = "category"
         }
+        struct Value {
+            /// Using placeholder value only for Matomo backward compatibility.
+            static let customURL = "/"
+        }
     }
 
     let name: String = Constants.name
     let parameters: [String: Any]
 
-    init(customURL: String, pageTitle: String?, category: String?) {
+    init(title: String?, category: String?) {
         self.parameters = [
-            Constants.Key.customURL: customURL,
-            Constants.Key.pageTitle: pageTitle,
+            Constants.Key.customURL: Constants.Value.customURL,
+            Constants.Key.pageTitle: title,
             Constants.Key.category: category
         ].compactMapValues { $0 }
     }

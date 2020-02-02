@@ -43,7 +43,6 @@ final class OptiTrackComponentTests: XCTestCase {
     func test_screen_event_report() {
         // given
         let screenTitle = "screenTitle"
-        let screenPath = "screenPath"
         let category = "category"
 
         // then
@@ -55,12 +54,11 @@ final class OptiTrackComponentTests: XCTestCase {
         }
 
         let trackViewExpectation = expectation(description: "track view event haven't been generated.")
-        let expectedURL = URL(string: "http://\(screenPath)")!
         tracker.trackViewAssertFunction = { (views: [String], url: URL?) -> Void in
             XCTAssert(views == [screenTitle],
                       "Expect \([screenTitle]). Actual \(views)")
-            XCTAssert(url == expectedURL,
-                      "Expect \(expectedURL). Actual \(String(describing: url))")
+            XCTAssert(url == URL(string: PageVisitEvent.Constants.Value.customURL),
+                      "Expect \(String(describing: URL(string: PageVisitEvent.Constants.Value.customURL))). Actual \(String(describing: url))")
             trackViewExpectation.fulfill()
         }
 
@@ -69,8 +67,7 @@ final class OptiTrackComponentTests: XCTestCase {
             try optitrack.handle(
                 OperationContext(
                     .reportScreenEvent(
-                        customURL: screenPath,
-                        pageTitle: screenTitle,
+                        title: screenTitle,
                         category: category
                     )
                 )

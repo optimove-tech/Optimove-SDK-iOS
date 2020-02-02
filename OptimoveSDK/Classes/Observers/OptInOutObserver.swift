@@ -6,9 +6,12 @@ import OptimoveCore
 final class OptInOutObserver {
 
     private let optInService: OptInService
+    private let notificationPermissionFetcher: NotificationPermissionFetcher
 
-    init(optInService: OptInService) {
+    init(optInService: OptInService,
+         notificationPermissionFetcher: NotificationPermissionFetcher) {
         self.optInService = optInService
+        self.notificationPermissionFetcher = notificationPermissionFetcher
     }
 
 }
@@ -31,18 +34,11 @@ extension OptInOutObserver: DeviceStateObservable {
 private extension OptInOutObserver {
 
     func checkSettings() {
-        let onGetNotificationSettings: (UNNotificationSettings) -> Void = { [optInService] (settings) in
+        notificationPermissionFetcher.fetch { [optInService] (granted) in
             tryCatch {
-                if #available(iOS 12.0, *) {
-                    let isAuthorized = settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional
-                    try optInService.didPushAuthorization(isGranted: isAuthorized)
-                } else {
-                    let isAuthorized = settings.authorizationStatus == .authorized
-                    try optInService.didPushAuthorization(isGranted: isAuthorized)
-                }
+                try optInService.didPushAuthorization(isGranted: granted)
             }
         }
-        UNUserNotificationCenter.current().getNotificationSettings(completionHandler: onGetNotificationSettings)
     }
 
 }

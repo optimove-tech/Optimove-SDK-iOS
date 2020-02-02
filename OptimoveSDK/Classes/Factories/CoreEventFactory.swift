@@ -12,7 +12,7 @@ enum CoreEventType {
     case setUserEmail
     case setAdvertisingId
     case setUserId
-    case pageVisit(screenPath: String, screenTitle: String, category: String?)
+    case pageVisit(title: String, category: String?)
 }
 
 protocol CoreEventFactory {
@@ -51,8 +51,8 @@ extension CoreEventFactoryImpl: CoreEventFactory {
             return try createOptipushOptOutEvent()
         case .metaData:
             return try createMetaDataEvent()
-        case let .pageVisit(screenPath: sp, screenTitle: st, category: c):
-            return createPageVisitEvent(screenPath: sp, screenTitle: st, category: c)
+        case let .pageVisit(title: t, category: c):
+            return createPageVisitEvent(title: t, category: c)
         case .setUserAgent:
             return try createSetUserAgentEvent()
         case .setAdvertisingId:
@@ -125,10 +125,9 @@ private extension CoreEventFactoryImpl {
         )
     }
 
-    func createPageVisitEvent(screenPath: String, screenTitle: String, category: String?) -> PageVisitEvent {
+    func createPageVisitEvent(title: String, category: String?) -> PageVisitEvent {
         return PageVisitEvent(
-            customURL: screenPath,
-            pageTitle: screenTitle,
+            title: title,
             category: category
         )
     }
