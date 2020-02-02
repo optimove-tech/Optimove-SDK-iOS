@@ -84,20 +84,14 @@ public struct OptipushConfig: Codable, TenantInfo {
     public let tenantID: Int
     public let mbaasEndpoint: URL
     public let pushTopicsRegistrationEndpoint: URL
-    public let firebaseProjectKeys: FirebaseProjectKeys
-    public let clientsServiceProjectKeys: ClientsServiceProjectKeys
 
     public init(
         tenantID: Int,
         mbaasEndpoint: URL,
-        pushTopicsRegistrationEndpoint: URL,
-        firebaseProjectKeys: FirebaseProjectKeys,
-        clientsServiceProjectKeys: ClientsServiceProjectKeys) {
+        pushTopicsRegistrationEndpoint: URL) {
         self.tenantID = tenantID
         self.mbaasEndpoint = mbaasEndpoint
         self.pushTopicsRegistrationEndpoint = pushTopicsRegistrationEndpoint
-        self.firebaseProjectKeys = firebaseProjectKeys
-        self.clientsServiceProjectKeys = clientsServiceProjectKeys
     }
 }
 

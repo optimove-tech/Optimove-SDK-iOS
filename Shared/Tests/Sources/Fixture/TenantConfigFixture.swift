@@ -10,8 +10,6 @@ final class TenantConfigFixture {
             realtime: tenantRealtimeConfigFixture(),
             optitrack: tenantOptitrackConfigFixture(),
             optipush: tenantOptipushConfigFixture(),
-            firebaseProjectKeys: firebaseProjectKeysFixture(),
-            clientsServiceProjectKeys: clientsServiceProjectKeysFixture(),
             events: createTenantEventFixture()
         )
     }
@@ -34,28 +32,6 @@ final class TenantConfigFixture {
         return TenantOptipushConfig(
             pushTopicsRegistrationEndpoint: StubVariables.url,
             enableAdvertisingIdReport: StubVariables.bool
-        )
-    }
-
-    func firebaseProjectKeysFixture() -> FirebaseProjectKeys {
-        return FirebaseProjectKeys(
-            appid: StubVariables.string,
-            webApiKey: StubVariables.string,
-            dbUrl: StubVariables.string,
-            senderId: StubVariables.string,
-            storageBucket: StubVariables.string,
-            projectId: StubVariables.string
-        )
-    }
-
-    func clientsServiceProjectKeysFixture() -> ClientsServiceProjectKeys {
-        return ClientsServiceProjectKeys(
-            appid: StubVariables.string,
-            webApiKey: StubVariables.string,
-            dbUrl: StubVariables.string,
-            senderId: StubVariables.string,
-            storageBucket: StubVariables.string,
-            projectId: StubVariables.string
         )
     }
 

@@ -180,38 +180,6 @@ class KeyValueStorageTests: XCTestCase {
         XCTAssertThrowsError(try storage.getApnsToken())
     }
 
-    func test_defaultFcmToken() {
-        // when
-        storage.defaultFcmToken = StubVariables.string
-
-        // then
-        XCTAssertNoThrow(try storage.getDefaultFcmToken())
-    }
-
-    func test_no_defaultFcmToken() {
-        // when
-        storage.apnsToken = nil
-
-        // then
-        XCTAssertThrowsError(try storage.getDefaultFcmToken())
-    }
-
-    func test_fcmToken() {
-        // when
-        storage.fcmToken = StubVariables.string
-
-        // then
-        XCTAssertNoThrow(try storage.getFcmToken())
-    }
-
-    func test_no_fcmToken() {
-        // when
-        storage.apnsToken = nil
-
-        // then
-        XCTAssertThrowsError(try storage.getFcmToken())
-    }
-
     func test_firstVisitTimestamp() {
         // when
         storage.firstVisitTimestamp = 42
@@ -274,20 +242,6 @@ class KeyValueStorageTests: XCTestCase {
     }
 
     // MARK: Simple
-
-    func test_isClientHasFirebase() {
-        // when
-        let value = StubVariables.bool
-        storage.isClientHasFirebase = value
-
-        // then
-        XCTAssert(storage.isClientHasFirebase == value)
-    }
-
-    func test_no_isClientHasFirebase() {
-        // then
-        XCTAssert(storage.isClientHasFirebase == false)
-    }
 
     func test_isAddingUserAliasSuccess() {
         // when

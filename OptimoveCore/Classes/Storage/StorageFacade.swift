@@ -32,11 +32,8 @@ public enum StorageKey: String, CaseIterable {
     case userEmail
     case apnsToken
     case siteID
-    case isClientHasFirebase
     case addingUserAliasSuccess
     case settingUserSuccess
-    case defaultFcmToken
-    case fcmToken
     case firstVisitTimestamp
     case realtimeSetUserIdFailed
     case realtimeSetEmailFailed
@@ -79,12 +76,8 @@ public protocol StorageValue {
     var userEmail: String? { get set }
     var apnsToken: Data? { get set }
     var siteID: Int? { get set }
-    /// Default value is `false`
-    var isClientHasFirebase: Bool { get set }
     var isAddingUserAliasSuccess: Bool? { get set }
     var isSettingUserSuccess: Bool? { get set }
-    var defaultFcmToken: String? { get set }
-    var fcmToken: String? { get set }
     var firstVisitTimestamp: Int64? { get set }
     var realtimeSetUserIdFailed: Bool { get set }
     var realtimeSetEmailFailed: Bool { get set }
@@ -92,8 +85,6 @@ public protocol StorageValue {
     func getUserEmail() throws -> String
     func getApnsToken() throws -> Data
     func getSiteID() throws -> Int
-    func getDefaultFcmToken() throws -> String
-    func getFcmToken() throws -> String
     func getFirstVisitTimestamp() throws -> Int64
 }
 
@@ -131,11 +122,8 @@ public final class StorageFacade: OptimoveStorage {
         .userEmail,
         .apnsToken,
         .siteID,
-        .isClientHasFirebase,
         .addingUserAliasSuccess,
         .settingUserSuccess,
-        .defaultFcmToken,
-        .fcmToken,
         .firstVisitTimestamp,
         .realtimeSetUserIdFailed,
         .realtimeSetEmailFailed
@@ -468,15 +456,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var isClientHasFirebase: Bool {
-        get {
-            return self[.isClientHasFirebase] ?? false
-        }
-        set {
-            self[.isClientHasFirebase] = newValue
-        }
-    }
-
     var isAddingUserAliasSuccess: Bool? {
         get {
             return self[.addingUserAliasSuccess]
@@ -492,24 +471,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             return self[.settingUserSuccess] = newValue
-        }
-    }
-
-    var defaultFcmToken: String? {
-        get {
-            return self[.defaultFcmToken]
-        }
-        set {
-            self[.defaultFcmToken] = newValue
-        }
-    }
-
-    var fcmToken: String? {
-        get {
-            return self[.fcmToken]
-        }
-        set {
-            self[.fcmToken] = newValue
         }
     }
 
@@ -559,20 +520,6 @@ public extension KeyValueStorage where Self: StorageValue {
     func getSiteID() throws -> Int {
         guard let value = siteID else {
             throw StorageError.noValue(.siteID)
-        }
-        return value
-    }
-
-    func getDefaultFcmToken() throws -> String {
-        guard let value = defaultFcmToken else {
-            throw StorageError.noValue(.defaultFcmToken)
-        }
-        return value
-    }
-
-    func getFcmToken() throws -> String {
-        guard let value = fcmToken else {
-            throw StorageError.noValue(.fcmToken)
         }
         return value
     }
