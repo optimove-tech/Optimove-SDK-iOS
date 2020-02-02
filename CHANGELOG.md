@@ -1,5 +1,10 @@
 # Changelog
 
+# 2.10.0
+
+- **remove** test mode API.
+- **remove** firebase dependency.
+
 # 2.9.0
 
 - **fix** carthage firebase dependency for version 6.15.
