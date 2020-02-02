@@ -76,7 +76,7 @@ private extension OptiTrack {
             guard let category = category else { return "" }
             return ", category: '\(category)'"
         }()
-        Logger.debug("OptiTrack: Report screen event: title='\(title)' \(categoryDescription)")
+        Logger.debug("OptiTrack: Report screen event: title='\(title)'\(categoryDescription)")
         let event = try coreEventFactory.createEvent(
             .pageVisit(
                 title: title,
@@ -84,7 +84,7 @@ private extension OptiTrack {
             )
         )
         try report(event: event)
-        tracker.track(view: [title])
+        tracker.track(view: [title], url: URL(string: PageVisitEvent.Constants.Value.customURL))
     }
 
     func dispatchNow() {

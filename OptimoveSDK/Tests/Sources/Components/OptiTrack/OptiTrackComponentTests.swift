@@ -57,6 +57,8 @@ final class OptiTrackComponentTests: XCTestCase {
         tracker.trackViewAssertFunction = { (views: [String], url: URL?) -> Void in
             XCTAssert(views == [screenTitle],
                       "Expect \([screenTitle]). Actual \(views)")
+            XCTAssert(url == URL(string: PageVisitEvent.Constants.Value.customURL),
+                      "Expect \(String(describing: URL(string: PageVisitEvent.Constants.Value.customURL))). Actual \(String(describing: url))")
             trackViewExpectation.fulfill()
         }
 
