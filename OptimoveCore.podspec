@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '10.0'
   s.swift_version = '5'
   base_dir = "OptimoveCore/"
-  s.source_files = base_dir + 'Classes/**/*'
+  s.source_files = base_dir + 'Sources/Classes/**/*'
   s.frameworks = 'Foundation'
   s.test_spec 'unit' do |unit_tests|
     unit_tests.source_files = base_dir + 'Tests/Sources/**/*', 'Shared/Tests/Sources/**/*'
