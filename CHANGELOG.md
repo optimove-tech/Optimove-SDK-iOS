@@ -2,6 +2,7 @@
 
 # 2.10.0
 
+- **add** SPM support.
 - **remove** test mode API.
 - **remove** firebase dependency.
 
