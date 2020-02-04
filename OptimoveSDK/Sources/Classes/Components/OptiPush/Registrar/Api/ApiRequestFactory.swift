@@ -24,11 +24,6 @@ final class ApiRequestFactory {
                 userID: try storage.getInitialVisitorId(),
                 model: payloadBuilder.createSetUser()
             )
-        case .addUserAlias:
-            return try requestBuilder.putMigrateUser(
-                userID: try storage.getInitialVisitorId(),
-                model: try payloadBuilder.createAddUserAlias()
-            )
         }
     }
 

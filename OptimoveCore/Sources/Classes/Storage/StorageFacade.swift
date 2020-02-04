@@ -24,7 +24,6 @@ public enum StorageKey: String, CaseIterable {
     case deviceResolutionHeight
     case advertisingIdentifier
     case optFlag
-    case failedCustomerIDs
 
     // MARK: Shared keys
     /// Placed in tenant container (legacy)
@@ -32,7 +31,6 @@ public enum StorageKey: String, CaseIterable {
     case userEmail
     case apnsToken
     case siteID
-    case addingUserAliasSuccess
     case settingUserSuccess
     case firstVisitTimestamp
     case realtimeSetUserIdFailed
@@ -58,7 +56,6 @@ public protocol StorageValue {
     var deviceResolutionHeight: Float? { get set }
     var advertisingIdentifier: String? { get set }
     var optFlag: Bool { get set }
-    var failedCustomerIDs: Set<String> { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -76,7 +73,6 @@ public protocol StorageValue {
     var userEmail: String? { get set }
     var apnsToken: Data? { get set }
     var siteID: Int? { get set }
-    var isAddingUserAliasSuccess: Bool? { get set }
     var isSettingUserSuccess: Bool? { get set }
     var firstVisitTimestamp: Int64? { get set }
     var realtimeSetUserIdFailed: Bool { get set }
@@ -113,7 +109,6 @@ public final class StorageFacade: OptimoveStorage {
         .deviceResolutionHeight,
         .advertisingIdentifier,
         .optFlag,
-        .failedCustomerIDs
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.
@@ -122,7 +117,6 @@ public final class StorageFacade: OptimoveStorage {
         .userEmail,
         .apnsToken,
         .siteID,
-        .addingUserAliasSuccess,
         .settingUserSuccess,
         .firstVisitTimestamp,
         .realtimeSetUserIdFailed,
@@ -332,22 +326,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var failedCustomerIDs: Set<String> {
-        get {
-            do {
-                guard let data: Data = self[.failedCustomerIDs] else { return [] }
-                return Set<String>(try JSONDecoder().decode([String].self, from: data))
-            } catch {
-                return []
-            }
-        }
-        set {
-            tryCatch {
-                self[.failedCustomerIDs] = try JSONEncoder().encode(newValue)
-            }
-        }
-    }
-
     // MARK: Group values getters
 
     func getConfigurationEndPoint() throws -> URL {
@@ -453,15 +431,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             self[.siteID] = newValue
-        }
-    }
-
-    var isAddingUserAliasSuccess: Bool? {
-        get {
-            return self[.addingUserAliasSuccess]
-        }
-        set {
-            self[.addingUserAliasSuccess] = newValue
         }
     }
 

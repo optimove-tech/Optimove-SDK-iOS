@@ -27,12 +27,4 @@ final class ApiPayloadBuilder {
         )
     }
 
-    // Alias is a value, like id, that could identifier an object of user/tenant.
-    func createAddUserAlias() throws -> AddUserAlias {
-        let customerID = try storage.getCustomerID()
-        let customerIDs = Set<String>([customerID]).union(storage.failedCustomerIDs)
-        return AddUserAlias(
-            newAliases: Array(customerIDs)
-        )
-    }
 }

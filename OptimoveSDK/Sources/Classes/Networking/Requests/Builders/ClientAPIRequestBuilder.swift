@@ -28,16 +28,4 @@ final class ClientAPIRequestBuilder {
         )
     }
 
-    func putMigrateUser(userID: String, model: AddUserAlias) throws -> NetworkRequest {
-        return try NetworkRequest(
-            method: .put,
-            baseURL: optipushConfig.mbaasEndpoint
-                .appendingPathComponent(Constants.tenantsPath)
-                .appendingPathComponent(String(optipushConfig.tenantID))
-                .appendingPathComponent(Constants.usersPath)
-                .appendingPathComponent(userID),
-            body: model
-        )
-    }
-
 }

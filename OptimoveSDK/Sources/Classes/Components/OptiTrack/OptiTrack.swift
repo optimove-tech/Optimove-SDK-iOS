@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import UIKit.UIApplication
+import Foundation
 import OptimoveCore
 
 final class OptiTrack {

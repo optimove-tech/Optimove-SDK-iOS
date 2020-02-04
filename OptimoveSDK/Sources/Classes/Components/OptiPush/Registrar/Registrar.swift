@@ -40,9 +40,6 @@ extension Registrar: Registrable {
         if let isSettingUserSuccess = storage.isSettingUserSuccess, isSettingUserSuccess == false {
             handle(.setUser)
         }
-        if let isAddingUserAliasSuccess = storage.isAddingUserAliasSuccess, isAddingUserAliasSuccess == false {
-            handle(.addUserAlias)
-        }
     }
 
 }
@@ -62,14 +59,6 @@ private extension Registrar {
             case .setUser:
                 Logger.error("Set User operation was failed. \(error.localizedDescription)")
                 storage.isSettingUserSuccess = false
-            case .addUserAlias:
-                Logger.error("Add User Alias operation was failed. \(error.localizedDescription)")
-                storage.isAddingUserAliasSuccess = false
-                if let customerID = storage.customerID {
-                    var failedCustomerIDs: Set<String> = storage.failedCustomerIDs
-                    failedCustomerIDs.insert(customerID)
-                    storage.failedCustomerIDs = failedCustomerIDs
-                }
             }
         }
 
@@ -77,9 +66,6 @@ private extension Registrar {
             switch operation {
             case .setUser:
                 storage.isSettingUserSuccess = true
-            case .addUserAlias:
-                storage.isAddingUserAliasSuccess = true
-                storage.failedCustomerIDs = []
             }
         }
     }

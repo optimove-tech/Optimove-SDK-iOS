@@ -26,15 +26,7 @@ extension OptiPush: Component {
         case let .deviceToken(token: token):
             storage.apnsToken = token
             registrar.handle(.setUser)
-            /// Alias`initialVisitorID` with `customerID` if the last one existed.
-            /// Keep actual DB connections between the client aliases and the latest token.
-            if (storage.customerID != nil) {
-                registrar.handle(.addUserAlias)
-            }
-        case .migrateUser:
-            guard storage.apnsToken != nil else { return }
-            registrar.handle(.addUserAlias)
-        case .optIn, .optOut:
+        case .migrateUser, .setUserId, .optIn, .optOut:
             guard storage.apnsToken != nil else { return }
             registrar.handle(.setUser)
         default:

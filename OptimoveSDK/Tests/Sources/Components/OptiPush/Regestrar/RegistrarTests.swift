@@ -128,44 +128,4 @@ class RegistrarTests: OptimoveTestCase {
         wait(for: [networkExpectation, successFlagExpectation], timeout: defaultTimeout)
     }
 
-    func test_retry_migrate_user() {
-        // given
-        prefillStorageAsCustomer()
-        storage.isAddingUserAliasSuccess = false
-        storage.failedCustomerIDs = ["a"]
-
-        // then
-        let networkExpectation = expectation(description: "Request was not generated.")
-        networking.assertFunction = { (operation) in
-            XCTAssertEqual(operation, .addUserAlias)
-            networkExpectation.fulfill()
-            return .success("")
-        }
-
-        // and
-        let successFlagExpectation = expectation(description: "Success flag was not updated.")
-        let failedCustomeerIDsExpectation = expectation(description: "Failed CustomerIDs was not updated.")
-        storage.assertFunction = { (value: Any?, key: StorageKey) -> Void in
-            if key == .addingUserAliasSuccess {
-                XCTAssert(value as? Bool == true)
-                successFlagExpectation.fulfill()
-            }
-            if key == .failedCustomerIDs {
-                XCTAssertEqual(try! JSONDecoder().decode(Set<String>.self, from: value as! Data), Set<String>([]))
-                failedCustomeerIDsExpectation.fulfill()
-            }
-        }
-
-        // when
-        try! registrable.retryFailedOperationsIfExist()
-        wait(
-            for:
-            [
-                networkExpectation,
-                successFlagExpectation,
-                failedCustomeerIDsExpectation
-            ],
-            timeout: defaultTimeout
-        )
-    }
 }

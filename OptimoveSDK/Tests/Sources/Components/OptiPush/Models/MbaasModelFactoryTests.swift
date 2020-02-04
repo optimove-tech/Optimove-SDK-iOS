@@ -45,31 +45,4 @@ class ApiPayloadBuilderTests: OptimoveTestCase {
         XCTAssertFalse(payload.optIn)
     }
 
-    func test_migrate_user() {
-        // given
-        prefillStorageAsCustomer()
-
-        // when
-        XCTAssertNoThrow(try factory.createAddUserAlias())
-        let payload = try! factory.createAddUserAlias()
-
-        // then
-        XCTAssertEqual(payload.newAliases, [storage.customerID!])
-    }
-
-    func test_migrate_user_with_failed_payload() {
-        // given
-        prefillStorageAsCustomer()
-        let failedCustomerIDs: Set<String> = ["a", "b", "c"]
-        storage.failedCustomerIDs = failedCustomerIDs
-
-        // when
-        XCTAssertNoThrow(try factory.createAddUserAlias())
-        let payload = try! factory.createAddUserAlias()
-
-        // then
-
-        XCTAssertEqual(Set(payload.newAliases), Set([storage.customerID!]).union(failedCustomerIDs))
-    }
-
 }

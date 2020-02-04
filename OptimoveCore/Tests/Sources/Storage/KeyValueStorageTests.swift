@@ -243,20 +243,6 @@ class KeyValueStorageTests: XCTestCase {
 
     // MARK: Simple
 
-    func test_isAddingUserAliasSuccess() {
-        // when
-        let value = StubVariables.bool
-        storage.isAddingUserAliasSuccess = value
-
-        // then
-        XCTAssert(storage.isAddingUserAliasSuccess == value)
-    }
-
-    func test_no_isAddingUserAliasSuccess() {
-        // then
-        XCTAssertNil(storage.isAddingUserAliasSuccess)
-    }
-
     func test_isSettingUserSuccess() {
         // when
         let value = StubVariables.bool
