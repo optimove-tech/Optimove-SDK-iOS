@@ -53,7 +53,6 @@ targets:
       testTargets:
         - OptimoveSDK-Unit
     settings:
-      OTHER_LDFLAGS: -ObjC
       MACH_O_TYPE: staticlib
       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk
     dependencies: 

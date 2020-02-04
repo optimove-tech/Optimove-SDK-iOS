@@ -1806,21 +1806,21 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		"TEMP_0F1C974D-59D8-4964-9B87-C468D6D7C235" /* Tests */ = {
+		"TEMP_2910C2BB-E3F7-4E99-A70A-0E9D64C27DBA" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_18A894BD-9965-4504-98B6-C0CCCB92A030" /* Tests */ = {
+		"TEMP_4EF51209-F432-4335-A540-95FB2515F47E" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_74DD141B-4E10-4FED-8A1F-5B260E880504" /* Tests */ = {
+		"TEMP_FDAD9737-AE41-4F73-84E7-9BDD53603411" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -2615,7 +2615,6 @@
 					"@executable_path/Frameworks",
 				);
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.optimove.sdk;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -2644,7 +2643,6 @@
 					"@executable_path/Frameworks",
 				);
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.optimove.sdk;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
