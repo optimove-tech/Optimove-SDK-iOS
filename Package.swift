@@ -11,7 +11,7 @@ let package = Package(
     products: [
         .library(
             name: "OptimoveSDK",
-            type: .dynamic,
+            type: .static,
             targets: ["OptimoveSDK"]
         ),
         .library(
@@ -38,30 +38,9 @@ let package = Package(
             ],
             path: "OptimoveSDK/Sources"
         ),
-        .testTarget(
-            name: "OptimoveSDK-Unit",
-            dependencies: [
-                "OptimoveSDK",
-                "Mocker"
-            ],
-            path: "OptimoveSDK/Tests",
-            sources: [
-                "Shared/Tests",
-            ]
-        ),
         .target(
             name: "OptimoveCore",
             path: "OptimoveCore/Sources"
-        ),
-        .testTarget(
-            name: "OptimoveCore-Unit",
-            dependencies: [
-                "OptimoveCore"
-            ],
-            path: "OptimoveCore/Tests",
-            sources: [
-                "Shared/Tests",
-            ]
         ),
         .target(
             name: "OptimoveNotificationServiceExtension",
@@ -69,16 +48,6 @@ let package = Package(
                 "OptimoveCore"
             ],
             path: "OptimoveNotificationServiceExtension/Sources"
-        ),
-        .testTarget(
-            name: "OptimoveNotificationServiceExtension-Unit",
-            dependencies: [
-                "OptimoveNotificationServiceExtension"
-            ],
-            path: "OptimoveNotificationServiceExtension/Tests",
-            sources: [
-                "Shared/Tests",
-            ]
         ),
     ],
     swiftLanguageVersions: [.v5]
