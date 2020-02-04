@@ -76,11 +76,14 @@ private extension OptimoveNotificationHandler {
             let params: [String: String]? = urlComp.queryItems?.reduce(into: [String: String](), { (result, next) in
                 result.updateValue(next.value ?? "", forKey: next.name)
             })
+            // The dropFirst() is to eliminate the "/" prefix of the path
+            let screenName = String(urlComp.path.dropFirst())
+            Logger.debug("Sending a deeplink with screenName: \(screenName) and params: \(String(describing: params))")
             deeplinkService.setDeepLinkComponents(
                 OptimoveDeepLinkComponents(
-                    screenName: String(urlComp.path.dropFirst()),
+                    screenName: screenName,
                     parameters: params
-                )  // The dropFirst() is to eliminate the "/" prefix of the path
+                )
             )
         } catch {
             Logger.error(error.localizedDescription)
