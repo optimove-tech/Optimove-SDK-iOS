@@ -82,7 +82,7 @@ extension Optimove {
     /// - Parameters:
     ///   - screenTitle: The screen title.
     ///   - screenCategory: The screen category.
-    @objc public func setScreenVisit(screenTitle: String, screenCategory: String? = nil) {
+    @objc public func reportScreenVisit(screenTitle: String, screenCategory: String? = nil) {
         let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
         Logger.info("Report a screen event w/title: \(screenTitle)")
         let validationResult = ScreenVisitValidator.validate(screenTitle: screenTitle)
@@ -103,9 +103,9 @@ extension Optimove {
     ///   - screenPathArray: An array of breadcrumbs – an UI path to the screen.
     ///   - screenTitle: The screen title.
     ///   - screenCategory: The screen category.
-    @available(*, deprecated, renamed: "setScreenVisit(screenTitle:screenCategory:)")
+    @available(*, deprecated, renamed: "reportScreenVisit(screenTitle:screenCategory:)")
     @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
-        setScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
+        reportScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
     }
 
     /// Report the screen visit event.
@@ -113,11 +113,11 @@ extension Optimove {
     ///   - screenPath: An UI path to the screen.
     ///   - screenTitle: The screen title.
     ///   - screenCategory: The screen category.
-    @available(*, deprecated, renamed: "setScreenVisit(screenTitle:screenCategory:)")
+    @available(*, deprecated, renamed: "reportScreenVisit(screenTitle:screenCategory:)")
     @objc public func setScreenVisit(screenPath: String,
                                      screenTitle: String,
                                      screenCategory: String? = nil) {
-        setScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
+            reportScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
     }
 
 }
@@ -260,6 +260,7 @@ extension Optimove {
     }
 
     /// Request to unsubscribe from test campaign topics
+    @available(*, deprecated, message: "No need to calls stop test mode.")
     @objc public func stopTestMode() {
         
     }
