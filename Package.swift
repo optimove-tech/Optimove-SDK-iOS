@@ -7,6 +7,7 @@ let package = Package(
     name: "Optimove",
     platforms: [
         .iOS(.v10),
+        .macOS(.v10_14),
     ],
     products: [
         .library(
