@@ -45,13 +45,15 @@ public final class NetworkRequest {
         queryItems: [URLQueryItem]? = DefaultValue.queryItems,
         body: Body,
         timeoutInterval: TimeInterval = DefaultValue.timeoutInterval) throws {
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
         self.init(
             method: method,
             baseURL: baseURL,
             path: path,
             headers: headers + [HTTPHeader(field: .contentType, value: .json)],
             queryItems: queryItems,
-            httpBody: try JSONEncoder().encode(body),
+            httpBody: try encoder.encode(body),
             timeoutInterval: timeoutInterval
         )
     }

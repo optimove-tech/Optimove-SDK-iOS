@@ -3,11 +3,12 @@
 import Foundation
 import OptimoveCore
 
-final class ClientAPIRequestBuilder {
+final class ApiRequestBuilder {
 
     struct Constants {
+        static let versionPath = "v3"
         static let tenantsPath = "tenants"
-        static let usersPath = "users"
+        static let installationPath = "installation"
     }
 
     private let optipushConfig: OptipushConfig
@@ -16,14 +17,14 @@ final class ClientAPIRequestBuilder {
         self.optipushConfig = optipushConfig
     }
 
-    func postAddMergeUser(userID: String, model: SetUser) throws -> NetworkRequest {
+    func postSetInstallation(model: Installation) throws -> NetworkRequest {
         return try NetworkRequest(
             method: .post,
             baseURL: optipushConfig.mbaasEndpoint
+                .appendingPathComponent(Constants.versionPath)
                 .appendingPathComponent(Constants.tenantsPath)
                 .appendingPathComponent(String(optipushConfig.tenantID))
-                .appendingPathComponent(Constants.usersPath)
-                .appendingPathComponent(userID),
+                .appendingPathComponent(Constants.installationPath),
             body: model
         )
     }

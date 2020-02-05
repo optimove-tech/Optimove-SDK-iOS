@@ -153,7 +153,7 @@ final class ServiceLocator {
                 storage: storage(),
                 appNamespace: try! Bundle.getApplicationNameSpace()
             ),
-            requestBuilder: ClientAPIRequestBuilder(
+            requestBuilder: ApiRequestBuilder(
                 optipushConfig: configuration.optipush
             )
         )

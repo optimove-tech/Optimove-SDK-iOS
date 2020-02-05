@@ -20,7 +20,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         let requestFactory = ApiRequestFactory(
             storage: storage,
             payloadBuilder: payloadBuilder,
-            requestBuilder: ClientAPIRequestBuilder(
+            requestBuilder: ApiRequestBuilder(
                 optipushConfig: config
             )
         )
@@ -38,10 +38,9 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         Mocker.register(
             Mock(
                 url: config.mbaasEndpoint
-                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.tenantsPath)
+                    .appendingPathComponent(ApiRequestBuilder.Constants.tenantsPath)
                     .appendingPathComponent(String(config.tenantID))
-                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.usersPath)
-                    .appendingPathComponent(storage.initialVisitorId!),
+                    .appendingPathComponent(ApiRequestBuilder.Constants.installationPath),
                 dataType: .json,
                 statusCode: 200,
                 data: [.post: Data()]
@@ -50,7 +49,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
 
         // when
         let resultExpectation = expectation(description: "Result was not generated.")
-        networking.sendToMbaas(operation: .setUser) { (result) in
+        networking.sendToMbaas(operation: .setInstallation) { (result) in
             switch result {
             case .success:
                 resultExpectation.fulfill()
@@ -66,23 +65,23 @@ class RegistrarNetworkingTests: OptimoveTestCase {
     func test_migrate_user() {
         // given
         prefillStorageAsCustomer()
+        prefillPushToken()
 
         Mocker.register(
             Mock(
                 url: config.mbaasEndpoint
-                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.tenantsPath)
+                    .appendingPathComponent(ApiRequestBuilder.Constants.tenantsPath)
                     .appendingPathComponent(String(config.tenantID))
-                    .appendingPathComponent(ClientAPIRequestBuilder.Constants.usersPath)
-                    .appendingPathComponent(storage.initialVisitorId!),
+                    .appendingPathComponent(ApiRequestBuilder.Constants.installationPath),
                 dataType: .json,
                 statusCode: 200,
-                data: [.put: Data()]
+                data: [.post: Data()]
             )
         )
 
         // when
         let resultExpectation = expectation(description: "Result was not generated.")
-        networking.sendToMbaas(operation: .addUserAlias) { (result) in
+        networking.sendToMbaas(operation: .setInstallation) { (result) in
             switch result {
             case .success:
                 resultExpectation.fulfill()

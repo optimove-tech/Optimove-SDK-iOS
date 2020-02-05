@@ -13,8 +13,8 @@ final class OptiPush {
          storage: OptimoveStorage) {
         self.storage = storage
         self.registrar = registrar
-        retryFailedMbaasOperations()
         Logger.debug("OptiPush initialized.")
+        registrar.retryFailedOperationsIfExist()
     }
 
 }
@@ -25,24 +25,12 @@ extension OptiPush: Component {
         switch context.operation {
         case let .deviceToken(token: token):
             storage.apnsToken = token
-            registrar.handle(.setUser)
-        case .migrateUser, .setUserId, .optIn, .optOut:
+            registrar.handle(.setInstallation)
+        case .setUserId, .optIn, .optOut:
             guard storage.apnsToken != nil else { return }
-            registrar.handle(.setUser)
+            registrar.handle(.setInstallation)
         default:
             break
         }
     }
-}
-
-private extension OptiPush {
-
-    func retryFailedMbaasOperations() {
-        do {
-            try registrar.retryFailedOperationsIfExist()
-        } catch {
-            Logger.error(error.localizedDescription)
-        }
-    }
-
 }

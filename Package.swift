@@ -7,7 +7,7 @@ let package = Package(
     name: "Optimove",
     platforms: [
         .iOS(.v10),
-        .macOS(.v10_14),
+        .macOS(.v10_14)
     ],
     products: [
         .library(
@@ -24,18 +24,18 @@ let package = Package(
             name: "OptimoveNotificationServiceExtension",
             type: .dynamic,
             targets: ["OptimoveNotificationServiceExtension"]
-        ),
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/matomo-org/matomo-sdk-ios.git", from: "7.2.0"),
-        .package(url: "https://github.com/WeTransfer/Mocker.git", from: "2.0.2"),
+        .package(url: "https://github.com/WeTransfer/Mocker.git", from: "2.0.2")
     ],
     targets: [
         .target(
             name: "OptimoveSDK",
             dependencies: [
                 "OptimoveCore",
-                "MatomoTracker",
+                "MatomoTracker"
             ],
             path: "OptimoveSDK/Sources"
         ),
@@ -49,7 +49,7 @@ let package = Package(
                 "OptimoveCore"
             ],
             path: "OptimoveNotificationServiceExtension/Sources"
-        ),
+        )
     ],
     swiftLanguageVersions: [.v5]
 )

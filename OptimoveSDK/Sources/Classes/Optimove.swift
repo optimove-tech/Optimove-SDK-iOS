@@ -97,7 +97,6 @@ extension Optimove {
         }
     }
 
-
     /// Report the screen visit event.
     /// - Parameters:
     ///   - screenPathArray: An array of breadcrumbs – an UI path to the screen.
@@ -145,7 +144,6 @@ extension Optimove {
         guard validationResult == .valid else { return }
         NewUserIDHandler(storage: storage).handle(userID: userID)
         synchronizer.handle(.setUserId)
-        synchronizer.handle(.migrateUser)
     }
 
     /// Set a user email to the Optimove SDK.
@@ -262,7 +260,7 @@ extension Optimove {
     /// Request to unsubscribe from test campaign topics
     @available(*, deprecated, message: "No need to calls stop test mode.")
     @objc public func stopTestMode() {
-        
+
     }
 }
 

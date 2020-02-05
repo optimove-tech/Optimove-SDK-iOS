@@ -30,7 +30,7 @@ class RegistrarTests: OptimoveTestCase {
         // then
         let networkExpectation = expectation(description: "Request was not generated.")
         networking.assertFunction = { (operation) in
-            XCTAssert(operation == .setUser)
+            XCTAssert(operation == .setInstallation)
             networkExpectation.fulfill()
             return .success("")
         }
@@ -45,7 +45,7 @@ class RegistrarTests: OptimoveTestCase {
         }
 
         // when
-        registrable.handle(.setUser)
+        registrable.handle(.setInstallation)
         wait(for: [networkExpectation, successFlagExpectation], timeout: defaultTimeout)
     }
 
@@ -56,7 +56,7 @@ class RegistrarTests: OptimoveTestCase {
         // then
         let networkExpectation = expectation(description: "Request was not generated.")
         networking.assertFunction = { (operation) in
-            XCTAssert(operation == .setUser)
+            XCTAssert(operation == .setInstallation)
             networkExpectation.fulfill()
             return .success("")
         }
@@ -71,7 +71,7 @@ class RegistrarTests: OptimoveTestCase {
         }
 
         // when
-        registrable.handle(.setUser)
+        registrable.handle(.setInstallation)
         wait(for: [networkExpectation, successFlagExpectation], timeout: defaultTimeout)
     }
 
@@ -82,7 +82,7 @@ class RegistrarTests: OptimoveTestCase {
         // then
         let networkExpectation = expectation(description: "Request was not generated.")
         networking.assertFunction = { (operation) in
-            XCTAssert(operation == .setUser)
+            XCTAssert(operation == .setInstallation)
             networkExpectation.fulfill()
             return .failure(StubError.test)
         }
@@ -97,7 +97,7 @@ class RegistrarTests: OptimoveTestCase {
         }
 
         // when
-        registrable.handle(.setUser)
+        registrable.handle(.setInstallation)
         wait(for: [networkExpectation, successFlagExpectation], timeout: defaultTimeout)
     }
 
@@ -109,7 +109,7 @@ class RegistrarTests: OptimoveTestCase {
         // then
         let networkExpectation = expectation(description: "Request was not generated.")
         networking.assertFunction = { (operation) in
-            XCTAssert(operation == .setUser)
+            XCTAssert(operation == .setInstallation)
             networkExpectation.fulfill()
             return .success("")
         }

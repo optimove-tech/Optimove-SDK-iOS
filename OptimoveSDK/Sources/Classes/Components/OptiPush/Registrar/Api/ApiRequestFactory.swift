@@ -7,11 +7,11 @@ final class ApiRequestFactory {
 
     private let storage: OptimoveStorage
     private let payloadBuilder: ApiPayloadBuilder
-    private let requestBuilder: ClientAPIRequestBuilder
+    private let requestBuilder: ApiRequestBuilder
 
     init(storage: OptimoveStorage,
          payloadBuilder: ApiPayloadBuilder,
-         requestBuilder: ClientAPIRequestBuilder) {
+         requestBuilder: ApiRequestBuilder) {
         self.storage = storage
         self.payloadBuilder = payloadBuilder
         self.requestBuilder = requestBuilder
@@ -19,10 +19,9 @@ final class ApiRequestFactory {
 
     func createRequest(operation: ApiOperation) throws -> NetworkRequest {
         switch operation {
-        case .setUser:
-            return try requestBuilder.postAddMergeUser(
-                userID: try storage.getInitialVisitorId(),
-                model: payloadBuilder.createSetUser()
+        case .setInstallation:
+            return try requestBuilder.postSetInstallation(
+                model: try payloadBuilder.createInstallation()
             )
         }
     }

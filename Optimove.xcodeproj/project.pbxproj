@@ -259,7 +259,7 @@
 		EA217C02FADC03C69449F317 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46370B16EF571A0A88EC6A65 /* NetworkClient.swift */; };
 		EAEE293A4A4E489DB7C9E6AC /* MockOptimoveStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0D16D34EAA14578617D5D6 /* MockOptimoveStorage.swift */; };
 		EB8989F57C67363DF5ACE46F /* RealTimeRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F11E3B818A8862F3957165F /* RealTimeRequestBuilder.swift */; };
-		EBF1D8977E67092C8ACCD29D /* SetUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766AB7EB587B1E08E52383F2 /* SetUser.swift */; };
+		EBF1D8977E67092C8ACCD29D /* Installation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766AB7EB587B1E08E52383F2 /* Installation.swift */; };
 		EC6FCE53F6000850B92B2511 /* GlobalConfigurationDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF56D64273E803F0F9A6ACA /* GlobalConfigurationDownloaderTests.swift */; };
 		EC8157C51B383BD1B3BD9095 /* dev.tid.107.optipush.json in Resources */ = {isa = PBXBuildFile; fileRef = 0B00D121B7D35C23D9DE8B8E /* dev.tid.107.optipush.json */; };
 		EEA726E93CBE99DE605ECBC4 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C7EC2263685823B37EC99A /* UserNotifications.framework */; };
@@ -469,7 +469,7 @@
 		732378F1F571519EBD60950B /* ComponentOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentOperation.swift; sourceTree = "<group>"; };
 		738B25C939FAE2104D09DB7B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		743439E918A7943D2FFA435C /* ApiRequestFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiRequestFactory.swift; sourceTree = "<group>"; };
-		766AB7EB587B1E08E52383F2 /* SetUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetUser.swift; sourceTree = "<group>"; };
+		766AB7EB587B1E08E52383F2 /* Installation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Installation.swift; sourceTree = "<group>"; };
 		769C151F4313E1C1E223FE8E /* ApiOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiOperation.swift; sourceTree = "<group>"; };
 		7709EE79BECC8179B83190A3 /* SetUserIdEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetUserIdEventTests.swift; sourceTree = "<group>"; };
 		784310CA6E46E1BAD767ACA4 /* OptipushOptInEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptipushOptInEventTests.swift; sourceTree = "<group>"; };
@@ -1132,7 +1132,7 @@
 		54CAFB76FB576E371FC5D8F6 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				766AB7EB587B1E08E52383F2 /* SetUser.swift */,
+				766AB7EB587B1E08E52383F2 /* Installation.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -2142,7 +2142,7 @@
 				E04C734BCB92039C3B747495 /* ScreenVisitValidator.swift in Sources */,
 				B44B56B11935E11D4A3DFDAC /* ServiceLocator.swift in Sources */,
 				A7949C48A6E6758214235394 /* SetAdvertisingIdEvent.swift in Sources */,
-				EBF1D8977E67092C8ACCD29D /* SetUser.swift in Sources */,
+				EBF1D8977E67092C8ACCD29D /* Installation.swift in Sources */,
 				C2A001E9BC1DD27508D7B8C6 /* SetUserAgent.swift in Sources */,
 				6EBAAB8917D02E887688A33D /* SetUserEmailEvent.swift in Sources */,
 				F4463BD44A499220DDE80852 /* SetUserIdEvent.swift in Sources */,

@@ -24,7 +24,6 @@ enum Operation {
     case reportScreenEvent(title: String, category: String?)
     case dispatchNow
     case deviceToken(token: Data)
-    case migrateUser
     case optIn
     case optOut
 }

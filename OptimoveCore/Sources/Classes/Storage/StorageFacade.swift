@@ -108,7 +108,7 @@ public final class StorageFacade: OptimoveStorage {
         .deviceResolutionWidth,
         .deviceResolutionHeight,
         .advertisingIdentifier,
-        .optFlag,
+        .optFlag
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.

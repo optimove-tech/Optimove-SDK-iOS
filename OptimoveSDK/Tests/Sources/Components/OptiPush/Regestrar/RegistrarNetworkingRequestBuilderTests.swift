@@ -19,7 +19,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         builder = ApiRequestFactory(
             storage: storage,
             payloadBuilder: payloadBuilder,
-            requestBuilder: ClientAPIRequestBuilder(
+            requestBuilder: ApiRequestBuilder(
                 optipushConfig: config
             )
         )
@@ -31,20 +31,19 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         prefillPushToken()
 
         // when
-        let request = try! builder.createRequest(operation: .setUser)
+        let request = try! builder.createRequest(operation: .setInstallation)
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
-            .appendingPathComponent(ClientAPIRequestBuilder.Constants.tenantsPath)
+            .appendingPathComponent(ApiRequestBuilder.Constants.tenantsPath)
             .appendingPathComponent(String(config.tenantID))
-            .appendingPathComponent(ClientAPIRequestBuilder.Constants.usersPath)
-            .appendingPathComponent(storage.initialVisitorId!)
+            .appendingPathComponent(ApiRequestBuilder.Constants.installationPath)
         )
         XCTAssertEqual(request.method, .post)
         XCTAssertEqual(request.timeoutInterval, NetworkRequest.DefaultValue.timeoutInterval)
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
-        XCTAssertEqual(request.httpBody, try! encoder.encode(payloadBuilder.createSetUser()))
+        XCTAssertEqual(request.httpBody, try! encoder.encode(payloadBuilder.createInstallation()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
@@ -57,20 +56,19 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         prefillPushToken()
 
         // when
-        let request = try! builder.createRequest(operation: .setUser)
+        let request = try! builder.createRequest(operation: .setInstallation)
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
-            .appendingPathComponent(ClientAPIRequestBuilder.Constants.tenantsPath)
+            .appendingPathComponent(ApiRequestBuilder.Constants.tenantsPath)
             .appendingPathComponent(String(config.tenantID))
-            .appendingPathComponent(ClientAPIRequestBuilder.Constants.usersPath)
-            .appendingPathComponent(storage.initialVisitorId!)
+            .appendingPathComponent(ApiRequestBuilder.Constants.installationPath)
         )
         XCTAssert(request.method == .post)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
-        XCTAssertEqual(request.httpBody, try! encoder.encode(payloadBuilder.createSetUser()))
+        XCTAssertEqual(request.httpBody, try! encoder.encode(payloadBuilder.createInstallation()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
@@ -80,22 +78,22 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
     func test_migrate_user_request() {
         // given
         prefillStorageAsCustomer()
+        prefillPushToken()
 
         // when
-        let request = try! builder.createRequest(operation: .addUserAlias)
+        let request = try! builder.createRequest(operation: .setInstallation)
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
-            .appendingPathComponent(ClientAPIRequestBuilder.Constants.tenantsPath)
+            .appendingPathComponent(ApiRequestBuilder.Constants.tenantsPath)
             .appendingPathComponent(String(config.tenantID))
-            .appendingPathComponent(ClientAPIRequestBuilder.Constants.usersPath)
-            .appendingPathComponent(storage.initialVisitorId!)
+            .appendingPathComponent(ApiRequestBuilder.Constants.installationPath)
         )
-        XCTAssert(request.method == .put)
+        XCTAssert(request.method == .post)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
-        XCTAssertEqual(request.httpBody, try! encoder.encode(try! payloadBuilder.createAddUserAlias()))
+        XCTAssertEqual(request.httpBody, try! encoder.encode(try! payloadBuilder.createInstallation()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
