@@ -35,6 +35,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
+            .appendingPathComponent(ApiRequestBuilder.Constants.versionPath)
             .appendingPathComponent(ApiRequestBuilder.Constants.tenantsPath)
             .appendingPathComponent(String(config.tenantID))
             .appendingPathComponent(ApiRequestBuilder.Constants.installationPath)
@@ -60,6 +61,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
+            .appendingPathComponent(ApiRequestBuilder.Constants.versionPath)
             .appendingPathComponent(ApiRequestBuilder.Constants.tenantsPath)
             .appendingPathComponent(String(config.tenantID))
             .appendingPathComponent(ApiRequestBuilder.Constants.installationPath)
@@ -85,6 +87,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
+            .appendingPathComponent(ApiRequestBuilder.Constants.versionPath)
             .appendingPathComponent(ApiRequestBuilder.Constants.tenantsPath)
             .appendingPathComponent(String(config.tenantID))
             .appendingPathComponent(ApiRequestBuilder.Constants.installationPath)

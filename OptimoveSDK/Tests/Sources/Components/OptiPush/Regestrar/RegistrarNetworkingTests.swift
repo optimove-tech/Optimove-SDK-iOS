@@ -38,6 +38,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         Mocker.register(
             Mock(
                 url: config.mbaasEndpoint
+                    .appendingPathComponent(ApiRequestBuilder.Constants.versionPath)
                     .appendingPathComponent(ApiRequestBuilder.Constants.tenantsPath)
                     .appendingPathComponent(String(config.tenantID))
                     .appendingPathComponent(ApiRequestBuilder.Constants.installationPath),
@@ -70,6 +71,7 @@ class RegistrarNetworkingTests: OptimoveTestCase {
         Mocker.register(
             Mock(
                 url: config.mbaasEndpoint
+                    .appendingPathComponent(ApiRequestBuilder.Constants.versionPath)
                     .appendingPathComponent(ApiRequestBuilder.Constants.tenantsPath)
                     .appendingPathComponent(String(config.tenantID))
                     .appendingPathComponent(ApiRequestBuilder.Constants.installationPath),
