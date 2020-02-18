@@ -1926,53 +1926,53 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		"TEMP_2476D835-99DA-4D47-83B0-F2D3C19B6715" /* Sources */ = {
+		"TEMP_03732DBE-E278-4A12-B5C4-E4F118CC96FC" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
-			path = Sources;
+			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_676625FC-CAA7-46EE-87A8-FAC3CCE4F025" /* Networking */ = {
+		"TEMP_4A9F4FF8-C535-4A33-BEFD-43F25081482D" /* Networking */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Networking;
 			sourceTree = "<group>";
 		};
-		"TEMP_70586424-FD50-442E-872F-C6D8F9D5AE64" /* Tests */ = {
+		"TEMP_5D058F2B-4E6D-4093-8ACD-070AC032799E" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_90345AD4-7A55-408F-8460-1E978ABB51FD" /* Tests */ = {
+		"TEMP_6CC2A99A-EFF0-4E1D-B4A1-84E7596EBE74" /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		"TEMP_C575078E-B0E4-4961-9FD5-F851F654C1F4" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_C705ACEA-95E6-40AD-BC4A-E3AF5AEA6CB3" /* Optimove */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Optimove;
-			sourceTree = "<group>";
-		};
-		"TEMP_D372B7C4-0F33-4543-BCED-7FD575FE5087" /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		"TEMP_EE2F1C28-84A7-40E2-941B-F622ECC17DB5" /* Classes */ = {
+		"TEMP_CE9429FE-1E8C-4C4B-B42A-876FDCB53969" /* Classes */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Classes;
+			sourceTree = "<group>";
+		};
+		"TEMP_D58F2325-2A32-4F18-8DC7-82BC153F3EFE" /* Optimove */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Optimove;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2092,6 +2092,8 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1020;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 05A4DEC880B8C9907862CC6F /* Build configuration list for PBXProject "Optimove" */;
 			compatibilityVersion = "Xcode 10.0";
