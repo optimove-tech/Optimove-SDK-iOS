@@ -50,7 +50,6 @@ class OptimoveTestCase: XCTestCase {
         storage.apnsToken = StubConstants.apnsToken
     }
 
-
 }
 
 extension String {

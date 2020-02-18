@@ -28,7 +28,7 @@ final class InstallationIdTests: OptimoveTestCase {
 
         wait(
             for: [
-                installationIdExpectation,
+                installationIdExpectation
             ],
             timeout: defaultTimeout
         )
@@ -52,7 +52,7 @@ final class InstallationIdTests: OptimoveTestCase {
 
         wait(
             for: [
-                installationIdExpectation,
+                installationIdExpectation
             ],
             timeout: defaultTimeout
         )
@@ -76,11 +76,10 @@ final class InstallationIdTests: OptimoveTestCase {
 
         wait(
             for: [
-                installationIdExpectation,
+                installationIdExpectation
             ],
             timeout: defaultTimeout
         )
     }
 
 }
-
