@@ -11,9 +11,9 @@ public extension FileManager {
         guard let url = self.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier) else {
             throw GuardError.custom(
                 """
-                Unable to found container for the application group identifier: \(groupIdentifier).
-                Reason: a client forgot to add the app group as described in the documentation.
-                Link: ttps://tinyurl.com/y3kfnjw9
+                Unable to initialize FileManager container for the application group identifier "\(groupIdentifier)".
+                Highly possible that the client forgot to add the app group as described in the documentation.
+                Link: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Setup#3-setting-up-capabilities
                 """
             )
         }
