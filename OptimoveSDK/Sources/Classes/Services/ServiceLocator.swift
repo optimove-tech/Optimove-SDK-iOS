@@ -13,20 +13,7 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _storage: StorageFacade = {
-        do {
-            let bundleIdentifier = try Bundle.getApplicationNameSpace()
-            let groupStorage = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
-            let fileStorage = try FileStorageImpl(bundleIdentifier: bundleIdentifier, fileManager: .default)
-            return StorageFacade(
-                groupedStorage: groupStorage,
-                sharedStorage: UserDefaults.standard,
-                fileStorage: fileStorage
-            )
-        } catch {
-            fatalError(error.localizedDescription)
-        }
-    }()
+    private let _storage: StorageFacade
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
     private lazy var _statisticService: StatisticService = {
@@ -41,6 +28,22 @@ final class ServiceLocator {
             )
         )
     }()
+
+    private lazy var _deviceStateObserver: DeviceStateObserver = {
+        return DeviceStateObserverFactory(
+            statisticService: statisticService(),
+            synchronizer: synchronizer(),
+            optInService: optInService(),
+            dateTimeProvider: dateTimeProvider(),
+            coreEventFactory: coreEventFactory()
+        ).build()
+    }()
+
+    /// MARK: - Initializer
+
+    init(storageFacade: StorageFacade) {
+        _storage = storageFacade
+    }
 
     // MARK: - Functions
 
@@ -83,17 +86,17 @@ final class ServiceLocator {
         return _synchronizer
     }
 
-    func configurationFetcher(operationFactory: OperationFactory) -> ConfigurationFetcher {
+    func configurationFetcher() -> ConfigurationFetcher {
         return ConfigurationFetcher(
-            operationFactory: operationFactory,
+            operationFactory: operationFactory(),
             configurationRepository: configurationRepository()
         )
     }
 
-    func initializer(componentFactory: ComponentFactory) -> SDKInitializer {
+    func initializer() -> SDKInitializer {
         return SDKInitializer(
             storage: storage(),
-            componentFactory: componentFactory,
+            componentFactory: componentFactory(),
             chainMutator: _synchronizer
         )
     }
@@ -118,31 +121,47 @@ final class ServiceLocator {
         return InstallationIdGenerator(storage: storage())
     }
 
-    func optInService(coreEventFactory: CoreEventFactory) -> OptInService {
+    func optInService() -> OptInService {
         return OptInService(
             synchronizer: synchronizer(),
-            coreEventFactory: coreEventFactory,
+            coreEventFactory: coreEventFactory(),
             storage: storage()
         )
     }
 
-    func deviceStateObserver(coreEventFactory: CoreEventFactory) -> DeviceStateObserver {
-        return DeviceStateObserver(
-            observers: [
-                ResignActiveObserver(
-                    subscriber: synchronizer()
-                ),
-                OptInOutObserver(
-                    optInService: optInService(coreEventFactory: coreEventFactory),
-                    notificationPermissionFetcher: NotificationPermissionFetcherImpl()
-                ),
-                AppOpenObserver(
-                    synchronizer: synchronizer(),
-                    statisticService: statisticService(),
-                    dateTimeProvider: dateTimeProvider(),
-                    coreEventFactory: coreEventFactory
-                )
-            ]
+    func deviceStateObserver() -> DeviceStateObserver {
+        return _deviceStateObserver
+    }
+
+    /// MARK: - Factories
+
+    func componentFactory() -> ComponentFactory {
+        return ComponentFactory(
+            serviceLocator: self,
+            coreEventFactory: coreEventFactory()
+        )
+    }
+
+    func coreEventFactory() -> CoreEventFactory {
+        return CoreEventFactoryImpl(
+            storage: storage(),
+            dateTimeProvider: dateTimeProvider()
+        )
+    }
+
+    func networkingFactory() -> NetworkingFactory {
+        return NetworkingFactory(
+            networkClient: NetworkClientImpl(),
+            requestBuilderFactory: NetworkRequestBuilderFactory(
+                serviceLocator: self
+            )
+        )
+    }
+
+    func operationFactory() -> OperationFactory {
+        return OperationFactory(
+            configurationRepository: configurationRepository(),
+            networking: networkingFactory().createRemoteConfigurationNetworking()
         )
     }
 

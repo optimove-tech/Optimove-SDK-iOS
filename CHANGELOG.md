@@ -1,5 +1,9 @@
 # Changelog
 
+# 2.9.1
+
+- **hotfix** safety wrap the SDK initialization to prevent from a crash regarding a corrupt file system access.
+
 # 2.10.0
 
 - **add** SPM support.

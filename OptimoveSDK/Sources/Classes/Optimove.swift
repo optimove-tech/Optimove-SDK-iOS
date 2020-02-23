@@ -15,25 +15,15 @@ public typealias OptimoveEvent = OptimoveCore.OptimoveEvent
     /// The current OptimoveSDK version string value.
     public static let version = SDKVersion
 
-    private let deviceStateObserver: DeviceStateObserver
-    private let factory: MainFactory
-    private let serviceLocator: ServiceLocator
-    private let synchronizer: Synchronizer
-    private var storage: OptimoveStorage
-
     /// The shared instance of Optimove SDK.
     @objc public static let shared: Optimove = {
         return Optimove()
     }()
 
+    private let container: Container
+
     private override init() {
-        serviceLocator = ServiceLocator()
-        factory = MainFactory(serviceLocator: serviceLocator)
-        storage = serviceLocator.storage()
-        synchronizer = serviceLocator.synchronizer()
-        deviceStateObserver = serviceLocator.deviceStateObserver(
-            coreEventFactory: factory.coreEventFactory()
-        )
+        self.container = Assembly().makeContainer()
         super.init()
     }
 
@@ -42,10 +32,12 @@ public typealias OptimoveEvent = OptimoveCore.OptimoveEvent
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
         /// FUTURE: To merge configure call with init.
-        shared.serviceLocator.loggerInitializator().initialize()
-        shared.serviceLocator.newTenantInfoHandler().handle(tenantInfo)
-        shared.deviceStateObserver.start()
-        shared.startSDK { _ in }
+        shared.container.resolve { serviceLocator in
+            serviceLocator.loggerInitializator().initialize()
+            serviceLocator.newTenantInfoHandler().handle(tenantInfo)
+            serviceLocator.deviceStateObserver().start()
+            shared.startSDK { _ in }
+        }
     }
 
 }
@@ -60,8 +52,10 @@ extension Optimove {
     ///   - name: Name of the event.
     ///   - parameters: The dictionary of attributes.
     @objc public func reportEvent(name: String, parameters: [String: Any] = [:]) {
-        let customEvent = CommonOptimoveEvent(name: name, parameters: parameters)
-        synchronizer.handle(.report(event: customEvent))
+        container.resolve { serviceLocator in
+            let customEvent = CommonOptimoveEvent(name: name, parameters: parameters)
+            serviceLocator.synchronizer().handle(.report(event: customEvent))
+        }
     }
 
     /// Report the event to Optimove SDK.
@@ -69,7 +63,9 @@ extension Optimove {
     /// - Parameters:
     ///   - event: Instance of OptimoveEvent type.
     @objc public func reportEvent(_ event: OptimoveEvent) {
-        synchronizer.handle(.report(event: event))
+        container.resolve { serviceLocator in
+            serviceLocator.synchronizer().handle(.report(event: event))
+        }
     }
 
 }
@@ -87,14 +83,17 @@ extension Optimove {
         Logger.info("Report a screen event w/title: \(screenTitle)")
         let validationResult = ScreenVisitValidator.validate(screenTitle: screenTitle)
         guard validationResult == .valid else { return }
-        tryCatch {
-            synchronizer.handle(
-                .reportScreenEvent(
-                    title: screenTitle,
-                    category: screenCategory
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            tryCatch {
+                serviceLocator.synchronizer().handle(
+                    .reportScreenEvent(
+                        title: screenTitle,
+                        category: screenCategory
+                    )
                 )
-            )
+            }
         }
+        container.resolve(function)
     }
 
     /// Report the screen visit event.
@@ -140,22 +139,31 @@ extension Optimove {
     /// - Parameter userID: The user unique identifier.
     @objc public func setUserId(_ userID: String) {
         let userID = userID.trimmingCharacters(in: .whitespaces)
-        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
-        guard validationResult == .valid else { return }
-        NewUserIDHandler(storage: storage).handle(userID: userID)
-        synchronizer.handle(.setUserId)
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            let storage = serviceLocator.storage()
+            let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
+            guard validationResult == .valid else { return }
+            NewUserIDHandler(storage: storage).handle(userID: userID)
+            let syncronizer = serviceLocator.synchronizer()
+            syncronizer.handle(.setUserId)
+        }
+        container.resolve(function)
     }
 
     /// Set a user email to the Optimove SDK.
     ///
     /// - Parameter email: The user email.
     @objc public func setUserEmail(email: String) {
-        let validationResult = EmailValidator(storage: storage).isValid(email)
-        guard validationResult == .valid else { return }
-        NewEmailHandler(storage: storage).handle(email: email)
-        tryCatch {
-            reportEvent(try factory.coreEventFactory().createEvent(.setUserEmail))
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            let storage = serviceLocator.storage()
+            let validationResult = EmailValidator(storage: storage).isValid(email)
+            guard validationResult == .valid else { return }
+            NewEmailHandler(storage: storage).handle(email: email)
+            tryCatch {
+                Optimove.shared.reportEvent(try serviceLocator.coreEventFactory().createEvent(.setUserEmail))
+            }
         }
+        container.resolve(function)
     }
 
 }
@@ -189,15 +197,18 @@ extension Optimove {
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
         ) -> Bool {
         Logger.info("Received a notification in foreground mode.")
-        let notificationListener = serviceLocator.notificationListener()
-        let result = notificationListener.isOptipush(notification: notification)
-        if result {
-            notificationListener.willPresent(
-                notification: notification,
-                withCompletionHandler: completionHandler
-            )
+        let function: (ServiceLocator) -> (Bool) = { serviceLocator in
+            let notificationListener = serviceLocator.notificationListener()
+            let result = notificationListener.isOptipush(notification: notification)
+            if result {
+                notificationListener.willPresent(
+                    notification: notification,
+                    withCompletionHandler: completionHandler
+                )
+            }
+            return result
         }
-        return result
+        return container.resolve(function) ?? false
     }
 
     /// Asks the Optimove SDK to process the user's response to a delivered notification.
@@ -211,18 +222,21 @@ extension Optimove {
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
         Logger.info("User produce a response for a notificaiton.")
-        let notificationListener = serviceLocator.notificationListener()
-        let result = notificationListener.isOptipush(notification: response.notification)
-        if result {
-            startSDK { result in
-                guard result.isSuccessful else { return }
-                notificationListener.didReceive(
-                    response: response,
-                    withCompletionHandler: completionHandler
-                )
+        let function: (ServiceLocator) -> (Bool) = { serviceLocator in
+            let notificationListener = serviceLocator.notificationListener()
+            let result = notificationListener.isOptipush(notification: response.notification)
+            if result {
+                Optimove.shared.startSDK { result in
+                    guard result.isSuccessful else { return }
+                    notificationListener.didReceive(
+                        response: response,
+                        withCompletionHandler: completionHandler
+                    )
+                }
             }
+            return result
         }
-        return result
+        return container.resolve(function) ?? false
     }
 }
 
@@ -234,21 +248,26 @@ extension Optimove {
     ///
     /// - Parameter deviceToken: A token that was received from the AppDelegate.
     @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        let validationResult = APNsTokenValidator(storage: serviceLocator.storage())
-        if validationResult.validate(token: deviceToken) == .new {
-            Logger.debug("New APNS token: \(deviceToken.map { String(format: "%02.2hhx", $0) }.joined())")
-            synchronizer.handle(.deviceToken(token: deviceToken))
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            let validationResult = APNsTokenValidator(storage: serviceLocator.storage())
+            if validationResult.validate(token: deviceToken) == .new {
+                Logger.debug("New APNS token: \(deviceToken.map { String(format: "%02.2hhx", $0) }.joined())")
+                serviceLocator.synchronizer().handle(.deviceToken(token: deviceToken))
+            }
         }
+        container.resolve(function)
     }
 
     /// User authorization is required for applications to notify the user using UNUserNotificationCenter via both local and remote notifications.
     ///
     /// - Parameter fromUserNotificationCenter: A response from
     @objc public func didReceivePushAuthorization(fromUserNotificationCenter granted: Bool) {
-        tryCatch {
-            let optInService = serviceLocator.optInService(coreEventFactory: factory.coreEventFactory())
-            try optInService.didPushAuthorization(isGranted: granted)
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            tryCatch {
+                try serviceLocator.optInService().didPushAuthorization(isGranted: granted)
+            }
         }
+        container.resolve(function)
     }
 
     /// Request to subscribe to test campaign topics
@@ -269,11 +288,15 @@ extension Optimove {
 extension Optimove: OptimoveDeepLinkResponding {
 
     @objc public func register(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-        serviceLocator.deeplinkService().register(deepLinkResponder: responder)
+        container.resolve { serviceLocator in
+            serviceLocator.deeplinkService().register(deepLinkResponder: responder)
+        }
     }
 
     @objc public func unregister(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-        serviceLocator.deeplinkService().unregister(deepLinkResponder: responder)
+        container.resolve { serviceLocator in
+            serviceLocator.deeplinkService().unregister(deepLinkResponder: responder)
+        }
     }
 }
 
@@ -286,28 +309,32 @@ private extension Optimove {
     /// The method use to fetch tenant config, initialize Optimove SDK and control this process.
     /// - Parameter completion: A result of initializtion.
     func startSDK(completion: @escaping (Result<Void, Error>) -> Void) {
-        guard RunningFlagsIndication.isSdkNeedInitializing else {
-            Logger.info("Skip initializtion since Optimove SDK already running.")
-            completion(.success(()))
-            return
-        }
-        RunningFlagsIndication.isInitializerRunning.toggle()
-        serviceLocator.installationIdGenerator().generate()
-        serviceLocator.newVisitorIdGenerator().generate()
-        serviceLocator.firstTimeVisitGenerator().generate()
-        let configurationFetcher = serviceLocator.configurationFetcher(operationFactory: factory.operationFactory())
-        configurationFetcher.fetch { result in
-            switch result {
-            case let .success(configuration):
-                self.initialize(with: configuration)
-                Logger.info("Initialization finished. ✅")
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            guard RunningFlagsIndication.isSdkNeedInitializing else {
+                Logger.info("Skip initializtion since Optimove SDK already running.")
                 completion(.success(()))
-            case let .failure(error):
-                Logger.error(error.localizedDescription)
-                Logger.error("Initialization failed. 🛑")
-                completion(.failure(error))
+                return
             }
+            RunningFlagsIndication.isInitializerRunning.toggle()
+            serviceLocator.installationIdGenerator().generate()
+            serviceLocator.newVisitorIdGenerator().generate()
+            serviceLocator.firstTimeVisitGenerator().generate()
+            let configurationFetcher = serviceLocator.configurationFetcher()
+            configurationFetcher.fetch { result in
+                switch result {
+                case let .success(configuration):
+                    self.initialize(with: configuration)
+                    Logger.info("Initialization finished. ✅")
+                    completion(.success(()))
+                case let .failure(error):
+                    Logger.error(error.localizedDescription)
+                    Logger.error("Initialization failed. 🛑")
+                    completion(.failure(error))
+                }
+            }
+
         }
+        container.resolve(function)
     }
 
     // MARK: Configuration
@@ -315,32 +342,19 @@ private extension Optimove {
     /// Initialization of SDK with a configuration.
     /// - Parameter configuration: A `Configuration` filetype.
     func initialize(with configuration: Configuration) {
-        let onStartEventGenerator = OnStartEventGenerator(
-            coreEventFactory: factory.coreEventFactory(),
-            synchronizer: synchronizer,
-            storage: storage
-        )
-        onStartEventGenerator.generate()
-        let initializer = serviceLocator.initializer(
-            componentFactory: factory.componentFactory()
-        )
-        initializer.initialize(with: configuration)
-        RunningFlagsIndication.isInitializerRunning.toggle()
-        RunningFlagsIndication.isSdkRunning.toggle()
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            let onStartEventGenerator = OnStartEventGenerator(
+                coreEventFactory: serviceLocator.coreEventFactory(),
+                synchronizer: serviceLocator.synchronizer(),
+                storage: serviceLocator.storage()
+            )
+            onStartEventGenerator.generate()
+            let initializer = serviceLocator.initializer()
+            initializer.initialize(with: configuration)
+            RunningFlagsIndication.isInitializerRunning.toggle()
+            RunningFlagsIndication.isSdkRunning.toggle()
+        }
+        container.resolve(function)
     }
-
-}
-
-// MARK: - Deprecated: SDK state observing
-
-extension Optimove {
-
-    @available(*, deprecated, message: "No need to register for lifecycle events. Use the SDK directly.")
-    public func registerSuccessStateListener(_ listener: OptimoveSuccessStateListener) {
-        listener.optimove(self, didBecomeActiveWithMissingPermissions: [])
-    }
-
-    @available(*, deprecated, message: "No need to unregister from lifecycle events anymore. Use the SDK directly.")
-    public func unregisterSuccessStateListener(_ listener: OptimoveSuccessStateListener) { }
 
 }
