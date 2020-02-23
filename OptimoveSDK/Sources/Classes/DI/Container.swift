@@ -1,5 +1,6 @@
-//  Copyright © 2020 Optimove. All rights reserved.
+//  Copyright © 2020 Optimove. All rights
 
+/// The container is using for prevent an unexpected internal crash to affect on a tenant app.
 final class Container {
 
     private var serviceLocator: ServiceLocator?
