@@ -2,6 +2,7 @@
 
 import Foundation
 
+/// The protocol proposes a subscription logic for deep-links from the Optimove platform.
 @objc protocol OptimoveDeepLinkResponding {
 
     /// The Deeplink subscription to receive a deep link from Optimove notification payload.
