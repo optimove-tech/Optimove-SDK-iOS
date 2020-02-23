@@ -35,7 +35,8 @@ final class ServiceLocator {
             synchronizer: synchronizer(),
             optInService: optInService(),
             dateTimeProvider: dateTimeProvider(),
-            coreEventFactory: coreEventFactory()
+            coreEventFactory: coreEventFactory(),
+            storage: storage()
         ).build()
     }()
 

@@ -84,6 +84,9 @@
 		456F8995DB8CDD70E03FD382 /* NewUserIDHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6C83A68863BF37E8F3275B /* NewUserIDHandler.swift */; };
 		45AEE0276D250CF2208C644E /* OnStartEventGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F1D9A9EC40981BD427CB4C /* OnStartEventGeneratorTests.swift */; };
 		45E8890FB696618F19DE0E1C /* OptimoveSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F195D6A74F16DC039009B692 /* OptimoveSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		460413BA2402836C00417983 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460413B92402836C00417983 /* Version.swift */; };
+		460413BC2402837D00417983 /* MigrationWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460413BB2402837D00417983 /* MigrationWork.swift */; };
+		460413C0240283AF00417983 /* MigrationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460413BF240283AF00417983 /* MigrationObserver.swift */; };
 		499D5BF06BBCC8EBB94263E4 /* Optimove.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA418E3FDBEB318519B1F183 /* Optimove.swift */; };
 		49CF203CF09FBC2F4578AF84 /* OptimoveNotificationServiceExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AF7CBE1A75BE741CAF7483 /* OptimoveNotificationServiceExtensionTests.swift */; };
 		4B583BA9BF1C2FA8274AACD3 /* String+Split.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB8B22F680152DE4E7C00A7 /* String+Split.swift */; };
@@ -418,6 +421,9 @@
 		44FF0834723551EEAD3787A5 /* MockTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTracker.swift; sourceTree = "<group>"; };
 		458897EAB1CC463D34F58C56 /* notificationWithTriggeredCampaign.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = notificationWithTriggeredCampaign.json; sourceTree = "<group>"; };
 		4592839140B76A8D32F05DC8 /* RemoteLoggerStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerStream.swift; sourceTree = "<group>"; };
+		460413B92402836C00417983 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
+		460413BB2402837D00417983 /* MigrationWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationWork.swift; sourceTree = "<group>"; };
+		460413BF240283AF00417983 /* MigrationObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationObserver.swift; sourceTree = "<group>"; };
 		460F691675BB2E55AB39B0F3 /* ApiPayloadBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiPayloadBuilder.swift; sourceTree = "<group>"; };
 		46370B16EF571A0A88EC6A65 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
 		472CC4141ED9FBD9DD0B65F1 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
@@ -722,23 +728,24 @@
 			isa = PBXGroup;
 			children = (
 				329CE901655C81D4751CB22B /* .gitkeep */,
-				A506CE7C768F77DF1C031E7D /* Environment.swift */,
-				DA418E3FDBEB318519B1F183 /* Optimove.swift */,
-				5DBF2019AF35B48C9F8F9C7F /* OptimoveTenantInfo.swift */,
 				7A701B350A9A47124CB6F501 /* Components */,
 				F5B9321DDE62D40FE2B0B980 /* Constants */,
 				2EE3A3201CC89F94569FE7E4 /* DataStructs */,
 				42C5CB0ACF5C3D9D74FCB3F9 /* DI */,
+				A506CE7C768F77DF1C031E7D /* Environment.swift */,
 				059971E08A10B8A4891F2794 /* Events */,
 				DAA77376C81139461DA5DFE3 /* Extensions */,
 				32023D2509AE094416A62A3C /* Factories */,
 				253AB325787A2A681A8F93C1 /* Handlers */,
 				A5252A6E2E5FAD79133267EA /* Initializer */,
 				EA38BCA90CA160B46A3B5692 /* Legacy */,
+				460413B82402835A00417983 /* Migration */,
 				67EB23423FC05DC191C8148A /* Networking */,
 				0CEE3CCD7B14A0976E778A76 /* Observers */,
 				6B5BFEAF9F7D336231486959 /* OnStartHelpers */,
 				555940095A8E06805647E039 /* Operations */,
+				DA418E3FDBEB318519B1F183 /* Optimove.swift */,
+				5DBF2019AF35B48C9F8F9C7F /* OptimoveTenantInfo.swift */,
 				E79A480E34BFAE7E3D576952 /* Preprocessors */,
 				F6D0C30CA75C18FEF95CD647 /* Providers */,
 				15D585D36C5DBE64170F3791 /* Provisioning */,
@@ -757,6 +764,7 @@
 				37FF76A69D6A6A50ACED5DAC /* NotificationPermissionFetcher.swift */,
 				A875DE64F64CAB1C385EF4D1 /* OptInOutObserver.swift */,
 				EAE898BE82A77234095B3BE0 /* ResignActiveObserver.swift */,
+				460413BF240283AF00417983 /* MigrationObserver.swift */,
 			);
 			path = Observers;
 			sourceTree = "<group>";
@@ -1089,6 +1097,15 @@
 				C04629380902B7E31CF43D52 /* Container.swift */,
 			);
 			path = DI;
+			sourceTree = "<group>";
+		};
+		460413B82402835A00417983 /* Migration */ = {
+			isa = PBXGroup;
+			children = (
+				460413B92402836C00417983 /* Version.swift */,
+				460413BB2402837D00417983 /* MigrationWork.swift */,
+			);
+			path = Migration;
 			sourceTree = "<group>";
 		};
 		4A802689AFE69F115DC0B92F /* Services */ = {
@@ -2091,6 +2108,7 @@
 				FF3AF2CD8B3EF34CBDD6479B /* FirstTimeVisitGenerator.swift in Sources */,
 				B622A895623E6DF7C6A09277 /* GlobalConfigurationDownloader.swift in Sources */,
 				C5D958D0A9D4CB0C2301E4F8 /* Handler.swift in Sources */,
+				460413BC2402837D00417983 /* MigrationWork.swift in Sources */,
 				54A3E476C0AB5D834FB6DACF /* HandlersPool.swift in Sources */,
 				84294ACA411D4E3EFE6F9D3E /* InMemoryBuffer.swift in Sources */,
 				0E5985B708EBAF5FAF663CFA /* Installation.swift in Sources */,
@@ -2119,6 +2137,7 @@
 				55754C0209B72C6239CCE64E /* OperationFactory.swift in Sources */,
 				4F2C212ED09A0819A1B2CDED /* OptEvent.swift in Sources */,
 				E169E43A16008BBB9E14C4D6 /* OptInOutObserver.swift in Sources */,
+				460413C0240283AF00417983 /* MigrationObserver.swift in Sources */,
 				C3E05FDC7B4A8CB9F467A283 /* OptInService.swift in Sources */,
 				432EE244D778884AEA4A9208 /* OptiLoggerOutputStream.swift in Sources */,
 				2EA9D0284826D6D32BFA3219 /* OptiLoggerStreamsContainer.swift in Sources */,
@@ -2169,6 +2188,7 @@
 				D3442290F4766F3C2835815D /* String+isBlank.swift in Sources */,
 				68FA63CCDADAD13FA979A68B /* String+random.swift in Sources */,
 				79CD25EC4E940F6CEC7C0F03 /* String.swift in Sources */,
+				460413BA2402836C00417983 /* Version.swift in Sources */,
 				3F914AEC67178E83B132E387 /* Syncronizer.swift in Sources */,
 				E965C7402C8DCA4FAB3940D2 /* TenantConfigurationDownloader.swift in Sources */,
 				F1BC06348A10EFAA189414A9 /* Tracker.swift in Sources */,

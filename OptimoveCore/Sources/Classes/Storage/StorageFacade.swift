@@ -5,7 +5,9 @@ import Foundation
 /// Combined protocol for a convenince access to stored values and files.
 public typealias OptimoveStorage = KeyValueStorage & FileStorage & StorageValue
 
-// MARK: - StorageKey
+/// MARK: - StorageCase
+
+/// MARK: - StorageKey
 
 public enum StorageKey: String, CaseIterable {
 
@@ -24,6 +26,8 @@ public enum StorageKey: String, CaseIterable {
     case deviceResolutionHeight
     case advertisingIdentifier
     case optFlag
+    /// For storing a migration history
+    case migrationVersions
 
     // MARK: Shared keys
     /// Placed in tenant container (legacy)
@@ -68,6 +72,11 @@ public protocol StorageValue {
     func getDeviceResolutionHeight() throws -> Float
     func getAdvertisingIdentifier() throws -> String
 
+    /// Called when a migration is finished for the version.
+    mutating func finishedMigration(to version: String)
+    /// Use for checking if a migration was applied for the version
+    func isAlreadyMigrated(to version: String) -> Bool
+
     // MARK: Shared values
 
     var userEmail: String? { get set }
@@ -108,7 +117,8 @@ public final class StorageFacade: OptimoveStorage {
         .deviceResolutionWidth,
         .deviceResolutionHeight,
         .advertisingIdentifier,
-        .optFlag
+        .optFlag,
+        .migrationVersions
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.
@@ -326,6 +336,15 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
+    var migrationVersions: [String] {
+        get {
+            return self[.migrationVersions] ?? []
+        }
+        set {
+            self[.migrationVersions] = newValue
+        }
+    }
+
     // MARK: Group values getters
 
     func getConfigurationEndPoint() throws -> URL {
@@ -404,6 +423,17 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         return value
     }
+
+    mutating func finishedMigration(to version: String) {
+        var versions = migrationVersions
+        versions.append(version)
+        migrationVersions = versions
+    }
+
+    func isAlreadyMigrated(to version: String) -> Bool {
+        return migrationVersions.contains(version)
+    }
+
 
     // MARK: Shared values
 
