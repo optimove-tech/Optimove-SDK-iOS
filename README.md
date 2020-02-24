@@ -2,10 +2,10 @@
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/optimove-tech/Optimove-SDK-iOS?style=flat-square)](https://github.com/optimove-tech/Optimove-SDK-iOS/releases/latest)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/optimove-tech/Optimove-SDK-iOS/CI?style=flat-square)
+![Cocoapods platforms](https://img.shields.io/cocoapods/p/OptimoveSDK?color=brightgreen&label=CocoaPods&style=flat-square)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
 ![SwiftPM comppatible](https://img.shields.io/badge/SwiftPM-compatible-success?style=flat-square)
 ![GitHub](https://img.shields.io/github/license/optimove-tech/Optimove-SDK-iOS?style=flat-square)
-![Cocoapods platforms](https://img.shields.io/cocoapods/p/OptimoveSDK?style=flat-square)
 
 The official Optimove iOS integration frameworks are an iOS SDK for sending analytics to an Optimove server, such as:
 
