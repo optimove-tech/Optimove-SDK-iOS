@@ -1,21 +1,21 @@
 # Changelog
 
-# 2.9.1
-
-- **hotfix** safety wrap the SDK initialization to prevent from a crash regarding a corrupt file system access.
-
-# 2.10.0
+## 2.10.0
 
 - **add** SPM support.
 - **remove** test mode API.
 - **remove** firebase dependency.
 
-# 2.9.0
+## 2.9.1
+
+- **hotfix** safety wrap the SDK initialization to prevent from a crash regarding a corrupt file system access.
+
+## 2.9.0
 
 - **fix** carthage firebase dependency for version 6.15.
 - **fix** set_user_id issue if it calls before `configure`.
 
-# 2.8.1
+## 2.8.1
 
 - **fix** xcode 10 build.
 
