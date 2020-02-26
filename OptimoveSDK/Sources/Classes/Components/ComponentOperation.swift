@@ -20,6 +20,8 @@ final class OperationContext {
 
 enum Operation {
     case setUserId
+    case enablePushCampaigns
+    case disablePushCampaigns
     case report(event: OptimoveEvent)
     case reportScreenEvent(title: String, category: String?)
     case dispatchNow

@@ -28,6 +28,7 @@ public enum StorageKey: String, CaseIterable {
     case optFlag
     /// For storing a migration history
     case migrationVersions
+    case isDisabledPushCampaign
 
     // MARK: Shared keys
     /// Placed in tenant container (legacy)
