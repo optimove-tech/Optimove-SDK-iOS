@@ -1,5 +1,7 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
+import OptimoveCore
+
 protocol MigrationWork {
     func isAllowToMiragte(_ currentVersion: String) -> Bool
     func runMigration()

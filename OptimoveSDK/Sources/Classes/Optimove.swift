@@ -5,7 +5,6 @@ import UserNotifications
 import OptimoveCore
 
 public typealias OptimoveEvent = OptimoveCore.OptimoveEvent
-public typealias OptimoveStorage = OptimoveCore.OptimoveStorage
 
 /// The Optimove SDK for iOS - a realtime customer data platform.
 /// The integration guide: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki
