@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.11.0
+
+- **add** method `disablePushCampaigns`.
+- **add** method `enablePushCampaigns`.
+
 ## 2.10.0
 
 - **add** SPM support.
