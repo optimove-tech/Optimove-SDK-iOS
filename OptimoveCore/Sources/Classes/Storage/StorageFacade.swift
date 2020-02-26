@@ -28,7 +28,7 @@ public enum StorageKey: String, CaseIterable {
     case optFlag
     /// For storing a migration history
     case migrationVersions
-    case isDisabledPushCampaign
+    case arePushCampaignsDisabled
 
     // MARK: Shared keys
     /// Placed in tenant container (legacy)
@@ -61,6 +61,8 @@ public protocol StorageValue {
     var deviceResolutionHeight: Float? { get set }
     var advertisingIdentifier: String? { get set }
     var optFlag: Bool { get set }
+    /// Store indication of disabled push campaigns for this installation.
+    var arePushCampaignsDisabled: Bool { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -75,7 +77,7 @@ public protocol StorageValue {
 
     /// Called when a migration is finished for the version.
     mutating func finishedMigration(to version: String)
-    /// Use for checking if a migration was applied for the version
+    /// Use for checking if a migration was applied for the version.
     func isAlreadyMigrated(to version: String) -> Bool
 
     // MARK: Shared values
@@ -119,7 +121,8 @@ public final class StorageFacade: OptimoveStorage {
         .deviceResolutionHeight,
         .advertisingIdentifier,
         .optFlag,
-        .migrationVersions
+        .migrationVersions,
+        .arePushCampaignsDisabled
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.
@@ -343,6 +346,15 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             self[.migrationVersions] = newValue
+        }
+    }
+
+    var arePushCampaignsDisabled: Bool {
+        get{
+            return self[.arePushCampaignsDisabled] ?? false
+        }
+        set {
+            self[.arePushCampaignsDisabled] = newValue
         }
     }
 
