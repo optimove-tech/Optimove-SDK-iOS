@@ -5,7 +5,6 @@ import UserNotifications
 import OptimoveCore
 
 public typealias OptimoveEvent = OptimoveCore.OptimoveEvent
-public typealias OptimoveStorage = OptimoveCore.OptimoveStorage
 
 /// The Optimove SDK for iOS - a realtime customer data platform.
 /// The integration guide: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki
@@ -163,6 +162,30 @@ extension Optimove {
             tryCatch {
                 Optimove.shared.reportEvent(try serviceLocator.coreEventFactory().createEvent(.setUserEmail))
             }
+        }
+        container.resolve(function)
+    }
+
+    /// A call to this method will stop executions of any push campaign
+    /// targeted to this installation.
+    /// By default, receiving a push campaign is enabled.
+    /// In case to continue receiving push campaigns after disabling,
+    /// you have to call the `enablePushCampaigns` method.
+    @objc public func disablePushCampaigns() {
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            serviceLocator.synchronizer().handle(.togglePushCampaigns)
+        }
+        container.resolve(function)
+    }
+
+    /// A call to this method will resume executions of any push campaign
+    /// targeted to this installation.
+    /// By default, receiving a push campaign is enabled.
+    /// In case to stop receiving push campaigns after enabling,
+    /// you have to call the `disablePushCampaigns` method.
+    @objc public func enablePushCampaigns() {
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            serviceLocator.synchronizer().handle(.togglePushCampaigns)
         }
         container.resolve(function)
     }

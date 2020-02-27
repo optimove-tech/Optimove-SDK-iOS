@@ -299,4 +299,15 @@ class KeyValueStorageTests: XCTestCase {
         XCTAssert(storage.realtimeSetEmailFailed == false)
     }
 
+    func test_push_campaign_disabled_default_value() {
+        // then
+        XCTAssert(!storage.arePushCampaignsDisabled)
+    }
+
+    func test_push_campaign_disabled_toggle() {
+        storage.arePushCampaignsDisabled.toggle()
+
+        // then
+        XCTAssert(storage.arePushCampaignsDisabled)
+    }
 }
