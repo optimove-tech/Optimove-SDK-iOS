@@ -169,7 +169,7 @@ extension Optimove {
     /// A call to this method will stop executions of any push campaign
     /// targeted to this installation.
     /// By default, receiving a push campaign is enabled.
-    /// In case to continue receiving push campaigns after disabling,
+    /// To continue receiving push campaigns after disabling,
     /// you have to call the `enablePushCampaigns` method.
     @objc public func disablePushCampaigns() {
         let function: (ServiceLocator) -> Void = { serviceLocator in
@@ -181,7 +181,7 @@ extension Optimove {
     /// A call to this method will resume executions of any push campaign
     /// targeted to this installation.
     /// By default, receiving a push campaign is enabled.
-    /// In case to stop receiving push campaigns after enabling,
+    /// To stop receiving push campaigns after enabling,
     /// you have to call the `disablePushCampaigns` method.
     @objc public func enablePushCampaigns() {
         let function: (ServiceLocator) -> Void = { serviceLocator in
