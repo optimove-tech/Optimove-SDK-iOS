@@ -1834,32 +1834,32 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		"TEMP_083F6AD0-5A6D-4D1A-B7DB-B1F7D3368D42" /* Tests */ = {
+		"TEMP_63317675-A56F-4C00-92BE-FBF5EB840E70" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_4A1F2571-D367-463C-A518-92A08E7A831B" /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		"TEMP_E214355D-784C-4ACF-8A1B-F051F3654579" /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		"TEMP_FB51DAF8-0BF4-4B13-B02D-F2307F8388A1" /* Optimove */ = {
+		"TEMP_6C00290B-AFE8-44B8-A666-4832E992F672" /* Optimove */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Optimove;
+			sourceTree = "<group>";
+		};
+		"TEMP_A645DAA8-F9A0-4B87-BDD1-0F04EB06CF0C" /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		"TEMP_FD29F227-F8AD-4876-BFC9-A22B81679A60" /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

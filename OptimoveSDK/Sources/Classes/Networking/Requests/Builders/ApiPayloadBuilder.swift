@@ -32,7 +32,8 @@ final class ApiPayloadBuilder {
             visitorID: try storage.getInitialVisitorId(),
             optIn: storage.optFlag,
             isDev: AppEnvironment.isSandboxAps,
-            metadata: metadata
+            metadata: metadata,
+            isPushCampaignsDisabled: storage.arePushCampaignsDisabled
         )
     }
 

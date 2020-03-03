@@ -124,7 +124,7 @@ class RegistrarTests: OptimoveTestCase {
         }
 
         // when
-        try! registrable.retryFailedOperationsIfExist()
+        registrable.retryFailedOperationsIfExist()
         wait(for: [networkExpectation, successFlagExpectation], timeout: defaultTimeout)
     }
 

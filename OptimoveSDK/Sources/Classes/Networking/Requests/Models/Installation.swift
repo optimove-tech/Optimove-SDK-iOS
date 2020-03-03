@@ -20,5 +20,6 @@ struct Installation: Codable {
     let deviceToken, installationID, appNS, visitorID: String
     let optIn, isDev: Bool
     let metadata: Metadata
+    let isPushCampaignsDisabled: Bool
 
 }

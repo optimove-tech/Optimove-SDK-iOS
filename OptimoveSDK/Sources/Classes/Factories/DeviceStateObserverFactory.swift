@@ -1,5 +1,7 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
+import OptimoveCore
+
 final class DeviceStateObserverFactory {
 
     private let statisticService: StatisticService
