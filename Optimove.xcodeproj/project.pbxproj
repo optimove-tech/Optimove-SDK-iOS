@@ -1834,28 +1834,21 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		"TEMP_63317675-A56F-4C00-92BE-FBF5EB840E70" /* Tests */ = {
+		"TEMP_03F15E03-4B13-411F-8E52-65C2B8EB5E29" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_6C00290B-AFE8-44B8-A666-4832E992F672" /* Optimove */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Optimove;
-			sourceTree = "<group>";
-		};
-		"TEMP_A645DAA8-F9A0-4B87-BDD1-0F04EB06CF0C" /* Tests */ = {
+		"TEMP_1F4D4037-4FCA-4093-8D2E-12B85034E9FA" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_FD29F227-F8AD-4876-BFC9-A22B81679A60" /* Tests */ = {
+		"TEMP_A816C666-F517-4D50-B53F-AF34B57F6447" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -1987,7 +1980,6 @@
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				Base,
 				en,
 			);
 			mainGroup = 0FF4DF40AC6AAC3B8661208C;
@@ -2735,7 +2727,7 @@
 				5BC7D36D2FABD1FB892CF132 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		733E6F974907D2A3BD878D16 /* Build configuration list for PBXNativeTarget "OptimoveSDK-Unit" */ = {
 			isa = XCConfigurationList;
@@ -2744,7 +2736,7 @@
 				01BFFC2AAF748813AF323804 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		88D4057F007C76FA6794054D /* Build configuration list for PBXNativeTarget "OptimoveCore" */ = {
 			isa = XCConfigurationList;
@@ -2753,7 +2745,7 @@
 				4A27E1E9D26058C86424147C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		CF1765029ADC1E22B7CF865B /* Build configuration list for PBXNativeTarget "OptimoveSDK" */ = {
 			isa = XCConfigurationList;
@@ -2762,7 +2754,7 @@
 				8C0755B84AB3622DF37009B3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		F64309E27387162F2741A1E9 /* Build configuration list for PBXNativeTarget "OptimoveNotificationServiceExtension-Unit" */ = {
 			isa = XCConfigurationList;
@@ -2771,7 +2763,7 @@
 				3E2E371B4B13AC132AC62C0E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 		FFD81B2D83B4FE60621F8B92 /* Build configuration list for PBXNativeTarget "OptimoveNotificationServiceExtension" */ = {
 			isa = XCConfigurationList;
@@ -2780,7 +2772,7 @@
 				637E5E27537E8A4E1D8359F4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "";
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
