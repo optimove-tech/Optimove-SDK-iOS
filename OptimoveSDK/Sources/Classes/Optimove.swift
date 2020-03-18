@@ -173,7 +173,7 @@ extension Optimove {
     /// you have to call the `enablePushCampaigns` method.
     @objc public func disablePushCampaigns() {
         let function: (ServiceLocator) -> Void = { serviceLocator in
-            serviceLocator.synchronizer().handle(.togglePushCampaigns)
+            serviceLocator.synchronizer().handle(.togglePushCampaigns(areDisabled: true))
         }
         container.resolve(function)
     }
@@ -185,7 +185,7 @@ extension Optimove {
     /// you have to call the `disablePushCampaigns` method.
     @objc public func enablePushCampaigns() {
         let function: (ServiceLocator) -> Void = { serviceLocator in
-            serviceLocator.synchronizer().handle(.togglePushCampaigns)
+            serviceLocator.synchronizer().handle(.togglePushCampaigns(areDisabled: false))
         }
         container.resolve(function)
     }
