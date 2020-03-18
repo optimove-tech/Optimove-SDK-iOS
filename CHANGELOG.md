@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.11.1
+
+- **fix** saving a control state of a push campaign.
+
 ## 2.11.0
 
 - **add** method `disablePushCampaigns`.
