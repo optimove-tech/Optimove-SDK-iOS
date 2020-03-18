@@ -31,6 +31,7 @@ extension OptiPush: Component {
             registrar.handle(.setInstallation)
         case let .togglePushCampaigns(areDisabled: areDisabled):
             storage.arePushCampaignsDisabled = areDisabled
+            guard storage.apnsToken != nil else { return }
             registrar.handle(.setInstallation)
         default:
             break
