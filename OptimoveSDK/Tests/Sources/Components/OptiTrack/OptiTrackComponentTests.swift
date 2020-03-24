@@ -23,7 +23,8 @@ final class OptiTrackComponentTests: XCTestCase {
             storage: storage,
             coreEventFactory: CoreEventFactoryImpl(
                 storage: storage,
-                dateTimeProvider: dateProvider
+                dateTimeProvider: dateProvider,
+                locationService: MockLocationService()
             ),
             tracker: tracker
         )

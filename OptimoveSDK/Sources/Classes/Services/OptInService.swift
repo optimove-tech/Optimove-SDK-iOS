@@ -36,14 +36,18 @@ private extension OptInService {
     func executeOptIn() throws {
         Logger.warn("OptiPush: User AUTHORIZED notifications.")
         storage.optFlag = true
-        synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptIn)))
+        try coreEventFactory.createEvent(.optipushOptIn) { event in
+            self.synchronizer.handle(.report(event: event))
+        }
         synchronizer.handle(.optIn)
     }
 
     func executeOptOut() throws {
         Logger.warn("OptiPush: User UNAUTHORIZED notifications.")
         storage.optFlag = false
-        synchronizer.handle(.report(event: try coreEventFactory.createEvent(.optipushOptOut)))
+        try coreEventFactory.createEvent(.optipushOptOut) { event in
+            self.synchronizer.handle(.report(event: event))
+        }
         synchronizer.handle(.optOut)
     }
 

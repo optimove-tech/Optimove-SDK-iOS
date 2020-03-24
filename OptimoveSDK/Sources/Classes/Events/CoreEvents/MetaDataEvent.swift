@@ -10,19 +10,34 @@ final class MetaDataEvent: OptimoveCoreEvent {
             static let configFileURL = "config_file_url"
             static let sdkPlatform = "sdk_platform"
             static let appNS = "app_ns"
+            static let location = "location"
+            static let locationLatitude = "location_latitude"
+            static let locationLongitude = "location_longitude"
+            static let language = "language"
         }
     }
 
     let name: String = Constants.name
     let parameters: [String: Any]
 
-    init(configUrl: String, sdkVersion: String, bundleIdentifier: String) {
-        parameters = [
+    init(configUrl: String,
+         sdkVersion: String,
+         bundleIdentifier: String,
+         location: String?,
+         locationLatitude: String?,
+         locationLongitude: String?,
+         language: String?) {
+        let params: [String: Any?] = [
             Constants.Key.sdkVersion: sdkVersion,
             Constants.Key.configFileURL: configUrl,
             Constants.Key.sdkPlatform: Constants.sdkPlatform,
-            Constants.Key.appNS: bundleIdentifier
+            Constants.Key.appNS: bundleIdentifier,
+            Constants.Key.location: location,
+            Constants.Key.locationLatitude: locationLatitude,
+            Constants.Key.locationLongitude: locationLongitude,
+            Constants.Key.language: language
         ]
+        parameters = params.filter { $0.value != nil } as [String: Any]
     }
 
 }

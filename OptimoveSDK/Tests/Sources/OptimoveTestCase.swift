@@ -31,6 +31,7 @@ class OptimoveTestCase: XCTestCase {
     func prefillStorageWithTheFirstLaunch() {
         prefillStorageWithConfiguration()
         storage.installationID = UUID().uuidString
+        storage.userAgent = "user-agent"
     }
 
     func prefillStorageAsVisitor() {

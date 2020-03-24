@@ -33,9 +33,10 @@ final class AppOpenObserver {
         let now = dateTimeProvider.now.timeIntervalSince1970
         let appOpenTime = statisticService.applicationOpenTime
         if (now - appOpenTime) > threshold {
-            let event = try coreEventFactory.createEvent(.appOpen)
-            synchronizer.handle(.report(event: event))
-            statisticService.applicationOpenTime = dateTimeProvider.now.timeIntervalSince1970
+            try coreEventFactory.createEvent(.appOpen, { event in
+                self.synchronizer.handle(.report(event: event))
+                self.statisticService.applicationOpenTime = self.dateTimeProvider.now.timeIntervalSince1970
+            })
         }
     }
 

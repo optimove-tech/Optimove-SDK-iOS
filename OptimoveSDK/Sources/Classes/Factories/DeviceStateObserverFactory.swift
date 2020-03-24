@@ -30,7 +30,7 @@ final class DeviceStateObserverFactory {
             observers: [
                 MigrationObserver(
                     migrationWorks: [
-                        MigrationWork_2_10_0(synchronizer: synchronizer, storage: storage),
+                        MigrationWork_2_10_0(synchronizer: synchronizer, storage: storage)
                     ]
                 ),
                 ResignActiveObserver(

@@ -54,7 +54,9 @@ private extension OptiTrack {
         let userID = try storage.getCustomerID()
         Logger.info("OptiTrack: Set user id \(userID)")
         tracker.userId = userID
-        try report(event: try coreEventFactory.createEvent(.setUserId))
+        try coreEventFactory.createEvent(.setUserId) { event in
+            tryCatch { try self.report(event: event) }
+        }
     }
 
     func report(event: OptimoveEvent) throws {
@@ -77,14 +79,10 @@ private extension OptiTrack {
             return ", category: '\(category)'"
         }()
         Logger.debug("OptiTrack: Report screen event: title='\(title)'\(categoryDescription)")
-        let event = try coreEventFactory.createEvent(
-            .pageVisit(
-                title: title,
-                category: category
-            )
-        )
-        try report(event: event)
-        tracker.track(view: [title], url: URL(string: PageVisitEvent.Constants.Value.customURL))
+        try coreEventFactory.createEvent(.pageVisit(title: title, category: category)) { event in
+            tryCatch { try self.report(event: event) }
+            self.tracker.track(view: [title], url: URL(string: PageVisitEvent.Constants.Value.customURL))
+        }
     }
 
     func dispatchNow() {

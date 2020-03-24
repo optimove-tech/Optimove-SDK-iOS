@@ -29,7 +29,8 @@ class RealTimeComponentTests: XCTestCase {
             handler: handler,
             coreEventFactory: CoreEventFactoryImpl(
                 storage: storage,
-                dateTimeProvider: dateProvider
+                dateTimeProvider: dateProvider,
+                locationService: MockLocationService()
             )
         )
     }

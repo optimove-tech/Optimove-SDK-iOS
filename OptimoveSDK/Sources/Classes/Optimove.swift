@@ -160,7 +160,9 @@ extension Optimove {
             guard validationResult == .valid else { return }
             NewEmailHandler(storage: storage).handle(email: email)
             tryCatch {
-                Optimove.shared.reportEvent(try serviceLocator.coreEventFactory().createEvent(.setUserEmail))
+                try serviceLocator.coreEventFactory().createEvent(.setUserEmail) { event in
+                    Optimove.shared.reportEvent(event)
+                }
             }
         }
         container.resolve(function)
