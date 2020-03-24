@@ -15,7 +15,8 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
         generator = OnStartEventGenerator(
             coreEventFactory: CoreEventFactoryImpl(
                 storage: storage,
-                dateTimeProvider: dataProvider
+                dateTimeProvider: dataProvider,
+                locationService: MockLocationService()
             ),
             synchronizer: synchronizer,
             storage: storage

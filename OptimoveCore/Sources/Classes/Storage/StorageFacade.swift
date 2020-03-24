@@ -350,7 +350,7 @@ public extension KeyValueStorage where Self: StorageValue {
     }
 
     var arePushCampaignsDisabled: Bool {
-        get{
+        get {
             return self[.arePushCampaignsDisabled] ?? false
         }
         set {
@@ -446,7 +446,6 @@ public extension KeyValueStorage where Self: StorageValue {
     func isAlreadyMigrated(to version: String) -> Bool {
         return migrationVersions.contains(version)
     }
-
 
     // MARK: Shared values
 
