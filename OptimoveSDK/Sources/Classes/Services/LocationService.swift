@@ -67,12 +67,29 @@ final class LocationServiceImpl {
 
     private func getLocality(location: CLLocation,
                              onComplete: @escaping (Result<String, LocationError>) -> Void) {
-        CLGeocoder().reverseGeocodeLocation(location) { (placemarks, error) in
+        let completionHandler: CLGeocodeCompletionHandler = { (placemarks, error) in
+            if let error = error {
+                Logger.error(error.localizedDescription)
+                onComplete(.failure(.noLocality))
+                return
+            }
             guard let locality = placemarks?.filter({ $0.locality != nil }).first?.locality else {
                 onComplete(.failure(.noLocality))
                 return
             }
             onComplete(.success(locality))
+        }
+        if #available(iOS 11, *) {
+            CLGeocoder().reverseGeocodeLocation(
+                location,
+                preferredLocale: Locale(identifier: "en_US_POSIX"),
+                completionHandler: completionHandler
+            )
+        } else {
+            CLGeocoder().reverseGeocodeLocation(
+                location,
+                completionHandler: completionHandler
+            )
         }
     }
 
