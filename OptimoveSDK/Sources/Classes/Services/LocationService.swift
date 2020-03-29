@@ -17,21 +17,35 @@ enum LocationError: String, Error {
 }
 
 protocol LocationService {
+    func useLocationManager(_ locationManager: CLLocationManager)
     func getLocation(onComplete: @escaping (Result<[Location: String], LocationError>) -> Void)
 }
 
 extension LocationServiceImpl: LocationService {
 
+    func useLocationManager(_ locationManager: CLLocationManager) {
+        self.locationManager = locationManager
+    }
+
     func getLocation(onComplete: @escaping (Result<[Location: String], LocationError>) -> Void) {
-        if isMainAppHasLocationDescriptions(), isLocationAuthorized() {
-            return getCoordinates(onComplete)
+        DispatchQueue.main.async {
+            if self.isMainAppHasLocationDescriptions(), self.isLocationAuthorized() {
+                return self.getCoordinates(onComplete)
+            }
+            onComplete(.failure(.notAuthorized))
         }
-        onComplete(.failure(.notAuthorized))
     }
 
 }
 
+
 final class LocationServiceImpl {
+
+    private var locationManager: CLLocationManager?
+
+    init() {
+        locationManager = CLLocationManager()
+    }
 
     private func isMainAppHasLocationDescriptions() -> Bool {
         return (Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription") != nil) ||
@@ -44,9 +58,8 @@ final class LocationServiceImpl {
     }
 
     private func getCoordinates(_ onComplete: @escaping (Result<[Location: String], LocationError>) -> Void) {
-        let manager = CLLocationManager()
-        manager.desiredAccuracy = kCLLocationAccuracyKilometer
-        guard let location = CLLocationManager().location else {
+        locationManager?.desiredAccuracy = kCLLocationAccuracyKilometer
+        guard let location = locationManager?.location else {
             onComplete(.failure(.noLocation))
             return
         }

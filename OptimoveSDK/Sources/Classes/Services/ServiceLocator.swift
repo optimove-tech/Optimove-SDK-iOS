@@ -29,6 +29,11 @@ final class ServiceLocator {
         )
     }()
 
+    /// Keeps as singleton in reason to share a session state between a service consumers.
+    private lazy var _locationManager: LocationService = {
+        return LocationServiceImpl()
+    }()
+
     private lazy var _deviceStateObserver: DeviceStateObserver = {
         return DeviceStateObserverFactory(
             statisticService: statisticService(),
@@ -147,7 +152,7 @@ final class ServiceLocator {
         return CoreEventFactoryImpl(
             storage: storage(),
             dateTimeProvider: dateTimeProvider(),
-            locationService: LocationServiceImpl()
+            locationService: locationManager()
         )
     }
 
@@ -186,6 +191,10 @@ final class ServiceLocator {
             storage: storage(),
             networking: apiNetworking
         )
+    }
+
+    func locationManager() -> LocationService {
+        return _locationManager
     }
 
 }
