@@ -95,29 +95,6 @@ extension Optimove {
         }
         container.resolve(function)
     }
-
-    /// Report the screen visit event.
-    /// - Parameters:
-    ///   - screenPathArray: An array of breadcrumbs – an UI path to the screen.
-    ///   - screenTitle: The screen title.
-    ///   - screenCategory: The screen category.
-    @available(*, deprecated, renamed: "reportScreenVisit(screenTitle:screenCategory:)")
-    @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
-        reportScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
-    }
-
-    /// Report the screen visit event.
-    /// - Parameters:
-    ///   - screenPath: An UI path to the screen.
-    ///   - screenTitle: The screen title.
-    ///   - screenCategory: The screen category.
-    @available(*, deprecated, renamed: "reportScreenVisit(screenTitle:screenCategory:)")
-    @objc public func setScreenVisit(screenPath: String,
-                                     screenTitle: String,
-                                     screenCategory: String? = nil) {
-            reportScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
-    }
-
 }
 
 // MARK: - SetUserID API call
@@ -194,7 +171,7 @@ extension Optimove {
 
 }
 
-// MARK: - Notification API call
+// MARK: - OptiPush API call
 
 extension Optimove {
 
@@ -264,11 +241,6 @@ extension Optimove {
         }
         return container.resolve(function) ?? false
     }
-}
-
-// MARK: - OptiPush API call
-
-extension Optimove {
 
     /// Tells the Optimove SDK that the app successfully registered with Apple Push Notification service (APNs).
     ///
@@ -296,17 +268,6 @@ extension Optimove {
         container.resolve(function)
     }
 
-    /// Request to subscribe to test campaign topics
-    @available(*, deprecated, message: "No need to calls start test mode.")
-    @objc public func startTestMode() {
-
-    }
-
-    /// Request to unsubscribe from test campaign topics
-    @available(*, deprecated, message: "No need to calls stop test mode.")
-    @objc public func stopTestMode() {
-
-    }
 }
 
 // MARK: - OptimoveDeepLinkResponding
@@ -358,7 +319,6 @@ private extension Optimove {
                     completion(.failure(error))
                 }
             }
-
         }
         container.resolve(function)
     }
@@ -381,6 +341,42 @@ private extension Optimove {
             RunningFlagsIndication.isSdkRunning.toggle()
         }
         container.resolve(function)
+    }
+
+}
+
+// MARK: - Deprecated
+
+extension Optimove {
+
+    /// Request to subscribe to test campaign topics
+    @available(*, deprecated, message: "No need to calls start test mode. Use Optimove site for tests.")
+    @objc public func startTestMode() {}
+
+    /// Request to unsubscribe from test campaign topics
+    @available(*, deprecated, message: "No need to calls stop test mode. Use Optimove site for tests.")
+    @objc public func stopTestMode() {}
+
+    /// Report the screen visit event.
+    /// - Parameters:
+    ///   - screenPathArray: An array of breadcrumbs – an UI path to the screen.
+    ///   - screenTitle: The screen title.
+    ///   - screenCategory: The screen category.
+    @available(*, deprecated, renamed: "reportScreenVisit(screenTitle:screenCategory:)")
+    @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
+        reportScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
+    }
+
+    /// Report the screen visit event.
+    /// - Parameters:
+    ///   - screenPath: An UI path to the screen.
+    ///   - screenTitle: The screen title.
+    ///   - screenCategory: The screen category.
+    @available(*, deprecated, renamed: "reportScreenVisit(screenTitle:screenCategory:)")
+    @objc public func setScreenVisit(screenPath: String,
+                                     screenTitle: String,
+                                     screenCategory: String? = nil) {
+            reportScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
     }
 
 }
