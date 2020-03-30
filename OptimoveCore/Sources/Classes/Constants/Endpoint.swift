@@ -5,7 +5,7 @@ import Foundation
 public struct Endpoints {
 
     public struct Logger {
-        public static let defaultEndpint = URL(string: "https://mbaas.optimove.net/reportLog")!
+        public static let defaultEndpint = URL(string: "https://mbaas.optimove.net/report/log")!
     }
 
     public struct Remote {
