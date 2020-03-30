@@ -287,52 +287,6 @@ extension Optimove: OptimoveDeepLinkResponding {
     }
 }
 
-// MARK: - Geo-location
-
-#if canImport(CoreLocation)
-
-import CoreLocation
-
-extension Optimove {
-
-    /// Tells the Optimove authorization status when the app creates the location manager and when the authorization status changes.
-    /// - Parameters:
-    ///   - manager: The location manager object reporting the event.
-    ///   - status: The authorization status for the app.
-    public func locationManager(_ manager: CLLocationManager,
-                                didChangeAuthorization status: CLAuthorizationStatus) {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            serviceLocator.locationManager().useLocationManager(manager)
-            tryCatch {
-                try serviceLocator.coreEventFactory().createEvent(.metaData) { event in
-                    Optimove.shared.reportEvent(event)
-                }
-            }
-        }
-        container.resolve(function)
-    }
-
-    /// Tells the Optimove that new location data is available.
-    /// - Parameters:
-    ///   - manager: The location manager object that generated the update event.
-    ///   - status: An array of CLLocation objects containing the location data.
-    public func locationManager(_ manager: CLLocationManager,
-                                didUpdateLocations locations: [CLLocation]) {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            serviceLocator.locationManager().useLocationManager(manager)
-            tryCatch {
-                try serviceLocator.coreEventFactory().createEvent(.metaData) { event in
-                    Optimove.shared.reportEvent(event)
-                }
-            }
-        }
-        container.resolve(function)
-    }
-
-}
-
-#endif
-
 // MARK: - Private
 
 private extension Optimove {

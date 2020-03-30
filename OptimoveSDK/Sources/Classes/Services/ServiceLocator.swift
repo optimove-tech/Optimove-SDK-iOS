@@ -152,7 +152,7 @@ final class ServiceLocator {
         return CoreEventFactoryImpl(
             storage: storage(),
             dateTimeProvider: dateTimeProvider(),
-            locationService: locationManager()
+            locationService: _locationManager
         )
     }
 
@@ -191,10 +191,6 @@ final class ServiceLocator {
             storage: storage(),
             networking: apiNetworking
         )
-    }
-
-    func locationManager() -> LocationService {
-        return _locationManager
     }
 
 }
