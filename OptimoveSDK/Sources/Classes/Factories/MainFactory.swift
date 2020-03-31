@@ -18,10 +18,7 @@ final class MainFactory {
     }
 
     func coreEventFactory() -> CoreEventFactory {
-        return CoreEventFactoryImpl(
-            storage: serviceLocator.storage(),
-            dateTimeProvider: serviceLocator.dateTimeProvider()
-        )
+        return serviceLocator.coreEventFactory()
     }
 
     func networkingFactory() -> NetworkingFactory {

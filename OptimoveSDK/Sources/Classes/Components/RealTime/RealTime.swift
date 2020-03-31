@@ -50,11 +50,9 @@ extension RealTime: Component {
         case let .report(event: event):
             try reportEvent(event: event, retryFailedEvents: true)
         case let .reportScreenEvent(title: title, category: category):
-            try reportEvent(
-                event: try coreEventFactory.createEvent(
-                    .pageVisit(title: title, category: category)
-                )
-            )
+            try coreEventFactory.createEvent(.pageVisit(title: title, category: category)) { event in
+                tryCatch { try self.reportEvent(event: event) }
+            }
         case .dispatchNow:
             // Consciously do nothing.
             break
@@ -89,13 +87,15 @@ extension RealTime {
     }
 
     func reportUserId() throws {
-        let event = try coreEventFactory.createEvent(.setUserId)
-        try reportEvent(event: event, retryFailedEvents: false)
+        try coreEventFactory.createEvent(.setUserId) { event in
+            tryCatch { try self.reportEvent(event: event, retryFailedEvents: false) }
+        }
     }
 
     func reportUserEmail() throws {
-        let event = try coreEventFactory.createEvent(.setUserEmail)
-        try reportEvent(event: event, retryFailedEvents: false)
+        try coreEventFactory.createEvent(.setUserEmail) { event in
+            tryCatch { try self.reportEvent(event: event, retryFailedEvents: false) }
+        }
     }
 
 }

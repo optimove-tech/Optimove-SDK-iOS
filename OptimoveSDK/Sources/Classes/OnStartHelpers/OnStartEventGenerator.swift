@@ -23,11 +23,12 @@ final class OnStartEventGenerator {
     }
 
     private func generateEvents() {
-        [
-            try? coreEventFactory.createEvent(.metaData),
-            try? coreEventFactory.createEvent(.setAdvertisingId)
-        ].compactMap { $0 }
-        .forEach { synchronizer.handle(.report(event: $0)) }
+        try? coreEventFactory.createEvent(.metaData) { event in
+            self.synchronizer.handle(.report(event: event))
+        }
+        try? coreEventFactory.createEvent(.setAdvertisingId) { event in
+            self.synchronizer.handle(.report(event: event))
+        }
     }
 
     private func asyncGenerate() {

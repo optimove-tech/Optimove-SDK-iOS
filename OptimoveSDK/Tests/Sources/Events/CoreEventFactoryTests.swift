@@ -4,99 +4,100 @@ import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
 
-class CoreEventFactoryTests: XCTestCase {
+class CoreEventFactoryTests: OptimoveTestCase {
 
-    var storage: OptimoveStorage!
     var factory: CoreEventFactory!
     var dateProvider: MockDateTimeProvider!
 
     override func setUp() {
-        storage = MockOptimoveStorage()
         dateProvider = MockDateTimeProvider()
         factory = CoreEventFactoryImpl(
             storage: storage,
-            dateTimeProvider: dateProvider
+            dateTimeProvider: dateProvider,
+            locationService: MockLocationService()
         )
     }
 
     func test_create_AppOpenEvent() {
-        XCTAssertNoThrow({
-            // when
-            let event = try self.factory.createEvent(.appOpen)
-
-            // then
+        prefillStorageAsVisitor()
+        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
+        try? self.factory.createEvent(.appOpen) { event in
             XCTAssert(event.name == AppOpenEvent.Constants.name)
-        })
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: defaultTimeout)
     }
 
     func test_create_SetUserIdEvent() {
-        XCTAssertNoThrow({
-            // when
-            let event = try self.factory.createEvent(.setUserId)
-
-            // then
+        prefillStorageAsCustomer()
+        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
+        try? self.factory.createEvent(.setUserId) { event in
             XCTAssert(event.name == SetUserIdEvent.Constants.name)
-        })
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: defaultTimeout)
     }
 
     func test_create_metaData() {
-        XCTAssertNoThrow({
-            // when
-            let event = try self.factory.createEvent(.metaData)
-
-            // then
-            XCTAssert(event.name == SetUserIdEvent.Constants.name)
-        })
+        prefillStorageAsVisitor()
+        storage.configurationEndPoint = URL(string: "https://optimove.net")
+        storage.tenantToken = "1234"
+        storage.version = "1"
+        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
+        try? self.factory.createEvent(.metaData) { event in
+            XCTAssert(event.name == MetaDataEvent.Constants.name)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: defaultTimeout)
     }
 
     func test_create_optipushOptIn() {
-        XCTAssertNoThrow({
-            // when
-            let event = try self.factory.createEvent(.optipushOptIn)
-
-            // then
-            XCTAssert(event.name == SetUserIdEvent.Constants.name)
-        })
+        prefillStorageAsVisitor()
+        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
+        try? self.factory.createEvent(.optipushOptIn) { event in
+            XCTAssert(event.name == OptEvent.Constants.optInName)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: defaultTimeout)
     }
 
     func test_create_optipushOptOut() {
-        XCTAssertNoThrow({
-            // when
-            let event = try self.factory.createEvent(.optipushOptOut)
-
-            // then
-            XCTAssert(event.name == SetUserIdEvent.Constants.name)
-        })
+        prefillStorageAsVisitor()
+        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
+        try? self.factory.createEvent(.optipushOptOut) { event in
+            XCTAssert(event.name == OptEvent.Constants.optOutName)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: defaultTimeout)
     }
 
     func test_create_setAdvertisingId() {
-        XCTAssertNoThrow({
-            // when
-            let event = try self.factory.createEvent(.setAdvertisingId)
-
-            // then
-            XCTAssert(event.name == SetUserIdEvent.Constants.name)
-        })
+        prefillStorageAsVisitor()
+        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
+        try? self.factory.createEvent(.setAdvertisingId) { event in
+            XCTAssert(event.name == SetAdvertisingIdEvent.Constants.name)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: defaultTimeout)
     }
 
     func test_create_setUserAgent() {
-        XCTAssertNoThrow({
-            // when
-            let event = try self.factory.createEvent(.setUserAgent)
-
-            // then
-            XCTAssert(event.name == SetUserIdEvent.Constants.name)
-        })
+        prefillStorageAsVisitor()
+        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
+        try? self.factory.createEvent(.setUserAgent) { event in
+            XCTAssert(event.name == SetUserAgent.Constants.name)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: defaultTimeout)
     }
 
     func test_create_pageVisit() {
-        XCTAssertNoThrow({
-            // when
-            let event = try self.factory.createEvent(.pageVisit(title: "", category: ""))
-
-            // then
-            XCTAssert(event.name == SetUserIdEvent.Constants.name)
-        })
+        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
+        try? self.factory.createEvent(.pageVisit(title: "", category: "")) { event in
+            XCTAssert(event.name == PageVisitEvent.Constants.name)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: defaultTimeout)
     }
 
 }

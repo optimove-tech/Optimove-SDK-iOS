@@ -33,9 +33,9 @@ final class UserAgentGenerator {
             }
             self.storage.userAgent = (result as? String) ?? "user_agent_undefined"
             tryCatch {
-                self.synchronizer.handle(
-                    .report(event: try self.coreEventFactory.createEvent(.setUserAgent))
-                )
+                try self.coreEventFactory.createEvent(.setUserAgent) { event in
+                    self.synchronizer.handle(.report(event: event))
+                }
             }
             self.webView = nil
         }

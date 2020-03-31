@@ -29,10 +29,7 @@ final class ComponentFactory {
             handler: RealTimeHanlderImpl(
                 storage: storage
             ),
-            coreEventFactory: CoreEventFactoryImpl(
-                storage: storage,
-                dateTimeProvider: serviceLocator.dateTimeProvider()
-            )
+            coreEventFactory: serviceLocator.coreEventFactory()
         )
     }
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.12.0
+
+- **added** fetching geo-location data if available.
+- **change** default endpoint for remote logging.
+
 ## 2.11.1
 
 - **fix** saving a control state of a push campaign.

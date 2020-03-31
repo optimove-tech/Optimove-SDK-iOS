@@ -17,7 +17,8 @@ final class OptInOutObserverTests: OptimoveTestCase {
             synchronizer: synchronizer,
             coreEventFactory: CoreEventFactoryImpl(
                 storage: storage,
-                dateTimeProvider: MockDateTimeProvider()
+                dateTimeProvider: MockDateTimeProvider(),
+                locationService: MockLocationService()
             ),
             storage: storage
         )

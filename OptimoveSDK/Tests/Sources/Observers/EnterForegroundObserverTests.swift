@@ -18,7 +18,8 @@ class EnterForegroundObserverTests: XCTestCase {
             dateTimeProvider: dateProvider,
             coreEventFactory: CoreEventFactoryImpl(
                 storage: storage,
-                dateTimeProvider: dateProvider
+                dateTimeProvider: dateProvider,
+                locationService: MockLocationService()
             )
         )
     }
