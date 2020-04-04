@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.12.1
+
+- **fix** calling UIKit method in the Main thread.
+
 ## 2.12.0
 
 - **added** fetching geo-location data if available.
