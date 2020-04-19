@@ -84,6 +84,8 @@
 		456F8995DB8CDD70E03FD382 /* NewUserIDHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6C83A68863BF37E8F3275B /* NewUserIDHandler.swift */; };
 		45AEE0276D250CF2208C644E /* OnStartEventGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F1D9A9EC40981BD427CB4C /* OnStartEventGeneratorTests.swift */; };
 		45E8890FB696618F19DE0E1C /* OptimoveSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F195D6A74F16DC039009B692 /* OptimoveSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		46C12D2B244C3D4F0066FF07 /* OptistreamEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C12D2A244C3D4F0066FF07 /* OptistreamEventTests.swift */; };
+		46F111EB2448772800A62798 /* OptistreamEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F111EA2448772800A62798 /* OptistreamEvent.swift */; };
 		499D5BF06BBCC8EBB94263E4 /* Optimove.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA418E3FDBEB318519B1F183 /* Optimove.swift */; };
 		49CF203CF09FBC2F4578AF84 /* OptimoveNotificationServiceExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AF7CBE1A75BE741CAF7483 /* OptimoveNotificationServiceExtensionTests.swift */; };
 		4B583BA9BF1C2FA8274AACD3 /* String+Split.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB8B22F680152DE4E7C00A7 /* String+Split.swift */; };
@@ -429,6 +431,8 @@
 		4592839140B76A8D32F05DC8 /* RemoteLoggerStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerStream.swift; sourceTree = "<group>"; };
 		460F691675BB2E55AB39B0F3 /* ApiPayloadBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiPayloadBuilder.swift; sourceTree = "<group>"; };
 		46370B16EF571A0A88EC6A65 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
+		46C12D2A244C3D4F0066FF07 /* OptistreamEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEventTests.swift; sourceTree = "<group>"; };
+		46F111EA2448772800A62798 /* OptistreamEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEvent.swift; sourceTree = "<group>"; };
 		472CC4141ED9FBD9DD0B65F1 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		485BDCB56EA98CD3DD5AE9DE /* TenantConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantConfigTests.swift; sourceTree = "<group>"; };
 		487536D1DE6FD34739D24A91 /* Installation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Installation.swift; sourceTree = "<group>"; };
@@ -1112,6 +1116,22 @@
 			path = DI;
 			sourceTree = "<group>";
 		};
+		46C12D29244C3D310066FF07 /* OptistreamEvent */ = {
+			isa = PBXGroup;
+			children = (
+				46C12D2A244C3D4F0066FF07 /* OptistreamEventTests.swift */,
+			);
+			path = OptistreamEvent;
+			sourceTree = "<group>";
+		};
+		46F111E9244876B300A62798 /* Optistream */ = {
+			isa = PBXGroup;
+			children = (
+				46F111EA2448772800A62798 /* OptistreamEvent.swift */,
+			);
+			path = Optistream;
+			sourceTree = "<group>";
+		};
 		4A802689AFE69F115DC0B92F /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -1545,6 +1565,7 @@
 		AA81ADF695C82CF49700A70D /* Events */ = {
 			isa = PBXGroup;
 			children = (
+				46C12D29244C3D310066FF07 /* OptistreamEvent */,
 				FB929F27ECD0720A4201056D /* CoreEventFactoryTests.swift */,
 				0EB46CB2A2B3AA95D3576048 /* CoreEvents */,
 			);
@@ -2060,6 +2081,7 @@
 				19FAAD1B5B8F3A83CCE1681A /* MockConfigurationRepository.swift in Sources */,
 				1EC0331B7F3631CAFF5B4BE7 /* MockDateTimeProvider.swift in Sources */,
 				98F9B9E29920E18313F20771 /* MockLocationService.swift in Sources */,
+				46C12D2B244C3D4F0066FF07 /* OptistreamEventTests.swift in Sources */,
 				794AABCA624F604F26CF9F78 /* MockNotificationPermissionFetcher.swift in Sources */,
 				A6D704D18C74065D0101020A /* MockOptimoveStorage.swift in Sources */,
 				A0F04EF654F238AD6B9E210B /* MockRealTimeHanlder.swift in Sources */,
@@ -2169,6 +2191,7 @@
 				4F2C212ED09A0819A1B2CDED /* OptEvent.swift in Sources */,
 				E169E43A16008BBB9E14C4D6 /* OptInOutObserver.swift in Sources */,
 				C3E05FDC7B4A8CB9F467A283 /* OptInService.swift in Sources */,
+				46F111EB2448772800A62798 /* OptistreamEvent.swift in Sources */,
 				432EE244D778884AEA4A9208 /* OptiLoggerOutputStream.swift in Sources */,
 				2EA9D0284826D6D32BFA3219 /* OptiLoggerStreamsContainer.swift in Sources */,
 				E26ADF45F23CE93001206923 /* OptiPush.swift in Sources */,
