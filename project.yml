@@ -25,6 +25,7 @@ targets:
       - path: OptimoveCore
         excludes:
           - "Tests/**/*"
+          - ".gitkeep"
     info:
       path: OptimoveCore/Info.plist
       properties:
@@ -45,6 +46,7 @@ targets:
       - path: OptimoveSDK
         excludes:
           - "Tests/**/*"
+          - ".gitkeep"
     info:
       path: OptimoveSDK/Info.plist
       properties:
@@ -70,6 +72,7 @@ targets:
       - path: OptimoveNotificationServiceExtension
         excludes:
           - "Tests/**/*"
+          - ".gitkeep"
     info:
       path: OptimoveNotificationServiceExtension/Info.plist
       properties:
@@ -93,6 +96,9 @@ targets:
     sources: 
       - path: OptimoveCore/Tests/
         name: OptimoveCore-Unit
+        excludes:
+          - ".gitkeep"
+    info:
       - path: Shared
         name: Shared-Unit
     dependencies:
@@ -104,6 +110,8 @@ targets:
     sources: 
       - path: OptimoveSDK/Tests/
         name: OptimoveSDK-Unit
+        excludes:
+          - ".gitkeep"
       - path: Shared
         name: Shared-Unit
     dependencies:
@@ -116,6 +124,8 @@ targets:
     sources:
       - path: OptimoveNotificationServiceExtension/Tests/
         name: OptimoveNotificationServiceExtension-Unit
+        excludes:
+          - ".gitkeep"
       - path: Shared
         name: Shared-Unit
     dependencies:
