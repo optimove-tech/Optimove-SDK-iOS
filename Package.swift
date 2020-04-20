@@ -27,7 +27,6 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/matomo-org/matomo-sdk-ios.git", from: "7.2.0"),
         .package(url: "https://github.com/WeTransfer/Mocker.git", from: "2.0.2")
     ],
     targets: [
@@ -35,7 +34,6 @@ let package = Package(
             name: "OptimoveSDK",
             dependencies: [
                 "OptimoveCore",
-                "MatomoTracker"
             ],
             path: "OptimoveSDK/Sources"
         ),

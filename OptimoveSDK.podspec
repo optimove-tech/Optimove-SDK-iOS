@@ -14,7 +14,6 @@ Pod::Spec.new do |s|
   s.swift_version = '5'
   base_dir = "OptimoveSDK/"
   s.source_files = base_dir +'Sources/Classes/**/*'
-  s.dependency 'MatomoTracker', '~> 7.0'
   s.dependency 'OptimoveCore', s.version.to_s
   s.frameworks = 'Foundation', 'UIKit', 'SystemConfiguration', 'UserNotifications', 'AdSupport'
   s.test_spec 'unit' do |unit_tests|

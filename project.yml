@@ -59,7 +59,6 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk
     dependencies: 
       - target: OptimoveCore
-      - carthage: MatomoTracker
       - sdk: UIKit.framework
       - sdk: UserNotifications.framework
       - sdk: AdSupport.framework

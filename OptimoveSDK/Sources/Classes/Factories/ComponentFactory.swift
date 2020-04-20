@@ -45,10 +45,7 @@ final class ComponentFactory {
             configuration: configuration.optitrack,
             storage: serviceLocator.storage(),
             coreEventFactory: coreEventFactory,
-            tracker: MatomoTrackerAdapter(
-                configuration: configuration.optitrack,
-                storage: serviceLocator.storage()
-            )
+            tracker: nil
         )
     }
 

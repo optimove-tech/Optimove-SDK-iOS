@@ -1,3 +1,2 @@
-$(SRCROOT)/Carthage/Build/iOS/MatomoTracker.framework
 $(SRCROOT)/Carthage/Build/iOS/OptimoveCore.framework
 $(SRCROOT)/Carthage/Build/iOS/OptimoveNotificationServiceExtension.framework
