@@ -1,5 +1,7 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
+import Foundation
+
 enum JsonType: Encodable {
     case number(Int)
     case string(String)
@@ -28,12 +30,12 @@ enum JsonType: Encodable {
 typealias OptistreamEventContext = [String: JsonType]
 
 struct OptistreamEvent: Encodable {
-    let tenant: UInt8
+    let tenant: Int
     let category: String
     let event: String
     let origin: String
     let customer: String?
     let visitor: String
-    let timestamp: UInt32
+    let timestamp: TimeInterval
     let context: OptistreamEventContext
 }
