@@ -13,26 +13,6 @@ final class ComponentFactory {
         self.coreEventFactory = coreEventFactory
     }
 
-    func createRealtimeComponent(configuration: Configuration) -> RealTime {
-        let storage = serviceLocator.storage()
-        return RealTime(
-            configuration: configuration.realtime,
-            storage: storage,
-            networking: RealTimeNetworkingImpl(
-                networkClient: serviceLocator.networking(),
-                realTimeRequestBuildable: RealTimeRequestBuilder(),
-                configuration: configuration.realtime
-            ),
-            eventBuilder: RealTimeEventBuilder(
-                storage: storage
-            ),
-            handler: RealTimeHanlderImpl(
-                storage: storage
-            ),
-            coreEventFactory: serviceLocator.coreEventFactory()
-        )
-    }
-
     func createOptipushComponent(configuration: Configuration) -> OptiPush {
         return OptiPush(
             registrar: serviceLocator.registrar(configuration: configuration),
