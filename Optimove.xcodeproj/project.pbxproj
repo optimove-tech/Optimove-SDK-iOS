@@ -991,6 +991,8 @@
 				8DAFF173166A96219F652DE6 /* ApiNetworking.swift */,
 				769C151F4313E1C1E223FE8E /* ApiOperation.swift */,
 				743439E918A7943D2FFA435C /* ApiRequestFactory.swift */,
+				460F691675BB2E55AB39B0F3 /* ApiPayloadBuilder.swift */,
+				DD086DA8F82346C96AD3DF50 /* ApiRequestBuilder.swift */,
 			);
 			path = Api;
 			sourceTree = "<group>";
@@ -1546,8 +1548,6 @@
 		A3C1B65F44459AF7F2C9F9B0 /* Builders */ = {
 			isa = PBXGroup;
 			children = (
-				460F691675BB2E55AB39B0F3 /* ApiPayloadBuilder.swift */,
-				DD086DA8F82346C96AD3DF50 /* ApiRequestBuilder.swift */,
 				7050C386BF1D5D2C1991ACDF /* RemoteConfigurationRequestBuilder.swift */,
 			);
 			path = Builders;
