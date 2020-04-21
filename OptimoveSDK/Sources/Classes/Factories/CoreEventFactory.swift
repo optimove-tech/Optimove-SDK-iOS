@@ -3,6 +3,8 @@
 import Foundation
 import OptimoveCore
 
+protocol OptimoveCoreEvent: OptimoveEvent {}
+
 enum CoreEventType {
     case appOpen
     case optipushOptIn
