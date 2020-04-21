@@ -19,11 +19,10 @@ final class OperationContext {
 }
 
 enum Operation {
-    case setUserId
-    case togglePushCampaigns(areDisabled: Bool)
     case report(event: OptimoveEvent)
-    case reportScreenEvent(title: String, category: String?)
     case dispatchNow
+    case setInstallation
+    case togglePushCampaigns(areDisabled: Bool)
     case deviceToken(token: Data)
     case optIn
     case optOut

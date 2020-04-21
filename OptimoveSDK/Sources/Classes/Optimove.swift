@@ -78,19 +78,17 @@ extension Optimove {
     /// - Parameters:
     ///   - screenTitle: The screen title.
     ///   - screenCategory: The screen category.
-    @objc public func reportScreenVisit(screenTitle: String, screenCategory: String? = nil) {
-        let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
-        Logger.info("Report a screen event w/title: \(screenTitle)")
-        let validationResult = ScreenVisitValidator.validate(screenTitle: screenTitle)
+    @objc public func reportScreenVisit(screenTitle title: String, screenCategory category: String? = nil) {
+        let title = title.trimmingCharacters(in: .whitespaces)
+        Logger.info("Report a screen event with title: \(title) and category \(category ?? "nil")")
+        let validationResult = ScreenVisitValidator.validate(screenTitle: title)
         guard validationResult == .valid else { return }
         let function: (ServiceLocator) -> Void = { serviceLocator in
             tryCatch {
-                serviceLocator.synchronizer().handle(
-                    .reportScreenEvent(
-                        title: screenTitle,
-                        category: screenCategory
-                    )
-                )
+                try serviceLocator.coreEventFactory().createEvent(.pageVisit(title: title,
+                                                                             category: category)) { event in
+                    Optimove.shared.reportEvent(event)
+                }
             }
         }
         container.resolve(function)
@@ -121,8 +119,11 @@ extension Optimove {
             let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
             guard validationResult == .valid else { return }
             NewUserIDHandler(storage: storage).handle(userID: userID)
-            let syncronizer = serviceLocator.synchronizer()
-            syncronizer.handle(.setUserId)
+            tryCatch {
+                try serviceLocator.coreEventFactory().createEvent(.setUserId) { event in
+                    Optimove.shared.reportEvent(event)
+                }
+            }
         }
         container.resolve(function)
     }

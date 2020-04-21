@@ -26,7 +26,7 @@ extension OptiPush: Component {
         case let .deviceToken(token: token):
             storage.apnsToken = token
             registrar.handle(.setInstallation)
-        case .setUserId, .optIn, .optOut:
+        case .setInstallation, .optIn, .optOut:
             guard storage.apnsToken != nil else { return }
             registrar.handle(.setInstallation)
         case let .togglePushCampaigns(areDisabled: areDisabled):
