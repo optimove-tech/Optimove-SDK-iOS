@@ -23,8 +23,7 @@ final class OptiTrack {
         self.eventReportingQueue = DispatchQueue(label: "com.optimove.sdk.optitrack", qos: .background)
 
         Logger.debug("OptiTrack initialized.")
-        syncVisitorAndUserIdToMatomo()
-        dispatchNow()
+        dispatchNow() // TODO: Delete it after queue with timer will be done.
     }
 
 }
@@ -88,52 +87,6 @@ private extension OptiTrack {
     func dispatchNow() {
         Logger.debug("OptiTrack: User asked to dispatch.")
         tracker.dispatch()
-    }
-
-}
-
-extension OptiTrack {
-
-    func syncVisitorAndUserIdToMatomo() {
-        if let globalVisitorID = storage.visitorID {
-            let localVisitorID: String? = tracker.forcedVisitorId
-            if localVisitorID != globalVisitorID {
-                tracker.forcedVisitorId = globalVisitorID
-            }
-        }
-        if let globalUserID = storage.customerID {
-            let localUserID: String? = tracker.userId
-            if localUserID != globalUserID {
-                tryCatch { try setUserId() }
-            }
-        }
-    }
-
-    func sendReport(event: OptimoveEvent, config: EventsConfig) {
-        let customDimensionIDS = configuration.customDimensionIDS
-        let maxCustomDimensions = customDimensionIDS.maxActionCustomDimensions + customDimensionIDS.maxVisitCustomDimensions
-
-        let getOptitrackDimensionId: (String) -> Int? = { parameterName in
-            return config.parameters[parameterName]?.optiTrackDimensionId
-        }
-
-        let parameterDimensions: [TrackerEvent.CustomDimension] = event.parameters
-            .compactMapKeys(getOptitrackDimensionId)
-            .filter { $0.key <= maxCustomDimensions }
-            .mapValues { String(describing: $0).trimmingCharacters(in: .whitespaces) }
-            .map { TrackerEvent.CustomDimension(index: $0.key, value: $0.value) }
-
-        let nameDimensions: [TrackerEvent.CustomDimension] = [
-            TrackerEvent.CustomDimension(index: customDimensionIDS.eventIDCustomDimensionID, value: String(config.id)),
-            TrackerEvent.CustomDimension(index: customDimensionIDS.eventNameCustomDimensionID, value: event.name)
-        ]
-
-        let event = TrackerEvent(
-            category: configuration.eventCategoryName,
-            action: event.name,
-            dimensions: parameterDimensions + nameDimensions
-        )
-        tracker.track(event)
     }
 
 }

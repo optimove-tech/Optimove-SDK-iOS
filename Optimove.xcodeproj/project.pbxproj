@@ -84,6 +84,7 @@
 		46C12D2B244C3D4F0066FF07 /* OptistreamEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C12D2A244C3D4F0066FF07 /* OptistreamEventTests.swift */; };
 		46C12D2F244C66E40066FF07 /* OptistreamEventBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C12D2E244C66E40066FF07 /* OptistreamEventBuilder.swift */; };
 		46F111EB2448772800A62798 /* OptistreamEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F111EA2448772800A62798 /* OptistreamEvent.swift */; };
+		46F227F7244DD76B00215E22 /* OptistreamTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F227F6244DD76B00215E22 /* OptistreamTracker.swift */; };
 		499D5BF06BBCC8EBB94263E4 /* Optimove.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA418E3FDBEB318519B1F183 /* Optimove.swift */; };
 		49CF203CF09FBC2F4578AF84 /* OptimoveNotificationServiceExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AF7CBE1A75BE741CAF7483 /* OptimoveNotificationServiceExtensionTests.swift */; };
 		4B583BA9BF1C2FA8274AACD3 /* String+Split.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB8B22F680152DE4E7C00A7 /* String+Split.swift */; };
@@ -425,6 +426,7 @@
 		46C12D2A244C3D4F0066FF07 /* OptistreamEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEventTests.swift; sourceTree = "<group>"; };
 		46C12D2E244C66E40066FF07 /* OptistreamEventBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEventBuilder.swift; sourceTree = "<group>"; };
 		46F111EA2448772800A62798 /* OptistreamEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEvent.swift; sourceTree = "<group>"; };
+		46F227F6244DD76B00215E22 /* OptistreamTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamTracker.swift; sourceTree = "<group>"; };
 		472CC4141ED9FBD9DD0B65F1 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		485BDCB56EA98CD3DD5AE9DE /* TenantConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantConfigTests.swift; sourceTree = "<group>"; };
 		487536D1DE6FD34739D24A91 /* Installation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Installation.swift; sourceTree = "<group>"; };
@@ -1101,6 +1103,7 @@
 			children = (
 				46F111EA2448772800A62798 /* OptistreamEvent.swift */,
 				46C12D2E244C66E40066FF07 /* OptistreamEventBuilder.swift */,
+				46F227F6244DD76B00215E22 /* OptistreamTracker.swift */,
 			);
 			path = Optistream;
 			sourceTree = "<group>";
@@ -2114,6 +2117,7 @@
 				EA217C02FADC03C69449F317 /* NetworkClient.swift in Sources */,
 				1EC0D984EB3BB7D44CF3D480 /* NetworkError.swift in Sources */,
 				D4E7BB58F63585E5AC06D321 /* NetworkRequest.swift in Sources */,
+				46F227F7244DD76B00215E22 /* OptistreamTracker.swift in Sources */,
 				50B6E591AC81B656E87934F7 /* NetworkRequestFactory.swift in Sources */,
 				0CD8302F32E07D11E39B187D /* NetworkResponse.swift in Sources */,
 				0F61B8F6204E009963092F25 /* NetworkResult.swift in Sources */,

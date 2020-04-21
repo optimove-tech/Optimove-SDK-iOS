@@ -25,7 +25,7 @@ final class ComponentFactory {
             configuration: configuration.optitrack,
             storage: serviceLocator.storage(),
             coreEventFactory: coreEventFactory,
-            tracker: nil
+            tracker: OptistreamTracker()
         )
     }
 
