@@ -25,7 +25,7 @@ extension SynchronizerImpl: Synchronizer {
     func handle(_ operation: Operation) {
         queue.async { [chain] in
             tryCatch {
-                try chain.next.execute(.init(operation))
+                try chain.next.execute(operation)
             }
         }
     }

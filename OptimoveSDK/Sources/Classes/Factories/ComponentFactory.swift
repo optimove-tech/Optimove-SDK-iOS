@@ -22,8 +22,15 @@ final class ComponentFactory {
 
     func createOptitrackComponent(configuration: Configuration) -> OptiTrack {
         return OptiTrack(
-            configuration: configuration.optitrack,
-            tracker: OptistreamTracker()
+            tracker: OptistreamTracker(
+                queue: OptistreamQueueImpl(
+                    storage: serviceLocator.storage()
+                ),
+                optirstreamEventBuilder: OptistreamEventBuilder(
+                    configuration: configuration.optitrack,
+                    storage: serviceLocator.storage()
+                )
+            )
         )
     }
 

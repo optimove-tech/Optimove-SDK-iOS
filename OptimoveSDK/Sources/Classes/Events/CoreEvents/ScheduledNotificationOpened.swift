@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class ScheduledNotificationOpened: OptimoveCoreEvent {
+final class ScheduledNotificationOpened: Event {
 
     struct Constants {
         static let name = "notification_opened"
@@ -18,19 +18,19 @@ final class ScheduledNotificationOpened: OptimoveCoreEvent {
         }
     }
 
-    let name: String = Constants.name
-    let parameters: [String: Any]
-
     init(bundleIdentifier: String, campaign: ScheduledNotificationCampaign) {
-        parameters = [
-            Constants.Key.timestamp: Int(Date().timeIntervalSince1970),
-            Constants.Key.appNS: bundleIdentifier,
-            Constants.Key.templateID: campaign.templateID,
-            Constants.Key.actionSerial: campaign.actionSerial,
-            Constants.Key.campignID: campaign.campaignID,
-            Constants.Key.engagementID: campaign.engagementID,
-            Constants.Key.campaignType: campaign.campaignType ?? -1
-        ]
+        super.init(
+            name: Constants.name,
+            context: [
+                Constants.Key.timestamp: Int(Date().timeIntervalSince1970),
+                Constants.Key.appNS: bundleIdentifier,
+                Constants.Key.templateID: campaign.templateID,
+                Constants.Key.actionSerial: campaign.actionSerial,
+                Constants.Key.campignID: campaign.campaignID,
+                Constants.Key.engagementID: campaign.engagementID,
+                Constants.Key.campaignType: campaign.campaignType ?? -1
+            ]
+        )
     }
 
 }

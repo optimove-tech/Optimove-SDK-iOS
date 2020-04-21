@@ -19,27 +19,18 @@ final class OptistreamEventBuilder {
         self.storage = storage
     }
 
-    func build(
-        event: Event,
-        timestamp: TimeInterval,
-        category: String) throws -> OptistreamEvent {
+    func build(event: Event) throws -> OptistreamEvent {
         return OptistreamEvent(
+            uuid: event.uuid,
             tenant: configuration.tenantID,
-            category: category,
+            category: event.category,
             event: event.name,
             origin: Constants.origin,
             customer: storage.customerID,
             visitor: try storage.getVisitorID(),
-            timestamp: timestamp,
-            context: event.parameters
+            timestamp: event.timestamp,
+            context: event.context
         )
     }
 
-}
-
-typealias EventParameters = [String: JsonType]
-
-protocol Event {
-    var name: String { get }
-    var parameters: EventParameters { get }
 }

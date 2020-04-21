@@ -10,7 +10,7 @@ class ComponentHandler: Node {
         self.components = components
     }
 
-    override func execute(_ context: OperationContext) throws {
+    override func execute(_ context: Operation) throws {
         components.forEach { component in
             do {
                 try component.handle(context)

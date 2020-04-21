@@ -7,7 +7,7 @@ private struct Constants {
     static let boolean = "Boolean"
 }
 
-extension OptimoveEvent {
+extension Event {
 
     /// The normalization process contains next steps:
     /// - Replacing all spaces in a key with underscore character.
@@ -17,12 +17,12 @@ extension OptimoveEvent {
     /// - Parameter event: The event for normilization.
     /// - Returns: Normilized event
     /// - Throws: Throw an error if an event configuration are missing.
-    func normilize(_ events: [String: EventsConfig]) throws -> OptimoveEvent {
+    func normilize(_ events: [String: EventsConfig]) throws -> Event {
         let normilizeName = self.name.normilizeKey()
         guard let eventConfig = events[normilizeName] else {
             throw GuardError.custom("Configurations are missing for event \(self.name)")
         }
-        let normalizedParameters = self.parameters.reduce(into: [String: Any]()) { (result, next) in
+        let normalizedParameters = self.context.reduce(into: [String: Any]()) { (result, next) in
             // Replacing all spaces in a key with underscore character.
             let normalizedKey = next.key.normilizeKey()
 
@@ -40,7 +40,13 @@ extension OptimoveEvent {
                 result[next.key] = nil
             }
         }
-        return CommonOptimoveEvent(name: normilizeName, parameters: normalizedParameters)
+        return Event(
+            uuid:self.uuid,
+            name: normilizeName,
+            category: self.category,
+            context: normalizedParameters,
+            timestamp: self.timestamp
+        )
     }
 
 }

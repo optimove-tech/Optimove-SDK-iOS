@@ -2,7 +2,7 @@
 
 public struct Parameter: Codable, Equatable {
     public let type: String
-    public let optiTrackDimensionId: Int
+    public let optiTrackDimensionId: Int /// TODO: Remove it
     public let optional: Bool
 
     public init(

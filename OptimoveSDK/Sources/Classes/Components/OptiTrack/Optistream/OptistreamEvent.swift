@@ -2,34 +2,8 @@
 
 import Foundation
 
-enum JsonType: Encodable {
-    case number(Int)
-    case string(String)
-    case bool(Bool)
-    case array([JsonType])
-    case dictionary([String: JsonType])
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        switch self {
-        case .number(let number):
-            try container.encode(number)
-        case .string(let string):
-            try container.encode(string)
-        case .bool(let bool):
-            try container.encode(bool)
-        case .array(let array):
-            try container.encode(array)
-        case .dictionary(let dictionary):
-            try container.encode(dictionary)
-        }
-    }
-
-}
-
-typealias OptistreamEventContext = [String: JsonType]
-
-struct OptistreamEvent: Encodable {
+struct OptistreamEvent {
+    let uuid: String
     let tenant: Int
     let category: String
     let event: String
@@ -37,5 +11,13 @@ struct OptistreamEvent: Encodable {
     let customer: String?
     let visitor: String
     let timestamp: TimeInterval
-    let context: OptistreamEventContext
+    let context: [String: Any]
+}
+
+extension OptistreamEvent: Equatable {
+
+    static func == (lhs: OptistreamEvent, rhs: OptistreamEvent) -> Bool {
+        return lhs.uuid == rhs.uuid
+    }
+
 }

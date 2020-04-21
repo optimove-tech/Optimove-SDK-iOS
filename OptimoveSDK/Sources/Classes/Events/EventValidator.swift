@@ -37,29 +37,29 @@ final class EventValidator: Node {
         self.configuration = configuration
     }
 
-    override func execute(_ context: OperationContext) throws {
-        let validationFunction = { [configuration] () -> OperationContext in
-            switch context.operation {
+    override func execute(_ operation: Operation) throws {
+        let validationFunction = { [configuration] () -> Operation in
+            switch operation {
             case let .report(event: event):
                 let eventConfig = try event.matchConfiguration(with: configuration.events)
                 try self.validate(event: event, withConfig: eventConfig)
-                return context
+                return operation
             default:
-                return context
+                return operation
             }
         }
         try next?.execute(validationFunction())
     }
 
-    private func validate(event: OptimoveEvent, withConfig eventConfiguration: EventsConfig) throws {
+    private func validate(event: Event, withConfig eventConfiguration: EventsConfig) throws {
         // Verify mandatory parameter exist
         for (name, parameter) in eventConfiguration.parameters where parameter.mandatory {
-            if event.parameters[name] == nil {
+            if event.context[name] == nil {
                 throw Error.mandatoryParameterMissing
             }
         }
         // Verify Type is as defined
-        for (key, value) in event.parameters {
+        for (key, value) in event.context {
             if let parameterConfiguration = eventConfiguration.parameters[key] {
                 switch parameterConfiguration.type {
                 case Constants.number:

@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-final class SetUserEmailEvent: OptimoveCoreEvent {
+final class SetUserEmailEvent: Event {
 
     struct Constants {
         static let name = OptimoveKeys.Configuration.setEmail.rawValue
@@ -9,12 +9,7 @@ final class SetUserEmailEvent: OptimoveCoreEvent {
         }
     }
 
-    let name: String = Constants.name
-    let parameters: [String: Any]
-
     init(email: String) {
-        self.parameters = [
-            Constants.Key.email: email
-        ]
+        super.init(name: Constants.name, context: [Constants.Key.email: email])
     }
 }

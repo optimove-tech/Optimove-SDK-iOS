@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-extension OptimoveEvent {
+extension Event {
 
     func matchConfiguration(with events: [String: EventsConfig]) throws -> EventsConfig {
         guard let eventConfig = events[self.name] else {

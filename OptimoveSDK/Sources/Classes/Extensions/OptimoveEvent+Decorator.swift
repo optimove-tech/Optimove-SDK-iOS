@@ -3,10 +3,9 @@
 import Foundation
 import OptimoveCore
 
-/// Adjust event entity to satisfy Optimove's business logic before dispatch
-final class OptimoveEventDecorator: OptimoveEvent {
+extension Event {
 
-    struct Constants {
+    private struct Constants {
         struct Key {
             static let eventDeviceType = OptimoveKeys.AdditionalAttributesKeys.eventDeviceType
             static let eventNativeMobile = OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile
@@ -21,40 +20,32 @@ final class OptimoveEventDecorator: OptimoveEvent {
         }
     }
 
-    var name: String
-    var parameters: [String: Any]
-
-    init(event: OptimoveEvent) {
-        self.name = event.name
-        self.parameters = event.parameters
-    }
-
-    /// For core events, where the naming conventions is satisfy by the event source, use this convenience initializer to just add the additional attributes according to the config file.
-    ///
-    /// - Parameters:
-    ///   - event: Event that is sent to Track & Trigger
-    ///   - config: The config of the event as provided by the config file
-    convenience init(event: OptimoveEvent, config: EventsConfig) {
-        self.init(event: event)
-        self.decorate(config)
+    func decorate(config: EventsConfig) -> Event {
+        return Event(uuid: self.uuid,
+                     name: self.name,
+                     category: self.category,
+                     context: decorate(config: config),
+                     timestamp: self.timestamp)
     }
 
     /// Add Additional attributes according to event configuration
     ///
     /// - Parameter config: The event configurations as provided in file
-    func decorate(_ config: EventsConfig) {
+    private func decorate(config: EventsConfig) -> [String: Any] {
+        var context = self.context
         if config.parameters[Constants.Key.eventDeviceType] != nil {
-            self.parameters[Constants.Key.eventDeviceType] = Constants.Value.eventDeviceType
+            context[Constants.Key.eventDeviceType] = Constants.Value.eventDeviceType
         }
         if config.parameters[Constants.Key.eventNativeMobile] != nil {
-            self.parameters[Constants.Key.eventNativeMobile] = Constants.Value.eventNativeMobile
+            context[Constants.Key.eventNativeMobile] = Constants.Value.eventNativeMobile
         }
         if config.parameters[Constants.Key.eventOs] != nil {
-            self.parameters[Constants.Key.eventOs] = Constants.Value.eventOs
+            context[Constants.Key.eventOs] = Constants.Value.eventOs
         }
         if config.parameters[Constants.Key.eventPlatform] != nil {
-            self.parameters[Constants.Key.eventPlatform] = Constants.Value.eventPlatform
+            context[Constants.Key.eventPlatform] = Constants.Value.eventPlatform
         }
+        return context
     }
 
 }

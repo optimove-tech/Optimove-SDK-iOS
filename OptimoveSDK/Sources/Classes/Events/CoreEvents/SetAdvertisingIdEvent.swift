@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-final class SetAdvertisingIdEvent: OptimoveCoreEvent {
+final class SetAdvertisingIdEvent: Event {
 
     struct Constants {
         static let name = OptimoveKeys.Configuration.setAdvertisingId.rawValue
@@ -11,14 +11,14 @@ final class SetAdvertisingIdEvent: OptimoveCoreEvent {
         }
     }
 
-    let name: String = Constants.name
-    let parameters: [String: Any]
-
     init(advertisingId: String, deviceId: String, appNs: String) {
-        parameters = [
-            Constants.Key.advertisingId: advertisingId,
-            Constants.Key.deviceId: deviceId,
-            Constants.Key.appNS: appNs
-        ]
+        super.init(
+            name: Constants.name,
+            context: [
+                Constants.Key.advertisingId: advertisingId,
+                Constants.Key.deviceId: deviceId,
+                Constants.Key.appNS: appNs
+            ]
+        )
     }
 }

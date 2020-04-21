@@ -40,7 +40,7 @@ private extension OptimoveNotificationHandler {
         }
     }
 
-    func createEvent(from response: UNNotificationResponse) throws -> OptimoveCoreEvent {
+    func createEvent(from response: UNNotificationResponse) throws -> Event {
         let notificationDetails = response.notification.request.content.userInfo
         let data = try JSONSerialization.data(withJSONObject: notificationDetails)
         let notification = try JSONDecoder().decode(NotificationPayload.self, from: data)

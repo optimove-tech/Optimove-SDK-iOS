@@ -21,8 +21,8 @@ final class OptiPush {
 
 extension OptiPush: Component {
 
-    func handle(_ context: OperationContext) throws {
-        switch context.operation {
+    func handle(_ operation: Operation) throws {
+        switch operation {
         case let .deviceToken(token: token):
             storage.apnsToken = token
             registrar.handle(.setInstallation)

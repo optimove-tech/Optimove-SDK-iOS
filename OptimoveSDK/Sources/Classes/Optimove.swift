@@ -53,8 +53,8 @@ extension Optimove {
     ///   - parameters: The dictionary of attributes.
     @objc public func reportEvent(name: String, parameters: [String: Any] = [:]) {
         container.resolve { serviceLocator in
-            let customEvent = CommonOptimoveEvent(name: name, parameters: parameters)
-            serviceLocator.synchronizer().handle(.report(event: customEvent))
+            let tenantEvent = TenantEvent(name: name, context: parameters)
+            serviceLocator.synchronizer().handle(.report(event: tenantEvent))
         }
     }
 
@@ -64,7 +64,8 @@ extension Optimove {
     ///   - event: Instance of OptimoveEvent type.
     @objc public func reportEvent(_ event: OptimoveEvent) {
         container.resolve { serviceLocator in
-            serviceLocator.synchronizer().handle(.report(event: event))
+            let tenantEvent = TenantEvent(name: event.name, context: event.parameters)
+            serviceLocator.synchronizer().handle(.report(event: tenantEvent))
         }
     }
 
@@ -83,15 +84,14 @@ extension Optimove {
         Logger.info("Report a screen event with title: \(title) and category \(category ?? "nil")")
         let validationResult = ScreenVisitValidator.validate(screenTitle: title)
         guard validationResult == .valid else { return }
-        let function: (ServiceLocator) -> Void = { serviceLocator in
+        container.resolve { serviceLocator in
             tryCatch {
-                try serviceLocator.coreEventFactory().createEvent(.pageVisit(title: title,
-                                                                             category: category)) { event in
-                    Optimove.shared.reportEvent(event)
+                let factory = serviceLocator.coreEventFactory()
+                try factory.createEvent(.pageVisit(title: title, category: category)) { event in
+                    serviceLocator.synchronizer().handle(.report(event: event))
                 }
             }
         }
-        container.resolve(function)
     }
 }
 
@@ -121,7 +121,7 @@ extension Optimove {
             NewUserIDHandler(storage: storage).handle(userID: userID)
             tryCatch {
                 try serviceLocator.coreEventFactory().createEvent(.setUserId) { event in
-                    Optimove.shared.reportEvent(event)
+                    serviceLocator.synchronizer().handle(.report(event: event))
                 }
             }
         }
@@ -139,7 +139,7 @@ extension Optimove {
             NewEmailHandler(storage: storage).handle(email: email)
             tryCatch {
                 try serviceLocator.coreEventFactory().createEvent(.setUserEmail) { event in
-                    Optimove.shared.reportEvent(event)
+                    serviceLocator.synchronizer().handle(.report(event: event))
                 }
             }
         }

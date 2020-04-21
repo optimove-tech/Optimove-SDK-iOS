@@ -13,18 +13,15 @@ final class ParametersNormalizer: Node {
 
     // MARK: - EventableHandler
 
-    override func execute(_ context: OperationContext) throws {
-        let normilizeFunction = { [configuration] () -> OperationContext in
-            switch context.operation {
+    override func execute(_ operation: Operation) throws {
+        let normilizeFunction = { [configuration] () -> Operation in
+            switch operation {
             case let .report(event: event):
-                return OperationContext(
-                    operation: .report(
-                        event: try event.normilize(configuration.events)
-                    ),
-                    timestamp: context.timestamp
+                return Operation.report(
+                    event: try event.normilize(configuration.events)
                 )
             default:
-                return context
+                return operation
             }
         }
         try next?.execute(normilizeFunction())
