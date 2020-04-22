@@ -3,11 +3,11 @@
 import Foundation
 import OptimoveCore
 
-private struct Constants {
-    static let boolean = "Boolean"
-}
-
 extension Event {
+
+    private struct Constants {
+        static let boolean = "Boolean"
+    }
 
     /// The normalization process contains next steps:
     /// - Replacing all spaces in a key with underscore character.
