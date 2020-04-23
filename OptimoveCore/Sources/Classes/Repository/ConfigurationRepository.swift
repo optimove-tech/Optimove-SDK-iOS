@@ -48,7 +48,7 @@ extension ConfigurationRepositoryImpl: ConfigurationRepository {
     }
 
     public func setConfiguration(_ config: Configuration) throws {
-        try storage.save(data: try JSONSerialization.data(withJSONObject: config, options: []),
+        try storage.save(data: config,
                          toFileName: Constants.Configuration.fileName, shared: Constants.Configuration.sharedStorage)
     }
 
@@ -58,7 +58,7 @@ extension ConfigurationRepositoryImpl: ConfigurationRepository {
     }
 
     public func saveGlobal(_ config: GlobalConfig) throws {
-        try storage.save(data: try JSONSerialization.data(withJSONObject: config, options: []),
+        try storage.save(data: config,
                          toFileName: Constants.Global.fileName,
                          shared: Constants.Global.sharedStorage)
     }
@@ -73,7 +73,7 @@ extension ConfigurationRepositoryImpl: ConfigurationRepository {
     public func saveTenant(_ config: TenantConfig) throws {
         let version = try storage.getVersion()
         let fileName = version + Constants.fileExtension
-        try storage.save(data: try JSONSerialization.data(withJSONObject: config, options: []),
+        try storage.save(data: config,
                          toFileName: fileName,
                          shared: Constants.Tenant.sharedStorage)
     }

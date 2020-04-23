@@ -28,11 +28,10 @@ extension OptistreamNetworkingImpl: OptistreamNetworking {
 
     func send(event: OptistreamEvent, completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
         do {
-            let data = try JSONSerialization.data(withJSONObject: event.json(), options: [])
-            let request = NetworkRequest(
+            let request = try NetworkRequest(
                 method: .post,
                 baseURL: configuration.optitrackEndpoint,
-                httpBody: data
+                body: event
             )
             networkClient.perform(request) {
                 OptistreamNetworkingImpl.handleResult(result: $0, for: event, completion: completion)

@@ -69,13 +69,8 @@ final class OptistreamQueueImpl {
 
     private func save(events: [OptistreamEvent]) {
         do {
-            let data = try JSONSerialization.data(
-                withJSONObject: events.map({
-                    $0.dictionary }),
-                options: []
-            )
             try storage.save(
-                data: data,
+                data: events,
                 toFileName: Constants.queuePersistanceFileName,
                 shared: false
             )

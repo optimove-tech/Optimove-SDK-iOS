@@ -18,7 +18,7 @@ public protocol FileStorage {
     ///   - data: Data object that will be saved.
     ///   - toFileName: The file name on disk space.
     ///   - shared: set `true` if the file should be save a shared container.
-    func save(data: Data, toFileName: String, shared: Bool) throws
+    func save<T: Encodable>(data: T, toFileName: String, shared: Bool) throws
 
     /// Save file.
     ///
@@ -96,10 +96,11 @@ extension FileStorageImpl: FileStorage {
         }
     }
 
-    public func save(
-        data: Data,
+    public func save<T: Encodable>(
+        data: T,
         toFileName fileName: String,
         shared: Bool = false) throws {
+        let data = try JSONEncoder().encode(data)
         try saveData(data: data, toFileName: fileName, shared: shared)
     }
 
