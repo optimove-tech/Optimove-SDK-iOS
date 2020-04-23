@@ -80,9 +80,13 @@
 		456F8995DB8CDD70E03FD382 /* NewUserIDHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6C83A68863BF37E8F3275B /* NewUserIDHandler.swift */; };
 		45AEE0276D250CF2208C644E /* OnStartEventGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F1D9A9EC40981BD427CB4C /* OnStartEventGeneratorTests.swift */; };
 		45E8890FB696618F19DE0E1C /* OptimoveSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F195D6A74F16DC039009B692 /* OptimoveSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		466C5280244F474E0052734C /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466C527F244F474E0052734C /* Event.swift */; };
 		466C5282244F50980052734C /* TenantEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466C5281244F50980052734C /* TenantEvent.swift */; };
 		466C5285244F664F0052734C /* OptistreamNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466C5284244F664F0052734C /* OptistreamNetworking.swift */; };
+		466E96D724509BE0005E6FD0 /* Initialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E96D624509BE0005E6FD0 /* Initialization.swift */; };
+		466E96D924509C18005E6FD0 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E96D824509C18005E6FD0 /* JSON.swift */; };
+		466E96DB24509C45005E6FD0 /* Merging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E96DA24509C45005E6FD0 /* Merging.swift */; };
+		466E96DD24509C68005E6FD0 /* Querying.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E96DC24509C68005E6FD0 /* Querying.swift */; };
+		466E96DF2450A234005E6FD0 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E96DE2450A234005E6FD0 /* Event.swift */; };
 		46C12D2B244C3D4F0066FF07 /* OptistreamEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C12D2A244C3D4F0066FF07 /* OptistreamEventTests.swift */; };
 		46C12D2F244C66E40066FF07 /* OptistreamEventBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C12D2E244C66E40066FF07 /* OptistreamEventBuilder.swift */; };
 		46F111EB2448772800A62798 /* OptistreamEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F111EA2448772800A62798 /* OptistreamEvent.swift */; };
@@ -423,9 +427,13 @@
 		4592839140B76A8D32F05DC8 /* RemoteLoggerStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerStream.swift; sourceTree = "<group>"; };
 		460F691675BB2E55AB39B0F3 /* ApiPayloadBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiPayloadBuilder.swift; sourceTree = "<group>"; };
 		46370B16EF571A0A88EC6A65 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
-		466C527F244F474E0052734C /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		466C5281244F50980052734C /* TenantEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantEvent.swift; sourceTree = "<group>"; };
 		466C5284244F664F0052734C /* OptistreamNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamNetworking.swift; sourceTree = "<group>"; };
+		466E96D624509BE0005E6FD0 /* Initialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Initialization.swift; sourceTree = "<group>"; };
+		466E96D824509C18005E6FD0 /* JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
+		466E96DA24509C45005E6FD0 /* Merging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Merging.swift; sourceTree = "<group>"; };
+		466E96DC24509C68005E6FD0 /* Querying.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Querying.swift; sourceTree = "<group>"; };
+		466E96DE2450A234005E6FD0 /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		46C12D2A244C3D4F0066FF07 /* OptistreamEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEventTests.swift; sourceTree = "<group>"; };
 		46C12D2E244C66E40066FF07 /* OptistreamEventBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEventBuilder.swift; sourceTree = "<group>"; };
 		46F111EA2448772800A62798 /* OptistreamEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEvent.swift; sourceTree = "<group>"; };
@@ -693,8 +701,8 @@
 		059971E08A10B8A4891F2794 /* Events */ = {
 			isa = PBXGroup;
 			children = (
+				466E96DE2450A234005E6FD0 /* Event.swift */,
 				57204664F03AA8ECAC34A28C /* EventValidator.swift */,
-				466C527F244F474E0052734C /* Event.swift */,
 				466C5281244F50980052734C /* TenantEvent.swift */,
 				B7E0C4FAAB0D1A333D7859D0 /* CoreEvents */,
 			);
@@ -1084,12 +1092,15 @@
 			path = DI;
 			sourceTree = "<group>";
 		};
-		466C5283244F66290052734C /* API */ = {
+		466E96D524509BD1005E6FD0 /* JSON */ = {
 			isa = PBXGroup;
 			children = (
-				466C5284244F664F0052734C /* OptistreamNetworking.swift */,
+				466E96D624509BE0005E6FD0 /* Initialization.swift */,
+				466E96D824509C18005E6FD0 /* JSON.swift */,
+				466E96DA24509C45005E6FD0 /* Merging.swift */,
+				466E96DC24509C68005E6FD0 /* Querying.swift */,
 			);
-			path = API;
+			path = JSON;
 			sourceTree = "<group>";
 		};
 		46C12D29244C3D310066FF07 /* OptistreamEvent */ = {
@@ -1103,7 +1114,7 @@
 		46F111E9244876B300A62798 /* Optistream */ = {
 			isa = PBXGroup;
 			children = (
-				466C5283244F66290052734C /* API */,
+				466C5284244F664F0052734C /* OptistreamNetworking.swift */,
 				46F111EA2448772800A62798 /* OptistreamEvent.swift */,
 				46C12D2E244C66E40066FF07 /* OptistreamEventBuilder.swift */,
 				46F227F6244DD76B00215E22 /* OptistreamTracker.swift */,
@@ -1459,6 +1470,7 @@
 		98D7458B42CE10B8BAFDE51B /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				466E96D524509BD1005E6FD0 /* JSON */,
 				325B5F8B3BDBB034C3516AAB /* .gitkeep */,
 				517F8BBB89498042BB4C4B44 /* Coding */,
 				9D17BEB9C45081815BEF5D44 /* Configurations */,
@@ -2126,6 +2138,7 @@
 				0F61B8F6204E009963092F25 /* NetworkResult.swift in Sources */,
 				0E86E3145ADEEE0A91734327 /* NetworkingFactory.swift in Sources */,
 				63485C3731D0062C1A21A186 /* NewEmailHandler.swift in Sources */,
+				466E96DF2450A234005E6FD0 /* Event.swift in Sources */,
 				8A615E8D19A27C22DC4DF552 /* NewTenantInfoHandler.swift in Sources */,
 				456F8995DB8CDD70E03FD382 /* NewUserIDHandler.swift in Sources */,
 				2831D1D6A605C2B8A6B57080 /* NewVisitorIdGenerator.swift in Sources */,
@@ -2136,7 +2149,6 @@
 				55754C0209B72C6239CCE64E /* OperationFactory.swift in Sources */,
 				4F2C212ED09A0819A1B2CDED /* OptEvent.swift in Sources */,
 				E169E43A16008BBB9E14C4D6 /* OptInOutObserver.swift in Sources */,
-				466C5280244F474E0052734C /* Event.swift in Sources */,
 				C3E05FDC7B4A8CB9F467A283 /* OptInService.swift in Sources */,
 				46F111EB2448772800A62798 /* OptistreamEvent.swift in Sources */,
 				432EE244D778884AEA4A9208 /* OptiLoggerOutputStream.swift in Sources */,
@@ -2255,6 +2267,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7EE04A5EE212B2BC27F2C27F /* AsyncOperation.swift in Sources */,
+				466E96D924509C18005E6FD0 /* JSON.swift in Sources */,
 				7A0EA2106501AF83CA31D429 /* Bundle+HostApp.swift in Sources */,
 				7699EE3297E8F95D98A71453 /* Configuration.swift in Sources */,
 				F7D485257EA33486539D87E8 /* ConfigurationBuilder.swift in Sources */,
@@ -2270,6 +2283,8 @@
 				C9B146D3726AFD48A46265DA /* LogLevelCore.swift in Sources */,
 				CDD3242FB03DDCFDBA27E186 /* Logger.swift in Sources */,
 				58B394186CECA09885F686F3 /* LoggerSettings.swift in Sources */,
+				466E96DB24509C45005E6FD0 /* Merging.swift in Sources */,
+				466E96D724509BE0005E6FD0 /* Initialization.swift in Sources */,
 				75DB09C4A3AD43DB5FDF2384 /* LoggerStream.swift in Sources */,
 				0B72803435C92BA78FD76BD0 /* MultiplexLoggerStream.swift in Sources */,
 				DC69391AA182CA1A728D65FF /* NotificationKey.swift in Sources */,
@@ -2287,6 +2302,7 @@
 				C68FBC333C5593438AE404CC /* StorageFacade.swift in Sources */,
 				EFF46260ABABD75A9ED21D09 /* TenantConfig.swift in Sources */,
 				20322858181A834B64873F38 /* UserDefaults+Optimove.swift in Sources */,
+				466E96DD24509C68005E6FD0 /* Querying.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
