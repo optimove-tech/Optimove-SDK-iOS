@@ -29,7 +29,7 @@ final class OptistreamEventBuilder {
             customer: storage.customerID,
             visitor: try storage.getVisitorID(),
             timestamp: event.timestamp,
-            context: event.context
+            context: try JSON(event.context)
         )
     }
 
