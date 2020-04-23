@@ -57,13 +57,19 @@ import OptimoveCore
                 sharedStorage: try UserDefaults.shared(tenantBundleIdentifier: bundleIdentifier),
                 fileStorage: try FileStorageImpl(bundleIdentifier: bundleIdentifier, fileManager: .default)
             )
+            let configurationRepository = ConfigurationRepositoryImpl(
+                storage: storage
+            )
+            let optitrack = try configurationRepository.getConfiguration().optitrack
             try handleNotification(
                 payload: payload,
-                optitrack: OptitrackNSEImpl(
-                    storage: storage,
-                    repository: ConfigurationRepositoryImpl(
-                        storage: storage
-                    )
+                networking: OptistreamNetworkingImpl(
+                    networkClient: NetworkClientImpl(),
+                    configuration: optitrack
+                ),
+                builder: OptistreamEventBuilder(
+                    configuration: optitrack,
+                    storage: storage
                 ),
                 bestAttemptContent: bestAttemptContent,
                 contentHandler: contentHandler
@@ -112,7 +118,8 @@ extension OptimoveNotificationServiceExtension {
 
     func handleNotification(
         payload: NotificationPayload,
-        optitrack: OptitrackNSE,
+        networking: OptistreamNetworking,
+        builder: OptistreamEventBuilder,
         bestAttemptContent: UNMutableNotificationContent,
         contentHandler: @escaping (UNNotificationContent) -> Void
     ) throws {
@@ -125,7 +132,8 @@ extension OptimoveNotificationServiceExtension {
             NotificationDeliveryReporter(
                 bundleIdentifier: bundleIdentifier,
                 notificationPayload: payload,
-                optitrack: optitrack
+                networking: networking,
+                builder: builder
             ),
             MediaAttachmentDownloader(
                 notificationPayload: payload,

@@ -2,7 +2,7 @@
 
 import Foundation
 
-extension TimeInterval {
+public extension TimeInterval {
     var seconds: Int {
         return Int(self)
     }

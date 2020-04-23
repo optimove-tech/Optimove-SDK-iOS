@@ -1,6 +1,11 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
+
+typealias OptistreamEvent = OptimoveCore.OptistreamEvent
+typealias OptistreamEventBuilder = OptimoveCore.OptistreamEventBuilder
+typealias OptistreamNetworking = OptimoveCore.OptistreamNetworking
 
 final class OptistreamTracker {
 
@@ -23,7 +28,15 @@ extension OptistreamTracker: Tracker {
     func track(event: Event) {
         tryCatch {
             let event = try optirstreamEventBuilder.build(event: event)
-            queue.enqueue(events: [event])
+//            queue.enqueue(events: [event])
+            networking.send(event: event) { (result) in
+                switch result {
+                case .success(let response):
+                    print(response)
+                case .failure(let error):
+                    print(error)
+                }
+            }
         }
     }
 

@@ -4,7 +4,7 @@ import UIKit.UIApplication
 import UserNotifications
 import OptimoveCore
 
-public typealias OptimoveEvent = OptimoveCore.OptimoveEvent
+public typealias Event = OptimoveCore.Event
 
 /// The Optimove SDK for iOS - a realtime customer data platform.
 /// The integration guide: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki
@@ -81,7 +81,7 @@ extension Optimove {
     ///   - screenCategory: The screen category.
     @objc public func reportScreenVisit(screenTitle title: String, screenCategory category: String? = nil) {
         let title = title.trimmingCharacters(in: .whitespaces)
-        Logger.info("Report a screen event with title: \(title) and category \(category ?? "nil")")
+        Logger.debug("Report a screen event with title: \(title) and category \(category ?? "nil")")
         let validationResult = ScreenVisitValidator.validate(screenTitle: title)
         guard validationResult == .valid else { return }
         container.resolve { serviceLocator in
@@ -315,8 +315,7 @@ private extension Optimove {
                     Logger.info("Initialization finished. ✅")
                     completion(.success(()))
                 case let .failure(error):
-                    Logger.error(error.localizedDescription)
-                    Logger.error("Initialization failed. 🛑")
+                    Logger.error("Initialization failed. 🛑\nReason: \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }

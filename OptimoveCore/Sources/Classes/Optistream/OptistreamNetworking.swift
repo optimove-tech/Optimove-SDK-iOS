@@ -1,23 +1,24 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
 import Foundation
-import OptimoveCore
 
-struct OptistreamResponse: Codable {
+public struct OptistreamResponse: Codable {
     let status, message: String
 }
 
-protocol OptistreamNetworking {
+public protocol OptistreamNetworking {
     func send(event: OptistreamEvent, completion: @escaping (Result<OptistreamResponse, Error>) -> Void)
 }
 
-final class OptistreamNetworkingImpl {
+public final class OptistreamNetworkingImpl {
 
     private let networkClient: NetworkClient
     private let configuration: OptitrackConfig
 
-    init(networkClient: NetworkClient,
-         configuration: OptitrackConfig) {
+    public init(
+        networkClient: NetworkClient,
+        configuration : OptitrackConfig
+    ) {
         self.networkClient = networkClient
         self.configuration = configuration
     }
@@ -26,7 +27,7 @@ final class OptistreamNetworkingImpl {
 
 extension OptistreamNetworkingImpl: OptistreamNetworking {
 
-    func send(event: OptistreamEvent, completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
+    public func send(event: OptistreamEvent, completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
         do {
             let request = try NetworkRequest(
                 method: .post,

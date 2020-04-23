@@ -178,7 +178,9 @@ public struct DynamicLinks: Decodable {
     /// The custom decoder does preprocess before the primary decoder.
     init(firebaseFrom decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
-        let string = try container.decode(String.self, forKey: .dynamicLinks)
+        guard let string = try container.decodeIfPresent(String.self, forKey: .dynamicLinks) else {
+            throw GuardError.custom("Not found value for key \(NotificationPayload.CodingKeys.dynamicLinks.rawValue)")
+        }
         let data: Data = try cast(string.data(using: .utf8))
         self = try JSONDecoder().decode(DynamicLinks.self, from: data)
     }

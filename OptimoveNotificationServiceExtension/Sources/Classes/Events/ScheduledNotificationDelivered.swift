@@ -3,10 +3,11 @@
 import Foundation
 import OptimoveCore
 
-final class ScheduledNotificationDelivered: OptimoveEvent {
+final class ScheduledNotificationDelivered: Event {
 
     struct Constants {
         static let name = "notification_delivered"
+        static let category = "optipush"
         struct Key {
             static let timestamp = "timestamp"
             static let appNS = "app_ns"
@@ -28,24 +29,26 @@ final class ScheduledNotificationDelivered: OptimoveEvent {
         }
     }
 
-    let name = Constants.name
-    let parameters: [String: Any]
-
     init(bundleId: String,
          campaign: ScheduledNotificationCampaign,
-         timestamp: TimeInterval) {
-        parameters = [
-            Constants.Key.timestamp: Int(timestamp),
-            Constants.Key.appNS: bundleId,
-            Constants.Key.campaignID: campaign.campaignID,
-            Constants.Key.actionSerial: campaign.actionSerial,
-            Constants.Key.templateID: campaign.templateID,
-            Constants.Key.engagementID: campaign.engagementID,
-            Constants.Key.campaignType: campaign.campaignType ?? -1,
-            Constants.Key.eventDeviceType: Constants.Value.deviceType,
-            Constants.Key.eventPlatform: Constants.Value.platform,
-            Constants.Key.eventOS: Constants.Value.os,
-            Constants.Key.eventNativeMobile: Constants.Value.nativeMobile
-        ]
+         timestamp: Int) {
+        super.init(
+            name: Constants.name,
+            category: Constants.category,
+            context: [
+                Constants.Key.timestamp: timestamp,
+                Constants.Key.appNS: bundleId,
+                Constants.Key.campaignID: campaign.campaignID,
+                Constants.Key.actionSerial: campaign.actionSerial,
+                Constants.Key.templateID: campaign.templateID,
+                Constants.Key.engagementID: campaign.engagementID,
+                Constants.Key.campaignType: campaign.campaignType ?? -1,
+                Constants.Key.eventDeviceType: Constants.Value.deviceType,
+                Constants.Key.eventPlatform: Constants.Value.platform,
+                Constants.Key.eventOS: Constants.Value.os,
+                Constants.Key.eventNativeMobile: Constants.Value.nativeMobile
+            ],
+            timestamp: timestamp
+        )
     }
 }

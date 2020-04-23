@@ -66,7 +66,7 @@ private extension DeeplinkExtracter {
             bestAttemptContent.userInfo[Constants.dynamicLinksKey] = urlString
 
         case let .failure(error):
-            os_log("Error: %{PRIVATE}@", log: OSLog.extracter, type: .error, error.localizedDescription)
+            os_log("Error: %{PUBLIC}@", log: OSLog.extracter, type: .error, error.localizedDescription)
         }
         state = .finished
     }

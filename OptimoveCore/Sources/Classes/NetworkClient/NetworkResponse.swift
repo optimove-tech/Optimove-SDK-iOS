@@ -2,12 +2,12 @@
 
 import Foundation
 
-struct NetworkResponse<Body> {
+public struct NetworkResponse<Body> {
     let statusCode: Int
     let body: Body
 }
 
-extension NetworkResponse where Body == Data? {
+public extension NetworkResponse where Body == Data? {
 
     func decode<BodyType: Decodable>(to type: BodyType.Type) throws -> BodyType {
         let data = try unwrap()

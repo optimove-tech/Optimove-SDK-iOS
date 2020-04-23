@@ -97,7 +97,6 @@ targets:
         name: OptimoveCore-Unit
         excludes:
           - ".gitkeep"
-    info:
       - path: Shared
         name: Shared-Unit
     dependencies:
