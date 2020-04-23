@@ -5,15 +5,11 @@ import Foundation
 final class TenantEvent: Event {
 
     struct Constants {
-        static let category = "global"
+        static let category = "global" /// TODO: Define the value
     }
 
-    override init(uuid: String = UUID().uuidString,
-                  name: String,
-                  category: String = Constants.category,
-                  context: [String : Any],
-                  timestamp: Double = Date().timeIntervalSince1970) {
-        super.init(uuid: uuid, name: name, category: category, context: context, timestamp: timestamp)
+    init(name: String, context: [String : Any]) {
+        super.init(name: name, category: Constants.category, context: context)
     }
 
 }
