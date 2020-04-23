@@ -11,7 +11,7 @@ struct OptistreamEvent: Codable {
     let origin: String
     let customer: String?
     let visitor: String
-    let timestamp: TimeInterval
+    let timestamp: Int
     let context: JSON
 }
 

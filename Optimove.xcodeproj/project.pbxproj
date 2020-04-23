@@ -87,6 +87,7 @@
 		466E96DB24509C45005E6FD0 /* Merging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E96DA24509C45005E6FD0 /* Merging.swift */; };
 		466E96DD24509C68005E6FD0 /* Querying.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E96DC24509C68005E6FD0 /* Querying.swift */; };
 		466E96DF2450A234005E6FD0 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E96DE2450A234005E6FD0 /* Event.swift */; };
+		466E96E12451887B005E6FD0 /* TimeInterval+Seconds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E96E02451887B005E6FD0 /* TimeInterval+Seconds.swift */; };
 		46C12D2B244C3D4F0066FF07 /* OptistreamEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C12D2A244C3D4F0066FF07 /* OptistreamEventTests.swift */; };
 		46C12D2F244C66E40066FF07 /* OptistreamEventBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C12D2E244C66E40066FF07 /* OptistreamEventBuilder.swift */; };
 		46F111EB2448772800A62798 /* OptistreamEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F111EA2448772800A62798 /* OptistreamEvent.swift */; };
@@ -434,6 +435,7 @@
 		466E96DA24509C45005E6FD0 /* Merging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Merging.swift; sourceTree = "<group>"; };
 		466E96DC24509C68005E6FD0 /* Querying.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Querying.swift; sourceTree = "<group>"; };
 		466E96DE2450A234005E6FD0 /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		466E96E02451887B005E6FD0 /* TimeInterval+Seconds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Seconds.swift"; sourceTree = "<group>"; };
 		46C12D2A244C3D4F0066FF07 /* OptistreamEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEventTests.swift; sourceTree = "<group>"; };
 		46C12D2E244C66E40066FF07 /* OptistreamEventBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEventBuilder.swift; sourceTree = "<group>"; };
 		46F111EA2448772800A62798 /* OptistreamEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamEvent.swift; sourceTree = "<group>"; };
@@ -1709,6 +1711,7 @@
 				2F6D1C3E09195F4AA62DE80C /* String+random.swift */,
 				0743DA20AB28DD7E78A80384 /* String+SHA1.swift */,
 				4DB8B22F680152DE4E7C00A7 /* String+Split.swift */,
+				466E96E02451887B005E6FD0 /* TimeInterval+Seconds.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2151,6 +2154,7 @@
 				E169E43A16008BBB9E14C4D6 /* OptInOutObserver.swift in Sources */,
 				C3E05FDC7B4A8CB9F467A283 /* OptInService.swift in Sources */,
 				46F111EB2448772800A62798 /* OptistreamEvent.swift in Sources */,
+				466E96E12451887B005E6FD0 /* TimeInterval+Seconds.swift in Sources */,
 				432EE244D778884AEA4A9208 /* OptiLoggerOutputStream.swift in Sources */,
 				2EA9D0284826D6D32BFA3219 /* OptiLoggerStreamsContainer.swift in Sources */,
 				E26ADF45F23CE93001206923 /* OptiPush.swift in Sources */,

@@ -12,13 +12,13 @@ class Event {
     let category: String
     let context: [String: Any]
     /// In seconds.
-    let timestamp: Double
+    let timestamp: Int
 
     internal init(uuid: String = UUID().uuidString,
                   name: String,
                   category: String = Constants.category,
                   context: [String: Any],
-                  timestamp: Double = Date().timeIntervalSince1970) {
+        timestamp: Int = Date().timeIntervalSince1970.seconds) {
         self.uuid = uuid
         self.name = name
         self.category = category
@@ -26,4 +26,5 @@ class Event {
         self.timestamp = timestamp
     }
 
+    }
 }
