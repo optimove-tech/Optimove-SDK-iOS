@@ -28,7 +28,7 @@ internal final class DeeplinkExtracter: AsyncOperation {
 
         let appKey = bundleIdentifier
         guard let url = notificationPayload.dynamicLinks?.ios?[appKey] else {
-            os_log("Found no url for this app", log: OSLog.extracter, type: .error)
+            os_log("Found no deeplink", log: OSLog.extracter, type: .error)
             state = .finished
             return
         }
