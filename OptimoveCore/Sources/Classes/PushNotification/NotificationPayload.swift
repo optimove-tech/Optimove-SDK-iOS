@@ -92,21 +92,25 @@ public struct TriggeredNotificationCampaign: NotificationCampaign {
     public let actionSerial: Int
     public let actionID: Int
     public let templateID: Int
+    public let engagementID: Int?
 
     public init(
         actionSerial: Int,
         actionID: Int,
-        templateID: Int
+        templateID: Int,
+        engagementID: Int?
     ) {
         self.actionSerial = actionSerial
         self.actionID = actionID
         self.templateID = templateID
+        self.engagementID = engagementID
     }
 
     enum CodingKeys: String, CodingKey {
         case actionSerial = "action_serial"
         case actionID = "action_id"
         case templateID = "template_id"
+        case engagementID = "engagement_id"
     }
 
     /// The custom decoder does preprocess before the primary decoder.

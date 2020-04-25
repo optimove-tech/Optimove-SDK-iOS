@@ -18,12 +18,14 @@ final class TriggeredNotificationRecieved: Event {
             static let eventPlatform = "event_platform"
             static let eventOS = "event_os"
             static let eventNativeMobile = "event_native_mobile"
+            static let engagementID = "engagement_id"
         }
         struct Value {
             static let deviceType = "Mobile"
             static let platform = "iOS"
             static let nativeMobile = true
             static let os = "iOS \(ProcessInfo().operatingSystemVersionOnlyString)"
+            static let noEngagementID = -1
         }
     }
 
@@ -42,7 +44,8 @@ final class TriggeredNotificationRecieved: Event {
                 Constants.Key.eventDeviceType: Constants.Value.deviceType,
                 Constants.Key.eventPlatform: Constants.Value.platform,
                 Constants.Key.eventOS: Constants.Value.os,
-                Constants.Key.eventNativeMobile: Constants.Value.nativeMobile
+                Constants.Key.eventNativeMobile: Constants.Value.nativeMobile,
+                Constants.Key.engagementID: campaign.engagementID ?? Constants.Value.noEngagementID
             ],
             timestamp: timestamp
         )
