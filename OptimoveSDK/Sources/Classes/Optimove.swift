@@ -122,6 +122,7 @@ extension Optimove {
             tryCatch {
                 try serviceLocator.coreEventFactory().createEvent(.setUserId) { event in
                     serviceLocator.synchronizer().handle(.report(event: event))
+                    serviceLocator.synchronizer().handle(.setInstallation)
                 }
             }
         }
