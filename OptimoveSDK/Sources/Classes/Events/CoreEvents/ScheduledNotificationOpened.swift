@@ -7,6 +7,7 @@ final class ScheduledNotificationOpened: Event {
 
     struct Constants {
         static let name = "notification_opened"
+        static let category = "optipush"
         struct Key {
             static let timestamp = OptimoveKeys.Configuration.timestamp.rawValue
             static let appNS = OptimoveKeys.Configuration.appNs.rawValue
@@ -21,6 +22,7 @@ final class ScheduledNotificationOpened: Event {
     init(bundleIdentifier: String, campaign: ScheduledNotificationCampaign) {
         super.init(
             name: Constants.name,
+            category: Constants.category,
             context: [
                 Constants.Key.timestamp: Int(Date().timeIntervalSince1970),
                 Constants.Key.appNS: bundleIdentifier,
