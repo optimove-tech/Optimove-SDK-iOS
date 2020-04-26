@@ -9,6 +9,10 @@ typealias OptistreamNetworking = OptimoveCore.OptistreamNetworking
 
 final class OptistreamTracker {
 
+    private struct Constants {
+        static let eventBatchLimit = 100
+    }
+
     private let queue: OptistreamQueue
     private let optirstreamEventBuilder: OptistreamEventBuilder
     private let networking: OptistreamNetworking
@@ -28,20 +32,34 @@ extension OptistreamTracker: Tracker {
     func track(event: Event) {
         tryCatch {
             let event = try optirstreamEventBuilder.build(event: event)
-//            queue.enqueue(events: [event])
-            networking.send(event: event) { (result) in
+            queue.enqueue(events: [event])
+            networking.send(event: event) { [weak self] (result) in
                 switch result {
                 case .success(let response):
-                    print(response)
+                    Logger.info(response.message)
+                    self?.queue.remove(events: [event])
                 case .failure(let error):
-                    print(error)
+                    Logger.error(error.localizedDescription)
                 }
             }
         }
     }
 
     func dispatch() {
-
+        let events = queue.first(limit: Constants.eventBatchLimit)
+        guard !events.isEmpty else {
+            Logger.debug("No events for dispatch.")
+            return
+        }
+        networking.send(events: events) { [weak self](result) in
+            switch result {
+            case .success(let response):
+                Logger.info(response.message)
+                self?.queue.remove(events: events)
+            case .failure(let error):
+                Logger.error(error.localizedDescription)
+            }
+        }
     }
 
 }
@@ -58,7 +76,7 @@ protocol OptistreamQueue {
 final class OptistreamQueueImpl {
 
     private struct Constants {
-        static let queuePersistanceFileName = "optistream_queue"
+        static let queuePersistanceFileName = "optistream_queue.json"
     }
 
     private let storage: OptimoveStorage
@@ -101,21 +119,18 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func enqueue(events: [OptistreamEvent]) {
-        Logger.debug("Queue: Enqueue\n\(events.map({$0.event}))")
+        Logger.debug("Queue: Enqueue \(events.count) events:\n\(events.map({$0.event}))")
         inMemoryEvents.append(contentsOf: events)
         save(events: inMemoryEvents)
     }
 
     func first(limit: Int) -> [OptistreamEvent] {
         let amount = limit <= eventCount ? limit : eventCount
-        /// TODO: remove from queue
         return Array(inMemoryEvents[0..<amount])
     }
 
-    // success failure
     func remove(events: [OptistreamEvent]) {
-        Logger.debug("Queue: Dequeue\n\(events.map({$0.event}))")
-        /// TODO: add to queue
+        Logger.debug("Queue: Dequeue \(events.count) events:\n\(events.map({$0.event}))")
         inMemoryEvents = inMemoryEvents.filter { cachedEvent in
             !events.contains(cachedEvent) // O(n*n)
         }

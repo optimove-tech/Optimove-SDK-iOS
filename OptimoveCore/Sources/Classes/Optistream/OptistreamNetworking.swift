@@ -3,11 +3,12 @@
 import Foundation
 
 public struct OptistreamResponse: Codable {
-    let status, message: String
+    public let status, message: String
 }
 
 public protocol OptistreamNetworking {
     func send(event: OptistreamEvent, completion: @escaping (Result<OptistreamResponse, Error>) -> Void)
+    func send(events: [OptistreamEvent], completion: @escaping (Result<OptistreamResponse, Error>) -> Void)
 }
 
 public final class OptistreamNetworkingImpl {
@@ -35,7 +36,22 @@ extension OptistreamNetworkingImpl: OptistreamNetworking {
                 body: event
             )
             networkClient.perform(request) {
-                OptistreamNetworkingImpl.handleResult(result: $0, for: event, completion: completion)
+                OptistreamNetworkingImpl.handleResult(result: $0, for: [event], completion: completion)
+            }
+        } catch {
+            completion(.failure(error))
+        }
+    }
+
+    public func send(events: [OptistreamEvent], completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
+        do {
+            let request = try NetworkRequest(
+                method: .post,
+                baseURL: configuration.optitrackEndpoint,
+                body: events
+            )
+            networkClient.perform(request) {
+                OptistreamNetworkingImpl.handleResult(result: $0, for: events, completion: completion)
             }
         } catch {
             completion(.failure(error))
@@ -47,17 +63,27 @@ extension OptistreamNetworkingImpl: OptistreamNetworking {
 private extension OptistreamNetworkingImpl {
 
     static func handleResult(result: Result<NetworkResponse<Data?>, Error>,
-                      for event: OptistreamEvent,
+                      for events: [OptistreamEvent],
                       completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
         completion(
             Result {
                 do {
                     let response = try result.get().decode(to: OptistreamResponse.self)
-                    Logger.debug("Optistream succeed:\n\trequest: \(event.event)\n\tresponse: \(response)")
+                    Logger.debug(
+                        """
+                        Optistream succeed:
+                            request: \(events.map{ $0.event }.joined(separator: "\n"))
+                            response: \(response)
+                        """
+                    )
                     return response
                 } catch {
                     Logger.error(
-                        "Optistream failed:\n\trequest: \(event.event)\n\treason: \(error.localizedDescription)"
+                        """
+                        Optistream failed:
+                            request: \(events.map{ $0.event }.joined(separator: "\n"))
+                            reason: \(error.localizedDescription)
+                        """
                     )
                     throw error
                 }

@@ -3,7 +3,7 @@
 /// Builds an Optistream event from internal event type.
 public final class OptistreamEventBuilder {
 
-    private struct Constants {
+    struct Constants {
         static let origin = "sdk"
     }
 
