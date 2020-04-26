@@ -12,6 +12,7 @@ public struct OptistreamEvent: Codable {
     public let visitor: String
     public let timestamp: Int
     public let context: JSON
+    public let metadata: JSON
 
     public init(
         uuid: String,
@@ -22,7 +23,8 @@ public struct OptistreamEvent: Codable {
         customer: String?,
         visitor: String,
         timestamp: Int,
-        context: JSON
+        context: JSON,
+        metadata: JSON
     ) {
         self.uuid = uuid
         self.tenant = tenant
@@ -33,6 +35,7 @@ public struct OptistreamEvent: Codable {
         self.visitor = visitor
         self.timestamp = timestamp
         self.context = context
+        self.metadata = metadata
     }
 }
 

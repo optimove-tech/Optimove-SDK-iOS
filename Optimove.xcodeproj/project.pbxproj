@@ -171,7 +171,6 @@
 		9AFEC62F7778B86862C6573D /* NotificationDeliveryReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AFAFD6EE31AD9F7438FB016 /* NotificationDeliveryReporter.swift */; };
 		9CF7237135A4CC033D355E3F /* TenantConfigFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197CDA59D9D767513A115BDF /* TenantConfigFixture.swift */; };
 		9D2CCBCF21B5641F0B9C3D9A /* OptimoveDeepLinkResponding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D9EAECD9E30C558169274E /* OptimoveDeepLinkResponding.swift */; };
-		9D54933F90FC14306E1A0F52 /* SDKVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720F660F46841EB5ABF872B1 /* SDKVersion.swift */; };
 		9D794BA3BA46E08DC6E67F65 /* ApiRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 743439E918A7943D2FFA435C /* ApiRequestFactory.swift */; };
 		9DCB165E5B552641766D3C2F /* NotificationCampaignTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87A0914A97E216F288914163 /* NotificationCampaignTests.swift */; };
 		9EFAA10F84365241FB47DBF5 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4E1BBE35E94BDE9796DE21 /* Event.swift */; };
@@ -200,6 +199,7 @@
 		B622A895623E6DF7C6A09277 /* GlobalConfigurationDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E50B8B778953A78713F075FF /* GlobalConfigurationDownloader.swift */; };
 		B624E386E0AEFCCA5F31F95B /* RealTimeRequestBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC28BA5971111A7AC297CC7C /* RealTimeRequestBuilderTests.swift */; };
 		B6A376B7681D9D6532B84D50 /* OptimoveCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2764B249D4CC9907122D2773 /* OptimoveCore.framework */; };
+		B7CAF22D462BF215234052A2 /* SDKVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B41BBBBB921C848D02E2BE6B /* SDKVersion.swift */; };
 		B94DA5A8ADAB6D528DC185D8 /* OptipushMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C15CE508057F304C79B5EB /* OptipushMetaData.swift */; };
 		B9D3F1723BB20889FD2817A6 /* AppOpenOnStartGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB486286AFEC603E2B5A5B71 /* AppOpenOnStartGenerator.swift */; };
 		BB3ADC4111A38EA75CDCD879 /* MockTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44FF0834723551EEAD3787A5 /* MockTracker.swift */; };
@@ -406,8 +406,8 @@
 		313AF75BEDDE3C3411F01615 /* OptimoveSDK-Unit.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "OptimoveSDK-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		31562C257FF5DAE1DB78F243 /* OptistreamTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamTracker.swift; sourceTree = "<group>"; };
 		3254240E2ED942F17B69FF7A /* OptimoveNotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationHandler.swift; sourceTree = "<group>"; };
-		325B5F8B3BDBB034C3516AAB /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
-		329CE901655C81D4751CB22B /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		325B5F8B3BDBB034C3516AAB /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		329CE901655C81D4751CB22B /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		33000E03B027C7F4EB7B2148 /* OptiPush.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptiPush.swift; sourceTree = "<group>"; };
 		36CB93F7FDDCB7374DA1CF9A /* OptimoveKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveKeys.swift; sourceTree = "<group>"; };
 		37FF76A69D6A6A50ACED5DAC /* NotificationPermissionFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPermissionFetcher.swift; sourceTree = "<group>"; };
@@ -429,7 +429,7 @@
 		44FF0834723551EEAD3787A5 /* MockTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTracker.swift; sourceTree = "<group>"; };
 		458897EAB1CC463D34F58C56 /* notificationWithTriggeredCampaign.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = notificationWithTriggeredCampaign.json; sourceTree = "<group>"; };
 		4592839140B76A8D32F05DC8 /* RemoteLoggerStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerStream.swift; sourceTree = "<group>"; };
-		472CC4141ED9FBD9DD0B65F1 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		472CC4141ED9FBD9DD0B65F1 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		485BDCB56EA98CD3DD5AE9DE /* TenantConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantConfigTests.swift; sourceTree = "<group>"; };
 		487536D1DE6FD34739D24A91 /* Installation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Installation.swift; sourceTree = "<group>"; };
 		4AFAFD6EE31AD9F7438FB016 /* NotificationDeliveryReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeliveryReporter.swift; sourceTree = "<group>"; };
@@ -452,7 +452,7 @@
 		5FC57145A54E5033A5CECAF0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		5FE216E57E65CEC3F6D9F4CE /* String+isBlank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+isBlank.swift"; sourceTree = "<group>"; };
 		60C210C2DB4BC192D8BD85E1 /* MergeRemoteConfigurationOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeRemoteConfigurationOperation.swift; sourceTree = "<group>"; };
-		615F8FAE93C5D0A6AC301070 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		615F8FAE93C5D0A6AC301070 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		63BEFDC2A507732039C5F009 /* MockRealTimeHanlder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRealTimeHanlder.swift; sourceTree = "<group>"; };
 		63C7EC2263685823B37EC99A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		64AAD2B0BFFF64DCB3907ECE /* OptimoveCore-Unit.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "OptimoveCore-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -468,8 +468,7 @@
 		70EC39175948194604CEA34B /* StringSplitByLenghtExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringSplitByLenghtExtensionsTests.swift; sourceTree = "<group>"; };
 		7142C292241C1F13B6D2F370 /* HandlersPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandlersPool.swift; sourceTree = "<group>"; };
 		71A9D3341C3268497BDCBED0 /* OptimoveNotificationServiceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationServiceExtension.swift; sourceTree = "<group>"; };
-		720F660F46841EB5ABF872B1 /* SDKVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKVersion.swift; sourceTree = "<group>"; };
-		72CF66E4BD3D9F58D52640AE /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		72CF66E4BD3D9F58D52640AE /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		732378F1F571519EBD60950B /* ComponentOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentOperation.swift; sourceTree = "<group>"; };
 		738B25C939FAE2104D09DB7B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		743439E918A7943D2FFA435C /* ApiRequestFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiRequestFactory.swift; sourceTree = "<group>"; };
@@ -541,10 +540,11 @@
 		AC298B299B5C54C00F88C94E /* ParametersDecorator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParametersDecorator.swift; sourceTree = "<group>"; };
 		ACBA73DD67337E6F4FF32033 /* DynamicLinkParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicLinkParser.swift; sourceTree = "<group>"; };
 		ADF1A285E540507DACCA9630 /* LoggerStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStream.swift; sourceTree = "<group>"; };
-		AE5ED65D35DAEDBE1D34995A /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		AE5ED65D35DAEDBE1D34995A /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		B1AE3D387F20FA87B31F301E /* MockRealTimeNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRealTimeNetworking.swift; sourceTree = "<group>"; };
 		B1AEF7257DAA1A2E7FB12680 /* GlobalFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalFunctions.swift; sourceTree = "<group>"; };
 		B1B51D44551B095F9BA4EDBD /* KeyValueStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueStorageTests.swift; sourceTree = "<group>"; };
+		B41BBBBB921C848D02E2BE6B /* SDKVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKVersion.swift; sourceTree = "<group>"; };
 		B4713C0DA9400A929216B24D /* MultiplexLoggerStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiplexLoggerStream.swift; sourceTree = "<group>"; };
 		B6C15CE508057F304C79B5EB /* OptipushMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptipushMetaData.swift; sourceTree = "<group>"; };
 		B8467A40C1D544CA8220AAE2 /* OptimoveStorageFacadeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveStorageFacadeTests.swift; sourceTree = "<group>"; };
@@ -1179,6 +1179,7 @@
 				253C68E8F1DE460F5E45705E /* NotificationKey.swift */,
 				CE4FD77A1B209FBAA7B1ABAF /* SdkEnvironment.swift */,
 				E36EE80C309330F735D037E2 /* SdkPlatform.swift */,
+				B41BBBBB921C848D02E2BE6B /* SDKVersion.swift */,
 			);
 			path = Constants;
 			sourceTree = "<group>";
@@ -1800,7 +1801,6 @@
 			isa = PBXGroup;
 			children = (
 				36CB93F7FDDCB7374DA1CF9A /* OptimoveKeys.swift */,
-				720F660F46841EB5ABF872B1 /* SDKVersion.swift */,
 			);
 			path = Constants;
 			sourceTree = "<group>";
@@ -1832,6 +1832,27 @@
 				A9C561207CC35F94397DF455 /* UserIDValidator.swift */,
 			);
 			path = Validators;
+			sourceTree = "<group>";
+		};
+		"TEMP_236CD4F4-BF91-44FA-9ACB-8EAD139D7FB5" /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		"TEMP_7D0788AF-8F09-4B67-874D-1F25F1CDF201" /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		"TEMP_E94C17A2-0068-4E86-8044-DE3781595CCA" /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1951,6 +1972,8 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1020;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 05A4DEC880B8C9907862CC6F /* Build configuration list for PBXProject "Optimove" */;
 			compatibilityVersion = "Xcode 10.0";
@@ -2161,7 +2184,6 @@
 				5A08B9EDBA80168AC667425D /* RingBuffer.swift in Sources */,
 				D3C3D981332E7956C784F156 /* RunningFlagsContainer.swift in Sources */,
 				5AF8B551D48AF8A7B37B2054 /* SDKInitializer.swift in Sources */,
-				9D54933F90FC14306E1A0F52 /* SDKVersion.swift in Sources */,
 				E60EF0CF996959037583C83F /* ScheduledNotificationOpened.swift in Sources */,
 				E04C734BCB92039C3B747495 /* ScreenVisitValidator.swift in Sources */,
 				B44B56B11935E11D4A3DFDAC /* ServiceLocator.swift in Sources */,
@@ -2291,6 +2313,7 @@
 				05A2444050AEF0639DC080AC /* RemoteLoggerStream.swift in Sources */,
 				74EB8910931416EBF66AEF33 /* Result+Successful.swift in Sources */,
 				3F44720B367301EC17CC321B /* RuntimeCodingKey.swift in Sources */,
+				B7CAF22D462BF215234052A2 /* SDKVersion.swift in Sources */,
 				EFE8C2D3BC85DE2223893ACB /* SdkEnvironment.swift in Sources */,
 				5C1ED211A45E17583F4499F1 /* SdkPlatform.swift in Sources */,
 				C68FBC333C5593438AE404CC /* StorageFacade.swift in Sources */,

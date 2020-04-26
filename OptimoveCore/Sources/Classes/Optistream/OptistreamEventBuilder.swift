@@ -4,7 +4,16 @@
 public final class OptistreamEventBuilder {
 
     struct Constants {
-        static let origin = "sdk"
+        struct Keys {
+            static let platform = "sdk_platform"
+            static let version = "sdk_version"
+        }
+        struct Values {
+            static let origin = "sdk"
+            static let platform = "iOS"
+        }
+
+
     }
 
     private let configuration: OptitrackConfig
@@ -24,11 +33,15 @@ public final class OptistreamEventBuilder {
             tenant: configuration.tenantID,
             category: event.category,
             event: event.name,
-            origin: Constants.origin,
+            origin: Constants.Values.origin,
             customer: storage.customerID,
             visitor: try storage.getVisitorID(),
             timestamp: event.timestamp,
-            context: try JSON(event.context)
+            context: try JSON(event.context),
+            metadata: try JSON.init([
+                Constants.Keys.platform: Constants.Values.platform,
+                Constants.Keys.version: SDKVersion
+            ])
         )
     }
 

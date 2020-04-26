@@ -13,7 +13,7 @@ public typealias Event = OptimoveCore.Event
 @objc public final class Optimove: NSObject {
 
     /// The current OptimoveSDK version string value.
-    public static let version = SDKVersion
+    public static let version = OptimoveCore.SDKVersion
 
     /// The shared instance of Optimove SDK.
     @objc public static let shared: Optimove = {
