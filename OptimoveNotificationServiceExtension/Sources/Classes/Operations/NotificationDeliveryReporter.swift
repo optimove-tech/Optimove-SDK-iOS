@@ -55,7 +55,12 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
     private func report(_ event: Event) throws {
         let optistreamEvent = try builder.build(event: event)
         networking.send(event: optistreamEvent) { [unowned self] (result) in
-            /// TODO: Log result
+            switch result {
+            case .success(let response):
+                os_log("Delivery reported %{public}@", log: OSLog.reporter, type: .info, response.status)
+            case .failure(let error):
+                os_log("Error: %{public}@", log: OSLog.reporter, type: .error, error.localizedDescription)
+            }
             self.state = .finished
         }
     }

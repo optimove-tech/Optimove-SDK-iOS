@@ -13,7 +13,8 @@ class TriggeredNotificationOpenedTests: XCTestCase {
             campaign: TriggeredNotificationCampaign(
                 actionSerial: StubVariables.int,
                 actionID: StubVariables.int,
-                templateID: StubVariables.int
+                templateID: StubVariables.int,
+                engagementID: nil
             )
         )
 
@@ -35,17 +36,18 @@ class TriggeredNotificationOpenedTests: XCTestCase {
             campaign: TriggeredNotificationCampaign(
                 actionSerial: actionSerial,
                 actionID: actionID,
-                templateID: templateID
+                templateID: templateID,
+                engagementID: nil
             ),
             date: date
         )
 
         // then
-        XCTAssert(event.parameters[TriggeredNotificationOpened.Constants.Key.appNS] as? String == bundleIdentifier)
-        XCTAssert(event.parameters[TriggeredNotificationOpened.Constants.Key.actionSerial] as? Int == actionSerial)
-        XCTAssert(event.parameters[TriggeredNotificationOpened.Constants.Key.actionID] as? Int == actionID)
-        XCTAssert(event.parameters[TriggeredNotificationOpened.Constants.Key.templateID] as? Int == templateID)
-        XCTAssert(event.parameters[TriggeredNotificationOpened.Constants.Key.timestamp] as? Int == Int(date.timeIntervalSince1970))
+        XCTAssert(event.context[TriggeredNotificationOpened.Constants.Key.appNS] as? String == bundleIdentifier)
+        XCTAssert(event.context[TriggeredNotificationOpened.Constants.Key.actionSerial] as? Int == actionSerial)
+        XCTAssert(event.context[TriggeredNotificationOpened.Constants.Key.actionID] as? Int == actionID)
+        XCTAssert(event.context[TriggeredNotificationOpened.Constants.Key.templateID] as? Int == templateID)
+        XCTAssert(event.context[TriggeredNotificationOpened.Constants.Key.timestamp] as? Int == Int(date.timeIntervalSince1970))
     }
 
 }

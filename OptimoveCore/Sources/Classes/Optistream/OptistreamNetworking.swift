@@ -4,6 +4,10 @@ import Foundation
 
 public struct OptistreamResponse: Codable {
     public let status, message: String
+    public init(status: String, message: String) {
+        self.status = status
+        self.message = message
+    }
 }
 
 public protocol OptistreamNetworking {

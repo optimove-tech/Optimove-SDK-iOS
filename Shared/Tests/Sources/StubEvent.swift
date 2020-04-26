@@ -2,7 +2,7 @@
 
 @testable import OptimoveCore
 
-final class StubEvent: OptimoveEvent {
+final class StubEvent: Event {
 
     struct Constnats {
         static let id = 2_000
@@ -11,9 +11,10 @@ final class StubEvent: OptimoveEvent {
         static let value = "stub_value"
     }
 
-    var name: String = Constnats.name
-    var parameters: [String: Any] = [
-        Constnats.key: Constnats.value
-    ]
+    init() {
+        super.init(name: Constnats.name, context: [
+            Constnats.key: Constnats.value
+        ])
+    }
 
 }

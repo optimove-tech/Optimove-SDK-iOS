@@ -5,42 +5,43 @@ import OptimoveCore
 import UserNotifications
 @testable import OptimoveNotificationServiceExtension
 
-class OptimoveNotificationServiceExtensionTests: XCTestCase, FileAccessible {
+class OptimoveNotificationServiceExtensionTests: OptimoveTestCase, FileAccessible {
 
     var fileName: String = "notificationWithScheduledCampaign.json"
-    var storage = MockOptimoveStorage()
-    let mock = MockOptitrackNSE()
+    let networking = OptistreamNetworkingMock()
     var notificationService: OptimoveNotificationServiceExtension!
 
     override func setUp() {
         notificationService = OptimoveNotificationServiceExtension(appBundleId: "com.apple.dt.xctest.tool")
     }
 
-    func test_even_scheduled_notification_received_sent() {
+    func test_even_scheduled_notification_received_sent() throws {
         // given
+        prefillStorageAsVisitor()
         fileName = "notificationWithScheduledCampaign.json"
 
         // when
-        even_notification_received_sent { (event) in
+        try even_notification_received_sent { (event) in
 
             // then
-            XCTAssertEqual(event.name, ScheduledNotificationDelivered.Constants.name)
+            XCTAssertEqual(event.event, ScheduledNotificationDelivered.Constants.name)
         }
     }
 
-    func test_even_triggered_notification_received_sent() {
+    func test_even_triggered_notification_received_sent() throws {
         // given
+        prefillStorageAsVisitor()
         fileName = "notificationWithTriggeredCampaign.json"
 
         // when
-        even_notification_received_sent { (event) in
+        try even_notification_received_sent { (event) in
 
             // then
-            XCTAssertEqual(event.name, TriggeredNotificationRecieved.Constants.name)
+            XCTAssertEqual(event.event, TriggeredNotificationRecieved.Constants.name)
         }
     }
 
-    func even_notification_received_sent(assert: @escaping (OptimoveEvent) -> Void) {
+    func even_notification_received_sent(assert: @escaping (OptistreamEvent) -> Void) throws {
         // given
         // fetch payload from a JSON
         let payload = try! JSONDecoder().decode(NotificationPayload.self, from: data)
@@ -65,27 +66,24 @@ class OptimoveNotificationServiceExtensionTests: XCTestCase, FileAccessible {
 
         // check that delivery event sent.
         let optitrackExpectation = expectation(description: "Optitrack event was not generated.")
-        mock.assetFunction = { event, completion in
+        networking.assetOneEventFunction = { event, completion in
             assert(event)
-            completion()
+            completion(.success(OptistreamResponse(status: "", message: "")))
             optitrackExpectation.fulfill()
         }
 
         // then
-        try! notificationService.handleNotification(payload: payload,
-                                                    optitrack: mock,
-                                                    bestAttemptContent: bestAttemptContent!,
-                                                    contentHandler: contentHandler)
+        try notificationService.handleNotification(
+            payload: payload,
+            networking: networking,
+            builder: OptistreamEventBuilder(
+                configuration: ConfigurationFixture.build().optitrack,
+                storage: storage
+            ),
+            bestAttemptContent: bestAttemptContent!,
+            contentHandler: contentHandler
+        )
         wait(for: [contentHandlerExpectation, optitrackExpectation], timeout: 1)
     }
 
-}
-
-final class MockOptitrackNSE: OptitrackNSE {
-
-    var assetFunction: ((_ event: OptimoveEvent, _ completion: () -> Void) -> Void)?
-
-    func report(event: OptimoveEvent, completion: @escaping () -> Void) throws {
-        assetFunction?(event, completion)
-    }
 }

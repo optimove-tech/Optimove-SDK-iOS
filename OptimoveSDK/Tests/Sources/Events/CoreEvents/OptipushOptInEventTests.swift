@@ -36,9 +36,9 @@ class OptipushOptInEventTests: XCTestCase {
         )
 
         // then
-        XCTAssert(event.parameters[OptipushOptInEvent.Constants.Key.timestamp] as? Int == Int(timestamp))
-        XCTAssert(event.parameters[OptipushOptInEvent.Constants.Key.appNs] as? String == tenantBundleIdentifier)
-        XCTAssert(event.parameters[OptipushOptInEvent.Constants.Key.deviceId] as? String == deviceId)
+        XCTAssert(event.context[OptipushOptInEvent.Constants.Key.timestamp] as? Int == Int(timestamp))
+        XCTAssert(event.context[OptipushOptInEvent.Constants.Key.appNs] as? String == tenantBundleIdentifier)
+        XCTAssert(event.context[OptipushOptInEvent.Constants.Key.deviceId] as? String == deviceId)
     }
 
 }

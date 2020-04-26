@@ -28,9 +28,9 @@ class SetUserIdEventTests: XCTestCase {
         let event = SetUserIdEvent(originalVistorId: originalVistorId, userId: userId, updateVisitorId: updateVisitorId)
 
         // then
-        XCTAssert(event.parameters[SetUserIdEvent.Constants.Key.originalVistorId] as? String == originalVistorId)
-        XCTAssert(event.parameters[SetUserIdEvent.Constants.Key.userId] as? String == userId)
-        XCTAssert(event.parameters[SetUserIdEvent.Constants.Key.updatedVisitorId] as? String == updateVisitorId)
+        XCTAssert(event.context[SetUserIdEvent.Constants.Key.originalVistorId] as? String == originalVistorId)
+        XCTAssert(event.context[SetUserIdEvent.Constants.Key.userId] as? String == userId)
+        XCTAssert(event.context[SetUserIdEvent.Constants.Key.updatedVisitorId] as? String == updateVisitorId)
     }
 
 }

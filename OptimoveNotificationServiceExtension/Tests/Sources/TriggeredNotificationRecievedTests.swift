@@ -18,21 +18,22 @@ class TriggeredNotificationRecievedTests: XCTestCase {
             campaign: TriggeredNotificationCampaign(
                 actionSerial: actionSerial,
                 actionID: actionID,
-                templateID: templateID
+                templateID: templateID,
+                engagementID: 1234
             ),
-            timestamp: timestamp
+            timestamp: Int(timestamp)
         )
 
         XCTAssertEqual(TriggeredNotificationRecieved.Constants.name, event.name)
-        XCTAssertEqual(actionSerial, event.parameters[TriggeredNotificationRecieved.Constants.Key.actionSerial] as? Int)
-        XCTAssertEqual(actionID, event.parameters[TriggeredNotificationRecieved.Constants.Key.actionID] as? Int)
-        XCTAssertEqual(templateID, event.parameters[TriggeredNotificationRecieved.Constants.Key.templateID] as? Int)
-        XCTAssertEqual(Int(timestamp), event.parameters[TriggeredNotificationRecieved.Constants.Key.timestamp] as? Int)
-        XCTAssertEqual(bundleIdentifier, event.parameters[TriggeredNotificationRecieved.Constants.Key.appNS] as? String)
-        XCTAssertEqual(TriggeredNotificationRecieved.Constants.Value.deviceType, event.parameters[TriggeredNotificationRecieved.Constants.Key.eventDeviceType] as? String)
-        XCTAssertEqual(TriggeredNotificationRecieved.Constants.Value.nativeMobile, event.parameters[TriggeredNotificationRecieved.Constants.Key.eventNativeMobile] as? Bool)
-        XCTAssertEqual(TriggeredNotificationRecieved.Constants.Value.os, event.parameters[TriggeredNotificationRecieved.Constants.Key.eventOS] as? String)
-        XCTAssertEqual(TriggeredNotificationRecieved.Constants.Value.platform, event.parameters[TriggeredNotificationRecieved.Constants.Key.eventPlatform] as? String)
+        XCTAssertEqual(actionSerial, event.context[TriggeredNotificationRecieved.Constants.Key.actionSerial] as? Int)
+        XCTAssertEqual(actionID, event.context[TriggeredNotificationRecieved.Constants.Key.actionID] as? Int)
+        XCTAssertEqual(templateID, event.context[TriggeredNotificationRecieved.Constants.Key.templateID] as? Int)
+        XCTAssertEqual(Int(timestamp), event.context[TriggeredNotificationRecieved.Constants.Key.timestamp] as? Int)
+        XCTAssertEqual(bundleIdentifier, event.context[TriggeredNotificationRecieved.Constants.Key.appNS] as? String)
+        XCTAssertEqual(TriggeredNotificationRecieved.Constants.Value.deviceType, event.context[TriggeredNotificationRecieved.Constants.Key.eventDeviceType] as? String)
+        XCTAssertEqual(TriggeredNotificationRecieved.Constants.Value.nativeMobile, event.context[TriggeredNotificationRecieved.Constants.Key.eventNativeMobile] as? Bool)
+        XCTAssertEqual(TriggeredNotificationRecieved.Constants.Value.os, event.context[TriggeredNotificationRecieved.Constants.Key.eventOS] as? String)
+        XCTAssertEqual(TriggeredNotificationRecieved.Constants.Value.platform, event.context[TriggeredNotificationRecieved.Constants.Key.eventPlatform] as? String)
     }
 
 }

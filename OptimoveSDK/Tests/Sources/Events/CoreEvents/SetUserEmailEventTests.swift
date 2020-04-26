@@ -24,6 +24,6 @@ class SetUserEmailEventTests: XCTestCase {
         let event = SetUserEmailEvent(email: email)
 
         // then
-        XCTAssert(event.parameters[SetUserEmailEvent.Constants.Key.email] as? String == email)
+        XCTAssert(event.context[SetUserEmailEvent.Constants.Key.email] as? String == email)
     }
 }

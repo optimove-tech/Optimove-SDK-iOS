@@ -2,6 +2,7 @@
 
 import XCTest
 import Mocker
+import OptimoveCore
 @testable import OptimoveSDK
 
 class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {

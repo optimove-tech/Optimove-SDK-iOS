@@ -2,7 +2,6 @@
 
 import XCTest
 import OptimoveCore
-@testable import OptimoveSDK
 
 let defaultTimeout: TimeInterval = 0.8
 
