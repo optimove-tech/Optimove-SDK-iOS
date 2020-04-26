@@ -25,7 +25,8 @@ extension Event {
                      name: self.name,
                      category: self.category,
                      context: decorate(config: config),
-                     timestamp: self.timestamp)
+                     timestamp: self.timestamp,
+                     isRealtime: config.supportedOnRealTime)
     }
 
     /// Add Additional attributes according to event configuration
