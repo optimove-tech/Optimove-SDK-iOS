@@ -5,7 +5,7 @@ import OptimoveCore
 
 final class TriggeredNotificationRecieved: Event {
 
-    private struct Constants {
+    struct Constants {
         static let name = "triggered_notification_received"
         struct Key {
             static let timestamp = "timestamp"
