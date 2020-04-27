@@ -5,9 +5,8 @@ import OptimoveCore
 
 final class ScheduledNotificationDelivered: Event {
 
-    struct Constants {
+    private struct Constants {
         static let name = "notification_delivered"
-        static let category = "optipush"
         struct Key {
             static let timestamp = "timestamp"
             static let appNS = "app_ns"
@@ -34,7 +33,7 @@ final class ScheduledNotificationDelivered: Event {
          timestamp: Int) {
         super.init(
             name: Constants.name,
-            category: Constants.category,
+            category: "optipush",
             context: [
                 Constants.Key.timestamp: timestamp,
                 Constants.Key.appNS: bundleId,

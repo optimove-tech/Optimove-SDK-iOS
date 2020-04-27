@@ -5,9 +5,8 @@ import OptimoveCore
 
 final class TriggeredNotificationRecieved: Event {
 
-    struct Constants {
+    private struct Constants {
         static let name = "triggered_notification_received"
-        static let category = "optipush"
         struct Key {
             static let timestamp = "timestamp"
             static let appNS = "app_ns"
@@ -34,7 +33,7 @@ final class TriggeredNotificationRecieved: Event {
          timestamp: Int) {
         super.init(
             name: Constants.name,
-            category: Constants.category,
+            category: "optipush",
             context: [
                 Constants.Key.timestamp: timestamp,
                 Constants.Key.appNS: bundleId,
