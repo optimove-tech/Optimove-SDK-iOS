@@ -72,8 +72,8 @@ public enum HTTPMethod: String {
 }
 
 public struct HTTPHeader {
-    let field: String
-    let value: String
+    public let field: String
+    public let value: String
 }
 
 public extension HTTPHeader {

@@ -32,7 +32,7 @@ final class MigrationWork_2_10_0: MigrationWork {
     }
 
     func runMigration() {
-        synchronizer.handle(.setUserId)
+        synchronizer.handle(.setInstallation)
         storage.finishedMigration(to: version.rawValue)
     }
 

@@ -21,12 +21,12 @@ final class OptiPush {
 
 extension OptiPush: Component {
 
-    func handle(_ context: OperationContext) throws {
-        switch context.operation {
+    func handle(_ operation: Operation) throws {
+        switch operation {
         case let .deviceToken(token: token):
             storage.apnsToken = token
             registrar.handle(.setInstallation)
-        case .setUserId, .optIn, .optOut:
+        case .setInstallation, .optIn, .optOut:
             guard storage.apnsToken != nil else { return }
             registrar.handle(.setInstallation)
         case let .togglePushCampaigns(areDisabled: areDisabled):

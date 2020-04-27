@@ -204,7 +204,7 @@ extension StorageFacade {
         return fileStorage.isExist(fileName: fileName, shared: shared)
     }
 
-    public func save<T>(data: T, toFileName: String, shared: Bool) throws where T: Encodable {
+    public func save<T: Encodable>(data: T, toFileName: String, shared: Bool) throws {
         try fileStorage.save(data: data, toFileName: toFileName, shared: shared)
     }
 

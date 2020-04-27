@@ -2,7 +2,7 @@
 
 import XCTest
 import Mocker
-@testable import OptimoveSDK
+@testable import OptimoveCore
 
 class NetworkClientTests: XCTestCase {
 

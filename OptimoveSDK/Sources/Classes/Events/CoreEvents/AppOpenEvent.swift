@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-final class AppOpenEvent: OptimoveCoreEvent {
+final class AppOpenEvent: Event {
 
     struct Constants {
         static let name = "app_open"
@@ -12,9 +12,6 @@ final class AppOpenEvent: OptimoveCoreEvent {
         }
     }
 
-    let name: String = Constants.name
-    let parameters: [String: Any]
-
     init(bundleIdentifier: String, deviceID: String, visitorID: String?, customerID: String?) {
         var parameters = [
             Constants.Key.appNS: bundleIdentifier,
@@ -25,6 +22,6 @@ final class AppOpenEvent: OptimoveCoreEvent {
         } else if let visitorID = visitorID {
             parameters[Constants.Key.visitorID] = visitorID
         }
-        self.parameters = parameters
+        super.init(name: Constants.name, context: parameters)
     }
 }

@@ -16,7 +16,7 @@ enum CoreEventType {
 }
 
 protocol CoreEventFactory {
-    func createEvent(_ type: CoreEventType, _ onComplete: @escaping (OptimoveCoreEvent) -> Void ) throws
+    func createEvent(_ type: CoreEventType, _ onComplete: @escaping (Event) -> Void ) throws
 }
 
 import AdSupport
@@ -42,7 +42,7 @@ final class CoreEventFactoryImpl {
 
 extension CoreEventFactoryImpl: CoreEventFactory {
 
-    func createEvent(_ type: CoreEventType, _ onComplete: @escaping (OptimoveCoreEvent) -> Void ) throws {
+    func createEvent(_ type: CoreEventType, _ onComplete: @escaping (Event) -> Void ) throws {
         switch type {
         case .appOpen:
             onComplete(try createAppOpenEvent())

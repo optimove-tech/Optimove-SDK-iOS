@@ -4,7 +4,7 @@ import UIKit.UIApplication
 import UserNotifications
 import OptimoveCore
 
-public typealias OptimoveEvent = OptimoveCore.OptimoveEvent
+public typealias Event = OptimoveCore.Event
 
 /// The Optimove SDK for iOS - a realtime customer data platform.
 /// The integration guide: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki
@@ -13,7 +13,7 @@ public typealias OptimoveEvent = OptimoveCore.OptimoveEvent
 @objc public final class Optimove: NSObject {
 
     /// The current OptimoveSDK version string value.
-    public static let version = SDKVersion
+    public static let version = OptimoveCore.SDKVersion
 
     /// The shared instance of Optimove SDK.
     @objc public static let shared: Optimove = {
@@ -53,8 +53,8 @@ extension Optimove {
     ///   - parameters: The dictionary of attributes.
     @objc public func reportEvent(name: String, parameters: [String: Any] = [:]) {
         container.resolve { serviceLocator in
-            let customEvent = CommonOptimoveEvent(name: name, parameters: parameters)
-            serviceLocator.synchronizer().handle(.report(event: customEvent))
+            let tenantEvent = TenantEvent(name: name, context: parameters)
+            serviceLocator.synchronizer().handle(.report(event: tenantEvent))
         }
     }
 
@@ -64,7 +64,8 @@ extension Optimove {
     ///   - event: Instance of OptimoveEvent type.
     @objc public func reportEvent(_ event: OptimoveEvent) {
         container.resolve { serviceLocator in
-            serviceLocator.synchronizer().handle(.report(event: event))
+            let tenantEvent = TenantEvent(name: event.name, context: event.parameters)
+            serviceLocator.synchronizer().handle(.report(event: tenantEvent))
         }
     }
 
@@ -78,22 +79,19 @@ extension Optimove {
     /// - Parameters:
     ///   - screenTitle: The screen title.
     ///   - screenCategory: The screen category.
-    @objc public func reportScreenVisit(screenTitle: String, screenCategory: String? = nil) {
-        let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
-        Logger.info("Report a screen event w/title: \(screenTitle)")
-        let validationResult = ScreenVisitValidator.validate(screenTitle: screenTitle)
+    @objc public func reportScreenVisit(screenTitle title: String, screenCategory category: String? = nil) {
+        let title = title.trimmingCharacters(in: .whitespaces)
+        Logger.debug("Report a screen event with title: \(title) and category \(category ?? "nil")")
+        let validationResult = ScreenVisitValidator.validate(screenTitle: title)
         guard validationResult == .valid else { return }
-        let function: (ServiceLocator) -> Void = { serviceLocator in
+        container.resolve { serviceLocator in
             tryCatch {
-                serviceLocator.synchronizer().handle(
-                    .reportScreenEvent(
-                        title: screenTitle,
-                        category: screenCategory
-                    )
-                )
+                let factory = serviceLocator.coreEventFactory()
+                try factory.createEvent(.pageVisit(title: title, category: category)) { event in
+                    serviceLocator.synchronizer().handle(.report(event: event))
+                }
             }
         }
-        container.resolve(function)
     }
 }
 
@@ -121,8 +119,12 @@ extension Optimove {
             let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
             guard validationResult == .valid else { return }
             NewUserIDHandler(storage: storage).handle(userID: userID)
-            let syncronizer = serviceLocator.synchronizer()
-            syncronizer.handle(.setUserId)
+            tryCatch {
+                try serviceLocator.coreEventFactory().createEvent(.setUserId) { event in
+                    serviceLocator.synchronizer().handle(.report(event: event))
+                    serviceLocator.synchronizer().handle(.setInstallation)
+                }
+            }
         }
         container.resolve(function)
     }
@@ -138,7 +140,7 @@ extension Optimove {
             NewEmailHandler(storage: storage).handle(email: email)
             tryCatch {
                 try serviceLocator.coreEventFactory().createEvent(.setUserEmail) { event in
-                    Optimove.shared.reportEvent(event)
+                    serviceLocator.synchronizer().handle(.report(event: event))
                 }
             }
         }
@@ -314,8 +316,7 @@ private extension Optimove {
                     Logger.info("Initialization finished. ✅")
                     completion(.success(()))
                 case let .failure(error):
-                    Logger.error(error.localizedDescription)
-                    Logger.error("Initialization failed. 🛑")
+                    Logger.error("Initialization failed. 🛑\nReason: \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }

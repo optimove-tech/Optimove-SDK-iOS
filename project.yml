@@ -25,6 +25,7 @@ targets:
       - path: OptimoveCore
         excludes:
           - "Tests/**/*"
+          - ".gitkeep"
     info:
       path: OptimoveCore/Info.plist
       properties:
@@ -45,6 +46,7 @@ targets:
       - path: OptimoveSDK
         excludes:
           - "Tests/**/*"
+          - ".gitkeep"
     info:
       path: OptimoveSDK/Info.plist
       properties:
@@ -57,7 +59,6 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk
     dependencies: 
       - target: OptimoveCore
-      - carthage: MatomoTracker
       - sdk: UIKit.framework
       - sdk: UserNotifications.framework
       - sdk: AdSupport.framework
@@ -70,6 +71,7 @@ targets:
       - path: OptimoveNotificationServiceExtension
         excludes:
           - "Tests/**/*"
+          - ".gitkeep"
     info:
       path: OptimoveNotificationServiceExtension/Info.plist
       properties:
@@ -93,10 +95,13 @@ targets:
     sources: 
       - path: OptimoveCore/Tests/
         name: OptimoveCore-Unit
+        excludes:
+          - .gitkeep
       - path: Shared
         name: Shared-Unit
     dependencies:
       - target: OptimoveCore
+      - carthage: Mocker
 
   OptimoveSDK-Unit:
     type: bundle.unit-test
@@ -104,6 +109,8 @@ targets:
     sources: 
       - path: OptimoveSDK/Tests/
         name: OptimoveSDK-Unit
+        excludes:
+          - .gitkeep
       - path: Shared
         name: Shared-Unit
     dependencies:
@@ -116,6 +123,8 @@ targets:
     sources:
       - path: OptimoveNotificationServiceExtension/Tests/
         name: OptimoveNotificationServiceExtension-Unit
+        excludes:
+          - .gitkeep
       - path: Shared
         name: Shared-Unit
     dependencies:

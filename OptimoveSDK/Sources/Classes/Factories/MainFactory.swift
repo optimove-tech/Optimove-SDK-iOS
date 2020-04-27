@@ -1,6 +1,10 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
+
+typealias NetworkClient = OptimoveCore.NetworkClient
+typealias NetworkClientImpl = OptimoveCore.NetworkClientImpl
 
 final class MainFactory {
 

@@ -8,20 +8,23 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
 
     private let bundleIdentifier: String
     private let notificationPayload: NotificationPayload
-    private let optitrack: OptitrackNSE
+    private let networking: OptistreamNetworking
+    private let builder: OptistreamEventBuilder
 
     init(bundleIdentifier: String,
          notificationPayload: NotificationPayload,
-         optitrack: OptitrackNSE) {
+         networking: OptistreamNetworking,
+         builder: OptistreamEventBuilder) {
         self.bundleIdentifier = bundleIdentifier
         self.notificationPayload = notificationPayload
-        self.optitrack = optitrack
+        self.networking = networking
+        self.builder = builder
     }
 
     override func main() {
         state = .executing
         do {
-            let timestamp = Date().timeIntervalSince1970
+            let timestamp = Date().timeIntervalSince1970.seconds
             switch notificationPayload.campaign {
             case let campaign as ScheduledNotificationCampaign:
                 try report(
@@ -49,13 +52,17 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
         }
     }
 
-    private func report(_ event: OptimoveEvent) throws {
-try optitrack.report(
-            event: event,
-            completion: { [unowned self] in
-                self.state = .finished
+    private func report(_ event: Event) throws {
+        let optistreamEvent = try builder.build(event: event)
+        networking.send(event: optistreamEvent) { [unowned self] (result) in
+            switch result {
+            case .success(let response):
+                os_log("Delivery reported %{public}@", log: OSLog.reporter, type: .info, response.status)
+            case .failure(let error):
+                os_log("Error: %{public}@", log: OSLog.reporter, type: .error, error.localizedDescription)
             }
-        )
+            self.state = .finished
+        }
     }
 }
 

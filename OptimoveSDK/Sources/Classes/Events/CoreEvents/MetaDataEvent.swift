@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-final class MetaDataEvent: OptimoveCoreEvent {
+final class MetaDataEvent: Event {
 
     struct Constants {
         static let name = "optimove_sdk_metadata"
@@ -16,9 +16,6 @@ final class MetaDataEvent: OptimoveCoreEvent {
             static let language = "language"
         }
     }
-
-    let name: String = Constants.name
-    let parameters: [String: Any]
 
     init(configUrl: String,
          sdkVersion: String,
@@ -37,7 +34,7 @@ final class MetaDataEvent: OptimoveCoreEvent {
             Constants.Key.locationLongitude: locationLongitude,
             Constants.Key.language: language
         ]
-        parameters = params.filter { $0.value != nil } as [String: Any]
+        super.init(name: Constants.name, context: params.filter { $0.value != nil } as [String: Any])
     }
 
 }

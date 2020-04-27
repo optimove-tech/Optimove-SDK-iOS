@@ -3,44 +3,50 @@
 import Foundation
 import OptimoveCore
 
+typealias OptistreamEvent = OptimoveCore.OptistreamEvent
+typealias OptistreamEventBuilder = OptimoveCore.OptistreamEventBuilder
+typealias OptistreamNetworking = OptimoveCore.OptistreamNetworking
+
 final class OptiTrack {
 
-    private let configuration: OptitrackConfig
-    private var storage: OptimoveStorage
-    private let coreEventFactory: CoreEventFactory
-    private let eventReportingQueue: DispatchQueue
-    private var tracker: Tracker
+    private struct Constants {
+        static let eventBatchLimit = 100
+        static let queueLabel = "com.optimove.track"
+    }
 
-    required init(
-        configuration: OptitrackConfig,
-        storage: OptimoveStorage,
-        coreEventFactory: CoreEventFactory,
-        tracker: Tracker) {
-        self.configuration = configuration
-        self.storage = storage
-        self.coreEventFactory = coreEventFactory
-        self.tracker = tracker
-        self.eventReportingQueue = DispatchQueue(label: "com.optimove.sdk.optitrack", qos: .background)
+    var dispatchInterval: TimeInterval = 30.0 {
+        didSet {
+            startDispatchTimer()
+        }
+    }
 
-        Logger.debug("OptiTrack initialized.")
-        syncVisitorAndUserIdToMatomo()
-        dispatchNow()
+    private let queue: OptistreamQueue
+    private let optirstreamEventBuilder: OptistreamEventBuilder
+    private let networking: OptistreamNetworking
+    private var isDispatching = false
+
+    private var dispatchTimer: Timer?
+    private let dispatchQueue = DispatchQueue(label: Constants.queueLabel)
+
+    init(queue: OptistreamQueue,
+         optirstreamEventBuilder: OptistreamEventBuilder,
+         networking: OptistreamNetworking) {
+        self.queue = queue
+        self.optirstreamEventBuilder = optirstreamEventBuilder
+        self.networking = networking
+        startDispatchTimer()
     }
 
 }
 
 extension OptiTrack: Component {
 
-    func handle(_ context: OperationContext) throws {
-        switch context.operation {
-        case .setUserId:
-            try setUserId()
+    func handle(_ operation: Operation) throws {
+        switch operation {
         case let .report(event: event):
-            try report(event: event)
-        case let .reportScreenEvent(title: pageTitle, category: category):
-            try reportScreenEvent(title: pageTitle, category: category)
+            track(event: event)
         case .dispatchNow:
-            dispatchNow()
+            dispatch()
         default:
             break
         }
@@ -50,90 +56,104 @@ extension OptiTrack: Component {
 
 private extension OptiTrack {
 
-    func setUserId() throws {
-        let userID = try storage.getCustomerID()
-        Logger.info("OptiTrack: Set user id \(userID)")
-        tracker.userId = userID
-        try coreEventFactory.createEvent(.setUserId) { event in
-            tryCatch { try self.report(event: event) }
+    func startDispatchTimer() {
+        guard isTrackQueue() else {
+            dispatchQueue.async {
+                self.startDispatchTimer()
+            }
+            return
         }
-    }
-
-    func report(event: OptimoveEvent) throws {
-        let config = try event.matchConfiguration(with: configuration.events)
-        guard config.supportedOnOptitrack else { return }
-        eventReportingQueue.async {
-            self.sendReport(
-                event: OptimoveEventDecorator(
-                    event: event,
-                    config: config
-                ),
-                config: config
+        guard dispatchInterval > 0  else { return }
+        if let dispatchTimer = dispatchTimer {
+            dispatchTimer.invalidate()
+            self.dispatchTimer = nil
+        }
+        dispatchQueue.async { [weak self] in
+            guard let self = self else { return }
+            let currentRunLoop = RunLoop.current
+            self.dispatchTimer = Timer(
+                timeInterval: self.dispatchInterval,
+                target: self,
+                selector: #selector(self.dispatch),
+                userInfo: nil,
+                repeats: false
             )
+            currentRunLoop.add(self.dispatchTimer!, forMode: .common)
+            currentRunLoop.run()
         }
     }
 
-    func reportScreenEvent(title: String, category: String?) throws {
-        let categoryDescription: String = {
-            guard let category = category else { return "" }
-            return ", category: '\(category)'"
-        }()
-        Logger.debug("OptiTrack: Report screen event: title='\(title)'\(categoryDescription)")
-        try coreEventFactory.createEvent(.pageVisit(title: title, category: category)) { event in
-            tryCatch { try self.report(event: event) }
-            self.tracker.track(view: [title], url: URL(string: PageVisitEvent.Constants.Value.customURL))
+    func isTrackQueue() -> Bool {
+        guard String(cString: __dispatch_queue_get_label(nil), encoding: .utf8) == Constants.queueLabel else {
+            return false
         }
+        return true
     }
 
-    func dispatchNow() {
-        Logger.debug("OptiTrack: User asked to dispatch.")
-        tracker.dispatch()
-    }
-
-}
-
-extension OptiTrack {
-
-    func syncVisitorAndUserIdToMatomo() {
-        if let globalVisitorID = storage.visitorID {
-            let localVisitorID: String? = tracker.forcedVisitorId
-            if localVisitorID != globalVisitorID {
-                tracker.forcedVisitorId = globalVisitorID
-            }
-        }
-        if let globalUserID = storage.customerID {
-            let localUserID: String? = tracker.userId
-            if localUserID != globalUserID {
-                tryCatch { try setUserId() }
+    func track(event: Event) {
+        tryCatch {
+            let streamEvent = try optirstreamEventBuilder.build(event: event)
+            dispatchQueue.async {
+                self.queue.enqueue(events: [streamEvent])
+                if event.isRealtime {
+                    self.dispatch()
+                }
             }
         }
     }
 
-    func sendReport(event: OptimoveEvent, config: EventsConfig) {
-        let customDimensionIDS = configuration.customDimensionIDS
-        let maxCustomDimensions = customDimensionIDS.maxActionCustomDimensions + customDimensionIDS.maxVisitCustomDimensions
-
-        let getOptitrackDimensionId: (String) -> Int? = { parameterName in
-            return config.parameters[parameterName]?.optiTrackDimensionId
+    @objc func dispatch() {
+        guard isTrackQueue() else {
+            dispatchQueue.async {
+                self.dispatch()
+            }
+            return
         }
+        guard !isDispatching else {
+            Logger.debug("Tracker is already dispatching.")
+            return
+        }
+        guard queue.eventCount > 0 else {
+            Logger.debug("No need to dispatch. Dispatch queue is empty.")
+            startDispatchTimer()
+            return
+        }
+        Logger.info("Start dispatching events")
+        isDispatching = true
+        dispatchBatch()
+    }
 
-        let parameterDimensions: [TrackerEvent.CustomDimension] = event.parameters
-            .compactMapKeys(getOptitrackDimensionId)
-            .filter { $0.key <= maxCustomDimensions }
-            .mapValues { String(describing: $0).trimmingCharacters(in: .whitespaces) }
-            .map { TrackerEvent.CustomDimension(index: $0.key, value: $0.value) }
-
-        let nameDimensions: [TrackerEvent.CustomDimension] = [
-            TrackerEvent.CustomDimension(index: customDimensionIDS.eventIDCustomDimensionID, value: String(config.id)),
-            TrackerEvent.CustomDimension(index: customDimensionIDS.eventNameCustomDimensionID, value: event.name)
-        ]
-
-        let event = TrackerEvent(
-            category: configuration.eventCategoryName,
-            action: event.name,
-            dimensions: parameterDimensions + nameDimensions
-        )
-        tracker.track(event)
+    func dispatchBatch() {
+        guard isTrackQueue() else {
+            dispatchQueue.async {
+                self.dispatchBatch()
+            }
+            return
+        }
+        let events = queue.first(limit: Constants.eventBatchLimit)
+        guard !events.isEmpty else {
+            self.isDispatching = false
+            self.startDispatchTimer()
+            Logger.debug("Finished dispatching events")
+            return
+        }
+        networking.send(events: events) { [weak self] (result) in
+            guard let self = self else { return }
+            switch result {
+            case .success(let response):
+                self.dispatchQueue.async {
+                    Logger.info(response.message)
+                    self.queue.remove(events: events)
+                    self.dispatchBatch()
+                }
+            case .failure(let error):
+                self.dispatchQueue.async {
+                    Logger.error(error.localizedDescription)
+                    self.isDispatching = false
+                    self.startDispatchTimer()
+                }
+            }
+        }
     }
 
 }

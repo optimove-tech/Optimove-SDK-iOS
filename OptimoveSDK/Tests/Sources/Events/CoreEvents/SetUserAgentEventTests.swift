@@ -26,7 +26,7 @@ class SetUserAgentEventTests: XCTestCase {
         let event = SetUserAgent(userAgent: userAgent)
 
         // then
-        XCTAssert(event.parameters.count == Int(expectedParameterCount))
+        XCTAssert(event.context.count == Int(expectedParameterCount))
     }
 
     func test_event_short_useragent() {
@@ -39,7 +39,7 @@ class SetUserAgentEventTests: XCTestCase {
         let event = SetUserAgent(userAgent: userAgent)
 
         // then
-        XCTAssert(event.parameters.count == Int(expectedParameterCount))
+        XCTAssert(event.context.count == Int(expectedParameterCount))
     }
 
     func test_event_useragent_key_started_with_1() {
@@ -51,7 +51,7 @@ class SetUserAgentEventTests: XCTestCase {
         let event = SetUserAgent(userAgent: userAgent)
 
         // then
-        let first = event.parameters.first
+        let first = event.context.first
         XCTAssert(first?.key == SetUserAgent.Constants.userAgentHeaderBase + String(1))
     }
 

@@ -15,7 +15,7 @@ public protocol FileStorage {
     /// Save file.
     ///
     /// - Parameters:
-    ///   - data: Encodable object that will be saved.
+    ///   - data: Data object that will be saved.
     ///   - toFileName: The file name on disk space.
     ///   - shared: set `true` if the file should be save a shared container.
     func save<T: Encodable>(data: T, toFileName: String, shared: Bool) throws

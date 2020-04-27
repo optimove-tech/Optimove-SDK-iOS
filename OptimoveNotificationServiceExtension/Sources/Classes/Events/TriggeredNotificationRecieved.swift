@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class TriggeredNotificationRecieved: OptimoveEvent {
+final class TriggeredNotificationRecieved: Event {
 
     struct Constants {
         static let name = "triggered_notification_received"
@@ -17,31 +17,36 @@ final class TriggeredNotificationRecieved: OptimoveEvent {
             static let eventPlatform = "event_platform"
             static let eventOS = "event_os"
             static let eventNativeMobile = "event_native_mobile"
+            static let engagementID = "engagement_id"
         }
         struct Value {
             static let deviceType = "Mobile"
             static let platform = "iOS"
             static let nativeMobile = true
             static let os = "iOS \(ProcessInfo().operatingSystemVersionOnlyString)"
+            static let noEngagementID = -1
         }
     }
 
-    let name = Constants.name
-    let parameters: [String: Any]
-
     init(bundleId: String,
          campaign: TriggeredNotificationCampaign,
-         timestamp: TimeInterval) {
-        parameters = [
-            Constants.Key.timestamp: Int(timestamp),
-            Constants.Key.appNS: bundleId,
-            Constants.Key.actionID: campaign.actionID,
-            Constants.Key.actionSerial: campaign.actionSerial,
-            Constants.Key.templateID: campaign.templateID,
-            Constants.Key.eventDeviceType: Constants.Value.deviceType,
-            Constants.Key.eventPlatform: Constants.Value.platform,
-            Constants.Key.eventOS: Constants.Value.os,
-            Constants.Key.eventNativeMobile: Constants.Value.nativeMobile
-        ]
+         timestamp: Int) {
+        super.init(
+            name: Constants.name,
+            category: "optipush",
+            context: [
+                Constants.Key.timestamp: timestamp,
+                Constants.Key.appNS: bundleId,
+                Constants.Key.actionID: campaign.actionID,
+                Constants.Key.actionSerial: campaign.actionSerial,
+                Constants.Key.templateID: campaign.templateID,
+                Constants.Key.eventDeviceType: Constants.Value.deviceType,
+                Constants.Key.eventPlatform: Constants.Value.platform,
+                Constants.Key.eventOS: Constants.Value.os,
+                Constants.Key.eventNativeMobile: Constants.Value.nativeMobile,
+                Constants.Key.engagementID: campaign.engagementID ?? Constants.Value.noEngagementID
+            ],
+            timestamp: timestamp
+        )
     }
 }

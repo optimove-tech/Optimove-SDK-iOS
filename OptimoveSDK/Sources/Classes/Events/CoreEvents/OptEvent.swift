@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-class OptEvent: OptimoveCoreEvent {
+class OptEvent: Event {
 
     struct Constants {
         static let optInName = OptimoveKeys.Configuration.optipushOptIn.rawValue
@@ -12,27 +12,33 @@ class OptEvent: OptimoveCoreEvent {
         }
     }
 
-    var name: String { fatalError("An implementation provides by inheritance.") }
-    let parameters: [String: Any]
-
-    required init(timestamp: Double, applicationNameSpace: String, deviceId: String) {
-        parameters = [
-            Constants.Key.timestamp: Int(timestamp),
-            Constants.Key.appNs: applicationNameSpace,
-            Constants.Key.deviceId: deviceId
-        ]
+    required init(name: String, timestamp: Double, applicationNameSpace: String, deviceId: String) {
+        super.init(
+            name: name,
+            context: [
+                Constants.Key.timestamp: Int(timestamp),
+                Constants.Key.appNs: applicationNameSpace,
+                Constants.Key.deviceId: deviceId
+            ]
+        )
     }
 
 }
 
 final class OptipushOptInEvent: OptEvent {
-    override var name: String {
-        return Constants.optInName
+
+    convenience init(timestamp: Double, applicationNameSpace: String, deviceId: String) {
+        self.init(
+            name: Constants.optInName,
+            timestamp: timestamp,
+            applicationNameSpace: applicationNameSpace, deviceId: deviceId)
     }
+
 }
 
 final class OptipushOptOutEvent: OptEvent {
-    override var name: String {
-        return Constants.optOutName
+
+    convenience init(timestamp: Double, applicationNameSpace: String, deviceId: String) {
+        self.init(name: Constants.optOutName, timestamp: timestamp, applicationNameSpace: applicationNameSpace, deviceId: deviceId)
     }
 }

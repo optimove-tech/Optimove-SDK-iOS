@@ -24,20 +24,20 @@ class ScheduledNotificationDeliveredTests: XCTestCase {
                 engagementID: engagementID,
                 campaignType: campaignType
             ),
-            timestamp: timestamp
+            timestamp: Int(timestamp)
         )
 
         XCTAssertEqual(ScheduledNotificationDelivered.Constants.name, event.name)
-        XCTAssertEqual(actionSerial, event.parameters[ScheduledNotificationDelivered.Constants.Key.actionSerial] as? Int)
-        XCTAssertEqual(campaignID, event.parameters[ScheduledNotificationDelivered.Constants.Key.campaignID] as? Int)
-        XCTAssertEqual(engagementID, event.parameters[ScheduledNotificationDelivered.Constants.Key.engagementID] as? Int)
-        XCTAssertEqual(campaignType, event.parameters[ScheduledNotificationDelivered.Constants.Key.campaignType] as? Int)
-        XCTAssertEqual(templateID, event.parameters[ScheduledNotificationDelivered.Constants.Key.templateID] as? Int)
-        XCTAssertEqual(Int(timestamp), event.parameters[ScheduledNotificationDelivered.Constants.Key.timestamp] as? Int)
-        XCTAssertEqual(bundleIdentifier, event.parameters[ScheduledNotificationDelivered.Constants.Key.appNS] as? String)
-        XCTAssertEqual(ScheduledNotificationDelivered.Constants.Value.deviceType, event.parameters[ScheduledNotificationDelivered.Constants.Key.eventDeviceType] as? String)
-        XCTAssertEqual(ScheduledNotificationDelivered.Constants.Value.nativeMobile, event.parameters[ScheduledNotificationDelivered.Constants.Key.eventNativeMobile] as? Bool)
-        XCTAssertEqual(ScheduledNotificationDelivered.Constants.Value.os, event.parameters[ScheduledNotificationDelivered.Constants.Key.eventOS] as? String)
-        XCTAssertEqual(ScheduledNotificationDelivered.Constants.Value.platform, event.parameters[ScheduledNotificationDelivered.Constants.Key.eventPlatform] as? String)
+        XCTAssertEqual(actionSerial, event.context[ScheduledNotificationDelivered.Constants.Key.actionSerial] as? Int)
+        XCTAssertEqual(campaignID, event.context[ScheduledNotificationDelivered.Constants.Key.campaignID] as? Int)
+        XCTAssertEqual(engagementID, event.context[ScheduledNotificationDelivered.Constants.Key.engagementID] as? Int)
+        XCTAssertEqual(campaignType, event.context[ScheduledNotificationDelivered.Constants.Key.campaignType] as? Int)
+        XCTAssertEqual(templateID, event.context[ScheduledNotificationDelivered.Constants.Key.templateID] as? Int)
+        XCTAssertEqual(Int(timestamp), event.context[ScheduledNotificationDelivered.Constants.Key.timestamp] as? Int)
+        XCTAssertEqual(bundleIdentifier, event.context[ScheduledNotificationDelivered.Constants.Key.appNS] as? String)
+        XCTAssertEqual(ScheduledNotificationDelivered.Constants.Value.deviceType, event.context[ScheduledNotificationDelivered.Constants.Key.eventDeviceType] as? String)
+        XCTAssertEqual(ScheduledNotificationDelivered.Constants.Value.nativeMobile, event.context[ScheduledNotificationDelivered.Constants.Key.eventNativeMobile] as? Bool)
+        XCTAssertEqual(ScheduledNotificationDelivered.Constants.Value.os, event.context[ScheduledNotificationDelivered.Constants.Key.eventOS] as? String)
+        XCTAssertEqual(ScheduledNotificationDelivered.Constants.Value.platform, event.context[ScheduledNotificationDelivered.Constants.Key.eventPlatform] as? String)
     }
 }

@@ -92,21 +92,25 @@ public struct TriggeredNotificationCampaign: NotificationCampaign {
     public let actionSerial: Int
     public let actionID: Int
     public let templateID: Int
+    public let engagementID: Int?
 
     public init(
         actionSerial: Int,
         actionID: Int,
-        templateID: Int
+        templateID: Int,
+        engagementID: Int?
     ) {
         self.actionSerial = actionSerial
         self.actionID = actionID
         self.templateID = templateID
+        self.engagementID = engagementID
     }
 
     enum CodingKeys: String, CodingKey {
         case actionSerial = "action_serial"
         case actionID = "action_id"
         case templateID = "template_id"
+        case engagementID = "engagement_id"
     }
 
     /// The custom decoder does preprocess before the primary decoder.
@@ -178,7 +182,9 @@ public struct DynamicLinks: Decodable {
     /// The custom decoder does preprocess before the primary decoder.
     init(firebaseFrom decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
-        let string = try container.decode(String.self, forKey: .dynamicLinks)
+        guard let string = try container.decodeIfPresent(String.self, forKey: .dynamicLinks) else {
+            throw GuardError.custom("Not found value for key \(NotificationPayload.CodingKeys.dynamicLinks.rawValue)")
+        }
         let data: Data = try cast(string.data(using: .utf8))
         self = try JSONDecoder().decode(DynamicLinks.self, from: data)
     }
