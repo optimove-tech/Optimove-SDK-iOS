@@ -212,7 +212,6 @@
 		C68FBC333C5593438AE404CC /* StorageFacade.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAF6DB20C4C312785D90075 /* StorageFacade.swift */; };
 		C7233F212065D5DE47B2E16E /* ApiOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769C151F4313E1C1E223FE8E /* ApiOperation.swift */; };
 		C85F44214432563BCCDAFED5 /* LogBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7C8A11E380D28029ED47E5 /* LogBody.swift */; };
-		C8E1C85C8DB193181D87D0C1 /* RealtimeMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AF4563527F35B0569B44CE /* RealtimeMetaData.swift */; };
 		C9B146D3726AFD48A46265DA /* LogLevelCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43F7C2632F53C9F5CD85B4E /* LogLevelCore.swift */; };
 		CB4AC43D9576A580D0C217DA /* OptimoveTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A3329FC290A675F44BEBFE /* OptimoveTestCase.swift */; };
 		CBA3D6BD2269778218266AD5 /* MockStatisticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C9108020CAF36768579AA7 /* MockStatisticService.swift */; };
@@ -387,7 +386,6 @@
 		1F9045DB7CC19B7319FF581C /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		2027ED43354F4EB835FA0AA0 /* KVOExpectation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KVOExpectation.swift; sourceTree = "<group>"; };
 		21E3D6232CC0A82FDD03F70F /* InstallationIdGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallationIdGenerator.swift; sourceTree = "<group>"; };
-		24AF4563527F35B0569B44CE /* RealtimeMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealtimeMetaData.swift; sourceTree = "<group>"; };
 		253C68E8F1DE460F5E45705E /* NotificationKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationKey.swift; sourceTree = "<group>"; };
 		25B6B3DE463ED6B71E84F945 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		261D38281C7EFF91CCFA2867 /* test_notification.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = test_notification.json; sourceTree = "<group>"; };
@@ -1140,7 +1138,6 @@
 				B6C15CE508057F304C79B5EB /* OptipushMetaData.swift */,
 				DF010CD78C12263BE8ED0CDD /* OptitrackMetaData.swift */,
 				F107FD1650EBED990862F73F /* Parameter.swift */,
-				24AF4563527F35B0569B44CE /* RealtimeMetaData.swift */,
 				9ABF630842AEE0342583B677 /* TenantConfig.swift */,
 			);
 			path = Tenant;
@@ -2222,7 +2219,6 @@
 				D0DF391C816A5EE42AC96ADF /* OptitrackMetaData.swift in Sources */,
 				7323B3246BBFECE6F63A3C12 /* Parameter.swift in Sources */,
 				00F83D263F7049A8120B7A8A /* Querying.swift in Sources */,
-				C8E1C85C8DB193181D87D0C1 /* RealtimeMetaData.swift in Sources */,
 				05A2444050AEF0639DC080AC /* RemoteLoggerStream.swift in Sources */,
 				74EB8910931416EBF66AEF33 /* Result+Successful.swift in Sources */,
 				3F44720B367301EC17CC321B /* RuntimeCodingKey.swift in Sources */,
