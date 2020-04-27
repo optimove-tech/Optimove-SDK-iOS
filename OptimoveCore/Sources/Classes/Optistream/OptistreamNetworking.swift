@@ -76,8 +76,8 @@ private extension OptistreamNetworkingImpl {
                     Logger.debug(
                         """
                         Optistream succeed:
-                            request: \(events.map{ $0.event }.joined(separator: "\n"))
-                            response: \(response)
+                            request: \n\(events.map{ $0.event }.joined(separator: "\n"))
+                            response: \n\(response)
                         """
                     )
                     return response
@@ -85,8 +85,8 @@ private extension OptistreamNetworkingImpl {
                     Logger.error(
                         """
                         Optistream failed:
-                            request: \(events.map{ $0.event }.joined(separator: "\n"))
-                            reason: \(error.localizedDescription)
+                            request: \n\(events.map{ $0.event }.joined(separator: "\n"))
+                            reason: \n\(error.localizedDescription)
                         """
                     )
                     throw error
