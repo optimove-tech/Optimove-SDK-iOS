@@ -56,7 +56,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func enqueue(events: [OptistreamEvent]) {
-        Logger.debug("Queue: Enqueue \(events.count) events:\n\(events.map({$0.event}))")
+        Logger.debug("Queue: Enqueue \(events.count) events:\n\(events.map({ $0.event }))")
         inMemoryEvents.append(contentsOf: events)
         save(events: inMemoryEvents)
     }
@@ -67,7 +67,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func remove(events: [OptistreamEvent]) {
-        Logger.debug("Queue: Dequeue \(events.count) events:\n\(events.map({$0.event}))")
+        Logger.debug("Queue: Dequeue \(events.count) events:\n\(events.map({ $0.event }))")
         inMemoryEvents = inMemoryEvents.filter { cachedEvent in
             !events.contains(cachedEvent) // O(n*n)
         }

@@ -33,7 +33,7 @@ let package = Package(
         .target(
             name: "OptimoveSDK",
             dependencies: [
-                "OptimoveCore",
+                "OptimoveCore"
             ],
             path: "OptimoveSDK/Sources"
         ),

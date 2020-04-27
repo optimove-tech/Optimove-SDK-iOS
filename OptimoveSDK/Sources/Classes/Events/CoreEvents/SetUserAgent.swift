@@ -17,7 +17,7 @@ final class SetUserAgent: Event {
                 .reduce(into: [String: Any]()) { (result, userAgent) in
                     let key = Constants.userAgentHeaderBase + String(userAgent.offset + 1)
                     result[key] = userAgent.element
-            }
+                }
         )
     }
 }

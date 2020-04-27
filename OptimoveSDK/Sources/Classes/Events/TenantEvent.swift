@@ -8,7 +8,7 @@ final class TenantEvent: Event {
         static let category = "global" /// TODO: Define the value
     }
 
-    init(name: String, context: [String : Any]) {
+    init(name: String, context: [String: Any]) {
         super.init(name: name, category: Constants.category, context: context)
     }
 

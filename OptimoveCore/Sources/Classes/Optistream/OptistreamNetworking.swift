@@ -22,7 +22,7 @@ public final class OptistreamNetworkingImpl {
 
     public init(
         networkClient: NetworkClient,
-        configuration : OptitrackConfig
+        configuration: OptitrackConfig
     ) {
         self.networkClient = networkClient
         self.configuration = configuration
@@ -76,7 +76,7 @@ private extension OptistreamNetworkingImpl {
                     Logger.debug(
                         """
                         Optistream succeed:
-                            request: \n\(events.map{ $0.event }.joined(separator: "\n"))
+                            request: \n\(events.map { $0.event }.joined(separator: "\n"))
                             response: \n\(response)
                         """
                     )
@@ -85,7 +85,7 @@ private extension OptistreamNetworkingImpl {
                     Logger.error(
                         """
                         Optistream failed:
-                            request: \n\(events.map{ $0.event }.joined(separator: "\n"))
+                            request: \n\(events.map { $0.event }.joined(separator: "\n"))
                             reason: \n\(error.localizedDescription)
                         """
                     )

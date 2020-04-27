@@ -1,4 +1,4 @@
-//  Copyright © 2020 Optimove. All rights
+//  Copyright © 2020 Optimove. All rights reserved.
 
 /// The container is using for prevent an unexpected internal crash to affect on a tenant app.
 final class Container {

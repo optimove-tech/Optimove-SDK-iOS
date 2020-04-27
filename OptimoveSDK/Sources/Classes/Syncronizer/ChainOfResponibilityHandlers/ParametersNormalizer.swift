@@ -67,7 +67,7 @@ extension Event {
             }
         }
         return Event(
-            uuid:self.uuid,
+            uuid: self.uuid,
             name: normilizeName,
             category: self.category,
             context: normalizedParameters,
@@ -90,4 +90,3 @@ private extension String {
             .replacingOccurrences(of: Constants.spaceCharacter, with: replacement)
     }
 }
-

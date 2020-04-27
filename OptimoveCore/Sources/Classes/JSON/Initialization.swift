@@ -52,7 +52,7 @@ extension JSON {
             self = .bool(bool)
         case let array as [Any]:
             self = .array(try array.map(JSON.init))
-        case let dict as [String:Any]:
+        case let dict as [String: Any]:
             self = .object(try dict.mapValues(JSON.init))
         default:
             throw InitializationError()
@@ -94,7 +94,7 @@ extension JSON: ExpressibleByArrayLiteral {
 extension JSON: ExpressibleByDictionaryLiteral {
 
     public init(dictionaryLiteral elements: (String, JSON)...) {
-        var object: [String:JSON] = [:]
+        var object: [String: JSON] = [:]
         for (k, v) in elements {
             object[k] = v
         }

@@ -33,7 +33,6 @@ extension LocationServiceImpl: LocationService {
 
 }
 
-
 final class LocationServiceImpl {
 
     private var locationManager = CLLocationManager()

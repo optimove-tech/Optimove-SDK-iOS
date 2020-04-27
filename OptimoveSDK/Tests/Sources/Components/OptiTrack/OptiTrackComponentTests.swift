@@ -85,5 +85,4 @@ final class MockOptistreamQueue: OptistreamQueue {
         }
     }
 
-
 }

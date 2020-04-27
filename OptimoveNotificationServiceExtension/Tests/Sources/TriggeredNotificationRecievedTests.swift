@@ -19,7 +19,7 @@ class TriggeredNotificationRecievedTests: XCTestCase {
                 actionSerial: actionSerial,
                 actionID: actionID,
                 templateID: templateID,
-                engagementID: 1234
+                engagementID: 1_234
             ),
             timestamp: Int(timestamp)
         )

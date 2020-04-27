@@ -13,7 +13,6 @@ public final class OptistreamEventBuilder {
             static let platform = "iOS"
         }
 
-
     }
 
     private let configuration: OptitrackConfig
@@ -38,7 +37,7 @@ public final class OptistreamEventBuilder {
             visitor: try storage.getVisitorID(),
             timestamp: event.timestamp,
             context: try JSON(event.context),
-            metadata: try JSON.init([
+            metadata: try JSON([
                 Constants.Keys.platform: Constants.Values.platform,
                 Constants.Keys.version: SDKVersion
             ])

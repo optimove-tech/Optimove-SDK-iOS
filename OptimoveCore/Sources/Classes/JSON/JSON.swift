@@ -31,7 +31,7 @@ import Foundation
 @dynamicMemberLookup public enum JSON: Equatable {
     case string(String)
     case number(Double)
-    case object([String:JSON])
+    case object([String: JSON])
     case array([JSON])
     case bool(Bool)
     case null
