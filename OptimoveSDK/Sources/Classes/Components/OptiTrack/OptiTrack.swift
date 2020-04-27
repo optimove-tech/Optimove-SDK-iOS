@@ -14,11 +14,17 @@ final class OptiTrack {
         static let queueLabel = "com.optimove.track"
     }
 
+    var dispatchInterval: TimeInterval = 30.0 {
+        didSet {
+            startDispatchTimer()
+        }
+    }
+
     private let queue: OptistreamQueue
     private let optirstreamEventBuilder: OptistreamEventBuilder
     private let networking: OptistreamNetworking
     private var isDispatching = false
-    private var dispatchInterval: TimeInterval = 30.0
+
     private var dispatchTimer: Timer?
     private let dispatchQueue = DispatchQueue(label: Constants.queueLabel)
 

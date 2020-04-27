@@ -23,6 +23,7 @@ final class OptiTrackComponentTests: OptimoveTestCase {
             optirstreamEventBuilder: builder,
             networking: networking
         )
+        optitrack.dispatchInterval = 1
     }
 
     func test_event_one_report() throws {
@@ -32,14 +33,14 @@ final class OptiTrackComponentTests: OptimoveTestCase {
 
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
-        networking.assetOneEventFunction = { (event, completion) -> Void in
-            XCTAssertEqual(event.event, StubEvent.Constnats.name)
+        networking.assetManyEventsFunction = { (events, completion) -> Void in
+            XCTAssertEqual(events.count, 1)
             networkExpectation.fulfill()
         }
 
         // when
         try optitrack.handle(.report(event: stubEvent))
-        wait(for: [networkExpectation], timeout: defaultTimeout)
+        wait(for: [networkExpectation], timeout: defaultTimeout + 5)
     }
 
     func test_event_many_reports() throws {
@@ -57,7 +58,7 @@ final class OptiTrackComponentTests: OptimoveTestCase {
 
         // when
         try optitrack.handle(.dispatchNow)
-        wait(for: [networkExpectation], timeout: defaultTimeout)
+        wait(for: [networkExpectation], timeout: defaultTimeout + 1)
     }
 
 }

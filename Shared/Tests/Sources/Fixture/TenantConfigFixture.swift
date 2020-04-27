@@ -7,17 +7,9 @@ final class TenantConfigFixture {
 
     func build() -> TenantConfig {
         return TenantConfig(
-            realtime: tenantRealtimeConfigFixture(),
             optitrack: tenantOptitrackConfigFixture(),
             optipush: tenantOptipushConfigFixture(),
             events: createTenantEventFixture()
-        )
-    }
-
-    func tenantRealtimeConfigFixture() -> TenantRealtimeConfig {
-        return TenantRealtimeConfig(
-            realtimeToken: "realtimeToken",
-            realtimeGateway: StubVariables.url
         )
     }
 
@@ -44,27 +36,22 @@ final class TenantConfigFixture {
                 parameters: [
                     StubEvent.Constnats.key: Parameter(
                         type: "String",
-                        optiTrackDimensionId: 20,
                         optional: false
                     ),
                     "event_platform": Parameter(
                         type: "String",
-                        optiTrackDimensionId: 11,
                         optional: true
                     ),
                     "event_device_type": Parameter(
                         type: "String",
-                        optiTrackDimensionId: 12,
                         optional: true
                     ),
                     "event_os": Parameter(
                         type: "String",
-                        optiTrackDimensionId: 13,
                         optional: true
                     ),
                     "event_native_mobile": Parameter(
                         type: "Boolean",
-                        optiTrackDimensionId: 14,
                         optional: true
                     )
                 ]
