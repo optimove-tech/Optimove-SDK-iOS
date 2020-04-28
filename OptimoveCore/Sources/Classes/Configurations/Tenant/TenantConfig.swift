@@ -1,6 +1,7 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
 public struct TenantConfig: Codable, Equatable {
+    public let supportAirship: Bool?
     public var optitrack: TenantOptitrackConfig
     public let optipush: TenantOptipushConfig
     public let events: [String: EventsConfig]
@@ -8,15 +9,18 @@ public struct TenantConfig: Codable, Equatable {
     public init(
         optitrack: TenantOptitrackConfig,
         optipush: TenantOptipushConfig,
-        events: [String: EventsConfig]
+        events: [String: EventsConfig],
+        supportAirship: Bool?
     ) {
         self.optitrack = optitrack
         self.optipush = optipush
         self.events = events
+        self.supportAirship = supportAirship
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        supportAirship = try container.decodeIfPresent(Bool.self, forKey: .supportAirship)
         optitrack = try container.decode(TenantOptitrackConfig.self, forKey: .optitrack)
         events = try container.decode([String: EventsConfig].self, forKey: .events)
         let mobile = try container.nestedContainer(keyedBy: MobileCodingKey.self, forKey: .mobile)
@@ -32,6 +36,7 @@ public struct TenantConfig: Codable, Equatable {
     }
 
     enum CodingKeys: String, CodingKey {
+        case supportAirship
         case optitrack = "optitrackMetaData"
         case mobile
         case events
