@@ -6,13 +6,13 @@ import OptimoveCore
 
 class ScheduledNotificationDeliveredTests: XCTestCase {
 
-    func testExample() {
+    func test_event() {
         let campaignID = Int.random(in: 10...1_000)
         let actionSerial = Int.random(in: 10...1_000)
         let templateID = Int.random(in: 10...1_000)
         let engagementID = Int.random(in: 10...1_000)
         let campaignType = Int.random(in: 1...2)
-        let timestamp = Date().timeIntervalSince1970
+        let timestamp = Date()
         let bundleIdentifier = "BundleIdentifier"
 
         let event = ScheduledNotificationDelivered(
@@ -24,7 +24,7 @@ class ScheduledNotificationDeliveredTests: XCTestCase {
                 engagementID: engagementID,
                 campaignType: campaignType
             ),
-            timestamp: Int(timestamp)
+            timestamp: timestamp
         )
 
         XCTAssertEqual(ScheduledNotificationDelivered.Constants.name, event.name)
@@ -33,7 +33,7 @@ class ScheduledNotificationDeliveredTests: XCTestCase {
         XCTAssertEqual(engagementID, event.context[ScheduledNotificationDelivered.Constants.Key.engagementID] as? Int)
         XCTAssertEqual(campaignType, event.context[ScheduledNotificationDelivered.Constants.Key.campaignType] as? Int)
         XCTAssertEqual(templateID, event.context[ScheduledNotificationDelivered.Constants.Key.templateID] as? Int)
-        XCTAssertEqual(Int(timestamp), event.context[ScheduledNotificationDelivered.Constants.Key.timestamp] as? Int)
+        XCTAssertEqual(timestamp.timeIntervalSince1970.seconds, event.context[ScheduledNotificationDelivered.Constants.Key.timestamp] as? Int)
         XCTAssertEqual(bundleIdentifier, event.context[ScheduledNotificationDelivered.Constants.Key.appNS] as? String)
         XCTAssertEqual(ScheduledNotificationDelivered.Constants.Value.deviceType, event.context[ScheduledNotificationDelivered.Constants.Key.eventDeviceType] as? String)
         XCTAssertEqual(ScheduledNotificationDelivered.Constants.Value.nativeMobile, event.context[ScheduledNotificationDelivered.Constants.Key.eventNativeMobile] as? Bool)

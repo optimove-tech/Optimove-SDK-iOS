@@ -24,7 +24,7 @@ private extension OptimoveNotificationHandler {
         Logger.info("User react '\(response.actionIdentifier)' to a notification.")
         do {
             let event = try createEvent(from: response)
-            let task = UIApplication.shared.beginBackgroundTask(withName: "Handling a notification reponse")
+            let task = UIApplication.shared.beginBackgroundTask(withName: "com.optimove.sdk")
             switch response.actionIdentifier {
             case UNNotificationDefaultActionIdentifier:
                 synchronizer.handle(.report(event: event))

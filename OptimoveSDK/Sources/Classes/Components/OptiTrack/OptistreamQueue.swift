@@ -58,6 +58,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     func enqueue(events: [OptistreamEvent]) {
         Logger.debug("Queue: Enqueue \(events.count) events:\n\(events.map({ $0.event }))")
         inMemoryEvents.append(contentsOf: events)
+        // TODO: dispatch on will resign active
         save(events: inMemoryEvents)
     }
 

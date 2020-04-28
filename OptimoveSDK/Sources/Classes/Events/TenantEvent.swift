@@ -5,7 +5,7 @@ import Foundation
 final class TenantEvent: Event {
 
     struct Constants {
-        static let category = "track" /// TODO: Define the value
+        static let category = "track"
     }
 
     init(name: String, context: [String: Any]) {
