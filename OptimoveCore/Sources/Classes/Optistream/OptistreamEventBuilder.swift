@@ -9,12 +9,14 @@ public final class OptistreamEventBuilder {
         struct Keys {
             static let platform = "sdk_platform"
             static let version = "sdk_version"
+            static let appVersion = "app_version"
+            static let osVersion = "os_version"
+            static let deviceModel = "device_model"
         }
         struct Values {
             static let origin = "sdk"
             static let platform = "iOS"
         }
-
     }
 
     private let configuration: OptitrackConfig
@@ -41,7 +43,10 @@ public final class OptistreamEventBuilder {
             context: try JSON(event.context),
             metadata: try JSON([
                 Constants.Keys.platform: Constants.Values.platform,
-                Constants.Keys.version: SDKVersion
+                Constants.Keys.version: SDKVersion,
+                Constants.Keys.appVersion: Bundle.main.appVersion,
+                Constants.Keys.osVersion: ProcessInfo.processInfo.osVersion,
+                Constants.Keys.deviceModel: utsname().deviceModel
             ])
         )
     }
