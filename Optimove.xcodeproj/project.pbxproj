@@ -80,6 +80,7 @@
 		464771172458208D00F075F4 /* Bundle+AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464771162458208D00F075F4 /* Bundle+AppVersion.swift */; };
 		46477119245820D900F075F4 /* utsname+DeviceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46477118245820D900F075F4 /* utsname+DeviceModel.swift */; };
 		4647711B245820EE00F075F4 /* ProcessInfo+OsVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4647711A245820EE00F075F4 /* ProcessInfo+OsVersion.swift */; };
+		4647711D24583EF000F075F4 /* AirshipService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4647711C24583EF000F075F4 /* AirshipService.swift */; };
 		4706D362A1B3BD2B148D9DDE /* NetworkResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB19792511783857E3051963 /* NetworkResponse.swift */; };
 		499D5BF06BBCC8EBB94263E4 /* Optimove.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA418E3FDBEB318519B1F183 /* Optimove.swift */; };
 		49CF203CF09FBC2F4578AF84 /* OptimoveNotificationServiceExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AF7CBE1A75BE741CAF7483 /* OptimoveNotificationServiceExtensionTests.swift */; };
@@ -429,6 +430,7 @@
 		464771162458208D00F075F4 /* Bundle+AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+AppVersion.swift"; sourceTree = "<group>"; };
 		46477118245820D900F075F4 /* utsname+DeviceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "utsname+DeviceModel.swift"; sourceTree = "<group>"; };
 		4647711A245820EE00F075F4 /* ProcessInfo+OsVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessInfo+OsVersion.swift"; sourceTree = "<group>"; };
+		4647711C24583EF000F075F4 /* AirshipService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirshipService.swift; sourceTree = "<group>"; };
 		472CC4141ED9FBD9DD0B65F1 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		485BDCB56EA98CD3DD5AE9DE /* TenantConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantConfigTests.swift; sourceTree = "<group>"; };
 		487536D1DE6FD34739D24A91 /* Installation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Installation.swift; sourceTree = "<group>"; };
@@ -1431,6 +1433,7 @@
 				9999BCE7DA7D3AC1A9416207 /* PushNotification */,
 				3415A067C92411318D5A27B5 /* Repository */,
 				9BB85218819DA69644CA626C /* Storage */,
+				4647711C24583EF000F075F4 /* AirshipService.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -2215,6 +2218,7 @@
 				74748751E3D0F685C3817AF3 /* JSON.swift in Sources */,
 				C85F44214432563BCCDAFED5 /* LogBody.swift in Sources */,
 				C9B146D3726AFD48A46265DA /* LogLevelCore.swift in Sources */,
+				4647711D24583EF000F075F4 /* AirshipService.swift in Sources */,
 				CDD3242FB03DDCFDBA27E186 /* Logger.swift in Sources */,
 				58B394186CECA09885F686F3 /* LoggerSettings.swift in Sources */,
 				75DB09C4A3AD43DB5FDF2384 /* LoggerStream.swift in Sources */,

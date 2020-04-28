@@ -27,7 +27,11 @@ final class ComponentFactory {
             ),
             optirstreamEventBuilder: OptistreamEventBuilder(
                 configuration: configuration.optitrack,
-                storage: serviceLocator.storage()
+                storage: serviceLocator.storage(),
+                airshipService: AirshipService(
+                    storage: serviceLocator.storage(),
+                    configuration: configuration
+                )
             ),
             networking: OptistreamNetworkingImpl(
                 networkClient: serviceLocator.networkClient(),

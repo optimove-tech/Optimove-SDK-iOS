@@ -24,7 +24,8 @@ public final class ConfigurationBuilder {
             logger: buildLoggerConfig(),
             optitrack: buildOptitrackConfig(),
             optipush: buildOptipushConfig(),
-            events: events
+            events: events,
+            isSupportedAirship: tenantConfig.isSupportedAirship
         )
     }
 

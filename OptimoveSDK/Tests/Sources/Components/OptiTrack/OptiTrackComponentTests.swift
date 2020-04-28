@@ -14,9 +14,14 @@ final class OptiTrackComponentTests: OptimoveTestCase {
     var builder: OptistreamEventBuilder!
 
     override func setUp() {
+        let configuration = ConfigurationFixture.build()
         builder = OptistreamEventBuilder(
-            configuration: ConfigurationFixture.build().optitrack,
-            storage: storage
+            configuration: configuration.optitrack,
+            storage: storage,
+            airshipService: AirshipService(
+                storage: storage,
+                configuration: configuration
+            )
         )
         optitrack = OptiTrack(
             queue: queue,

@@ -60,16 +60,20 @@ import OptimoveCore
             let configurationRepository = ConfigurationRepositoryImpl(
                 storage: storage
             )
-            let optitrack = try configurationRepository.getConfiguration().optitrack
+            let configuration = try configurationRepository.getConfiguration()
             try handleNotification(
                 payload: payload,
                 networking: OptistreamNetworkingImpl(
                     networkClient: NetworkClientImpl(),
-                    configuration: optitrack
+                    configuration: configuration.optitrack
                 ),
                 builder: OptistreamEventBuilder(
-                    configuration: optitrack,
-                    storage: storage
+                    configuration: configuration.optitrack,
+                    storage: storage,
+                    airshipService: AirshipService(
+                        storage: storage,
+                        configuration: configuration
+                    )
                 ),
                 bestAttemptContent: bestAttemptContent,
                 contentHandler: contentHandler

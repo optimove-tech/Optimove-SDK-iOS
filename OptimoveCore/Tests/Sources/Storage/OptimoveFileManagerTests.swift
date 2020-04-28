@@ -51,22 +51,22 @@ class OptimoveFileManagerTests: XCTestCase {
         XCTAssert(fileStorage.isExist(fileName: fileName, shared: shared))
     }
 
-    func test_load_data_shared() {
-        load_data(shared: true)
+    func test_load_data_shared() throws {
+        try load_data(shared: true)
     }
 
-    func test_load_data_no_shared() {
-        load_data(shared: false)
+    func test_load_data_no_shared() throws {
+        try load_data(shared: false)
     }
 
-    func load_data(shared: Bool) {
+    func load_data(shared: Bool) throws {
         // given
         save_encodable(shared: shared)
 
         // then
-        XCTAssertNoThrow(try fileStorage.load(fileName: fileName, shared: shared))
-        let data = try! fileStorage.load(fileName: fileName, shared: shared)
-        XCTAssertNoThrow(try JSONDecoder().decode(StubCodable.self, from: data))
+        XCTAssertNotNil(try fileStorage.loadData(fileName: fileName, shared: shared))
+        let stub: StubCodable = try fileStorage.load(fileName: fileName, shared: shared)
+        XCTAssertNotNil(stub)
     }
 
     func test_delete_shared() {

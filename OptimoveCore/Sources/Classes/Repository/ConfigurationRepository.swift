@@ -43,8 +43,8 @@ public final class ConfigurationRepositoryImpl {
 extension ConfigurationRepositoryImpl: ConfigurationRepository {
 
     public func getConfiguration() throws -> Configuration {
-        let data = try storage.load(fileName: Constants.Configuration.fileName, shared: Constants.Configuration.sharedStorage)
-        return try JSONDecoder().decode(Configuration.self, from: data)
+        return try storage.load(fileName: Constants.Configuration.fileName,
+                                shared: Constants.Configuration.sharedStorage)
     }
 
     public func setConfiguration(_ config: Configuration) throws {
@@ -53,8 +53,7 @@ extension ConfigurationRepositoryImpl: ConfigurationRepository {
     }
 
     public func getGlobal() throws -> GlobalConfig {
-        let data = try storage.load(fileName: Constants.Global.fileName, shared: Constants.Global.sharedStorage)
-        return try JSONDecoder().decode(GlobalConfig.self, from: data)
+        return try storage.load(fileName: Constants.Global.fileName, shared: Constants.Global.sharedStorage)
     }
 
     public func saveGlobal(_ config: GlobalConfig) throws {
@@ -66,8 +65,7 @@ extension ConfigurationRepositoryImpl: ConfigurationRepository {
     public func getTenant() throws -> TenantConfig {
         let version = try storage.getVersion()
         let fileName = version + Constants.fileExtension
-        let data = try storage.load(fileName: fileName, shared: Constants.Tenant.sharedStorage)
-        return try JSONDecoder().decode(TenantConfig.self, from: data)
+        return try storage.load(fileName: fileName, shared: Constants.Tenant.sharedStorage)
     }
 
     public func saveTenant(_ config: TenantConfig) throws {

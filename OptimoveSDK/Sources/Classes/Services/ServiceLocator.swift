@@ -101,9 +101,13 @@ final class ServiceLocator {
 
     func initializer() -> SDKInitializer {
         return SDKInitializer(
-            storage: storage(),
             componentFactory: componentFactory(),
-            chainMutator: _synchronizer
+            chainMutator: _synchronizer,
+            dependencies: [
+                OptimoveStrorageSDKInitializerDependency(storage: storage()),
+                MultiplexLoggerStreamSDKInitializerDependency(),
+                AirshipServiceSDKInitializerDependency(storage: storage())
+            ]
         )
     }
 

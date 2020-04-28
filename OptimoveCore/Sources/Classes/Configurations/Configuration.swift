@@ -8,18 +8,21 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
     public let optitrack: OptitrackConfig
     public let optipush: OptipushConfig
     public let events: [String: EventsConfig]
+    public let isSupportedAirship: Bool?
 
     public init(
         tenantID: Int,
         logger: LoggerConfig,
         optitrack: OptitrackConfig,
         optipush: OptipushConfig,
-        events: [String: EventsConfig]) {
+        events: [String: EventsConfig],
+        isSupportedAirship: Bool?) {
         self.tenantID = tenantID
         self.logger = logger
         self.optitrack = optitrack
         self.optipush = optipush
         self.events = events
+        self.isSupportedAirship = isSupportedAirship
     }
 }
 

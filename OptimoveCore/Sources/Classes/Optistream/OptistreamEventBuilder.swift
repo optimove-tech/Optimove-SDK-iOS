@@ -12,6 +12,7 @@ public final class OptistreamEventBuilder {
             static let appVersion = "app_version"
             static let osVersion = "os_version"
             static let deviceModel = "device_model"
+            static let channel = "channel"
         }
         struct Values {
             static let origin = "sdk"
@@ -21,13 +22,16 @@ public final class OptistreamEventBuilder {
 
     private let configuration: OptitrackConfig
     private let storage: OptimoveStorage
+    private let airshipService: AirshipService
 
     public init(
         configuration: OptitrackConfig,
-        storage: OptimoveStorage
+        storage: OptimoveStorage,
+        airshipService: AirshipService
     ) {
         self.configuration = configuration
         self.storage = storage
+        self.airshipService = airshipService
     }
 
     public func build(event: Event) throws -> OptistreamEvent {
@@ -41,14 +45,26 @@ public final class OptistreamEventBuilder {
             visitor: try storage.getVisitorID(),
             timestamp: Formatter.iso8601withFractionalSeconds.string(from: event.timestamp),
             context: try JSON(event.context),
-            metadata: try JSON([
-                Constants.Keys.platform: Constants.Values.platform,
-                Constants.Keys.version: SDKVersion,
-                Constants.Keys.appVersion: Bundle.main.appVersion,
-                Constants.Keys.osVersion: ProcessInfo.processInfo.osVersion,
-                Constants.Keys.deviceModel: utsname().deviceModel
-            ])
+            metadata: try buildMetadata()
         )
+    }
+
+    private func buildMetadata() throws -> JSON {
+        var metadata = try JSON([
+            Constants.Keys.platform: Constants.Values.platform,
+            Constants.Keys.version: SDKVersion,
+            Constants.Keys.appVersion: Bundle.main.appVersion,
+            Constants.Keys.osVersion: ProcessInfo.processInfo.osVersion,
+            Constants.Keys.deviceModel: utsname().deviceModel
+        ])
+        if let airship = try? airshipService.loadAirshipIntegration() {
+            metadata = metadata.merging(
+                with: JSON.init(
+                    dictionaryLiteral: (Constants.Keys.channel, try JSON.init(encodable: airship))
+                )
+            )
+        }
+        return metadata
     }
 
 }

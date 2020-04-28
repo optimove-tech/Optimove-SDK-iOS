@@ -27,8 +27,7 @@ final class OptistreamQueueImpl {
     private func loadEventFromStorageToMemory() -> [OptistreamEvent] {
         guard storage.isExist(fileName: Constants.queuePersistanceFileName, shared: false) else { return [] }
         do {
-            let data = try storage.load(fileName: Constants.queuePersistanceFileName, shared: false)
-            return try JSONSerialization.jsonObject(with: data, options: []) as? [OptistreamEvent] ?? []
+            return try storage.load(fileName: Constants.queuePersistanceFileName, shared: false)
         } catch {
             Logger.error(error.localizedDescription)
             return []
