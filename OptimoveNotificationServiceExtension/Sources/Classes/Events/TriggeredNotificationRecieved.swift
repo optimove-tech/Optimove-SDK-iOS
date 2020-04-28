@@ -30,12 +30,12 @@ final class TriggeredNotificationRecieved: Event {
 
     init(bundleId: String,
          campaign: TriggeredNotificationCampaign,
-         timestamp: Int) {
+         timestamp: Date) {
         super.init(
             name: Constants.name,
             category: "optipush",
             context: [
-                Constants.Key.timestamp: timestamp,
+                Constants.Key.timestamp: timestamp.timeIntervalSince1970.seconds,
                 Constants.Key.appNS: bundleId,
                 Constants.Key.actionID: campaign.actionID,
                 Constants.Key.actionSerial: campaign.actionSerial,

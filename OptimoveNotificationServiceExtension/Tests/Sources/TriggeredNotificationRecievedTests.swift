@@ -10,7 +10,7 @@ class TriggeredNotificationRecievedTests: XCTestCase {
         let actionSerial = Int.random(in: 10...1_000)
         let actionID = Int.random(in: 10...1_000)
         let templateID = Int.random(in: 10...1_000)
-        let timestamp = Date().timeIntervalSince1970
+        let timestamp = Date()
         let bundleIdentifier = "BundleIdentifier"
 
         let event = TriggeredNotificationRecieved(
@@ -21,14 +21,14 @@ class TriggeredNotificationRecievedTests: XCTestCase {
                 templateID: templateID,
                 engagementID: 1_234
             ),
-            timestamp: Int(timestamp)
+            timestamp: timestamp
         )
 
         XCTAssertEqual(TriggeredNotificationRecieved.Constants.name, event.name)
         XCTAssertEqual(actionSerial, event.context[TriggeredNotificationRecieved.Constants.Key.actionSerial] as? Int)
         XCTAssertEqual(actionID, event.context[TriggeredNotificationRecieved.Constants.Key.actionID] as? Int)
         XCTAssertEqual(templateID, event.context[TriggeredNotificationRecieved.Constants.Key.templateID] as? Int)
-        XCTAssertEqual(Int(timestamp), event.context[TriggeredNotificationRecieved.Constants.Key.timestamp] as? Int)
+        XCTAssertEqual(timestamp.timeIntervalSince1970.seconds, event.context[TriggeredNotificationRecieved.Constants.Key.timestamp] as? Int)
         XCTAssertEqual(bundleIdentifier, event.context[TriggeredNotificationRecieved.Constants.Key.appNS] as? String)
         XCTAssertEqual(TriggeredNotificationRecieved.Constants.Value.deviceType, event.context[TriggeredNotificationRecieved.Constants.Key.eventDeviceType] as? String)
         XCTAssertEqual(TriggeredNotificationRecieved.Constants.Value.nativeMobile, event.context[TriggeredNotificationRecieved.Constants.Key.eventNativeMobile] as? Bool)

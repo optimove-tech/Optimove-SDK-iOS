@@ -1,5 +1,7 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
+import Foundation
+
 /// Builds an Optistream event from internal event type.
 public final class OptistreamEventBuilder {
 
@@ -35,7 +37,7 @@ public final class OptistreamEventBuilder {
             origin: Constants.Values.origin,
             customer: storage.customerID,
             visitor: try storage.getVisitorID(),
-            timestamp: event.timestamp,
+            timestamp: Formatter.iso8601withFractionalSeconds.string(from: event.timestamp),
             context: try JSON(event.context),
             metadata: try JSON([
                 Constants.Keys.platform: Constants.Values.platform,

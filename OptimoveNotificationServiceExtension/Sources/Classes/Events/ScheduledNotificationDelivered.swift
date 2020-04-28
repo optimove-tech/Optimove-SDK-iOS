@@ -30,12 +30,12 @@ final class ScheduledNotificationDelivered: Event {
 
     init(bundleId: String,
          campaign: ScheduledNotificationCampaign,
-         timestamp: Int) {
+         timestamp: Date) {
         super.init(
             name: Constants.name,
             category: "optipush",
             context: [
-                Constants.Key.timestamp: timestamp,
+                Constants.Key.timestamp: timestamp.timeIntervalSince1970.seconds,
                 Constants.Key.appNS: bundleId,
                 Constants.Key.campaignID: campaign.campaignID,
                 Constants.Key.actionSerial: campaign.actionSerial,

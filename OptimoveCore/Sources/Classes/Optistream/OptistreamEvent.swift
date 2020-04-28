@@ -10,7 +10,7 @@ public struct OptistreamEvent: Codable {
     public let origin: String
     public let customer: String?
     public let visitor: String
-    public let timestamp: Int
+    public let timestamp: String // iso8601
     public let context: JSON
     public let metadata: JSON
 
@@ -22,7 +22,7 @@ public struct OptistreamEvent: Codable {
         origin: String,
         customer: String?,
         visitor: String,
-        timestamp: Int,
+        timestamp: String,
         context: JSON,
         metadata: JSON
     ) {

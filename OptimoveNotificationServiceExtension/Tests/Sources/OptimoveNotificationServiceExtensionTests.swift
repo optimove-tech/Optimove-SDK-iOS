@@ -44,7 +44,7 @@ class OptimoveNotificationServiceExtensionTests: OptimoveTestCase, FileAccessibl
     func even_notification_received_sent(assert: @escaping (OptistreamEvent) -> Void) throws {
         // given
         // fetch payload from a JSON
-        let payload = try! JSONDecoder().decode(NotificationPayload.self, from: data)
+        let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
 
         // and
         // create best attempt content
@@ -83,7 +83,7 @@ class OptimoveNotificationServiceExtensionTests: OptimoveTestCase, FileAccessibl
             bestAttemptContent: bestAttemptContent!,
             contentHandler: contentHandler
         )
-        wait(for: [contentHandlerExpectation, optitrackExpectation], timeout: 1)
+        wait(for: [contentHandlerExpectation, optitrackExpectation], timeout: 40)
     }
 
 }

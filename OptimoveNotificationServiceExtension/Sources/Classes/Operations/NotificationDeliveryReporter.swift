@@ -24,7 +24,7 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
     override func main() {
         state = .executing
         do {
-            let timestamp = Date().timeIntervalSince1970.seconds
+            let timestamp = Date()
             switch notificationPayload.campaign {
             case let campaign as ScheduledNotificationCampaign:
                 try report(

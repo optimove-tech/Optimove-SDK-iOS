@@ -12,7 +12,7 @@ open class Event {
     public let name: String
     public let category: String
     public let context: [String: Any]
-    public let timestamp: Int
+    public let timestamp: Date
     public let isRealtime: Bool
 
     public init(
@@ -20,7 +20,7 @@ open class Event {
         name: String,
         category: String = Constants.category,
         context: [String: Any],
-        timestamp: Int = Date().timeIntervalSince1970.seconds,
+        timestamp: Date = Date(),
         isRealtime: Bool = false) {
         self.uuid = uuid
         self.name = name
