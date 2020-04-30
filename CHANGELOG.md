@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.13.0
+
+- **add** a support of the new Optistream events.
+- **remove** the Matomo SDK dependency.
+
 ## 2.12.1
 
 - **fix** calling UIKit method in the Main thread.
