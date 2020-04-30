@@ -79,7 +79,7 @@ class OptimoveNotificationServiceExtensionTests: OptimoveTestCase, FileAccessibl
             builder: OptistreamEventBuilder(
                 configuration: ConfigurationFixture.build().optitrack,
                 storage: storage,
-                airshipService: AirshipService(
+                airshipIntegration: OptimoveAirshipIntegration(
                     storage: storage,
                     configuration: ConfigurationFixture.build()
                 )

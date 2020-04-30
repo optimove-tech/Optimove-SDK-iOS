@@ -20,7 +20,8 @@ final class OptInOutObserverTests: OptimoveTestCase {
                 dateTimeProvider: MockDateTimeProvider(),
                 locationService: MockLocationService()
             ),
-            storage: storage
+            storage: storage,
+            subscribers: []
         )
         observer = OptInOutObserver(
             optInService: optInService,
