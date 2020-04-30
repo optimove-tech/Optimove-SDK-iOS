@@ -70,7 +70,7 @@ import OptimoveCore
                 builder: OptistreamEventBuilder(
                     configuration: configuration.optitrack,
                     storage: storage,
-                    airshipService: AirshipService(
+                    airshipIntegration: OptimoveAirshipIntegration(
                         storage: storage,
                         configuration: configuration
                     )

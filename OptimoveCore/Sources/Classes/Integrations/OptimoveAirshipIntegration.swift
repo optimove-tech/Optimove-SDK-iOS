@@ -2,14 +2,14 @@
 
 import Foundation
 
-public struct AirshipService {
+public struct OptimoveAirshipIntegration {
 
     struct Constants {
         static let airshipFile = "airship_file.json"
         static let isShared = false
     }
 
-    public struct AirshipIntegration: Codable {
+    public struct Airship: Codable {
         let channelId: String
         let appKey: String
     }
@@ -29,13 +29,14 @@ public struct AirshipService {
         }
         guard let channelId = secretChannelIdentifier(),
             let appKey = secretAppKey() else { return }
-        try storage.save(data: AirshipIntegration(channelId: channelId, appKey: appKey),
+        try storage.save(data: Airship(channelId: channelId, appKey: appKey),
                          toFileName: Constants.airshipFile,
                          shared: Constants.isShared)
     }
 
-    public func loadAirshipIntegration() throws -> AirshipIntegration {
-        guard configuration.isSupportedAirship ?? false else {
+    public func loadAirshipIntegration() throws -> Airship {
+        guard configuration.isSupportedAirship ?? false,
+            storage.isExist(fileName: Constants.airshipFile, shared: Constants.isShared) else {
             throw GuardError.custom("Airship integration does not supported")
         }
         return try storage.load(fileName: Constants.airshipFile, shared: Constants.isShared)

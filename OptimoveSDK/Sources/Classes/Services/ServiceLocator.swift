@@ -135,7 +135,13 @@ final class ServiceLocator {
         return OptInService(
             synchronizer: synchronizer(),
             coreEventFactory: coreEventFactory(),
-            storage: storage()
+            storage: storage(),
+            subscribers: [
+                AirshipIntegrationOptInSubscriber(
+                    storage: storage(),
+                    configurationRepository: configurationRepository()
+                )
+            ]
         )
     }
 

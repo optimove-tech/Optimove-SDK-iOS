@@ -99,7 +99,7 @@ final class AirshipServiceSDKInitializerDependency: SDKInitializerDependency {
 
     func onConfigurationFetch(_ configuration: Configuration) {
         tryCatch {
-            try AirshipService(storage: storage, configuration: configuration).obtain()
+            try OptimoveAirshipIntegration(storage: storage, configuration: configuration).obtain()
         }
     }
 }

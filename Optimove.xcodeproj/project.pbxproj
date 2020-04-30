@@ -63,6 +63,7 @@
 		34F891B25C0607047E535D8D /* PageVisitEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8411A92C5ADEF8363F217CD /* PageVisitEventTests.swift */; };
 		36D0BE577A817ED7B5076112 /* GlobalConfigFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558B0FF7FB691AD7EF1BC356 /* GlobalConfigFixture.swift */; };
 		370BDBC6F608BEE16E9B7439 /* StubVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2A46DD2F42545E3AD9B152 /* StubVariables.swift */; };
+		3999235100145AE553898385 /* OptimoveAirshipIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645827DC38A5B11688962537 /* OptimoveAirshipIntegration.swift */; };
 		3A758813E0D3A1DFD74286FB /* OptimoveFileManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F0DCFD3F00AA505DC781F4 /* OptimoveFileManagerTests.swift */; };
 		3B92DE47BF4898E25F51F918 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A506CE7C768F77DF1C031E7D /* Environment.swift */; };
 		3F44720B367301EC17CC321B /* RuntimeCodingKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26931EEB560FA3B43177A022 /* RuntimeCodingKey.swift */; };
@@ -272,7 +273,6 @@
 		EFF46260ABABD75A9ED21D09 /* TenantConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABF630842AEE0342583B677 /* TenantConfig.swift */; };
 		F10384A2967EBD8705F3DD77 /* OptimoveNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3254240E2ED942F17B69FF7A /* OptimoveNotificationHandler.swift */; };
 		F20E19FEEEF9B200E5321625 /* MetaDataEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8CF0105BA68C767A4105F8B /* MetaDataEvent.swift */; };
-		F22D067DDADB1BBC3640EBA9 /* AirshipService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2FEC36E0A54A4A016FE695 /* AirshipService.swift */; };
 		F366378361753D8AC34D9449 /* ConfigurationFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4268499EEA7348C481371C /* ConfigurationFixture.swift */; };
 		F3D39729FD0DF7010B59799A /* OptimoveEvent+Decorator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873554066577D3A90F107D14 /* OptimoveEvent+Decorator.swift */; };
 		F4463BD44A499220DDE80852 /* SetUserIdEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79935407BEFEEDD1A3D2B0A9 /* SetUserIdEvent.swift */; };
@@ -451,6 +451,7 @@
 		60C210C2DB4BC192D8BD85E1 /* MergeRemoteConfigurationOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeRemoteConfigurationOperation.swift; sourceTree = "<group>"; };
 		615F8FAE93C5D0A6AC301070 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		63C7EC2263685823B37EC99A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		645827DC38A5B11688962537 /* OptimoveAirshipIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveAirshipIntegration.swift; sourceTree = "<group>"; };
 		64AAD2B0BFFF64DCB3907ECE /* OptimoveCore-Unit.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "OptimoveCore-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65CA140085BC23AFEE47F451 /* Dictionary+CompactMapKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+CompactMapKeys.swift"; sourceTree = "<group>"; };
 		668AE72BEF6D9E3FC0E0BBC5 /* OptistreamQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamQueue.swift; sourceTree = "<group>"; };
@@ -598,7 +599,6 @@
 		ECFE1A26CB2C36CBBE414871 /* OperationFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperationFactory.swift; sourceTree = "<group>"; };
 		EDEDE4BE8CAAD487F2893395 /* TimeInterval+Seconds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Seconds.swift"; sourceTree = "<group>"; };
 		EE2A46DD2F42545E3AD9B152 /* StubVariables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubVariables.swift; sourceTree = "<group>"; };
-		EE2FEC36E0A54A4A016FE695 /* AirshipService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirshipService.swift; sourceTree = "<group>"; };
 		EECA51F0B0A4A890AD8AC1B7 /* OptimoveEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveEvent.swift; sourceTree = "<group>"; };
 		EF827CC59D9B56C6588A4C57 /* OptEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptEvent.swift; sourceTree = "<group>"; };
 		F08A0D27C5C445E0BB3E46F9 /* SetUserEmailEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetUserEmailEvent.swift; sourceTree = "<group>"; };
@@ -1419,13 +1419,13 @@
 			isa = PBXGroup;
 			children = (
 				325B5F8B3BDBB034C3516AAB /* .gitkeep */,
-				EE2FEC36E0A54A4A016FE695 /* AirshipService.swift */,
 				517F8BBB89498042BB4C4B44 /* Coding */,
 				9D17BEB9C45081815BEF5D44 /* Configurations */,
 				58B14FCC5250E2BB06BF4C64 /* Constants */,
 				C3F03E5274C14B699912BF84 /* Events */,
 				397BA35C85B5B3A82E6E7611 /* Extension */,
 				7662316982793EED67541C0F /* GlobalScope */,
+				CC9A34E5F2FD33D559A69941 /* Integrations */,
 				6F6FFC9B91E6C9D52749E6A7 /* JSON */,
 				79FDF8132462002D922A9465 /* Logger */,
 				DB1649375EE0F07134ABB0B1 /* NetworkClient */,
@@ -1614,6 +1614,14 @@
 			path = OptimoveNotificationServiceExtension;
 			sourceTree = "<group>";
 		};
+		CC9A34E5F2FD33D559A69941 /* Integrations */ = {
+			isa = PBXGroup;
+			children = (
+				645827DC38A5B11688962537 /* OptimoveAirshipIntegration.swift */,
+			);
+			path = Integrations;
+			sourceTree = "<group>";
+		};
 		D85980716F84947A9D9B2474 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
@@ -1787,21 +1795,21 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		"TEMP_0A4196F4-3AD2-4629-ADA5-F6C9A445981C" /* Tests */ = {
+		"TEMP_06505716-82D9-4466-B0B5-55E6BBCFCD6F" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_74C99AE5-68F9-479A-8632-30C74FD39ADC" /* Tests */ = {
+		"TEMP_4836250D-18BD-4467-8976-9223DCDD894B" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_E6E5F2FC-4852-4AA7-94E6-06F0B82B1F02" /* Tests */ = {
+		"TEMP_91251D23-D2A4-4AFA-8390-145C11A0C318" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -2221,7 +2229,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F22D067DDADB1BBC3640EBA9 /* AirshipService.swift in Sources */,
 				7EE04A5EE212B2BC27F2C27F /* AsyncOperation.swift in Sources */,
 				7AE7A3860389CA7E12F38A22 /* Bundle+AppVersion.swift in Sources */,
 				7A0EA2106501AF83CA31D429 /* Bundle+HostApp.swift in Sources */,
@@ -2253,6 +2260,7 @@
 				FF21D2585D696E2119159E34 /* NetworkResult.swift in Sources */,
 				DC69391AA182CA1A728D65FF /* NotificationKey.swift in Sources */,
 				5F119B4AEB28CE16E8700C14 /* NotificationPayload.swift in Sources */,
+				3999235100145AE553898385 /* OptimoveAirshipIntegration.swift in Sources */,
 				B94DA5A8ADAB6D528DC185D8 /* OptipushMetaData.swift in Sources */,
 				BBE68E031DE089BC52731ED4 /* OptistreamEvent.swift in Sources */,
 				5518455C199FC2B155304797 /* OptistreamEventBuilder.swift in Sources */,

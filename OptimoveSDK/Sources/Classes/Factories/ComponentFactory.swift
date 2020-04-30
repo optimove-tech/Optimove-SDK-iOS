@@ -28,7 +28,7 @@ final class ComponentFactory {
             optirstreamEventBuilder: OptistreamEventBuilder(
                 configuration: configuration.optitrack,
                 storage: serviceLocator.storage(),
-                airshipService: AirshipService(
+                airshipIntegration: OptimoveAirshipIntegration(
                     storage: serviceLocator.storage(),
                     configuration: configuration
                 )
