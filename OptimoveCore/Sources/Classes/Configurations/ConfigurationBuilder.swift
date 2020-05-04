@@ -26,6 +26,7 @@ public final class ConfigurationBuilder {
             optitrack: buildOptitrackConfig(),
             optipush: buildOptipushConfig(),
             events: events,
+            isEnableRealtime: tenantConfig.isEnableRealtime,
             isSupportedAirship: tenantConfig.isSupportedAirship
         )
     }
@@ -46,7 +47,8 @@ private extension ConfigurationBuilder {
             tenantID: tenantConfig.optitrack.siteId,
             realtimeToken: tenantConfig.realtime.realtimeToken,
             realtimeGateway: tenantConfig.realtime.realtimeGateway,
-            events: events
+            events: events,
+            isEnableRealtimeThroughOptistream: tenantConfig.isEnableRealtimeThroughOptistream
         )
     }
 
@@ -57,7 +59,8 @@ private extension ConfigurationBuilder {
             enableAdvertisingIdReport: tenantConfig.optipush.enableAdvertisingIdReport,
             eventCategoryName: globalConfig.optitrack.eventCategoryName,
             customDimensionIDS: globalConfig.optitrack.customDimensionIDs,
-            events: events
+            events: events,
+            isEnableRealtimeThroughOptistream: tenantConfig.isEnableRealtimeThroughOptistream
         )
     }
 

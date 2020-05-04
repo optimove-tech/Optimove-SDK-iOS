@@ -28,9 +28,11 @@ final class OptiTrack {
     private var dispatchTimer: Timer?
     private let dispatchQueue = DispatchQueue(label: Constants.queueLabel)
 
-    init(queue: OptistreamQueue,
-         optirstreamEventBuilder: OptistreamEventBuilder,
-         networking: OptistreamNetworking) {
+    init(
+        queue: OptistreamQueue,
+        optirstreamEventBuilder: OptistreamEventBuilder,
+        networking: OptistreamNetworking
+    ) {
         self.queue = queue
         self.optirstreamEventBuilder = optirstreamEventBuilder
         self.networking = networking

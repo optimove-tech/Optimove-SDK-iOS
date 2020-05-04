@@ -42,13 +42,19 @@ private extension SDKInitializer {
         // 3 responder
         let decorator = ParametersDecorator(configuration: configuration)
 
+        var components: [Component] = [
+            componentFactory.createOptitrackComponent(configuration: configuration),
+            componentFactory.createOptipushComponent(configuration: configuration)
+        ]
+        if configuration.isEnableRealtime {
+            components.append(
+                componentFactory.createRealtimeComponent(configuration: configuration)
+            )
+        }
+
         // 4 responder
         let componentHanlder = ComponentHandler(
-            components: [
-                componentFactory.createOptitrackComponent(configuration: configuration),
-                componentFactory.createRealtimeComponent(configuration: configuration),
-                componentFactory.createOptipushComponent(configuration: configuration)
-            ]
+            components: components
         )
 
         decorator.next = componentHanlder

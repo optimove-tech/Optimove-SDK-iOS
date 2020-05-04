@@ -45,7 +45,7 @@ extension RealTime: Component {
     func handle(_ context: Operation) throws {
         switch context {
         case let .report(event: event):
-            guard isAllowedEvent(event) else { break }
+            guard isAllowToUseRealtimeInsteadOfOptistream(), isAllowedEvent(event) else { break }
             try reportEvent(event: event, retryFailedEvents: true)
         default:
             break
@@ -54,6 +54,10 @@ extension RealTime: Component {
 }
 
 extension RealTime {
+
+    func isAllowToUseRealtimeInsteadOfOptistream() -> Bool {
+        return !(configuration.isEnableRealtimeThroughOptistream ?? false)
+    }
 
     func isAllowedEvent(_ event: Event) -> Bool {
         let now = Date().timeIntervalSince1970

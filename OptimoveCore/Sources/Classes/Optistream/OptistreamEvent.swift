@@ -26,6 +26,7 @@ public struct OptistreamEvent: Codable {
         let osVersion: String
         let deviceModel: String
         let channel: Channel?
+        let realtime: Bool?
 
         enum CodingKeys: String, CodingKey {
             case platform = "sdk_platform"
@@ -33,7 +34,8 @@ public struct OptistreamEvent: Codable {
             case appVersion = "app_version"
             case osVersion = "os_version"
             case deviceModel = "device_model"
-            case channel = "channel"
+            case channel
+            case realtime
         }
 
     }

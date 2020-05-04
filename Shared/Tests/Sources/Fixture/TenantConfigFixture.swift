@@ -11,7 +11,9 @@ final class TenantConfigFixture {
             optitrack: tenantOptitrackConfigFixture(),
             optipush: tenantOptipushConfigFixture(),
             events: createTenantEventFixture(),
-            isSupportedAirship: nil
+            isEnableRealtime: true,
+            isSupportedAirship: nil,
+            isEnableRealtimeThroughOptistream: true
         )
     }
 

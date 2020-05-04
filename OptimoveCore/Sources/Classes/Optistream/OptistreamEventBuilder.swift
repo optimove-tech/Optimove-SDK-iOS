@@ -27,6 +27,10 @@ public final class OptistreamEventBuilder {
     }
 
     public func build(event: Event) throws -> OptistreamEvent {
+        let realtime: Bool? = {
+            guard configuration.isEnableRealtimeThroughOptistream == true else { return nil }
+            return event.isRealtime
+        }()
         return OptistreamEvent(
             uuid: event.uuid,
             tenant: configuration.tenantID,
@@ -45,7 +49,8 @@ public final class OptistreamEventBuilder {
                 deviceModel: utsname().deviceModel,
                 channel: OptistreamEvent.Metadata.Channel(
                     airship: try? airshipIntegration.loadAirshipIntegration()
-                )
+                ),
+                realtime: realtime
             )
         )
     }
