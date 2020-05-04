@@ -46,6 +46,7 @@ private extension SDKInitializer {
         let componentHanlder = ComponentHandler(
             components: [
                 componentFactory.createOptitrackComponent(configuration: configuration),
+                componentFactory.createRealtimeComponent(configuration: configuration),
                 componentFactory.createOptipushComponent(configuration: configuration)
             ]
         )
