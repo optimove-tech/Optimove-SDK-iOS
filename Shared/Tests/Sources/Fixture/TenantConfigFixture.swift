@@ -9,7 +9,8 @@ final class TenantConfigFixture {
         return TenantConfig(
             optitrack: tenantOptitrackConfigFixture(),
             optipush: tenantOptipushConfigFixture(),
-            events: createTenantEventFixture()
+            events: createTenantEventFixture(),
+            isSupportedAirship: nil
         )
     }
 

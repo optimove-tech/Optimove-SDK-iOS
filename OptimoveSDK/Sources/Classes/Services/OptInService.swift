@@ -8,20 +8,34 @@ final class OptInService {
     private let synchronizer: Synchronizer
     private var storage: OptimoveStorage
     private let coreEventFactory: CoreEventFactory
+    private var subscribers: [OptInOutSubscriber]
 
     init(synchronizer: Synchronizer,
          coreEventFactory: CoreEventFactory,
-         storage: OptimoveStorage) {
+         storage: OptimoveStorage,
+         subscribers: [OptInOutSubscriber]) {
         self.synchronizer = synchronizer
         self.coreEventFactory = coreEventFactory
         self.storage = storage
+        self.subscribers = subscribers
+    }
+
+    func didPushAuthorization(isGranted: Bool) throws {
+        let status: OptStatus = isGranted ? .optIn : .optOut
+        try didPushAuthorization(status: status)
     }
 
     /// Handle changing of UserNotificaiont authorization status.
-    func didPushAuthorization(isGranted granted: Bool) throws {
-        requestTokenIfNeeded(pushAuthorizationGranted: granted)
-        guard isOptStateChanged(with: granted) else { return }
-        granted ? try executeOptIn() : try executeOptOut()
+    func didPushAuthorization(status: OptStatus) throws {
+        requestTokenIfNeeded(status: status)
+        guard isOptStateChanged(status: status) else { return }
+        subscribers.forEach({ $0.statusChanged(status: status)})
+        switch status {
+        case .optIn:
+            try executeOptIn()
+        case .optOut:
+            try executeOptOut()
+        }
     }
 
 }
@@ -29,8 +43,8 @@ final class OptInService {
 private extension OptInService {
 
     /// Check if an OptIn/OptOut state was changed, or do nothing.
-    func isOptStateChanged(with newState: Bool) -> Bool {
-        return newState != storage.optFlag
+    func isOptStateChanged(status: OptStatus) -> Bool {
+        return (status == .optIn) != storage.optFlag
     }
 
     func executeOptIn() throws {
@@ -51,11 +65,33 @@ private extension OptInService {
         synchronizer.handle(.optOut)
     }
 
-    func requestTokenIfNeeded(pushAuthorizationGranted: Bool) {
-        guard pushAuthorizationGranted, storage.apnsToken == nil else { return }
+    func requestTokenIfNeeded(status: OptStatus) {
+        guard status == .optIn, storage.apnsToken == nil else { return }
         DispatchQueue.main.async {
             UIApplication.shared.registerForRemoteNotifications()
         }
+    }
+
+}
+
+protocol OptInOutSubscriber {
+    func statusChanged(status: OptStatus)
+}
+
+final class AirshipIntegrationOptInSubscriber: OptInOutSubscriber {
+
+    private let storage: OptimoveStorage
+    private let configurationRepository: ConfigurationRepository
+
+    init(storage: OptimoveStorage,
+         configurationRepository: ConfigurationRepository) {
+        self.storage = storage
+        self.configurationRepository = configurationRepository
+    }
+
+    func statusChanged(status: OptStatus) {
+        guard status == .optIn, let configuration = try? configurationRepository.getConfiguration() else { return }
+        try? OptimoveAirshipIntegration(storage: storage, configuration: configuration).obtain()
     }
 
 }

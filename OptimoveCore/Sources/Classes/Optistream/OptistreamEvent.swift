@@ -12,7 +12,31 @@ public struct OptistreamEvent: Codable {
     public let visitor: String
     public let timestamp: String // iso8601
     public let context: JSON
-    public let metadata: JSON
+    public let metadata: Metadata
+
+    public struct Metadata: Codable {
+
+        public struct Channel: Codable {
+            public let airship: OptimoveAirshipIntegration.Airship?
+        }
+
+        let platform: String
+        let version: String
+        let appVersion: String
+        let osVersion: String
+        let deviceModel: String
+        let channel: Channel?
+
+        enum CodingKeys: String, CodingKey {
+            case platform = "sdk_platform"
+            case version = "sdk_version"
+            case appVersion = "app_version"
+            case osVersion = "os_version"
+            case deviceModel = "device_model"
+            case channel = "channel"
+        }
+
+    }
 
     public init(
         uuid: String,
@@ -24,7 +48,7 @@ public struct OptistreamEvent: Codable {
         visitor: String,
         timestamp: String,
         context: JSON,
-        metadata: JSON
+        metadata: Metadata
     ) {
         self.uuid = uuid
         self.tenant = tenant

@@ -204,7 +204,7 @@ extension StorageFacade {
         return fileStorage.isExist(fileName: fileName, shared: shared)
     }
 
-    public func save<T: Encodable>(data: T, toFileName: String, shared: Bool) throws {
+    public func save<T: Codable>(data: T, toFileName: String, shared: Bool) throws {
         try fileStorage.save(data: data, toFileName: toFileName, shared: shared)
     }
 
@@ -212,8 +212,12 @@ extension StorageFacade {
         try fileStorage.saveData(data: data, toFileName: toFileName, shared: shared)
     }
 
-    public func load(fileName: String, shared: Bool) throws -> Data {
+    public func load<T: Codable>(fileName: String, shared: Bool) throws -> T {
         return try fileStorage.load(fileName: fileName, shared: shared)
+    }
+
+    public func loadData(fileName: String, shared: Bool) throws -> Data {
+        return try fileStorage.loadData(fileName: fileName, shared: shared)
     }
 
     public func delete(fileName: String, shared: Bool) throws {

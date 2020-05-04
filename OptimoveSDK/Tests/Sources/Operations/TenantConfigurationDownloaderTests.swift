@@ -26,7 +26,7 @@ class TenantConfigurationDownloaderTests: XCTestCase {
         )
     }
 
-    func test_fetch_global_config() {
+    func test_fetch_global_config() throws {
         let tenantToken = String.randomString(length: 10)
         storage.tenantToken = tenantToken
         let version = String.randomString(length: 10)
@@ -43,7 +43,7 @@ class TenantConfigurationDownloaderTests: XCTestCase {
                 url: expectedURL,
                 dataType: .json,
                 statusCode: 200,
-                data: [.get: try! JSONEncoder().encode(expectedConfig)]
+                data: [.get: try JSONEncoder().encode(expectedConfig)]
             )
         )
 

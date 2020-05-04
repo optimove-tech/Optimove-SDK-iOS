@@ -38,37 +38,3 @@ final class ApiPayloadBuilder {
     }
 
 }
-
-private extension Bundle {
-
-    var appVersion: String {
-        return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "undefined"
-    }
-
-}
-
-private extension utsname {
-
-    var deviceModel: String {
-        var systemInfo = self
-        uname(&systemInfo)
-        let machineMirror = Mirror(reflecting: systemInfo.machine)
-        return machineMirror.children.reduce("") { identifier, element in
-            guard let value = element.value as? Int8, value != 0 else { return identifier }
-            return identifier + String(UnicodeScalar(UInt8(value)))
-        }
-    }
-
-}
-
-private extension ProcessInfo {
-
-    var osVersion: String {
-        [
-            self.operatingSystemVersion.majorVersion,
-            self.operatingSystemVersion.minorVersion,
-            self.operatingSystemVersion.patchVersion
-        ].map { String($0) }.joined(separator: ".")
-    }
-
-}

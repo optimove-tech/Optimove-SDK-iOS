@@ -13,7 +13,7 @@ class MockKeyValueStorage: KeyValueStorage {
     }
 
     func value(for key: StorageKey) -> Any? {
-        return state[key]
+        return state[key] ?? nil
     }
 
     subscript<T>(key: StorageKey) -> T? {
@@ -34,7 +34,7 @@ class MockFileStorage: FileStorage {
         return storage[fileName] != nil
     }
 
-    func save<T>(data: T, toFileName: String, shared: Bool) throws where T: Encodable {
+    func save<T: Codable>(data: T, toFileName: String, shared: Bool) throws {
         storage[toFileName] = try JSONEncoder().encode(data)
     }
 
@@ -42,7 +42,11 @@ class MockFileStorage: FileStorage {
         storage[toFileName] = data
     }
 
-    func load(fileName: String, shared: Bool) throws -> Data {
+    func load<T: Codable>(fileName: String, shared: Bool) throws -> T {
+        return try JSONDecoder().decode(T.self, from: try unwrap(storage[fileName]))
+    }
+
+    func loadData(fileName: String, shared: Bool) throws -> Data {
         return try unwrap(storage[fileName])
     }
 

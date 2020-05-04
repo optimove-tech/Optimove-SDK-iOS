@@ -15,10 +15,10 @@ public protocol FileStorage {
     /// Save file.
     ///
     /// - Parameters:
-    ///   - data: Data object that will be saved.
+    ///   - data: `Codable` object that will be saved.
     ///   - toFileName: The file name on disk space.
     ///   - shared: set `true` if the file should be save a shared container.
-    func save<T: Encodable>(data: T, toFileName: String, shared: Bool) throws
+    func save<T: Codable>(data: T, toFileName: String, shared: Bool) throws
 
     /// Save file.
     ///
@@ -34,7 +34,15 @@ public protocol FileStorage {
     ///   - fileName: The file name on disk space.
     ///   - shared: set `true` if the requested file should be lookup in a shared container.
     /// - Returns: Return `Data` if file will be found, or `nil` if not.
-    func load(fileName: String, shared: Bool) throws -> Data
+    func loadData(fileName: String, shared: Bool) throws -> Data
+
+    /// Load file.
+    ///
+    /// - Parameters:
+    ///   - fileName: The file name on disk space.
+    ///   - shared: set `true` if the requested file should be lookup in a shared container.
+    /// - Returns: Return `Codable` if file will be found, or `nil` if not.
+    func load<T: Codable>(fileName: String, shared: Bool) throws -> T
 
     /// Delete file.
     ///
@@ -84,7 +92,7 @@ extension FileStorageImpl: FileStorage {
         return fileManager.fileExists(atPath: fileUrl.path)
     }
 
-    public func load(fileName: String, shared: Bool) throws -> Data {
+    public func loadData(fileName: String, shared: Bool) throws -> Data {
         let fileUrl = getDirectory(shared: shared).appendingPathComponent(fileName)
         do {
             let contents = try unwrap(fileManager.contents(atPath: fileUrl.path))
@@ -94,6 +102,11 @@ extension FileStorageImpl: FileStorage {
             Logger.error("Unable to load file \(fileName) at \(fileUrl.path). Reason: \(error.localizedDescription)")
             throw error
         }
+    }
+
+    public func load<T: Codable>(fileName: String, shared: Bool) throws -> T {
+        let data = try loadData(fileName: fileName, shared: shared)
+        return try JSONDecoder().decode(T.self, from: data)
     }
 
     public func save<T: Encodable>(
