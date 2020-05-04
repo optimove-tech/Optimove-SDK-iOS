@@ -11,11 +11,11 @@ enum RealTimeEventType {
 }
 
 struct RealTimeEventContext {
-    private(set) var event: OptimoveEvent
+    private(set) var event: Event
     private(set) var config: EventsConfig
     private(set) var type: RealTimeEventType
 
-    init(event: OptimoveEvent,
+    init(event: Event,
          config: EventsConfig,
          type: RealTimeEventType) {
         self.event = event

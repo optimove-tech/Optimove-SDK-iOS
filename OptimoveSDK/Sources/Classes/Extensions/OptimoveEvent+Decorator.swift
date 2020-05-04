@@ -7,16 +7,18 @@ extension Event {
 
     private struct Constants {
         struct Key {
-            static let eventDeviceType = OptimoveKeys.AdditionalAttributesKeys.eventDeviceType
-            static let eventNativeMobile = OptimoveKeys.AdditionalAttributesKeys.eventNativeMobile
-            static let eventOs = OptimoveKeys.AdditionalAttributesKeys.eventOs
-            static let eventPlatform = OptimoveKeys.AdditionalAttributesKeys.eventPlatform
+            static let eventDeviceType = "event_device_type"
+            static let eventPlatform = "event_platform"
+            static let eventOs = "event_os"
+            static let eventNativeMobile = "event_native_mobile"
         }
         struct Value {
-            static let eventDeviceType = OptimoveKeys.AddtionalAttributesValues.eventDeviceType
-            static let eventNativeMobile = OptimoveKeys.AddtionalAttributesValues.eventNativeMobile
-            static let eventOs = OptimoveKeys.AddtionalAttributesValues.eventOs
-            static let eventPlatform = OptimoveKeys.AddtionalAttributesValues.eventPlatform
+            static let eventDeviceType = "Mobile"
+            static let eventPlatform = "iOS"
+            static let eventOs = "iOS \(operatingSystemVersionOnlyString)"
+            static let eventNativeMobile = true
+            private static let operatingSystemVersionOnlyString = ProcessInfo().operatingSystemVersionOnlyString
+
         }
     }
 

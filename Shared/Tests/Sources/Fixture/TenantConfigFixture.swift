@@ -7,10 +7,18 @@ final class TenantConfigFixture {
 
     func build() -> TenantConfig {
         return TenantConfig(
+            realtime: tenantRealtimeConfigFixture(),
             optitrack: tenantOptitrackConfigFixture(),
             optipush: tenantOptipushConfigFixture(),
             events: createTenantEventFixture(),
             isSupportedAirship: nil
+        )
+    }
+
+    func tenantRealtimeConfigFixture() -> TenantRealtimeConfig {
+        return TenantRealtimeConfig(
+            realtimeToken: "realtimeToken",
+            realtimeGateway: StubVariables.url
         )
     }
 

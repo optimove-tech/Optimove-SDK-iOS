@@ -1,0 +1,13 @@
+//  Copyright © 2017 Optimove. All rights reserved.
+
+import Foundation
+// TODO: Remove it
+public struct TenantRealtimeConfig: Codable, Equatable {
+    public var realtimeToken: String
+    public var realtimeGateway: URL
+
+    public init(realtimeToken: String, realtimeGateway: URL) {
+        self.realtimeToken = realtimeToken
+        self.realtimeGateway = realtimeGateway
+    }
+}

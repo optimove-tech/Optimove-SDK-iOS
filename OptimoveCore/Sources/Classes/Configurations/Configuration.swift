@@ -5,6 +5,7 @@ import Foundation
 public struct Configuration: Codable, TenantInfo, EventInfo {
     public let tenantID: Int
     public let logger: LoggerConfig
+    public let realtime: RealtimeConfig
     public let optitrack: OptitrackConfig
     public let optipush: OptipushConfig
     public let events: [String: EventsConfig]
@@ -13,12 +14,14 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
     public init(
         tenantID: Int,
         logger: LoggerConfig,
+        realtime: RealtimeConfig,
         optitrack: OptitrackConfig,
         optipush: OptipushConfig,
         events: [String: EventsConfig],
         isSupportedAirship: Bool?) {
         self.tenantID = tenantID
         self.logger = logger
+        self.realtime = realtime
         self.optitrack = optitrack
         self.optipush = optipush
         self.events = events
@@ -35,6 +38,24 @@ public struct LoggerConfig: Codable, TenantInfo {
         logServiceEndpoint: URL) {
         self.tenantID = tenantID
         self.logServiceEndpoint = logServiceEndpoint
+    }
+}
+
+public struct RealtimeConfig: Codable, TenantInfo, EventInfo {
+    public let tenantID: Int
+    public let realtimeToken: String
+    public let realtimeGateway: URL
+    public let events: [String: EventsConfig]
+
+    public init(
+        tenantID: Int,
+        realtimeToken: String,
+        realtimeGateway: URL,
+        events: [String: EventsConfig]) {
+        self.tenantID = tenantID
+        self.realtimeToken = realtimeToken
+        self.realtimeGateway = realtimeGateway
+        self.events = events
     }
 }
 

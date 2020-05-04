@@ -42,20 +42,11 @@ final class RealTime {
 
 extension RealTime: Component {
 
-    func handle(_ context: OperationContext) throws {
-        guard isAllowedEvent(context) else { return }
-        switch context.operation {
-        case .setUserId:
-            try reportUserId()
+    func handle(_ context: Operation) throws {
+        switch context {
         case let .report(event: event):
+            guard isAllowedEvent(event) else { break }
             try reportEvent(event: event, retryFailedEvents: true)
-        case let .reportScreenEvent(title: title, category: category):
-            try coreEventFactory.createEvent(.pageVisit(title: title, category: category)) { event in
-                tryCatch { try self.reportEvent(event: event) }
-            }
-        case .dispatchNow:
-            // Consciously do nothing.
-            break
         default:
             break
         }
@@ -64,12 +55,13 @@ extension RealTime: Component {
 
 extension RealTime {
 
-    func isAllowedEvent(_ context: OperationContext) -> Bool {
+    func isAllowedEvent(_ event: Event) -> Bool {
         let now = Date().timeIntervalSince1970
-        return (now - context.timestamp) < Constatnts.timeThresholdInSeconds
+        let eventCreationTime = event.timestamp.timeIntervalSince1970
+        return (now - eventCreationTime) < Constatnts.timeThresholdInSeconds
     }
 
-    func reportEvent(event: OptimoveEvent, retryFailedEvents: Bool = true) throws {
+    func reportEvent(event: Event, retryFailedEvents: Bool = true) throws {
         let config = try event.matchConfiguration(with: configuration.events)
         guard config.supportedOnRealTime else {
             Logger.info("Realtime: Event \(event.name) is not supported.")
@@ -77,7 +69,7 @@ extension RealTime {
         }
         do {
             let context = createEventContext(
-                event: OptimoveEventDecorator(event: event, config: config),
+                event: event.decorate(config: config),
                 config: config
             )
             try report(context: context, retryFailedEvents: retryFailedEvents)
@@ -106,7 +98,7 @@ private extension RealTime {
 
     // MARK: Transforming an event
 
-    func createEventContext(event: OptimoveEvent, config: EventsConfig) -> RealTimeEventContext {
+    func createEventContext(event: Event, config: EventsConfig) -> RealTimeEventContext {
         switch event.name {
         case OptimoveKeys.Configuration.setUserId.rawValue:
             return RealTimeEventContext(

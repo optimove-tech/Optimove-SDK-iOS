@@ -22,6 +22,7 @@ public final class ConfigurationBuilder {
         return Configuration(
             tenantID: tenantConfig.optitrack.siteId,
             logger: buildLoggerConfig(),
+            realtime: buildRealtimeConfig(),
             optitrack: buildOptitrackConfig(),
             optipush: buildOptipushConfig(),
             events: events,
@@ -37,6 +38,15 @@ private extension ConfigurationBuilder {
         return LoggerConfig(
             tenantID: tenantConfig.optitrack.siteId,
             logServiceEndpoint: globalConfig.general.logsServiceEndpoint
+        )
+    }
+
+    func buildRealtimeConfig() -> RealtimeConfig {
+        return RealtimeConfig(
+            tenantID: tenantConfig.optitrack.siteId,
+            realtimeToken: tenantConfig.realtime.realtimeToken,
+            realtimeGateway: tenantConfig.realtime.realtimeGateway,
+            events: events
         )
     }
 
