@@ -9,7 +9,7 @@ final class EventValidator: Node {
         case invalidEvent
         case illegalParameterLength
         case mismatchParamterType
-        case mandatoryParameterMissing(String)
+        case mandatoryParameterMissing
 
         var errorDescription: String? {
             switch self {
@@ -19,8 +19,8 @@ final class EventValidator: Node {
                 return "illegalParameterLength"
             case .mismatchParamterType:
                 return "mismatchParamterType"
-            case .mandatoryParameterMissing(let parameterName):
-                return "mandatoryParameterMissing \(parameterName)"
+            case .mandatoryParameterMissing:
+                return "mandatoryParameterMissing"
             }
         }
     }
@@ -55,7 +55,7 @@ final class EventValidator: Node {
         // Verify mandatory parameter exist
         for (name, parameter) in eventConfiguration.parameters where parameter.mandatory {
             if event.context[name] == nil {
-                throw Error.mandatoryParameterMissing(name)
+                throw Error.mandatoryParameterMissing
             }
         }
         // Verify Type is as defined
