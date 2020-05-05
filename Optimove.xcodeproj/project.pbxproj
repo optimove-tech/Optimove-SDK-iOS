@@ -168,7 +168,6 @@
 		8D24DBF32623CCCAB9652019 /* OptiTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B5B5EC7877594E3E96DBCC /* OptiTrack.swift */; };
 		8D28D0CF3F9FFB3CFCDD6B6F /* OnStartEventGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD108B5E64EF357FD2D9FEE1 /* OnStartEventGenerator.swift */; };
 		91EFA9B02C815F93C7725986 /* PageVisitEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669DFBB1484B628AAF9DB0DB /* PageVisitEvent.swift */; };
-		955C70AB7350DAE1B7A2EC4A /* EventValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57204664F03AA8ECAC34A28C /* EventValidator.swift */; };
 		96C32363670FDF6E770C8FF6 /* ApiPayloadBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F10C0249188552751C93979 /* ApiPayloadBuilder.swift */; };
 		9839623196598C955928FEA0 /* KVOExpectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2027ED43354F4EB835FA0AA0 /* KVOExpectation.swift */; };
 		98C5A68EE8133BD14877F57B /* Dictionary+CompactMapKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CA140085BC23AFEE47F451 /* Dictionary+CompactMapKeys.swift */; };
@@ -238,6 +237,7 @@
 		D0DF391C816A5EE42AC96ADF /* OptitrackMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF010CD78C12263BE8ED0CDD /* OptitrackMetaData.swift */; };
 		D17587E6A1F4700D55C6C9A1 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C7EC2263685823B37EC99A /* UserNotifications.framework */; };
 		D2C87A350F92584BAF68542C /* notificationWithMediaAttachment.json in Resources */ = {isa = PBXBuildFile; fileRef = F99F5BD0A5354C5A06F6B351 /* notificationWithMediaAttachment.json */; };
+		D2D1E0F7A825B50EBA059531 /* EventValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FE148C3F1509DB051CD35B /* EventValidator.swift */; };
 		D3126FACD3A8EED32268202F /* core_events.json in Resources */ = {isa = PBXBuildFile; fileRef = 0FA5B03E91EC1B9C8B7A921A /* core_events.json */; };
 		D3442290F4766F3C2835815D /* String+isBlank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FE216E57E65CEC3F6D9F4CE /* String+isBlank.swift */; };
 		D3C3D981332E7956C784F156 /* RunningFlagsContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0D8804B2EC84EE6FC4B506 /* RunningFlagsContainer.swift */; };
@@ -452,7 +452,6 @@
 		556267956174392FFDE951C6 /* DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatter.swift; sourceTree = "<group>"; };
 		558B0FF7FB691AD7EF1BC356 /* GlobalConfigFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConfigFixture.swift; sourceTree = "<group>"; };
 		566B20B2B1E2E316902899F3 /* Assembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assembly.swift; sourceTree = "<group>"; };
-		57204664F03AA8ECAC34A28C /* EventValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventValidator.swift; sourceTree = "<group>"; };
 		589AF55AF0FF6949387B66AD /* notificationWithCampaignDetails.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = notificationWithCampaignDetails.json; sourceTree = "<group>"; };
 		5B2476035D945779F9130EAD /* NetworkingFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingFactory.swift; sourceTree = "<group>"; };
 		5D74FD73F62F2896D05BAFD1 /* NewTenantInfoHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTenantInfoHandler.swift; sourceTree = "<group>"; };
@@ -574,6 +573,7 @@
 		BDC2B74FB6EEF23A85E335EB /* DeeplinkExtracter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeplinkExtracter.swift; sourceTree = "<group>"; };
 		BE6C83A68863BF37E8F3275B /* NewUserIDHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewUserIDHandler.swift; sourceTree = "<group>"; };
 		C04629380902B7E31CF43D52 /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
+		C0FE148C3F1509DB051CD35B /* EventValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventValidator.swift; sourceTree = "<group>"; };
 		C2D5405AF08AADF9DA4ED566 /* UserAgentGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentGenerator.swift; sourceTree = "<group>"; };
 		C5DF6AE81EB4608EDFDF9649 /* Locale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locale.swift; sourceTree = "<group>"; };
 		C82F8074F2CA36DE0F752880 /* ParametersNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParametersNormalizer.swift; sourceTree = "<group>"; };
@@ -710,7 +710,6 @@
 		059971E08A10B8A4891F2794 /* Events */ = {
 			isa = PBXGroup;
 			children = (
-				57204664F03AA8ECAC34A28C /* EventValidator.swift */,
 				EECA51F0B0A4A890AD8AC1B7 /* OptimoveEvent.swift */,
 				A6952311F3B4BB669CE43372 /* TenantEvent.swift */,
 				B7E0C4FAAB0D1A333D7859D0 /* CoreEvents */,
@@ -1407,6 +1406,7 @@
 			isa = PBXGroup;
 			children = (
 				38ECD8544861591201013A2A /* ComponentHandlers.swift */,
+				C0FE148C3F1509DB051CD35B /* EventValidator.swift */,
 				01A82BD251259FAFF8606611 /* Handler.swift */,
 				7142C292241C1F13B6D2F370 /* HandlersPool.swift */,
 				3835A7A892F376A75302E758 /* InMemoryBuffer.swift */,
@@ -1827,21 +1827,21 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		"TEMP_14B91CDA-2EE1-477E-B22D-24815491BFBE" /* Tests */ = {
+		"TEMP_5585281D-FD9B-4ADB-81D8-B0E80C53F309" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_32636B54-E348-4940-9201-6337C13D3D27" /* Tests */ = {
+		"TEMP_5A5FF662-F783-4558-895A-BFD040160819" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_FFA834A9-4D84-4ACC-B294-32179E69290F" /* Tests */ = {
+		"TEMP_8BCE3EF7-9649-4964-846E-D81175FBE178" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -2112,7 +2112,7 @@
 				98C5A68EE8133BD14877F57B /* Dictionary+CompactMapKeys.swift in Sources */,
 				8D229B5DC22108C54B21D53B /* EmailValidator.swift in Sources */,
 				3B92DE47BF4898E25F51F918 /* Environment.swift in Sources */,
-				955C70AB7350DAE1B7A2EC4A /* EventValidator.swift in Sources */,
+				D2D1E0F7A825B50EBA059531 /* EventValidator.swift in Sources */,
 				FF3AF2CD8B3EF34CBDD6479B /* FirstTimeVisitGenerator.swift in Sources */,
 				B622A895623E6DF7C6A09277 /* GlobalConfigurationDownloader.swift in Sources */,
 				C5D958D0A9D4CB0C2301E4F8 /* Handler.swift in Sources */,
