@@ -22,9 +22,11 @@ public final class ConfigurationBuilder {
         return Configuration(
             tenantID: tenantConfig.optitrack.siteId,
             logger: buildLoggerConfig(),
+            realtime: buildRealtimeConfig(),
             optitrack: buildOptitrackConfig(),
             optipush: buildOptipushConfig(),
             events: events,
+            isEnableRealtime: tenantConfig.isEnableRealtime,
             isSupportedAirship: tenantConfig.isSupportedAirship
         )
     }
@@ -40,6 +42,16 @@ private extension ConfigurationBuilder {
         )
     }
 
+    func buildRealtimeConfig() -> RealtimeConfig {
+        return RealtimeConfig(
+            tenantID: tenantConfig.optitrack.siteId,
+            realtimeToken: tenantConfig.realtime.realtimeToken,
+            realtimeGateway: tenantConfig.realtime.realtimeGateway,
+            events: events,
+            isEnableRealtimeThroughOptistream: tenantConfig.isEnableRealtimeThroughOptistream
+        )
+    }
+
     func buildOptitrackConfig() -> OptitrackConfig {
         return OptitrackConfig(
             tenantID: tenantConfig.optitrack.siteId,
@@ -47,7 +59,8 @@ private extension ConfigurationBuilder {
             enableAdvertisingIdReport: tenantConfig.optipush.enableAdvertisingIdReport,
             eventCategoryName: globalConfig.optitrack.eventCategoryName,
             customDimensionIDS: globalConfig.optitrack.customDimensionIDs,
-            events: events
+            events: events,
+            isEnableRealtimeThroughOptistream: tenantConfig.isEnableRealtimeThroughOptistream
         )
     }
 

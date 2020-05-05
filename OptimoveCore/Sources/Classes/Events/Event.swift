@@ -4,6 +4,11 @@ import Foundation
 
 open class Event {
 
+    public enum EventType {
+        case core
+        case custom
+    }
+
     public struct Constants {
         public static let category = "track"
     }
@@ -14,6 +19,7 @@ open class Event {
     public let context: [String: Any]
     public let timestamp: Date
     public let isRealtime: Bool
+    public let type: Event.EventType
 
     public init(
         uuid: String = UUID().uuidString,
@@ -21,13 +27,16 @@ open class Event {
         category: String = Constants.category,
         context: [String: Any],
         timestamp: Date = Date(),
-        isRealtime: Bool = false) {
+        isRealtime: Bool = false,
+        type: Event.EventType = .core
+    ) {
         self.uuid = uuid
         self.name = name
         self.category = category
         self.context = context
         self.timestamp = timestamp
         self.isRealtime = isRealtime
+        self.type = type
     }
 
 }

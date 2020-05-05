@@ -4,6 +4,7 @@
   "enableOptipush": true,
   "enableVisitors": true,
   "enableRealtime": false,
+  "enableRealtimeThroughOptistream": true,
   "realtimeMetaData": {
     "realtimeToken": "054454057e5b6b5cb85a7d06f22e929fd8f32682b5f81b29deb6dd778e7e5184",
     "realtimeGateway": "http://173.255.119.3/",

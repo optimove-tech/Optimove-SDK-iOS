@@ -4,27 +4,6 @@ import Foundation
 
 struct OptimoveKeys {
 
-    enum Registration: String, CodingKey {
-        case tenantID = "tenant_id"
-        case customerID = "public_customer_id"
-        case visitorID = "visitor_id"
-        case iosToken = "ios_token"
-        case isVisitor = "is_visitor"
-        case isConversion = "is_conversion"
-        case origVisitorID = "orig_visitor_id"
-        case deviceID = "device_id"
-        case optIn = "opt_in"
-        case optOut = "opt_out"
-        case token = "token"
-        case osVersion = "os_version"
-        case registrationData = "registration_data"
-        case unregistrationData = "unregistration_data"
-        case apps = "apps"
-        case bundleID = "app_ns"
-        case successStatus = "success_status"
-        case optOutStatus = "opt-out_status"
-    }
-
     enum Configuration: String {
         case ios = "ios"
         case setAdvertisingId = "set_advertising_id"
@@ -68,18 +47,4 @@ struct OptimoveKeys {
         case command = "command"
     }
 
-    struct AddtionalAttributesValues {
-        static let eventDeviceType = "Mobile"
-        static let eventPlatform = "iOS"
-        static let eventOs = "iOS \(operatingSystemVersionOnlyString)"
-        static let eventNativeMobile = true
-        private static let operatingSystemVersionOnlyString = ProcessInfo().operatingSystemVersionOnlyString
-    }
-
-    struct AdditionalAttributesKeys {
-        static let eventDeviceType = "event_device_type"
-        static let eventPlatform = "event_platform"
-        static let eventOs = "event_os"
-        static let eventNativeMobile = "event_native_mobile"
-    }
 }
