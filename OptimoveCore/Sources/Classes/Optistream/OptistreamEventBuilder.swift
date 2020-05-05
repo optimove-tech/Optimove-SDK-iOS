@@ -7,7 +7,6 @@ public final class OptistreamEventBuilder {
 
     struct Constants {
         struct Values {
-            static let platform = "iOS"
             static let origin = "sdk"
         }
     }
@@ -42,8 +41,6 @@ public final class OptistreamEventBuilder {
             timestamp: Formatter.iso8601withFractionalSeconds.string(from: event.timestamp),
             context: try JSON(event.context),
             metadata: OptistreamEvent.Metadata(
-                platform: Constants.Values.platform,
-                version: SDKVersion,
                 appVersion: Bundle.main.appVersion,
                 osVersion: ProcessInfo.processInfo.osVersion,
                 deviceModel: utsname().deviceModel,

@@ -20,8 +20,6 @@ public struct OptistreamEvent: Codable {
             public let airship: OptimoveAirshipIntegration.Airship?
         }
 
-        let platform: String
-        let version: String
         let appVersion: String
         let osVersion: String
         let deviceModel: String
@@ -29,8 +27,6 @@ public struct OptistreamEvent: Codable {
         let realtime: Bool?
 
         enum CodingKeys: String, CodingKey {
-            case platform = "sdk_platform"
-            case version = "sdk_version"
             case appVersion = "app_version"
             case osVersion = "os_version"
             case deviceModel = "device_model"
