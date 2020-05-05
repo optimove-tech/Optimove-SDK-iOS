@@ -85,8 +85,7 @@ extension String {
     }
 
     func normilizeKey(with replacement: String = Constants.underscoreCharacter) -> String {
-        return self.lowercased()
-            .trimmingCharacters(in: .whitespaces)
+        return self.trimmingCharacters(in: .whitespaces)
             .replacingOccurrences(of: Constants.spaceCharacter, with: replacement)
     }
 }
