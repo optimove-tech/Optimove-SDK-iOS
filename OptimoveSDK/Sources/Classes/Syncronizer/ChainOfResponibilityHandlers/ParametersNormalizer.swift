@@ -77,7 +77,7 @@ extension Event {
 
 }
 
-private extension String {
+extension String {
 
     private struct Constants {
         static let spaceCharacter = " "
