@@ -9,7 +9,7 @@ final class TenantEvent: Event {
     }
 
     init(name: String, context: [String: Any]) {
-        super.init(name: name, category: Constants.category, context: context, type: .custom)
+        super.init(name: name, category: Constants.category, context: context)
     }
 
 }
