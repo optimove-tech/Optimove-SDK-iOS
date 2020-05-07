@@ -23,29 +23,19 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
 
     override func main() {
         state = .executing
+        guard let campaign = notificationPayload.campaign else {
+            os_log("Unrecognized campaign type.", log: OSLog.reporter, type: .error)
+            state = .finished
+            return
+        }
         do {
-            let timestamp = Date()
-            switch notificationPayload.campaign {
-            case let campaign as ScheduledNotificationCampaign:
-                try report(
-                    ScheduledNotificationDelivered(
-                        bundleId: bundleIdentifier,
-                        campaign: campaign,
-                        timestamp: timestamp
-                    )
+            try report(
+                NotificationDeliveredEvent(
+                    bundleId: bundleIdentifier,
+                    notificationType: campaign.type,
+                    identityToken: campaign.identityToken
                 )
-            case let campaign as TriggeredNotificationCampaign:
-                try report(
-                    TriggeredNotificationRecieved(
-                        bundleId: bundleIdentifier,
-                        campaign: campaign,
-                        timestamp: timestamp
-                    )
-                )
-            default:
-                os_log("Unrecognized campaign type.", log: OSLog.reporter, type: .error)
-                state = .finished
-            }
+            )
         } catch {
             os_log("Error: %{public}@", log: OSLog.reporter, type: .error, error.localizedDescription)
             state = .finished
