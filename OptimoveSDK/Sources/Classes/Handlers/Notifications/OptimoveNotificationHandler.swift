@@ -44,25 +44,19 @@ private extension OptimoveNotificationHandler {
         let notificationDetails = response.notification.request.content.userInfo
         let data = try JSONSerialization.data(withJSONObject: notificationDetails)
         let notification = try JSONDecoder().decode(NotificationPayload.self, from: data)
-        switch notification.campaign {
-        case let campaign as ScheduledNotificationCampaign:
-            return ScheduledNotificationOpened(
-                bundleIdentifier: try Bundle.getApplicationNameSpace(),
-                campaign: campaign
-            )
-        case let campaign as TriggeredNotificationCampaign:
-            return TriggeredNotificationOpened(
-                bundleIdentifier: try Bundle.getApplicationNameSpace(),
-                campaign: campaign
-            )
-        default:
+        guard let campaign = notification.campaign else {
             throw GuardError.custom(
                 """
-                The campaign of type \(notification.campaign?.type.rawValue ?? "nil") is not supported.
+                The campaign of type is not supported.
                 Probably this is a test notification.
                 """
             )
         }
+        return NotificationOpenedEvent(
+            bundleIdentifier: try Bundle.getApplicationNameSpace(),
+            notificationType: campaign.type,
+            pushMetadata: campaign.pushMetadata
+        )
     }
 
     func handleDeepLinkDelegation(_ response: UNNotificationResponse) {

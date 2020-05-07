@@ -9,7 +9,7 @@ public struct NotificationPayload: Decodable {
     public let content: String
     public let dynamicLinks: DynamicLinks?
     public let deepLinkPersonalization: DeeplinkPersonalization?
-    public let campaign: NotificationCampaign?
+    public let campaign: NotificationCampaignContainer?
     public let isOptipush: Bool
     public let media: MediaAttachment?
 
@@ -19,11 +19,6 @@ public struct NotificationPayload: Decodable {
         case dynamicLinks = "dynamic_links"
         case deepLinkPersonalization = "deep_link_personalization_values"
         case campaign
-        case campaignID = "campaign_id"
-        case actionSerial = "action_serial"
-        case templateID = "template_id"
-        case engagementID = "engagement_id"
-        case campaignType = "campaign_type"
         case isOptipush = "is_optipush"
         case media
         case userAction = "user_action"
@@ -35,7 +30,7 @@ public struct NotificationPayload: Decodable {
         self.content = try container.decode(String.self, forKey: .content)
         self.dynamicLinks = try? DynamicLinks(firebaseFrom: decoder)
         self.deepLinkPersonalization = try? DeeplinkPersonalization(firebaseFrom: decoder)
-        self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder).campaign
+        self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder)
         self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
         self.media = try? MediaAttachment(firebaseFrom: decoder)
     }
@@ -48,116 +43,34 @@ public enum NotificationCampaignType: String, CodingKey, CaseIterable {
     case triggered = "triggered_campaign"
 }
 
-public protocol NotificationCampaign: Decodable {
-    var type: NotificationCampaignType { get }
-}
-
-struct NotificationCampaignContainer {
-    let campaign: NotificationCampaign
+public struct NotificationCampaignContainer {
+    public let type: NotificationCampaignType
+    public let identityToken: String
 
     init(firebaseFrom decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: NotificationCampaignType.self)
-        let stringAndCampaignType: (string: String, type: NotificationCampaignType) = try {
+        let decoded: (identityToken: String, type: NotificationCampaignType) = try {
             if let string = try container.decodeIfPresent(String.self, forKey: .scheduled) {
-                return (string, .scheduled)
+                return (identityToken: string, type: .scheduled)
             }
             if let string = try container.decodeIfPresent(String.self, forKey: .triggered) {
-                return (string, .triggered)
+                return (identityToken: string, type: .triggered)
             }
             throw DecodingError.valueNotFound(
-                NotificationCampaign.self,
+                NotificationCampaignContainer.self,
                 DecodingError.Context(
                     codingPath: container.codingPath,
                     debugDescription:
                     """
                     Unable to find a supported Notification campaign type.
+                    Probably this is a test push.
                     Supported types: \(NotificationCampaignType.allCases.map { $0.rawValue })
                     """
                 )
             )
         }()
-        let data: Data = try cast(stringAndCampaignType.string.data(using: .utf8))
-        switch stringAndCampaignType.type {
-        case .scheduled:
-            self.campaign = try JSONDecoder().decode(ScheduledNotificationCampaign.self, from: data)
-        case .triggered:
-            self.campaign = try JSONDecoder().decode(TriggeredNotificationCampaign.self, from: data)
-        }
-    }
-
-}
-
-public struct TriggeredNotificationCampaign: NotificationCampaign {
-    public private(set) var type: NotificationCampaignType = .triggered
-    public let actionSerial: Int
-    public let actionID: Int
-    public let templateID: Int
-    public let engagementID: Int?
-
-    public init(
-        actionSerial: Int,
-        actionID: Int,
-        templateID: Int,
-        engagementID: Int?
-    ) {
-        self.actionSerial = actionSerial
-        self.actionID = actionID
-        self.templateID = templateID
-        self.engagementID = engagementID
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case actionSerial = "action_serial"
-        case actionID = "action_id"
-        case templateID = "template_id"
-        case engagementID = "engagement_id"
-    }
-
-    /// The custom decoder does preprocess before the primary decoder.
-    init(firebaseFrom decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
-        let string = try container.decode(String.self, forKey: .campaign)
-        let data: Data = try cast(string.data(using: .utf8))
-        self = try JSONDecoder().decode(TriggeredNotificationCampaign.self, from: data)
-    }
-}
-
-public struct ScheduledNotificationCampaign: NotificationCampaign {
-    public private(set) var type: NotificationCampaignType = .scheduled
-    public let campaignID: Int
-    public let actionSerial: Int
-    public let templateID: Int
-    public let engagementID: Int
-    public let campaignType: Int?
-
-    public init(
-        campaignID: Int,
-        actionSerial: Int,
-        templateID: Int,
-        engagementID: Int,
-        campaignType: Int?
-    ) {
-        self.campaignID = campaignID
-        self.actionSerial = actionSerial
-        self.templateID = templateID
-        self.engagementID = engagementID
-        self.campaignType = campaignType
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case campaignID = "campaign_id"
-        case actionSerial = "action_serial"
-        case templateID = "template_id"
-        case engagementID = "engagement_id"
-        case campaignType = "campaign_type"
-    }
-
-    /// The custom decoder does preprocess before the primary decoder.
-    init(firebaseFrom decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
-        let string = try container.decode(String.self, forKey: .campaign)
-        let data: Data = try cast(string.data(using: .utf8))
-        self = try JSONDecoder().decode(ScheduledNotificationCampaign.self, from: data)
+        self.type = decoded.type
+        self.identityToken = decoded.identityToken
     }
 
 }

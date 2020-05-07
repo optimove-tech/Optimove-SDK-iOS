@@ -51,12 +51,8 @@ private extension DeeplinkExtracter {
                         continue
                     }
                     guard let percentValue = value.addingPercentEncoding(withAllowedCharacters: alphanumericsSet) else {
-                        if let campaign = notificationPayload.campaign as? ScheduledNotificationCampaign {
-                            if campaign.campaignID > 0 {  // This is not Test campaign, any non-string values must be replaced with empty string
-                                urlString = urlString.replacingOccurrences(of: percentKey, with: "")
-                                continue
-                            }  // This is a test campaign PN, tags must stay as keys
-                        }
+                        // any non-string values must be replaced with empty string
+                        urlString = urlString.replacingOccurrences(of: percentKey, with: "")
                         continue
                     }
                     urlString = urlString.replacingOccurrences(of: percentKey, with: percentValue)
