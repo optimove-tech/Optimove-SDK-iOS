@@ -44,7 +44,7 @@ final class NotificationDeliveredEvent: Event {
     }
 }
 
-private extension NotificationCampaignType {
+extension NotificationCampaignType {
 
     var eventName: String {
         switch self {

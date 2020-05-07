@@ -8,7 +8,7 @@ final class NotificationOpenedEvent: Event {
     struct Constants {
         static let category = "optipush"
         struct Key {
-            static let pushMetadata = "pushMetadata"
+            static let identityToken = "identity_token"
             static let timestamp = OptimoveKeys.Configuration.timestamp.rawValue
             static let appNS = OptimoveKeys.Configuration.appNs.rawValue
         }
@@ -17,14 +17,15 @@ final class NotificationOpenedEvent: Event {
     init(
         bundleIdentifier: String,
         notificationType: NotificationCampaignType,
-        pushMetadata: String
+        identityToken: String,
+        timestamp: Date = Date()
     ) {
         super.init(
             name: notificationType.eventName,
             category: Constants.category,
             context: [
-                Constants.Key.timestamp: Int(Date().timeIntervalSince1970),
-                Constants.Key.pushMetadata: pushMetadata,
+                Constants.Key.timestamp: timestamp.timeIntervalSince1970.seconds,
+                Constants.Key.identityToken: identityToken,
                 Constants.Key.appNS: bundleIdentifier
             ]
         )
@@ -32,7 +33,7 @@ final class NotificationOpenedEvent: Event {
 
 }
 
-private extension NotificationCampaignType {
+extension NotificationCampaignType {
 
     var eventName: String {
         switch self {

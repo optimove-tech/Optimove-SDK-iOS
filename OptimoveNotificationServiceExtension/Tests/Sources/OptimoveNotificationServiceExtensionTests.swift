@@ -24,7 +24,7 @@ class OptimoveNotificationServiceExtensionTests: OptimoveTestCase, FileAccessibl
         try even_notification_received_sent { (event) in
 
             // then
-            XCTAssertEqual(event.event, ScheduledNotificationDelivered.Constants.name)
+            XCTAssertEqual(event.event, NotificationCampaignType.scheduled.eventName)
         }
     }
 
@@ -37,7 +37,7 @@ class OptimoveNotificationServiceExtensionTests: OptimoveTestCase, FileAccessibl
         try even_notification_received_sent { (event) in
 
             // then
-            XCTAssertEqual(event.event, TriggeredNotificationRecieved.Constants.name)
+            XCTAssertEqual(event.event, NotificationCampaignType.triggered.eventName)
         }
     }
 
