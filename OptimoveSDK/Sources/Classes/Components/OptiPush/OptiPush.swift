@@ -19,7 +19,7 @@ final class OptiPush {
 
 }
 
-extension OptiPush: Component {
+extension OptiPush: CommonComponent {
 
     func handle(_ operation: Operation) throws {
         switch operation {

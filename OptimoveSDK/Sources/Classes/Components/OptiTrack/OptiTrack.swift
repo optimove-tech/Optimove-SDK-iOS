@@ -10,47 +10,45 @@ typealias OptistreamNetworking = OptimoveCore.OptistreamNetworking
 final class OptiTrack {
 
     private struct Constants {
-        static let eventBatchLimit = 100
+        static let eventBatchLimit = 50
         static let queueLabel = "com.optimove.track"
     }
 
-    var dispatchInterval: TimeInterval = 30.0 {
+    var dispatchInterval: TimeInterval = 30 {
         didSet {
             startDispatchTimer()
         }
     }
 
     private let queue: OptistreamQueue
-    private let optirstreamEventBuilder: OptistreamEventBuilder
     private let networking: OptistreamNetworking
-    private var isDispatching = false
+    private let configuration: OptitrackConfig
 
+    private var isDispatching = false
     private var dispatchTimer: Timer?
     private let dispatchQueue = DispatchQueue(label: Constants.queueLabel)
 
     init(
         queue: OptistreamQueue,
-        optirstreamEventBuilder: OptistreamEventBuilder,
-        networking: OptistreamNetworking
+        networking: OptistreamNetworking,
+        configuration: OptitrackConfig
     ) {
         self.queue = queue
-        self.optirstreamEventBuilder = optirstreamEventBuilder
         self.networking = networking
+        self.configuration = configuration
         startDispatchTimer()
     }
 
 }
 
-extension OptiTrack: Component {
-
-    func handle(_ operation: Operation) throws {
+extension OptiTrack: OptistreamComponent {
+    
+    func handle(_ operation: OptistreamOperation) throws {
         switch operation {
         case let .report(event: event):
             track(event: event)
         case .dispatchNow:
             dispatch()
-        default:
-            break
         }
     }
 
@@ -92,16 +90,18 @@ private extension OptiTrack {
         return true
     }
 
-    func track(event: Event) {
-        tryCatch {
-            let streamEvent = try optirstreamEventBuilder.build(event: event)
-            dispatchQueue.async {
-                self.queue.enqueue(events: [streamEvent])
-                if event.isRealtime {
-                    self.dispatch()
-                }
+    func track(event: OptistreamEvent) {
+        dispatchQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.queue.enqueue(events: [event])
+            if self.shouldDispatchNow(event) {
+                self.dispatch()
             }
         }
+    }
+
+    func shouldDispatchNow(_ event: OptistreamEvent) -> Bool {
+        return event.metadata.realtime && configuration.isEnableRealtimeThroughOptistream
     }
 
     @objc func dispatch() {

@@ -50,14 +50,14 @@ public struct RealtimeConfig: Codable, TenantInfo, EventInfo {
     public let realtimeToken: String
     public let realtimeGateway: URL
     public let events: [String: EventsConfig]
-    public let isEnableRealtimeThroughOptistream: Bool?
+    public let isEnableRealtimeThroughOptistream: Bool
 
     public init(
         tenantID: Int,
         realtimeToken: String,
         realtimeGateway: URL,
         events: [String: EventsConfig],
-        isEnableRealtimeThroughOptistream: Bool?
+        isEnableRealtimeThroughOptistream: Bool
     ) {
         self.tenantID = tenantID
         self.realtimeToken = realtimeToken
@@ -74,7 +74,7 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
     public let eventCategoryName: String
     public let customDimensionIDS: CustomDimensionIDs
     public let events: [String: EventsConfig]
-    public let isEnableRealtimeThroughOptistream: Bool?
+    public let isEnableRealtimeThroughOptistream: Bool
 
     public init(
         tenantID: Int,
@@ -83,7 +83,7 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
         eventCategoryName: String,
         customDimensionIDS: CustomDimensionIDs,
         events: [String: EventsConfig],
-        isEnableRealtimeThroughOptistream: Bool?
+        isEnableRealtimeThroughOptistream: Bool
     ) {
         self.tenantID = tenantID
         self.optitrackEndpoint = optitrackEndpoint

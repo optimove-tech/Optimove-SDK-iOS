@@ -11,47 +11,31 @@ public struct OptistreamResponse: Codable {
 }
 
 public protocol OptistreamNetworking {
-    func send(event: OptistreamEvent, completion: @escaping (Result<OptistreamResponse, Error>) -> Void)
     func send(events: [OptistreamEvent], completion: @escaping (Result<OptistreamResponse, Error>) -> Void)
 }
 
 public final class OptistreamNetworkingImpl {
 
     private let networkClient: NetworkClient
-    private let configuration: OptitrackConfig
+    private let endpoint: URL
 
     public init(
         networkClient: NetworkClient,
-        configuration: OptitrackConfig
+        endpoint: URL
     ) {
         self.networkClient = networkClient
-        self.configuration = configuration
+        self.endpoint = endpoint
     }
 
 }
 
 extension OptistreamNetworkingImpl: OptistreamNetworking {
 
-    public func send(event: OptistreamEvent, completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
-        do {
-            let request = try NetworkRequest(
-                method: .post,
-                baseURL: configuration.optitrackEndpoint,
-                body: event
-            )
-            networkClient.perform(request) {
-                OptistreamNetworkingImpl.handleResult(result: $0, for: [event], completion: completion)
-            }
-        } catch {
-            completion(.failure(error))
-        }
-    }
-
     public func send(events: [OptistreamEvent], completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
         do {
             let request = try NetworkRequest(
                 method: .post,
-                baseURL: configuration.optitrackEndpoint,
+                baseURL: endpoint,
                 body: events
             )
             networkClient.perform(request) {

@@ -81,7 +81,6 @@ extension Optimove {
     ///   - screenCategory: The screen category.
     @objc public func reportScreenVisit(screenTitle title: String, screenCategory category: String? = nil) {
         let title = title.trimmingCharacters(in: .whitespaces)
-        Logger.debug("Report a screen event with title: \(title) and category \(category ?? "nil")")
         let validationResult = ScreenVisitValidator.validate(screenTitle: title)
         guard validationResult == .valid else { return }
         container.resolve { serviceLocator in
@@ -226,7 +225,7 @@ extension Optimove {
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
-        Logger.info("User produce a response for a notificaiton.")
+        Logger.info("User produced the response for the notificaiton.")
         let function: (ServiceLocator) -> (Bool) = { serviceLocator in
             let notificationListener = serviceLocator.notificationListener()
             let result = notificationListener.isOptipush(notification: response.notification)
@@ -309,7 +308,8 @@ private extension Optimove {
             serviceLocator.newVisitorIdGenerator().generate()
             serviceLocator.firstTimeVisitGenerator().generate()
             let configurationFetcher = serviceLocator.configurationFetcher()
-            configurationFetcher.fetch { result in
+            configurationFetcher.fetch { [weak self] result in
+                guard let self = self else { return }
                 switch result {
                 case let .success(configuration):
                     self.initialize(with: configuration)

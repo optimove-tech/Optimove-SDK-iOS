@@ -11,3 +11,8 @@ enum Operation {
     case optIn
     case optOut
 }
+
+enum OptistreamOperation {
+    case report(event: OptistreamEvent)
+    case dispatchNow
+}
