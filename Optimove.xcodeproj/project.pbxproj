@@ -102,7 +102,6 @@
 		567FF1C790FA8B2A7FAC4F7F /* InstallationIdTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 809CCE6596151864378607B5 /* InstallationIdTests.swift */; };
 		574C8292CC812A34F86B8892 /* NotificationOpenedEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5BB6E717D62FCA403815BF /* NotificationOpenedEventTests.swift */; };
 		57DFD79E50682E5EBECA7F4C /* OptInOutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90C9509F668ABF2A4746946D /* OptInOutObserverTests.swift */; };
-		57E9F6522320094ABB6E2779 /* VisitorIDPreprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9D6CC571532F1254FC6755D /* VisitorIDPreprocessor.swift */; };
 		580681431B6A11DC2C05DEED /* notificationWithTriggeredCampaign.json in Resources */ = {isa = PBXBuildFile; fileRef = 458897EAB1CC463D34F58C56 /* notificationWithTriggeredCampaign.json */; };
 		58B394186CECA09885F686F3 /* LoggerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3CF3C568D77B634AFD35B8 /* LoggerSettings.swift */; };
 		599FA52041C9CB1EDAD6D399 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89E7B8102C3B8854279817C1 /* Notification.swift */; };
@@ -559,7 +558,6 @@
 		C82F8074F2CA36DE0F752880 /* ParametersNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParametersNormalizer.swift; sourceTree = "<group>"; };
 		C8411A92C5ADEF8363F217CD /* PageVisitEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageVisitEventTests.swift; sourceTree = "<group>"; };
 		C95FC1B779C18A7446E2845C /* EventConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventConfig.swift; sourceTree = "<group>"; };
-		C9D6CC571532F1254FC6755D /* VisitorIDPreprocessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitorIDPreprocessor.swift; sourceTree = "<group>"; };
 		CC23809D9F4BD02A13F8C661 /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
 		CD3436699569EEA03153B1F9 /* NotificationDeliveredEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeliveredEventTests.swift; sourceTree = "<group>"; };
 		CD9601883B48B328BEA00024 /* SetAdvertisingIdEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetAdvertisingIdEventTests.swift; sourceTree = "<group>"; };
@@ -739,7 +737,6 @@
 				0CEE3CCD7B14A0976E778A76 /* Observers */,
 				6B5BFEAF9F7D336231486959 /* OnStartHelpers */,
 				555940095A8E06805647E039 /* Operations */,
-				E79A480E34BFAE7E3D576952 /* Preprocessors */,
 				F6D0C30CA75C18FEF95CD647 /* Providers */,
 				15D585D36C5DBE64170F3791 /* Provisioning */,
 				4A802689AFE69F115DC0B92F /* Services */,
@@ -1676,14 +1673,6 @@
 			path = NetworkClient;
 			sourceTree = "<group>";
 		};
-		E79A480E34BFAE7E3D576952 /* Preprocessors */ = {
-			isa = PBXGroup;
-			children = (
-				C9D6CC571532F1254FC6755D /* VisitorIDPreprocessor.swift */,
-			);
-			path = Preprocessors;
-			sourceTree = "<group>";
-		};
 		E8DD9ABEF7740FCB8768F6D8 /* OptiTrack */ = {
 			isa = PBXGroup;
 			children = (
@@ -2162,7 +2151,6 @@
 				6F2F6C1080B6763E7EE538D2 /* UserAgentGenerator.swift in Sources */,
 				F693A5BC0F53267848657C3B /* UserIDValidator.swift in Sources */,
 				AAB7C3B91AA0AD65E7A6AC9B /* Version.swift in Sources */,
-				57E9F6522320094ABB6E2779 /* VisitorIDPreprocessor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

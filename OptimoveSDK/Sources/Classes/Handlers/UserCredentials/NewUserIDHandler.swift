@@ -12,7 +12,7 @@ final class NewUserIDHandler {
     }
 
     func handle(userID: String) {
-        storage.visitorID = VisitorIDPreprocessor.process(userID)
+        storage.visitorID = userID.sha1().prefix(16).description.lowercased()
         storage.customerID = userID
     }
 
