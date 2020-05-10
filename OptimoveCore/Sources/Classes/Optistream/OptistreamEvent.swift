@@ -17,11 +17,25 @@ public struct OptistreamEvent: Codable {
     public struct Metadata: Codable, Hashable {
 
         public struct Channel: Codable, Hashable {
+
             public let airship: OptimoveAirshipIntegration.Airship?
+
+            public init(airship: OptimoveAirshipIntegration.Airship?) {
+                self.airship = airship
+            }
         }
 
         public let channel: Channel?
         public var realtime: Bool
+
+        public init(
+            channel: OptistreamEvent.Metadata.Channel?,
+            realtime: Bool
+        ) {
+            self.channel = channel
+            self.realtime = realtime
+        }
+
     }
 
     public init(

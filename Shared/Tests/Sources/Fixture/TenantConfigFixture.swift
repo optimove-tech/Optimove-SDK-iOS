@@ -5,15 +5,15 @@ import OptimoveCore
 
 final class TenantConfigFixture {
 
-    func build() -> TenantConfig {
+    func build(_ options: Options = Options.default) -> TenantConfig {
         return TenantConfig(
             realtime: tenantRealtimeConfigFixture(),
             optitrack: tenantOptitrackConfigFixture(),
             optipush: tenantOptipushConfigFixture(),
             events: createTenantEventFixture(),
-            isEnableRealtime: true,
+            isEnableRealtime: options.isEnableRealtime,
             isSupportedAirship: nil,
-            isEnableRealtimeThroughOptistream: true
+            isEnableRealtimeThroughOptistream: options.isEnableRealtimeThroughOptistream
         )
     }
 

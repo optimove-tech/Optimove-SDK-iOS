@@ -3,7 +3,7 @@
 import Foundation
 
 public struct OptistreamResponse: Codable {
-    public let status, message: String
+    public let status, message: String /// TODO: Shlomit changes
     public init(status: String, message: String) {
         self.status = status
         self.message = message
