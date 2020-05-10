@@ -42,9 +42,9 @@ extension OptistreamNetworkingImpl: OptistreamNetworking {
 
 private extension OptistreamNetworkingImpl {
 
-    static func handleResult(result: Result<NetworkResponse<Data?>, Error>,
-                      for events: [OptistreamEvent],
-                      completion: @escaping (Result<Void, Error>) -> Void) {
+    static func handleResult(result: Result<NetworkResponse<Data?>, NetworkError>,
+                             for events: [OptistreamEvent],
+                             completion: @escaping (Result<Void, Error>) -> Void) {
         completion(
             Result {
                 do {
