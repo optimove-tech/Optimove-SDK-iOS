@@ -37,8 +37,8 @@ final class EventValidator: Node {
         self.configuration = configuration
     }
 
-    override func execute(_ operation: Operation) throws {
-        let validationFunction = { [configuration] () -> Operation in
+    override func execute(_ operation: CommonOperation) throws {
+        let validationFunction = { [configuration] () -> CommonOperation in
             switch operation {
             case let .report(events: events):
                 try events.forEach { event in

@@ -13,11 +13,11 @@ final class ParametersNormalizer: Node {
 
     // MARK: - EventableHandler
 
-    override func execute(_ operation: Operation) throws {
-        let normilizeFunction = { () -> Operation in
+    override func execute(_ operation: CommonOperation) throws {
+        let normilizeFunction = { () -> CommonOperation in
             switch operation {
             case let .report(events: events):
-                return Operation.report(
+                return CommonOperation.report(
                     events: try self.normilize(events)
                 )
             default:

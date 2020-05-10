@@ -2,7 +2,7 @@
 
 import Foundation
 
-enum Operation {
+enum CommonOperation {
     case report(events: [Event])
     case dispatchNow
     case setInstallation

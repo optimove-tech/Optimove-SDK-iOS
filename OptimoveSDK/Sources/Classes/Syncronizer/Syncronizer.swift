@@ -5,7 +5,7 @@ import OptimoveCore
 
 /// Use for executing a internal operation flow with serial queue.
 protocol Synchronizer: ChainMutator, ResignActiveSubscriber {
-    func handle(_: Operation)
+    func handle(_: CommonOperation)
 }
 
 final class SynchronizerImpl {
@@ -22,7 +22,7 @@ final class SynchronizerImpl {
 
 extension SynchronizerImpl: Synchronizer {
 
-    func handle(_ operation: Operation) {
+    func handle(_ operation: CommonOperation) {
         queue.async { [chain] in
             tryCatch {
                 try chain.next.execute(operation)

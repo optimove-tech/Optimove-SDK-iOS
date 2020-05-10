@@ -17,12 +17,12 @@ class ComponentHandler: Node {
         self.optirstreamEventBuilder = optirstreamEventBuilder
     }
 
-    override func execute(_ operation: Operation) throws {
+    override func execute(_ operation: CommonOperation) throws {
         sendToCommonComponents(operation)
         sendToStreamComponents(operation)
     }
 
-    private func sendToCommonComponents(_ operation: Operation) {
+    private func sendToCommonComponents(_ operation: CommonOperation) {
         commonComponents.forEach { component in
             tryCatch {
                 try component.handle(operation)
@@ -30,7 +30,7 @@ class ComponentHandler: Node {
         }
     }
 
-    private func sendToStreamComponents(_ operation: Operation) {
+    private func sendToStreamComponents(_ operation: CommonOperation) {
         switch operation {
         case .report(events: let events):
             let streamEvents: [OptistreamEvent] = events.compactMap { event in

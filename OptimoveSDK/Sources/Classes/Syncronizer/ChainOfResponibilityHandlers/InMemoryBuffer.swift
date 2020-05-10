@@ -5,7 +5,7 @@ import OptimoveCore
 
 final class InMemoryBuffer: Node {
 
-    private var buffer = RingBuffer<Operation>(count: 100)
+    private var buffer = RingBuffer<CommonOperation>(count: 100)
 
     override var next: Node? {
         didSet {
@@ -13,7 +13,7 @@ final class InMemoryBuffer: Node {
         }
     }
 
-    override func execute(_ operation: Operation) throws {
+    override func execute(_ operation: CommonOperation) throws {
         if next == nil {
             buffer.write(operation)
         } else {
