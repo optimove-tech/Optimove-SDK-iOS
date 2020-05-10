@@ -12,6 +12,7 @@ final class OptiTrackComponentTests: OptimoveTestCase {
     var networking = OptistreamNetworkingMock()
     var queue = MockOptistreamQueue()
     var builder: OptistreamEventBuilder!
+    let dispatchInterval: TimeInterval = 1
 
     override func setUp() {
         let configuration = ConfigurationFixture.build()
@@ -28,7 +29,7 @@ final class OptiTrackComponentTests: OptimoveTestCase {
             networking: networking,
             configuration: configuration.optitrack
         )
-        optitrack.dispatchInterval = 1
+        optitrack.dispatchInterval = dispatchInterval
     }
 
     func test_event_one_report() throws {
@@ -63,7 +64,7 @@ final class OptiTrackComponentTests: OptimoveTestCase {
 
         // when
         try optitrack.handle(.dispatchNow)
-        wait(for: [networkExpectation], timeout: defaultTimeout + 1)
+        wait(for: [networkExpectation], timeout: defaultTimeout + dispatchInterval)
     }
 
 }
