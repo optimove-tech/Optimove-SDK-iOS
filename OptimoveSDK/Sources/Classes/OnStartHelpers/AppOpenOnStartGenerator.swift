@@ -24,9 +24,8 @@ final class AppOpenOnStartGenerator {
         }
         guard UIApplication.shared.applicationState != .background else { return }
         tryCatch {
-            try coreEventFactory.createEvent(.appOpen) { event in
-                self.synchronizer.handle(.report(events: [event]))
-            }
+            let event = try coreEventFactory.createEvent(.appOpen)
+            self.synchronizer.handle(.report(events: [event]))
         }
     }
 

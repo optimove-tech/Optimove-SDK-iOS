@@ -86,9 +86,8 @@ extension Optimove {
         container.resolve { serviceLocator in
             tryCatch {
                 let factory = serviceLocator.coreEventFactory()
-                try factory.createEvent(.pageVisit(title: title, category: category)) { event in
-                    serviceLocator.synchronizer().handle(.report(events: [event]))
-                }
+                let event = try factory.createEvent(.pageVisit(title: title, category: category))
+                serviceLocator.synchronizer().handle(.report(events: [event]))
             }
         }
     }
@@ -104,28 +103,42 @@ extension Optimove {
     ///   - sdkId: The user unique identifier.
     ///   - email: The user email.
     @objc public func registerUser(sdkId: String, email: String) {
-        setUserId(sdkId)
-        setUserEmail(email: email)
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            tryCatch {
+                let setUserIdEvent = try self._setUserId(sdkId, serviceLocator)
+                let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
+                serviceLocator.synchronizer().handle(.report(events: [setUserIdEvent, setUserEmailEvent]))
+                serviceLocator.synchronizer().handle(.setInstallation)
+            }
+        }
+        container.resolve(function)
     }
 
     /// Set a user ID to the Optimove SDK.
     ///
     /// - Parameter userID: The user unique identifier.
     @objc public func setUserId(_ userID: String) {
-        let userID = userID.trimmingCharacters(in: .whitespaces)
         let function: (ServiceLocator) -> Void = { serviceLocator in
-            let storage = serviceLocator.storage()
-            let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
-            guard validationResult == .valid else { return }
-            NewUserIDHandler(storage: storage).handle(userID: userID)
             tryCatch {
-                try serviceLocator.coreEventFactory().createEvent(.setUserId) { event in
-                    serviceLocator.synchronizer().handle(.report(events: [event]))
-                    serviceLocator.synchronizer().handle(.setInstallation)
-                }
+                let event = try self._setUserId(userID, serviceLocator)
+                serviceLocator.synchronizer().handle(.report(events: [event]))
+                serviceLocator.synchronizer().handle(.setInstallation)
             }
         }
         container.resolve(function)
+    }
+
+    private func _setUserId(_ userID: String, _ serviceLocator: ServiceLocator) throws -> Event {
+        let userID = userID.trimmingCharacters(in: .whitespaces)
+        let storage = serviceLocator.storage()
+        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
+        switch validationResult {
+        case .valid:
+            NewUserIDHandler(storage: storage).handle(userID: userID)
+            return try serviceLocator.coreEventFactory().createEvent(.setUserId)
+        default:
+            throw GuardError.custom("UserID is \(validationResult.rawValue)")
+        }
     }
 
     /// Set a user email to the Optimove SDK.
@@ -133,17 +146,24 @@ extension Optimove {
     /// - Parameter email: The user email.
     @objc public func setUserEmail(email: String) {
         let function: (ServiceLocator) -> Void = { serviceLocator in
-            let storage = serviceLocator.storage()
-            let validationResult = EmailValidator(storage: storage).isValid(email)
-            guard validationResult == .valid else { return }
-            NewEmailHandler(storage: storage).handle(email: email)
             tryCatch {
-                try serviceLocator.coreEventFactory().createEvent(.setUserEmail) { event in
-                    serviceLocator.synchronizer().handle(.report(events: [event]))
-                }
+                let event: Event = try self._setUserEmail(email, serviceLocator)
+                serviceLocator.synchronizer().handle(.report(events: [event]))
             }
         }
         container.resolve(function)
+    }
+
+    private func _setUserEmail(_ email: String, _ serviceLocator: ServiceLocator) throws -> Event {
+        let storage = serviceLocator.storage()
+        let validationResult = EmailValidator(storage: storage).isValid(email)
+        switch validationResult {
+        case .valid:
+            NewEmailHandler(storage: storage).handle(email: email)
+            return try serviceLocator.coreEventFactory().createEvent(.setUserEmail)
+        default:
+            throw GuardError.custom("Email is \(validationResult.rawValue)")
+        }
     }
 
     /// A call to this method will stop executions of any push campaign

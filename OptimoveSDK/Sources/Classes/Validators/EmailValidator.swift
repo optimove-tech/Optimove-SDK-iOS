@@ -5,7 +5,7 @@ import OptimoveCore
 
 struct EmailValidator {
 
-    enum Result {
+    enum Result: String {
         case valid
         case notValid
         case alreadySetIn
