@@ -3,7 +3,7 @@
 import Foundation
 
 public protocol OptistreamNetworking {
-    func send(events: [OptistreamEvent], completion: @escaping (Result<Void, Error>) -> Void)
+    func send(events: [OptistreamEvent], completion: @escaping (Result<Void, NetworkError>) -> Void)
 }
 
 public final class OptistreamNetworkingImpl {
@@ -23,7 +23,7 @@ public final class OptistreamNetworkingImpl {
 
 extension OptistreamNetworkingImpl: OptistreamNetworking {
 
-    public func send(events: [OptistreamEvent], completion: @escaping (Result<Void, Error>) -> Void) {
+    public func send(events: [OptistreamEvent], completion: @escaping (Result<Void, NetworkError>) -> Void) {
         do {
             let request = try NetworkRequest(
                 method: .post,
@@ -34,7 +34,7 @@ extension OptistreamNetworkingImpl: OptistreamNetworking {
                 OptistreamNetworkingImpl.handleResult(result: $0, for: events, completion: completion)
             }
         } catch {
-            completion(.failure(error))
+            completion(.failure(NetworkError.error(error)))
         }
     }
 
@@ -44,30 +44,27 @@ private extension OptistreamNetworkingImpl {
 
     static func handleResult(result: Result<NetworkResponse<Data?>, NetworkError>,
                              for events: [OptistreamEvent],
-                             completion: @escaping (Result<Void, Error>) -> Void) {
-        completion(
-            Result {
-                do {
-                    let response = try result.get()
-                    Logger.debug(
-                        """
-                        Optistream succeed:
-                            request: \n\(events.map { $0.event }.joined(separator: "\n"))
-                            response: \n\(response)
-                        """
-                    )
-                } catch {
-                    Logger.error(
-                        """
-                        Optistream failed:
-                            request: \n\(events.map { $0.event }.joined(separator: "\n"))
-                            reason: \n\(error.localizedDescription)
-                        """
-                    )
-                    throw error
-                }
-            }
-        )
+                             completion: @escaping (Result<Void, NetworkError>) -> Void) {
+        do {
+            let response = try result.get()
+            Logger.debug(
+                """
+                Optistream succeed:
+                    request: \n\(events.map { $0.event }.joined(separator: "\n"))
+                    response: \n\(response)
+                """
+            )
+            completion(.success(()))
+        } catch {
+            Logger.error(
+                """
+                Optistream failed:
+                    request: \n\(events.map { $0.event }.joined(separator: "\n"))
+                    reason: \n\(error.localizedDescription)
+                """
+            )
+            completion(.failure(NetworkError.error(error)))
+        }
     }
 
 }

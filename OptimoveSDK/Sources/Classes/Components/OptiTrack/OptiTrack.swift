@@ -158,6 +158,12 @@ private extension OptiTrack {
                 self.dispatchQueue.async {
                     Logger.error(error.localizedDescription)
                     self.isDispatching = false
+                    switch error {
+                    case .requestInvalid(_):
+                        self.queue.remove(events: events)
+                    default:
+                        break
+                    }
                     self.startDispatchTimer()
                 }
             }
