@@ -37,18 +37,20 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
         let appOpenEventExpectation = expectation(description: "AppOpenEvent was not generated.")
         synchronizer.assertFunction = { operation in
             switch operation {
-            case let .report(event: event):
-                switch event.name {
-                case SetAdvertisingIdEvent.Constants.name:
-                    ifdaEventExpectation.fulfill()
-                case MetaDataEvent.Constants.name:
-                    metaDataEventExpectation.fulfill()
-                case SetUserAgent.Constants.name:
-                    userAgentEventExpectation.fulfill()
-                case AppOpenEvent.Constants.name:
-                    appOpenEventExpectation.fulfill()
-                default:
-                    break
+            case let .report(events: events):
+                events.forEach { event in
+                    switch event.name {
+                    case SetAdvertisingIdEvent.Constants.name:
+                        ifdaEventExpectation.fulfill()
+                    case MetaDataEvent.Constants.name:
+                        metaDataEventExpectation.fulfill()
+                    case SetUserAgent.Constants.name:
+                        userAgentEventExpectation.fulfill()
+                    case AppOpenEvent.Constants.name:
+                        appOpenEventExpectation.fulfill()
+                    default:
+                        break
+                    }
                 }
             default:
                 break

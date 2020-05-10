@@ -4,30 +4,37 @@ import Foundation
 import OptimoveCore
 
 protocol OptistreamQueue {
+    var isEmpty: Bool { get }
     var eventCount: Int { get }
     func enqueue(events: [OptistreamEvent])
     func first(limit: Int) -> [OptistreamEvent]
     func remove(events: [OptistreamEvent])
 }
 
-final class OptistreamQueueImpl {
+struct QueueFilenameConstants {
+    static let track = "track_queue.json"
+    static let realtime = "realtime_queue.json"
+}
 
-    private struct Constants {
-        static let queuePersistanceFileName = "optistream_queue.json"
-    }
+final class OptistreamQueueImpl {
 
     private let storage: OptimoveStorage
     private var inMemoryEvents = [OptistreamEvent]()
+    private let queuePersistanceFileName: String
 
-    init(storage: OptimoveStorage) {
+    init(
+        storage: OptimoveStorage,
+        queuePersistanceFileName: String
+    ) {
         self.storage = storage
+        self.queuePersistanceFileName = queuePersistanceFileName
         inMemoryEvents = loadEventFromStorageToMemory()
     }
 
     private func loadEventFromStorageToMemory() -> [OptistreamEvent] {
-        guard storage.isExist(fileName: Constants.queuePersistanceFileName, shared: false) else { return [] }
+        guard storage.isExist(fileName: queuePersistanceFileName, shared: false) else { return [] }
         do {
-            return try storage.load(fileName: Constants.queuePersistanceFileName, shared: false)
+            return try storage.load(fileName: queuePersistanceFileName, shared: false)
         } catch {
             Logger.error(error.localizedDescription)
             return []
@@ -38,7 +45,7 @@ final class OptistreamQueueImpl {
         do {
             try storage.save(
                 data: events,
-                toFileName: Constants.queuePersistanceFileName,
+                toFileName: queuePersistanceFileName,
                 shared: false
             )
         } catch {
@@ -50,11 +57,16 @@ final class OptistreamQueueImpl {
 
 extension OptistreamQueueImpl: OptistreamQueue {
 
+    var isEmpty: Bool {
+        return inMemoryEvents.isEmpty
+    }
+
     var eventCount: Int {
         return inMemoryEvents.count
     }
 
     func enqueue(events: [OptistreamEvent]) {
+        guard !events.isEmpty else { return }
         Logger.debug("Queue: Enqueue \(events.count) events:\n\(events.map({ $0.event }))")
         inMemoryEvents.append(contentsOf: events)
         // TODO: dispatch on will resign active
@@ -67,6 +79,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func remove(events: [OptistreamEvent]) {
+        guard !events.isEmpty else { return }
         Logger.debug("Queue: Dequeue \(events.count) events:\n\(events.map({ $0.event }))")
         inMemoryEvents = inMemoryEvents.filter { cachedEvent in
             !events.contains(cachedEvent) // O(n*n)

@@ -65,7 +65,7 @@ import OptimoveCore
                 payload: payload,
                 networking: OptistreamNetworkingImpl(
                     networkClient: NetworkClientImpl(),
-                    configuration: configuration.optitrack
+                    endpoint: configuration.optitrack.optitrackEndpoint
                 ),
                 builder: OptistreamEventBuilder(
                     configuration: configuration.optitrack,

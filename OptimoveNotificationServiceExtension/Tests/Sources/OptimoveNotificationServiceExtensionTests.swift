@@ -66,9 +66,8 @@ class OptimoveNotificationServiceExtensionTests: OptimoveTestCase, FileAccessibl
 
         // check that delivery event sent.
         let optitrackExpectation = expectation(description: "Optitrack event was not generated.")
-        networking.assetOneEventFunction = { event, completion in
-            assert(event)
-            completion(.success(OptistreamResponse(status: "", message: "")))
+        networking.assetEventsFunction = { events, completion in
+            completion(.success(()))
             optitrackExpectation.fulfill()
         }
 

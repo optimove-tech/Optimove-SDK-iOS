@@ -54,7 +54,7 @@ extension Optimove {
     @objc public func reportEvent(name: String, parameters: [String: Any] = [:]) {
         container.resolve { serviceLocator in
             let tenantEvent = TenantEvent(name: name, context: parameters)
-            serviceLocator.synchronizer().handle(.report(event: tenantEvent))
+            serviceLocator.synchronizer().handle(.report(events: [tenantEvent]))
         }
     }
 
@@ -65,7 +65,7 @@ extension Optimove {
     @objc public func reportEvent(_ event: OptimoveEvent) {
         container.resolve { serviceLocator in
             let tenantEvent = TenantEvent(name: event.name, context: event.parameters)
-            serviceLocator.synchronizer().handle(.report(event: tenantEvent))
+            serviceLocator.synchronizer().handle(.report(events: [tenantEvent]))
         }
     }
 
@@ -81,15 +81,13 @@ extension Optimove {
     ///   - screenCategory: The screen category.
     @objc public func reportScreenVisit(screenTitle title: String, screenCategory category: String? = nil) {
         let title = title.trimmingCharacters(in: .whitespaces)
-        Logger.debug("Report a screen event with title: \(title) and category \(category ?? "nil")")
         let validationResult = ScreenVisitValidator.validate(screenTitle: title)
         guard validationResult == .valid else { return }
         container.resolve { serviceLocator in
             tryCatch {
                 let factory = serviceLocator.coreEventFactory()
-                try factory.createEvent(.pageVisit(title: title, category: category)) { event in
-                    serviceLocator.synchronizer().handle(.report(event: event))
-                }
+                let event = try factory.createEvent(.pageVisit(title: title, category: category))
+                serviceLocator.synchronizer().handle(.report(events: [event]))
             }
         }
     }
@@ -105,28 +103,42 @@ extension Optimove {
     ///   - sdkId: The user unique identifier.
     ///   - email: The user email.
     @objc public func registerUser(sdkId: String, email: String) {
-        setUserId(sdkId)
-        setUserEmail(email: email)
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            tryCatch {
+                let setUserIdEvent = try self._setUserId(sdkId, serviceLocator)
+                let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
+                serviceLocator.synchronizer().handle(.report(events: [setUserIdEvent, setUserEmailEvent]))
+                serviceLocator.synchronizer().handle(.setInstallation)
+            }
+        }
+        container.resolve(function)
     }
 
     /// Set a user ID to the Optimove SDK.
     ///
     /// - Parameter userID: The user unique identifier.
     @objc public func setUserId(_ userID: String) {
-        let userID = userID.trimmingCharacters(in: .whitespaces)
         let function: (ServiceLocator) -> Void = { serviceLocator in
-            let storage = serviceLocator.storage()
-            let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
-            guard validationResult == .valid else { return }
-            NewUserIDHandler(storage: storage).handle(userID: userID)
             tryCatch {
-                try serviceLocator.coreEventFactory().createEvent(.setUserId) { event in
-                    serviceLocator.synchronizer().handle(.report(event: event))
-                    serviceLocator.synchronizer().handle(.setInstallation)
-                }
+                let event = try self._setUserId(userID, serviceLocator)
+                serviceLocator.synchronizer().handle(.report(events: [event]))
+                serviceLocator.synchronizer().handle(.setInstallation)
             }
         }
         container.resolve(function)
+    }
+
+    private func _setUserId(_ userID: String, _ serviceLocator: ServiceLocator) throws -> Event {
+        let userID = userID.trimmingCharacters(in: .whitespaces)
+        let storage = serviceLocator.storage()
+        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
+        switch validationResult {
+        case .valid:
+            NewUserIDHandler(storage: storage).handle(userID: userID)
+            return try serviceLocator.coreEventFactory().createEvent(.setUserId)
+        default:
+            throw GuardError.custom("UserID is \(validationResult.rawValue)")
+        }
     }
 
     /// Set a user email to the Optimove SDK.
@@ -134,17 +146,24 @@ extension Optimove {
     /// - Parameter email: The user email.
     @objc public func setUserEmail(email: String) {
         let function: (ServiceLocator) -> Void = { serviceLocator in
-            let storage = serviceLocator.storage()
-            let validationResult = EmailValidator(storage: storage).isValid(email)
-            guard validationResult == .valid else { return }
-            NewEmailHandler(storage: storage).handle(email: email)
             tryCatch {
-                try serviceLocator.coreEventFactory().createEvent(.setUserEmail) { event in
-                    serviceLocator.synchronizer().handle(.report(event: event))
-                }
+                let event: Event = try self._setUserEmail(email, serviceLocator)
+                serviceLocator.synchronizer().handle(.report(events: [event]))
             }
         }
         container.resolve(function)
+    }
+
+    private func _setUserEmail(_ email: String, _ serviceLocator: ServiceLocator) throws -> Event {
+        let storage = serviceLocator.storage()
+        let validationResult = EmailValidator(storage: storage).isValid(email)
+        switch validationResult {
+        case .valid:
+            NewEmailHandler(storage: storage).handle(email: email)
+            return try serviceLocator.coreEventFactory().createEvent(.setUserEmail)
+        default:
+            throw GuardError.custom("Email is \(validationResult.rawValue)")
+        }
     }
 
     /// A call to this method will stop executions of any push campaign
@@ -226,7 +245,7 @@ extension Optimove {
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
-        Logger.info("User produce a response for a notificaiton.")
+        Logger.info("User produced the response for the notificaiton.")
         let function: (ServiceLocator) -> (Bool) = { serviceLocator in
             let notificationListener = serviceLocator.notificationListener()
             let result = notificationListener.isOptipush(notification: response.notification)
@@ -309,7 +328,8 @@ private extension Optimove {
             serviceLocator.newVisitorIdGenerator().generate()
             serviceLocator.firstTimeVisitGenerator().generate()
             let configurationFetcher = serviceLocator.configurationFetcher()
-            configurationFetcher.fetch { result in
+            configurationFetcher.fetch { [weak self] result in
+                guard let self = self else { return }
                 switch result {
                 case let .success(configuration):
                     self.initialize(with: configuration)

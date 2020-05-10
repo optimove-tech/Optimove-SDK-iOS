@@ -71,9 +71,11 @@ class EnterForegroundObserverTests: XCTestCase {
         appOpenEventExpectation.isInverted.toggle()
         synchronizer.assertFunction = { operation in
             switch operation {
-            case let .report(event: event):
-                if event.name == AppOpenEvent.Constants.name {
-                    appOpenEventExpectation.fulfill()
+            case let .report(events: events):
+                events.forEach { event in
+                    if event.name == AppOpenEvent.Constants.name {
+                        appOpenEventExpectation.fulfill()
+                    }
                 }
             default:
                 break

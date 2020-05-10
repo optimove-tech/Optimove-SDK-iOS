@@ -2,56 +2,32 @@
 
 import Foundation
 
-public struct OptistreamResponse: Codable {
-    public let status, message: String
-    public init(status: String, message: String) {
-        self.status = status
-        self.message = message
-    }
-}
-
 public protocol OptistreamNetworking {
-    func send(event: OptistreamEvent, completion: @escaping (Result<OptistreamResponse, Error>) -> Void)
-    func send(events: [OptistreamEvent], completion: @escaping (Result<OptistreamResponse, Error>) -> Void)
+    func send(events: [OptistreamEvent], completion: @escaping (Result<Void, Error>) -> Void)
 }
 
 public final class OptistreamNetworkingImpl {
 
     private let networkClient: NetworkClient
-    private let configuration: OptitrackConfig
+    private let endpoint: URL
 
     public init(
         networkClient: NetworkClient,
-        configuration: OptitrackConfig
+        endpoint: URL
     ) {
         self.networkClient = networkClient
-        self.configuration = configuration
+        self.endpoint = endpoint
     }
 
 }
 
 extension OptistreamNetworkingImpl: OptistreamNetworking {
 
-    public func send(event: OptistreamEvent, completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
+    public func send(events: [OptistreamEvent], completion: @escaping (Result<Void, Error>) -> Void) {
         do {
             let request = try NetworkRequest(
                 method: .post,
-                baseURL: configuration.optitrackEndpoint,
-                body: event
-            )
-            networkClient.perform(request) {
-                OptistreamNetworkingImpl.handleResult(result: $0, for: [event], completion: completion)
-            }
-        } catch {
-            completion(.failure(error))
-        }
-    }
-
-    public func send(events: [OptistreamEvent], completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
-        do {
-            let request = try NetworkRequest(
-                method: .post,
-                baseURL: configuration.optitrackEndpoint,
+                baseURL: endpoint,
                 body: events
             )
             networkClient.perform(request) {
@@ -66,13 +42,13 @@ extension OptistreamNetworkingImpl: OptistreamNetworking {
 
 private extension OptistreamNetworkingImpl {
 
-    static func handleResult(result: Result<NetworkResponse<Data?>, Error>,
-                      for events: [OptistreamEvent],
-                      completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
+    static func handleResult(result: Result<NetworkResponse<Data?>, NetworkError>,
+                             for events: [OptistreamEvent],
+                             completion: @escaping (Result<Void, Error>) -> Void) {
         completion(
             Result {
                 do {
-                    let response = try result.get().decode(to: OptistreamResponse.self)
+                    let response = try result.get()
                     Logger.debug(
                         """
                         Optistream succeed:
@@ -80,7 +56,6 @@ private extension OptistreamNetworkingImpl {
                             response: \n\(response)
                         """
                     )
-                    return response
                 } catch {
                     Logger.error(
                         """

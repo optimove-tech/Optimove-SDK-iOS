@@ -2,7 +2,7 @@
 
 import Foundation
 
-public typealias NetworkServiceCompletion = (Result<NetworkResponse<Data?>, Error>) -> Void
+public typealias NetworkServiceCompletion = (Result<NetworkResponse<Data?>, NetworkError>) -> Void
 
 public protocol NetworkClient {
     func perform(_ request: NetworkRequest, _ completion: @escaping NetworkServiceCompletion)
@@ -58,11 +58,17 @@ extension NetworkClientImpl: NetworkClient {
                 completion(.failure(NetworkError.error(error)))
                 return
             }
-            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            guard let httpResponse = response as? HTTPURLResponse else {
                 completion(.failure(NetworkError.requestFailed))
                 return
             }
-            completion(.success(NetworkResponse<Data?>(statusCode: httpResponse.statusCode, body: data)))
+            if (200...299).contains(httpResponse.statusCode) {
+                completion(.success(NetworkResponse<Data?>(statusCode: httpResponse.statusCode, body: data)))
+            }
+            if (400...499).contains(httpResponse.statusCode) {
+                completion(.failure(NetworkError.requestInvalid(data)))
+            }
+
         }
         task.resume()
     }

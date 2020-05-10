@@ -3,7 +3,7 @@
 public struct TenantConfig: Codable, Equatable {
     public let isSupportedAirship: Bool?
     public let isEnableRealtime: Bool
-    public let isEnableRealtimeThroughOptistream: Bool?
+    public let isEnableRealtimeThroughOptistream: Bool
     public let realtime: TenantRealtimeConfig
     public var optitrack: TenantOptitrackConfig
     public let optipush: TenantOptipushConfig
@@ -16,7 +16,7 @@ public struct TenantConfig: Codable, Equatable {
         events: [String: EventsConfig],
         isEnableRealtime: Bool,
         isSupportedAirship: Bool?,
-        isEnableRealtimeThroughOptistream: Bool?
+        isEnableRealtimeThroughOptistream: Bool
     ) {
         self.realtime = realtime
         self.optitrack = optitrack
@@ -31,8 +31,9 @@ public struct TenantConfig: Codable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         isSupportedAirship = try container.decodeIfPresent(Bool.self, forKey: .supportAirship)
         isEnableRealtime = try container.decode(Bool.self, forKey: .enableRealtime)
-        isEnableRealtimeThroughOptistream = try container.decodeIfPresent(Bool.self,
-                                                                          forKey: .enableRealtimeThroughOptistream)
+        isEnableRealtimeThroughOptistream = (
+            try? container.decodeIfPresent(Bool.self,forKey: .enableRealtimeThroughOptistream)
+        ) ?? false
         realtime = try container.decode(TenantRealtimeConfig.self, forKey: .realtime)
         optitrack = try container.decode(TenantOptitrackConfig.self, forKey: .optitrack)
         events = try container.decode([String: EventsConfig].self, forKey: .events)

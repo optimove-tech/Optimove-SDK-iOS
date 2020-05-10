@@ -11,14 +11,16 @@ final class ParametersDecorator: Node {
         self.configuration = configuration
     }
 
-    override func execute(_ operation: Operation) throws {
-        let decorationFunction = { [configuration] () -> Operation in
+    override func execute(_ operation: CommonOperation) throws {
+        let decorationFunction = { [configuration] () -> CommonOperation in
             switch operation {
-            case let .report(event: event):
-                return Operation.report(
-                    event: event.decorate(
-                        config: try event.matchConfiguration(with: configuration.events)
-                    )
+            case let .report(events: events):
+                return CommonOperation.report(
+                    events: try events.map {
+                        $0.decorate(
+                            config: try $0.matchConfiguration(with: configuration.events)
+                        )
+                    }
                 )
             default:
                 return operation

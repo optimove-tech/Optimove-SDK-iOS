@@ -13,18 +13,27 @@ final class ParametersNormalizer: Node {
 
     // MARK: - EventableHandler
 
-    override func execute(_ operation: Operation) throws {
-        let normilizeFunction = { [configuration] () -> Operation in
+    override func execute(_ operation: CommonOperation) throws {
+        let normilizeFunction = { () -> CommonOperation in
             switch operation {
-            case let .report(event: event) where event.category == TenantEvent.Constants.category:
-                return Operation.report(
-                    event: try event.normilize(configuration.events)
+            case let .report(events: events):
+                return CommonOperation.report(
+                    events: try self.normilize(events)
                 )
             default:
                 return operation
             }
         }
         try next?.execute(normilizeFunction())
+    }
+
+    private func normilize(_ events: [Event]) throws -> [Event] {
+        return try events.map { event in
+            if event.category == TenantEvent.Constants.category {
+                return try event.normilize(configuration.events)
+            }
+            return event
+        }
     }
 
 }

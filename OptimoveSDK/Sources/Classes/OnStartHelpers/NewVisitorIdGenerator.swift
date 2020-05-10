@@ -13,9 +13,7 @@ final class NewVisitorIdGenerator {
 
     func generate() {
         guard storage.initialVisitorId == nil else { return }
-        let uuid = UUID().uuidString
-        let sanitizedUUID = uuid.replacingOccurrences(of: "-", with: "")
-        storage.initialVisitorId = VisitorIDPreprocessor.process(sanitizedUUID)
+        storage.initialVisitorId = UUID().uuidString
         if storage.visitorID == nil {
             storage.visitorID = storage.initialVisitorId
         }

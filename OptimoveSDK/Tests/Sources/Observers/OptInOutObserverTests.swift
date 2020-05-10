@@ -38,12 +38,14 @@ final class OptInOutObserverTests: OptimoveTestCase {
         let optInEventExpectation = expectation(description: "optFlag event was not generated.")
         synchronizer.assertFunction = { operation in
             switch operation {
-            case let .report(event: event):
-                switch event.name {
-                case OptipushOptInEvent.Constants.optInName:
-                    optInEventExpectation.fulfill()
-                default:
-                    break
+            case let .report(events: events):
+                events.forEach { event in
+                    switch event.name {
+                    case OptipushOptInEvent.Constants.optInName:
+                        optInEventExpectation.fulfill()
+                    default:
+                        break
+                    }
                 }
             default:
                 break
@@ -82,12 +84,14 @@ final class OptInOutObserverTests: OptimoveTestCase {
             switch operation {
             case .optOut:
                 optFlagOperationExpectation.fulfill()
-            case let .report(event: event):
-                switch event.name {
-                case OptipushOptInEvent.Constants.optOutName:
-                    optFlagEventExpectation.fulfill()
-                default:
-                    break
+            case let .report(events: events):
+                events.forEach { event in
+                    switch event.name {
+                    case OptipushOptInEvent.Constants.optOutName:
+                        optFlagEventExpectation.fulfill()
+                    default:
+                        break
+                    }
                 }
             default:
                 break
@@ -128,12 +132,14 @@ final class OptInOutObserverTests: OptimoveTestCase {
             switch operation {
             case .optIn:
                 optFlagOperationExpectation.fulfill()
-            case let .report(event: event):
-                switch event.name {
-                case OptipushOptInEvent.Constants.optInName:
-                    optFlagEventExpectation.fulfill()
-                default:
-                    break
+            case let .report(events: events):
+                events.forEach { event in
+                    switch event.name {
+                    case OptipushOptInEvent.Constants.optInName:
+                        optFlagEventExpectation.fulfill()
+                    default:
+                        break
+                    }
                 }
             default:
                 break

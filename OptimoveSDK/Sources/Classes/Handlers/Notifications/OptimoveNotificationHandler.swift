@@ -27,7 +27,7 @@ private extension OptimoveNotificationHandler {
             let task = UIApplication.shared.beginBackgroundTask(withName: "com.optimove.sdk")
             switch response.actionIdentifier {
             case UNNotificationDefaultActionIdentifier:
-                synchronizer.handle(.report(event: event))
+                synchronizer.handle(.report(events: [event]))
                 let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 2.0)
                 DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
                     UIApplication.shared.endBackgroundTask(task)

@@ -18,18 +18,14 @@ final class ComponentFactory {
         return RealTime(
             configuration: configuration.realtime,
             storage: storage,
-            networking: RealTimeNetworkingImpl(
-                networkClient: serviceLocator.networking(),
-                realTimeRequestBuildable: RealTimeRequestBuilder(),
-                configuration: configuration.realtime
+            networking: OptistreamNetworkingImpl(
+                networkClient: serviceLocator.networkClient(),
+                endpoint: configuration.realtime.realtimeGateway
             ),
-            eventBuilder: RealTimeEventBuilder(
-                storage: storage
-            ),
-            handler: RealTimeHanlderImpl(
-                storage: storage
-            ),
-            coreEventFactory: serviceLocator.coreEventFactory()
+            queue: OptistreamQueueImpl(
+                storage: serviceLocator.storage(),
+                queuePersistanceFileName: QueueFilenameConstants.realtime
+            )
         )
     }
 
@@ -43,19 +39,24 @@ final class ComponentFactory {
     func createOptitrackComponent(configuration: Configuration) -> OptiTrack {
         return OptiTrack(
             queue: OptistreamQueueImpl(
-                storage: serviceLocator.storage()
-            ),
-            optirstreamEventBuilder: OptistreamEventBuilder(
-                configuration: configuration.optitrack,
                 storage: serviceLocator.storage(),
-                airshipIntegration: OptimoveAirshipIntegration(
-                    storage: serviceLocator.storage(),
-                    configuration: configuration
-                )
+                queuePersistanceFileName: QueueFilenameConstants.track
             ),
             networking: OptistreamNetworkingImpl(
                 networkClient: serviceLocator.networkClient(),
-                configuration: configuration.optitrack
+                endpoint: configuration.optitrack.optitrackEndpoint
+            ),
+            configuration: configuration.optitrack
+        )
+    }
+
+    func createOptistreamEventBuilder(configuration: Configuration) -> OptistreamEventBuilder {
+        return OptistreamEventBuilder(
+            configuration: configuration.optitrack,
+            storage: serviceLocator.storage(),
+            airshipIntegration: OptimoveAirshipIntegration(
+                storage: serviceLocator.storage(),
+                configuration: configuration
             )
         )
     }

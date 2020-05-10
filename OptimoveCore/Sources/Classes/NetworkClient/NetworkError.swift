@@ -6,6 +6,7 @@ public enum NetworkError: LocalizedError {
     case error(Error)
     case noData
     case invalidURL
+    case requestInvalid(Data?)
     case requestFailed
 
     public var errorDescription: String? {
@@ -17,6 +18,12 @@ public enum NetworkError: LocalizedError {
                 return "No data returns."
             case .invalidURL:
                 return "Invalid URL."
+            case .requestInvalid(let data):
+                var msg = "Invalid resquest."
+                if let data = data, let string = String(bytes: data, encoding: .utf8) {
+                    msg = msg + "\n\(string)"
+                }
+                return msg
             case .requestFailed:
                 return "Request failed."
             }

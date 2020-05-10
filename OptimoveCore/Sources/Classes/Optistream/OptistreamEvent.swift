@@ -12,26 +12,28 @@ public struct OptistreamEvent: Codable {
     public let visitor: String
     public let timestamp: String // iso8601
     public let context: JSON
-    public let metadata: Metadata
+    public var metadata: Metadata
 
-    public struct Metadata: Codable {
+    public struct Metadata: Codable, Hashable {
 
-        public struct Channel: Codable {
+        public struct Channel: Codable, Hashable {
+
             public let airship: OptimoveAirshipIntegration.Airship?
+
+            public init(airship: OptimoveAirshipIntegration.Airship?) {
+                self.airship = airship
+            }
         }
 
-        let appVersion: String
-        let osVersion: String
-        let deviceModel: String
-        let channel: Channel?
-        let realtime: Bool?
+        public let channel: Channel?
+        public var realtime: Bool
 
-        enum CodingKeys: String, CodingKey {
-            case appVersion = "app_version"
-            case osVersion = "os_version"
-            case deviceModel = "device_model"
-            case channel
-            case realtime
+        public init(
+            channel: OptistreamEvent.Metadata.Channel?,
+            realtime: Bool
+        ) {
+            self.channel = channel
+            self.realtime = realtime
         }
 
     }
@@ -68,3 +70,5 @@ extension OptistreamEvent: Equatable {
     }
 
 }
+
+extension OptistreamEvent: Hashable { }

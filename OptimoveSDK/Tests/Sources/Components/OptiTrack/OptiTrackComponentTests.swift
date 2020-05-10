@@ -12,6 +12,7 @@ final class OptiTrackComponentTests: OptimoveTestCase {
     var networking = OptistreamNetworkingMock()
     var queue = MockOptistreamQueue()
     var builder: OptistreamEventBuilder!
+    let dispatchInterval: TimeInterval = 1
 
     override func setUp() {
         let configuration = ConfigurationFixture.build()
@@ -25,26 +26,26 @@ final class OptiTrackComponentTests: OptimoveTestCase {
         )
         optitrack = OptiTrack(
             queue: queue,
-            optirstreamEventBuilder: builder,
-            networking: networking
+            networking: networking,
+            configuration: configuration.optitrack
         )
-        optitrack.dispatchInterval = 1
+        optitrack.dispatchInterval = dispatchInterval
     }
 
     func test_event_one_report() throws {
         // given
         prefillStorageAsVisitor()
-        let stubEvent = StubEvent()
+        let stubEvent = StubOptistreamEvent
 
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
-        networking.assetManyEventsFunction = { (events, completion) -> Void in
+        networking.assetEventsFunction = { (events, completion) -> Void in
             XCTAssertEqual(events.count, 1)
             networkExpectation.fulfill()
         }
 
         // when
-        try optitrack.handle(.report(event: stubEvent))
+        try optitrack.handle(.report(events: [stubEvent]))
         wait(for: [networkExpectation], timeout: defaultTimeout + 5)
     }
 
@@ -56,39 +57,14 @@ final class OptiTrackComponentTests: OptimoveTestCase {
 
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
-        networking.assetManyEventsFunction = { (events, completion) -> Void in
+        networking.assetEventsFunction = { (events, completion) -> Void in
             XCTAssertEqual(stubEvents.count, events.count)
             networkExpectation.fulfill()
         }
 
         // when
         try optitrack.handle(.dispatchNow)
-        wait(for: [networkExpectation], timeout: defaultTimeout + 1)
-    }
-
-}
-
-final class MockOptistreamQueue: OptistreamQueue {
-
-    var events: [OptistreamEvent] = []
-
-    var eventCount: Int {
-        return events.count
-    }
-
-    func enqueue(events: [OptistreamEvent]) {
-        self.events.append(contentsOf: events)
-    }
-
-    func first(limit: Int) -> [OptistreamEvent] {
-        let amount = limit <= eventCount ? limit : eventCount
-        return Array(self.events[0..<amount])
-    }
-
-    func remove(events: [OptistreamEvent]) {
-        self.events = self.events.filter { cachedEvent in
-            !events.contains(cachedEvent) // O(n*n)
-        }
+        wait(for: [networkExpectation], timeout: defaultTimeout + dispatchInterval)
     }
 
 }

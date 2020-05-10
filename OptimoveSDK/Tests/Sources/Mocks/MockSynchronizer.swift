@@ -4,9 +4,9 @@
 
 final class MockSynchronizer: Synchronizer {
 
-    var assertFunction: ((Operation) -> Void)?
+    var assertFunction: ((CommonOperation) -> Void)?
 
-    func handle(_ op: Operation) {
+    func handle(_ op: CommonOperation) {
         assertFunction?(op)
     }
 
