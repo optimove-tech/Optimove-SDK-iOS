@@ -2,16 +2,8 @@
 
 import Foundation
 
-public struct OptistreamResponse: Codable {
-    public let status, message: String /// TODO: Shlomit changes
-    public init(status: String, message: String) {
-        self.status = status
-        self.message = message
-    }
-}
-
 public protocol OptistreamNetworking {
-    func send(events: [OptistreamEvent], completion: @escaping (Result<OptistreamResponse, Error>) -> Void)
+    func send(events: [OptistreamEvent], completion: @escaping (Result<Void, Error>) -> Void)
 }
 
 public final class OptistreamNetworkingImpl {
@@ -31,7 +23,7 @@ public final class OptistreamNetworkingImpl {
 
 extension OptistreamNetworkingImpl: OptistreamNetworking {
 
-    public func send(events: [OptistreamEvent], completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
+    public func send(events: [OptistreamEvent], completion: @escaping (Result<Void, Error>) -> Void) {
         do {
             let request = try NetworkRequest(
                 method: .post,
@@ -52,11 +44,11 @@ private extension OptistreamNetworkingImpl {
 
     static func handleResult(result: Result<NetworkResponse<Data?>, Error>,
                       for events: [OptistreamEvent],
-                      completion: @escaping (Result<OptistreamResponse, Error>) -> Void) {
+                      completion: @escaping (Result<Void, Error>) -> Void) {
         completion(
             Result {
                 do {
-                    let response = try result.get().decode(to: OptistreamResponse.self)
+                    let response = try result.get()
                     Logger.debug(
                         """
                         Optistream succeed:
@@ -64,7 +56,6 @@ private extension OptistreamNetworkingImpl {
                             response: \n\(response)
                         """
                     )
-                    return response
                 } catch {
                     Logger.error(
                         """
