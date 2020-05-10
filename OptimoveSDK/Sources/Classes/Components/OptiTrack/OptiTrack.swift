@@ -93,6 +93,7 @@ private extension OptiTrack {
     func track(events: [OptistreamEvent]) {
         dispatchQueue.async { [weak self] in
             guard let self = self else { return }
+            let events = events.map(self.applyRealtimeMutation)
             self.queue.enqueue(events: events)
             if events.map(self.shouldDispatchNow).contains(true) {
                 self.dispatch()
@@ -100,8 +101,14 @@ private extension OptiTrack {
         }
     }
 
+    func applyRealtimeMutation(_ event: OptistreamEvent) -> OptistreamEvent {
+        var event = event
+        event.metadata.realtime = event.metadata.realtime && configuration.isEnableRealtimeThroughOptistream
+        return event
+    }
+
     func shouldDispatchNow(_ event: OptistreamEvent) -> Bool {
-        return event.metadata.realtime && configuration.isEnableRealtimeThroughOptistream
+        return event.metadata.realtime
     }
 
     @objc func dispatch() {

@@ -40,7 +40,7 @@ public final class OptistreamEventBuilder {
                 channel: OptistreamEvent.Metadata.Channel(
                     airship: try? airshipIntegration.loadAirshipIntegration()
                 ),
-                realtime: configuration.isEnableRealtimeThroughOptistream && event.isRealtime
+                realtime: event.isRealtime
             )
         )
     }

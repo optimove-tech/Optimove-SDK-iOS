@@ -12,7 +12,7 @@ public struct OptistreamEvent: Codable {
     public let visitor: String
     public let timestamp: String // iso8601
     public let context: JSON
-    public let metadata: Metadata
+    public var metadata: Metadata
 
     public struct Metadata: Codable, Hashable {
 
@@ -21,7 +21,7 @@ public struct OptistreamEvent: Codable {
         }
 
         public let channel: Channel?
-        public let realtime: Bool
+        public var realtime: Bool
     }
 
     public init(
