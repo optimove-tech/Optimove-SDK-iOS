@@ -5,6 +5,13 @@ import OptimoveCore
 
 final class RealTime {
 
+    private struct Constants {
+        static let failProtectedEvents = [
+            OptimoveKeys.Configuration.setUserId.rawValue,
+            OptimoveKeys.Configuration.setEmail.rawValue
+        ]
+    }
+
     private let configuration: RealtimeConfig
     private let realTimeQueue = DispatchQueue(label: "com.optimove.sdk.realtime", qos: .userInitiated)
     private var storage: OptimoveStorage
@@ -32,9 +39,10 @@ extension RealTime: OptistreamComponent {
         let handleOperationOnQueue: () -> Void = { [weak self] in
             guard let self = self else { return }
             switch operation {
-            case let .report(event: event):
-                guard self.isAllowedToReport(event) else { break }
-                self.report(event)
+            case let .report(events: events):
+                let allowedEvents = events.filter(self.isAllowedToReport)
+                guard !allowedEvents.isEmpty else { break }
+                self.report(allowedEvents)
             default:
                 break
             }
@@ -49,8 +57,21 @@ private extension RealTime {
         return event.metadata.realtime && !configuration.isEnableRealtimeThroughOptistream
     }
 
-    func report(_ event: OptistreamEvent) {
-//        shouldPersist(event)
+    func report(_ events: [OptistreamEvent]) {
+        if queue.isEmpty {
+            sentReportEvent(events)
+        } else {
+            let cachedEvents = queue.first(limit: 10)
+            if events.filter(shouldPersist).isEmpty {
+                sentReportEvent(cachedEvents + events)
+            } else {
+                let toSend = cachedEvents.filter { (event) -> Bool in
+                    return events.filter { $0.event == event.event }.isEmpty /// O(n²)
+                }
+                queue.remove(events: cachedEvents.filter { !toSend.contains($0) })
+                sentReportEvent(toSend + events)
+            }
+        }
     }
 
 }
@@ -59,139 +80,35 @@ private extension RealTime {
 
 private extension RealTime {
 
-    //    // MARK: Transforming an event
-    //
-    //    func createEventContext(event: OptistreamEvent, config: EventsConfig) -> RealTimeEventContext {
-    //        switch event.event {
-    //        case OptimoveKeys.Configuration.setUserId.rawValue:
-    //            return RealTimeEventContext(
-    //                event: event,
-    //                config: config,
-    //                type: .setUserID
-    //            )
-    //        case OptimoveKeys.Configuration.setEmail.rawValue:
-    //            return RealTimeEventContext(
-    //                event: event,
-    //                config: config,
-    //                type: .setUserEmail
-    //            )
-    //        default:
-    //            return RealTimeEventContext(
-    //                event: event,
-    //                config: config,
-    //                type: .regular
-    //            )
-    //        }
-    //    }
-
-    // MARK: Prepare before send a report
-
-    //    func report(context: RealTimeEventContext, retryFailedEvents: Bool) throws {
-    //        if retryFailedEvents {
-    //            try retryUserDataIfNeeded(context: context)
-    //        }
-    //        sentReportEvent(context: context)
-    //    }
-
-    // MARK: Retry
-
-    /// Verify that failed set_user_id is dispatched before failed set_email
-    /// and before any custom event.
-    /// This is requirment from the Server-side.
-    //    func retryUserDataIfNeeded(context: RealTimeEventContext) throws {
-    //        // Do not invoke retry on a new UserID
-    //        if context.type != .setUserID {
-    //            try retrySetUserIdEventIfNeeded()
-    //        }
-    //        // Do not invoke retry on a new UserEmail
-    //        if context.type != .setUserEmail {
-    //            try retrySetUserEmailIfNeeded()
-    //        }
-    //    }
-
-    //    func retrySetUserIdEventIfNeeded() throws {
-    //        if storage.realtimeSetUserIdFailed {
-    //            try reportUserId()
-    //        }
-    //    }
-    //
-    //    func retrySetUserEmailIfNeeded() throws {
-    //        if storage.realtimeSetEmailFailed {
-    //            try reportUserEmail()
-    //        }
-    //    }
-
     // MARK: Send report
 
-    func sentReportEvent(_ event: OptistreamEvent) {
-        networking.send(events: [event]) { [weak self] (result) in
+    func sentReportEvent(_ events: [OptistreamEvent]) {
+        networking.send(events: events) { [weak self] (result) in
             guard let self = self else { return }
             self.realTimeQueue.async { [weak self] in
                 guard let self = self else { return }
                 switch result {
                 case let .success(response):
                     Logger.info(response.message)
-                    self.onSuccess(event)
+                    self.onSuccess(events)
                 case let .failure(error):
                     Logger.error(error.localizedDescription)
-                    self.onError(event)
+                    self.onError(events)
                 }
             }
         }
     }
 
-
-    //            do {
-    //                /// The `semaphore.wait` added as the way to keep order in realtime events without possible race conditions produced by a network handling.
-    //                semaphore.wait()
-    //                let realtimeEvent = try eventBuilder.createEvent(context: context, realtimeToken: realtimeToken)
-    //                try networking.report(event: realtimeEvent) { (result) in
-    //                    semaphore.signal()
-    //                    switch result {
-    //                    case let .success(json):
-    //                        hanlder.handleOnSuccess(context, json: json)
-    //                    case let .failure(error):
-    //                        hanlder.handleOnError(context, error: error)
-    //                    }
-    //                }
-    //            } catch {
-    //                hanlder.handleOnError(context, error: error)
-    //            }
-    //}
-
-    func onSuccess(_ event: OptistreamEvent) {
-        if shouldPersist(event) {
-            queue.remove(events: [event])
-        }
+    func onSuccess(_ events: [OptistreamEvent]) {
+        queue.remove(events: events.filter(shouldPersist))
     }
 
-    func onError(_ event: OptistreamEvent) {
-        if shouldPersist(event) {
-            queue.enqueue(events: [event])
-        }
+    func onError(_ events: [OptistreamEvent]) {
+        queue.enqueue(events: events.filter(shouldPersist))
     }
 
     func shouldPersist(_ event: OptistreamEvent) -> Bool {
-        switch event.event {
-        case OptimoveKeys.Configuration.setUserId.rawValue, OptimoveKeys.Configuration.setEmail.rawValue:
-            return true
-        default:
-            return false
-        }
+        return Constants.failProtectedEvents.contains(event.event)
     }
 
-}
-
-enum RealTimeError: LocalizedError {
-    case eitherCustomerOrVisitorIdIsNil
-    case deviceOffline
-
-    var errorDescription: String? {
-        switch self {
-        case .eitherCustomerOrVisitorIdIsNil:
-            return "Either a CustomerID or a VisitorID should not be nil."
-        case .deviceOffline:
-            return "Device is offline."
-        }
-    }
 }

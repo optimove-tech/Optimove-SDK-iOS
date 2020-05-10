@@ -4,6 +4,7 @@ import Foundation
 import OptimoveCore
 
 protocol OptistreamQueue {
+    var isEmpty: Bool { get }
     var eventCount: Int { get }
     func enqueue(events: [OptistreamEvent])
     func first(limit: Int) -> [OptistreamEvent]
@@ -56,11 +57,16 @@ final class OptistreamQueueImpl {
 
 extension OptistreamQueueImpl: OptistreamQueue {
 
+    var isEmpty: Bool {
+        return inMemoryEvents.isEmpty
+    }
+
     var eventCount: Int {
         return inMemoryEvents.count
     }
 
     func enqueue(events: [OptistreamEvent]) {
+        guard !events.isEmpty else { return }
         Logger.debug("Queue: Enqueue \(events.count) events:\n\(events.map({ $0.event }))")
         inMemoryEvents.append(contentsOf: events)
         // TODO: dispatch on will resign active
@@ -73,6 +79,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func remove(events: [OptistreamEvent]) {
+        guard !events.isEmpty else { return }
         Logger.debug("Queue: Dequeue \(events.count) events:\n\(events.map({ $0.event }))")
         inMemoryEvents = inMemoryEvents.filter { cachedEvent in
             !events.contains(cachedEvent) // O(n*n)

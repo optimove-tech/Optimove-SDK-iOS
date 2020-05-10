@@ -25,8 +25,8 @@ final class OptiTrackComponentTests: OptimoveTestCase {
         )
         optitrack = OptiTrack(
             queue: queue,
-            optirstreamEventBuilder: builder,
-            networking: networking
+            networking: networking,
+            configuration: configuration.optitrack
         )
         optitrack.dispatchInterval = 1
     }
@@ -34,17 +34,17 @@ final class OptiTrackComponentTests: OptimoveTestCase {
     func test_event_one_report() throws {
         // given
         prefillStorageAsVisitor()
-        let stubEvent = StubEvent()
+        let stubEvent = StubOptistreamEvent
 
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
-        networking.assetManyEventsFunction = { (events, completion) -> Void in
+        networking.assetEventsFunction = { (events, completion) -> Void in
             XCTAssertEqual(events.count, 1)
             networkExpectation.fulfill()
         }
 
         // when
-        try optitrack.handle(.report(event: stubEvent))
+        try optitrack.handle(.report(events: [stubEvent]))
         wait(for: [networkExpectation], timeout: defaultTimeout + 5)
     }
 
@@ -56,7 +56,7 @@ final class OptiTrackComponentTests: OptimoveTestCase {
 
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
-        networking.assetManyEventsFunction = { (events, completion) -> Void in
+        networking.assetEventsFunction = { (events, completion) -> Void in
             XCTAssertEqual(stubEvents.count, events.count)
             networkExpectation.fulfill()
         }
@@ -71,6 +71,10 @@ final class OptiTrackComponentTests: OptimoveTestCase {
 final class MockOptistreamQueue: OptistreamQueue {
 
     var events: [OptistreamEvent] = []
+
+    var isEmpty: Bool {
+        return events.isEmpty
+    }
 
     var eventCount: Int {
         return events.count

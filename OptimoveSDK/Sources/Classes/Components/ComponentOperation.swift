@@ -3,7 +3,7 @@
 import Foundation
 
 enum Operation {
-    case report(event: Event)
+    case report(events: [Event])
     case dispatchNow
     case setInstallation
     case togglePushCampaigns(areDisabled: Bool)
@@ -13,6 +13,6 @@ enum Operation {
 }
 
 enum OptistreamOperation {
-    case report(event: OptistreamEvent)
+    case report(events: [OptistreamEvent])
     case dispatchNow
 }

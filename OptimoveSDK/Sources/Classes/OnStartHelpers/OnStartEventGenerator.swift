@@ -24,10 +24,10 @@ final class OnStartEventGenerator {
 
     private func generateEvents() {
         try? coreEventFactory.createEvent(.metaData) { event in
-            self.synchronizer.handle(.report(event: event))
+            self.synchronizer.handle(.report(events: [event]))
         }
         try? coreEventFactory.createEvent(.setAdvertisingId) { event in
-            self.synchronizer.handle(.report(event: event))
+            self.synchronizer.handle(.report(events: [event]))
         }
     }
 

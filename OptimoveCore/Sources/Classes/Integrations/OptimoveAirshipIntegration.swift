@@ -9,7 +9,7 @@ public struct OptimoveAirshipIntegration {
         static let isShared = false
     }
 
-    public struct Airship: Codable {
+    public struct Airship: Codable, Hashable {
         let channelId: String
         let appKey: String
     }

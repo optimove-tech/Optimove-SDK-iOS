@@ -51,7 +51,7 @@ private extension OptInService {
         Logger.warn("OptiPush: User AUTHORIZED notifications.")
         storage.optFlag = true
         try coreEventFactory.createEvent(.optipushOptIn) { event in
-            self.synchronizer.handle(.report(event: event))
+            self.synchronizer.handle(.report(events: [event]))
         }
         synchronizer.handle(.optIn)
     }
@@ -60,7 +60,7 @@ private extension OptInService {
         Logger.warn("OptiPush: User UNAUTHORIZED notifications.")
         storage.optFlag = false
         try coreEventFactory.createEvent(.optipushOptOut) { event in
-            self.synchronizer.handle(.report(event: event))
+            self.synchronizer.handle(.report(events: [event]))
         }
         synchronizer.handle(.optOut)
     }

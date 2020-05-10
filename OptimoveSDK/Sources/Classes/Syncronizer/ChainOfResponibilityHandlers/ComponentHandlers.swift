@@ -32,13 +32,18 @@ class ComponentHandler: Node {
 
     private func sendToStreamComponents(_ operation: Operation) {
         switch operation {
-        case .report(event: let event):
-            tryCatch {
-                let streamEvent = try optirstreamEventBuilder.build(event: event)
-                optistreamComponents.forEach { (component) in
-                    tryCatch {
-                        try component.handle(.report(event: streamEvent))
-                    }
+        case .report(events: let events):
+            let streamEvents: [OptistreamEvent] = events.compactMap { event in
+                do {
+                   return try optirstreamEventBuilder.build(event: event)
+                } catch {
+                    Logger.error(error.localizedDescription)
+                    return nil
+                }
+            }
+            optistreamComponents.forEach { (component) in
+                tryCatch {
+                    try component.handle(.report(events: streamEvents))
                 }
             }
         case .dispatchNow:

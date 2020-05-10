@@ -45,8 +45,8 @@ extension OptiTrack: OptistreamComponent {
     
     func handle(_ operation: OptistreamOperation) throws {
         switch operation {
-        case let .report(event: event):
-            track(event: event)
+        case let .report(events: events):
+            track(events: events)
         case .dispatchNow:
             dispatch()
         }
@@ -90,11 +90,11 @@ private extension OptiTrack {
         return true
     }
 
-    func track(event: OptistreamEvent) {
+    func track(events: [OptistreamEvent]) {
         dispatchQueue.async { [weak self] in
             guard let self = self else { return }
-            self.queue.enqueue(events: [event])
-            if self.shouldDispatchNow(event) {
+            self.queue.enqueue(events: events)
+            if events.map(self.shouldDispatchNow).contains(true) {
                 self.dispatch()
             }
         }

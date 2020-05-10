@@ -14,11 +14,13 @@ final class ParametersDecorator: Node {
     override func execute(_ operation: Operation) throws {
         let decorationFunction = { [configuration] () -> Operation in
             switch operation {
-            case let .report(event: event):
+            case let .report(events: events):
                 return Operation.report(
-                    event: event.decorate(
-                        config: try event.matchConfiguration(with: configuration.events)
-                    )
+                    events: try events.map {
+                        $0.decorate(
+                            config: try $0.matchConfiguration(with: configuration.events)
+                        )
+                    }
                 )
             default:
                 return operation

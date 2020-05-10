@@ -54,7 +54,7 @@ extension Optimove {
     @objc public func reportEvent(name: String, parameters: [String: Any] = [:]) {
         container.resolve { serviceLocator in
             let tenantEvent = TenantEvent(name: name, context: parameters)
-            serviceLocator.synchronizer().handle(.report(event: tenantEvent))
+            serviceLocator.synchronizer().handle(.report(events: [tenantEvent]))
         }
     }
 
@@ -65,7 +65,7 @@ extension Optimove {
     @objc public func reportEvent(_ event: OptimoveEvent) {
         container.resolve { serviceLocator in
             let tenantEvent = TenantEvent(name: event.name, context: event.parameters)
-            serviceLocator.synchronizer().handle(.report(event: tenantEvent))
+            serviceLocator.synchronizer().handle(.report(events: [tenantEvent]))
         }
     }
 
@@ -87,7 +87,7 @@ extension Optimove {
             tryCatch {
                 let factory = serviceLocator.coreEventFactory()
                 try factory.createEvent(.pageVisit(title: title, category: category)) { event in
-                    serviceLocator.synchronizer().handle(.report(event: event))
+                    serviceLocator.synchronizer().handle(.report(events: [event]))
                 }
             }
         }
@@ -120,7 +120,7 @@ extension Optimove {
             NewUserIDHandler(storage: storage).handle(userID: userID)
             tryCatch {
                 try serviceLocator.coreEventFactory().createEvent(.setUserId) { event in
-                    serviceLocator.synchronizer().handle(.report(event: event))
+                    serviceLocator.synchronizer().handle(.report(events: [event]))
                     serviceLocator.synchronizer().handle(.setInstallation)
                 }
             }
@@ -139,7 +139,7 @@ extension Optimove {
             NewEmailHandler(storage: storage).handle(email: email)
             tryCatch {
                 try serviceLocator.coreEventFactory().createEvent(.setUserEmail) { event in
-                    serviceLocator.synchronizer().handle(.report(event: event))
+                    serviceLocator.synchronizer().handle(.report(events: [event]))
                 }
             }
         }

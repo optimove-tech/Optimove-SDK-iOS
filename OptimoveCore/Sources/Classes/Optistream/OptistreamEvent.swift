@@ -14,9 +14,9 @@ public struct OptistreamEvent: Codable {
     public let context: JSON
     public let metadata: Metadata
 
-    public struct Metadata: Codable {
+    public struct Metadata: Codable, Hashable {
 
-        public struct Channel: Codable {
+        public struct Channel: Codable, Hashable {
             public let airship: OptimoveAirshipIntegration.Airship?
         }
 
@@ -56,3 +56,5 @@ extension OptistreamEvent: Equatable {
     }
 
 }
+
+extension OptistreamEvent: Hashable { }
