@@ -4,9 +4,9 @@ import OptimoveCore
 
 final class OptistreamNetworkingMock: OptistreamNetworking {
 
-    var assetEventsFunction: ((_ events: [OptistreamEvent], _ completion: (Result<Void, Error>) -> Void) -> Void)?
+    var assetEventsFunction: ((_ events: [OptistreamEvent], _ completion: (Result<Void, NetworkError>) -> Void) -> Void)?
 
-    func send(events: [OptistreamEvent], completion: @escaping (Result<Void, Error>) -> Void) {
+    func send(events: [OptistreamEvent], completion: @escaping (Result<Void, NetworkError>) -> Void) {
         assetEventsFunction?(events, completion)
     }
 
