@@ -21,14 +21,14 @@ final class StubEvent: Event {
 }
 
 public let StubOptistreamEvent = OptistreamEvent(
-    uuid: UUID().uuidString,
+    uuid: UUID(),
     tenant: StubVariables.tenantID,
     category: "test",
     event: "stub",
     origin: "sdk",
     customer: nil,
     visitor: StubVariables.initialVisitorId,
-    timestamp: "2020-05-10T07:32:29+00:00",
+    timestamp: Date(),
     context: [],
     metadata: OptistreamEvent.Metadata(channel: nil, realtime: true)
 )

@@ -11,16 +11,13 @@ final class MockOptistreamQueue: OptistreamQueue {
         return events.isEmpty
     }
 
-    var eventCount: Int {
-        return events.count
-    }
-
     func enqueue(events: [OptistreamEvent]) {
         self.events.append(contentsOf: events)
     }
 
     func first(limit: Int) -> [OptistreamEvent] {
-        let amount = limit <= eventCount ? limit : eventCount
+        let amount = limit <= events.count
+            ? limit : events.count
         return Array(self.events[0..<amount])
     }
 
