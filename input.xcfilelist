@@ -1,2 +1,3 @@
 $(SRCROOT)/Carthage/Build/iOS/OptimoveCore.framework
+$(SRCROOT)/Carthage/Build/iOS/OptimoveSDK.framework
 $(SRCROOT)/Carthage/Build/iOS/OptimoveNotificationServiceExtension.framework
