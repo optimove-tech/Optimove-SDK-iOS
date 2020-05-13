@@ -21,10 +21,16 @@ final class OptistreamQueueImpl {
         container: PersistentContainer,
         tenant: Int
     ) throws {
-        self.queueType = queueType
-        self.container = container
-        try container.loadPersistentStores(storeName: "\(Constants.Store.name)-\(tenant)")
-        context = container.newBackgroundContext()
+        do {
+            self.queueType = queueType
+            self.container = container
+            try container.loadPersistentStores(storeName: "\(Constants.Store.name)-\(tenant)")
+            context = container.newBackgroundContext()
+        } catch {
+            Logger.error(error.localizedDescription)
+            throw error
+        }
+
     }
 
 }

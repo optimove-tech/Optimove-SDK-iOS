@@ -21,15 +21,19 @@ final class SDKInitializer {
 
     func initialize(with configuration: Configuration) {
         dependencies.forEach { $0.onConfigurationFetch(configuration) }
-        setupOptimoveComponents(configuration)
-        Logger.debug("SDK is initialized.")
+        do {
+            try setupOptimoveComponents(configuration)
+            Logger.debug("SDK is initialized.")
+        } catch {
+            Logger.error("🚨 SDK failed on initialization. Error: \(error.localizedDescription)")
+        }
     }
 
 }
 
 private extension SDKInitializer {
 
-    func setupOptimoveComponents(_ configuration: Configuration) {
+    func setupOptimoveComponents(_ configuration: Configuration) throws {
 
         // MARK: Setup Eventable chain of responsibility.
 
@@ -43,11 +47,11 @@ private extension SDKInitializer {
         let decorator = ParametersDecorator(configuration: configuration)
 
         var optistreamComponents: [OptistreamComponent?] = [
-            try? componentFactory.createOptitrackComponent(configuration: configuration),
+            try componentFactory.createOptitrackComponent(configuration: configuration),
         ]
         if configuration.isEnableRealtime {
             optistreamComponents.append(
-                try? componentFactory.createRealtimeComponent(configuration: configuration)
+                try componentFactory.createRealtimeComponent(configuration: configuration)
             )
         }
 
