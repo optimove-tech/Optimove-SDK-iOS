@@ -42,12 +42,12 @@ private extension SDKInitializer {
         // 3 responder
         let decorator = ParametersDecorator(configuration: configuration)
 
-        var optistreamComponents: [OptistreamComponent] = [
-            componentFactory.createOptitrackComponent(configuration: configuration),
+        var optistreamComponents: [OptistreamComponent?] = [
+            try? componentFactory.createOptitrackComponent(configuration: configuration),
         ]
         if configuration.isEnableRealtime {
             optistreamComponents.append(
-                componentFactory.createRealtimeComponent(configuration: configuration)
+                try? componentFactory.createRealtimeComponent(configuration: configuration)
             )
         }
 
@@ -56,7 +56,7 @@ private extension SDKInitializer {
             commonComponents: [
                 componentFactory.createOptipushComponent(configuration: configuration)
             ],
-            optistreamComponents: optistreamComponents,
+            optistreamComponents: optistreamComponents.compactMap { $0 },
             optirstreamEventBuilder: componentFactory.createOptistreamEventBuilder(configuration: configuration)
         )
 

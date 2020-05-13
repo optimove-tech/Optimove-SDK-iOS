@@ -3,14 +3,14 @@
 import Foundation
 
 public struct OptistreamEvent: Codable {
-    public let uuid: String
+    public let uuid: UUID
     public let tenant: Int
     public let category: String
     public let event: String
     public let origin: String
     public let customer: String?
     public let visitor: String
-    public let timestamp: String // iso8601
+    public let timestamp: Date
     public let context: JSON
     public var metadata: Metadata
 
@@ -39,14 +39,14 @@ public struct OptistreamEvent: Codable {
     }
 
     public init(
-        uuid: String,
+        uuid: UUID,
         tenant: Int,
         category: String,
         event: String,
         origin: String,
         customer: String?,
         visitor: String,
-        timestamp: String,
+        timestamp: Date,
         context: JSON,
         metadata: Metadata
     ) {

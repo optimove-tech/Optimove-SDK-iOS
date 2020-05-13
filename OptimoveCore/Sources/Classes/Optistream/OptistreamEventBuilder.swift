@@ -34,7 +34,7 @@ public final class OptistreamEventBuilder {
             origin: Constants.Values.origin,
             customer: storage.customerID,
             visitor: try storage.getVisitorID(),
-            timestamp: Formatter.iso8601withFractionalSeconds.string(from: event.timestamp),
+            timestamp: event.timestamp,
             context: try JSON(event.context),
             metadata: OptistreamEvent.Metadata(
                 channel: OptistreamEvent.Metadata.Channel(
