@@ -12,7 +12,7 @@ let package = Package(
     products: [
         .library(
             name: "OptimoveSDK",
-            type: .static,
+            type: .dynamic,
             targets: ["OptimoveSDK"]
         ),
         .library(
@@ -25,9 +25,6 @@ let package = Package(
             type: .dynamic,
             targets: ["OptimoveNotificationServiceExtension"]
         )
-    ],
-    dependencies: [
-        .package(url: "https://github.com/WeTransfer/Mocker.git", from: "2.0.2")
     ],
     targets: [
         .target(
