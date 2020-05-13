@@ -58,7 +58,6 @@ private extension ConfigurationBuilder {
             optitrackEndpoint: tenantConfig.optitrack.optitrackEndpoint,
             enableAdvertisingIdReport: tenantConfig.optipush.enableAdvertisingIdReport,
             eventCategoryName: globalConfig.optitrack.eventCategoryName,
-            customDimensionIDS: globalConfig.optitrack.customDimensionIDs,
             events: events,
             isEnableRealtimeThroughOptistream: tenantConfig.isEnableRealtimeThroughOptistream
         )

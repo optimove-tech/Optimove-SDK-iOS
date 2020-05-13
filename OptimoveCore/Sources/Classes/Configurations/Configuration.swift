@@ -72,7 +72,6 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
     public let optitrackEndpoint: URL
     public let enableAdvertisingIdReport: Bool
     public let eventCategoryName: String
-    public let customDimensionIDS: CustomDimensionIDs
     public let events: [String: EventsConfig]
     public let isEnableRealtimeThroughOptistream: Bool
 
@@ -81,7 +80,6 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
         optitrackEndpoint: URL,
         enableAdvertisingIdReport: Bool,
         eventCategoryName: String,
-        customDimensionIDS: CustomDimensionIDs,
         events: [String: EventsConfig],
         isEnableRealtimeThroughOptistream: Bool
     ) {
@@ -89,7 +87,6 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
         self.optitrackEndpoint = optitrackEndpoint
         self.enableAdvertisingIdReport = enableAdvertisingIdReport
         self.eventCategoryName = eventCategoryName
-        self.customDimensionIDS = customDimensionIDS
         self.events = events
         self.isEnableRealtimeThroughOptistream = isEnableRealtimeThroughOptistream
     }
