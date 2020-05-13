@@ -6,6 +6,7 @@ import OptimoveCore
 final class RealTime {
 
     private struct Constants {
+        static let eventBatchLimit = 50
         static let failProtectedEvents = [
             OptimoveKeys.Configuration.setUserId.rawValue,
             OptimoveKeys.Configuration.setEmail.rawValue
@@ -61,12 +62,12 @@ private extension RealTime {
         if queue.isEmpty {
             sentReportEvent(events)
         } else {
-            let cachedEvents = queue.first(limit: 10)
+            let cachedEvents = queue.first(limit: max(Constants.eventBatchLimit - events.count, 1))
             if events.filter(shouldPersist).isEmpty {
                 sentReportEvent(cachedEvents + events)
             } else {
                 let toSend = cachedEvents.filter { (event) -> Bool in
-                    return events.filter { $0.event == event.event }.isEmpty /// O(n²)
+                    return events.filter { $0.event == event.event }.isEmpty
                 }
                 queue.remove(events: cachedEvents.filter { !toSend.contains($0) })
                 sentReportEvent(toSend + events)

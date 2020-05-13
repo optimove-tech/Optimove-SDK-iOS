@@ -13,7 +13,7 @@ final class ComponentFactory {
         self.coreEventFactory = coreEventFactory
     }
 
-    func createRealtimeComponent(configuration: Configuration) -> RealTime {
+    func createRealtimeComponent(configuration: Configuration) throws -> RealTime {
         let storage = serviceLocator.storage()
         return RealTime(
             configuration: configuration.realtime,
@@ -22,9 +22,10 @@ final class ComponentFactory {
                 networkClient: serviceLocator.networkClient(),
                 endpoint: configuration.realtime.realtimeGateway
             ),
-            queue: OptistreamQueueImpl(
-                storage: serviceLocator.storage(),
-                queuePersistanceFileName: QueueFilenameConstants.realtime
+            queue: try OptistreamQueueImpl(
+                queueType: .realtime,
+                container: PersistentContainer(modelName: PersistantModelNames.optistream),
+                tenant: configuration.tenantID
             )
         )
     }
@@ -36,11 +37,12 @@ final class ComponentFactory {
         )
     }
 
-    func createOptitrackComponent(configuration: Configuration) -> OptiTrack {
+    func createOptitrackComponent(configuration: Configuration) throws -> OptiTrack {
         return OptiTrack(
-            queue: OptistreamQueueImpl(
-                storage: serviceLocator.storage(),
-                queuePersistanceFileName: QueueFilenameConstants.track
+            queue: try OptistreamQueueImpl(
+                queueType: .track,
+                container: PersistentContainer(modelName: PersistantModelNames.optistream),
+                tenant: configuration.tenantID
             ),
             networking: OptistreamNetworkingImpl(
                 networkClient: serviceLocator.networkClient(),

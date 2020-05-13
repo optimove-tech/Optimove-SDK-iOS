@@ -55,7 +55,6 @@ targets:
       testTargets:
         - OptimoveSDK-Unit
     settings:
-      MACH_O_TYPE: staticlib
       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk
     dependencies: 
       - target: OptimoveCore
@@ -63,6 +62,7 @@ targets:
       - sdk: UserNotifications.framework
       - sdk: AdSupport.framework
       - sdk: Foundation.framework
+      - sdk: CoreData.framework
 
   OptimoveNotificationServiceExtension:
     type: framework

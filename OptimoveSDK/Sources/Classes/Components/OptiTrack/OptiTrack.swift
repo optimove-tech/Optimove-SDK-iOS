@@ -122,7 +122,7 @@ private extension OptiTrack {
             Logger.debug("Tracker is already dispatching.")
             return
         }
-        guard queue.eventCount > 0 else {
+        guard !queue.isEmpty else {
             Logger.debug("No need to dispatch. Dispatch queue is empty.")
             startDispatchTimer()
             return

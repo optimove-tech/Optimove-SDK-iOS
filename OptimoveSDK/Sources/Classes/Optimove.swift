@@ -5,6 +5,7 @@ import UserNotifications
 import OptimoveCore
 
 public typealias Event = OptimoveCore.Event
+typealias Logger = OptimoveCore.Logger
 
 /// The Optimove SDK for iOS - a realtime customer data platform.
 /// The integration guide: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki
