@@ -29,7 +29,6 @@ final class EventValidator: Node {
         static let string = "String"
         static let number = "Number"
         static let boolean = "Boolean"
-        static let legalParameterLength = 4000
     }
 
     private let configuration: Configuration
@@ -70,7 +69,8 @@ final class EventValidator: Node {
                         Logger.error("Parameter '\(key)' is not number type.")
                         throw Error.mismatchParamterType
                     }
-                    if String(describing: numberValue).count > Constants.legalParameterLength {
+                    // Verify parameter value
+                    if String(describing: numberValue).count > 255 {
                         throw Error.illegalParameterLength
                     }
                 case Constants.string:
@@ -78,7 +78,8 @@ final class EventValidator: Node {
                         Logger.error("Parameter \(key) is not string type.")
                         throw Error.mismatchParamterType
                     }
-                    if stringValue.count > Constants.legalParameterLength {
+                    // Verify parameter value length
+                    if stringValue.count > 255 {
                         throw Error.illegalParameterLength
                     }
                 case Constants.boolean:

@@ -89,6 +89,7 @@
 		49CF203CF09FBC2F4578AF84 /* OptimoveNotificationServiceExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AF7CBE1A75BE741CAF7483 /* OptimoveNotificationServiceExtensionTests.swift */; };
 		4A11B57152FB7677DD379DE1 /* Mocker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4DD62415D8168FE58AAE959 /* Mocker.framework */; };
 		4A65C0ABA1ED79C7C36D83A4 /* NotificationDeliveredEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5346604A8A9C9946B29B6F5 /* NotificationDeliveredEvent.swift */; };
+		4B583BA9BF1C2FA8274AACD3 /* String+Split.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB8B22F680152DE4E7C00A7 /* String+Split.swift */; };
 		4C7AA28A09CA23B070FFB281 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EC09BC1C5CB77E5AD50317 /* NetworkError.swift */; };
 		4D00A84B5E6DD748540A1DCF /* Mocker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4DD62415D8168FE58AAE959 /* Mocker.framework */; };
 		4F2C212ED09A0819A1B2CDED /* OptEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF827CC59D9B56C6588A4C57 /* OptEvent.swift */; };
@@ -140,6 +141,7 @@
 		75DB09C4A3AD43DB5FDF2384 /* LoggerStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF1A285E540507DACCA9630 /* LoggerStream.swift */; };
 		766617C2383406E64E0AEC8B /* NotificationPermissionFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FF76A69D6A6A50ACED5DAC /* NotificationPermissionFetcher.swift */; };
 		7699EE3297E8F95D98A71453 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9045DB7CC19B7319FF581C /* Configuration.swift */; };
+		7718B45F3E6F2D43C6A5ED3F /* StringSplitByLenghtExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70EC39175948194604CEA34B /* StringSplitByLenghtExtensionsTests.swift */; };
 		7946547A4A94770AE03156AE /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035801D597864BD02A3F3C22 /* LocationService.swift */; };
 		794AABCA624F604F26CF9F78 /* MockNotificationPermissionFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CAE2FCEA5FEDA23AA726A0E /* MockNotificationPermissionFetcher.swift */; };
 		79B848B05EF3742A8A5F5BED /* DateTimeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7BE307B3A9F9AABA03961C /* DateTimeProvider.swift */; };
@@ -440,6 +442,7 @@
 		485BDCB56EA98CD3DD5AE9DE /* TenantConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantConfigTests.swift; sourceTree = "<group>"; };
 		487536D1DE6FD34739D24A91 /* Installation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Installation.swift; sourceTree = "<group>"; };
 		4AFAFD6EE31AD9F7438FB016 /* NotificationDeliveryReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeliveryReporter.swift; sourceTree = "<group>"; };
+		4DB8B22F680152DE4E7C00A7 /* String+Split.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Split.swift"; sourceTree = "<group>"; };
 		4E4E1BBE35E94BDE9796DE21 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		4E527862BE390ACDCE2EE444 /* EmailValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailValidator.swift; sourceTree = "<group>"; };
 		4F0710E98EE949C1E5B12D69 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
@@ -472,6 +475,7 @@
 		6E3C5B3C925979A600092193 /* TenantConfigurationDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantConfigurationDownloader.swift; sourceTree = "<group>"; };
 		6E5BB6E717D62FCA403815BF /* NotificationOpenedEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationOpenedEventTests.swift; sourceTree = "<group>"; };
 		7050C386BF1D5D2C1991ACDF /* RemoteConfigurationRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationRequestBuilder.swift; sourceTree = "<group>"; };
+		70EC39175948194604CEA34B /* StringSplitByLenghtExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringSplitByLenghtExtensionsTests.swift; sourceTree = "<group>"; };
 		7142C292241C1F13B6D2F370 /* HandlersPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandlersPool.swift; sourceTree = "<group>"; };
 		71A9D3341C3268497BDCBED0 /* OptimoveNotificationServiceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationServiceExtension.swift; sourceTree = "<group>"; };
 		72CF66E4BD3D9F58D52640AE /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
@@ -1102,6 +1106,7 @@
 		4C46E5E7FF3426E1DE9E9405 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				70EC39175948194604CEA34B /* StringSplitByLenghtExtensionsTests.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1683,6 +1688,7 @@
 				5FE216E57E65CEC3F6D9F4CE /* String+isBlank.swift */,
 				2F6D1C3E09195F4AA62DE80C /* String+random.swift */,
 				0743DA20AB28DD7E78A80384 /* String+SHA1.swift */,
+				4DB8B22F680152DE4E7C00A7 /* String+Split.swift */,
 				468A5C02246C124E00DAD2B5 /* NSManagedObjectContext+Utilities.swift */,
 			);
 			path = Extensions;
@@ -2040,6 +2046,7 @@
 				419EFD0DCB8F3A6D4017D32B /* SetUserAgentEventTests.swift in Sources */,
 				54B57794ADCCA618D003408C /* SetUserEmailEventTests.swift in Sources */,
 				C071798869C6349DEC23D89B /* SetUserIdEventTests.swift in Sources */,
+				7718B45F3E6F2D43C6A5ED3F /* StringSplitByLenghtExtensionsTests.swift in Sources */,
 				6AE6747FCF19E211146D3E1C /* StubEvent.swift in Sources */,
 				370BDBC6F608BEE16E9B7439 /* StubVariables.swift in Sources */,
 				9CF7237135A4CC033D355E3F /* TenantConfigFixture.swift in Sources */,
@@ -2150,6 +2157,7 @@
 				F4463BD44A499220DDE80852 /* SetUserIdEvent.swift in Sources */,
 				BDB72CFA372352BF226C045D /* StatisticService.swift in Sources */,
 				64C373178EC3796339003DA1 /* String+SHA1.swift in Sources */,
+				4B583BA9BF1C2FA8274AACD3 /* String+Split.swift in Sources */,
 				529587C2B105ADD76A48F003 /* String+alphanumeric.swift in Sources */,
 				D3442290F4766F3C2835815D /* String+isBlank.swift in Sources */,
 				68FA63CCDADAD13FA979A68B /* String+random.swift in Sources */,
