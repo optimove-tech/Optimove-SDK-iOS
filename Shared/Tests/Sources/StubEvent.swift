@@ -21,7 +21,6 @@ final class StubEvent: Event {
 }
 
 public let StubOptistreamEvent = OptistreamEvent(
-    uuid: UUID(),
     tenant: StubVariables.tenantID,
     category: "test",
     event: "stub",
@@ -30,5 +29,9 @@ public let StubOptistreamEvent = OptistreamEvent(
     visitor: StubVariables.initialVisitorId,
     timestamp: Date(),
     context: [],
-    metadata: OptistreamEvent.Metadata(channel: nil, realtime: true)
+    metadata: OptistreamEvent.Metadata(
+        channel: nil,
+        realtime: true,
+        uuid: UUID()
+    )
 )

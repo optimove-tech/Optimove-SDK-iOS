@@ -12,7 +12,7 @@ final class EventCD: NSManagedObject {
         of type: OptistreamQueueType
     ) throws -> EventCD {
         let eventCD: EventCD = try context.insertObject()
-        eventCD.uuid = event.uuid.uuidString
+        eventCD.uuid = event.metadata.uuid.uuidString
         eventCD.date = event.timestamp
         eventCD.data = try JSONEncoder().encode(event)
         eventCD.type = type.rawValue

@@ -82,7 +82,6 @@ final class FixtureOptistreamEvent {
 
     static func generateEvent(event: String) -> OptistreamEvent {
         return OptistreamEvent(
-            uuid: UUID(),
             tenant: StubVariables.tenantID,
             category: "test",
             event: event,
@@ -91,7 +90,11 @@ final class FixtureOptistreamEvent {
             visitor: StubVariables.visitorID,
             timestamp: Date(),
             context: [],
-            metadata: OptistreamEvent.Metadata.init(channel: nil, realtime: true)
+            metadata: OptistreamEvent.Metadata.init(
+                channel: nil,
+                realtime: true,
+                uuid: UUID()
+            )
         )
     }
 

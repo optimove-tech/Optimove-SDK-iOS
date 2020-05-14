@@ -27,7 +27,6 @@ public final class OptistreamEventBuilder {
 
     public func build(event: Event) throws -> OptistreamEvent {
         return OptistreamEvent(
-            uuid: event.uuid,
             tenant: configuration.tenantID,
             category: event.category,
             event: event.name,
@@ -40,7 +39,8 @@ public final class OptistreamEventBuilder {
                 channel: OptistreamEvent.Metadata.Channel(
                     airship: try? airshipIntegration.loadAirshipIntegration()
                 ),
-                realtime: event.isRealtime
+                realtime: event.isRealtime,
+                uuid: event.uuid
             )
         )
     }

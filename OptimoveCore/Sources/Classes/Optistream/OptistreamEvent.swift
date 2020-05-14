@@ -3,7 +3,6 @@
 import Foundation
 
 public struct OptistreamEvent: Codable {
-    public let uuid: UUID
     public let tenant: Int
     public let category: String
     public let event: String
@@ -27,19 +26,21 @@ public struct OptistreamEvent: Codable {
 
         public let channel: Channel?
         public var realtime: Bool
+        public let uuid: UUID
 
         public init(
             channel: OptistreamEvent.Metadata.Channel?,
-            realtime: Bool
+            realtime: Bool,
+            uuid: UUID
         ) {
             self.channel = channel
             self.realtime = realtime
+            self.uuid = uuid
         }
 
     }
 
     public init(
-        uuid: UUID,
         tenant: Int,
         category: String,
         event: String,
@@ -50,7 +51,6 @@ public struct OptistreamEvent: Codable {
         context: JSON,
         metadata: Metadata
     ) {
-        self.uuid = uuid
         self.tenant = tenant
         self.category = category
         self.event = event
@@ -66,7 +66,7 @@ public struct OptistreamEvent: Codable {
 extension OptistreamEvent: Equatable {
 
     public static func == (lhs: OptistreamEvent, rhs: OptistreamEvent) -> Bool {
-        return lhs.uuid == rhs.uuid
+        return lhs.metadata.uuid == rhs.metadata.uuid
     }
 
 }

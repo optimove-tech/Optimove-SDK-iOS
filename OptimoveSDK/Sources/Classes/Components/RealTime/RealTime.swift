@@ -69,7 +69,8 @@ private extension RealTime {
                 let toSend = cachedEvents.filter { (event) -> Bool in
                     return events.filter { $0.event == event.event }.isEmpty
                 }
-                queue.remove(events: cachedEvents.filter { !toSend.contains($0) })
+                let toRemove = cachedEvents.filter { !toSend.contains($0) }
+                queue.remove(events: toRemove)
                 sentReportEvent(toSend + events)
             }
         }
