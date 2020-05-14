@@ -8,6 +8,7 @@
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="uuid"/>
+                <constraint value="type"/>
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
