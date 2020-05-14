@@ -60,17 +60,25 @@ private extension RealTime {
 
     func report(_ events: [OptistreamEvent]) {
         if queue.isEmpty {
+            /// Simply send incoming events if the queue is empty
             sentReportEvent(events)
         } else {
-            let cachedEvents = queue.first(limit: max(Constants.eventBatchLimit - events.count, 1))
-            if events.filter(shouldPersist).isEmpty {
-                sentReportEvent(cachedEvents + events)
+            let failProtectedEvents = queue.first(limit: max(Constants.eventBatchLimit - events.count, 1))
+            /// Check if we have intersection between `failProtectedEvents` and incoming events.
+            if events.filter(isFailProtectedEvent).isEmpty {
+                /// If no intersection found – merge them and send.
+                sentReportEvent(failProtectedEvents + events)
             } else {
-                let toSend = cachedEvents.filter { (event) -> Bool in
+                /// If intersection found, we have to separate the outdated `failProtectedEvents` from the up-to-dated `failProtectedEvents`,
+                /// and keep only up-to-dated, if they're left.
+                var toSend = failProtectedEvents.filter { (event) -> Bool in
                     return events.filter { $0.event == event.event }.isEmpty
                 }
-                let toRemove = cachedEvents.filter { !toSend.contains($0) }
+                /// Remove the outdated `failProtectedEvents` from a queue.
+                let toRemove = failProtectedEvents.filter { !toSend.contains($0) }
                 queue.remove(events: toRemove)
+                /// Send the up-to-dated `failProtectedEvents` merged with incoming events to RT.
+                toSend = (toSend + events).sorted(by: { $0.timestamp < $1.timestamp })
                 sentReportEvent(toSend + events)
             }
         }
@@ -101,14 +109,14 @@ private extension RealTime {
     }
 
     func onSuccess(_ events: [OptistreamEvent]) {
-        queue.remove(events: events.filter(shouldPersist))
+        queue.remove(events: events.filter(isFailProtectedEvent))
     }
 
     func onError(_ events: [OptistreamEvent]) {
-        queue.enqueue(events: events.filter(shouldPersist))
+        queue.enqueue(events: events.filter(isFailProtectedEvent))
     }
 
-    func shouldPersist(_ event: OptistreamEvent) -> Bool {
+    func isFailProtectedEvent(_ event: OptistreamEvent) -> Bool {
         return Constants.failProtectedEvents.contains(event.event)
     }
 
