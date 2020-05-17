@@ -105,7 +105,7 @@ private extension OptiTrack {
 
     func applyRealtimeMutation(_ event: OptistreamEvent) -> OptistreamEvent {
         var event = event
-        event.metadata.realtime = event.metadata.realtime && configuration.isEnableRealtimeThroughOptistream
+        event.metadata.realtime = event.metadata.realtime && configuration.isEnableRealtime
         return event
     }
 

@@ -59,7 +59,7 @@ private extension ConfigurationBuilder {
             enableAdvertisingIdReport: tenantConfig.optipush.enableAdvertisingIdReport,
             eventCategoryName: globalConfig.optitrack.eventCategoryName,
             events: events,
-            isEnableRealtimeThroughOptistream: tenantConfig.isEnableRealtimeThroughOptistream
+            isEnableRealtime: tenantConfig.isEnableRealtime && tenantConfig.isEnableRealtimeThroughOptistream
         )
     }
 

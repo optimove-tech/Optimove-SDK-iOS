@@ -73,7 +73,7 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
     public let enableAdvertisingIdReport: Bool
     public let eventCategoryName: String
     public let events: [String: EventsConfig]
-    public let isEnableRealtimeThroughOptistream: Bool
+    public let isEnableRealtime: Bool
 
     public init(
         tenantID: Int,
@@ -81,14 +81,14 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
         enableAdvertisingIdReport: Bool,
         eventCategoryName: String,
         events: [String: EventsConfig],
-        isEnableRealtimeThroughOptistream: Bool
+        isEnableRealtime: Bool
     ) {
         self.tenantID = tenantID
         self.optitrackEndpoint = optitrackEndpoint
         self.enableAdvertisingIdReport = enableAdvertisingIdReport
         self.eventCategoryName = eventCategoryName
         self.events = events
-        self.isEnableRealtimeThroughOptistream = isEnableRealtimeThroughOptistream
+        self.isEnableRealtime = isEnableRealtime
     }
 }
 
