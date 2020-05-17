@@ -93,9 +93,7 @@ private extension OptiTrack {
     func track(events: [OptistreamEvent]) {
         dispatchQueue.async { [weak self] in
             guard let self = self else { return }
-            let events = events
-                .map(self.applyRealtimeMutation)
-                .sorted(by: { $0.timestamp < $1.timestamp })
+            let events = events.map(self.applyRealtimeMutation)
             self.queue.enqueue(events: events)
             if events.map(self.shouldDispatchNow).contains(true) {
                 self.dispatch()

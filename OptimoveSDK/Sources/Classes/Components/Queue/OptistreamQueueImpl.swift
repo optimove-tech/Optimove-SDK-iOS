@@ -63,6 +63,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
             return try context.performAndWait {
                 let events = try EventCD.fetch(in: context) { request in
                     request.predicate = EventCD.queueTypePredicate(queueType: queueType)
+                    request.sortDescriptors = EventCD.defaultSortDescriptors
                     request.fetchLimit = limit
                     request.returnsObjectsAsFaults = false
                 }

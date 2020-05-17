@@ -36,7 +36,7 @@ extension EventCD: Managed {
     }
 
     static var defaultSortDescriptors: [NSSortDescriptor] {
-        return [NSSortDescriptor(key: #keyPath(date), ascending: false)]
+        return [NSSortDescriptor(key: #keyPath(date), ascending: true)]
     }
 
 }

@@ -71,14 +71,13 @@ private extension RealTime {
             } else {
                 /// If intersection found, we have to separate the outdated `failProtectedEvents` from the up-to-dated `failProtectedEvents`,
                 /// and keep only up-to-dated, if they're left.
-                var toSend = failProtectedEvents.filter { (event) -> Bool in
+                let toSend = failProtectedEvents.filter { (event) -> Bool in
                     return events.filter { $0.event == event.event }.isEmpty
                 }
                 /// Remove the outdated `failProtectedEvents` from a queue.
                 let toRemove = failProtectedEvents.filter { !toSend.contains($0) }
                 queue.remove(events: toRemove)
                 /// Send the up-to-dated `failProtectedEvents` merged with incoming events to RT.
-                toSend = (toSend + events).sorted(by: { $0.timestamp < $1.timestamp })
                 sentReportEvent(toSend + events)
             }
         }
