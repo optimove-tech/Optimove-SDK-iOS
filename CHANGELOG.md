@@ -4,6 +4,9 @@
 
 - **add** a support of the new Optistream events.
 - **remove** the Matomo SDK dependency.
+- **add** Airship integration.
+- **improve** persistent layer for events.
+- **change** global config to v4.
 
 ## 2.12.1
 
