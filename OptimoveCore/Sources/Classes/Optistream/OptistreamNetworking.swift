@@ -3,7 +3,16 @@
 import Foundation
 
 public protocol OptistreamNetworking {
-    func send(events: [OptistreamEvent], completion: @escaping (Result<Void, NetworkError>) -> Void)
+    func send(
+        events: [OptistreamEvent],
+        path: String,
+        completion: @escaping (Result<Void, NetworkError>) -> Void
+    )
+
+    func send(
+        events: [OptistreamEvent],
+        completion: @escaping (Result<Void, NetworkError>) -> Void
+    )
 }
 
 public final class OptistreamNetworkingImpl {
@@ -19,15 +28,16 @@ public final class OptistreamNetworkingImpl {
         self.endpoint = endpoint
     }
 
-}
-
-extension OptistreamNetworkingImpl: OptistreamNetworking {
-
-    public func send(events: [OptistreamEvent], completion: @escaping (Result<Void, NetworkError>) -> Void) {
+    private func _send(
+        events: [OptistreamEvent],
+        path: String?,
+        completion: @escaping (Result<Void, NetworkError>) -> Void
+    ) {
         do {
             let request = try NetworkRequest(
                 method: .post,
                 baseURL: endpoint,
+                path: path,
                 body: events
             )
             networkClient.perform(request) {
@@ -36,6 +46,24 @@ extension OptistreamNetworkingImpl: OptistreamNetworking {
         } catch {
             completion(.failure(NetworkError.error(error)))
         }
+    }
+}
+
+extension OptistreamNetworkingImpl: OptistreamNetworking {
+
+    public func send(
+        events: [OptistreamEvent],
+        path: String,
+        completion: @escaping (Result<Void, NetworkError>) -> Void
+    ) {
+        _send(events: events, path: path, completion: completion)
+    }
+
+    public func send(
+        events: [OptistreamEvent],
+        completion: @escaping (Result<Void, NetworkError>) -> Void
+    ) {
+        _send(events: events, path: nil, completion: completion)
     }
 
 }

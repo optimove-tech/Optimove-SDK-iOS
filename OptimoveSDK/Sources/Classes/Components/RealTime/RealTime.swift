@@ -11,6 +11,7 @@ final class RealTime {
             OptimoveKeys.Configuration.setUserId.rawValue,
             OptimoveKeys.Configuration.setEmail.rawValue
         ]
+        static let path = "reportEvent"
     }
 
     private let configuration: RealtimeConfig
@@ -92,7 +93,7 @@ private extension RealTime {
     // MARK: Send report
 
     func sentReportEvent(_ events: [OptistreamEvent]) {
-        networking.send(events: events) { [weak self] (result) in
+        networking.send(events: events, path: Constants.path) { [weak self] (result) in
             guard let self = self else { return }
             self.realTimeQueue.async { [weak self] in
                 guard let self = self else { return }
