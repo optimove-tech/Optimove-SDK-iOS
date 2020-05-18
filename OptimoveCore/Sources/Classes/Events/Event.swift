@@ -4,9 +4,7 @@ import Foundation
 
 open class Event {
 
-    public struct Constants {
-        public static let category = "track"
-    }
+    public static let category = "track"
 
     public let uuid: UUID
     public let name: String
@@ -18,7 +16,7 @@ open class Event {
     public init(
         uuid: UUID = UUID(),
         name: String,
-        category: String = Constants.category,
+        category: String = category,
         context: [String: Any],
         timestamp: Date = Date(),
         isRealtime: Bool = false
