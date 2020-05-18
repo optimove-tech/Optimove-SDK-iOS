@@ -10,4 +10,8 @@ final class OptistreamNetworkingMock: OptistreamNetworking {
         assetEventsFunction?(events, completion)
     }
 
+    func send(events: [OptistreamEvent], path: String, completion: @escaping (Result<Void, NetworkError>) -> Void) {
+        assetEventsFunction?(events, completion)
+    }
+
 }
