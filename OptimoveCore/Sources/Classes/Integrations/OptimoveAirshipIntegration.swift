@@ -6,7 +6,7 @@ public struct OptimoveAirshipIntegration {
 
     struct Constants {
         static let airshipFile = "airship_file.json"
-        static let isShared = false
+        static let isGroupContainer = false
     }
 
     public struct Airship: Codable, Hashable {
@@ -31,15 +31,15 @@ public struct OptimoveAirshipIntegration {
             let appKey = secretAppKey() else { return }
         try storage.save(data: Airship(channelId: channelId, appKey: appKey),
                          toFileName: Constants.airshipFile,
-                         shared: Constants.isShared)
+                         isGroupContainer: Constants.isGroupContainer)
     }
 
     public func loadAirshipIntegration() throws -> Airship {
         guard configuration.isSupportedAirship ?? false,
-            storage.isExist(fileName: Constants.airshipFile, shared: Constants.isShared) else {
+            storage.isExist(fileName: Constants.airshipFile, isGroupContainer: Constants.isGroupContainer) else {
             throw GuardError.custom("Airship integration does not supported")
         }
-        return try storage.load(fileName: Constants.airshipFile, shared: Constants.isShared)
+        return try storage.load(fileName: Constants.airshipFile, isGroupContainer: Constants.isGroupContainer)
     }
 
     /// `[UAirship channel].identifier]`

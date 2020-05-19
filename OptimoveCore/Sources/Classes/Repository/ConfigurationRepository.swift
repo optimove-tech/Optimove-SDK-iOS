@@ -21,14 +21,14 @@ public final class ConfigurationRepositoryImpl {
         static let fileExtension = ".json"
         struct Global {
             static let fileName = "global_config" + fileExtension
-            static let sharedStorage = true
+            static let isGroupContainer = true
         }
         struct Tenant {
-            static let sharedStorage = true
+            static let isGroupContainer = true
         }
         struct Configuration {
             static let fileName = "configuration" + fileExtension
-            static let sharedStorage = true
+            static let isGroupContainer = true
         }
     }
 
@@ -44,28 +44,31 @@ extension ConfigurationRepositoryImpl: ConfigurationRepository {
 
     public func getConfiguration() throws -> Configuration {
         return try storage.load(fileName: Constants.Configuration.fileName,
-                                shared: Constants.Configuration.sharedStorage)
+                                isGroupContainer: Constants.Configuration.isGroupContainer)
     }
 
     public func setConfiguration(_ config: Configuration) throws {
         try storage.save(data: config,
-                         toFileName: Constants.Configuration.fileName, shared: Constants.Configuration.sharedStorage)
+                         toFileName: Constants.Configuration.fileName,
+                         isGroupContainer: Constants.Configuration.isGroupContainer)
     }
 
     public func getGlobal() throws -> GlobalConfig {
-        return try storage.load(fileName: Constants.Global.fileName, shared: Constants.Global.sharedStorage)
+        return try storage.load(fileName: Constants.Global.fileName,
+                                isGroupContainer: Constants.Global.isGroupContainer)
     }
 
     public func saveGlobal(_ config: GlobalConfig) throws {
         try storage.save(data: config,
                          toFileName: Constants.Global.fileName,
-                         shared: Constants.Global.sharedStorage)
+                         isGroupContainer: Constants.Global.isGroupContainer)
     }
 
     public func getTenant() throws -> TenantConfig {
         let version = try storage.getVersion()
         let fileName = version + Constants.fileExtension
-        return try storage.load(fileName: fileName, shared: Constants.Tenant.sharedStorage)
+        return try storage.load(fileName: fileName,
+                                isGroupContainer: Constants.Tenant.isGroupContainer)
     }
 
     public func saveTenant(_ config: TenantConfig) throws {
@@ -73,6 +76,6 @@ extension ConfigurationRepositoryImpl: ConfigurationRepository {
         let fileName = version + Constants.fileExtension
         try storage.save(data: config,
                          toFileName: fileName,
-                         shared: Constants.Tenant.sharedStorage)
+                         isGroupContainer: Constants.Tenant.isGroupContainer)
     }
 }

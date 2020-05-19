@@ -200,28 +200,28 @@ extension StorageFacade {
 
 extension StorageFacade {
 
-    public func isExist(fileName: String, shared: Bool) -> Bool {
-        return fileStorage.isExist(fileName: fileName, shared: shared)
+    public func isExist(fileName: String, isGroupContainer: Bool) -> Bool {
+        return fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer)
     }
 
-    public func save<T: Codable>(data: T, toFileName: String, shared: Bool) throws {
-        try fileStorage.save(data: data, toFileName: toFileName, shared: shared)
+    public func save<T: Codable>(data: T, toFileName: String, isGroupContainer: Bool) throws {
+        try fileStorage.save(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
     }
 
-    public func saveData(data: Data, toFileName: String, shared: Bool) throws {
-        try fileStorage.saveData(data: data, toFileName: toFileName, shared: shared)
+    public func saveData(data: Data, toFileName: String, isGroupContainer: Bool) throws {
+        try fileStorage.saveData(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
     }
 
-    public func load<T: Codable>(fileName: String, shared: Bool) throws -> T {
-        return try fileStorage.load(fileName: fileName, shared: shared)
+    public func load<T: Codable>(fileName: String, isGroupContainer: Bool) throws -> T {
+        return try fileStorage.load(fileName: fileName, isGroupContainer: isGroupContainer)
     }
 
-    public func loadData(fileName: String, shared: Bool) throws -> Data {
-        return try fileStorage.loadData(fileName: fileName, shared: shared)
+    public func loadData(fileName: String, isGroupContainer: Bool) throws -> Data {
+        return try fileStorage.loadData(fileName: fileName, isGroupContainer: isGroupContainer)
     }
 
-    public func delete(fileName: String, shared: Bool) throws {
-        try fileStorage.delete(fileName: fileName, shared: shared)
+    public func delete(fileName: String, isGroupContainer: Bool) throws {
+        try fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer)
     }
 
 }

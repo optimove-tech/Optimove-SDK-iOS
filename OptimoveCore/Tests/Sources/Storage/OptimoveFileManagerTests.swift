@@ -33,77 +33,77 @@ class OptimoveFileManagerTests: XCTestCase {
     }
 
     func test_save_encodable_shared() {
-        save_encodable(shared: true)
+        save_encodable(isGroupContainer: true)
     }
 
     func test_save_encodable_no_shared() {
-        save_encodable(shared: false)
+        save_encodable(isGroupContainer: false)
     }
 
-    func save_encodable(shared: Bool) {
+    func save_encodable(isGroupContainer: Bool) {
         // given
         let model = StubCodable()
 
         // when
-        XCTAssertNoThrow(try fileStorage.save(data: model, toFileName: fileName, shared: shared))
+        XCTAssertNoThrow(try fileStorage.save(data: model, toFileName: fileName, isGroupContainer: isGroupContainer))
 
         // then
-        XCTAssert(fileStorage.isExist(fileName: fileName, shared: shared))
+        XCTAssert(fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer))
     }
 
     func test_load_data_shared() throws {
-        try load_data(shared: true)
+        try load_data(isGroupContainer: true)
     }
 
     func test_load_data_no_shared() throws {
-        try load_data(shared: false)
+        try load_data(isGroupContainer: false)
     }
 
-    func load_data(shared: Bool) throws {
+    func load_data(isGroupContainer: Bool) throws {
         // given
-        save_encodable(shared: shared)
+        save_encodable(isGroupContainer: isGroupContainer)
 
         // then
-        XCTAssertNotNil(try fileStorage.loadData(fileName: fileName, shared: shared))
-        let stub: StubCodable = try fileStorage.load(fileName: fileName, shared: shared)
+        XCTAssertNotNil(try fileStorage.loadData(fileName: fileName, isGroupContainer: isGroupContainer))
+        let stub: StubCodable = try fileStorage.load(fileName: fileName, isGroupContainer: isGroupContainer)
         XCTAssertNotNil(stub)
     }
 
     func test_delete_shared() {
-        delete_file(shared: true)
+        delete_file(isGroupContainer: true)
     }
 
     func test_delete_no_shared() {
-        delete_file(shared: false)
+        delete_file(isGroupContainer: false)
     }
 
-    func delete_file(shared: Bool) {
+    func delete_file(isGroupContainer: Bool) {
         // given
-        save_encodable(shared: shared)
+        save_encodable(isGroupContainer: isGroupContainer)
 
         // when
-        XCTAssertNoThrow(try fileStorage.delete(fileName: fileName, shared: shared))
+        XCTAssertNoThrow(try fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer))
 
         // then
-        XCTAssert(fileStorage.isExist(fileName: fileName, shared: shared) == false)
+        XCTAssert(fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer) == false)
     }
 
     func test_delete_not_existed_file_shared() {
-        delete_not_existed_file(shared: true)
+        delete_not_existed_file(isGroupContainer: true)
     }
 
     func test_delete_not_existed_file_no_shared() {
-        delete_not_existed_file(shared: false)
+        delete_not_existed_file(isGroupContainer: false)
     }
 
-    func delete_not_existed_file(shared: Bool) {
+    func delete_not_existed_file(isGroupContainer: Bool) {
         // check if file exist as result of an another test.
-        if fileStorage.isExist(fileName: fileName, shared: shared) {
-            try? fileStorage.delete(fileName: fileName, shared: shared)
+        if fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer) {
+            try? fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer)
         }
 
         // then
-        XCTAssertThrowsError(try fileStorage.delete(fileName: fileName, shared: shared))
+        XCTAssertThrowsError(try fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer))
     }
 
 }

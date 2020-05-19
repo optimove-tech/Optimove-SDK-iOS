@@ -30,27 +30,27 @@ class MockFileStorage: FileStorage {
 
     var storage: [String: Data] = [:]
 
-    func isExist(fileName: String, shared: Bool) -> Bool {
+    func isExist(fileName: String, isGroupContainer: Bool) -> Bool {
         return storage[fileName] != nil
     }
 
-    func save<T: Codable>(data: T, toFileName: String, shared: Bool) throws {
+    func save<T: Codable>(data: T, toFileName: String, isGroupContainer: Bool) throws {
         storage[toFileName] = try JSONEncoder().encode(data)
     }
 
-    func saveData(data: Data, toFileName: String, shared: Bool) throws {
+    func saveData(data: Data, toFileName: String, isGroupContainer: Bool) throws {
         storage[toFileName] = data
     }
 
-    func load<T: Codable>(fileName: String, shared: Bool) throws -> T {
+    func load<T: Codable>(fileName: String, isGroupContainer: Bool) throws -> T {
         return try JSONDecoder().decode(T.self, from: try unwrap(storage[fileName]))
     }
 
-    func loadData(fileName: String, shared: Bool) throws -> Data {
+    func loadData(fileName: String, isGroupContainer: Bool) throws -> Data {
         return try unwrap(storage[fileName])
     }
 
-    func delete(fileName: String, shared: Bool) throws {
+    func delete(fileName: String, isGroupContainer: Bool) throws {
         return storage[fileName] = nil
     }
 
