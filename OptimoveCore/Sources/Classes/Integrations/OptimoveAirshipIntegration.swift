@@ -6,7 +6,7 @@ public struct OptimoveAirshipIntegration {
 
     struct Constants {
         static let airshipFile = "airship_file.json"
-        static let isGroupContainer = false
+        static let isGroupContainer = true
     }
 
     public struct Airship: Codable, Hashable {
