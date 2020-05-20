@@ -47,7 +47,7 @@ private extension SDKInitializer {
         let decorator = ParametersDecorator(configuration: configuration)
 
         var optistreamComponents: [OptistreamComponent?] = [
-            try componentFactory.createOptitrackComponent(configuration: configuration),
+            try componentFactory.createOptitrackComponent(configuration: configuration)
         ]
         if configuration.isEnableRealtime {
             optistreamComponents.append(

@@ -42,7 +42,7 @@ final class OptiTrack {
 }
 
 extension OptiTrack: OptistreamComponent {
-    
+
     func handle(_ operation: OptistreamOperation) throws {
         switch operation {
         case let .report(events: events):
@@ -149,7 +149,7 @@ private extension OptiTrack {
         networking.send(events: events) { [weak self] (result) in
             guard let self = self else { return }
             switch result {
-            case .success():
+            case .success:
                 self.dispatchQueue.async {
                     self.queue.remove(events: events)
                     self.dispatchBatch()
@@ -159,7 +159,7 @@ private extension OptiTrack {
                     Logger.error(error.localizedDescription)
                     self.isDispatching = false
                     switch error {
-                    case .requestInvalid(_):
+                    case .requestInvalid:
                         self.queue.remove(events: events)
                     default:
                         break

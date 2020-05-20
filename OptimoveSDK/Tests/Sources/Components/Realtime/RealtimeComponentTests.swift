@@ -90,7 +90,7 @@ final class FixtureOptistreamEvent {
             visitor: StubVariables.visitorID,
             timestamp: Date(),
             context: [],
-            metadata: OptistreamEvent.Metadata.init(
+            metadata: OptistreamEvent.Metadata(
                 channel: nil,
                 realtime: true,
                 firstVisitorDate: Date().timeIntervalSince1970.seconds,

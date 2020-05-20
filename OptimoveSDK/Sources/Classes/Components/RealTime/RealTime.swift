@@ -98,7 +98,7 @@ private extension RealTime {
             self.realTimeQueue.async { [weak self] in
                 guard let self = self else { return }
                 switch result {
-                case .success():
+                case .success:
                     self.onSuccess(events)
                 case let .failure(error):
                     Logger.error(error.localizedDescription)

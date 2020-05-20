@@ -29,7 +29,7 @@ final class OptInService {
     func didPushAuthorization(status: OptStatus) throws {
         requestTokenIfNeeded(status: status)
         guard isOptStateChanged(status: status) else { return }
-        subscribers.forEach({ $0.statusChanged(status: status)})
+        subscribers.forEach({ $0.statusChanged(status: status) })
         switch status {
         case .optIn:
             try executeOptIn()

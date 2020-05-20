@@ -122,7 +122,7 @@ private extension CoreEventFactoryImpl {
             )
             semaphore.signal()
         })
-        let _ = semaphore.wait(timeout: .now() + .seconds(3))
+        _ = semaphore.wait(timeout: .now() + .seconds(3))
         return try unwrap(event)
     }
 

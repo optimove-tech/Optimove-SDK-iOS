@@ -32,7 +32,7 @@ public struct TenantConfig: Codable, Equatable {
         isSupportedAirship = try container.decodeIfPresent(Bool.self, forKey: .supportAirship)
         isEnableRealtime = try container.decode(Bool.self, forKey: .enableRealtime)
         isEnableRealtimeThroughOptistream = (
-            try? container.decodeIfPresent(Bool.self,forKey: .enableRealtimeThroughOptistream)
+            try? container.decodeIfPresent(Bool.self, forKey: .enableRealtimeThroughOptistream)
         ) ?? false
         realtime = try container.decode(TenantRealtimeConfig.self, forKey: .realtime)
         optitrack = try container.decode(TenantOptitrackConfig.self, forKey: .optitrack)

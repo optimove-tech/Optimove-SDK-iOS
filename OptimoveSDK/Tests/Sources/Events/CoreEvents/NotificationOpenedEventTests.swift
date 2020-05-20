@@ -22,7 +22,7 @@ class NotificationOpenedEventTests: XCTestCase {
 
         // then
         XCTAssertEqual(event.name, campaign.eventName)
-        XCTAssertEqual(event.context[NotificationOpenedEvent.Constants.Key.appNS] as? String , bundleIdentifier)
+        XCTAssertEqual(event.context[NotificationOpenedEvent.Constants.Key.appNS] as? String, bundleIdentifier)
         XCTAssertEqual(event.context[NotificationOpenedEvent.Constants.Key.identityToken] as? String, identityToken)
         XCTAssertEqual(event.context[NotificationOpenedEvent.Constants.Key.timestamp] as? Int64, timestamp.timeIntervalSince1970.seconds)
     }
@@ -43,7 +43,7 @@ class NotificationOpenedEventTests: XCTestCase {
 
         // then
         XCTAssertEqual(event.name, campaign.eventName)
-        XCTAssertEqual(event.context[NotificationOpenedEvent.Constants.Key.appNS] as? String , bundleIdentifier)
+        XCTAssertEqual(event.context[NotificationOpenedEvent.Constants.Key.appNS] as? String, bundleIdentifier)
         XCTAssertEqual(event.context[NotificationOpenedEvent.Constants.Key.identityToken] as? String, identityToken)
         XCTAssertEqual(event.context[NotificationOpenedEvent.Constants.Key.timestamp] as? Int64, timestamp.timeIntervalSince1970.seconds)
     }

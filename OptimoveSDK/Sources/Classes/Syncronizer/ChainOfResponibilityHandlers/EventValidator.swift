@@ -29,7 +29,7 @@ final class EventValidator: Node {
         static let string = "String"
         static let number = "Number"
         static let boolean = "Boolean"
-        static let legalParameterLength = 4000
+        static let legalParameterLength = 4_000
     }
 
     private let configuration: Configuration

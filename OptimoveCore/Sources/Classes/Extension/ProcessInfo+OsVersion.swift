@@ -12,4 +12,3 @@ public extension ProcessInfo {
         ].map { String($0) }.joined(separator: ".")
     }
 }
-
