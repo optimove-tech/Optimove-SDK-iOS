@@ -26,15 +26,18 @@ public struct OptistreamEvent: Codable {
 
         public let channel: Channel?
         public var realtime: Bool
+        public var firstVisitorDate: Int64
         public let uuid: UUID
 
         public init(
             channel: OptistreamEvent.Metadata.Channel?,
             realtime: Bool,
+            firstVisitorDate: Int64,
             uuid: UUID
         ) {
             self.channel = channel
             self.realtime = realtime
+            self.firstVisitorDate = firstVisitorDate
             self.uuid = uuid
         }
 

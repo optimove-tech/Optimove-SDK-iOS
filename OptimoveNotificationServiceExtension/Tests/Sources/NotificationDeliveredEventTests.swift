@@ -20,7 +20,7 @@ class NotificationDeliveredEventTests: XCTestCase {
         )
 
         XCTAssertEqual(notificationType.eventName, event.name)
-        XCTAssertEqual(timestamp.timeIntervalSince1970.seconds, event.context[NotificationDeliveredEvent.Constants.Key.timestamp] as? Int)
+        XCTAssertEqual(timestamp.timeIntervalSince1970.seconds, event.context[NotificationDeliveredEvent.Constants.Key.timestamp] as? Int64)
         XCTAssertEqual(identityToken, event.context[NotificationDeliveredEvent.Constants.Key.identityToken] as? String)
         XCTAssertEqual(bundleIdentifier, event.context[NotificationDeliveredEvent.Constants.Key.appNS] as? String)
         XCTAssertEqual(NotificationDeliveredEvent.Constants.Value.deviceType, event.context[NotificationDeliveredEvent.Constants.Key.eventDeviceType] as? String)
@@ -43,7 +43,7 @@ class NotificationDeliveredEventTests: XCTestCase {
         )
 
         XCTAssertEqual(notificationType.eventName, event.name)
-        XCTAssertEqual(timestamp.timeIntervalSince1970.seconds, event.context[NotificationDeliveredEvent.Constants.Key.timestamp] as? Int)
+        XCTAssertEqual(timestamp.timeIntervalSince1970.seconds, event.context[NotificationDeliveredEvent.Constants.Key.timestamp] as? Int64)
         XCTAssertEqual(identityToken, event.context[NotificationDeliveredEvent.Constants.Key.identityToken] as? String)
         XCTAssertEqual(bundleIdentifier, event.context[NotificationDeliveredEvent.Constants.Key.appNS] as? String)
         XCTAssertEqual(NotificationDeliveredEvent.Constants.Value.deviceType, event.context[NotificationDeliveredEvent.Constants.Key.eventDeviceType] as? String)

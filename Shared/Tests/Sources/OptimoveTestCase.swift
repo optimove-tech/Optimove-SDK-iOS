@@ -27,6 +27,7 @@ class OptimoveTestCase: XCTestCase {
         prefillStorageWithConfiguration()
         storage.installationID = UUID().uuidString
         storage.userAgent = "user-agent"
+        storage.firstVisitTimestamp = Date().timeIntervalSince1970.seconds
     }
 
     func prefillStorageAsVisitor() {

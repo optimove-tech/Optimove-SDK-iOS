@@ -3,7 +3,7 @@
 import Foundation
 
 public extension TimeInterval {
-    var seconds: Int {
-        return Int(self)
+    var seconds: Int64 {
+        return Int64(self)
     }
 }

@@ -14,7 +14,7 @@ final class FirstTimeVisitGenerator {
     func generate() {
         if storage.firstVisitTimestamp == nil {
             // Realtime server asked to get it in seconds
-            storage.firstVisitTimestamp = Int64(Date().timeIntervalSince1970)
+            storage.firstVisitTimestamp = Date().timeIntervalSince1970.seconds
         }
     }
 }

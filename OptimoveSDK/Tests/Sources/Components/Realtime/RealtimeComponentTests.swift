@@ -93,6 +93,7 @@ final class FixtureOptistreamEvent {
             metadata: OptistreamEvent.Metadata.init(
                 channel: nil,
                 realtime: true,
+                firstVisitorDate: Date().timeIntervalSince1970.seconds,
                 uuid: UUID()
             )
         )

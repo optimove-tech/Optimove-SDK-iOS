@@ -32,6 +32,7 @@ public let StubOptistreamEvent = OptistreamEvent(
     metadata: OptistreamEvent.Metadata(
         channel: nil,
         realtime: true,
+        firstVisitorDate: Date().timeIntervalSince1970.seconds,
         uuid: UUID()
     )
 )
