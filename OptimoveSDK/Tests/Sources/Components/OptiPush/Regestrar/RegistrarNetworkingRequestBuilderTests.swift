@@ -10,6 +10,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
     var builder: ApiRequestFactory!
     var payloadBuilder: ApiPayloadBuilder!
     let config = ConfigurationFixture.build().optipush
+    let encoder = JSONEncoder()
 
     override func setUp() {
         super.setUp()
@@ -26,13 +27,13 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         )
     }
 
-    func test_add_user_request_for_visitor() {
+    func test_add_user_request_for_visitor() throws {
         // given
         prefillStorageAsVisitor()
         prefillPushToken()
 
         // when
-        let request = try! builder.createRequest(operation: .setInstallation)
+        let request = try builder.createRequest(operation: .setInstallation)
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
@@ -43,22 +44,20 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         )
         XCTAssertEqual(request.method, .post)
         XCTAssertEqual(request.timeoutInterval, NetworkRequest.DefaultValue.timeoutInterval)
-        let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
-        XCTAssertEqual(request.httpBody, try! encoder.encode(payloadBuilder.createInstallation()))
+        XCTAssertEqual(request.httpBody, try encoder.encode(payloadBuilder.createInstallation()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
         }))
     }
 
-    func test_add_user_request_for_customer() {
+    func test_add_user_request_for_customer() throws {
         // given
         prefillStorageAsCustomer()
         prefillPushToken()
 
         // when
-        let request = try! builder.createRequest(operation: .setInstallation)
+        let request = try builder.createRequest(operation: .setInstallation)
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
@@ -69,22 +68,20 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         )
         XCTAssert(request.method == .post)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
-        XCTAssertEqual(request.httpBody, try! encoder.encode(payloadBuilder.createInstallation()))
+        XCTAssertEqual(request.httpBody, try encoder.encode(payloadBuilder.createInstallation()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
         }))
     }
 
-    func test_migrate_user_request() {
+    func test_migrate_user_request() throws {
         // given
         prefillStorageAsCustomer()
         prefillPushToken()
 
         // when
-        let request = try! builder.createRequest(operation: .setInstallation)
+        let request = try builder.createRequest(operation: .setInstallation)
 
         // then
         XCTAssertEqual(request.baseURL, config.mbaasEndpoint
@@ -95,9 +92,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
         )
         XCTAssert(request.method == .post)
         XCTAssert(request.timeoutInterval == NetworkRequest.DefaultValue.timeoutInterval)
-        let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
-        XCTAssertEqual(request.httpBody, try! encoder.encode(try! payloadBuilder.createInstallation()))
+        XCTAssertEqual(request.httpBody, try encoder.encode(try payloadBuilder.createInstallation()))
         XCTAssert(request.headers!.contains(where: { (header) -> Bool in
             return header.field == HTTPHeader.Fields.contentType.rawValue &&
                 header.value == HTTPHeader.Values.json.rawValue
