@@ -46,7 +46,6 @@ public final class NetworkRequest {
         body: Body,
         timeoutInterval: TimeInterval = DefaultValue.timeoutInterval) throws {
         let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
         encoder.dateEncodingStrategy = .formatted(Formatter.iso8601withFractionalSeconds)
         self.init(
             method: method,
