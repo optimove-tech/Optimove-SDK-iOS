@@ -6,11 +6,13 @@ final class ComponentFactory {
 
     private let serviceLocator: ServiceLocator
     private let coreEventFactory: CoreEventFactory
+    private let persistentContainer: PersistentContainer
 
     init(serviceLocator: ServiceLocator,
          coreEventFactory: CoreEventFactory) {
         self.serviceLocator = serviceLocator
         self.coreEventFactory = coreEventFactory
+        self.persistentContainer = PersistentContainer()
     }
 
     func createRealtimeComponent(configuration: Configuration) throws -> RealTime {
@@ -24,7 +26,7 @@ final class ComponentFactory {
             ),
             queue: try OptistreamQueueImpl(
                 queueType: .realtime,
-                container: PersistentContainer(modelName: PersistantModelNames.optistream),
+                container: self.persistentContainer,
                 tenant: configuration.tenantID
             )
         )
@@ -41,7 +43,7 @@ final class ComponentFactory {
         return OptiTrack(
             queue: try OptistreamQueueImpl(
                 queueType: .track,
-                container: PersistentContainer(modelName: PersistantModelNames.optistream),
+                container: self.persistentContainer,
                 tenant: configuration.tenantID
             ),
             networking: OptistreamNetworkingImpl(

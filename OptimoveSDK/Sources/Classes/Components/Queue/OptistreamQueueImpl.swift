@@ -52,8 +52,6 @@ extension OptistreamQueueImpl: OptistreamQueue {
                     _ = try EventCD.insert(into: self.context, event: event, of: self.queueType)
                 }
             }
-        }
-        context.perform {
             self.context.saveOrRollback()
         }
     }
@@ -92,10 +90,8 @@ extension OptistreamQueueImpl: OptistreamQueue {
                 fetch.predicate = predicate
                 let request = NSBatchDeleteRequest(fetchRequest: fetch)
                 try self.context.execute(request)
+                self.context.saveOrRollback()
             }
-        }
-        context.perform {
-            self.context.saveOrRollback()
         }
     }
 }

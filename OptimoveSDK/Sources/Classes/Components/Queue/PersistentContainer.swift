@@ -4,22 +4,20 @@ import Foundation
 import CoreData
 import OptimoveCore
 
-struct PersistantModelNames {
-    static let optistream = "OptistreamQueue"
-}
-
 final class PersistentContainer: NSPersistentContainer {
 
     private struct Constants {
+        static let modelName = "OptistreamQueue"
         static let folderName = "com.optimove.sdk.no-backup"
     }
 
-    init(modelName: String) {
+    init(modelName: String = Constants.modelName) {
         let mom = CoreDataModelDescription.makeOptistreamEventModel()
         super.init(name: modelName, managedObjectModel: mom)
     }
 
     func loadPersistentStores(storeName: String) throws {
+        guard isThisStoreNotLoaded(storeName: storeName) else { return }
         let persistentStoreDescription = NSPersistentStoreDescription()
         persistentStoreDescription.url = try defineStoreURL(storeName: storeName)
         self.persistentStoreDescriptions = [persistentStoreDescription]
@@ -28,6 +26,12 @@ final class PersistentContainer: NSPersistentContainer {
                 Logger.error("Unable to load persistent stores: \(error)")
             }
         }
+    }
+
+    private func isThisStoreNotLoaded(storeName: String) -> Bool {
+        return persistentStoreDescriptions.compactMap { psd in
+            return psd.url?.deletingPathExtension().lastPathComponent
+        }.filter { $0 == storeName}.isEmpty
     }
 }
 
