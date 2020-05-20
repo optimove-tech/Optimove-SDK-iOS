@@ -80,7 +80,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
             Logger.error(error.localizedDescription)
             return []
         }
-        
+
     }
 
     func remove(events: [OptistreamEvent]) {

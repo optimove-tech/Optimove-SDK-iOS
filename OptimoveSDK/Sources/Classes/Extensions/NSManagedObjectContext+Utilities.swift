@@ -15,7 +15,7 @@ extension NSManagedObjectContext {
 
     func insertObject<A: NSManagedObject>() throws -> A where A: Managed {
         guard let obj = NSEntityDescription.insertNewObject(forEntityName: A.entityName, into: self) as? A else {
-            throw GuardError.custom("Wrong object type")
+            throw GuardError.custom("Wrong object type for entity name: \(A.entityName)")
         }
         return obj
     }

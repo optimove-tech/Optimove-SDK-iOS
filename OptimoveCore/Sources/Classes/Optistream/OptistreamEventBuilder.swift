@@ -45,5 +45,5 @@ public final class OptistreamEventBuilder {
             )
         )
     }
-    
+
 }

@@ -4,6 +4,7 @@
 import Foundation
 import CoreData
 
+@objc(EventCD)
 final class EventCD: NSManagedObject {
 
     static func insert(
