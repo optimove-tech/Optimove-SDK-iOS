@@ -56,7 +56,6 @@ targets:
         - OptimoveSDK-Unit
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk
-      OTHER_LDFLAGS: -ObjC
     dependencies: 
       - target: OptimoveCore
       - sdk: UIKit.framework
