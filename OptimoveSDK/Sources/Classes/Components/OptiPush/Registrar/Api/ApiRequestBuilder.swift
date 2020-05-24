@@ -25,7 +25,8 @@ final class ApiRequestBuilder {
                 .appendingPathComponent(Constants.tenantsPath)
                 .appendingPathComponent(String(optipushConfig.tenantID))
                 .appendingPathComponent(Constants.installationPath),
-            body: model
+            body: model,
+            keyEncodingStrategy: .convertToSnakeCase
         )
     }
 

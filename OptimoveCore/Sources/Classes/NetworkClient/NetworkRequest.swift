@@ -10,6 +10,7 @@ public final class NetworkRequest {
         public static let queryItems: [URLQueryItem]? = nil
         public static let httpBody: Data? = nil
         public static let timeoutInterval: TimeInterval = 60
+        public static let keyEncodingStrategy: KeyEncodingStrategy = .useDefaultKeys
     }
 
     public let method: HTTPMethod
@@ -19,6 +20,7 @@ public final class NetworkRequest {
     public let queryItems: [URLQueryItem]?
     public let httpBody: Data?
     public let timeoutInterval: TimeInterval
+    public let keyEncodingStrategy: KeyEncodingStrategy
 
     public required init(
         method: HTTPMethod,
@@ -27,7 +29,8 @@ public final class NetworkRequest {
         headers: [HTTPHeader] = DefaultValue.headers,
         queryItems: [URLQueryItem]? = DefaultValue.queryItems,
         httpBody: Data? = DefaultValue.httpBody,
-        timeoutInterval: TimeInterval = DefaultValue.timeoutInterval) {
+        timeoutInterval: TimeInterval = DefaultValue.timeoutInterval,
+        keyEncodingStrategy: KeyEncodingStrategy = DefaultValue.keyEncodingStrategy) {
         self.method = method
         self.baseURL = baseURL
         self.path = path
@@ -35,6 +38,7 @@ public final class NetworkRequest {
         self.queryItems = queryItems
         self.httpBody = httpBody
         self.timeoutInterval = timeoutInterval
+        self.keyEncodingStrategy = keyEncodingStrategy
     }
 
     public convenience init<Body: Encodable>(
@@ -44,8 +48,10 @@ public final class NetworkRequest {
         headers: [HTTPHeader] = DefaultValue.headers,
         queryItems: [URLQueryItem]? = DefaultValue.queryItems,
         body: Body,
-        timeoutInterval: TimeInterval = DefaultValue.timeoutInterval) throws {
+        timeoutInterval: TimeInterval = DefaultValue.timeoutInterval,
+        keyEncodingStrategy: KeyEncodingStrategy = DefaultValue.keyEncodingStrategy) throws {
         let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = keyEncodingStrategy.toJSONEncoderStrategy()
         encoder.dateEncodingStrategy = .formatted(Formatter.iso8601withFractionalSeconds)
         self.init(
             method: method,
@@ -117,5 +123,22 @@ extension NetworkRequest: CustomStringConvertible {
         [Body]: \(String(describing: httpBody == nil ? nil : String(data: httpBody!, encoding: .utf8)))
         [TimeoutInterval]: \(timeoutInterval)
         """
+    }
+}
+
+public enum KeyEncodingStrategy {
+    case useDefaultKeys
+    case convertToSnakeCase
+    case custom(([CodingKey]) -> CodingKey)
+
+    func toJSONEncoderStrategy() -> JSONEncoder.KeyEncodingStrategy {
+        switch self {
+        case .convertToSnakeCase:
+            return .convertToSnakeCase
+        case .useDefaultKeys:
+            return .useDefaultKeys
+        case .custom(let function):
+            return .custom(function)
+        }
     }
 }
