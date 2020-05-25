@@ -15,7 +15,9 @@ final class OptiTrackComponentTests: OptimoveTestCase {
     let dispatchInterval: TimeInterval = 1
 
     override func setUp() {
-        let configuration = ConfigurationFixture.build()
+        let configuration = ConfigurationFixture.build(
+            Options(isEnableRealtime: true, isEnableRealtimeThroughOptistream: true)
+        )
         builder = OptistreamEventBuilder(
             configuration: configuration.optitrack,
             storage: storage,

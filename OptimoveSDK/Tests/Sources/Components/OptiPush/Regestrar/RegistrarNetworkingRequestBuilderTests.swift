@@ -14,6 +14,7 @@ class RegistrarNetworkingRequestBuilderTests: OptimoveTestCase {
 
     override func setUp() {
         super.setUp()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
         payloadBuilder = ApiPayloadBuilder(
             storage: storage,
             appNamespace: try! Bundle.getApplicationNameSpace()
