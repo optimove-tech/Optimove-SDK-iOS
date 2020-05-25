@@ -366,39 +366,3 @@ private extension Optimove {
     }
 
 }
-
-// MARK: - Deprecated
-
-extension Optimove {
-
-    /// Request to subscribe to test campaign topics
-    @available(*, deprecated, message: "No need to calls start test mode. Use Optimove site for tests.")
-    @objc public func startTestMode() {}
-
-    /// Request to unsubscribe from test campaign topics
-    @available(*, deprecated, message: "No need to calls stop test mode. Use Optimove site for tests.")
-    @objc public func stopTestMode() {}
-
-    /// Report the screen visit event.
-    /// - Parameters:
-    ///   - screenPathArray: An array of breadcrumbs – an UI path to the screen.
-    ///   - screenTitle: The screen title.
-    ///   - screenCategory: The screen category.
-    @available(*, deprecated, renamed: "reportScreenVisit(screenTitle:screenCategory:)")
-    @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
-        reportScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
-    }
-
-    /// Report the screen visit event.
-    /// - Parameters:
-    ///   - screenPath: An UI path to the screen.
-    ///   - screenTitle: The screen title.
-    ///   - screenCategory: The screen category.
-    @available(*, deprecated, renamed: "reportScreenVisit(screenTitle:screenCategory:)")
-    @objc public func setScreenVisit(screenPath: String,
-                                     screenTitle: String,
-                                     screenCategory: String? = nil) {
-            reportScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
-    }
-
-}
