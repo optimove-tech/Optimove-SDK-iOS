@@ -2,9 +2,9 @@ platform :ios, '10.0'
 use_frameworks!
 
 target 'DemoApp' do
-  pod 'OptimoveSDK', '~> 2.0'
+  pod 'OptimoveSDK'
 end
 
 target 'NotificationExtension' do
-  pod 'OptimoveNotificationServiceExtension', '~> 2.0'
+  pod 'OptimoveNotificationServiceExtension'
 end

@@ -1,105 +1,31 @@
 PODS:
-  - FirebaseAnalyticsInterop (1.4.0)
-  - FirebaseCore (6.3.0):
-    - FirebaseCoreDiagnostics (~> 1.0)
-    - FirebaseCoreDiagnosticsInterop (~> 1.0)
-    - GoogleUtilities/Environment (~> 6.2)
-    - GoogleUtilities/Logger (~> 6.2)
-  - FirebaseCoreDiagnostics (1.1.0):
-    - FirebaseCoreDiagnosticsInterop (~> 1.0)
-    - GoogleDataTransportCCTSupport (~> 1.0)
-    - GoogleUtilities/Environment (~> 6.2)
-    - GoogleUtilities/Logger (~> 6.2)
-  - FirebaseCoreDiagnosticsInterop (1.0.0)
-  - FirebaseInstanceID (4.2.5):
-    - FirebaseCore (~> 6.0)
-    - GoogleUtilities/Environment (~> 6.0)
-    - GoogleUtilities/UserDefaults (~> 6.0)
-  - FirebaseMessaging (4.1.5):
-    - FirebaseAnalyticsInterop (~> 1.3)
-    - FirebaseCore (~> 6.2)
-    - FirebaseInstanceID (~> 4.1)
-    - GoogleUtilities/AppDelegateSwizzler (~> 6.2)
-    - GoogleUtilities/Environment (~> 6.2)
-    - GoogleUtilities/Reachability (~> 6.2)
-    - GoogleUtilities/UserDefaults (~> 6.2)
-    - Protobuf (~> 3.1)
-  - GoogleDataTransport (2.0.0)
-  - GoogleDataTransportCCTSupport (1.1.0):
-    - GoogleDataTransport (~> 2.0)
-    - nanopb
-  - GoogleUtilities/AppDelegateSwizzler (6.3.1):
-    - GoogleUtilities/Environment
-    - GoogleUtilities/Logger
-    - GoogleUtilities/Network
-  - GoogleUtilities/Environment (6.3.1)
-  - GoogleUtilities/Logger (6.3.1):
-    - GoogleUtilities/Environment
-  - GoogleUtilities/Network (6.3.1):
-    - GoogleUtilities/Logger
-    - "GoogleUtilities/NSData+zlib"
-    - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (6.3.1)"
-  - GoogleUtilities/Reachability (6.3.1):
-    - GoogleUtilities/Logger
-  - GoogleUtilities/UserDefaults (6.3.1):
-    - GoogleUtilities/Logger
-  - MatomoTracker (7.0.1):
-    - MatomoTracker/Core (= 7.0.1)
-  - MatomoTracker/Core (7.0.1)
-  - nanopb (0.3.901):
-    - nanopb/decode (= 0.3.901)
-    - nanopb/encode (= 0.3.901)
-  - nanopb/decode (0.3.901)
-  - nanopb/encode (0.3.901)
-  - OptimoveCore (2.3.0)
-  - OptimoveNotificationServiceExtension (2.3.0):
-    - OptimoveCore (~> 2.0)
-  - OptimoveSDK (2.3.0):
-    - FirebaseMessaging (~> 4.0)
+  - MatomoTracker (7.2.0):
+    - MatomoTracker/Core (= 7.2.0)
+  - MatomoTracker/Core (7.2.0)
+  - OptimoveCore (2.12.1)
+  - OptimoveNotificationServiceExtension (2.12.1):
+    - OptimoveCore (= 2.12.1)
+  - OptimoveSDK (2.12.1):
     - MatomoTracker (~> 7.0)
-    - OptimoveCore (~> 2.0)
-  - Protobuf (3.9.2)
+    - OptimoveCore (= 2.12.1)
 
 DEPENDENCIES:
-  - OptimoveNotificationServiceExtension (~> 2.0)
-  - OptimoveSDK (~> 2.0)
+  - OptimoveNotificationServiceExtension
+  - OptimoveSDK
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
-    - FirebaseAnalyticsInterop
-    - FirebaseCore
-    - FirebaseCoreDiagnostics
-    - FirebaseCoreDiagnosticsInterop
-    - FirebaseInstanceID
-    - FirebaseMessaging
-    - GoogleDataTransport
-    - GoogleDataTransportCCTSupport
-    - GoogleUtilities
+  trunk:
     - MatomoTracker
-    - nanopb
     - OptimoveCore
     - OptimoveNotificationServiceExtension
     - OptimoveSDK
-    - Protobuf
 
 SPEC CHECKSUMS:
-  FirebaseAnalyticsInterop: d48b6ab67bcf016a05e55b71fc39c61c0cb6b7f3
-  FirebaseCore: 8b2765c445d40db7137989b7146a3aa3f91b5529
-  FirebaseCoreDiagnostics: be4f7a09d02ab305f18de59a470412caddb64c2a
-  FirebaseCoreDiagnosticsInterop: 6829da2b8d1fc795ff1bd99df751d3788035d2cb
-  FirebaseInstanceID: 550df9be1f99f751d8fcde3ac342a1e21a0e6c42
-  FirebaseMessaging: b22b949cc45c14da01e60404dd7bffc78956380c
-  GoogleDataTransport: c8617c00e4f3eb9418e42ac0e8ac5241a9d555dd
-  GoogleDataTransportCCTSupport: 9f352523e8785a71f6754f51eeff09f49ec19268
-  GoogleUtilities: f895fde57977df4e0233edda0dbeac490e3703b6
-  MatomoTracker: 0c350fcb19c133a1793731f1017ca9f489a73fcc
-  nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
-  OptimoveCore: 56179642aed3c90906045a6d7e54d6cbfd3fff67
-  OptimoveNotificationServiceExtension: a2aa5df391be5678310eda79f1ec9a1e71285bdf
-  OptimoveSDK: 52c120aef6e5471d7fdd0779dc559c7524cf89cb
-  Protobuf: 67fb42ba613def994e61854de2b3164f13790cc4
+  MatomoTracker: 6f89e2561083685a360e223fb663e9ccd57c1d1a
+  OptimoveCore: fbeceef71325fe99799ced3b7f3473c670e760a7
+  OptimoveNotificationServiceExtension: a7487da267942754b67e4a5331174f2dfdf87c7e
+  OptimoveSDK: a0b62a916d2a71cc87abff88579864ffb7ea7b7e
 
-PODFILE CHECKSUM: 721f8891d371da104629f54cb7d6b13a5a53b191
+PODFILE CHECKSUM: 934a16613f015250edc20d54f88212da91fbce70
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.1
