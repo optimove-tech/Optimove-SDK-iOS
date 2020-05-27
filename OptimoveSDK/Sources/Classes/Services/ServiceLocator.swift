@@ -105,8 +105,7 @@ final class ServiceLocator {
             chainMutator: _synchronizer,
             dependencies: [
                 OptimoveStrorageSDKInitializerDependency(storage: storage()),
-                MultiplexLoggerStreamSDKInitializerDependency(),
-                AirshipServiceSDKInitializerDependency(storage: storage())
+                MultiplexLoggerStreamSDKInitializerDependency()
             ]
         )
     }
@@ -136,12 +135,7 @@ final class ServiceLocator {
             synchronizer: synchronizer(),
             coreEventFactory: coreEventFactory(),
             storage: storage(),
-            subscribers: [
-                AirshipIntegrationOptInSubscriber(
-                    storage: storage(),
-                    configurationRepository: configurationRepository()
-                )
-            ]
+            subscribers: []
         )
     }
 

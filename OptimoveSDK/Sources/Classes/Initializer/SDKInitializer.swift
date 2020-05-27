@@ -102,18 +102,3 @@ final class MultiplexLoggerStreamSDKInitializerDependency: SDKInitializerDepende
     }
 
 }
-
-final class AirshipServiceSDKInitializerDependency: SDKInitializerDependency {
-
-    private let storage: OptimoveStorage
-
-    init(storage: OptimoveStorage) {
-        self.storage = storage
-    }
-
-    func onConfigurationFetch(_ configuration: Configuration) {
-        tryCatch {
-            try OptimoveAirshipIntegration(storage: storage, configuration: configuration).obtain()
-        }
-    }
-}

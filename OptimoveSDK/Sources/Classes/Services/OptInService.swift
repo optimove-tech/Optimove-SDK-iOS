@@ -75,21 +75,3 @@ private extension OptInService {
 protocol OptInOutSubscriber {
     func statusChanged(status: OptStatus)
 }
-
-final class AirshipIntegrationOptInSubscriber: OptInOutSubscriber {
-
-    private let storage: OptimoveStorage
-    private let configurationRepository: ConfigurationRepository
-
-    init(storage: OptimoveStorage,
-         configurationRepository: ConfigurationRepository) {
-        self.storage = storage
-        self.configurationRepository = configurationRepository
-    }
-
-    func statusChanged(status: OptStatus) {
-        guard status == .optIn, let configuration = try? configurationRepository.getConfiguration() else { return }
-        try? OptimoveAirshipIntegration(storage: storage, configuration: configuration).obtain()
-    }
-
-}
