@@ -15,6 +15,13 @@ final class OptistreamQueueImpl {
     private let container: PersistentContainer
     private let context: NSManagedObjectContext
     private let queueType: OptistreamQueueType
+    private var dispatchTimer: Timer?
+
+    var dispatchInterval: TimeInterval = 5 {
+        didSet {
+            startSaveTimer()
+        }
+    }
 
     init(
         queueType: OptistreamQueueType,
@@ -30,7 +37,41 @@ final class OptistreamQueueImpl {
             Logger.error(error.localizedDescription)
             throw error
         }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(save),
+            name: UIApplication.willTerminateNotification,
+            object: nil
+        )
+        startSaveTimer()
+    }
 
+    private func startSaveTimer() {
+        guard dispatchInterval > 0  else { return }
+        if let dispatchTimer = dispatchTimer {
+            dispatchTimer.invalidate()
+            self.dispatchTimer = nil
+        }
+        context.perform { [weak self] in
+            guard let self = self else { return }
+            let currentRunLoop = RunLoop.current
+            self.dispatchTimer = Timer(
+                timeInterval: self.dispatchInterval,
+                target: self,
+                selector: #selector(self.save),
+                userInfo: nil,
+                repeats: false
+            )
+            currentRunLoop.add(self.dispatchTimer!, forMode: .common)
+            currentRunLoop.run()
+        }
+    }
+
+    @objc func save() {
+        context.perform {
+            self.context.saveOrRollback()
+            self.startSaveTimer()
+        }
     }
 
 }
@@ -52,7 +93,6 @@ extension OptistreamQueueImpl: OptistreamQueue {
                     _ = try EventCD.insert(into: self.context, event: event, of: self.queueType)
                 }
             }
-            self.context.saveOrRollback()
         }
     }
 
@@ -90,7 +130,6 @@ extension OptistreamQueueImpl: OptistreamQueue {
                 fetch.predicate = predicate
                 let request = NSBatchDeleteRequest(fetchRequest: fetch)
                 try self.context.execute(request)
-                self.context.saveOrRollback()
             }
         }
     }
