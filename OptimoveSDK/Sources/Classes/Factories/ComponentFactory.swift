@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import OptimoveCore
+import UIKit
 
 final class ComponentFactory {
 
@@ -35,7 +36,8 @@ final class ComponentFactory {
     func createOptipushComponent(configuration: Configuration) -> OptiPush {
         return OptiPush(
             registrar: serviceLocator.registrar(configuration: configuration),
-            storage: serviceLocator.storage()
+            storage: serviceLocator.storage(),
+            application: UIApplication.shared
         )
     }
 

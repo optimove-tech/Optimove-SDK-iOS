@@ -3,6 +3,7 @@
 import Foundation
 import UserNotifications
 import OptimoveCore
+import UIKit
 
 final class OptiPush {
 
@@ -10,9 +11,17 @@ final class OptiPush {
     private var storage: OptimoveStorage
 
     init(registrar: Registrable,
-         storage: OptimoveStorage) {
+         storage: OptimoveStorage,
+         application: UIApplication) {
         self.storage = storage
         self.registrar = registrar
+
+        DispatchQueue.main.async {
+            // Register for remote notifications right away.
+            // This does not prompt for permissions to show notifications, but starts the device token registration.
+            application.registerForRemoteNotifications()
+        }
+
         Logger.debug("OptiPush initialized.")
         registrar.retryFailedOperationsIfExist()
     }
