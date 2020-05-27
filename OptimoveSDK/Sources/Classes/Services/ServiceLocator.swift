@@ -122,8 +122,8 @@ final class ServiceLocator {
         return NewVisitorIdGenerator(storage: storage())
     }
 
-    func firstTimeVisitGenerator() -> FirstTimeVisitGenerator {
-        return FirstTimeVisitGenerator(storage: storage())
+    func firstTimeVisitGenerator() -> FirstRunTimestampGenerator {
+        return FirstRunTimestampGenerator(storage: storage())
     }
 
     func installationIdGenerator() -> InstallationIdGenerator {

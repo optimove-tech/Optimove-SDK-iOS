@@ -26,9 +26,9 @@ public enum StorageKey: String, CaseIterable {
     case deviceResolutionHeight
     case advertisingIdentifier
     case optFlag
-    /// For storing a migration history
-    case migrationVersions
+    case migrationVersions /// For storing a migration history
     case arePushCampaignsDisabled
+    case firstRunTimestamp
 
     // MARK: Shared keys
     /// Placed in tenant container (legacy)
@@ -37,7 +37,7 @@ public enum StorageKey: String, CaseIterable {
     case apnsToken
     case siteID
     case settingUserSuccess
-    case firstVisitTimestamp
+    case firstVisitTimestamp /// Legacy
     case realtimeSetUserIdFailed
     case realtimeSetEmailFailed
 }
@@ -86,6 +86,7 @@ public protocol StorageValue {
     var apnsToken: Data? { get set }
     var siteID: Int? { get set }
     var isSettingUserSuccess: Bool? { get set }
+    /// Legacy. Use `firstRunTimestamp` instead
     var firstVisitTimestamp: Int64? { get set }
     var realtimeSetUserIdFailed: Bool { get set }
     var realtimeSetEmailFailed: Bool { get set }
@@ -93,7 +94,6 @@ public protocol StorageValue {
     func getUserEmail() throws -> String
     func getApnsToken() throws -> Data
     func getSiteID() throws -> Int
-    func getFirstVisitTimestamp() throws -> Int64
 }
 
 /// The protocol used for convenience implementation of any storage technology below this protocol.
@@ -122,7 +122,8 @@ public final class StorageFacade: OptimoveStorage {
         .advertisingIdentifier,
         .optFlag,
         .migrationVersions,
-        .arePushCampaignsDisabled
+        .arePushCampaignsDisabled,
+        .firstRunTimestamp
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.
@@ -362,6 +363,15 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
+    var firstRunTimestamp: Int64? {
+        get {
+            return self[.firstRunTimestamp]
+        }
+        set {
+            self[.firstRunTimestamp] = newValue
+        }
+    }
+
     // MARK: Group values getters
 
     func getConfigurationEndPoint() throws -> URL {
@@ -437,6 +447,13 @@ public extension KeyValueStorage where Self: StorageValue {
     func getAdvertisingIdentifier() throws -> String {
         guard let value = advertisingIdentifier else {
             throw StorageError.noValue(.advertisingIdentifier)
+        }
+        return value
+    }
+
+    func getFirstRunTimestamp() throws -> Int64 {
+        guard let value = firstRunTimestamp else {
+            throw StorageError.noValue(.firstRunTimestamp)
         }
         return value
     }
@@ -535,13 +552,6 @@ public extension KeyValueStorage where Self: StorageValue {
     func getSiteID() throws -> Int {
         guard let value = siteID else {
             throw StorageError.noValue(.siteID)
-        }
-        return value
-    }
-
-    func getFirstVisitTimestamp() throws -> Int64 {
-        guard let value = firstVisitTimestamp else {
-            throw StorageError.noValue(.firstVisitTimestamp)
         }
         return value
     }

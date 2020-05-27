@@ -40,7 +40,7 @@ public final class OptistreamEventBuilder {
                     airship: try? airshipIntegration.loadAirshipIntegration()
                 ),
                 realtime: event.isRealtime,
-                firstVisitorDate: try storage.getFirstVisitTimestamp(),
+                firstVisitorDate: try storage.getFirstRunTimestamp(),
                 uuid: event.uuid
             )
         )

@@ -295,7 +295,7 @@
 		FD6B210141F97A6B47D3B50B /* MockOptimoveStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0D16D34EAA14578617D5D6 /* MockOptimoveStorage.swift */; };
 		FE6961AE12E4BCB6A294FB85 /* OptimoveEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECA51F0B0A4A890AD8AC1B7 /* OptimoveEvent.swift */; };
 		FF21D2585D696E2119159E34 /* NetworkResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436C5AA2215F8E91D2D754E3 /* NetworkResult.swift */; };
-		FF3AF2CD8B3EF34CBDD6479B /* FirstTimeVisitGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 430C7A9694838C100E058E86 /* FirstTimeVisitGenerator.swift */; };
+		FF3AF2CD8B3EF34CBDD6479B /* FirstRunTimestampGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 430C7A9694838C100E058E86 /* FirstRunTimestampGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -434,7 +434,7 @@
 		3E1C1A66CA07D50B6692CA7B /* MockConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationRepository.swift; sourceTree = "<group>"; };
 		40AF7CBE1A75BE741CAF7483 /* OptimoveNotificationServiceExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationServiceExtensionTests.swift; sourceTree = "<group>"; };
 		426EC561F9EB6986A2F5AF76 /* Managed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Managed.swift; sourceTree = "<group>"; };
-		430C7A9694838C100E058E86 /* FirstTimeVisitGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstTimeVisitGenerator.swift; sourceTree = "<group>"; };
+		430C7A9694838C100E058E86 /* FirstRunTimestampGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunTimestampGenerator.swift; sourceTree = "<group>"; };
 		432D5D39398212165A5C8188 /* StubEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubEvent.swift; sourceTree = "<group>"; };
 		435C8327104AB22583A40C00 /* CoreDataModelDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataModelDescription.swift; sourceTree = "<group>"; };
 		436C5AA2215F8E91D2D754E3 /* NetworkResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkResult.swift; sourceTree = "<group>"; };
@@ -1292,7 +1292,7 @@
 			isa = PBXGroup;
 			children = (
 				EB486286AFEC603E2B5A5B71 /* AppOpenOnStartGenerator.swift */,
-				430C7A9694838C100E058E86 /* FirstTimeVisitGenerator.swift */,
+				430C7A9694838C100E058E86 /* FirstRunTimestampGenerator.swift */,
 				21E3D6232CC0A82FDD03F70F /* InstallationIdGenerator.swift */,
 				D5217E6590AD8BD80A6985CC /* LoggerInitializator.swift */,
 				5D74FD73F62F2896D05BAFD1 /* NewTenantInfoHandler.swift */,
@@ -2107,7 +2107,7 @@
 				3B92DE47BF4898E25F51F918 /* Environment.swift in Sources */,
 				0335B3ABF072561EC75ED4BD /* EventCoreData.swift in Sources */,
 				D2D1E0F7A825B50EBA059531 /* EventValidator.swift in Sources */,
-				FF3AF2CD8B3EF34CBDD6479B /* FirstTimeVisitGenerator.swift in Sources */,
+				FF3AF2CD8B3EF34CBDD6479B /* FirstRunTimestampGenerator.swift in Sources */,
 				B622A895623E6DF7C6A09277 /* GlobalConfigurationDownloader.swift in Sources */,
 				C5D958D0A9D4CB0C2301E4F8 /* Handler.swift in Sources */,
 				54A3E476C0AB5D834FB6DACF /* HandlersPool.swift in Sources */,

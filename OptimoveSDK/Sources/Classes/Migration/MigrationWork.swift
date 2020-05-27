@@ -7,16 +7,17 @@ protocol MigrationWork {
     func runMigration()
 }
 
-final class MigrationWork_2_10_0: MigrationWork {
+class MigrationWorker: MigrationWork {
 
-    private let version: Version = .v_2_10_0
-    private let synchronizer: Synchronizer
-    private var storage: OptimoveStorage
+    fileprivate let version: Version
+    fileprivate var storage: OptimoveStorage
 
-    init(synchronizer: Synchronizer,
-         storage: OptimoveStorage) {
-        self.synchronizer = synchronizer
+    init(
+        storage: OptimoveStorage,
+        version: Version
+    ) {
         self.storage = storage
+        self.version = version
     }
 
     func isAllowToMiragte(_ currentVersion: String) -> Bool {
@@ -31,8 +32,36 @@ final class MigrationWork_2_10_0: MigrationWork {
         }
     }
 
-    func runMigration() {
+    func runMigration() {}
+}
+
+final class MigrationWork_2_10_0: MigrationWorker {
+
+    private let synchronizer: Synchronizer
+
+    init(synchronizer: Synchronizer,
+         storage: OptimoveStorage) {
+        self.synchronizer = synchronizer
+        super.init(storage: storage, version: .v_2_10_0)
+    }
+
+    override func runMigration() {
         synchronizer.handle(.setInstallation)
+        storage.finishedMigration(to: version.rawValue)
+    }
+
+}
+
+final class MigrationWork_3_0_0: MigrationWorker {
+
+    init(storage: OptimoveStorage) {
+        super.init(storage: storage, version: .v_3_0_0)
+    }
+
+    override func runMigration() {
+        if storage.firstRunTimestamp == nil {
+            storage.firstRunTimestamp = storage.firstVisitTimestamp
+        }
         storage.finishedMigration(to: version.rawValue)
     }
 

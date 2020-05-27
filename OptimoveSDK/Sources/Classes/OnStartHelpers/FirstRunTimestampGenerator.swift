@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class FirstTimeVisitGenerator {
+final class FirstRunTimestampGenerator {
 
     private var storage: OptimoveStorage
 
@@ -12,9 +12,9 @@ final class FirstTimeVisitGenerator {
     }
 
     func generate() {
-        if storage.firstVisitTimestamp == nil {
+        if storage.firstRunTimestamp == nil {
             // Realtime server asked to get it in seconds
-            storage.firstVisitTimestamp = Date().timeIntervalSince1970.seconds
+            storage.firstRunTimestamp = Date().timeIntervalSince1970.seconds
         }
     }
 }
