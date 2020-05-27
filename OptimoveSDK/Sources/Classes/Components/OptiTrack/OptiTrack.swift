@@ -23,8 +23,8 @@ final class OptiTrack {
     private let queue: OptistreamQueue
     private let networking: OptistreamNetworking
     private let configuration: OptitrackConfig
-
     private var isDispatching = false
+    private var backgroundTaskId: UIBackgroundTaskIdentifier = .invalid
     private var dispatchTimer: Timer?
     private let dispatchQueue = DispatchQueue(label: Constants.queueLabel)
 
@@ -39,6 +39,17 @@ final class OptiTrack {
         startDispatchTimer()
     }
 
+    private func startBackgroundTask() {
+        backgroundTaskId = UIApplication.shared.beginBackgroundTask(withName: "Dispatch now") {
+            self.stopBackgroundTask()
+        }
+    }
+
+    private func stopBackgroundTask() {
+        guard self.backgroundTaskId != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(self.backgroundTaskId)
+        self.backgroundTaskId = .invalid
+    }
 }
 
 extension OptiTrack: OptistreamComponent {
@@ -48,6 +59,7 @@ extension OptiTrack: OptistreamComponent {
         case let .report(events: events):
             track(events: events)
         case .dispatchNow:
+            startBackgroundTask()
             dispatch()
         }
     }
@@ -119,12 +131,14 @@ private extension OptiTrack {
             return
         }
         guard !isDispatching else {
+            stopBackgroundTask()
             Logger.debug("Tracker is already dispatching.")
             return
         }
         guard !queue.isEmpty else {
             Logger.debug("No need to dispatch. Dispatch queue is empty.")
             startDispatchTimer()
+            stopBackgroundTask()
             return
         }
         Logger.info("Start dispatching events")
@@ -143,6 +157,7 @@ private extension OptiTrack {
         guard !events.isEmpty else {
             self.isDispatching = false
             self.startDispatchTimer()
+            stopBackgroundTask()
             Logger.debug("Finished dispatching events")
             return
         }
@@ -165,6 +180,7 @@ private extension OptiTrack {
                         break
                     }
                     self.startDispatchTimer()
+                    self.stopBackgroundTask()
                 }
             }
         }
