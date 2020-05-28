@@ -88,13 +88,13 @@ final class FixtureOptistreamEvent {
             origin: "sdk",
             customer: nil,
             visitor: StubVariables.visitorID,
-            timestamp: Date(),
+            timestamp: Formatter.iso8601withFractionalSeconds.string(from: Date()),
             context: [],
             metadata: OptistreamEvent.Metadata(
                 channel: nil,
                 realtime: true,
                 firstVisitorDate: Date().timeIntervalSince1970.seconds,
-                uuid: UUID()
+                uuid: UUID().uuidString
             )
         )
     }

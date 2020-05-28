@@ -9,12 +9,14 @@ final class OptiTrackComponentTests: OptimoveTestCase {
     var optitrack: OptiTrack!
     var dateProvider = MockDateTimeProvider()
     var statisticService = MockStatisticService()
-    var networking = OptistreamNetworkingMock()
-    var queue = MockOptistreamQueue()
+    var networking: OptistreamNetworkingMock!
+    var queue: MockOptistreamQueue!
     var builder: OptistreamEventBuilder!
     let dispatchInterval: TimeInterval = 1
 
     override func setUp() {
+        networking = OptistreamNetworkingMock()
+        queue = MockOptistreamQueue()
         let configuration = ConfigurationFixture.build(
             Options(isEnableRealtime: true, isEnableRealtimeThroughOptistream: true)
         )
@@ -39,6 +41,7 @@ final class OptiTrackComponentTests: OptimoveTestCase {
         prefillStorageAsVisitor()
         let stubEvent = StubOptistreamEvent
 
+
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
         networking.assetEventsFunction = { (events, completion) -> Void in
@@ -48,7 +51,7 @@ final class OptiTrackComponentTests: OptimoveTestCase {
 
         // when
         try optitrack.handle(.report(events: [stubEvent]))
-        wait(for: [networkExpectation], timeout: defaultTimeout + 5)
+        wait(for: [networkExpectation], timeout: defaultTimeout + dispatchInterval * 2)
     }
 
     func test_event_many_reports() throws {

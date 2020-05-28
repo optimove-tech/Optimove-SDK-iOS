@@ -184,20 +184,20 @@ class KeyValueStorageTests: XCTestCase {
         XCTAssertThrowsError(try storage.getApnsToken())
     }
 
-    func test_firstVisitTimestamp() {
+    func test_firstRunTimestamp() {
         // when
-        storage.firstVisitTimestamp = 42
+        storage.firstRunTimestamp = 42
 
         // then
-        XCTAssertNoThrow(try storage.getFirstVisitTimestamp())
+        XCTAssertNoThrow(try storage.getFirstRunTimestamp())
     }
 
-    func test_no_firstVisitTimestamp() {
+    func test_no_firstRunTimestamp() {
         // when
         storage.firstVisitTimestamp = nil
 
         // then
-        XCTAssertThrowsError(try storage.getFirstVisitTimestamp())
+        XCTAssertThrowsError(try storage.getFirstRunTimestamp())
     }
 
     func test_configurationEndPoint() {
