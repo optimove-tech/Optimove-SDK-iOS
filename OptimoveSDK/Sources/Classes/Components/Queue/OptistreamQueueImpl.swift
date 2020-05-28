@@ -123,7 +123,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func remove(events: [OptistreamEvent]) {
-        let uuidStrings = events.map { $0.metadata.uuid.uuidString }
+        let uuidStrings = events.map { $0.metadata.uuid }
         let predicate = EventCD.queueTypeAndUuidsPredicate(uuidStrings: uuidStrings, queueType: queueType)
         tryCatch {
             try context.performAndWait {

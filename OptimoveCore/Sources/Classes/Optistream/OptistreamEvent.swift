@@ -9,7 +9,7 @@ public struct OptistreamEvent: Codable {
     public let origin: String
     public let customer: String?
     public let visitor: String
-    public let timestamp: Date
+    public let timestamp: String
     public let context: JSON
     public var metadata: Metadata
 
@@ -27,13 +27,13 @@ public struct OptistreamEvent: Codable {
         public let channel: Channel?
         public var realtime: Bool
         public var firstVisitorDate: Int64
-        public let uuid: UUID
+        public let uuid: String
 
         public init(
             channel: OptistreamEvent.Metadata.Channel?,
             realtime: Bool,
             firstVisitorDate: Int64,
-            uuid: UUID
+            uuid: String
         ) {
             self.channel = channel
             self.realtime = realtime
@@ -50,7 +50,7 @@ public struct OptistreamEvent: Codable {
         origin: String,
         customer: String?,
         visitor: String,
-        timestamp: Date,
+        timestamp: String,
         context: JSON,
         metadata: Metadata
     ) {
