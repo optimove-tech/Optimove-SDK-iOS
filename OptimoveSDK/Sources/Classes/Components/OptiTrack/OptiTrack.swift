@@ -2,6 +2,7 @@
 
 import Foundation
 import OptimoveCore
+import UIKit
 
 typealias OptistreamEvent = OptimoveCore.OptistreamEvent
 typealias OptistreamEventBuilder = OptimoveCore.OptistreamEventBuilder

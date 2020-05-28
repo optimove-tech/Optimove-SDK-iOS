@@ -3,6 +3,7 @@
 import Foundation
 import CoreData
 import OptimoveCore
+import UIKit
 
 final class OptistreamQueueImpl {
 
