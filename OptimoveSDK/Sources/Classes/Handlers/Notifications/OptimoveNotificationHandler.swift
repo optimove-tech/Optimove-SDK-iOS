@@ -22,21 +22,18 @@ private extension OptimoveNotificationHandler {
 
     func reportNotification(response: UNNotificationResponse) {
         Logger.info("User react '\(response.actionIdentifier)' to a notification.")
-        do {
-            let event = try createEvent(from: response)
-            let task = UIApplication.shared.beginBackgroundTask(withName: "com.optimove.sdk")
+        tryCatch {
             switch response.actionIdentifier {
             case UNNotificationDefaultActionIdentifier:
+                let task = UIApplication.shared.beginBackgroundTask(withName: "Optimove SDK report notification event")
+                let event = try createEvent(from: response)
                 synchronizer.handle(.report(events: [event]))
-                let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 2.0)
-                DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(20)) {
                     UIApplication.shared.endBackgroundTask(task)
                 }
             default:
-                UIApplication.shared.endBackgroundTask(task)
+                break
             }
-        } catch {
-            Logger.error(error.localizedDescription)
         }
     }
 
@@ -65,7 +62,7 @@ private extension OptimoveNotificationHandler {
             Logger.debug("Notification does not contain a dynamic link.")
             return
         }
-        do {
+        tryCatch {
             let urlComp = try unwrap(URLComponents(string: dynamicLink))
             let params: [String: String]? = urlComp.queryItems?.reduce(into: [String: String](), { (result, next) in
                 result.updateValue(next.value ?? "", forKey: next.name)
@@ -79,8 +76,6 @@ private extension OptimoveNotificationHandler {
                     parameters: params
                 )
             )
-        } catch {
-            Logger.error(error.localizedDescription)
         }
     }
 

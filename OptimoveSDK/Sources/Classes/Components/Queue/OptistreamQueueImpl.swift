@@ -18,7 +18,7 @@ final class OptistreamQueueImpl {
     private let queueType: OptistreamQueueType
     private var dispatchTimer: Timer?
 
-    var dispatchInterval: TimeInterval = 5 {
+    var dispatchInterval: TimeInterval = 1 {
         didSet {
             startSaveTimer()
         }

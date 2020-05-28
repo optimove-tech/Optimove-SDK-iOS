@@ -17,7 +17,7 @@ final class PersistentContainer: NSPersistentContainer {
     }
 
     func loadPersistentStores(storeName: String) throws {
-        guard isThisStoreNotLoaded(storeName: storeName) else { return }
+        guard !isThisStoreAlreadyLoaded(storeName: storeName) else { return }
         let persistentStoreDescription = NSPersistentStoreDescription()
         persistentStoreDescription.url = try defineStoreURL(storeName: storeName)
         self.persistentStoreDescriptions = [persistentStoreDescription]
@@ -28,8 +28,8 @@ final class PersistentContainer: NSPersistentContainer {
         }
     }
 
-    private func isThisStoreNotLoaded(storeName: String) -> Bool {
-        return persistentStoreDescriptions.compactMap { psd in
+    private func isThisStoreAlreadyLoaded(storeName: String) -> Bool {
+        return !persistentStoreDescriptions.compactMap { psd in
             return psd.url?.deletingPathExtension().lastPathComponent
         }.filter { $0 == storeName}.isEmpty
     }
@@ -81,7 +81,7 @@ extension CoreDataModelDescription {
                     managedObjectClass: EventCD.self,
                     attributes: [
                         .attribute(name: #keyPath(EventCD.data), type: .binaryDataAttributeType),
-                        .attribute(name: #keyPath(EventCD.date), type: .dateAttributeType),
+                        .attribute(name: #keyPath(EventCD.date), type: .stringAttributeType),
                         .attribute(name: #keyPath(EventCD.type), type: .stringAttributeType),
                         .attribute(name: #keyPath(EventCD.uuid), type: .stringAttributeType)
                     ],

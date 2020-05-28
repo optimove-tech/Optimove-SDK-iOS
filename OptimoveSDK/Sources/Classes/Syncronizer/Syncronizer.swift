@@ -14,7 +14,7 @@ final class SynchronizerImpl {
     private let chain: Chain
 
     init(chain: Chain) {
-        queue = DispatchQueue(label: "com.optimove.synchronizer", qos: .utility)
+        queue = DispatchQueue(label: "com.optimove.synchronizer", qos: .userInitiated)
         self.chain = chain
     }
 

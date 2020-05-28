@@ -15,7 +15,7 @@ final class OptiTrack {
         static let queueLabel = "com.optimove.track"
     }
 
-    var dispatchInterval: TimeInterval = 30 {
+    var dispatchInterval: TimeInterval = 10 {
         didSet {
             startDispatchTimer()
         }
@@ -27,7 +27,7 @@ final class OptiTrack {
     private var isDispatching = false
     private var backgroundTaskId: UIBackgroundTaskIdentifier = .invalid
     private var dispatchTimer: Timer?
-    private let dispatchQueue = DispatchQueue(label: Constants.queueLabel)
+    private let dispatchQueue = DispatchQueue(label: Constants.queueLabel, qos: .userInitiated)
 
     init(
         queue: OptistreamQueue,
@@ -41,6 +41,7 @@ final class OptiTrack {
     }
 
     private func startBackgroundTask() {
+        stopBackgroundTask()
         backgroundTaskId = UIApplication.shared.beginBackgroundTask(withName: "Dispatch now") {
             self.stopBackgroundTask()
         }
