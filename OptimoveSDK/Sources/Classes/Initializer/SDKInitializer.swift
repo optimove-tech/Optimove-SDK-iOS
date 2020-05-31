@@ -49,7 +49,7 @@ private extension SDKInitializer {
         var optistreamComponents: [OptistreamComponent?] = [
             try componentFactory.createOptitrackComponent(configuration: configuration)
         ]
-        if configuration.isEnableRealtime {
+        if isAllowedToRunRealtimeComponent(configuration) {
             optistreamComponents.append(
                 try componentFactory.createRealtimeComponent(configuration: configuration)
             )
@@ -71,6 +71,10 @@ private extension SDKInitializer {
         chain.addNode(normalizer)
 
         Logger.info("All components setup finished.")
+    }
+
+    func isAllowedToRunRealtimeComponent(_ configuration: Configuration) -> Bool {
+        return configuration.isEnableRealtime && !configuration.realtime.isEnableRealtimeThroughOptistream
     }
 
 }
