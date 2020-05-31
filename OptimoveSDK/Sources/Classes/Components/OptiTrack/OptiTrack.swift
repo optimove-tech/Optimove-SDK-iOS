@@ -24,10 +24,25 @@ final class OptiTrack {
     private let queue: OptistreamQueue
     private let networking: OptistreamNetworking
     private let configuration: OptitrackConfig
-    private var isDispatching = false
     private var backgroundTaskId: UIBackgroundTaskIdentifier = .invalid
     private var dispatchTimer: Timer?
-    private let dispatchQueue = DispatchQueue(label: Constants.queueLabel, qos: .userInitiated)
+    private let dispatchQueue = DispatchQueue(label: Constants.queueLabel, qos: .default, attributes: .concurrent)
+
+    private var isDispatching: Bool {
+        get {
+            var name = false
+            dispatchQueue.sync {
+                name = private_isDispatching
+            }
+            return name
+        }
+        set {
+            dispatchQueue.async(flags: .barrier) {
+                self.private_isDispatching = newValue
+            }
+        }
+    }
+    private var private_isDispatching = false
 
     init(
         queue: OptistreamQueue,
@@ -59,10 +74,17 @@ extension OptiTrack: OptistreamComponent {
     func handle(_ operation: OptistreamOperation) throws {
         switch operation {
         case let .report(events: events):
-            track(events: events)
+            DispatchQueue.global().async { [weak self] in
+                guard let self = self else { return }
+                let events = events.map(self.applyRealtimeMutation)
+                self.queue.enqueue(events: events)
+                if events.map(self.shouldDispatchNow).contains(true) {
+                    self.dispatch()
+                }
+            }
         case .dispatchNow:
-            startBackgroundTask()
-            dispatch()
+            self.startBackgroundTask()
+            self.dispatch()
         }
     }
 
@@ -71,48 +93,19 @@ extension OptiTrack: OptistreamComponent {
 private extension OptiTrack {
 
     func startDispatchTimer() {
-        guard isTrackQueue() else {
-            dispatchQueue.async {
-                self.startDispatchTimer()
-            }
-            return
-        }
         guard dispatchInterval > 0  else { return }
         if let dispatchTimer = dispatchTimer {
             dispatchTimer.invalidate()
             self.dispatchTimer = nil
         }
-        dispatchQueue.async { [weak self] in
-            guard let self = self else { return }
-            let currentRunLoop = RunLoop.current
-            self.dispatchTimer = Timer(
-                timeInterval: self.dispatchInterval,
-                target: self,
-                selector: #selector(self.dispatch),
-                userInfo: nil,
-                repeats: false
-            )
-            currentRunLoop.add(self.dispatchTimer!, forMode: .common)
-            currentRunLoop.run()
-        }
-    }
-
-    func isTrackQueue() -> Bool {
-        guard String(cString: __dispatch_queue_get_label(nil), encoding: .utf8) == Constants.queueLabel else {
-            return false
-        }
-        return true
-    }
-
-    func track(events: [OptistreamEvent]) {
-        dispatchQueue.async { [weak self] in
-            guard let self = self else { return }
-            let events = events.map(self.applyRealtimeMutation)
-            self.queue.enqueue(events: events)
-            if events.map(self.shouldDispatchNow).contains(true) {
-                self.dispatch()
-            }
-        }
+        dispatchTimer = Timer(
+            timeInterval: self.dispatchInterval,
+            target: self,
+            selector: #selector(dispatch),
+            userInfo: nil,
+            repeats: false
+        )
+        RunLoop.main.add(dispatchTimer!, forMode: RunLoop.Mode.common)
     }
 
     func applyRealtimeMutation(_ event: OptistreamEvent) -> OptistreamEvent {
@@ -126,35 +119,26 @@ private extension OptiTrack {
     }
 
     @objc func dispatch() {
-        guard isTrackQueue() else {
-            dispatchQueue.async {
-                self.dispatch()
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
+            guard !self.isDispatching else {
+                self.stopBackgroundTask()
+                Logger.debug("Tracker is already dispatching.")
+                return
             }
-            return
+            guard !self.queue.isEmpty else {
+                Logger.debug("No need to dispatch. Dispatch queue is empty.")
+                self.startDispatchTimer()
+                self.stopBackgroundTask()
+                return
+            }
+            Logger.info("Start dispatching events")
+            self.isDispatching = true
+            self.dispatchBatch()
         }
-        guard !isDispatching else {
-            stopBackgroundTask()
-            Logger.debug("Tracker is already dispatching.")
-            return
-        }
-        guard !queue.isEmpty else {
-            Logger.debug("No need to dispatch. Dispatch queue is empty.")
-            startDispatchTimer()
-            stopBackgroundTask()
-            return
-        }
-        Logger.info("Start dispatching events")
-        isDispatching = true
-        dispatchBatch()
     }
 
     func dispatchBatch() {
-        guard isTrackQueue() else {
-            dispatchQueue.async {
-                self.dispatchBatch()
-            }
-            return
-        }
         let events = queue.first(limit: Constants.eventBatchLimit)
         guard !events.isEmpty else {
             self.isDispatching = false
@@ -167,23 +151,17 @@ private extension OptiTrack {
             guard let self = self else { return }
             switch result {
             case .success:
-                self.dispatchQueue.async {
-                    self.queue.remove(events: events)
-                    self.dispatchBatch()
-                }
+                self.queue.remove(events: events)
+                self.dispatchBatch()
             case .failure(let error):
-                self.dispatchQueue.async {
-                    Logger.error(error.localizedDescription)
-                    self.isDispatching = false
-                    switch error {
-                    case .requestInvalid:
-                        self.queue.remove(events: events)
-                    default:
-                        break
-                    }
-                    self.startDispatchTimer()
-                    self.stopBackgroundTask()
+                Logger.error(error.localizedDescription)
+                switch error {
+                case .requestInvalid:
+                    self.queue.remove(events: events)
+                default:
+                    break
                 }
+                self.isDispatching = false
             }
         }
     }

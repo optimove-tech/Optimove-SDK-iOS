@@ -88,7 +88,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func enqueue(events: [OptistreamEvent]) {
-        context.performAndWait {
+        context.perform {
             events.forEach { event in
                 tryCatch {
                     _ = try EventCD.insert(into: self.context, event: event, of: self.queueType)
@@ -125,13 +125,11 @@ extension OptistreamQueueImpl: OptistreamQueue {
     func remove(events: [OptistreamEvent]) {
         let uuidStrings = events.map { $0.metadata.uuid }
         let predicate = EventCD.queueTypeAndUuidsPredicate(uuidStrings: uuidStrings, queueType: queueType)
-        tryCatch {
-            try context.performAndWait {
-                let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: EventCD.entityName)
-                fetch.predicate = predicate
-                let request = NSBatchDeleteRequest(fetchRequest: fetch)
-                try self.context.execute(request)
-            }
+        context.performChanges {
+            let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: EventCD.entityName)
+            fetch.predicate = predicate
+            let request = NSBatchDeleteRequest(fetchRequest: fetch)
+            _ = try? self.context.execute(request)
         }
     }
 }
