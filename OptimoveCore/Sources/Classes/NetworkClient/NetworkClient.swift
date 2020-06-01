@@ -68,7 +68,9 @@ extension NetworkClientImpl: NetworkClient {
             if (400...499).contains(httpResponse.statusCode) {
                 completion(.failure(NetworkError.requestInvalid(data)))
             }
-
+            if (500...599).contains(httpResponse.statusCode) {
+                completion(.failure(NetworkError.requestFailed))
+            }
         }
         task.resume()
     }
