@@ -122,14 +122,13 @@ private extension OptiTrack {
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
             guard !self.isDispatching else {
-                self.stopBackgroundTask()
                 Logger.debug("Tracker is already dispatching.")
+                self.stopBackgroundTask()
                 return
             }
             guard !self.queue.isEmpty else {
                 Logger.debug("No need to dispatch. Dispatch queue is empty.")
-                self.startDispatchTimer()
-                self.stopBackgroundTask()
+                self.stopDispatching()
                 return
             }
             Logger.info("Start dispatching events")
@@ -141,9 +140,7 @@ private extension OptiTrack {
     func dispatchBatch() {
         let events = queue.first(limit: Constants.eventBatchLimit)
         guard !events.isEmpty else {
-            self.isDispatching = false
-            self.startDispatchTimer()
-            stopBackgroundTask()
+            self.stopDispatching()
             Logger.debug("Finished dispatching events")
             return
         }
@@ -161,9 +158,15 @@ private extension OptiTrack {
                 default:
                     break
                 }
-                self.isDispatching = false
+                self.stopDispatching()
             }
         }
+    }
+
+    func stopDispatching() {
+        isDispatching = false
+        stopBackgroundTask()
+        startDispatchTimer()
     }
 
 }
