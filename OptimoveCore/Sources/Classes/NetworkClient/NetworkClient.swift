@@ -71,6 +71,8 @@ extension NetworkClientImpl: NetworkClient {
             if (500...599).contains(httpResponse.statusCode) {
                 completion(.failure(NetworkError.requestFailed))
             }
+            // FIXME: Cover all other codes.
+            completion(.success(NetworkResponse<Data?>(statusCode: httpResponse.statusCode, body: data)))
         }
         task.resume()
     }
