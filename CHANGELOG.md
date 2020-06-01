@@ -1,12 +1,13 @@
 # Changelog
 
-## 2.13.0
+## 3.0.0
 
 - **add** a support of the new Optistream events.
-- **remove** the Matomo SDK dependency.
 - **add** Airship integration.
 - **improve** persistent layer for events.
 - **change** global config to v4.
+- **remove** the Matomo SDK dependency.
+- **remove** deprecated API.
 
 ## 2.12.1
 
