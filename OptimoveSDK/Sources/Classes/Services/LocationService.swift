@@ -24,7 +24,7 @@ extension LocationServiceImpl: LocationService {
 
     func getLocation(onComplete: @escaping (Result<[Location: String], LocationError>) -> Void) {
         DispatchQueue.main.async {
-            if self.isMainAppHasLocationDescriptions(), self.isLocationAuthorized() {
+            if self.hasLocationDescriptions, self.isLocationAuthorized() {
                 return self.getCoordinates(onComplete)
             }
             onComplete(.failure(.notAuthorized))
@@ -33,10 +33,14 @@ extension LocationServiceImpl: LocationService {
 
 }
 
-
 final class LocationServiceImpl {
 
     private var locationManager = CLLocationManager()
+    private var hasLocationDescriptions: Bool = false
+
+    init() {
+        hasLocationDescriptions = self.isMainAppHasLocationDescriptions()
+    }
 
     private func isMainAppHasLocationDescriptions() -> Bool {
         return (Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription") != nil) ||

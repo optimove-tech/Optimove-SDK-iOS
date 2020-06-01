@@ -2,29 +2,17 @@
 
 import Foundation
 
-final class OperationContext {
-    /// The timestamp of a creation if this context.
-    let timestamp: TimeInterval
-    let operation: Operation
-
-    init(operation: Operation, timestamp: TimeInterval) {
-        self.operation = operation
-        self.timestamp = timestamp
-    }
-
-    convenience init(_ operation: Operation) {
-        self.init(operation: operation, timestamp: Date().timeIntervalSince1970)
-    }
-
-}
-
-enum Operation {
-    case setUserId
-    case togglePushCampaigns(areDisabled: Bool)
-    case report(event: OptimoveEvent)
-    case reportScreenEvent(title: String, category: String?)
+enum CommonOperation {
+    case report(events: [Event])
     case dispatchNow
+    case setInstallation
+    case togglePushCampaigns(areDisabled: Bool)
     case deviceToken(token: Data)
     case optIn
     case optOut
+}
+
+enum OptistreamOperation {
+    case report(events: [OptistreamEvent])
+    case dispatchNow
 }

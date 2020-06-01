@@ -16,7 +16,7 @@ enum CoreEventType {
 }
 
 protocol CoreEventFactory {
-    func createEvent(_ type: CoreEventType, _ onComplete: @escaping (OptimoveCoreEvent) -> Void ) throws
+    func createEvent(_ type: CoreEventType) throws -> Event
 }
 
 import AdSupport
@@ -42,28 +42,26 @@ final class CoreEventFactoryImpl {
 
 extension CoreEventFactoryImpl: CoreEventFactory {
 
-    func createEvent(_ type: CoreEventType, _ onComplete: @escaping (OptimoveCoreEvent) -> Void ) throws {
+    func createEvent(_ type: CoreEventType) throws -> Event {
         switch type {
         case .appOpen:
-            onComplete(try createAppOpenEvent())
+            return try createAppOpenEvent()
         case .setUserId:
-            onComplete(try createSetUserIdEvent())
+            return try createSetUserIdEvent()
         case .optipushOptIn:
-            onComplete(try createOptipushOptInEvent())
+            return try createOptipushOptInEvent()
         case .optipushOptOut:
-            onComplete(try createOptipushOptOutEvent())
+            return try createOptipushOptOutEvent()
         case .metaData:
-            try createMetaDataEvent(onComplete: { (result) in
-                onComplete(result)
-            })
+            return try createMetaDataEvent()
         case let .pageVisit(title: t, category: c):
-            onComplete(self.createPageVisitEvent(title: t, category: c))
+            return self.createPageVisitEvent(title: t, category: c)
         case .setUserAgent:
-            onComplete(try createSetUserAgentEvent())
+            return try createSetUserAgentEvent()
         case .setAdvertisingId:
-            onComplete(try createSetAdvertisingIdEvent())
+            return try createSetAdvertisingIdEvent()
         case .setUserEmail:
-            onComplete(try createSetUserEmailEvent())
+            return try createSetUserEmailEvent()
         }
     }
 }
@@ -95,7 +93,7 @@ private extension CoreEventFactoryImpl {
         )
     }
 
-    func createMetaDataEvent(onComplete: @escaping (MetaDataEvent) -> Void) throws {
+    func createMetaDataEvent() throws -> MetaDataEvent {
         func getFullConfigurationPath() throws -> String {
             let configurationEndPoint = try storage.getConfigurationEndPoint()
             let tenantToken = try storage.getTenantToken()
@@ -109,9 +107,11 @@ private extension CoreEventFactoryImpl {
         let configUrl = try getFullConfigurationPath()
         let tenantBundle = try getApplicationNamespace()
         let sdkVersion = getSdkVersion()
+        var event: MetaDataEvent?
+        let semaphore = DispatchSemaphore(value: 0)
         locationService.getLocation(onComplete: { (result) in
             let location = try? result.get()
-            let event = MetaDataEvent(
+            event = MetaDataEvent(
                 configUrl: configUrl,
                 sdkVersion: sdkVersion,
                 bundleIdentifier: tenantBundle,
@@ -120,8 +120,10 @@ private extension CoreEventFactoryImpl {
                 locationLongitude: location?[.longitude],
                 language: Locale.preferredLanguages.first
             )
-            onComplete(event)
+            semaphore.signal()
         })
+        _ = semaphore.wait(timeout: .now() + .seconds(3))
+        return try unwrap(event)
     }
 
     func createSetUserAgentEvent() throws -> SetUserAgent {

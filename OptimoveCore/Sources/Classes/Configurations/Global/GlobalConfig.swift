@@ -73,49 +73,12 @@ public struct GlobalOptipushConfig: Codable, Equatable {
 // MARK: - Optitrack
 public struct GlobalOptitrackConfig: Codable, Equatable {
     public let eventCategoryName: String
-    public let customDimensionIDs: CustomDimensionIDs
 
-    public init(eventCategoryName: String, customDimensionIDs: CustomDimensionIDs) {
+    public init(eventCategoryName: String) {
         self.eventCategoryName = eventCategoryName
-        self.customDimensionIDs = customDimensionIDs
     }
 
     enum CodingKeys: String, CodingKey {
         case eventCategoryName = "event_category_name"
-        case customDimensionIDs = "custom_dimension_ids"
-    }
-}
-
-// MARK: - CustomDimensionIDS
-public struct CustomDimensionIDs: Codable, Equatable {
-    public let eventIDCustomDimensionID: Int
-    public let eventNameCustomDimensionID: Int
-    public let visitCustomDimensionsStartID: Int
-    public let maxVisitCustomDimensions: Int
-    public let actionCustomDimensionsStartID: Int
-    public let maxActionCustomDimensions: Int
-
-    public init(
-        eventIDCustomDimensionID: Int,
-        eventNameCustomDimensionID: Int,
-        visitCustomDimensionsStartID: Int,
-        maxVisitCustomDimensions: Int,
-        actionCustomDimensionsStartID: Int,
-        maxActionCustomDimensions: Int) {
-        self.eventIDCustomDimensionID = eventIDCustomDimensionID
-        self.eventNameCustomDimensionID = eventNameCustomDimensionID
-        self.visitCustomDimensionsStartID = visitCustomDimensionsStartID
-        self.maxVisitCustomDimensions = maxVisitCustomDimensions
-        self.actionCustomDimensionsStartID = actionCustomDimensionsStartID
-        self.maxActionCustomDimensions = maxActionCustomDimensions
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case eventIDCustomDimensionID = "event_id_custom_dimension_id"
-        case eventNameCustomDimensionID = "event_name_custom_dimension_id"
-        case visitCustomDimensionsStartID = "visit_custom_dimensions_start_id"
-        case maxVisitCustomDimensions = "max_visit_custom_dimensions"
-        case actionCustomDimensionsStartID = "action_custom_dimensions_start_id"
-        case maxActionCustomDimensions = "max_action_custom_dimensions"
     }
 }

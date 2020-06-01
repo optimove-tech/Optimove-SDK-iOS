@@ -13,7 +13,7 @@ class MockKeyValueStorage: KeyValueStorage {
     }
 
     func value(for key: StorageKey) -> Any? {
-        return state[key]
+        return state[key] ?? nil
     }
 
     subscript<T>(key: StorageKey) -> T? {
@@ -30,23 +30,27 @@ class MockFileStorage: FileStorage {
 
     var storage: [String: Data] = [:]
 
-    func isExist(fileName: String, shared: Bool) -> Bool {
+    func isExist(fileName: String, isGroupContainer: Bool) -> Bool {
         return storage[fileName] != nil
     }
 
-    func save<T>(data: T, toFileName: String, shared: Bool) throws where T: Encodable {
+    func save<T: Codable>(data: T, toFileName: String, isGroupContainer: Bool) throws {
         storage[toFileName] = try JSONEncoder().encode(data)
     }
 
-    func saveData(data: Data, toFileName: String, shared: Bool) throws {
+    func saveData(data: Data, toFileName: String, isGroupContainer: Bool) throws {
         storage[toFileName] = data
     }
 
-    func load(fileName: String, shared: Bool) throws -> Data {
+    func load<T: Codable>(fileName: String, isGroupContainer: Bool) throws -> T {
+        return try JSONDecoder().decode(T.self, from: try unwrap(storage[fileName]))
+    }
+
+    func loadData(fileName: String, isGroupContainer: Bool) throws -> Data {
         return try unwrap(storage[fileName])
     }
 
-    func delete(fileName: String, shared: Bool) throws {
+    func delete(fileName: String, isGroupContainer: Bool) throws {
         return storage[fileName] = nil
     }
 
@@ -180,20 +184,20 @@ class KeyValueStorageTests: XCTestCase {
         XCTAssertThrowsError(try storage.getApnsToken())
     }
 
-    func test_firstVisitTimestamp() {
+    func test_firstRunTimestamp() {
         // when
-        storage.firstVisitTimestamp = 42
+        storage.firstRunTimestamp = 42
 
         // then
-        XCTAssertNoThrow(try storage.getFirstVisitTimestamp())
+        XCTAssertNoThrow(try storage.getFirstRunTimestamp())
     }
 
-    func test_no_firstVisitTimestamp() {
+    func test_no_firstRunTimestamp() {
         // when
         storage.firstVisitTimestamp = nil
 
         // then
-        XCTAssertThrowsError(try storage.getFirstVisitTimestamp())
+        XCTAssertThrowsError(try storage.getFirstRunTimestamp())
     }
 
     func test_configurationEndPoint() {

@@ -31,8 +31,8 @@ class PageVisitEventTests: XCTestCase {
             category: category
         )
         // then
-        XCTAssert(event.parameters[PageVisitEvent.Constants.Key.pageTitle] as? String == title)
-        XCTAssert(event.parameters[PageVisitEvent.Constants.Key.category] as? String == category)
+        XCTAssert(event.context[PageVisitEvent.Constants.Key.pageTitle] as? String == title)
+        XCTAssert(event.context[PageVisitEvent.Constants.Key.category] as? String == category)
     }
 
 }

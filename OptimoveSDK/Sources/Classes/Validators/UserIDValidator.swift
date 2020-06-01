@@ -4,7 +4,7 @@ import OptimoveCore
 
 struct UserIDValidator {
 
-    enum Result {
+    enum Result: String {
         case valid
         case notValid
         case alreadySetIn

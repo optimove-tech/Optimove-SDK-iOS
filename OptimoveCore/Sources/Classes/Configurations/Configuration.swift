@@ -9,6 +9,8 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
     public let optitrack: OptitrackConfig
     public let optipush: OptipushConfig
     public let events: [String: EventsConfig]
+    public let isEnableRealtime: Bool
+    public let isSupportedAirship: Bool?
 
     public init(
         tenantID: Int,
@@ -16,13 +18,18 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
         realtime: RealtimeConfig,
         optitrack: OptitrackConfig,
         optipush: OptipushConfig,
-        events: [String: EventsConfig]) {
+        events: [String: EventsConfig],
+        isEnableRealtime: Bool,
+        isSupportedAirship: Bool?
+    ) {
         self.tenantID = tenantID
         self.logger = logger
         self.realtime = realtime
         self.optitrack = optitrack
         self.optipush = optipush
         self.events = events
+        self.isEnableRealtime = isEnableRealtime
+        self.isSupportedAirship = isSupportedAirship
     }
 }
 
@@ -43,16 +50,20 @@ public struct RealtimeConfig: Codable, TenantInfo, EventInfo {
     public let realtimeToken: String
     public let realtimeGateway: URL
     public let events: [String: EventsConfig]
+    public let isEnableRealtimeThroughOptistream: Bool
 
     public init(
         tenantID: Int,
         realtimeToken: String,
         realtimeGateway: URL,
-        events: [String: EventsConfig]) {
+        events: [String: EventsConfig],
+        isEnableRealtimeThroughOptistream: Bool
+    ) {
         self.tenantID = tenantID
         self.realtimeToken = realtimeToken
         self.realtimeGateway = realtimeGateway
         self.events = events
+        self.isEnableRealtimeThroughOptistream = isEnableRealtimeThroughOptistream
     }
 }
 
@@ -61,22 +72,23 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
     public let optitrackEndpoint: URL
     public let enableAdvertisingIdReport: Bool
     public let eventCategoryName: String
-    public let customDimensionIDS: CustomDimensionIDs
     public let events: [String: EventsConfig]
+    public let isEnableRealtime: Bool
 
     public init(
         tenantID: Int,
         optitrackEndpoint: URL,
         enableAdvertisingIdReport: Bool,
         eventCategoryName: String,
-        customDimensionIDS: CustomDimensionIDs,
-        events: [String: EventsConfig]) {
+        events: [String: EventsConfig],
+        isEnableRealtime: Bool
+    ) {
         self.tenantID = tenantID
         self.optitrackEndpoint = optitrackEndpoint
         self.enableAdvertisingIdReport = enableAdvertisingIdReport
         self.eventCategoryName = eventCategoryName
-        self.customDimensionIDS = customDimensionIDS
         self.events = events
+        self.isEnableRealtime = isEnableRealtime
     }
 }
 

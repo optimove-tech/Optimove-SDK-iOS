@@ -22,47 +22,38 @@ private extension OptimoveNotificationHandler {
 
     func reportNotification(response: UNNotificationResponse) {
         Logger.info("User react '\(response.actionIdentifier)' to a notification.")
-        do {
-            let event = try createEvent(from: response)
-            let task = UIApplication.shared.beginBackgroundTask(withName: "Handling a notification reponse")
+        tryCatch {
             switch response.actionIdentifier {
             case UNNotificationDefaultActionIdentifier:
-                synchronizer.handle(.report(event: event))
-                let delay: TimeInterval = min(UIApplication.shared.backgroundTimeRemaining, 2.0)
-                DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+                let task = UIApplication.shared.beginBackgroundTask(withName: "Optimove SDK report notification event")
+                let event = try createEvent(from: response)
+                synchronizer.handle(.report(events: [event]))
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(20)) {
                     UIApplication.shared.endBackgroundTask(task)
                 }
             default:
-                UIApplication.shared.endBackgroundTask(task)
+                break
             }
-        } catch {
-            Logger.error(error.localizedDescription)
         }
     }
 
-    func createEvent(from response: UNNotificationResponse) throws -> OptimoveCoreEvent {
+    func createEvent(from response: UNNotificationResponse) throws -> Event {
         let notificationDetails = response.notification.request.content.userInfo
         let data = try JSONSerialization.data(withJSONObject: notificationDetails)
         let notification = try JSONDecoder().decode(NotificationPayload.self, from: data)
-        switch notification.campaign {
-        case let campaign as ScheduledNotificationCampaign:
-            return ScheduledNotificationOpened(
-                bundleIdentifier: try Bundle.getApplicationNameSpace(),
-                campaign: campaign
-            )
-        case let campaign as TriggeredNotificationCampaign:
-            return TriggeredNotificationOpened(
-                bundleIdentifier: try Bundle.getApplicationNameSpace(),
-                campaign: campaign
-            )
-        default:
+        guard let campaign = notification.campaign else {
             throw GuardError.custom(
                 """
-                The campaign of type \(notification.campaign?.type.rawValue ?? "nil") is not supported.
+                The campaign of type is not supported.
                 Probably this is a test notification.
                 """
             )
         }
+        return NotificationOpenedEvent(
+            bundleIdentifier: try Bundle.getApplicationNameSpace(),
+            notificationType: campaign.type,
+            identityToken: campaign.identityToken
+        )
     }
 
     func handleDeepLinkDelegation(_ response: UNNotificationResponse) {
@@ -71,7 +62,7 @@ private extension OptimoveNotificationHandler {
             Logger.debug("Notification does not contain a dynamic link.")
             return
         }
-        do {
+        tryCatch {
             let urlComp = try unwrap(URLComponents(string: dynamicLink))
             let params: [String: String]? = urlComp.queryItems?.reduce(into: [String: String](), { (result, next) in
                 result.updateValue(next.value ?? "", forKey: next.name)
@@ -85,8 +76,6 @@ private extension OptimoveNotificationHandler {
                     parameters: params
                 )
             )
-        } catch {
-            Logger.error(error.localizedDescription)
         }
     }
 

@@ -5,31 +5,35 @@ import OptimoveCore
 
 final class SDKInitializer {
 
-    private let storage: OptimoveStorage
     private let componentFactory: ComponentFactory
     private let chain: ChainMutator
+    private let dependencies: [SDKInitializerDependency]
 
     // MARK: - Construction
 
-    init(storage: OptimoveStorage,
-         componentFactory: ComponentFactory,
-         chainMutator: ChainMutator) {
-        self.storage = storage
+    init(componentFactory: ComponentFactory,
+         chainMutator: ChainMutator,
+         dependencies: [SDKInitializerDependency]) {
         self.componentFactory = componentFactory
         self.chain = chainMutator
+        self.dependencies = dependencies
     }
 
     func initialize(with configuration: Configuration) {
-        updateEnvironment(configuration)
-        setupOptimoveComponents(configuration)
-        Logger.debug("SDK is initialized.")
+        dependencies.forEach { $0.onConfigurationFetch(configuration) }
+        do {
+            try setupOptimoveComponents(configuration)
+            Logger.debug("SDK is initialized.")
+        } catch {
+            Logger.error("🚨 SDK failed on initialization. Error: \(error.localizedDescription)")
+        }
     }
 
 }
 
 private extension SDKInitializer {
 
-    func setupOptimoveComponents(_ configuration: Configuration) {
+    func setupOptimoveComponents(_ configuration: Configuration) throws {
 
         // MARK: Setup Eventable chain of responsibility.
 
@@ -42,13 +46,22 @@ private extension SDKInitializer {
         // 3 responder
         let decorator = ParametersDecorator(configuration: configuration)
 
+        var optistreamComponents: [OptistreamComponent?] = [
+            try componentFactory.createOptitrackComponent(configuration: configuration)
+        ]
+        if isAllowedToRunRealtimeComponent(configuration) {
+            optistreamComponents.append(
+                try componentFactory.createRealtimeComponent(configuration: configuration)
+            )
+        }
+
         // 4 responder
         let componentHanlder = ComponentHandler(
-            components: [
-                componentFactory.createOptitrackComponent(configuration: configuration),
-                componentFactory.createRealtimeComponent(configuration: configuration),
+            commonComponents: [
                 componentFactory.createOptipushComponent(configuration: configuration)
-            ]
+            ],
+            optistreamComponents: optistreamComponents.compactMap { $0 },
+            optirstreamEventBuilder: componentFactory.createOptistreamEventBuilder(configuration: configuration)
         )
 
         decorator.next = componentHanlder
@@ -60,15 +73,36 @@ private extension SDKInitializer {
         Logger.info("All components setup finished.")
     }
 
-    func updateEnvironment(_ config: Configuration) {
-        updateLoggerStreamContainers(config)
-        storage.set(value: config.tenantID, key: .siteID)
+    func isAllowedToRunRealtimeComponent(_ configuration: Configuration) -> Bool {
+        return configuration.isEnableRealtime && !configuration.realtime.isEnableRealtimeThroughOptistream
     }
 
-    func updateLoggerStreamContainers(_ config: Configuration) {
+}
+
+protocol SDKInitializerDependency {
+    func onConfigurationFetch(_ configuration: Configuration)
+}
+
+final class OptimoveStrorageSDKInitializerDependency: SDKInitializerDependency {
+
+    private let storage: OptimoveStorage
+
+    init(storage: OptimoveStorage) {
+        self.storage = storage
+    }
+
+    func onConfigurationFetch(_ configuration: Configuration) {
+        storage.set(value: configuration.tenantID, key: .siteID)
+    }
+}
+
+final class MultiplexLoggerStreamSDKInitializerDependency: SDKInitializerDependency {
+
+    func onConfigurationFetch(_ configuration: Configuration) {
         MultiplexLoggerStream.mutateStreams(mutator: { (stream) in
-            stream.tenantId = config.tenantID
-            stream.endpoint = config.logger.logServiceEndpoint
+            stream.tenantId = configuration.tenantID
+            stream.endpoint = configuration.logger.logServiceEndpoint
         })
     }
+
 }

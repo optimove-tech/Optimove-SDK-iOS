@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-final class SetUserIdEvent: OptimoveCoreEvent {
+final class SetUserIdEvent: Event {
 
     struct Constants {
         static let name = OptimoveKeys.Configuration.setUserId.rawValue
@@ -11,14 +11,14 @@ final class SetUserIdEvent: OptimoveCoreEvent {
         }
     }
 
-    let name: String = Constants.name
-    let parameters: [String: Any]
-
     init(originalVistorId: String, userId: String, updateVisitorId: String) {
-        parameters = [
-            Constants.Key.originalVistorId: originalVistorId,
-            Constants.Key.userId: userId,
-            Constants.Key.updatedVisitorId: updateVisitorId
-        ]
+        super.init(
+            name: Constants.name,
+            context: [
+                Constants.Key.originalVistorId: originalVistorId,
+                Constants.Key.userId: userId,
+                Constants.Key.updatedVisitorId: updateVisitorId
+            ]
+        )
     }
 }

@@ -26,9 +26,9 @@ public enum StorageKey: String, CaseIterable {
     case deviceResolutionHeight
     case advertisingIdentifier
     case optFlag
-    /// For storing a migration history
-    case migrationVersions
+    case migrationVersions /// For storing a migration history
     case arePushCampaignsDisabled
+    case firstRunTimestamp
 
     // MARK: Shared keys
     /// Placed in tenant container (legacy)
@@ -37,7 +37,7 @@ public enum StorageKey: String, CaseIterable {
     case apnsToken
     case siteID
     case settingUserSuccess
-    case firstVisitTimestamp
+    case firstVisitTimestamp /// Legacy
     case realtimeSetUserIdFailed
     case realtimeSetEmailFailed
 }
@@ -86,6 +86,7 @@ public protocol StorageValue {
     var apnsToken: Data? { get set }
     var siteID: Int? { get set }
     var isSettingUserSuccess: Bool? { get set }
+    /// Legacy. Use `firstRunTimestamp` instead
     var firstVisitTimestamp: Int64? { get set }
     var realtimeSetUserIdFailed: Bool { get set }
     var realtimeSetEmailFailed: Bool { get set }
@@ -93,7 +94,6 @@ public protocol StorageValue {
     func getUserEmail() throws -> String
     func getApnsToken() throws -> Data
     func getSiteID() throws -> Int
-    func getFirstVisitTimestamp() throws -> Int64
 }
 
 /// The protocol used for convenience implementation of any storage technology below this protocol.
@@ -122,7 +122,8 @@ public final class StorageFacade: OptimoveStorage {
         .advertisingIdentifier,
         .optFlag,
         .migrationVersions,
-        .arePushCampaignsDisabled
+        .arePushCampaignsDisabled,
+        .firstRunTimestamp
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.
@@ -200,24 +201,28 @@ extension StorageFacade {
 
 extension StorageFacade {
 
-    public func isExist(fileName: String, shared: Bool) -> Bool {
-        return fileStorage.isExist(fileName: fileName, shared: shared)
+    public func isExist(fileName: String, isGroupContainer: Bool) -> Bool {
+        return fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer)
     }
 
-    public func save<T>(data: T, toFileName: String, shared: Bool) throws where T: Encodable {
-        try fileStorage.save(data: data, toFileName: toFileName, shared: shared)
+    public func save<T: Codable>(data: T, toFileName: String, isGroupContainer: Bool) throws {
+        try fileStorage.save(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
     }
 
-    public func saveData(data: Data, toFileName: String, shared: Bool) throws {
-        try fileStorage.saveData(data: data, toFileName: toFileName, shared: shared)
+    public func saveData(data: Data, toFileName: String, isGroupContainer: Bool) throws {
+        try fileStorage.saveData(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
     }
 
-    public func load(fileName: String, shared: Bool) throws -> Data {
-        return try fileStorage.load(fileName: fileName, shared: shared)
+    public func load<T: Codable>(fileName: String, isGroupContainer: Bool) throws -> T {
+        return try fileStorage.load(fileName: fileName, isGroupContainer: isGroupContainer)
     }
 
-    public func delete(fileName: String, shared: Bool) throws {
-        try fileStorage.delete(fileName: fileName, shared: shared)
+    public func loadData(fileName: String, isGroupContainer: Bool) throws -> Data {
+        return try fileStorage.loadData(fileName: fileName, isGroupContainer: isGroupContainer)
+    }
+
+    public func delete(fileName: String, isGroupContainer: Bool) throws {
+        try fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer)
     }
 
 }
@@ -358,6 +363,15 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
+    var firstRunTimestamp: Int64? {
+        get {
+            return self[.firstRunTimestamp]
+        }
+        set {
+            self[.firstRunTimestamp] = newValue
+        }
+    }
+
     // MARK: Group values getters
 
     func getConfigurationEndPoint() throws -> URL {
@@ -433,6 +447,13 @@ public extension KeyValueStorage where Self: StorageValue {
     func getAdvertisingIdentifier() throws -> String {
         guard let value = advertisingIdentifier else {
             throw StorageError.noValue(.advertisingIdentifier)
+        }
+        return value
+    }
+
+    func getFirstRunTimestamp() throws -> Int64 {
+        guard let value = firstRunTimestamp else {
+            throw StorageError.noValue(.firstRunTimestamp)
         }
         return value
     }
@@ -531,13 +552,6 @@ public extension KeyValueStorage where Self: StorageValue {
     func getSiteID() throws -> Int {
         guard let value = siteID else {
             throw StorageError.noValue(.siteID)
-        }
-        return value
-    }
-
-    func getFirstVisitTimestamp() throws -> Int64 {
-        guard let value = firstVisitTimestamp else {
-            throw StorageError.noValue(.firstVisitTimestamp)
         }
         return value
     }

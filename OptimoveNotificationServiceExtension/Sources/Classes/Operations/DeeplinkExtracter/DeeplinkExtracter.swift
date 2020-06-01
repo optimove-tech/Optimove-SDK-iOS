@@ -28,7 +28,7 @@ internal final class DeeplinkExtracter: AsyncOperation {
 
         let appKey = bundleIdentifier
         guard let url = notificationPayload.dynamicLinks?.ios?[appKey] else {
-            os_log("Found no url for this app", log: OSLog.extracter, type: .error)
+            os_log("Found no deeplink", log: OSLog.extracter, type: .error)
             state = .finished
             return
         }
@@ -51,12 +51,8 @@ private extension DeeplinkExtracter {
                         continue
                     }
                     guard let percentValue = value.addingPercentEncoding(withAllowedCharacters: alphanumericsSet) else {
-                        if let campaign = notificationPayload.campaign as? ScheduledNotificationCampaign {
-                            if campaign.campaignID > 0 {  // This is not Test campaign, any non-string values must be replaced with empty string
-                                urlString = urlString.replacingOccurrences(of: percentKey, with: "")
-                                continue
-                            }  // This is a test campaign PN, tags must stay as keys
-                        }
+                        // any non-string values must be replaced with empty string
+                        urlString = urlString.replacingOccurrences(of: percentKey, with: "")
                         continue
                     }
                     urlString = urlString.replacingOccurrences(of: percentKey, with: percentValue)
@@ -66,7 +62,7 @@ private extension DeeplinkExtracter {
             bestAttemptContent.userInfo[Constants.dynamicLinksKey] = urlString
 
         case let .failure(error):
-            os_log("Error: %{PRIVATE}@", log: OSLog.extracter, type: .error, error.localizedDescription)
+            os_log("Error: %{PUBLIC}@", log: OSLog.extracter, type: .error, error.localizedDescription)
         }
         state = .finished
     }

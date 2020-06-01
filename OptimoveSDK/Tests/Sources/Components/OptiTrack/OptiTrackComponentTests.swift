@@ -4,149 +4,72 @@ import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
 
-final class OptiTrackComponentTests: XCTestCase {
+final class OptiTrackComponentTests: OptimoveTestCase {
 
     var optitrack: OptiTrack!
-    var tracker: MockTracker!
-    var storage: MockOptimoveStorage!
-    var dateProvider: MockDateTimeProvider!
-    var statisticService: MockStatisticService!
+    var dateProvider = MockDateTimeProvider()
+    var statisticService = MockStatisticService()
+    var networking: OptistreamNetworkingMock!
+    var queue: MockOptistreamQueue!
+    var builder: OptistreamEventBuilder!
+    let dispatchInterval: TimeInterval = 1
 
     override func setUp() {
-        storage = MockOptimoveStorage()
-        tracker = MockTracker()
-        dateProvider = MockDateTimeProvider()
-        statisticService = MockStatisticService()
-
-        optitrack = OptiTrack(
-            configuration: ConfigurationFixture.build().optitrack,
-            storage: storage,
-            coreEventFactory: CoreEventFactoryImpl(
-                storage: storage,
-                dateTimeProvider: dateProvider,
-                locationService: MockLocationService()
-            ),
-            tracker: tracker
+        networking = OptistreamNetworkingMock()
+        queue = MockOptistreamQueue()
+        let configuration = ConfigurationFixture.build(
+            Options(isEnableRealtime: true, isEnableRealtimeThroughOptistream: true)
         )
-    }
-
-    override func tearDown() {
-        storage.state = [:]
-    }
-
-    private func prefilledStorage() {
-        storage.customerID = StubVariables.customerID
-        storage.visitorID = StubVariables.visitorID
-        storage.userEmail = StubVariables.userEmail
-        storage.initialVisitorId = StubVariables.initialVisitorId
-    }
-
-    func test_screen_event_report() {
-        // given
-        let screenTitle = "screenTitle"
-        let category = "category"
-
-        // then
-        let trackEventExpectation = expectation(description: "track event haven't been generated.")
-        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-            XCTAssert(event.action == PageVisitEvent.Constants.name,
-                      "Expect \(PageVisitEvent.Constants.name). Actual \(event.action)")
-            trackEventExpectation.fulfill()
-        }
-
-        let trackViewExpectation = expectation(description: "track view event haven't been generated.")
-        tracker.trackViewAssertFunction = { (views: [String], url: URL?) -> Void in
-            XCTAssert(views == [screenTitle],
-                      "Expect \([screenTitle]). Actual \(views)")
-            XCTAssert(url == URL(string: PageVisitEvent.Constants.Value.customURL),
-                      "Expect \(String(describing: URL(string: PageVisitEvent.Constants.Value.customURL))). Actual \(String(describing: url))")
-            trackViewExpectation.fulfill()
-        }
-
-        // when
-        XCTAssertNoThrow(
-            try optitrack.handle(
-                OperationContext(
-                    .reportScreenEvent(
-                        title: screenTitle,
-                        category: category
-                    )
-                )
+        builder = OptistreamEventBuilder(
+            configuration: configuration.optitrack,
+            storage: storage,
+            airshipIntegration: OptimoveAirshipIntegration(
+                storage: storage,
+                configuration: configuration
             )
         )
-        wait(for: [trackViewExpectation, trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
+        optitrack = OptiTrack(
+            queue: queue,
+            networking: networking,
+            configuration: configuration.optitrack
+        )
+        optitrack.dispatchInterval = dispatchInterval
     }
 
-    func test_event_report() {
+    func test_event_one_report() throws {
         // given
-        let stubEvent = StubEvent()
+        prefillStorageAsVisitor()
+        let stubEvent = StubOptistreamEvent
+
 
         // then
-        let trackEventExpectation = expectation(description: "track event haven't been generated.")
-        tracker.trackEventAssertFunction = { (event: TrackerEvent) -> Void in
-            XCTAssert(event.action == StubEvent.Constnats.name,
-                      "Expect \(StubEvent.Constnats.name). Actual \(event.action)")
-            trackEventExpectation.fulfill()
+        let networkExpectation = expectation(description: "track event haven't been generated.")
+        networking.assetEventsFunction = { (events, completion) -> Void in
+            XCTAssertEqual(events.count, 1)
+            networkExpectation.fulfill()
         }
 
         // when
-        try! optitrack.handle(.init(.report(event: stubEvent)))
-        wait(for: [trackEventExpectation], timeout: defaultTimeout, enforceOrder: true)
+        try optitrack.handle(.report(events: [stubEvent]))
+        wait(for: [networkExpectation], timeout: defaultTimeout + dispatchInterval * 2)
     }
 
-    func test_dispatch_now() {
+    func test_event_many_reports() throws {
+        // given
+        prefillStorageAsVisitor()
+        let stubEvents = [StubEvent(), StubEvent()]
+        queue.events = stubEvents.map({ try! self.builder.build(event: $0) })
+
         // then
-        let trackDispatchExpectation = expectation(description: "dispatch now haven't been invoked.")
-        tracker.dispatchAssertFunction = {
-            trackDispatchExpectation.fulfill()
+        let networkExpectation = expectation(description: "track event haven't been generated.")
+        networking.assetEventsFunction = { (events, completion) -> Void in
+            XCTAssertEqual(stubEvents.count, events.count)
+            networkExpectation.fulfill()
         }
 
         // when
-        try! optitrack.handle(.init(.dispatchNow))
-        wait(for: [trackDispatchExpectation], timeout: defaultTimeout, enforceOrder: true)
-    }
-
-    // MARK: - Tests for private methods
-
-    func test_inject_to_tracker_visitorID() {
-        // given
-        let visitorID = StubVariables.visitorID
-
-        // when
-        storage.visitorID = visitorID
-        optitrack.syncVisitorAndUserIdToMatomo()
-
-        // then
-        XCTAssertEqual(tracker.forcedVisitorId, visitorID,
-                       "Expected value \(visitorID). Actual: \(String(describing: tracker.userId))")
-    }
-
-    func test_inject_to_tracker_customerID() {
-        // given
-        let customerID = StubVariables.customerID
-
-        // when
-        storage.customerID = customerID
-        optitrack.syncVisitorAndUserIdToMatomo()
-
-        // then
-        XCTAssert(tracker.userId == customerID,
-                  "Expected value \(customerID). Actual: \(String(describing: tracker.userId))")
-    }
-
-    func test_inject_to_tracker_visitorID_has_lower_priority_than_customerID() {
-        // given
-        let visitorID = StubVariables.visitorID
-        let customerID = StubVariables.customerID
-
-        // when
-        storage.visitorID = visitorID
-        storage.customerID = customerID
-        optitrack.syncVisitorAndUserIdToMatomo()
-
-        // then
-        XCTAssert(tracker.userId == customerID,
-                  "Expected value \(customerID). Actual: \(String(describing: tracker.userId))")
+        try optitrack.handle(.dispatchNow)
+        wait(for: [networkExpectation], timeout: defaultTimeout + dispatchInterval)
     }
 
 }

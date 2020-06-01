@@ -34,7 +34,7 @@ extension ApiNetworkingImpl: ApiNetworking {
 
 private extension ApiNetworkingImpl {
 
-    func handleResult(result: Result<NetworkResponse<Data?>, Error>,
+    func handleResult(result: Result<NetworkResponse<Data?>, NetworkError>,
                       for operation: ApiOperation,
                       completion: @escaping (Result<String, Error>) -> Void) {
         completion(

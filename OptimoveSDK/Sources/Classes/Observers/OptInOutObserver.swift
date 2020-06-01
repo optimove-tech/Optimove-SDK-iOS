@@ -3,6 +3,11 @@
 import UIKit
 import OptimoveCore
 
+enum OptStatus {
+    case optIn
+    case optOut
+}
+
 final class OptInOutObserver {
 
     private let optInService: OptInService

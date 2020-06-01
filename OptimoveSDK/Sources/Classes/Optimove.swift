@@ -4,7 +4,8 @@ import UIKit.UIApplication
 import UserNotifications
 import OptimoveCore
 
-public typealias OptimoveEvent = OptimoveCore.OptimoveEvent
+public typealias Event = OptimoveCore.Event
+typealias Logger = OptimoveCore.Logger
 
 /// The Optimove SDK for iOS - a realtime customer data platform.
 /// The integration guide: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki
@@ -13,7 +14,7 @@ public typealias OptimoveEvent = OptimoveCore.OptimoveEvent
 @objc public final class Optimove: NSObject {
 
     /// The current OptimoveSDK version string value.
-    public static let version = SDKVersion
+    public static let version = OptimoveCore.SDKVersion
 
     /// The shared instance of Optimove SDK.
     @objc public static let shared: Optimove = {
@@ -53,8 +54,8 @@ extension Optimove {
     ///   - parameters: The dictionary of attributes.
     @objc public func reportEvent(name: String, parameters: [String: Any] = [:]) {
         container.resolve { serviceLocator in
-            let customEvent = CommonOptimoveEvent(name: name, parameters: parameters)
-            serviceLocator.synchronizer().handle(.report(event: customEvent))
+            let tenantEvent = TenantEvent(name: name, context: parameters)
+            serviceLocator.synchronizer().handle(.report(events: [tenantEvent]))
         }
     }
 
@@ -64,7 +65,8 @@ extension Optimove {
     ///   - event: Instance of OptimoveEvent type.
     @objc public func reportEvent(_ event: OptimoveEvent) {
         container.resolve { serviceLocator in
-            serviceLocator.synchronizer().handle(.report(event: event))
+            let tenantEvent = TenantEvent(name: event.name, context: event.parameters)
+            serviceLocator.synchronizer().handle(.report(events: [tenantEvent]))
         }
     }
 
@@ -78,22 +80,17 @@ extension Optimove {
     /// - Parameters:
     ///   - screenTitle: The screen title.
     ///   - screenCategory: The screen category.
-    @objc public func reportScreenVisit(screenTitle: String, screenCategory: String? = nil) {
-        let screenTitle = screenTitle.trimmingCharacters(in: .whitespaces)
-        Logger.info("Report a screen event w/title: \(screenTitle)")
-        let validationResult = ScreenVisitValidator.validate(screenTitle: screenTitle)
+    @objc public func reportScreenVisit(screenTitle title: String, screenCategory category: String? = nil) {
+        let title = title.trimmingCharacters(in: .whitespaces)
+        let validationResult = ScreenVisitValidator.validate(screenTitle: title)
         guard validationResult == .valid else { return }
-        let function: (ServiceLocator) -> Void = { serviceLocator in
+        container.resolve { serviceLocator in
             tryCatch {
-                serviceLocator.synchronizer().handle(
-                    .reportScreenEvent(
-                        title: screenTitle,
-                        category: screenCategory
-                    )
-                )
+                let factory = serviceLocator.coreEventFactory()
+                let event = try factory.createEvent(.pageVisit(title: title, category: category))
+                serviceLocator.synchronizer().handle(.report(events: [event]))
             }
         }
-        container.resolve(function)
     }
 }
 
@@ -107,24 +104,42 @@ extension Optimove {
     ///   - sdkId: The user unique identifier.
     ///   - email: The user email.
     @objc public func registerUser(sdkId: String, email: String) {
-        setUserId(sdkId)
-        setUserEmail(email: email)
+        let function: (ServiceLocator) -> Void = { serviceLocator in
+            tryCatch {
+                let setUserIdEvent = try self._setUserId(sdkId, serviceLocator)
+                let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
+                serviceLocator.synchronizer().handle(.report(events: [setUserIdEvent, setUserEmailEvent]))
+                serviceLocator.synchronizer().handle(.setInstallation)
+            }
+        }
+        container.resolve(function)
     }
 
     /// Set a user ID to the Optimove SDK.
     ///
     /// - Parameter userID: The user unique identifier.
     @objc public func setUserId(_ userID: String) {
-        let userID = userID.trimmingCharacters(in: .whitespaces)
         let function: (ServiceLocator) -> Void = { serviceLocator in
-            let storage = serviceLocator.storage()
-            let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
-            guard validationResult == .valid else { return }
-            NewUserIDHandler(storage: storage).handle(userID: userID)
-            let syncronizer = serviceLocator.synchronizer()
-            syncronizer.handle(.setUserId)
+            tryCatch {
+                let event = try self._setUserId(userID, serviceLocator)
+                serviceLocator.synchronizer().handle(.report(events: [event]))
+                serviceLocator.synchronizer().handle(.setInstallation)
+            }
         }
         container.resolve(function)
+    }
+
+    private func _setUserId(_ userID: String, _ serviceLocator: ServiceLocator) throws -> Event {
+        let userID = userID.trimmingCharacters(in: .whitespaces)
+        let storage = serviceLocator.storage()
+        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
+        switch validationResult {
+        case .valid:
+            NewUserIDHandler(storage: storage).handle(userID: userID)
+            return try serviceLocator.coreEventFactory().createEvent(.setUserId)
+        default:
+            throw GuardError.custom("UserID is \(validationResult.rawValue)")
+        }
     }
 
     /// Set a user email to the Optimove SDK.
@@ -132,17 +147,24 @@ extension Optimove {
     /// - Parameter email: The user email.
     @objc public func setUserEmail(email: String) {
         let function: (ServiceLocator) -> Void = { serviceLocator in
-            let storage = serviceLocator.storage()
-            let validationResult = EmailValidator(storage: storage).isValid(email)
-            guard validationResult == .valid else { return }
-            NewEmailHandler(storage: storage).handle(email: email)
             tryCatch {
-                try serviceLocator.coreEventFactory().createEvent(.setUserEmail) { event in
-                    Optimove.shared.reportEvent(event)
-                }
+                let event: Event = try self._setUserEmail(email, serviceLocator)
+                serviceLocator.synchronizer().handle(.report(events: [event]))
             }
         }
         container.resolve(function)
+    }
+
+    private func _setUserEmail(_ email: String, _ serviceLocator: ServiceLocator) throws -> Event {
+        let storage = serviceLocator.storage()
+        let validationResult = EmailValidator(storage: storage).isValid(email)
+        switch validationResult {
+        case .valid:
+            NewEmailHandler(storage: storage).handle(email: email)
+            return try serviceLocator.coreEventFactory().createEvent(.setUserEmail)
+        default:
+            throw GuardError.custom("Email is \(validationResult.rawValue)")
+        }
     }
 
     /// A call to this method will stop executions of any push campaign
@@ -224,7 +246,7 @@ extension Optimove {
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
         ) -> Bool {
-        Logger.info("User produce a response for a notificaiton.")
+        Logger.info("User produced the response for the notificaiton.")
         let function: (ServiceLocator) -> (Bool) = { serviceLocator in
             let notificationListener = serviceLocator.notificationListener()
             let result = notificationListener.isOptipush(notification: response.notification)
@@ -307,15 +329,15 @@ private extension Optimove {
             serviceLocator.newVisitorIdGenerator().generate()
             serviceLocator.firstTimeVisitGenerator().generate()
             let configurationFetcher = serviceLocator.configurationFetcher()
-            configurationFetcher.fetch { result in
+            configurationFetcher.fetch { [weak self] result in
+                guard let self = self else { return }
                 switch result {
                 case let .success(configuration):
                     self.initialize(with: configuration)
                     Logger.info("Initialization finished. ✅")
                     completion(.success(()))
                 case let .failure(error):
-                    Logger.error(error.localizedDescription)
-                    Logger.error("Initialization failed. 🛑")
+                    Logger.error("Initialization failed. 🛑\nReason: \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }
@@ -341,42 +363,6 @@ private extension Optimove {
             RunningFlagsIndication.isSdkRunning.toggle()
         }
         container.resolve(function)
-    }
-
-}
-
-// MARK: - Deprecated
-
-extension Optimove {
-
-    /// Request to subscribe to test campaign topics
-    @available(*, deprecated, message: "No need to calls start test mode. Use Optimove site for tests.")
-    @objc public func startTestMode() {}
-
-    /// Request to unsubscribe from test campaign topics
-    @available(*, deprecated, message: "No need to calls stop test mode. Use Optimove site for tests.")
-    @objc public func stopTestMode() {}
-
-    /// Report the screen visit event.
-    /// - Parameters:
-    ///   - screenPathArray: An array of breadcrumbs – an UI path to the screen.
-    ///   - screenTitle: The screen title.
-    ///   - screenCategory: The screen category.
-    @available(*, deprecated, renamed: "reportScreenVisit(screenTitle:screenCategory:)")
-    @objc public func setScreenVisit(screenPathArray: [String], screenTitle: String, screenCategory: String? = nil) {
-        reportScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
-    }
-
-    /// Report the screen visit event.
-    /// - Parameters:
-    ///   - screenPath: An UI path to the screen.
-    ///   - screenTitle: The screen title.
-    ///   - screenCategory: The screen category.
-    @available(*, deprecated, renamed: "reportScreenVisit(screenTitle:screenCategory:)")
-    @objc public func setScreenVisit(screenPath: String,
-                                     screenTitle: String,
-                                     screenCategory: String? = nil) {
-            reportScreenVisit(screenTitle: screenTitle, screenCategory: screenCategory)
     }
 
 }

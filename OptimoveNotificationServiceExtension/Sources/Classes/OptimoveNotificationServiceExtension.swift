@@ -57,12 +57,22 @@ import OptimoveCore
                 sharedStorage: try UserDefaults.shared(tenantBundleIdentifier: bundleIdentifier),
                 fileStorage: try FileStorageImpl(bundleIdentifier: bundleIdentifier, fileManager: .default)
             )
+            let configurationRepository = ConfigurationRepositoryImpl(
+                storage: storage
+            )
+            let configuration = try configurationRepository.getConfiguration()
             try handleNotification(
                 payload: payload,
-                optitrack: OptitrackNSEImpl(
+                networking: OptistreamNetworkingImpl(
+                    networkClient: NetworkClientImpl(),
+                    endpoint: configuration.optitrack.optitrackEndpoint
+                ),
+                builder: OptistreamEventBuilder(
+                    configuration: configuration.optitrack,
                     storage: storage,
-                    repository: ConfigurationRepositoryImpl(
-                        storage: storage
+                    airshipIntegration: OptimoveAirshipIntegration(
+                        storage: storage,
+                        configuration: configuration
                     )
                 ),
                 bestAttemptContent: bestAttemptContent,
@@ -112,7 +122,8 @@ extension OptimoveNotificationServiceExtension {
 
     func handleNotification(
         payload: NotificationPayload,
-        optitrack: OptitrackNSE,
+        networking: OptistreamNetworking,
+        builder: OptistreamEventBuilder,
         bestAttemptContent: UNMutableNotificationContent,
         contentHandler: @escaping (UNNotificationContent) -> Void
     ) throws {
@@ -125,7 +136,8 @@ extension OptimoveNotificationServiceExtension {
             NotificationDeliveryReporter(
                 bundleIdentifier: bundleIdentifier,
                 notificationPayload: payload,
-                optitrack: optitrack
+                networking: networking,
+                builder: builder
             ),
             MediaAttachmentDownloader(
                 notificationPayload: payload,

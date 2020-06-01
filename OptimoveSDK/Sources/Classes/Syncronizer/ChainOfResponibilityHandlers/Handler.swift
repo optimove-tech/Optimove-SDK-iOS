@@ -2,7 +2,7 @@
 
 class Node {
     var next: Node?
-    func execute(_: OperationContext) throws {
+    func execute(_: CommonOperation) throws {
         fatalError("No implementation. Expect to be implemented by inheretance.")
     }
 }

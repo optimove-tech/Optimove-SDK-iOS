@@ -8,54 +8,50 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
 
     private let bundleIdentifier: String
     private let notificationPayload: NotificationPayload
-    private let optitrack: OptitrackNSE
+    private let networking: OptistreamNetworking
+    private let builder: OptistreamEventBuilder
 
     init(bundleIdentifier: String,
          notificationPayload: NotificationPayload,
-         optitrack: OptitrackNSE) {
+         networking: OptistreamNetworking,
+         builder: OptistreamEventBuilder) {
         self.bundleIdentifier = bundleIdentifier
         self.notificationPayload = notificationPayload
-        self.optitrack = optitrack
+        self.networking = networking
+        self.builder = builder
     }
 
     override func main() {
         state = .executing
+        guard let campaign = notificationPayload.campaign else {
+            os_log("Unrecognized campaign type.", log: OSLog.reporter, type: .error)
+            state = .finished
+            return
+        }
         do {
-            let timestamp = Date().timeIntervalSince1970
-            switch notificationPayload.campaign {
-            case let campaign as ScheduledNotificationCampaign:
-                try report(
-                    ScheduledNotificationDelivered(
-                        bundleId: bundleIdentifier,
-                        campaign: campaign,
-                        timestamp: timestamp
-                    )
-                )
-            case let campaign as TriggeredNotificationCampaign:
-                try report(
-                    TriggeredNotificationRecieved(
-                        bundleId: bundleIdentifier,
-                        campaign: campaign,
-                        timestamp: timestamp
-                    )
-                )
-            default:
-                os_log("Unrecognized campaign type.", log: OSLog.reporter, type: .error)
-                state = .finished
-            }
+            let event = NotificationDeliveredEvent(
+                bundleId: bundleIdentifier,
+                notificationType: campaign.type,
+                identityToken: campaign.identityToken
+            )
+            let optistreamEvent = try builder.build(event: event)
+            try report(optistreamEvent)
         } catch {
             os_log("Error: %{public}@", log: OSLog.reporter, type: .error, error.localizedDescription)
             state = .finished
         }
     }
 
-    private func report(_ event: OptimoveEvent) throws {
-try optitrack.report(
-            event: event,
-            completion: { [unowned self] in
-                self.state = .finished
+    private func report(_ event: OptistreamEvent) throws {
+        networking.send(events: [event]) { [unowned self] (result) in
+            switch result {
+            case .success:
+                    os_log("Delivery reported", log: OSLog.reporter, type: .info)
+            case .failure(let error):
+                os_log("Error: %{public}@", log: OSLog.reporter, type: .error, error.localizedDescription)
             }
-        )
+            self.state = .finished
+        }
     }
 }
 

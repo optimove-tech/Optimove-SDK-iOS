@@ -29,25 +29,13 @@ final class GlobalConfigFixture: FileAccessible {
 
     func optitrackConfigFixture() -> GlobalOptitrackConfig {
         return GlobalOptitrackConfig(
-            eventCategoryName: "event_category_name",
-            customDimensionIDs: customDimensionIDsFixture()
+            eventCategoryName: "event_category_name"
         )
     }
 
     func optipushConfigFixture() -> GlobalOptipushConfig {
         return GlobalOptipushConfig(
             mbaasEndpoint: StubVariables.url
-        )
-    }
-
-    func customDimensionIDsFixture() -> CustomDimensionIDs {
-        return CustomDimensionIDs(
-            eventIDCustomDimensionID: 6,
-            eventNameCustomDimensionID: 7,
-            visitCustomDimensionsStartID: 1,
-            maxVisitCustomDimensions: 5,
-            actionCustomDimensionsStartID: 8,
-            maxActionCustomDimensions: 25
         )
     }
 

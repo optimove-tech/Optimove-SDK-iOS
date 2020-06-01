@@ -21,14 +21,14 @@ public final class ConfigurationRepositoryImpl {
         static let fileExtension = ".json"
         struct Global {
             static let fileName = "global_config" + fileExtension
-            static let sharedStorage = true
+            static let isGroupContainer = true
         }
         struct Tenant {
-            static let sharedStorage = true
+            static let isGroupContainer = true
         }
         struct Configuration {
             static let fileName = "configuration" + fileExtension
-            static let sharedStorage = true
+            static let isGroupContainer = true
         }
     }
 
@@ -43,34 +43,39 @@ public final class ConfigurationRepositoryImpl {
 extension ConfigurationRepositoryImpl: ConfigurationRepository {
 
     public func getConfiguration() throws -> Configuration {
-        let data = try storage.load(fileName: Constants.Configuration.fileName, shared: Constants.Configuration.sharedStorage)
-        return try JSONDecoder().decode(Configuration.self, from: data)
+        return try storage.load(fileName: Constants.Configuration.fileName,
+                                isGroupContainer: Constants.Configuration.isGroupContainer)
     }
 
     public func setConfiguration(_ config: Configuration) throws {
         try storage.save(data: config,
-                         toFileName: Constants.Configuration.fileName, shared: Constants.Configuration.sharedStorage)
+                         toFileName: Constants.Configuration.fileName,
+                         isGroupContainer: Constants.Configuration.isGroupContainer)
     }
 
     public func getGlobal() throws -> GlobalConfig {
-        let data = try storage.load(fileName: Constants.Global.fileName, shared: Constants.Global.sharedStorage)
-        return try JSONDecoder().decode(GlobalConfig.self, from: data)
+        return try storage.load(fileName: Constants.Global.fileName,
+                                isGroupContainer: Constants.Global.isGroupContainer)
     }
 
     public func saveGlobal(_ config: GlobalConfig) throws {
-        try storage.save(data: config, toFileName: Constants.Global.fileName, shared: Constants.Global.sharedStorage)
+        try storage.save(data: config,
+                         toFileName: Constants.Global.fileName,
+                         isGroupContainer: Constants.Global.isGroupContainer)
     }
 
     public func getTenant() throws -> TenantConfig {
         let version = try storage.getVersion()
         let fileName = version + Constants.fileExtension
-        let data = try storage.load(fileName: fileName, shared: Constants.Tenant.sharedStorage)
-        return try JSONDecoder().decode(TenantConfig.self, from: data)
+        return try storage.load(fileName: fileName,
+                                isGroupContainer: Constants.Tenant.isGroupContainer)
     }
 
     public func saveTenant(_ config: TenantConfig) throws {
         let version = try storage.getVersion()
         let fileName = version + Constants.fileExtension
-        try storage.save(data: config, toFileName: fileName, shared: Constants.Tenant.sharedStorage)
+        try storage.save(data: config,
+                         toFileName: fileName,
+                         isGroupContainer: Constants.Tenant.isGroupContainer)
     }
 }

@@ -6,21 +6,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Report screen visit like this
-        Optimove.shared.setScreenVisit(screenPath: "Home/Store/Footwear/Boots", screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
+        Optimove.shared.reportScreenVisit(screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
         // OR
-        Optimove.shared.setScreenVisit(screenPathArray: ["Home", "Store", "Footwear", "Boots"], screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
+        Optimove.shared.reportScreenVisit(screenTitle: "<YOUR_TITLE>", screenCategory: "<OPTIONAL: YOUR_CATEGORY>")
 
         // Optipush Only
         Optimove.shared.register(deepLinkResponder: OptimoveDeepLinkResponder(self))
     }
 
-    @IBAction func startOptipushTestMode(_ sender: UIButton) {
-        Optimove.shared.startTestMode()
-    }
-
-    @IBAction func stopOptipushTestMode(_ sender: UIButton) {
-        Optimove.shared.stopTestMode()
-    }
 }
 
 // Mark - Optimove SDK Indentification

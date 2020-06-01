@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-final class PageVisitEvent: OptimoveCoreEvent {
+final class PageVisitEvent: Event {
 
     struct Constants {
         static let name = "set_page_visit"
@@ -15,14 +15,14 @@ final class PageVisitEvent: OptimoveCoreEvent {
         }
     }
 
-    let name: String = Constants.name
-    let parameters: [String: Any]
-
     init(title: String?, category: String?) {
-        self.parameters = [
-            Constants.Key.customURL: Constants.Value.customURL,
-            Constants.Key.pageTitle: title,
-            Constants.Key.category: category
-        ].compactMapValues { $0 }
+        super.init(
+            name: Constants.name,
+            context: [
+                Constants.Key.customURL: Constants.Value.customURL,
+                Constants.Key.pageTitle: title,
+                Constants.Key.category: category
+            ].compactMapValues { $0 }
+        )
     }
 }

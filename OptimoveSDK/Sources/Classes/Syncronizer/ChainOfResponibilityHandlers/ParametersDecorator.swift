@@ -11,21 +11,19 @@ final class ParametersDecorator: Node {
         self.configuration = configuration
     }
 
-    override func execute(_ context: OperationContext) throws {
-        let decorationFunction = { [configuration] () -> OperationContext in
-            switch context.operation {
-            case let .report(event: event):
-                return OperationContext(
-                    operation: .report(event:
-                        OptimoveEventDecorator(
-                            event: event,
-                            config: try event.matchConfiguration(with: configuration.events)
+    override func execute(_ operation: CommonOperation) throws {
+        let decorationFunction = { [configuration] () -> CommonOperation in
+            switch operation {
+            case let .report(events: events):
+                return CommonOperation.report(
+                    events: try events.map {
+                        $0.decorate(
+                            config: try $0.matchConfiguration(with: configuration.events)
                         )
-                    ),
-                    timestamp: context.timestamp
+                    }
                 )
             default:
-                return context
+                return operation
             }
         }
         try next?.execute(decorationFunction())
