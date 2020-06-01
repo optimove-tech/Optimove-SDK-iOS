@@ -141,7 +141,7 @@ private extension OptiTrack {
         let events = queue.first(limit: Constants.eventBatchLimit)
         guard !events.isEmpty else {
             self.stopDispatching()
-            Logger.debug("Finished dispatching events")
+            Logger.info("Finished dispatching events")
             return
         }
         networking.send(events: events) { [weak self] (result) in
