@@ -62,17 +62,16 @@ extension NetworkClientImpl: NetworkClient {
                 completion(.failure(NetworkError.requestFailed))
                 return
             }
-            if (200...299).contains(httpResponse.statusCode) {
+            switch httpResponse.statusCode {
+            case 200...299:
+                completion(.success(NetworkResponse<Data?>(statusCode: httpResponse.statusCode, body: data)))
+            case 400...499:
+                completion(.failure(NetworkError.requestInvalid(data)))
+            case 500...599:
+                completion(.failure(NetworkError.requestFailed))
+            default:
                 completion(.success(NetworkResponse<Data?>(statusCode: httpResponse.statusCode, body: data)))
             }
-            if (400...499).contains(httpResponse.statusCode) {
-                completion(.failure(NetworkError.requestInvalid(data)))
-            }
-            if (500...599).contains(httpResponse.statusCode) {
-                completion(.failure(NetworkError.requestFailed))
-            }
-            // FIXME: Cover all other codes.
-            completion(.success(NetworkResponse<Data?>(statusCode: httpResponse.statusCode, body: data)))
         }
         task.resume()
     }
