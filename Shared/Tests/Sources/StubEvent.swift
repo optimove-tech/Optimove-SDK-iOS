@@ -13,9 +13,11 @@ final class StubEvent: Event {
     }
 
     init() {
-        super.init(name: Constnats.name, context: [
-            Constnats.key: Constnats.value
-        ])
+        super.init(name: Constnats.name, context: [Constnats.key: Constnats.value])
+    }
+
+    init(context: [String: Any]) {
+        super.init(name: Constnats.name, context: context.merging([Constnats.key: Constnats.value], uniquingKeysWith: { $1 }))
     }
 
 }

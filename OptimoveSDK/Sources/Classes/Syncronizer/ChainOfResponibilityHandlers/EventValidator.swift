@@ -63,34 +63,43 @@ final class EventValidator: Node {
         }
         // Verify Type is as defined
         for (key, value) in event.context {
-            if let parameterConfiguration = eventConfiguration.parameters[key] {
-                switch parameterConfiguration.type {
-                case Constants.number:
-                    guard let numberValue = value as? NSNumber else {
-                        Logger.error("Parameter '\(key)' is not number type.")
-                        throw Error.mismatchParamterType
-                    }
-                    if String(describing: numberValue).count > Constants.legalParameterLength {
-                        throw Error.illegalParameterLength
-                    }
-                case Constants.string:
-                    guard let stringValue = value as? String else {
-                        Logger.error("Parameter \(key) is not string type.")
-                        throw Error.mismatchParamterType
-                    }
-                    if stringValue.count > Constants.legalParameterLength {
-                        throw Error.illegalParameterLength
-                    }
-                case Constants.boolean:
-                    guard value is Bool else {
-                        Logger.error("Parameter \(key) is not boolean type.")
-                        throw Error.mismatchParamterType
-                    }
-                default:
-                    throw Error.invalidEvent
-                }
-            }
+            guard let parameter = eventConfiguration.parameters[key] else { continue }
+            try validateParameter(parameter, key, value)
         }
     }
 
+    private func validateParameter(
+        _ parameter: Parameter,
+        _ key: String,
+        _ value: Any
+    ) throws {
+        switch parameter.type {
+        case Constants.number:
+            guard let numberValue = value as? NSNumber else {
+                Logger.error("Parameter '\(key)' is not number type.")
+                throw Error.mismatchParamterType
+            }
+            if String(describing: numberValue).count > Constants.legalParameterLength {
+                throw Error.illegalParameterLength
+            }
+
+        case Constants.string:
+            guard let stringValue = value as? String else {
+                Logger.error("Parameter \(key) is not string type.")
+                throw Error.mismatchParamterType
+            }
+            if stringValue.count > Constants.legalParameterLength {
+                throw Error.illegalParameterLength
+            }
+
+        case Constants.boolean:
+            guard value is Bool else {
+                Logger.error("Parameter \(key) is not boolean type.")
+                throw Error.mismatchParamterType
+            }
+
+        default:
+            throw Error.invalidEvent
+        }
+    }
 }

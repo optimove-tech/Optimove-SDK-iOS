@@ -82,6 +82,7 @@
 		45AA5FDB34AD5ED3F78A8040 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0CFD51DD85596306B721E0 /* NetworkClient.swift */; };
 		45AEE0276D250CF2208C644E /* OnStartEventGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F1D9A9EC40981BD427CB4C /* OnStartEventGeneratorTests.swift */; };
 		45E8890FB696618F19DE0E1C /* OptimoveSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F195D6A74F16DC039009B692 /* OptimoveSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		461220562486B7AE00E01EE3 /* EventValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461220542486B79500E01EE3 /* EventValidatorTests.swift */; };
 		4706D362A1B3BD2B148D9DDE /* NetworkResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB19792511783857E3051963 /* NetworkResponse.swift */; };
 		499D5BF06BBCC8EBB94263E4 /* Optimove.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA418E3FDBEB318519B1F183 /* Optimove.swift */; };
 		49CF203CF09FBC2F4578AF84 /* OptimoveNotificationServiceExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AF7CBE1A75BE741CAF7483 /* OptimoveNotificationServiceExtensionTests.swift */; };
@@ -420,8 +421,8 @@
 		2F6D1C3E09195F4AA62DE80C /* String+random.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+random.swift"; sourceTree = "<group>"; };
 		313AF75BEDDE3C3411F01615 /* OptimoveSDK-Unit.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "OptimoveSDK-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3254240E2ED942F17B69FF7A /* OptimoveNotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationHandler.swift; sourceTree = "<group>"; };
-		325B5F8B3BDBB034C3516AAB /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
-		329CE901655C81D4751CB22B /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		325B5F8B3BDBB034C3516AAB /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		329CE901655C81D4751CB22B /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		33000E03B027C7F4EB7B2148 /* OptiPush.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptiPush.swift; sourceTree = "<group>"; };
 		36CB93F7FDDCB7374DA1CF9A /* OptimoveKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveKeys.swift; sourceTree = "<group>"; };
 		37FF76A69D6A6A50ACED5DAC /* NotificationPermissionFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPermissionFetcher.swift; sourceTree = "<group>"; };
@@ -441,7 +442,8 @@
 		456C02EDEC171291D1C6FDCA /* PersistentContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentContainer.swift; sourceTree = "<group>"; };
 		458897EAB1CC463D34F58C56 /* notificationWithTriggeredCampaign.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = notificationWithTriggeredCampaign.json; sourceTree = "<group>"; };
 		4592839140B76A8D32F05DC8 /* RemoteLoggerStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerStream.swift; sourceTree = "<group>"; };
-		472CC4141ED9FBD9DD0B65F1 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		461220542486B79500E01EE3 /* EventValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventValidatorTests.swift; sourceTree = "<group>"; };
+		472CC4141ED9FBD9DD0B65F1 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		485BDCB56EA98CD3DD5AE9DE /* TenantConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantConfigTests.swift; sourceTree = "<group>"; };
 		487536D1DE6FD34739D24A91 /* Installation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Installation.swift; sourceTree = "<group>"; };
 		4AFAFD6EE31AD9F7438FB016 /* NotificationDeliveryReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeliveryReporter.swift; sourceTree = "<group>"; };
@@ -463,7 +465,7 @@
 		5FC57145A54E5033A5CECAF0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		5FE216E57E65CEC3F6D9F4CE /* String+isBlank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+isBlank.swift"; sourceTree = "<group>"; };
 		60C210C2DB4BC192D8BD85E1 /* MergeRemoteConfigurationOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MergeRemoteConfigurationOperation.swift; sourceTree = "<group>"; };
-		615F8FAE93C5D0A6AC301070 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		615F8FAE93C5D0A6AC301070 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		63C7EC2263685823B37EC99A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		6424915844F66E0315561874 /* RealTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTime.swift; sourceTree = "<group>"; };
 		645827DC38A5B11688962537 /* OptimoveAirshipIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveAirshipIntegration.swift; sourceTree = "<group>"; };
@@ -482,7 +484,7 @@
 		70EC39175948194604CEA34B /* StringSplitByLenghtExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringSplitByLenghtExtensionsTests.swift; sourceTree = "<group>"; };
 		7142C292241C1F13B6D2F370 /* HandlersPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandlersPool.swift; sourceTree = "<group>"; };
 		71A9D3341C3268497BDCBED0 /* OptimoveNotificationServiceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationServiceExtension.swift; sourceTree = "<group>"; };
-		72CF66E4BD3D9F58D52640AE /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		72CF66E4BD3D9F58D52640AE /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		732378F1F571519EBD60950B /* ComponentOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentOperation.swift; sourceTree = "<group>"; };
 		738B25C939FAE2104D09DB7B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		743439E918A7943D2FFA435C /* ApiRequestFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiRequestFactory.swift; sourceTree = "<group>"; };
@@ -551,7 +553,7 @@
 		AC298B299B5C54C00F88C94E /* ParametersDecorator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParametersDecorator.swift; sourceTree = "<group>"; };
 		ACBA73DD67337E6F4FF32033 /* DynamicLinkParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicLinkParser.swift; sourceTree = "<group>"; };
 		ADF1A285E540507DACCA9630 /* LoggerStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStream.swift; sourceTree = "<group>"; };
-		AE5ED65D35DAEDBE1D34995A /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		AE5ED65D35DAEDBE1D34995A /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		B1AEF7257DAA1A2E7FB12680 /* GlobalFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalFunctions.swift; sourceTree = "<group>"; };
 		B1B51D44551B095F9BA4EDBD /* KeyValueStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueStorageTests.swift; sourceTree = "<group>"; };
 		B250C7CF8C880EF6A147DE7E /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
@@ -1055,6 +1057,7 @@
 			isa = PBXGroup;
 			children = (
 				E0F41B5FDAD6DB908750FDF0 /* UserIDValidatorTests.swift */,
+				461220542486B79500E01EE3 /* EventValidatorTests.swift */,
 			);
 			path = Validator;
 			sourceTree = "<group>";
@@ -1837,27 +1840,6 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		"TEMP_18E43D76-6491-4BD8-A7C6-200FD2F07804" /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		"TEMP_299AAD3E-E380-42A1-A7DC-B96BD7E7A0E0" /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		"TEMP_762E10CD-0D03-456E-8982-779E75E65657" /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1975,8 +1957,6 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1020;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 05A4DEC880B8C9907862CC6F /* Build configuration list for PBXProject "Optimove" */;
 			compatibilityVersion = "Xcode 10.0";
@@ -2090,6 +2070,7 @@
 				9CF7237135A4CC033D355E3F /* TenantConfigFixture.swift in Sources */,
 				A5B65BA10A3B356CAACADB8D /* TenantConfigurationDownloaderTests.swift in Sources */,
 				83F8B837C82ED3DCCCF9F7FF /* UserIDValidatorTests.swift in Sources */,
+				461220562486B7AE00E01EE3 /* EventValidatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
