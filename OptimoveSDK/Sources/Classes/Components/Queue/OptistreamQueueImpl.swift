@@ -81,7 +81,9 @@ extension OptistreamQueueImpl: OptistreamQueue {
 
     var isEmpty: Bool {
         do {
-            return try context.count(for: EventCD.sortedFetchRequest) == 0
+            return try context.performAndWait {
+                return try context.count(for: EventCD.sortedFetchRequest) == 0
+            }
         } catch {
             return true
         }
