@@ -13,8 +13,9 @@ final class MigrationObserver {
 extension MigrationObserver: DeviceStateObservable {
 
     func observe() {
-        let version = Optimove.version
-        migrationWorks.filter { $0.isAllowToMiragte(version) }.forEach { $0.runMigration() }
+        migrationWorks
+            .filter { $0.isAllowToMiragte(Optimove.version) }
+            .forEach { $0.runMigration() }
     }
 
 }

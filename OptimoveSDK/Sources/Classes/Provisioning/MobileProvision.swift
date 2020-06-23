@@ -12,6 +12,7 @@ struct MobileProvision: Decodable {
     }
 
     struct Entitlements: Decodable {
+
         let apsEnvironment: Environment
 
         private enum CodingKeys: String, CodingKey {
@@ -28,7 +29,7 @@ struct MobileProvision: Decodable {
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            let apsEnvironment: Environment = (try? container.decode(Environment.self, forKey: .apsEnvironment)) ?? .disabled
+            let apsEnvironment: Environment = try container.decodeIfPresent(Environment.self, forKey: .apsEnvironment) ?? .disabled
             self.init(apsEnvironment: apsEnvironment)
         }
     }
@@ -36,9 +37,9 @@ struct MobileProvision: Decodable {
 
 extension MobileProvision {
 
-    private struct Constants {
-        static let startPlistTag = "<plist"
-        static let endPlistTag = "</plist>"
+    private struct PlistTags {
+        static let start = "<plist"
+        static let end = "</plist>"
     }
 
     static func read() throws -> MobileProvision {
@@ -47,21 +48,21 @@ extension MobileProvision {
     }
 
     static func read(from profilePath: String) throws -> MobileProvision {
-        let plistDataString = try String(contentsOfFile: profilePath, encoding: String.Encoding.isoLatin1)
-        let extractedPlist: String = try unwrap(scanPlistDataString(plistDataString))
-        let plist: Data = try unwrap(extractedPlist.appending(Constants.endPlistTag).data(using: .isoLatin1))
+        let profile = try String(contentsOfFile: profilePath, encoding: String.Encoding.isoLatin1)
+        let plistString: String = try unwrap(convertPlistDataToString(profile))
+        let plistData: Data = try unwrap(plistString.appending(PlistTags.end).data(using: .isoLatin1))
         let decoder = PropertyListDecoder()
-        return try decoder.decode(MobileProvision.self, from: plist)
+        return try decoder.decode(MobileProvision.self, from: plistData)
     }
 
-    private static func scanPlistDataString(_ string: String) throws -> String {
+    private static func convertPlistDataToString(_ string: String) throws -> String {
         let scanner = Scanner(string: string)
-        let noStartPlistTagError = GuardError.custom("Not found tag \(Constants.startPlistTag)")
-        let noEndPlistTagError = GuardError.custom("Not found tag \(Constants.endPlistTag)")
-        _ = try unwrap(scanner.scanUpTo(Constants.startPlistTag, into: nil), error: noStartPlistTagError)
+        let startError = GuardError.custom("Not found plist tag \(PlistTags.start), in '\(string)'")
+        let endError = GuardError.custom("Not found plist tag \(PlistTags.end), in '\(string)'")
+        _ = try unwrap(scanner.scanUpTo(PlistTags.start, into: nil), error: startError)
         var extractedPlist: NSString?
-        guard scanner.scanUpTo(Constants.endPlistTag, into: &extractedPlist) != false else {
-            throw noEndPlistTagError
+        guard scanner.scanUpTo(PlistTags.end, into: &extractedPlist) != false else {
+            throw endError
         }
         return String(try unwrap(extractedPlist))
     }
