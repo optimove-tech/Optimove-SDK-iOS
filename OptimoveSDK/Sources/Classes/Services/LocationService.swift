@@ -24,7 +24,7 @@ extension LocationServiceImpl: LocationService {
 
     func getLocation(onComplete: @escaping (Result<[Location: String], LocationError>) -> Void) {
         DispatchQueue.main.async {
-            if self.hasLocationDescriptions, self.isLocationAuthorized() {
+            if self.isAuthorized(), self.hasDescriptions {
                 return self.getCoordinates(onComplete)
             }
             onComplete(.failure(.notAuthorized))
@@ -35,25 +35,34 @@ extension LocationServiceImpl: LocationService {
 
 final class LocationServiceImpl {
 
-    private var locationManager = CLLocationManager()
-    private var hasLocationDescriptions: Bool = false
+    private let locationManager = CLLocationManager()
+    private let preferredLocale: Locale = Locale(identifier: "en_US_POSIX")
+    private let descriptionKeys: [String] = [
+        "NSLocationAlwaysUsageDescription",
+        "NSLocationWhenInUseUsageDescription"
+    ]
+    private let authorizedStatuses: [CLAuthorizationStatus] = [
+        .authorizedAlways,
+        .authorizedWhenInUse
+    ]
+    private let desiredAccuracy: CLLocationAccuracy = kCLLocationAccuracyKilometer
+    private var hasDescriptions: Bool = false
 
     init() {
-        hasLocationDescriptions = self.isMainAppHasLocationDescriptions()
+        hasDescriptions = self.hasDescriptionForMainApp()
     }
 
-    private func isMainAppHasLocationDescriptions() -> Bool {
-        return (Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription") != nil) ||
-        (Bundle.main.object(forInfoDictionaryKey: "NSLocationAlwaysUsageDescription") != nil)
+    private func hasDescriptionForMainApp() -> Bool {
+        return !descriptionKeys.compactMap(Bundle.main.object).isEmpty
     }
 
-    private func isLocationAuthorized() -> Bool {
-        return CLLocationManager.authorizationStatus() == CLAuthorizationStatus.authorizedAlways ||
-            CLLocationManager.authorizationStatus() == CLAuthorizationStatus.authorizedWhenInUse
+    private func isAuthorized() -> Bool {
+        let status = CLLocationManager.authorizationStatus()
+        return authorizedStatuses.contains(status)
     }
 
     private func getCoordinates(_ onComplete: @escaping (Result<[Location: String], LocationError>) -> Void) {
-        locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
+        locationManager.desiredAccuracy = desiredAccuracy
         guard let location = locationManager.location else {
             onComplete(.failure(.noLocation))
             return
@@ -81,16 +90,20 @@ final class LocationServiceImpl {
                 onComplete(.failure(.noLocality))
                 return
             }
-            guard let locality = placemarks?.filter({ $0.locality != nil }).first?.locality else {
-                onComplete(.failure(.noLocality))
-                return
+            func findLocality() -> String? {
+                return placemarks?.filter{ $0.locality != nil }.first?.locality
             }
-            onComplete(.success(locality))
+            switch findLocality() {
+            case Optional.none:
+                onComplete(.failure(.noLocality))
+            case Optional.some(let locality):
+                onComplete(.success(locality))
+            }
         }
         if #available(iOS 11, *) {
             CLGeocoder().reverseGeocodeLocation(
                 location,
-                preferredLocale: Locale(identifier: "en_US_POSIX"),
+                preferredLocale: preferredLocale,
                 completionHandler: completionHandler
             )
         } else {
