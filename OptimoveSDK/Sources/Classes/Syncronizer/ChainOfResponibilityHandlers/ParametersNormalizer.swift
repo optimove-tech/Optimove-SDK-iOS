@@ -76,7 +76,7 @@ extension Event {
             }
         }
         return Event(
-            uuid: self.uuid,
+            eventId: self.eventId,
             name: normilizeName,
             category: self.category,
             context: normalizedParameters,

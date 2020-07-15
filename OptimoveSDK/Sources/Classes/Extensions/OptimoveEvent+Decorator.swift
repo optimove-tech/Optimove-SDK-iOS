@@ -23,7 +23,7 @@ extension Event {
     }
 
     func decorate(config: EventsConfig) -> Event {
-        return Event(uuid: self.uuid,
+        return Event(eventId: self.eventId,
                      name: self.name,
                      category: self.category,
                      context: decorate(config: config),

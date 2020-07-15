@@ -41,7 +41,7 @@ public final class OptistreamEventBuilder {
                 ),
                 realtime: event.isRealtime,
                 firstVisitorDate: try storage.getFirstRunTimestamp(),
-                uuid: event.uuid.uuidString
+                eventId: event.eventId.uuidString
             )
         )
     }

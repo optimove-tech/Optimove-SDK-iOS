@@ -6,7 +6,7 @@ open class Event {
 
     public static let category = "track"
 
-    public let uuid: UUID
+    public let eventId: UUID
     public let name: String
     public let category: String
     public let context: [String: Any]
@@ -14,14 +14,14 @@ open class Event {
     public let isRealtime: Bool
 
     public init(
-        uuid: UUID = UUID(),
+        eventId: UUID = UUID(),
         name: String,
         category: String = category,
         context: [String: Any],
         timestamp: Date = Date(),
         isRealtime: Bool = false
     ) {
-        self.uuid = uuid
+        self.eventId = eventId
         self.name = name
         self.category = category
         self.context = context

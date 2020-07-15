@@ -27,18 +27,18 @@ public struct OptistreamEvent: Codable {
         public let channel: Channel?
         public var realtime: Bool
         public var firstVisitorDate: Int64
-        public let uuid: String
+        public let eventId: String
 
         public init(
             channel: OptistreamEvent.Metadata.Channel?,
             realtime: Bool,
             firstVisitorDate: Int64,
-            uuid: String
+            eventId: String
         ) {
             self.channel = channel
             self.realtime = realtime
             self.firstVisitorDate = firstVisitorDate
-            self.uuid = uuid
+            self.eventId = eventId
         }
 
     }
@@ -69,7 +69,7 @@ public struct OptistreamEvent: Codable {
 extension OptistreamEvent: Equatable {
 
     public static func == (lhs: OptistreamEvent, rhs: OptistreamEvent) -> Bool {
-        return lhs.metadata.uuid == rhs.metadata.uuid
+        return lhs.metadata.eventId == rhs.metadata.eventId
     }
 
 }
