@@ -94,7 +94,7 @@ final class FixtureOptistreamEvent {
                 channel: nil,
                 realtime: true,
                 firstVisitorDate: Date().timeIntervalSince1970.seconds,
-                uuid: UUID().uuidString
+                eventId: UUID().uuidString
             )
         )
     }
