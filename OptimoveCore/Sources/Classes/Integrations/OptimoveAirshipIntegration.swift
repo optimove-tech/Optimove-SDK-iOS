@@ -15,17 +15,17 @@ public class OptimoveAirshipIntegration {
     }
 
     private let storage: OptimoveStorage
-    private let configuration: Configuration
+    private let isSupportedAirship: Bool
     private var airship: Airship?
 
     public init(storage: OptimoveStorage,
-                configuration: Configuration) {
+                isSupportedAirship: Bool) {
         self.storage = storage
-        self.configuration = configuration
+        self.isSupportedAirship = isSupportedAirship
     }
 
     public func loadAirshipIntegration() throws -> Airship {
-        guard configuration.isSupportedAirship ?? false else {
+        guard isSupportedAirship else {
             throw GuardError.custom("Airship integration does not supported")
         }
         if let airship = airship {

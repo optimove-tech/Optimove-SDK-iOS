@@ -1,7 +1,7 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
 public struct TenantConfig: Codable, Equatable {
-    public let isSupportedAirship: Bool?
+    public let isSupportedAirship: Bool
     public let isEnableRealtime: Bool
     public let isEnableRealtimeThroughOptistream: Bool
     public let realtime: TenantRealtimeConfig
@@ -15,7 +15,7 @@ public struct TenantConfig: Codable, Equatable {
         optipush: TenantOptipushConfig,
         events: [String: EventsConfig],
         isEnableRealtime: Bool,
-        isSupportedAirship: Bool?,
+        isSupportedAirship: Bool,
         isEnableRealtimeThroughOptistream: Bool
     ) {
         self.realtime = realtime
@@ -29,7 +29,7 @@ public struct TenantConfig: Codable, Equatable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        isSupportedAirship = try container.decodeIfPresent(Bool.self, forKey: .supportAirship)
+        isSupportedAirship = try container.decodeIfPresent(Bool.self, forKey: .supportAirship) ?? false
         isEnableRealtime = try container.decode(Bool.self, forKey: .enableRealtime)
         isEnableRealtimeThroughOptistream = (
             try? container.decodeIfPresent(Bool.self, forKey: .enableRealtimeThroughOptistream)

@@ -9,11 +9,12 @@ import OptimoveCore
 
     @objc public private(set) var isHandledByOptimove: Bool = false
 
-    private let bundleIdentifier: String
-    private let operationQueue: OperationQueue
-
-    private var bestAttemptContent: UNMutableNotificationContent?
-    private var contentHandler: ((UNNotificationContent) -> Void)?
+    let bundleIdentifier: String
+    let operationQueue: OperationQueue
+    let storage: OptimoveStorage
+    let networking: OptistreamNetworking
+    var bestAttemptContent: UNMutableNotificationContent?
+    var contentHandler: ((UNNotificationContent) -> Void)?
 
     /// Initializer with a custom application bundle indentifier. Also, you can simply use the common init.
     /// In this case Optimove will fetch the bundle identifier automatically.
@@ -24,13 +25,48 @@ import OptimoveCore
 
     /// The convenience init will fetch the bundle identifier automatically.
     @objc public convenience override init() {
-        guard let bundleIdentifier = Bundle.hostAppBundle()?.bundleIdentifier else {
-            fatalError("Unable to find a bundle identifier.")
+        do {
+            let bundleIdentifier = try customUnwrap(
+                Bundle.hostAppBundle()?.bundleIdentifier,
+                CastError.customMessage(message: "Unable to find a bundle identifier.")
+            )
+            self.init(bundleIdentifier: bundleIdentifier)
+        } catch {
+            fatalError(error.localizedDescription)
         }
-        self.init(bundleIdentifier: bundleIdentifier)
     }
 
-    private init(bundleIdentifier: String) {
+    convenience init(bundleIdentifier: String) {
+        do {
+            let storage = StorageFacade(
+                groupedStorage: try UserDefaults.grouped(
+                    tenantBundleIdentifier: bundleIdentifier
+                ),
+                sharedStorage: try UserDefaults.shared(
+                    tenantBundleIdentifier: bundleIdentifier
+                ),
+                fileStorage: try FileStorageImpl(
+                    bundleIdentifier: bundleIdentifier,
+                    fileManager: FileManager.default
+                )
+            )
+            let networking = OptistreamNetworkingImpl(
+                networkClient: NetworkClientImpl(),
+                endpoint: try unwrap(storage.optitrackEndpoint)
+            )
+            self.init(bundleIdentifier: bundleIdentifier, storage: storage, networking: networking)
+        } catch {
+            fatalError(error.localizedDescription)
+        }
+    }
+
+    required init(
+        bundleIdentifier: String,
+        storage: OptimoveStorage,
+        networking: OptistreamNetworking
+    ) {
+        self.storage = storage
+        self.networking = networking
         self.bundleIdentifier = bundleIdentifier
 
         operationQueue = OperationQueue()
@@ -43,8 +79,10 @@ import OptimoveCore
     ///   - request: The original notification request.
     ///   - contentHandler: A UNNotificationContent object with the content to be displayed to the user.
     /// - Returns: Returns `true` if the message was consumed by Optimove, otherwise this request is not  from Optimove.
-    @objc public func didReceive(_ request: UNNotificationRequest,
-                                 withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) -> Bool {
+    @objc public func didReceive(
+        _ request: UNNotificationRequest,
+        withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void
+    ) -> Bool {
         do {
             let payload: NotificationPayload
             payload = try extractNotificationPayload(request)
@@ -52,32 +90,53 @@ import OptimoveCore
             let bestAttemptContent = try unwrap(createBestAttemptBaseContent(request: request, payload: payload))
             self.bestAttemptContent = bestAttemptContent
             self.contentHandler = contentHandler
-            let storage = StorageFacade(
-                groupedStorage: try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier),
-                sharedStorage: try UserDefaults.shared(tenantBundleIdentifier: bundleIdentifier),
-                fileStorage: try FileStorageImpl(bundleIdentifier: bundleIdentifier, fileManager: .default)
-            )
-            let configurationRepository = ConfigurationRepositoryImpl(
-                storage: storage
-            )
-            let configuration = try configurationRepository.getConfiguration()
-            try handleNotification(
-                payload: payload,
-                networking: OptistreamNetworkingImpl(
-                    networkClient: NetworkClientImpl(),
-                    endpoint: configuration.optitrack.optitrackEndpoint
-                ),
-                builder: OptistreamEventBuilder(
-                    configuration: configuration.optitrack,
+
+            let builder = OptistreamEventBuilder(
+                tenantID: try unwrap(storage.tenantID),
+                storage: storage,
+                airshipIntegration: OptimoveAirshipIntegration(
                     storage: storage,
-                    airshipIntegration: OptimoveAirshipIntegration(
-                        storage: storage,
-                        configuration: configuration
-                    )
-                ),
-                bestAttemptContent: bestAttemptContent,
-                contentHandler: contentHandler
+                    isSupportedAirship: false
+                )
             )
+
+            let operationsToExecute = [
+                DeeplinkExtracter(
+                    bundleIdentifier: bundleIdentifier,
+                    notificationPayload: payload,
+                    completionHandler: { [weak self] urlString in
+                        self?.bestAttemptContent?.userInfo[DeeplinkExtracter.Constants.dynamicLinksKey] = urlString
+                    }
+                ),
+                NotificationDeliveryReporter(
+                    bundleIdentifier: bundleIdentifier,
+                    notificationPayload: payload,
+                    networking: networking,
+                    builder: builder
+                ),
+                MediaAttachmentDownloader(
+                    notificationPayload: payload,
+                    bestAttemptContent: try unwrap(bestAttemptContent)
+                )
+            ]
+
+            // The completion operation going to be executed right after all operations are finished.
+            let completionOperation = BlockOperation {
+                bestAttemptContent.userInfo[NotificationKey.wasHandledByOptimoveNSE] = true
+                contentHandler(bestAttemptContent)
+                os_log("Operations were completed", log: OSLog.notification, type: .info)
+            }
+            os_log("Operations were scheduled", log: OSLog.notification, type: .info)
+
+            operationsToExecute.forEach {
+                // Set the completion operation as dependent for all operations before they start executing.
+                completionOperation.addDependency($0)
+                operationQueue.addOperation($0)
+            }
+
+            // The completion operation is performing on the main queue.
+            OperationQueue.main.addOperation(completionOperation)
+
         } catch {
             os_log(
                 "Unable to cast to Optimove notification. %{PUBLIC}@",
@@ -92,9 +151,14 @@ import OptimoveCore
     /// The method called by system in case if `didReceive(_:withContentHandler:)` takes to long to execute or
     /// out of memory.
     @objc public func serviceExtensionTimeWillExpire() {
+        operationQueue.cancelAllOperations()
         if let bestAttemptContent = bestAttemptContent {
             contentHandler?(bestAttemptContent)
         }
+        os_log(
+            "Notification Service Extension time was expire.",
+            log: OSLog.notification, type: .error
+        )
     }
 }
 
@@ -120,45 +184,6 @@ extension OptimoveNotificationServiceExtension {
         return bestAttemptContent
     }
 
-    func handleNotification(
-        payload: NotificationPayload,
-        networking: OptistreamNetworking,
-        builder: OptistreamEventBuilder,
-        bestAttemptContent: UNMutableNotificationContent,
-        contentHandler: @escaping (UNNotificationContent) -> Void
-    ) throws {
-        let operationsToExecute: [Operation] = [
-            DeeplinkExtracter(
-                bundleIdentifier: bundleIdentifier,
-                notificationPayload: payload,
-                bestAttemptContent: bestAttemptContent
-            ),
-            NotificationDeliveryReporter(
-                bundleIdentifier: bundleIdentifier,
-                notificationPayload: payload,
-                networking: networking,
-                builder: builder
-            ),
-            MediaAttachmentDownloader(
-                notificationPayload: payload,
-                bestAttemptContent: try unwrap(bestAttemptContent)
-            )
-        ]
-        // The completion operation going to be executed right after all operations are finished.
-        let completionOperation = BlockOperation {
-            bestAttemptContent.userInfo[NotificationKey.wasHandledByOptimoveNSE] = true
-            contentHandler(bestAttemptContent)
-            os_log("Operations were completed", log: OSLog.notification, type: .info)
-        }
-        os_log("Operations were scheduled", log: OSLog.notification, type: .info)
-        operationsToExecute.forEach {
-            // Set the completion operation as dependent for all operations before they start executing.
-            completionOperation.addDependency($0)
-            operationQueue.addOperation($0)
-        }
-        // The completion operation is performing on the main queue.
-        OperationQueue.main.addOperation(completionOperation)
-    }
 }
 
 extension OSLog {

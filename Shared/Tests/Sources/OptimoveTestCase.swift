@@ -21,6 +21,8 @@ class OptimoveTestCase: XCTestCase {
 
     func prefillStorageWithConfiguration() {
         storage.siteID = StubConstants.tenantID
+        storage.tenantID = StubConstants.tenantID
+        storage.optitrackEndpoint = URL(string: "https://optimove.net")!
     }
 
     func prefillStorageWithTheFirstLaunch() {
@@ -37,7 +39,6 @@ class OptimoveTestCase: XCTestCase {
     }
 
     func prefillStorageAsCustomer() {
-        prefillStorageWithTheFirstLaunch()
         prefillStorageAsVisitor()
         storage.customerID = StubConstants.customerID
         storage.initialVisitorId = StubConstants.initialVisitorId

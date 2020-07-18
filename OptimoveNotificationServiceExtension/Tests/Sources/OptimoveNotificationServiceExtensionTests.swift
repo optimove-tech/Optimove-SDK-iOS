@@ -7,86 +7,59 @@ import UserNotifications
 
 class OptimoveNotificationServiceExtensionTests: OptimoveTestCase, FileAccessible {
 
-    var fileName: String = "notificationWithScheduledCampaign.json"
+    var fileName: String = ""
     let networking = OptistreamNetworkingMock()
-    var notificationService: OptimoveNotificationServiceExtension!
+    var notificationServiceExtension: OptimoveNotificationServiceExtension!
 
     override func setUp() {
-        notificationService = OptimoveNotificationServiceExtension(appBundleId: "com.apple.dt.xctest.tool")
+        notificationServiceExtension = OptimoveNotificationServiceExtension(
+            bundleIdentifier: "com.apple.dt.xctest.tool",
+            storage: storage,
+            networking: networking
+        )
     }
 
-    func test_even_scheduled_notification_received_sent() throws {
+    func test_notification_delivery_event() throws {
         // given
         prefillStorageAsVisitor()
-        fileName = "notificationWithScheduledCampaign.json"
+        fileName = "apns_payload_scheduled_campaign.json"
 
-        // when
-        try even_notification_received_sent { (event) in
-
-            // then
-            XCTAssertEqual(event.event, NotificationCampaignType.scheduled.eventName)
-        }
-    }
-
-    func test_even_triggered_notification_received_sent() throws {
-        // given
-        prefillStorageAsVisitor()
-        fileName = "notificationWithTriggeredCampaign.json"
-
-        // when
-        try even_notification_received_sent { (event) in
-
-            // then
-            XCTAssertEqual(event.event, NotificationCampaignType.triggered.eventName)
-        }
-    }
-
-    func even_notification_received_sent(assert: @escaping (OptistreamEvent) -> Void) throws {
-        // given
-        // fetch payload from a JSON
-        let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
-
-        // and
-        // create best attempt content
-        let bestAttemptContent = notificationService.createBestAttemptBaseContent(
-            request: UNNotificationRequest(
-                identifier: "identifier",
-                content: UNNotificationContent(),
-                trigger: nil
-            ),
-            payload: payload
+        let payload = try JSONDecoder().decode(
+            NotificationPayload.self,
+            from: data
         )
 
-        // when
-        // check that content handler finally execute.
-        let contentHandlerExpectation = expectation(description: "Content handler was not generated.")
-        let contentHandler: (UNNotificationContent) -> Void = { content in
-            contentHandlerExpectation.fulfill()
-        }
+        // make content
+        let content: UNMutableNotificationContent = UNMutableNotificationContent()
+        content.body = payload.content
+        content.title = payload.title ?? ""
+        content.userInfo = try JSONSerialization.jsonObject(with: data, options: []) as! [AnyHashable : Any]
 
-        // check that delivery event sent.
-        let optitrackExpectation = expectation(description: "Optitrack event was not generated.")
+        // make request
+        let request = UNNotificationRequest(
+            identifier: "identifier",
+            content: content,
+            trigger: nil
+        )
+
+        //expectation from a network call
+        let deliveryExpectation = expectation(description: "delivery event")
         networking.assetEventsFunction = { events, completion in
+            if !events.filter({ $0.event == NotificationCampaignType.scheduled.eventName }).isEmpty {
+                deliveryExpectation.fulfill()
+            }
             completion(.success(()))
-            optitrackExpectation.fulfill()
         }
 
-        // then
-        try notificationService.handleNotification(
-            payload: payload,
-            networking: networking,
-            builder: OptistreamEventBuilder(
-                configuration: ConfigurationFixture.build().optitrack,
-                storage: storage,
-                airshipIntegration: OptimoveAirshipIntegration(
-                    storage: storage,
-                    configuration: ConfigurationFixture.build()
-                )
-            ),
-            bestAttemptContent: bestAttemptContent!,
-            contentHandler: contentHandler
-        )
-        wait(for: [contentHandlerExpectation, optitrackExpectation], timeout: 40)
+        // when
+        _ = notificationServiceExtension.didReceive(request) { (content) in
+            // then
+            XCTAssertNotNil(content.body)
+            XCTAssertNotNil(content.title)
+            XCTAssertNotNil(content.userInfo)
+            XCTAssertNotNil(content.userInfo[NotificationKey.wasHandledByOptimoveNSE])
+        }
+        wait(for: [deliveryExpectation], timeout: 10)
     }
 
 }

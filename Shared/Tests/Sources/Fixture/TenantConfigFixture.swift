@@ -12,7 +12,7 @@ final class TenantConfigFixture {
             optipush: tenantOptipushConfigFixture(),
             events: createTenantEventFixture(),
             isEnableRealtime: options.isEnableRealtime,
-            isSupportedAirship: nil,
+            isSupportedAirship: false,
             isEnableRealtimeThroughOptistream: options.isEnableRealtimeThroughOptistream
         )
     }
