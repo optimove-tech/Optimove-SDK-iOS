@@ -7,12 +7,14 @@ import OptimoveCore
 
 @objc public class OptimoveNotificationServiceExtension: NSObject {
 
-    @objc public private(set) var isHandledByOptimove: Bool = false
+    @objc public private(set) var isOptimovePayload: Bool = false
 
     let bundleIdentifier: String
     let operationQueue: OperationQueue
+    // FIXME: Remove these dependencies
     let storage: OptimoveStorage
     let networking: OptistreamNetworking
+    //
     var bestAttemptContent: UNMutableNotificationContent?
     var contentHandler: ((UNNotificationContent) -> Void)?
 
@@ -42,9 +44,7 @@ import OptimoveCore
                 groupedStorage: try UserDefaults.grouped(
                     tenantBundleIdentifier: bundleIdentifier
                 ),
-                sharedStorage: try UserDefaults.shared(
-                    tenantBundleIdentifier: bundleIdentifier
-                ),
+                sharedStorage: nil,
                 fileStorage: try FileStorageImpl(
                     bundleIdentifier: bundleIdentifier,
                     fileManager: FileManager.default
@@ -84,23 +84,14 @@ import OptimoveCore
         withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void
     ) -> Bool {
         do {
-            let payload: NotificationPayload
-            payload = try extractNotificationPayload(request)
-            isHandledByOptimove = true
-            let bestAttemptContent = try unwrap(createBestAttemptBaseContent(request: request, payload: payload))
-            self.bestAttemptContent = bestAttemptContent
+            let payload = try verifyAndCreatePayload(request)
+
+            isOptimovePayload = true
+
+            self.bestAttemptContent = createBestAttemptContent(request: request, payload: payload)
             self.contentHandler = contentHandler
 
-            let builder = OptistreamEventBuilder(
-                tenantID: try unwrap(storage.tenantID),
-                storage: storage,
-                airshipIntegration: OptimoveAirshipIntegration(
-                    storage: storage,
-                    isSupportedAirship: false
-                )
-            )
-
-            let operationsToExecute = [
+            let operations = [
                 DeeplinkExtracter(
                     bundleIdentifier: bundleIdentifier,
                     notificationPayload: payload,
@@ -112,23 +103,28 @@ import OptimoveCore
                     bundleIdentifier: bundleIdentifier,
                     notificationPayload: payload,
                     networking: networking,
-                    builder: builder
+                    storage: storage
                 ),
                 MediaAttachmentDownloader(
                     notificationPayload: payload,
-                    bestAttemptContent: try unwrap(bestAttemptContent)
+                    completionHandler: { [weak self] (attachment) in
+                        self?.bestAttemptContent?.attachments =
+                            (self?.bestAttemptContent?.attachments ?? [])
+                            + [attachment]
+                    }
                 )
             ]
 
             // The completion operation going to be executed right after all operations are finished.
-            let completionOperation = BlockOperation {
+            let completionOperation = BlockOperation { [weak self] in
+                guard let bestAttemptContent = self?.bestAttemptContent else { return }
                 bestAttemptContent.userInfo[NotificationKey.wasHandledByOptimoveNSE] = true
+                self?.bestAttemptContent = bestAttemptContent
                 contentHandler(bestAttemptContent)
                 os_log("Operations were completed", log: OSLog.notification, type: .info)
             }
-            os_log("Operations were scheduled", log: OSLog.notification, type: .info)
 
-            operationsToExecute.forEach {
+            operations.forEach {
                 // Set the completion operation as dependent for all operations before they start executing.
                 completionOperation.addDependency($0)
                 operationQueue.addOperation($0)
@@ -137,15 +133,17 @@ import OptimoveCore
             // The completion operation is performing on the main queue.
             OperationQueue.main.addOperation(completionOperation)
 
+            os_log("Operations were scheduled", log: OSLog.notification, type: .info)
+
         } catch {
+            // TODO: switch error types
             os_log(
                 "Unable to cast to Optimove notification. %{PUBLIC}@",
                 log: OSLog.notification, type: .error, error.localizedDescription
             )
-            contentHandler(request.content)
-            return false
+            return !isOptimovePayload
         }
-        return true
+        return isOptimovePayload
     }
 
     /// The method called by system in case if `didReceive(_:withContentHandler:)` takes to long to execute or
@@ -164,14 +162,14 @@ import OptimoveCore
 
 extension OptimoveNotificationServiceExtension {
 
-    func extractNotificationPayload(_ request: UNNotificationRequest) throws -> NotificationPayload {
+    func verifyAndCreatePayload(_ request: UNNotificationRequest) throws -> NotificationPayload {
         let userInfo = request.content.userInfo
         let data = try JSONSerialization.data(withJSONObject: userInfo)
         let decoder = JSONDecoder()
         return try decoder.decode(NotificationPayload.self, from: data)
     }
 
-    func createBestAttemptBaseContent(request: UNNotificationRequest,
+    func createBestAttemptContent(request: UNNotificationRequest,
                                       payload: NotificationPayload) -> UNMutableNotificationContent? {
         guard let bestAttemptContent = request.content.mutableCopy() as? UNMutableNotificationContent else {
             os_log("Unable to copy content.", log: OSLog.notification, type: .fault)

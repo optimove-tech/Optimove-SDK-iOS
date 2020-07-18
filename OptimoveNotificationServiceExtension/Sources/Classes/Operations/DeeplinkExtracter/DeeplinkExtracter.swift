@@ -24,6 +24,7 @@ internal final class DeeplinkExtracter: AsyncOperation {
     }
 
     override func main() {
+        guard !isCancelled else { return }
         state = .executing
 
         let appKey = bundleIdentifier
