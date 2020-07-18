@@ -35,6 +35,17 @@ open class Event {
 }
 
 public struct ValidationIssue: Encodable {
-    public let status: Int
+
+    public enum Status: String, Encodable {
+        case error
+        case warning
+    }
+
+    public let status: Status
     public let message: String
+
+    public init(status: Status, message: String) {
+        self.status = status
+        self.message = message
+    }
 }
