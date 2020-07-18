@@ -10,7 +10,7 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
     public let optipush: OptipushConfig
     public let events: [String: EventsConfig]
     public let isEnableRealtime: Bool
-    public let isSupportedAirship: Bool?
+    public let isSupportedAirship: Bool
 
     public init(
         tenantID: Int,
@@ -20,7 +20,7 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
         optipush: OptipushConfig,
         events: [String: EventsConfig],
         isEnableRealtime: Bool,
-        isSupportedAirship: Bool?
+        isSupportedAirship: Bool
     ) {
         self.tenantID = tenantID
         self.logger = logger

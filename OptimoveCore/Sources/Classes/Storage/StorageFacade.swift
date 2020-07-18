@@ -29,13 +29,15 @@ public enum StorageKey: String, CaseIterable {
     case migrationVersions /// For storing a migration history
     case arePushCampaignsDisabled
     case firstRunTimestamp
+    case optitrackEndpoint
+    case tenantID
 
     // MARK: Shared keys
     /// Placed in tenant container (legacy)
 
     case userEmail
     case apnsToken
-    case siteID
+    case siteID /// Legacy: See tenantID
     case settingUserSuccess
     case firstVisitTimestamp /// Legacy
     case realtimeSetUserIdFailed
@@ -63,6 +65,8 @@ public protocol StorageValue {
     var optFlag: Bool { get set }
     /// Store indication of disabled push campaigns for this installation.
     var arePushCampaignsDisabled: Bool { get set }
+    var optitrackEndpoint: URL? { get set }
+    var tenantID: Int? { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -84,6 +88,7 @@ public protocol StorageValue {
 
     var userEmail: String? { get set }
     var apnsToken: Data? { get set }
+    /// Legacy: See tenantID
     var siteID: Int? { get set }
     var isSettingUserSuccess: Bool? { get set }
     /// Legacy. Use `firstRunTimestamp` instead
@@ -107,8 +112,10 @@ public protocol KeyValueStorage {
 public final class StorageFacade: OptimoveStorage {
 
     // Use for constants that are used in the grouped "group.<bundle-main-id>.optimove" container.
-    private let groupedStorage: KeyValueStorage
-    private let groupKeys: Set<StorageKey> = [
+    private let groupedStorage: KeyValueStorage?
+    static let groupKeys: Set<StorageKey> = [
+        .optitrackEndpoint,
+        .tenantID,
         .installationID,
         .customerID,
         .configurationEndPoint,
@@ -127,8 +134,8 @@ public final class StorageFacade: OptimoveStorage {
     ]
 
     // Use for constants that are used in the shared "<bundle-main-id>" container.
-    private let sharedStorage: KeyValueStorage
-    private let sharedKeys: Set<StorageKey> = [
+    private let sharedStorage: KeyValueStorage?
+    static let sharedKeys: Set<StorageKey> = [
         .userEmail,
         .apnsToken,
         .siteID,
@@ -138,28 +145,19 @@ public final class StorageFacade: OptimoveStorage {
         .realtimeSetEmailFailed
     ]
 
-    private let fileStorage: FileStorage
+    private let fileStorage: FileStorage?
 
     public init(
-        groupedStorage: KeyValueStorage,
-        sharedStorage: KeyValueStorage,
-        fileStorage: FileStorage) {
+        groupedStorage: KeyValueStorage?,
+        sharedStorage: KeyValueStorage?,
+        fileStorage: FileStorage?) {
         self.groupedStorage = groupedStorage
         self.sharedStorage = sharedStorage
         self.fileStorage = fileStorage
-
-        let unitedKeys = sharedKeys.union(groupKeys)
-        precondition(
-            unitedKeys.isSuperset(of: StorageKey.allCases),
-            """
-            The `sharedKeys` and `groupKeys` together are not a superset of all StorageKeys.
-            Missed keys: \(unitedKeys.symmetricDifference(Set(StorageKey.allCases)))
-            """
-        )
     }
 
-    private func storage(for key: StorageKey) -> KeyValueStorage {
-        return sharedKeys.contains(key) ? sharedStorage : groupedStorage
+    private func storage(for key: StorageKey) -> KeyValueStorage? {
+        return StorageFacade.sharedKeys.contains(key) ? sharedStorage : groupedStorage
     }
 
 }
@@ -169,19 +167,19 @@ public final class StorageFacade: OptimoveStorage {
 extension StorageFacade {
 
     public func set(value: Any?, key: StorageKey) {
-        storage(for: key).set(value: value, key: key)
+        storage(for: key)?.set(value: value, key: key)
     }
 
     public func value(for key: StorageKey) -> Any? {
-        return storage(for: key).value(for: key)
+        return storage(for: key)?.value(for: key)
     }
 
     public subscript<T>(key: StorageKey) -> T? {
         get {
-            return storage(for: key).value(for: key) as? T
+            return storage(for: key)?.value(for: key) as? T
         }
         set {
-            storage(for: key).set(value: newValue, key: key)
+            storage(for: key)?.set(value: newValue, key: key)
         }
     }
 
@@ -202,27 +200,27 @@ extension StorageFacade {
 extension StorageFacade {
 
     public func isExist(fileName: String, isGroupContainer: Bool) -> Bool {
-        return fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer)
+        return fileStorage?.isExist(fileName: fileName, isGroupContainer: isGroupContainer) ?? false
     }
 
     public func save<T: Codable>(data: T, toFileName: String, isGroupContainer: Bool) throws {
-        try fileStorage.save(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
+        try fileStorage?.save(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
     }
 
     public func saveData(data: Data, toFileName: String, isGroupContainer: Bool) throws {
-        try fileStorage.saveData(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
+        try fileStorage?.saveData(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
     }
 
     public func load<T: Codable>(fileName: String, isGroupContainer: Bool) throws -> T {
-        return try fileStorage.load(fileName: fileName, isGroupContainer: isGroupContainer)
+        return try unwrap(fileStorage?.load(fileName: fileName, isGroupContainer: isGroupContainer))
     }
 
     public func loadData(fileName: String, isGroupContainer: Bool) throws -> Data {
-        return try fileStorage.loadData(fileName: fileName, isGroupContainer: isGroupContainer)
+        return try unwrap(fileStorage?.loadData(fileName: fileName, isGroupContainer: isGroupContainer))
     }
 
     public func delete(fileName: String, isGroupContainer: Bool) throws {
-        try fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer)
+        try fileStorage?.delete(fileName: fileName, isGroupContainer: isGroupContainer)
     }
 
 }
@@ -369,6 +367,23 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             self[.firstRunTimestamp] = newValue
+        }
+    }
+
+    var optitrackEndpoint: URL? {
+        get {
+            return self[.optitrackEndpoint]
+        }
+        set {
+            self[.optitrackEndpoint] = newValue
+        }
+    }
+    var tenantID: Int? {
+        get {
+            return self[.tenantID]
+        }
+        set {
+            self[.tenantID] = newValue
         }
     }
 

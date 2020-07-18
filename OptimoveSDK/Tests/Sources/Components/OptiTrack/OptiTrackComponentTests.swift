@@ -21,11 +21,11 @@ final class OptiTrackComponentTests: OptimoveTestCase {
             Options(isEnableRealtime: true, isEnableRealtimeThroughOptistream: true)
         )
         builder = OptistreamEventBuilder(
-            configuration: configuration.optitrack,
+            tenantID: configuration.optitrack.tenantID,
             storage: storage,
             airshipIntegration: OptimoveAirshipIntegration(
                 storage: storage,
-                configuration: configuration
+                isSupportedAirship: configuration.isSupportedAirship
             )
         )
         optitrack = OptiTrack(

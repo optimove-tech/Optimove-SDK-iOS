@@ -11,23 +11,23 @@ public final class OptistreamEventBuilder {
         }
     }
 
-    private let configuration: OptitrackConfig
+    private let tenantID: Int
     private let storage: OptimoveStorage
     private let airshipIntegration: OptimoveAirshipIntegration
 
     public init(
-        configuration: OptitrackConfig,
+        tenantID: Int,
         storage: OptimoveStorage,
         airshipIntegration: OptimoveAirshipIntegration
     ) {
-        self.configuration = configuration
+        self.tenantID = tenantID
         self.storage = storage
         self.airshipIntegration = airshipIntegration
     }
 
     public func build(event: Event) throws -> OptistreamEvent {
         return OptistreamEvent(
-            tenant: configuration.tenantID,
+            tenant: tenantID,
             category: event.category,
             event: event.name,
             origin: Constants.Values.origin,

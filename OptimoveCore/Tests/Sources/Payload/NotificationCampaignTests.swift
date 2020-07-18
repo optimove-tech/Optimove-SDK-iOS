@@ -9,7 +9,7 @@ class NotificationCampaignTests: XCTestCase, FileAccessible {
 
     func test_triggered_campaing() {
         // given
-        fileName = "notificationWithTriggeredCampaign.json"
+        fileName = "apns_payload_triggered_campaign.json"
 
         tryDecode {
             let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
@@ -19,7 +19,7 @@ class NotificationCampaignTests: XCTestCase, FileAccessible {
 
     func test_scheduled_campaing() {
         // given
-        fileName = "notificationWithScheduledCampaign.json"
+        fileName = "apns_payload_scheduled_campaign.json"
 
         tryDecode {
             let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)

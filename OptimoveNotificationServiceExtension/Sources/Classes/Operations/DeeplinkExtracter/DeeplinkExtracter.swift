@@ -7,20 +7,20 @@ import OptimoveCore
 
 internal final class DeeplinkExtracter: AsyncOperation {
 
-    private struct Constants {
+    struct Constants {
         static let dynamicLinksKey = "dynamic_link"
     }
 
     private let bundleIdentifier: String
     private let notificationPayload: NotificationPayload
-    private let bestAttemptContent: UNMutableNotificationContent
+    private let completionHandler: (String?) -> Void
 
     init(bundleIdentifier: String,
          notificationPayload: NotificationPayload,
-         bestAttemptContent: UNMutableNotificationContent) {
+         completionHandler: @escaping (String?) -> Void) {
         self.bundleIdentifier = bundleIdentifier
         self.notificationPayload = notificationPayload
-        self.bestAttemptContent = bestAttemptContent
+        self.completionHandler = completionHandler
     }
 
     override func main() {
@@ -32,7 +32,10 @@ internal final class DeeplinkExtracter: AsyncOperation {
             state = .finished
             return
         }
-        DynamicLinkParser(parsingCallback: parserHandler).parse(url)
+        let parser = DynamicLinkParser(
+            parsingCallback: parserHandler
+        )
+        parser.parse(url)
     }
 
 }
@@ -40,6 +43,9 @@ internal final class DeeplinkExtracter: AsyncOperation {
 private extension DeeplinkExtracter {
 
     func parserHandler(result: Result<URL, Error>) {
+        if (state == .cancelled) {
+            return
+        }
         switch result {
         case let .success(url):
             var urlString = replaceSpecialSymbols(in: url)
@@ -59,7 +65,7 @@ private extension DeeplinkExtracter {
                 }
             }
             os_log("Dynamic links were updated.", log: OSLog.extracter, type: .debug)
-            bestAttemptContent.userInfo[Constants.dynamicLinksKey] = urlString
+            completionHandler(urlString)
 
         case let .failure(error):
             os_log("Error: %{PUBLIC}@", log: OSLog.extracter, type: .error, error.localizedDescription)

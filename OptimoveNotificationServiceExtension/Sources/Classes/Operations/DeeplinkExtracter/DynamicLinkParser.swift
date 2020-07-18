@@ -3,14 +3,18 @@
 import Foundation
 
 final class DynamicLinkParser: NSObject, URLSessionDataDelegate {
-    private var session: URLSession!
-    private var parsingCallback: (Result<URL, Error>) -> Void
 
-    init(parsingCallback: @escaping (Result<URL, Error>) -> Void) {
+    var session: URLSession!
+    var parsingCallback: (Result<URL, Error>) -> Void
+
+    init(
+        configuration: URLSessionConfiguration = .default,
+        parsingCallback: @escaping (Result<URL, Error>) -> Void
+    ) {
         self.parsingCallback = parsingCallback
         super.init()
         session = URLSession(
-            configuration: .default,
+            configuration: configuration,
             delegate: self,
             delegateQueue: nil
         )
