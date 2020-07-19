@@ -8,15 +8,18 @@ final class SDKInitializer {
     private let componentFactory: ComponentFactory
     private let chain: ChainMutator
     private let dependencies: [SDKInitializerDependency]
+    private let storage: OptimoveStorage
 
     // MARK: - Construction
 
     init(componentFactory: ComponentFactory,
          chainMutator: ChainMutator,
-         dependencies: [SDKInitializerDependency]) {
+         dependencies: [SDKInitializerDependency],
+         storage: OptimoveStorage) {
         self.componentFactory = componentFactory
         self.chain = chainMutator
         self.dependencies = dependencies
+        self.storage = storage
     }
 
     func initialize(with configuration: Configuration) {
@@ -41,7 +44,7 @@ private extension SDKInitializer {
         let normalizer = ParametersNormalizer(configuration: configuration)
 
         // 2 responder
-        let validator = EventValidator(configuration: configuration)
+        let validator = EventValidator(configuration: configuration, storage: storage)
 
         // 3 responder
         let decorator = ParametersDecorator(configuration: configuration)

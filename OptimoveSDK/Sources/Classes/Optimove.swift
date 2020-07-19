@@ -130,16 +130,7 @@ extension Optimove {
     }
 
     private func _setUserId(_ userID: String, _ serviceLocator: ServiceLocator) throws -> Event {
-        let userID = userID.trimmingCharacters(in: .whitespaces)
-        let storage = serviceLocator.storage()
-        let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
-        switch validationResult {
-        case .valid:
-            NewUserIDHandler(storage: storage).handle(userID: userID)
-            return try serviceLocator.coreEventFactory().createEvent(.setUserId)
-        default:
-            throw GuardError.custom("UserID is \(validationResult.rawValue)")
-        }
+        return try serviceLocator.coreEventFactory().createEvent(.setUserId(userId: userID))
     }
 
     /// Set a user email to the Optimove SDK.
@@ -156,15 +147,7 @@ extension Optimove {
     }
 
     private func _setUserEmail(_ email: String, _ serviceLocator: ServiceLocator) throws -> Event {
-        let storage = serviceLocator.storage()
-        let validationResult = EmailValidator(storage: storage).isValid(email)
-        switch validationResult {
-        case .valid:
-            NewEmailHandler(storage: storage).handle(email: email)
-            return try serviceLocator.coreEventFactory().createEvent(.setUserEmail)
-        default:
-            throw GuardError.custom("Email is \(validationResult.rawValue)")
-        }
+        return try serviceLocator.coreEventFactory().createEvent(.setUserEmail(email: email))
     }
 
     /// A call to this method will stop executions of any push campaign

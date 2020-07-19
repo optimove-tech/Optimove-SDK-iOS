@@ -106,7 +106,8 @@ final class ServiceLocator {
             dependencies: [
                 OptimoveStrorageSDKInitializerDependency(storage: storage()),
                 MultiplexLoggerStreamSDKInitializerDependency()
-            ]
+            ],
+            storage: storage()
         )
     }
 

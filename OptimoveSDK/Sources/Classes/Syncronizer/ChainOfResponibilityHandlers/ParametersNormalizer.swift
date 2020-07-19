@@ -55,7 +55,7 @@ extension Event {
     func normilize(_ events: [String: EventsConfig]) throws -> Event {
         let normilizeName = self.name.normilizeKey()
         guard let eventConfig = events[normilizeName] else {
-            throw GuardError.custom("Configurations are missing for event \(self.name)")
+            return self
         }
         let normalizedParameters = self.context.reduce(into: [String: Any]()) { (result, next) in
             // Replacing all spaces in a key with underscore character.
@@ -84,17 +84,4 @@ extension Event {
         )
     }
 
-}
-
-extension String {
-
-    private struct Constants {
-        static let spaceCharacter = " "
-        static let underscoreCharacter = "_"
-    }
-
-    func normilizeKey(with replacement: String = Constants.underscoreCharacter) -> String {
-        return self.trimmingCharacters(in: .whitespaces)
-            .replacingOccurrences(of: Constants.spaceCharacter, with: replacement)
-    }
 }

@@ -74,6 +74,7 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
     public let eventCategoryName: String
     public let events: [String: EventsConfig]
     public let isEnableRealtime: Bool
+    public let maxActionCustomDimensions: Int
 
     public init(
         tenantID: Int,
@@ -81,7 +82,8 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
         enableAdvertisingIdReport: Bool,
         eventCategoryName: String,
         events: [String: EventsConfig],
-        isEnableRealtime: Bool
+        isEnableRealtime: Bool,
+        maxActionCustomDimensions: Int
     ) {
         self.tenantID = tenantID
         self.optitrackEndpoint = optitrackEndpoint
@@ -89,6 +91,7 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
         self.eventCategoryName = eventCategoryName
         self.events = events
         self.isEnableRealtime = isEnableRealtime
+        self.maxActionCustomDimensions = maxActionCustomDimensions
     }
 }
 
