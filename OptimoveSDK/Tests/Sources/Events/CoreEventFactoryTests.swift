@@ -28,9 +28,9 @@ class CoreEventFactoryTests: OptimoveTestCase {
     }
 
     func test_create_SetUserIdEvent() throws {
-        prefillStorageAsCustomer()
+        prefillStorageAsVisitor()
         let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
-        let event = try self.factory.createEvent(.setUserId)
+        let event = try self.factory.createEvent(.setUserId(userId: StubConstants.customerID))
         XCTAssert(event.name == SetUserIdEvent.Constants.name)
         expectation.fulfill()
         wait(for: [expectation], timeout: defaultTimeout)

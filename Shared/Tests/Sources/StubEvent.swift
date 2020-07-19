@@ -17,7 +17,7 @@ final class StubEvent: Event {
     }
 
     init(context: [String: Any]) {
-        super.init(name: Constnats.name, context: context.merging([Constnats.key: Constnats.value], uniquingKeysWith: { $1 }))
+        super.init(name: Constnats.name, context: context)
     }
 
 }
@@ -35,6 +35,7 @@ public let StubOptistreamEvent = OptistreamEvent(
         channel: nil,
         realtime: true,
         firstVisitorDate: Date().timeIntervalSince1970.seconds,
-        eventId: UUID().uuidString
+        eventId: UUID().uuidString,
+        validations: []
     )
 )
