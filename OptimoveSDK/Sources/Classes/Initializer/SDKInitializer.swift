@@ -85,7 +85,7 @@ protocol SDKInitializerDependency {
 
 final class OptimoveStrorageSDKInitializerDependency: SDKInitializerDependency {
 
-    private let storage: OptimoveStorage
+    private var storage: OptimoveStorage
 
     init(storage: OptimoveStorage) {
         self.storage = storage
@@ -93,8 +93,9 @@ final class OptimoveStrorageSDKInitializerDependency: SDKInitializerDependency {
 
     func onConfigurationFetch(_ configuration: Configuration) {
         storage.set(value: configuration.tenantID, key: .siteID)
-        storage.set(value: configuration.tenantID, key: .tenantID)
-        storage.set(value: configuration.optitrack.optitrackEndpoint, key: .optitrackEndpoint)
+        storage.siteID = configuration.tenantID
+        storage.tenantID = configuration.tenantID
+        storage.optitrackEndpoint = configuration.optitrack.optitrackEndpoint
     }
 }
 

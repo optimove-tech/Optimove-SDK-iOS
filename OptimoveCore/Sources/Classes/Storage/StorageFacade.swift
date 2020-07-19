@@ -166,6 +166,8 @@ public final class StorageFacade: OptimoveStorage {
 
 extension StorageFacade {
 
+    /// Use `storage.key` instead.
+    /// Some variable have formatters, implemented in own setters. Set unformatted value could cause an issue.
     public func set(value: Any?, key: StorageKey) {
         storage(for: key)?.set(value: value, key: key)
     }
@@ -372,12 +374,17 @@ public extension KeyValueStorage where Self: StorageValue {
 
     var optitrackEndpoint: URL? {
         get {
-            return self[.optitrackEndpoint]
+            do {
+                return URL(string: try unwrap(self[.optitrackEndpoint]))
+            } catch {
+                return nil
+            }
         }
         set {
-            self[.optitrackEndpoint] = newValue
+            self[.optitrackEndpoint] = newValue?.absoluteString
         }
     }
+
     var tenantID: Int? {
         get {
             return self[.tenantID]
