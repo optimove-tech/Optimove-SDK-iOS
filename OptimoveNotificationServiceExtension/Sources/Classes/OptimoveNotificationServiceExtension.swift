@@ -7,7 +7,7 @@ import OptimoveCore
 
 @objc public class OptimoveNotificationServiceExtension: NSObject {
 
-    @objc public private(set) var isOptimovePayload: Bool = false
+    @objc public private(set) var isHandledByOptimove: Bool = false
 
     let bundleIdentifier: String
     let operationQueue: OperationQueue
@@ -86,7 +86,7 @@ import OptimoveCore
         do {
             let payload = try verifyAndCreatePayload(request)
 
-            isOptimovePayload = true
+            isHandledByOptimove = true
 
             self.bestAttemptContent = createBestAttemptContent(request: request, payload: payload)
             self.contentHandler = contentHandler
