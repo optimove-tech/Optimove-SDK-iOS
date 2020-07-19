@@ -53,7 +53,8 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
                     ),
                     realtime: event.isRealtime,
                     firstVisitorDate: try storage.getFirstRunTimestamp(),
-                    eventId: event.eventId.uuidString
+                    eventId: event.eventId.uuidString,
+                    validations: []
                 )
             )
             try report(optistreamEvent)
