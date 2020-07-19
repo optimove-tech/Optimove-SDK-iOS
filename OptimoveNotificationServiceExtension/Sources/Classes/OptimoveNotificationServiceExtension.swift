@@ -84,8 +84,8 @@ import OptimoveCore
         withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void
     ) -> Bool {
         do {
+            isHandledByOptimove = false
             let payload = try verifyAndCreatePayload(request)
-
             isHandledByOptimove = true
 
             self.bestAttemptContent = createBestAttemptContent(request: request, payload: payload)
@@ -121,6 +121,7 @@ import OptimoveCore
                 bestAttemptContent.userInfo[NotificationKey.wasHandledByOptimoveNSE] = true
                 self?.bestAttemptContent = bestAttemptContent
                 contentHandler(bestAttemptContent)
+                self?.bestAttemptContent = nil
                 os_log("Operations were completed", log: OSLog.notification, type: .info)
             }
 
