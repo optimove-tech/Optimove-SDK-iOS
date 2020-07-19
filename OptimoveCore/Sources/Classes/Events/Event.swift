@@ -9,7 +9,7 @@ open class Event {
     public let eventId: UUID
     public let name: String
     public let category: String
-    public let context: [String: Any]
+    public var context: [String: Any]
     public let timestamp: Date
     public let isRealtime: Bool
     public var validations: [ValidationIssue]
@@ -34,9 +34,9 @@ open class Event {
 
 }
 
-public struct ValidationIssue: Encodable {
+public struct ValidationIssue: Codable, Hashable {
 
-    public enum Status: String, Encodable {
+    public enum Status: String, Codable {
         case error
         case warning
     }

@@ -9,9 +9,9 @@ enum CoreEventType {
     case optipushOptOut
     case metaData
     case setUserAgent
-    case setUserEmail
+    case setUserEmail(email: String)
     case setAdvertisingId
-    case setUserId
+    case setUserId(userId: String)
     case pageVisit(title: String, category: String?)
 }
 
@@ -46,8 +46,8 @@ extension CoreEventFactoryImpl: CoreEventFactory {
         switch type {
         case .appOpen:
             return try createAppOpenEvent()
-        case .setUserId:
-            return try createSetUserIdEvent()
+        case let .setUserId(userId):
+            return try createSetUserIdEvent(userId: userId)
         case .optipushOptIn:
             return try createOptipushOptInEvent()
         case .optipushOptOut:
@@ -60,8 +60,8 @@ extension CoreEventFactoryImpl: CoreEventFactory {
             return try createSetUserAgentEvent()
         case .setAdvertisingId:
             return try createSetAdvertisingIdEvent()
-        case .setUserEmail:
-            return try createSetUserEmailEvent()
+        case let .setUserEmail(email):
+            return try createSetUserEmailEvent(email: email)
         }
     }
 }
@@ -147,17 +147,17 @@ private extension CoreEventFactoryImpl {
         )
     }
 
-    func createSetUserIdEvent() throws -> SetUserIdEvent {
+    func createSetUserIdEvent(userId: String) throws -> SetUserIdEvent {
         return SetUserIdEvent(
             originalVistorId: try storage.getInitialVisitorId(),
-            userId: try storage.getCustomerID(),
+            userId: userId,
             updateVisitorId: try storage.getVisitorID()
         )
     }
 
-    func createSetUserEmailEvent() throws -> SetUserEmailEvent {
+    func createSetUserEmailEvent(email: String) throws -> SetUserEmailEvent {
         return SetUserEmailEvent(
-            email: try storage.getUserEmail()
+            email: email
         )
     }
 

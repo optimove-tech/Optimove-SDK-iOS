@@ -16,10 +16,11 @@ final class ParametersDecorator: Node {
             switch operation {
             case let .report(events: events):
                 return CommonOperation.report(
-                    events: try events.map {
-                        $0.decorate(
-                            config: try $0.matchConfiguration(with: configuration.events)
-                        )
+                    events: events.map { event in
+                        if let configuration = configuration.events[event.name] {
+                            return event.decorate(config: configuration)
+                        }
+                        return event
                     }
                 )
             default:

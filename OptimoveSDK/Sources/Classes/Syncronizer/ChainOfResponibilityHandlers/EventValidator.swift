@@ -34,11 +34,12 @@ final class EventValidator: Node {
         let validationFunction = { [configuration] () -> CommonOperation in
             switch operation {
             case let .report(events: events):
-                try events.forEach { event in
-                    let eventConfig = try event.matchConfiguration(with: configuration.events)
-                    try self.validate(event: event, withConfig: eventConfig)
+                let validatedEvents: [Event] = try events.map { event in
+                    let errors = try self.validate(event: event, withConfigs: configuration.events)
+                    event.validations = errors.map(EventValidator.translateToValidationIssue)
+                    return event
                 }
-                return operation
+                return CommonOperation.report(events: validatedEvents)
             default:
                 return operation
             }
@@ -46,20 +47,29 @@ final class EventValidator: Node {
         try next?.execute(validationFunction())
     }
 
-    private func validate(event: Event, withConfig eventConfiguration: EventsConfig) throws {
-        var errors: [ValidatorError] = []
+    func validate(event: Event, withConfigs configs: [String: EventsConfig]) throws -> [ValidationError] {
+        var errors: [ValidationError] = []
+
+        guard let eventConfiguration = configs[event.name] else {
+            errors.append(ValidationError.undefinedName(name: event.name))
+            return errors
+        }
 
         /// Check the allowed number of parameters
         let numberOfParamaters = event.context.count
         let allowedNumberOfParameters = configuration.optitrack.maxActionCustomDimensions
         if numberOfParamaters > allowedNumberOfParameters {
             errors.append(
-                ValidatorError.limitOfParameters(
+                ValidationError.limitOfParameters(
                     name: event.name,
                     actual: numberOfParamaters,
                     limit: allowedNumberOfParameters
                 )
             )
+            /// Delete items out of the limit
+            while event.context.count > allowedNumberOfParameters {
+                _ = event.context.remove(at: event.context.endIndex)
+            }
         }
 
         /// Verify mandatory parameters
@@ -69,7 +79,7 @@ final class EventValidator: Node {
             }
             /// Check has mandatory parameter which is undefined
             if parameter.mandatory {
-                errors.append(ValidatorError.undefinedMandatoryParameter(name: event.name, key: key))
+                errors.append(ValidationError.undefinedMandatoryParameter(name: event.name, key: key))
             }
         }
 
@@ -77,14 +87,14 @@ final class EventValidator: Node {
             let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
             let userID = userID.trimmingCharacters(in: .whitespaces)
             if userID.count > Constants.legalUserIdLength {
-                errors.append(ValidatorError.tooLongUserId(userId: userID, limit: Constants.legalUserIdLength))
+                errors.append(ValidationError.tooLongUserId(userId: userID, limit: Constants.legalUserIdLength))
             }
             let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
             switch validationResult {
             case .valid:
                 NewUserIDHandler(storage: storage).handle(userID: userID)
             default:
-                errors.append(ValidatorError.invalidUserId(userId: userID))
+                errors.append(ValidationError.invalidUserId(userId: userID))
             }
         }
 
@@ -94,7 +104,7 @@ final class EventValidator: Node {
             case .valid:
                 NewEmailHandler(storage: storage).handle(email: email)
             default:
-                errors.append(ValidatorError.invalidEmail(email: email))
+                errors.append(ValidationError.invalidEmail(email: email))
             }
         }
 
@@ -102,23 +112,23 @@ final class EventValidator: Node {
         for (key, value) in event.context {
             /// Check undefined parameter
             guard let parameter = eventConfiguration.parameters[key] else {
-                errors.append(ValidatorError.undefinedParameter(key: key))
+                errors.append(ValidationError.undefinedParameter(key: key))
                 continue
             }
             do {
                 try validateParameter(parameter, key, value)
             } catch {
-                if let error = error as? ValidatorError {
+                if let error = error as? ValidationError {
                     errors.append(error)
                 }
                 throw error
             }
         }
 
-        event.validations = errors.map(translateToValidationIssue)
+        return errors
     }
 
-    func translateToValidationIssue(error: ValidatorError) -> ValidationIssue {
+    static func translateToValidationIssue(error: ValidationError) -> ValidationIssue {
         return ValidationIssue(
             status: error.status,
             message: error.localizedDescription
@@ -131,34 +141,34 @@ final class EventValidator: Node {
         _ value: Any
     ) throws {
         guard let parameterType = Constants.AllowedType(rawValue: parameter.type) else {
-            throw ValidatorError.unsupportedType(key: key)
+            throw ValidationError.unsupportedType(key: key)
         }
         switch parameterType {
         case .number:
             guard let numberValue = value as? NSNumber else {
-                throw ValidatorError.wrongType(key: key, expected: .number)
+                throw ValidationError.wrongType(key: key, expected: .number)
             }
             if String(describing: numberValue).count > Constants.legalParameterLength {
-                throw ValidatorError.limitOfCharacters(key: key, limit: Constants.legalParameterLength)
+                throw ValidationError.limitOfCharacters(key: key, limit: Constants.legalParameterLength)
             }
 
         case .string:
             guard let stringValue = value as? String else {
-                throw ValidatorError.wrongType(key: key, expected: .string)
+                throw ValidationError.wrongType(key: key, expected: .string)
             }
             if stringValue.count > Constants.legalParameterLength {
-                throw ValidatorError.limitOfCharacters(key: key, limit: Constants.legalParameterLength)
+                throw ValidationError.limitOfCharacters(key: key, limit: Constants.legalParameterLength)
             }
 
         case .boolean:
             guard value is Bool else {
-                throw ValidatorError.wrongType(key: key, expected: .boolean)
+                throw ValidationError.wrongType(key: key, expected: .boolean)
             }
         }
     }
 }
 
-enum ValidatorError: LocalizedError, Equatable {
+enum ValidationError: LocalizedError, Equatable {
     case undefinedName(name: String)
     case limitOfParameters(name: String, actual: Int, limit: Int)
     case undefinedMandatoryParameter(name: String, key: String)
@@ -232,4 +242,17 @@ enum ValidatorError: LocalizedError, Equatable {
          }
      }
 
+}
+
+extension String {
+
+    private struct Constants {
+        static let spaceCharacter = " "
+        static let underscoreCharacter = "_"
+    }
+
+    func normilizeKey(with replacement: String = Constants.underscoreCharacter) -> String {
+        return self.trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: Constants.spaceCharacter, with: replacement)
+    }
 }
