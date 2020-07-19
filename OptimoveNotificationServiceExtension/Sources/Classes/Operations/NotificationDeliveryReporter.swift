@@ -22,7 +22,7 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
     }
 
     override func main() {
-        guard !(self.isCancelled ?? true) else { return }
+        guard !self.isCancelled else { return }
         state = .executing
         guard let campaign = notificationPayload.campaign else {
             os_log("Unrecognized campaign type.", log: OSLog.reporter, type: .error)
