@@ -9,19 +9,20 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
     private let bundleIdentifier: String
     private let notificationPayload: NotificationPayload
     private let networking: OptistreamNetworking
-    private let builder: OptistreamEventBuilder
+    private let storage: OptimoveStorage
 
     init(bundleIdentifier: String,
          notificationPayload: NotificationPayload,
          networking: OptistreamNetworking,
-         builder: OptistreamEventBuilder) {
+         storage: OptimoveStorage) {
         self.bundleIdentifier = bundleIdentifier
         self.notificationPayload = notificationPayload
         self.networking = networking
-        self.builder = builder
+        self.storage = storage
     }
 
     override func main() {
+        guard !(self.isCancelled ?? true) else { return }
         state = .executing
         guard let campaign = notificationPayload.campaign else {
             os_log("Unrecognized campaign type.", log: OSLog.reporter, type: .error)
@@ -34,7 +35,27 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
                 notificationType: campaign.type,
                 identityToken: campaign.identityToken
             )
-            let optistreamEvent = try builder.build(event: event)
+            let optistreamEvent = OptistreamEvent(
+                tenant: try storage.getTenantID(),
+                category: event.category,
+                event: event.name,
+                origin: "sdk",
+                customer: storage.customerID,
+                visitor: try storage.getVisitorID(),
+                timestamp: Formatter.iso8601withFractionalSeconds.string(from: event.timestamp),
+                context: try JSON(event.context),
+                metadata: OptistreamEvent.Metadata(
+                    channel: OptistreamEvent.Metadata.Channel(
+                        airship: try? OptimoveAirshipIntegration(
+                            storage: storage,
+                            isSupportedAirship: true
+                        ).loadAirshipIntegration()
+                    ),
+                    realtime: event.isRealtime,
+                    firstVisitorDate: try storage.getFirstRunTimestamp(),
+                    eventId: event.eventId.uuidString
+                )
+            )
             try report(optistreamEvent)
         } catch {
             os_log("Error: %{public}@", log: OSLog.reporter, type: .error, error.localizedDescription)
@@ -43,14 +64,15 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
     }
 
     private func report(_ event: OptistreamEvent) throws {
-        networking.send(events: [event]) { [unowned self] (result) in
+        networking.send(events: [event]) { [weak self] (result) in
+            guard !(self?.isCancelled ?? true) else { return }
             switch result {
             case .success:
                     os_log("Delivery reported", log: OSLog.reporter, type: .info)
             case .failure(let error):
                 os_log("Error: %{public}@", log: OSLog.reporter, type: .error, error.localizedDescription)
             }
-            self.state = .finished
+            self?.state = .finished
         }
     }
 }

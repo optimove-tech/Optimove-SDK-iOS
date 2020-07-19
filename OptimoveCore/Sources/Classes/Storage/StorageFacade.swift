@@ -473,6 +473,13 @@ public extension KeyValueStorage where Self: StorageValue {
         return value
     }
 
+    func getTenantID() throws -> Int {
+        guard let value = tenantID else {
+            throw StorageError.noValue(.tenantID)
+        }
+        return value
+    }
+
     mutating func finishedMigration(to version: String) {
         var versions = migrationVersions
         versions.append(version)
