@@ -141,9 +141,8 @@ import OptimoveCore
                 "Unable to cast to Optimove notification. %{PUBLIC}@",
                 log: OSLog.notification, type: .error, error.localizedDescription
             )
-            return !isOptimovePayload
         }
-        return isOptimovePayload
+        return isHandledByOptimove
     }
 
     /// The method called by system in case if `didReceive(_:withContentHandler:)` takes to long to execute or
