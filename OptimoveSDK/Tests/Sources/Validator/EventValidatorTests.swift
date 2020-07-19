@@ -23,4 +23,8 @@ class EventValidatorTests: OptimoveTestCase {
         XCTAssertNoThrow( try validator.execute(.report(events: [event])))
     }
 
+    func test_undefinedName_error() {
+        try validator.execute(.report(events: [event]))
+    }
+
 }

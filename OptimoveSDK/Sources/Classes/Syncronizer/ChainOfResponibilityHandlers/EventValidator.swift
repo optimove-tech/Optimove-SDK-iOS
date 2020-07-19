@@ -47,15 +47,8 @@ final class EventValidator: Node {
         try next?.execute(validationFunction())
     }
 
-    func validate(event: Event, withConfigs configs: [String: EventsConfig]) throws -> [ValidationError] {
+    fileprivate func verifyAllowedNumberOfParameters(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
-
-        guard let eventConfiguration = configs[event.name] else {
-            errors.append(ValidationError.undefinedName(name: event.name))
-            return errors
-        }
-
-        /// Check the allowed number of parameters
         let numberOfParamaters = event.context.count
         let allowedNumberOfParameters = configuration.optitrack.maxActionCustomDimensions
         if numberOfParamaters > allowedNumberOfParameters {
@@ -71,8 +64,11 @@ final class EventValidator: Node {
                 _ = event.context.remove(at: event.context.endIndex)
             }
         }
+        return errors
+    }
 
-        /// Verify mandatory parameters
+    private func verifyMandatoryParameters(_ eventConfiguration: EventsConfig, _ event: Event) -> [ValidationError] {
+        var errors: [ValidationError] = []
         for (key, parameter) in eventConfiguration.parameters {
             guard event.context[key] == nil else {
                 continue
@@ -82,7 +78,11 @@ final class EventValidator: Node {
                 errors.append(ValidationError.undefinedMandatoryParameter(name: event.name, key: key))
             }
         }
+        return errors
+    }
 
+    fileprivate func verifySetUserIdEvent(_ event: Event) -> [ValidationError] {
+        var errors: [ValidationError] = []
         if event.name == SetUserIdEvent.Constants.name,
             let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
             let userID = userID.trimmingCharacters(in: .whitespaces)
@@ -97,7 +97,11 @@ final class EventValidator: Node {
                 errors.append(ValidationError.invalidUserId(userId: userID))
             }
         }
+        return errors
+    }
 
+    fileprivate func verifySetEmailEvent(_ event: Event) -> [ValidationError] {
+        var errors: [ValidationError] = []
         if event.name == SetUserEmailEvent.Constants.name, let email = event.context[SetUserEmailEvent.Constants.Key.email] as? String {
             let validationResult = EmailValidator(storage: storage).isValid(email)
             switch validationResult {
@@ -107,8 +111,11 @@ final class EventValidator: Node {
                 errors.append(ValidationError.invalidEmail(email: email))
             }
         }
+        return errors
+    }
 
-        /// Verify event' parameters
+    private func verifyEventParameters(_ event: Event, _ eventConfiguration: EventsConfig) throws -> [ValidationError] {
+        var errors: [ValidationError] = []
         for (key, value) in event.context {
             /// Check undefined parameter
             guard let parameter = eventConfiguration.parameters[key] else {
@@ -124,8 +131,20 @@ final class EventValidator: Node {
                 throw error
             }
         }
-
         return errors
+    }
+
+    func validate(event: Event, withConfigs configs: [String: EventsConfig]) throws -> [ValidationError] {
+        guard let eventConfiguration = configs[event.name] else {
+            return [ValidationError.undefinedName(name: event.name)]
+        }
+        return [
+            verifyAllowedNumberOfParameters(event),
+            verifyMandatoryParameters(eventConfiguration, event),
+            verifySetUserIdEvent(event),
+            verifySetEmailEvent(event),
+            try verifyEventParameters(event, eventConfiguration)
+        ].flatMap { $0 }
     }
 
     static func translateToValidationIssue(error: ValidationError) -> ValidationIssue {
