@@ -57,8 +57,8 @@ final class OptiTrack {
 
     private func startBackgroundTask() {
         stopBackgroundTask()
-        backgroundTaskId = UIApplication.shared.beginBackgroundTask(withName: "Dispatch now") {
-            self.stopBackgroundTask()
+        backgroundTaskId = UIApplication.shared.beginBackgroundTask(withName: "Dispatch now") { [weak self] in
+            self?.stopBackgroundTask()
         }
     }
 
@@ -105,7 +105,9 @@ private extension OptiTrack {
             userInfo: nil,
             repeats: false
         )
-        RunLoop.main.add(dispatchTimer!, forMode: RunLoop.Mode.common)
+        if let dispatchTimer = dispatchTimer {
+            RunLoop.main.add(dispatchTimer, forMode: RunLoop.Mode.common)
+        }
     }
 
     func applyRealtimeMutation(_ event: OptistreamEvent) -> OptistreamEvent {
