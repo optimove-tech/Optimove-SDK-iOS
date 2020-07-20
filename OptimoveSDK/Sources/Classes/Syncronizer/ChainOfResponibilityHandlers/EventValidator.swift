@@ -93,7 +93,9 @@ final class EventValidator: Node {
             switch validationResult {
             case .valid:
                 NewUserIDHandler(storage: storage).handle(userID: userID)
-            default:
+            case .alreadySetIn:
+                break
+            case .notValid:
                 errors.append(ValidationError.invalidUserId(userId: userID))
             }
         }
@@ -107,7 +109,9 @@ final class EventValidator: Node {
             switch validationResult {
             case .valid:
                 NewEmailHandler(storage: storage).handle(email: email)
-            default:
+            case .alreadySetIn:
+                break
+            case .notValid:
                 errors.append(ValidationError.invalidEmail(email: email))
             }
         }
