@@ -150,8 +150,30 @@ class EventValidatorTests: OptimoveTestCase {
         XCTAssertEqual(storage.customerID, userId)
     }
 
+    func test_verifySetUserIdEvent_no_errors_if_already_set_in() {
+        let userId = "abc"
+        storage.customerID = userId
+        let event = SetUserIdEvent(
+            originalVistorId: "original",
+            userId: userId,
+            updateVisitorId: ""
+        )
+        let errors = validator.verifySetUserIdEvent(event)
+        XCTAssertEqual(errors.count, 0)
+        XCTAssertEqual(storage.customerID, userId)
+    }
+
     func test_verifySetEmailEvent_no_errors() {
         let email = "abcABC%-90@abcABC-.abcABC"
+        let event = SetUserEmailEvent(email: email)
+        let errors = validator.verifySetEmailEvent(event)
+        XCTAssertEqual(errors.count, 0)
+        XCTAssertEqual(storage.userEmail, email)
+    }
+
+    func test_verifySetEmailEvent_no_errors_if_already_set_in() {
+        let email = "abcABC%-90@abcABC-.abcABC"
+        storage.userEmail = email
         let event = SetUserEmailEvent(email: email)
         let errors = validator.verifySetEmailEvent(event)
         XCTAssertEqual(errors.count, 0)
