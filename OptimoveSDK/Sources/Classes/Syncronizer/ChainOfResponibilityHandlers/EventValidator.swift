@@ -163,9 +163,7 @@ final class EventValidator: Node {
         _ key: String,
         _ value: Any
     ) throws {
-        guard let parameterType = Constants.AllowedType(rawValue: parameter.type) else {
-            throw ValidationError.unsupportedType(key: key)
-        }
+        let parameterType = try unwrap(Constants.AllowedType(rawValue: parameter.type))
         switch parameterType {
         case .number:
             guard let numberValue = value as? NSNumber else {
@@ -197,7 +195,6 @@ enum ValidationError: LocalizedError, Equatable {
     case undefinedMandatoryParameter(name: String, key: String)
     case undefinedParameter(key: String)
     case limitOfCharacters(key: String, limit: Int)
-    case unsupportedType(key: String)
     case wrongType(key: String, expected: EventValidator.Constants.AllowedType)
     case invalidUserId(userId: String)
     case tooLongUserId(userId: String, limit: Int)
@@ -225,10 +222,6 @@ enum ValidationError: LocalizedError, Equatable {
             return """
             '\(key)' has exceeded the limit of allowed number of characters. The character limit is \(limit)
             """
-        case let .unsupportedType(key):
-            return """
-            '\(key)' should be of only TYPE of boolean or string or number
-            """
         case let .wrongType(key, expected):
             return """
             '\(key)' should be of TYPE \(expected.rawValue)
@@ -248,20 +241,17 @@ enum ValidationError: LocalizedError, Equatable {
         }
     }
 
-    var status: ValidationIssue.Status {
+    var status: Int {
          switch self {
-         case .undefinedName,
-              .undefinedMandatoryParameter,
-              .limitOfCharacters,
-              .unsupportedType,
-              .wrongType,
-              .invalidUserId,
-              .tooLongUserId,
-              .invalidEmail:
-             return .error
-         case .limitOfParameters,
-              .undefinedParameter:
-             return .warning
+         case .undefinedName: return 1010
+         case .limitOfParameters: return 1020
+         case .undefinedParameter: return 1030
+         case .undefinedMandatoryParameter: return 1040
+         case .limitOfCharacters: return 1050
+         case .wrongType: return 1060
+         case .invalidUserId: return 1070
+         case .tooLongUserId: return 1071
+         case .invalidEmail: return 1080
          }
      }
 

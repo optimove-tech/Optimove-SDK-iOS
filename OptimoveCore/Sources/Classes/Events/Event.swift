@@ -36,15 +36,10 @@ open class Event {
 
 public struct ValidationIssue: Codable, Hashable {
 
-    public enum Status: String, Codable {
-        case error
-        case warning
-    }
-
-    public let status: Status
+    public let status: Int
     public let message: String
 
-    public init(status: Status, message: String) {
+    public init(status: Int, message: String) {
         self.status = status
         self.message = message
     }
