@@ -57,23 +57,3 @@ class ComponentHandler: Node {
         }
     }
 }
-
-//final class OptistreamEventComponentDecider {
-//
-//    private let configuration: Configuration
-//
-//    init(configuration: Configuration) {
-//        self.configuration = configuration
-//    }
-//
-//    func isAllowToPassEvent(_ event: Event, to component: OptistreamComponentType) -> Bool {
-//        switch component {
-//        case .realtime:
-//            return configuration.isEnableRealtime && !configuration.optitrack.isEnableRealtimeThroughOptistream &&
-//                event.isRealtime
-//        case .track:
-//            return true
-//        }
-//    }
-//
-//}

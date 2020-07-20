@@ -23,32 +23,20 @@ extension Event {
     }
 
     func decorate(config: EventsConfig) -> Event {
-        return Event(eventId: self.eventId,
-                     name: self.name,
-                     category: self.category,
-                     context: decorate(config: config),
-                     timestamp: self.timestamp,
-                     isRealtime: config.supportedOnRealTime)
-    }
-
-    /// Add Additional attributes according to event configuration
-    ///
-    /// - Parameter config: The event configurations as provided in file
-    private func decorate(config: EventsConfig) -> [String: Any] {
-        var context = self.context
         if config.parameters[Constants.Key.eventDeviceType] != nil {
-            context[Constants.Key.eventDeviceType] = Constants.Value.eventDeviceType
+            self.context[Constants.Key.eventDeviceType] = Constants.Value.eventDeviceType
         }
         if config.parameters[Constants.Key.eventNativeMobile] != nil {
-            context[Constants.Key.eventNativeMobile] = Constants.Value.eventNativeMobile
+            self.context[Constants.Key.eventNativeMobile] = Constants.Value.eventNativeMobile
         }
         if config.parameters[Constants.Key.eventOs] != nil {
-            context[Constants.Key.eventOs] = Constants.Value.eventOs
+            self.context[Constants.Key.eventOs] = Constants.Value.eventOs
         }
         if config.parameters[Constants.Key.eventPlatform] != nil {
-            context[Constants.Key.eventPlatform] = Constants.Value.eventPlatform
+            self.context[Constants.Key.eventPlatform] = Constants.Value.eventPlatform
         }
-        return context
+        self.isRealtime = config.supportedOnRealTime
+        return self
     }
 
 }

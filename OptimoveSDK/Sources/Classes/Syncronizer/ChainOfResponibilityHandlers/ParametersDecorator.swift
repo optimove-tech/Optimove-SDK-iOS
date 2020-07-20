@@ -15,14 +15,13 @@ final class ParametersDecorator: Node {
         let decorationFunction = { [configuration] () -> CommonOperation in
             switch operation {
             case let .report(events: events):
-                return CommonOperation.report(
-                    events: events.map { event in
-                        if let configuration = configuration.events[event.name] {
-                            return event.decorate(config: configuration)
-                        }
-                        return event
+                let decoratedEvents: [Event] = events.map { event in
+                    if let configuration = configuration.events[event.name] {
+                        return event.decorate(config: configuration)
                     }
-                )
+                    return event
+                }
+                return CommonOperation.report(events: decoratedEvents)
             default:
                 return operation
             }

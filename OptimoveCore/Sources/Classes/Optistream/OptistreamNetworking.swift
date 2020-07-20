@@ -78,8 +78,25 @@ private extension OptistreamNetworkingImpl {
             Logger.debug(
                 """
                 Optistream succeed:
-                    request: \n\(events.map { $0.event }.joined(separator: "\n"))
-                    response: \n\(response)
+                    request:
+                    \(events.map { $0.event }.joined(separator: "\n"))
+                    response:
+                    \(response)
+                """
+            )
+            completion(.success(()))
+        } catch NetworkError.requestInvalid(let data) {
+            let response: () -> String = {
+                guard let data = data else { return "no data" }
+                return String(decoding: data, as: UTF8.self)
+            }
+            Logger.error(
+                """
+                Optistream request invalid:
+                    request:
+                    \(events.map { $0.event }.joined(separator: "\n"))
+                    reason:
+                    \(response())
                 """
             )
             completion(.success(()))
@@ -87,8 +104,10 @@ private extension OptistreamNetworkingImpl {
             Logger.error(
                 """
                 Optistream failed:
-                    request: \n\(events.map { $0.event }.joined(separator: "\n"))
-                    reason: \n\(error.localizedDescription)
+                    request:
+                    \(events.map { $0.event }.joined(separator: "\n"))
+                    reason:
+                    \(error.localizedDescription)
                 """
             )
             completion(.failure(NetworkError.error(error)))

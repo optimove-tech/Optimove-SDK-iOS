@@ -8,10 +8,10 @@ open class Event {
 
     public let eventId: UUID
     public let name: String
+    public let timestamp: Date
     public let category: String
     public var context: [String: Any]
-    public let timestamp: Date
-    public let isRealtime: Bool
+    public var isRealtime: Bool
     public var validations: [ValidationIssue]
 
     public init(
