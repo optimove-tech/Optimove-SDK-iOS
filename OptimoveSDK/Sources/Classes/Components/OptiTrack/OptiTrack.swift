@@ -125,7 +125,6 @@ private extension OptiTrack {
             guard let self = self else { return }
             guard !self.isDispatching else {
                 Logger.debug("Tracker is already dispatching.")
-                self.stopBackgroundTask()
                 return
             }
             guard !self.queue.isEmpty else {
