@@ -5,6 +5,10 @@ import OptimoveCore
 
 final class TenantConfigFixture {
 
+    struct Constants {
+        static let maxActionCustomDimensions = 10
+    }
+
     func build(_ options: Options = Options.default) -> TenantConfig {
         return TenantConfig(
             realtime: tenantRealtimeConfigFixture(),
@@ -27,7 +31,8 @@ final class TenantConfigFixture {
     func tenantOptitrackConfigFixture() -> TenantOptitrackConfig {
         return TenantOptitrackConfig(
             optitrackEndpoint: StubVariables.url,
-            siteId: StubVariables.int
+            siteId: StubVariables.int,
+            maxActionCustomDimensions: Constants.maxActionCustomDimensions
         )
     }
 

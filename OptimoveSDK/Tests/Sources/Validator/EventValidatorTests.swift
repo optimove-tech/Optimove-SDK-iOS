@@ -25,6 +25,64 @@ class EventValidatorTests: OptimoveTestCase {
         XCTAssertNoThrow( try validator.execute(.report(events: [event])))
     }
 
+    func test_cutting_mandatory_params() throws {
+        let context: [String: Any] = [
+            "1": "value",
+            "2": "value",
+            "3": "value",
+            "4": "value",
+            "5": "value",
+            "6": "value",
+            "7": "value",
+            "8": "value",
+            "9": "value",
+            "10": "value",
+            "11": "value"
+        ]
+        let parameters = context.keys.reduce(into: [:], { (acc, next) in
+            acc[next] = Parameter(type: "String", optional: false)
+        })
+        let eventConfiguration = EventsConfig(
+            id: 1,
+            supportedOnOptitrack: true,
+            supportedOnRealTime: true,
+            parameters: parameters
+        )
+        let event = StubEvent(context: context)
+        let errors = try validator.validate(event: event, withConfigs: [StubEvent.Constnats.name: eventConfiguration])
+        XCTAssertEqual(errors.count, 2)
+    }
+
+    func test_cutting_non_mandatory_params() throws {
+        let context: [String: Any] = [
+            "1": "value",
+            "2": "value",
+            "3": "value",
+            "4": "value",
+            "5": "value",
+            "6": "value",
+            "7": "value",
+            "8": "value",
+            "9": "value",
+            "10": "value",
+            "11": "value"
+        ]
+        let parameters = context.keys.reduce(into: [:], { (acc, next) in
+            acc[next] = Parameter(type: "String", optional: true)
+        })
+        let eventConfiguration = EventsConfig(
+            id: 1,
+            supportedOnOptitrack: true,
+            supportedOnRealTime: true,
+            parameters: parameters
+        )
+        let event = StubEvent(context: context)
+        let errors = try validator.validate(event: event, withConfigs: [StubEvent.Constnats.name: eventConfiguration])
+        XCTAssertEqual(errors.count, 1)
+    }
+
+    // MARK: - verifyAllowedNumberOfParameters
+
     func test_verifyAllowedNumberOfParameters_no_error() {
         let context: [String: Any] = [
             "1": "value",
@@ -70,6 +128,8 @@ class EventValidatorTests: OptimoveTestCase {
         )
     }
 
+    // MARK: - verifyMandatoryParameters
+
     func test_verifyMandatoryParameters_no_errors() {
         let mandatoryKey = "1"
         let event = StubEvent(context: [
@@ -89,31 +149,33 @@ class EventValidatorTests: OptimoveTestCase {
 
     func test_verifyMandatoryParameters_undefinedMandatoryParameter_error() {
         let mandatoryKey = "1"
+        let mandatoryKey2 = "2"
+        let mandatoryKey3 = "3"
         let event = StubEvent(context: [:])
         let eventConfiguration = EventsConfig(
             id: 1,
             supportedOnOptitrack: true,
             supportedOnRealTime: true,
             parameters: [
-                mandatoryKey: Parameter(type: "String", optional: false)
+                mandatoryKey: Parameter(type: "String", optional: false),
+                mandatoryKey2: Parameter(type: "Number", optional: false),
+                mandatoryKey3: Parameter(type: "Boolean", optional: false)
             ]
         )
         let errors = validator.verifyMandatoryParameters(eventConfiguration, event)
-        XCTAssertEqual(errors.count, 1)
-        XCTAssertEqual(
-            errors[0],
-            ValidationError.undefinedMandatoryParameter(name: StubEvent.Constnats.name, key: mandatoryKey)
-        )
+        XCTAssertEqual(errors.count, 3)
     }
 
-    func test_verifySetUserIdEvent_tooLongUserId_error() {
+    // MARK: - verifySetUserIdEvent
+
+    func test_verifySetUserIdEvent_tooLongUserId_error() throws {
         let userId = String(repeating: "A", count: EventValidator.Constants.legalUserIdLength + 1)
         let event = SetUserIdEvent(
             originalVistorId: "original",
             userId: userId,
             updateVisitorId: ""
         )
-        let errors = validator.verifySetUserIdEvent(event)
+        let errors = try validator.verifySetUserIdEvent(event)
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(
             errors[0],
@@ -122,14 +184,14 @@ class EventValidatorTests: OptimoveTestCase {
         XCTAssertNil(storage.customerID)
     }
 
-    func test_verifySetUserIdEvent_invalidUserId_error() {
+    func test_verifySetUserIdEvent_invalidUserId_error() throws {
         let userId = ""
         let event = SetUserIdEvent(
             originalVistorId: "original",
             userId: userId,
             updateVisitorId: ""
         )
-        let errors = validator.verifySetUserIdEvent(event)
+        let errors = try validator.verifySetUserIdEvent(event)
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(
             errors[0],
@@ -138,19 +200,19 @@ class EventValidatorTests: OptimoveTestCase {
         XCTAssertNil(storage.customerID)
     }
 
-    func test_verifySetUserIdEvent_no_errors() {
+    func test_verifySetUserIdEvent_no_errors() throws {
         let userId = "abc"
         let event = SetUserIdEvent(
             originalVistorId: "original",
             userId: userId,
             updateVisitorId: ""
         )
-        let errors = validator.verifySetUserIdEvent(event)
+        let errors = try validator.verifySetUserIdEvent(event)
         XCTAssertEqual(errors.count, 0)
         XCTAssertEqual(storage.customerID, userId)
     }
 
-    func test_verifySetUserIdEvent_no_errors_if_already_set_in() {
+    func test_verifySetUserIdEvent_no_errors_if_already_set_in() throws {
         let userId = "abc"
         storage.customerID = userId
         let event = SetUserIdEvent(
@@ -158,32 +220,30 @@ class EventValidatorTests: OptimoveTestCase {
             userId: userId,
             updateVisitorId: ""
         )
-        let errors = validator.verifySetUserIdEvent(event)
-        XCTAssertEqual(errors.count, 0)
-        XCTAssertEqual(storage.customerID, userId)
+        XCTAssertThrowsError(try validator.verifySetUserIdEvent(event))
     }
 
-    func test_verifySetEmailEvent_no_errors() {
+    // MARK: - verifySetEmailEvent
+
+    func test_verifySetEmailEvent_no_errors() throws {
         let email = "abcABC%-90@abcABC-.abcABC"
         let event = SetUserEmailEvent(email: email)
-        let errors = validator.verifySetEmailEvent(event)
+        let errors = try validator.verifySetEmailEvent(event)
         XCTAssertEqual(errors.count, 0)
         XCTAssertEqual(storage.userEmail, email)
     }
 
-    func test_verifySetEmailEvent_no_errors_if_already_set_in() {
+    func test_verifySetEmailEvent_no_errors_if_already_set_in() throws {
         let email = "abcABC%-90@abcABC-.abcABC"
         storage.userEmail = email
         let event = SetUserEmailEvent(email: email)
-        let errors = validator.verifySetEmailEvent(event)
-        XCTAssertEqual(errors.count, 0)
-        XCTAssertEqual(storage.userEmail, email)
+        XCTAssertThrowsError(try validator.verifySetEmailEvent(event))
     }
 
-    func test_verifySetEmailEvent_invalidEmail_error() {
+    func test_verifySetEmailEvent_invalidEmail_error() throws {
         let email = "abcABC%-90abcABC-.abcABC"
         let event = SetUserEmailEvent(email: email)
-        let errors = validator.verifySetEmailEvent(event)
+        let errors = try validator.verifySetEmailEvent(event)
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(
             errors[0],
@@ -191,6 +251,8 @@ class EventValidatorTests: OptimoveTestCase {
         )
         XCTAssertNil(storage.userEmail)
     }
+
+    // MARK: - verifyEventParameters
 
     func test_verifyEventParameters_undefinedParameter_error() throws {
         let key = "wrongKey"
@@ -279,9 +341,7 @@ class EventValidatorTests: OptimoveTestCase {
         let key = "key"
         let value = String(repeating: "A", count: EventValidator.Constants.legalParameterLength + 1)
         let parameter = Parameter(type: "String", optional: false)
-        do {
-            try validator.validateParameter(parameter, key, value)
-        } catch {
+        XCTAssertThrowsError(try validator.validateParameter(parameter, key, value)) { (error) in
             XCTAssertEqual(
                 error as! ValidationError,
                 ValidationError.limitOfCharacters(

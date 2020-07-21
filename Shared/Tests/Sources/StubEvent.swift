@@ -13,7 +13,7 @@ final class StubEvent: Event {
     }
 
     init() {
-        super.init(name: Constnats.name, context: [Constnats.key: Constnats.value])
+        super.init(name: Constnats.name, context: [:])
     }
 
     init(context: [String: Any]) {
