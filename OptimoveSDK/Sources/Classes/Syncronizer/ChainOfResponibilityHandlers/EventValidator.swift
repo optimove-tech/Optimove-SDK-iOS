@@ -135,6 +135,7 @@ final class EventValidator: Node {
             } catch {
                 if let error = error as? ValidationError {
                     errors.append(error)
+                    continue
                 }
                 throw error
             }
