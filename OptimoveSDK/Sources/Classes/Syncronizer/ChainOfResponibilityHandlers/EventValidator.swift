@@ -212,7 +212,7 @@ enum ValidationError: LocalizedError, Equatable {
             """
         case let .undefinedParameter(key):
             return """
-            \(key) is an undefined parameter. It will not be tracked and cannot be used within a trigger.
+            parameter '\(key)' has not been configured for this event. It will not be tracked and cannot be used within a trigger.
             """
         case let .undefinedMandatoryParameter(name, key):
             return """
@@ -232,7 +232,7 @@ enum ValidationError: LocalizedError, Equatable {
             """
         case let .tooLongUserId(userId, limit):
             return """
-            "userId, '\(userId)', is too long, the userId limit is \(limit)."
+            userId, '\(userId)', is too long, the userId limit is \(limit).
             """
         case let .invalidEmail(email):
             return """
