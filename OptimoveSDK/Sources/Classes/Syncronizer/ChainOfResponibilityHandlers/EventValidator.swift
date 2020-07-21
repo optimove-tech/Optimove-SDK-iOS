@@ -229,7 +229,7 @@ enum ValidationError: LocalizedError, Equatable {
             """
         case let .wrongType(key, expected):
             return """
-            '\(key)' should be of TYPE \(expected.rawValue)
+            '\(key)' should be of TYPE \(expected.rawValue.lowercased())
             """
         case let .invalidUserId(userId):
             return """
