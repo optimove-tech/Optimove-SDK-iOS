@@ -60,7 +60,7 @@ private extension ConfigurationBuilder {
             eventCategoryName: globalConfig.optitrack.eventCategoryName,
             events: events,
             isEnableRealtime: tenantConfig.isEnableRealtime && tenantConfig.isEnableRealtimeThroughOptistream,
-            maxActionCustomDimensions: 10
+            maxActionCustomDimensions: tenantConfig.optitrack.maxActionCustomDimensions
         )
     }
 
