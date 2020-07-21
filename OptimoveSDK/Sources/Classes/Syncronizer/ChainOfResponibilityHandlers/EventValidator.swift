@@ -80,7 +80,7 @@ final class EventValidator: Node {
         return errors
     }
 
-    func verifySetUserIdEvent(_ event: Event) -> [ValidationError] {
+    func verifySetUserIdEvent(_ event: Event) throws -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserIdEvent.Constants.name,
             let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
@@ -94,7 +94,9 @@ final class EventValidator: Node {
             case .valid:
                 NewUserIDHandler(storage: storage).handle(userID: userID)
             case .alreadySetIn:
-                break
+                let msg = "Optimove: User id '\(userID)' was already set in."
+                Logger.warn(msg)
+                throw GuardError.custom(msg)
             case .notValid:
                 errors.append(ValidationError.invalidUserId(userId: userID))
             }
@@ -102,7 +104,7 @@ final class EventValidator: Node {
         return errors
     }
 
-    func verifySetEmailEvent(_ event: Event) -> [ValidationError] {
+    func verifySetEmailEvent(_ event: Event) throws -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserEmailEvent.Constants.name, let email = event.context[SetUserEmailEvent.Constants.Key.email] as? String {
             let validationResult = EmailValidator(storage: storage).isValid(email)
@@ -110,7 +112,9 @@ final class EventValidator: Node {
             case .valid:
                 NewEmailHandler(storage: storage).handle(email: email)
             case .alreadySetIn:
-                break
+                let msg = "Optimove: Email '\(email)' was already set in."
+                Logger.warn(msg)
+                throw GuardError.custom(msg)
             case .notValid:
                 errors.append(ValidationError.invalidEmail(email: email))
             }
@@ -145,8 +149,8 @@ final class EventValidator: Node {
         return [
             verifyAllowedNumberOfParameters(event),
             verifyMandatoryParameters(eventConfiguration, event),
-            verifySetUserIdEvent(event),
-            verifySetEmailEvent(event),
+            try verifySetUserIdEvent(event),
+            try verifySetEmailEvent(event),
             try verifyEventParameters(event, eventConfiguration)
         ].flatMap { $0 }
     }
