@@ -20,6 +20,8 @@ final class PersistentContainer: NSPersistentContainer {
         guard !isThisStoreAlreadyLoaded(storeName: storeName) else { return }
         let persistentStoreDescription = NSPersistentStoreDescription()
         persistentStoreDescription.url = try defineStoreURL(storeName: storeName)
+        persistentStoreDescription.shouldMigrateStoreAutomatically = true
+        persistentStoreDescription.shouldInferMappingModelAutomatically = true
         self.persistentStoreDescriptions = [persistentStoreDescription]
         self.loadPersistentStores { description, error in
             if let error = error {
@@ -81,9 +83,13 @@ extension CoreDataModelDescription {
                     managedObjectClass: EventCD.self,
                     attributes: [
                         .attribute(name: #keyPath(EventCD.data), type: .binaryDataAttributeType),
-                        .attribute(name: #keyPath(EventCD.date), type: .stringAttributeType),
                         .attribute(name: #keyPath(EventCD.type), type: .stringAttributeType),
-                        .attribute(name: #keyPath(EventCD.uuid), type: .stringAttributeType)
+                        .attribute(name: #keyPath(EventCD.uuid), type: .stringAttributeType),
+                        .attribute(
+                            name: #keyPath(EventCD.creationDate),
+                            type: .dateAttributeType,
+                            defaultValue: Date()
+                        )
                     ],
                     constraints: [#keyPath(EventCD.uuid), #keyPath(EventCD.type)]
                 )

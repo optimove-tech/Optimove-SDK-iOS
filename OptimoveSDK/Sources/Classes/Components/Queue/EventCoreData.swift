@@ -14,9 +14,9 @@ final class EventCD: NSManagedObject {
     ) throws -> EventCD {
         let eventCD: EventCD = try context.insertObject()
         eventCD.uuid = event.metadata.eventId
-        eventCD.date = event.timestamp
         eventCD.data = try JSONEncoder().encode(event)
         eventCD.type = type.rawValue
+        eventCD.creationDate = Date()
         return eventCD
     }
 }
@@ -24,8 +24,8 @@ final class EventCD: NSManagedObject {
 extension EventCD {
 
     @NSManaged fileprivate(set) var uuid: String
+    @NSManaged fileprivate(set) var creationDate: Date
     @NSManaged fileprivate(set) var data: Data
-    @NSManaged fileprivate(set) var date: String
     @NSManaged fileprivate(set) var type: String
 
 }
@@ -37,7 +37,7 @@ extension EventCD: Managed {
     }
 
     static var defaultSortDescriptors: [NSSortDescriptor] {
-        return [NSSortDescriptor(key: #keyPath(date), ascending: true)]
+        return [NSSortDescriptor(keyPath: \EventCD.creationDate, ascending: true)]
     }
 
 }
