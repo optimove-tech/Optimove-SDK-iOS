@@ -12,7 +12,6 @@ final class OptiTrack {
 
     private struct Constants {
         static let eventBatchLimit = 50
-        static let queueLabel = "com.optimove.track"
     }
 
     var dispatchInterval: TimeInterval = 10 {
@@ -26,7 +25,7 @@ final class OptiTrack {
     private let configuration: OptitrackConfig
     private var backgroundTaskId: UIBackgroundTaskIdentifier = .invalid
     private var dispatchTimer: Timer?
-    private let dispatchQueue = DispatchQueue(label: Constants.queueLabel, qos: .background)
+    private let dispatchQueue = DispatchQueue(label: "com.optimove.track")
 
     private var isDispatching: Bool {
         get {
