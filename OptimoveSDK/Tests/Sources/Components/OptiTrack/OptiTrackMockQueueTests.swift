@@ -4,7 +4,7 @@ import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
 
-final class OptiTrackComponentTests: OptimoveTestCase {
+final class OptiTrackMockQueueTests: OptimoveTestCase {
 
     var optitrack: OptiTrack!
     var dateProvider = MockDateTimeProvider()
@@ -71,5 +71,4 @@ final class OptiTrackComponentTests: OptimoveTestCase {
         try optitrack.handle(.dispatchNow)
         wait(for: [networkExpectation], timeout: defaultTimeout + dispatchInterval)
     }
-
 }

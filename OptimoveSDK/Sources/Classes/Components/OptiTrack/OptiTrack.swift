@@ -10,7 +10,7 @@ typealias OptistreamNetworking = OptimoveCore.OptistreamNetworking
 
 final class OptiTrack {
 
-    private struct Constants {
+    struct Constants {
         static let eventBatchLimit = 50
     }
 
@@ -27,21 +27,7 @@ final class OptiTrack {
     private var dispatchTimer: Timer?
     private let dispatchQueue = DispatchQueue(label: "com.optimove.track")
 
-    private var isDispatching: Bool {
-        get {
-            var name = false
-            dispatchQueue.sync {
-                name = thread_unsafe_isDispatching
-            }
-            return name
-        }
-        set {
-            dispatchQueue.sync {
-                self.thread_unsafe_isDispatching = newValue
-            }
-        }
-    }
-    private var thread_unsafe_isDispatching = false
+    private var isDispatching: Bool = false
 
     init(
         queue: OptistreamQueue,
@@ -128,7 +114,7 @@ private extension OptiTrack {
 
     @objc func dispatch() {
         guard !Thread.isMainThread else {
-            DispatchQueue.global().async {
+            dispatchQueue.async {
                 self.dispatch()
             }
             return

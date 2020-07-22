@@ -32,8 +32,11 @@ final class OptistreamQueueImpl {
         do {
             self.queueType = queueType
             self.container = container
-            try container.loadPersistentStores(storeName: "\(Constants.Store.name)-\(tenant)")
+            try container.loadPersistentStores(
+                storeName: "\(Constants.Store.name)-\(tenant)"
+            )
             context = container.newBackgroundContext()
+            context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyStoreTrumpMergePolicyType)
         } catch {
             Logger.error(error.localizedDescription)
             throw error
@@ -90,7 +93,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func enqueue(events: [OptistreamEvent]) {
-        context.perform {
+        context.performAndWait {
             events.forEach { event in
                 tryCatch {
                     _ = try EventCD.insert(into: self.context, event: event, of: self.queueType)
@@ -130,8 +133,13 @@ extension OptistreamQueueImpl: OptistreamQueue {
         context.performAndWait {
             let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: EventCD.entityName)
             fetch.predicate = predicate
-            let request = NSBatchDeleteRequest(fetchRequest: fetch)
-            _ = try? self.context.execute(request)
+            tryCatch {
+                let results: [NSManagedObject] = try cast(try context.fetch(fetch))
+                results.forEach({ (object) in
+                    context.delete(object)
+                })
+            }
+
         }
     }
 }

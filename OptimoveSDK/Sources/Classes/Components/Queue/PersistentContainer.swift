@@ -11,6 +11,10 @@ final class PersistentContainer: NSPersistentContainer {
         static let folderName = "com.optimove.sdk.no-backup"
     }
 
+    private var isTesting: Bool {
+        return ProcessInfo.processInfo.arguments.contains("-com.optimove.track.test")
+    }
+
     init(modelName: String = Constants.modelName) {
         let mom = CoreDataModelDescription.makeOptistreamEventModel()
         super.init(name: modelName, managedObjectModel: mom)
@@ -19,6 +23,7 @@ final class PersistentContainer: NSPersistentContainer {
     func loadPersistentStores(storeName: String) throws {
         guard !isThisStoreAlreadyLoaded(storeName: storeName) else { return }
         let persistentStoreDescription = NSPersistentStoreDescription()
+        persistentStoreDescription.type = isTesting ? NSInMemoryStoreType : NSSQLiteStoreType
         persistentStoreDescription.url = try defineStoreURL(storeName: storeName)
         persistentStoreDescription.shouldMigrateStoreAutomatically = true
         persistentStoreDescription.shouldInferMappingModelAutomatically = true

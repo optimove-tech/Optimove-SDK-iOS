@@ -106,6 +106,9 @@ targets:
   OptimoveSDK-Unit:
     type: bundle.unit-test
     platform: iOS
+    scheme: 
+        commandLineArguments:
+          "-com.optimove.track.test": true
     sources: 
       - path: OptimoveSDK/Tests/
         name: OptimoveSDK-Unit
