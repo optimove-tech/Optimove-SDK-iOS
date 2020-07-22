@@ -103,19 +103,15 @@ extension Optimove {
     /// - Parameters:
     ///   - sdkId: The user unique identifier.
     ///   - email: The user email.
-    @objc public func registerUser(sdkId: String, email: String) {
+    @objc public func registerUser(sdkId userID: String, email: String) {
         let function: (ServiceLocator) -> Void = { serviceLocator in
             tryCatch {
-                let setUserIdEvent = try self._setUserId(sdkId, serviceLocator)
+                let setUserIdEvent = try self._setUserId(userID, serviceLocator)
                 let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
-                let validationResult = UserIDValidator(storage: serviceLocator.storage()).validateNewUserID(sdkId)
-                switch validationResult {
-                case .valid:
-                    serviceLocator.synchronizer().handle(.report(events: [setUserIdEvent, setUserEmailEvent]))
+                if UserIDValidator(storage: serviceLocator.storage()).validateNewUserID(userID) == .valid {
                     serviceLocator.synchronizer().handle(.setInstallation)
-                default:
-                    break
                 }
+                serviceLocator.synchronizer().handle(.report(events: [setUserIdEvent, setUserEmailEvent]))
             }
         }
         container.resolve(function)
