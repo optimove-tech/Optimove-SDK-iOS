@@ -121,21 +121,24 @@ private extension OptiTrack {
     }
 
     @objc func dispatch() {
-        DispatchQueue.global().async { [weak self] in
-            guard let self = self else { return }
-            guard !self.isDispatching else {
-                Logger.debug("Tracker is already dispatching.")
-                return
+        guard !Thread.isMainThread else {
+            DispatchQueue.global().async {
+                self.dispatch()
             }
-            guard !self.queue.isEmpty else {
-                Logger.debug("No need to dispatch. Dispatch queue is empty.")
-                self.stopDispatching()
-                return
-            }
-            Logger.info("Start dispatching events")
-            self.isDispatching = true
-            self.dispatchBatch()
+            return
         }
+        guard !isDispatching else {
+           Logger.debug("Tracker is already dispatching.")
+           return
+        }
+        guard !queue.isEmpty else {
+           Logger.debug("No need to dispatch. Dispatch queue is empty.")
+           stopDispatching()
+           return
+        }
+        Logger.info("Start dispatching events")
+        isDispatching = true
+        dispatchBatch()
     }
 
     func dispatchBatch() {
