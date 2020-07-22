@@ -108,8 +108,14 @@ extension Optimove {
             tryCatch {
                 let setUserIdEvent = try self._setUserId(sdkId, serviceLocator)
                 let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
-                serviceLocator.synchronizer().handle(.report(events: [setUserIdEvent, setUserEmailEvent]))
-                serviceLocator.synchronizer().handle(.setInstallation)
+                let validationResult = UserIDValidator(storage: serviceLocator.storage()).validateNewUserID(sdkId)
+                switch validationResult {
+                case .valid:
+                    serviceLocator.synchronizer().handle(.report(events: [setUserIdEvent, setUserEmailEvent]))
+                    serviceLocator.synchronizer().handle(.setInstallation)
+                default:
+                    break
+                }
             }
         }
         container.resolve(function)
@@ -123,7 +129,9 @@ extension Optimove {
             tryCatch {
                 let event = try self._setUserId(userID, serviceLocator)
                 serviceLocator.synchronizer().handle(.report(events: [event]))
-                serviceLocator.synchronizer().handle(.setInstallation)
+                if UserIDValidator(storage: serviceLocator.storage()).validateNewUserID(userID) == .valid {
+                    serviceLocator.synchronizer().handle(.setInstallation)
+                }
             }
         }
         container.resolve(function)
