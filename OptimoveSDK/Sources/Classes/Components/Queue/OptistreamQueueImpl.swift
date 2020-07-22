@@ -127,7 +127,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     func remove(events: [OptistreamEvent]) {
         let uuidStrings = events.map { $0.metadata.eventId }
         let predicate = EventCD.queueTypeAndUuidsPredicate(uuidStrings: uuidStrings, queueType: queueType)
-        context.performChanges {
+        context.performAndWait {
             let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: EventCD.entityName)
             fetch.predicate = predicate
             let request = NSBatchDeleteRequest(fetchRequest: fetch)
