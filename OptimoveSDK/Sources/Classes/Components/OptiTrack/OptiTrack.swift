@@ -26,23 +26,23 @@ final class OptiTrack {
     private let configuration: OptitrackConfig
     private var backgroundTaskId: UIBackgroundTaskIdentifier = .invalid
     private var dispatchTimer: Timer?
-    private let dispatchQueue = DispatchQueue(label: Constants.queueLabel, qos: .default, attributes: .concurrent)
+    private let dispatchQueue = DispatchQueue(label: Constants.queueLabel, qos: .background)
 
     private var isDispatching: Bool {
         get {
             var name = false
             dispatchQueue.sync {
-                name = private_isDispatching
+                name = thread_unsafe_isDispatching
             }
             return name
         }
         set {
-            dispatchQueue.async(flags: .barrier) {
-                self.private_isDispatching = newValue
+            dispatchQueue.sync {
+                self.thread_unsafe_isDispatching = newValue
             }
         }
     }
-    private var private_isDispatching = false
+    private var thread_unsafe_isDispatching = false
 
     init(
         queue: OptistreamQueue,
@@ -53,6 +53,10 @@ final class OptiTrack {
         self.networking = networking
         self.configuration = configuration
         startDispatchTimer()
+    }
+
+    deinit {
+        stopDispatchTimer()
     }
 
     private func startBackgroundTask() {
@@ -74,17 +78,14 @@ extension OptiTrack: OptistreamComponent {
     func handle(_ operation: OptistreamOperation) throws {
         switch operation {
         case let .report(events: events):
-            DispatchQueue.global().async { [weak self] in
-                guard let self = self else { return }
-                let events = events.map(self.applyRealtimeMutation)
-                self.queue.enqueue(events: events)
-                if events.map(self.shouldDispatchNow).contains(true) {
-                    self.dispatch()
-                }
+            let events = events.map(applyRealtimeMutation)
+            self.queue.enqueue(events: events)
+            if events.map(shouldDispatchNow).contains(true) {
+                dispatch()
             }
         case .dispatchNow:
-            self.startBackgroundTask()
-            self.dispatch()
+            startBackgroundTask()
+            dispatch()
         }
     }
 
@@ -94,10 +95,7 @@ private extension OptiTrack {
 
     func startDispatchTimer() {
         guard dispatchInterval > 0  else { return }
-        if let dispatchTimer = dispatchTimer {
-            dispatchTimer.invalidate()
-            self.dispatchTimer = nil
-        }
+        stopDispatchTimer()
         dispatchTimer = Timer(
             timeInterval: self.dispatchInterval,
             target: self,
@@ -106,7 +104,16 @@ private extension OptiTrack {
             repeats: false
         )
         if let dispatchTimer = dispatchTimer {
-            RunLoop.main.add(dispatchTimer, forMode: RunLoop.Mode.common)
+            DispatchQueue.main.async {
+                RunLoop.main.add(dispatchTimer, forMode: RunLoop.Mode.common)
+            }
+        }
+    }
+
+    func stopDispatchTimer() {
+        if let dispatchTimer = dispatchTimer {
+            dispatchTimer.invalidate()
+            self.dispatchTimer = nil
         }
     }
 
@@ -144,7 +151,7 @@ private extension OptiTrack {
     func dispatchBatch() {
         let events = queue.first(limit: Constants.eventBatchLimit)
         guard !events.isEmpty else {
-            self.stopDispatching()
+            stopDispatching()
             Logger.info("Finished dispatching events")
             return
         }
