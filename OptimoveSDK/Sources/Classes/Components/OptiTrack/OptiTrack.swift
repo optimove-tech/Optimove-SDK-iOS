@@ -61,16 +61,19 @@ final class OptiTrack {
 extension OptiTrack: OptistreamComponent {
 
     func handle(_ operation: OptistreamOperation) throws {
-        switch operation {
-        case let .report(events: events):
-            let events = events.map(applyRealtimeMutation)
-            self.queue.enqueue(events: events)
-            if events.map(shouldDispatchNow).contains(true) {
-                dispatch()
+        dispatchQueue.async { [weak self] in
+            guard let self = self else { return }
+            switch operation {
+            case let .report(events: events):
+                let events = events.map(self.applyRealtimeMutation)
+                self.queue.enqueue(events: events)
+                if events.map(self.shouldDispatchNow).contains(true) {
+                    self.dispatch()
+                }
+            case .dispatchNow:
+                self.startBackgroundTask()
+                self.dispatch()
             }
-        case .dispatchNow:
-            startBackgroundTask()
-            dispatch()
         }
     }
 
