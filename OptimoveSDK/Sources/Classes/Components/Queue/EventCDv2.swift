@@ -4,16 +4,17 @@
 import Foundation
 import CoreData
 
-@objc(EventCD)
-final class EventCD: NSManagedObject {
+@objc(EventCDv2)
+/// The Event – Core Data managed object
+final class EventCDv2: NSManagedObject {
 
     static func insert(
         into context: NSManagedObjectContext,
         event: OptistreamEvent,
         of type: OptistreamQueueType
-    ) throws -> EventCD {
-        let eventCD: EventCD = try context.insertObject()
-        eventCD.uuid = event.metadata.eventId
+    ) throws -> EventCDv2 {
+        let eventCD: EventCDv2 = try context.insertObject()
+        eventCD.eventId = event.metadata.eventId
         eventCD.data = try JSONEncoder().encode(event)
         eventCD.type = type.rawValue
         eventCD.creationDate = Date()
@@ -21,38 +22,38 @@ final class EventCD: NSManagedObject {
     }
 }
 
-extension EventCD {
+extension EventCDv2 {
 
-    @NSManaged fileprivate(set) var uuid: String
+    @NSManaged fileprivate(set) var eventId: String
     @NSManaged fileprivate(set) var creationDate: Date
     @NSManaged fileprivate(set) var data: Data
     @NSManaged fileprivate(set) var type: String
 
 }
 
-extension EventCD: Managed {
+extension EventCDv2: Managed {
 
     static var entityName: String {
-        return "EventCD"
+        return "EventCD2"
     }
 
     static var defaultSortDescriptors: [NSSortDescriptor] {
-        return [NSSortDescriptor(keyPath: \EventCD.creationDate, ascending: true)]
+        return [NSSortDescriptor(keyPath: \EventCDv2.creationDate, ascending: true)]
     }
 
 }
 
-extension EventCD {
+extension EventCDv2 {
 
     static func queueTypePredicate(queueType: OptistreamQueueType) -> NSPredicate {
-        return NSPredicate(format: "%K == %@", #keyPath(EventCD.type), queueType.rawValue)
+        return NSPredicate(format: "%K == %@", #keyPath(EventCDv2.type), queueType.rawValue)
     }
 
-    static func queueTypeAndUuidsPredicate(uuidStrings: [String], queueType: OptistreamQueueType) -> NSPredicate {
+    static func queueTypeAndEventIdsPredicate(eventIds: [String], queueType: OptistreamQueueType) -> NSPredicate {
         return NSPredicate(
             format: "(%K IN %@) AND (%K == %@)",
-            #keyPath(EventCD.uuid), uuidStrings,
-            #keyPath(EventCD.type), queueType.rawValue
+            #keyPath(EventCDv2.eventId), eventIds,
+            #keyPath(EventCDv2.type), queueType.rawValue
         )
     }
 }

@@ -10,14 +10,16 @@ struct CoreDataAttributeDescription {
         type: NSAttributeType,
         isOptional: Bool = false,
         defaultValue: Any? = nil,
-        isIndexedBySpotlight: Bool = false
+        isIndexedBySpotlight: Bool = false,
+        versionHashModifier: String? = nil
     ) -> CoreDataAttributeDescription {
         return CoreDataAttributeDescription(
             name: name,
             attributeType: type,
             isOptional: isOptional,
             defaultValue: defaultValue,
-            isIndexedBySpotlight: isIndexedBySpotlight
+            isIndexedBySpotlight: isIndexedBySpotlight,
+            versionHashModifier: versionHashModifier
         )
     }
 
@@ -26,6 +28,7 @@ struct CoreDataAttributeDescription {
     var isOptional: Bool
     var defaultValue: Any?
     var isIndexedBySpotlight: Bool
+    var versionHashModifier: String?
 
     func makeAttribute() -> NSAttributeDescription {
         let attribute = NSAttributeDescription()
@@ -34,6 +37,7 @@ struct CoreDataAttributeDescription {
         attribute.isOptional = isOptional
         attribute.defaultValue = defaultValue
         attribute.isIndexedBySpotlight = isIndexedBySpotlight
+        attribute.versionHashModifier = versionHashModifier
 
         return attribute
     }
