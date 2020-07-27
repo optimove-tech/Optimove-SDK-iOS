@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.1.0
+
+- **add** events flow visibility (validation results as a part of an event).
+- **add** `eventId` in the event metadata.
+- **add** CoreData migration.
+- **improve** Notification Service extension - reduce memory consumption.
+- **improve** APNS-token gathering.
+
+## 3.0.1
+
+- **fixed** core data a context concurrency violation.
+
 ## 3.0.0
 
 - **add** a support of the new Optistream events.
