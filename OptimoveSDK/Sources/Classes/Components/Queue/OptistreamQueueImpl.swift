@@ -85,7 +85,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     var isEmpty: Bool {
         do {
             return try context.performAndWait {
-                return try context.count(for: EventCD.sortedFetchRequest) == 0
+                return try context.count(for: EventCDv2.sortedFetchRequest) == 0
             }
         } catch {
             return true
@@ -96,7 +96,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
         context.performAndWait {
             events.forEach { event in
                 tryCatch {
-                    _ = try EventCD.insert(into: self.context, event: event, of: self.queueType)
+                    _ = try EventCDv2.insert(into: self.context, event: event, of: self.queueType)
                 }
             }
         }
@@ -105,15 +105,17 @@ extension OptistreamQueueImpl: OptistreamQueue {
     func first(limit: Int) -> [OptistreamEvent] {
         do {
             return try context.performAndWait {
-                let events = try EventCD.fetch(in: context) { request in
-                    request.predicate = EventCD.queueTypePredicate(queueType: queueType)
-                    request.sortDescriptors = EventCD.defaultSortDescriptors
+                let events = try EventCDv2.fetch(in: context) { request in
+                    request.predicate = EventCDv2.queueTypePredicate(queueType: queueType)
+                    request.sortDescriptors = EventCDv2.defaultSortDescriptors
                     request.fetchLimit = limit
                     request.returnsObjectsAsFaults = false
                 }
                 return events.compactMap { event in
                     do {
-                        return try JSONDecoder().decode(OptistreamEvent.self, from: event.data)
+                        let optistreamEvent = try JSONDecoder().decode(OptistreamEvent.self, from:
+                            event.data)
+                        return optistreamEvent
                     } catch {
                         Logger.error(error.localizedDescription)
                         return nil
@@ -128,10 +130,10 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func remove(events: [OptistreamEvent]) {
-        let uuidStrings = events.map { $0.metadata.eventId }
-        let predicate = EventCD.queueTypeAndUuidsPredicate(uuidStrings: uuidStrings, queueType: queueType)
+        let eventIds = events.map { $0.metadata.eventId }
+        let predicate = EventCDv2.queueTypeAndEventIdsPredicate(eventIds: eventIds, queueType: queueType)
         context.performAndWait {
-            let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: EventCD.entityName)
+            let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: EventCDv2.entityName)
             fetch.predicate = predicate
             tryCatch {
                 let results: [NSManagedObject] = try cast(try context.fetch(fetch))

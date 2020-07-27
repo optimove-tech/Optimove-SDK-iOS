@@ -44,7 +44,7 @@ class OptitrackTests: OptimoveTestCase {
         self.builder = nil
     }
     
-    func test_load_realtime() throws {
+    func disabled_test_load_realtime() throws {
         prefillStorageAsCustomer()
         let events: [Event] = Array(repeating: 1, count: 102).map { _ in
             let event = StubEvent()
@@ -54,7 +54,7 @@ class OptitrackTests: OptimoveTestCase {
         try test(events)
     }
 
-    func test_load() throws {
+    func disabled_test_load() throws {
         prefillStorageAsCustomer()
         let events = Array(repeating: 1, count: 90).map { _ in StubEvent() }
         try test(events)
