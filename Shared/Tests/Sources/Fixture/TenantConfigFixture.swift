@@ -38,7 +38,6 @@ final class TenantConfigFixture {
 
     func tenantOptipushConfigFixture() -> TenantOptipushConfig {
         return TenantOptipushConfig(
-            pushTopicsRegistrationEndpoint: StubVariables.url,
             enableAdvertisingIdReport: StubVariables.bool
         )
     }

@@ -67,8 +67,7 @@ private extension ConfigurationBuilder {
     func buildOptipushConfig() -> OptipushConfig {
         return OptipushConfig(
             tenantID: tenantConfig.optitrack.siteId,
-            mbaasEndpoint: globalConfig.optipush.mbaasEndpoint,
-            pushTopicsRegistrationEndpoint: tenantConfig.optipush.pushTopicsRegistrationEndpoint
+            mbaasEndpoint: globalConfig.optipush.mbaasEndpoint
         )
     }
 

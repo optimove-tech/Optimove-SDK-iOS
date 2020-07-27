@@ -98,15 +98,12 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
 public struct OptipushConfig: Codable, TenantInfo {
     public let tenantID: Int
     public let mbaasEndpoint: URL
-    public let pushTopicsRegistrationEndpoint: URL
 
     public init(
         tenantID: Int,
-        mbaasEndpoint: URL,
-        pushTopicsRegistrationEndpoint: URL) {
+        mbaasEndpoint: URL) {
         self.tenantID = tenantID
         self.mbaasEndpoint = mbaasEndpoint
-        self.pushTopicsRegistrationEndpoint = pushTopicsRegistrationEndpoint
     }
 }
 
