@@ -30,10 +30,10 @@ class OptimoveNotificationServiceExtensionTests: OptimoveTestCase, FileAccessibl
         )
 
         // make content
-        let content: UNMutableNotificationContent = UNMutableNotificationContent()
+        let content = UNMutableNotificationContent()
         content.body = payload.content
         content.title = payload.title ?? ""
-        content.userInfo = try JSONSerialization.jsonObject(with: data, options: []) as! [AnyHashable : Any]
+        content.userInfo = try JSONSerialization.jsonObject(with: data, options: []) as! [AnyHashable: Any]
 
         // make request
         let request = UNNotificationRequest(

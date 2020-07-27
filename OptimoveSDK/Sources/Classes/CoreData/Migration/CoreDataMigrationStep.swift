@@ -36,7 +36,7 @@ struct CoreDataMigrationStep {
         destinationVersion: CoreDataMigrationVersion
     ) -> NSMappingModel? {
         guard let customMapping = CoreDataCustomMappingModelFactory.make(for: destinationVersion) else {
-            return inferredMappingModel(fromSourceModel:sourceModel, toDestinationModel: destinationModel)
+            return inferredMappingModel(fromSourceModel: sourceModel, toDestinationModel: destinationModel)
         }
         return customMapping
     }

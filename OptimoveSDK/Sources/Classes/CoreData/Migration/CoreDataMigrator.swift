@@ -94,7 +94,7 @@ final class CoreDataMigrator: CoreDataMigratorProtocol {
             let options = [NSSQLitePragmasOption: ["journal_mode": "DELETE"]]
             let store = try persistentStoreCoordinator.addPersistentStore(at: storeURL, options: options)
             try persistentStoreCoordinator.remove(store)
-        } catch let error {
+        } catch {
             Logger.error("failed to force WAL checkpointing, error: \(error)")
             throw error
         }
@@ -103,7 +103,7 @@ final class CoreDataMigrator: CoreDataMigratorProtocol {
 
 private extension CoreDataMigrationVersion {
 
-    static func compatibleVersionForStoreMetadata(_ metadata: [String : Any]) -> CoreDataMigrationVersion? {
+    static func compatibleVersionForStoreMetadata(_ metadata: [String: Any]) -> CoreDataMigrationVersion? {
         let compatibleVersion = CoreDataMigrationVersion.allCases.first { version in
             let model = CoreDataModelDescription.makeOptistreamEventModel(version: version)
 
@@ -142,13 +142,13 @@ extension NSPersistentStoreCoordinator {
 
     // MARK: - Meta
 
-    static func metadata(at storeURL: URL) throws -> [String : Any]  {
+    static func metadata(at storeURL: URL) throws -> [String: Any] {
         return try NSPersistentStoreCoordinator.metadataForPersistentStore(ofType: NSSQLiteStoreType, at: storeURL, options: nil)
     }
 
     // MARK: - Add
 
-    func addPersistentStore(at storeURL: URL, options: [AnyHashable : Any]) throws -> NSPersistentStore {
+    func addPersistentStore(at storeURL: URL, options: [AnyHashable: Any]) throws -> NSPersistentStore {
         do {
             return try addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: options)
         } catch {

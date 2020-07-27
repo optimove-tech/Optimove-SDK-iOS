@@ -64,7 +64,7 @@ final class ParametersDecorator: Node {
         eventConfig: EventsConfig,
         limit: Int
     ) -> Event {
-        let defaultParameters: [String : Any] = [
+        let defaultParameters: [String: Any] = [
             Constants.Key.eventNativeMobile: Constants.Value.eventNativeMobile,
             Constants.Key.eventOs: Constants.Value.eventOs,
             Constants.Key.eventDeviceType: Constants.Value.eventDeviceType,

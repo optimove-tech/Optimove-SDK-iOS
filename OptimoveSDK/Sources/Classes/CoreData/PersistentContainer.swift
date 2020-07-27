@@ -79,7 +79,7 @@ final class PersistentContainer: NSPersistentContainer {
     private func isThisStoreAlreadyLoaded(storeName: String) -> Bool {
         return !persistentStoreDescriptions.compactMap { psd in
             return psd.url?.deletingPathExtension().lastPathComponent
-        }.filter { $0 == storeName}.isEmpty
+        }.filter { $0 == storeName }.isEmpty
     }
 }
 

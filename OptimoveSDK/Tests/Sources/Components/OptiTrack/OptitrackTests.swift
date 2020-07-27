@@ -1,6 +1,5 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-
 import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
@@ -43,7 +42,7 @@ class OptitrackTests: OptimoveTestCase {
         self.networking = nil
         self.builder = nil
     }
-    
+
     func disabled_test_load_realtime() throws {
         prefillStorageAsCustomer()
         let events: [Event] = Array(repeating: 1, count: 102).map { _ in
@@ -72,7 +71,7 @@ class OptitrackTests: OptimoveTestCase {
             "do not generate right amount of batches \(batchTimes)"
         )
         batchExpectation.expectedFulfillmentCount = batchTimes
-        var eventIds: [String] = [];
+        var eventIds: [String] = []
         networking.assetEventsFunction = { (events, completion) -> Void in
             events.enumerated().forEach { event in
                 let eventId = event.element.metadata.eventId

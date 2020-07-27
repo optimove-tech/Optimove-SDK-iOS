@@ -44,7 +44,7 @@ final class EventCDv1ToEventCDv2MigrationPolicy: NSEntityMigrationPolicy {
 
 }
 
-fileprivate struct MigrationSource_OptistreamEvent_v1: Codable {
+private struct MigrationSource_OptistreamEvent_v1: Codable {
     public let tenant: Int
     public let category: String
     public let event: String

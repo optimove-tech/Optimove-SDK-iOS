@@ -36,7 +36,7 @@ extension LocationServiceImpl: LocationService {
 final class LocationServiceImpl {
 
     private let locationManager = CLLocationManager()
-    private let preferredLocale: Locale = Locale(identifier: "en_US_POSIX")
+    private let preferredLocale = Locale(identifier: "en_US_POSIX")
     private let descriptionKeys: [String] = [
         "NSLocationAlwaysUsageDescription",
         "NSLocationWhenInUseUsageDescription"
@@ -91,7 +91,7 @@ final class LocationServiceImpl {
                 return
             }
             func findLocality() -> String? {
-                return placemarks?.filter{ $0.locality != nil }.first?.locality
+                return placemarks?.filter { $0.locality != nil }.first?.locality
             }
             switch findLocality() {
             case Optional.none:

@@ -248,15 +248,15 @@ enum ValidationError: LocalizedError, Equatable {
 
     var status: Int {
          switch self {
-         case .undefinedName: return 1010
-         case .limitOfParameters: return 1020
-         case .undefinedParameter: return 1030
-         case .undefinedMandatoryParameter: return 1040
-         case .limitOfCharacters: return 1050
-         case .wrongType: return 1060
-         case .invalidUserId: return 1070
-         case .tooLongUserId: return 1071
-         case .invalidEmail: return 1080
+         case .undefinedName: return 1_010
+         case .limitOfParameters: return 1_020
+         case .undefinedParameter: return 1_030
+         case .undefinedMandatoryParameter: return 1_040
+         case .limitOfCharacters: return 1_050
+         case .wrongType: return 1_060
+         case .invalidUserId: return 1_070
+         case .tooLongUserId: return 1_071
+         case .invalidEmail: return 1_080
          }
      }
 

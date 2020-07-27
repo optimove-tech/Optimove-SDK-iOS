@@ -41,7 +41,6 @@ final class OptiTrackMockQueueTests: OptimoveTestCase {
         prefillStorageAsVisitor()
         let stubEvent = StubOptistreamEvent
 
-
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
         networking.assetEventsFunction = { (events, completion) -> Void in
