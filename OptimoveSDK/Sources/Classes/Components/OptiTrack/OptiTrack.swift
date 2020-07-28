@@ -82,23 +82,34 @@ extension OptiTrack: OptistreamComponent {
 private extension OptiTrack {
 
     func startDispatchTimer() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.sync {
+                self.startDispatchTimer()
+            }
+            return
+        }
         guard dispatchInterval > 0  else { return }
         stopDispatchTimer()
-        dispatchTimer = Timer(
-            timeInterval: self.dispatchInterval,
-            target: self,
-            selector: #selector(dispatch),
-            userInfo: nil,
-            repeats: false
-        )
-        if let dispatchTimer = dispatchTimer {
-            DispatchQueue.main.async {
-                RunLoop.main.add(dispatchTimer, forMode: RunLoop.Mode.common)
-            }
+        /// Dispatching asynchronous to break the retain cycle
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.dispatchTimer = Timer.scheduledTimer(
+                timeInterval: self.dispatchInterval,
+                target: self,
+                selector: #selector(self.dispatch),
+                userInfo: nil,
+                repeats: false
+            )
         }
     }
 
     func stopDispatchTimer() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.sync {
+                self.startDispatchTimer()
+            }
+            return
+        }
         if let dispatchTimer = dispatchTimer {
             dispatchTimer.invalidate()
             self.dispatchTimer = nil
@@ -145,19 +156,21 @@ private extension OptiTrack {
         }
         networking.send(events: events) { [weak self] (result) in
             guard let self = self else { return }
-            switch result {
-            case .success:
-                self.queue.remove(events: events)
-                self.dispatchBatch()
-            case .failure(let error):
-                Logger.error(error.localizedDescription)
-                switch error {
-                case .requestInvalid:
+            self.dispatchQueue.async {
+                switch result {
+                case .success:
                     self.queue.remove(events: events)
-                default:
-                    break
+                    self.dispatchBatch()
+                case .failure(let error):
+                    Logger.error(error.localizedDescription)
+                    switch error {
+                    case .requestInvalid:
+                        self.queue.remove(events: events)
+                    default:
+                        break
+                    }
+                    self.stopDispatching()
                 }
-                self.stopDispatching()
             }
         }
     }
