@@ -93,13 +93,16 @@ private extension OptiTrack {
         /// Dispatching asynchronous to break the retain cycle
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.dispatchTimer = Timer.scheduledTimer(
+            let timer = Timer.scheduledTimer(
                 timeInterval: self.dispatchInterval,
                 target: self,
                 selector: #selector(self.dispatch),
                 userInfo: nil,
                 repeats: false
             )
+            timer.tolerance = 0.2
+            RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
+            self.dispatchTimer = timer
         }
     }
 
