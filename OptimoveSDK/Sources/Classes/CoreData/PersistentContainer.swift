@@ -44,7 +44,10 @@ final class PersistentContainer: NSPersistentContainer {
         guard !isThisStoreAlreadyLoaded(storeName: storeName) else { return }
         let persistentStoreDescription = NSPersistentStoreDescription()
         persistentStoreDescription.type = storeType.coreDataValue
-        persistentStoreDescription.url = try defineStoreURL(storeName: storeName)
+        persistentStoreDescription.url = try FileManager.default.defineStoreURL(
+            folderName: Constants.folderName,
+            storeName: storeName
+        )
         persistentStoreDescription.shouldMigrateStoreAutomatically = false
         persistentStoreDescription.shouldInferMappingModelAutomatically = false
         self.persistentStoreDescriptions = [persistentStoreDescription]
@@ -66,7 +69,11 @@ final class PersistentContainer: NSPersistentContainer {
 
         if migrator.requiresMigration(at: storeURL, toVersion: CoreDataMigrationVersion.current) {
             DispatchQueue.global(qos: .userInitiated).async {
-                try? self.migrator.migrateStore(at: storeURL, toVersion: CoreDataMigrationVersion.current)
+                do {
+                    try self.migrator.migrateStore(at: storeURL, toVersion: CoreDataMigrationVersion.current)
+                } catch {
+                    Logger.error(error.localizedDescription)
+                }
                 DispatchQueue.main.async {
                     completion()
                 }
@@ -81,25 +88,21 @@ final class PersistentContainer: NSPersistentContainer {
             return psd.url?.deletingPathExtension().lastPathComponent
         }.filter { $0 == storeName }.isEmpty
     }
-}
-
-private extension PersistentContainer {
-
-    func defineStoreURL(storeName: String) throws -> URL {
-        let fileManager = FileManager.default
-        let libraryDirectory = try unwrap(fileManager.urls(for: .libraryDirectory, in: .userDomainMask).first)
-        let libraryStoreDirectoryURL = try unwrap(libraryDirectory.appendingPathComponent(Constants.folderName))
-        let storeURL = try unwrap(libraryStoreDirectoryURL.appendingPathComponent("\(storeName).sqlite"))
-        guard !fileManager.directoryExists(atUrl: libraryStoreDirectoryURL, isDirectory: true) else {
-            return try fileManager.addSkipBackupAttributeToItemAtURL(url: storeURL)
-        }
-        try fileManager.createDirectory(at: libraryStoreDirectoryURL, withIntermediateDirectories: true)
-        return try fileManager.addSkipBackupAttributeToItemAtURL(url: storeURL)
-    }
 
 }
 
 extension FileManager {
+
+    func defineStoreURL(folderName: String, storeName: String) throws -> URL {
+        let libraryDirectory = try unwrap(self.urls(for: .libraryDirectory, in: .userDomainMask).first)
+        let libraryStoreDirectoryURL = try unwrap(libraryDirectory.appendingPathComponent(folderName))
+        let storeURL = try unwrap(libraryStoreDirectoryURL.appendingPathComponent("\(storeName).sqlite"))
+        guard !self.directoryExists(atUrl: libraryStoreDirectoryURL, isDirectory: true) else {
+            return try self.addSkipBackupAttributeToItemAtURL(url: storeURL)
+        }
+        try self.createDirectory(at: libraryStoreDirectoryURL, withIntermediateDirectories: true)
+        return try self.addSkipBackupAttributeToItemAtURL(url: storeURL)
+    }
 
     func addSkipBackupAttributeToItemAtURL(url: URL) throws -> URL {
         guard self.directoryExists(atUrl: url, isDirectory: false) else {
