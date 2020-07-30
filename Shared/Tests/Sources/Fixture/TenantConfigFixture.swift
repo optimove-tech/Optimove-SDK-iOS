@@ -23,7 +23,6 @@ final class TenantConfigFixture {
 
     func tenantRealtimeConfigFixture() -> TenantRealtimeConfig {
         return TenantRealtimeConfig(
-            realtimeToken: "realtimeToken",
             realtimeGateway: StubVariables.url
         )
     }

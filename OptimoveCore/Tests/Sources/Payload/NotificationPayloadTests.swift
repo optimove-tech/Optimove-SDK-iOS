@@ -24,12 +24,12 @@ class NotificationPayloadTests: XCTestCase, FileAccessible {
         }
     }
 
-    func test_decode_deep_link_personalization_values() {
-        fileName = "notificationWithDeepLinkPersonalizationValues.json"
+    func test_decode_deeplink() {
+        fileName = "notificationWithCampaignDetails.json"
 
         tryDecode {
             let payload = try JSONDecoder().decode(NotificationPayload.self, from: data)
-            XCTAssert(payload.deepLinkPersonalization != nil)
+            XCTAssert(payload.deepLink != nil)
         }
     }
 

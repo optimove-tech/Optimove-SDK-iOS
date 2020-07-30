@@ -13,7 +13,7 @@ class MockKeyValueStorage: KeyValueStorage {
     }
 
     func value(for key: StorageKey) -> Any? {
-        return state[key]
+        return state[key] ?? nil
     }
 
     subscript<T>(key: StorageKey) -> T? {
