@@ -47,20 +47,17 @@ public struct LoggerConfig: Codable, TenantInfo {
 
 public struct RealtimeConfig: Codable, TenantInfo, EventInfo {
     public let tenantID: Int
-    public let realtimeToken: String
     public let realtimeGateway: URL
     public let events: [String: EventsConfig]
     public let isEnableRealtimeThroughOptistream: Bool
 
     public init(
         tenantID: Int,
-        realtimeToken: String,
         realtimeGateway: URL,
         events: [String: EventsConfig],
         isEnableRealtimeThroughOptistream: Bool
     ) {
         self.tenantID = tenantID
-        self.realtimeToken = realtimeToken
         self.realtimeGateway = realtimeGateway
         self.events = events
         self.isEnableRealtimeThroughOptistream = isEnableRealtimeThroughOptistream

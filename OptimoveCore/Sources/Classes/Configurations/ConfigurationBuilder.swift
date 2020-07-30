@@ -45,7 +45,6 @@ private extension ConfigurationBuilder {
     func buildRealtimeConfig() -> RealtimeConfig {
         return RealtimeConfig(
             tenantID: tenantConfig.optitrack.siteId,
-            realtimeToken: tenantConfig.realtime.realtimeToken,
             realtimeGateway: tenantConfig.realtime.realtimeGateway,
             events: events,
             isEnableRealtimeThroughOptistream: tenantConfig.isEnableRealtimeThroughOptistream
