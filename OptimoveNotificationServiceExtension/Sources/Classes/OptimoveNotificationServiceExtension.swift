@@ -92,13 +92,6 @@ import OptimoveCore
             self.contentHandler = contentHandler
 
             let operations = [
-                DeeplinkExtracter(
-                    bundleIdentifier: bundleIdentifier,
-                    notificationPayload: payload,
-                    completionHandler: { [weak self] urlString in
-                        self?.bestAttemptContent?.userInfo[DeeplinkExtracter.Constants.dynamicLinksKey] = urlString
-                    }
-                ),
                 NotificationDeliveryReporter(
                     bundleIdentifier: bundleIdentifier,
                     notificationPayload: payload,
@@ -165,8 +158,7 @@ extension OptimoveNotificationServiceExtension {
     func verifyAndCreatePayload(_ request: UNNotificationRequest) throws -> NotificationPayload {
         let userInfo = request.content.userInfo
         let data = try JSONSerialization.data(withJSONObject: userInfo)
-        let decoder = JSONDecoder()
-        return try decoder.decode(NotificationPayload.self, from: data)
+        return try JSONDecoder().decode(NotificationPayload.self, from: data)
     }
 
     func createBestAttemptContent(request: UNNotificationRequest,

@@ -7,8 +7,7 @@ import Foundation
 public struct NotificationPayload: Decodable {
     public let title: String?
     public let content: String
-    public let dynamicLinks: DynamicLinks?
-    public let deepLinkPersonalization: DeeplinkPersonalization?
+    public let deepLink: URL?
     public let campaign: NotificationCampaignContainer?
     public let isOptipush: Bool
     public let media: MediaAttachment?
@@ -16,8 +15,7 @@ public struct NotificationPayload: Decodable {
     enum CodingKeys: String, CodingKey {
         case title
         case content
-        case dynamicLinks = "dynamic_links"
-        case deepLinkPersonalization = "deep_link_personalization_values"
+        case deepLink = "dl"
         case campaign
         case isOptipush = "is_optipush"
         case media
@@ -28,8 +26,7 @@ public struct NotificationPayload: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.title = try container.decodeIfPresent(String.self, forKey: .title)
         self.content = try container.decode(String.self, forKey: .content)
-        self.dynamicLinks = try? DynamicLinks(firebaseFrom: decoder)
-        self.deepLinkPersonalization = try? DeeplinkPersonalization(firebaseFrom: decoder)
+        self.deepLink = try? DeepLink(firebaseFrom: decoder).url
         self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder)
         self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
         self.media = try? MediaAttachment(firebaseFrom: decoder)
@@ -75,31 +72,19 @@ public struct NotificationCampaignContainer {
 
 }
 
-public struct DeeplinkPersonalization: Decodable {
-    public let values: [String: String]
+// MARK: - Deep link
 
-    /// The custom decoder does preprocess before the primary decoder.
+public struct DeepLink: Decodable {
+
+    public let url: URL?
+
     init(firebaseFrom decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
-        let string = try container.decode(String.self, forKey: .deepLinkPersonalization)
-        let data: Data = try cast(string.data(using: .utf8))
-        values = try JSONDecoder().decode([String: String].self, from: data)
-    }
-}
-
-// MARK: - Dynamic links
-
-public struct DynamicLinks: Decodable {
-    public let ios: [String: URL]?
-
-    /// The custom decoder does preprocess before the primary decoder.
-    init(firebaseFrom decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
-        guard let string = try container.decodeIfPresent(String.self, forKey: .dynamicLinks) else {
-            throw GuardError.custom("Not found value for key \(NotificationPayload.CodingKeys.dynamicLinks.rawValue)")
+        guard let string = try container.decodeIfPresent(String.self, forKey: .deepLink) else {
+            throw GuardError.custom("Not found value for key \(NotificationPayload.CodingKeys.deepLink.rawValue)")
         }
         let data: Data = try cast(string.data(using: .utf8))
-        self = try JSONDecoder().decode(DynamicLinks.self, from: data)
+        self.url = URL(dataRepresentation: data, relativeTo: nil)
     }
 }
 
@@ -133,7 +118,7 @@ public struct MediaAttachment: Decodable {
 /// https://stackoverflow.com/a/44596291
 struct StringCodableMap<Decoded: LosslessStringConvertible>: Codable {
 
-    var decoded: Decoded
+var decoded: Decoded
 
     init(_ decoded: Decoded) {
         self.decoded = decoded

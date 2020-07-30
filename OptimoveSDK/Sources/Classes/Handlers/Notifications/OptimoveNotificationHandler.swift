@@ -20,13 +20,12 @@ final class OptimoveNotificationHandler {
 // MARK: - Private Methods
 private extension OptimoveNotificationHandler {
 
-    func reportNotification(response: UNNotificationResponse) {
-        Logger.info("User react '\(response.actionIdentifier)' to a notification.")
+    func reportNotification(actionIdentifier: String, notification: NotificationPayload) {
         tryCatch {
-            switch response.actionIdentifier {
+            switch actionIdentifier {
             case UNNotificationDefaultActionIdentifier:
                 let task = UIApplication.shared.beginBackgroundTask(withName: "Optimove SDK report notification event")
-                let event = try createEvent(from: response)
+                let event = try createEvent(from: notification)
                 synchronizer.handle(.report(events: [event]))
                 DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(20)) {
                     UIApplication.shared.endBackgroundTask(task)
@@ -37,10 +36,7 @@ private extension OptimoveNotificationHandler {
         }
     }
 
-    func createEvent(from response: UNNotificationResponse) throws -> Event {
-        let notificationDetails = response.notification.request.content.userInfo
-        let data = try JSONSerialization.data(withJSONObject: notificationDetails)
-        let notification = try JSONDecoder().decode(NotificationPayload.self, from: data)
+    func createEvent(from notification: NotificationPayload) throws -> Event {
         guard let campaign = notification.campaign else {
             throw GuardError.custom(
                 """
@@ -56,14 +52,13 @@ private extension OptimoveNotificationHandler {
         )
     }
 
-    func handleDeepLinkDelegation(_ response: UNNotificationResponse) {
-        let userInfo = response.notification.request.content.userInfo
-        guard let dynamicLink = userInfo[OptimoveKeys.Notification.dynamicLink.rawValue] as? String else {
+    func handleDeepLinkDelegation(from notification: NotificationPayload) {
+        guard let deepLink = notification.deepLink else {
             Logger.debug("Notification does not contain a dynamic link.")
             return
         }
         tryCatch {
-            let urlComp = try unwrap(URLComponents(string: dynamicLink))
+            let urlComp = try unwrap(URLComponents(url: deepLink, resolvingAgainstBaseURL: true))
             let params: [String: String]? = urlComp.queryItems?.reduce(into: [String: String](), { (result, next) in
                 result.updateValue(next.value ?? "", forKey: next.name)
             })
@@ -105,17 +100,29 @@ extension OptimoveNotificationHandler: OptimoveNotificationHandling {
         response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        reportNotification(response: response)
-        if isNotificationOpened(response: response) {
-            handleDeepLinkDelegation(response)
+        tryCatch {
+            let actionIdentifier = response.actionIdentifier
+            Logger.info("User react '\(actionIdentifier)' to a notification.")
+            let notification = try verifyAndCreateNotificationPayload(response)
+            reportNotification(actionIdentifier: actionIdentifier, notification: notification)
+            if isNotificationOpened(actionIdentifier: actionIdentifier) {
+                handleDeepLinkDelegation(from: notification)
+            }
         }
         completionHandler()
     }
 }
 
-// MARK: - Helper methods
+
 extension OptimoveNotificationHandler {
-    private func isNotificationOpened(response: UNNotificationResponse) -> Bool {
-        return response.actionIdentifier == UNNotificationDefaultActionIdentifier
+
+    func verifyAndCreateNotificationPayload(_ response: UNNotificationResponse) throws -> NotificationPayload {
+        let notificationDetails = response.notification.request.content.userInfo
+        let data = try JSONSerialization.data(withJSONObject: notificationDetails)
+        return try JSONDecoder().decode(NotificationPayload.self, from: data)
+    }
+
+    func isNotificationOpened(actionIdentifier: String) -> Bool {
+        return actionIdentifier == UNNotificationDefaultActionIdentifier
     }
 }
