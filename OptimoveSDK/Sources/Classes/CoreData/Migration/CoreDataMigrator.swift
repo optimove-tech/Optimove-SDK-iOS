@@ -32,8 +32,10 @@ final class CoreDataMigrator: CoreDataMigratorProtocol {
             let manager = NSMigrationManager(sourceModel: migrationStep.sourceModel, destinationModel: migrationStep.destinationModel)
 
             /// Align managedObjectClassNames. On test this value clould be missed.
-            if manager.destinationModel.entities[0].managedObjectClassName != migrationStep.destinationModel.entities[0].managedObjectClassName {
-                manager.destinationModel.entities[0].managedObjectClassName = migrationStep.destinationModel.entities[0].managedObjectClassName
+            let stepDestinationClassName = migrationStep.destinationModel.entities.first?.managedObjectClassName
+            if stepDestinationClassName != nil,
+                manager.destinationModel.entities.first?.managedObjectClassName != stepDestinationClassName {
+                manager.destinationModel.entities.first?.managedObjectClassName = stepDestinationClassName
             }
 
             let destinationURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent(UUID().uuidString)
