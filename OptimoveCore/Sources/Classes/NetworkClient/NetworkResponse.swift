@@ -21,4 +21,16 @@ public extension NetworkResponse where Body == Data? {
         return data
     }
 
+    var description: String {
+        do {
+            let body = try unwrap()
+            guard let decodedBody = String(data: body, encoding: .utf8) else {
+                return "no body"
+            }
+            return decodedBody
+        } catch {
+            return error.localizedDescription
+        }
+    }
+
 }

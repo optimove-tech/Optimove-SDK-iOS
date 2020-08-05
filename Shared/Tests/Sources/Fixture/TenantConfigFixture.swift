@@ -17,7 +17,8 @@ final class TenantConfigFixture {
             events: createTenantEventFixture(),
             isEnableRealtime: options.isEnableRealtime,
             isSupportedAirship: false,
-            isEnableRealtimeThroughOptistream: options.isEnableRealtimeThroughOptistream
+            isEnableRealtimeThroughOptistream: options.isEnableRealtimeThroughOptistream,
+            isProductionLogsEnabled: false
         )
     }
 

@@ -36,12 +36,15 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
 public struct LoggerConfig: Codable, TenantInfo {
     public let tenantID: Int
     public let logServiceEndpoint: URL
+    public let isProductionLogsEnabled: Bool
 
     public init(
         tenantID: Int,
-        logServiceEndpoint: URL) {
+        logServiceEndpoint: URL,
+        isProductionLogsEnabled: Bool) {
         self.tenantID = tenantID
         self.logServiceEndpoint = logServiceEndpoint
+        self.isProductionLogsEnabled = isProductionLogsEnabled
     }
 }
 

@@ -108,6 +108,7 @@ final class MultiplexLoggerStreamSDKInitializerDependency: SDKInitializerDepende
         MultiplexLoggerStream.mutateStreams(mutator: { (stream) in
             stream.tenantId = configuration.tenantID
             stream.endpoint = configuration.logger.logServiceEndpoint
+            stream.isProductionLogsEnabled = configuration.logger.isProductionLogsEnabled
         })
     }
 
