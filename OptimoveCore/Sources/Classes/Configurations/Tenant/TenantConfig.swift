@@ -4,6 +4,7 @@ public struct TenantConfig: Codable, Equatable {
     public let isSupportedAirship: Bool
     public let isEnableRealtime: Bool
     public let isEnableRealtimeThroughOptistream: Bool
+    public let isProductionLogsEnabled: Bool
     public let realtime: TenantRealtimeConfig
     public var optitrack: TenantOptitrackConfig
     public let optipush: TenantOptipushConfig
@@ -16,7 +17,8 @@ public struct TenantConfig: Codable, Equatable {
         events: [String: EventsConfig],
         isEnableRealtime: Bool,
         isSupportedAirship: Bool,
-        isEnableRealtimeThroughOptistream: Bool
+        isEnableRealtimeThroughOptistream: Bool,
+        isProductionLogsEnabled: Bool
     ) {
         self.realtime = realtime
         self.optitrack = optitrack
@@ -25,15 +27,15 @@ public struct TenantConfig: Codable, Equatable {
         self.isEnableRealtime = isEnableRealtime
         self.isSupportedAirship = isSupportedAirship
         self.isEnableRealtimeThroughOptistream = isEnableRealtimeThroughOptistream
+        self.isProductionLogsEnabled = isProductionLogsEnabled
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         isSupportedAirship = try container.decodeIfPresent(Bool.self, forKey: .supportAirship) ?? false
         isEnableRealtime = try container.decode(Bool.self, forKey: .enableRealtime)
-        isEnableRealtimeThroughOptistream = (
-            try? container.decodeIfPresent(Bool.self, forKey: .enableRealtimeThroughOptistream)
-        ) ?? false
+        isProductionLogsEnabled = try container.decodeIfPresent(Bool.self, forKey: .prodLogsEnabled) ?? false
+        isEnableRealtimeThroughOptistream = try container.decodeIfPresent(Bool.self, forKey: .enableRealtimeThroughOptistream) ?? false
         realtime = try container.decode(TenantRealtimeConfig.self, forKey: .realtime)
         optitrack = try container.decode(TenantOptitrackConfig.self, forKey: .optitrack)
         events = try container.decode([String: EventsConfig].self, forKey: .events)
@@ -57,6 +59,7 @@ public struct TenantConfig: Codable, Equatable {
         case supportAirship
         case enableRealtime
         case enableRealtimeThroughOptistream
+        case prodLogsEnabled
         case realtime = "realtimeMetaData"
         case optitrack = "optitrackMetaData"
         case mobile

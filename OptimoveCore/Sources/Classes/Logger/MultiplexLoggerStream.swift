@@ -9,9 +9,9 @@ public final class MultiplexLoggerStream {
         static let placeholder = ""
     }
 
-    static var outputStreams: [ObjectIdentifier: LoggerStream] = [:]
+    static var streams: [LoggerStream] = []
 
-    private static let logQueue = DispatchQueue(label: "com.optimove.sdk.logger", qos: .background)
+    private static let queue = DispatchQueue(label: "com.optimove.sdk.logger", qos: .background)
 
     public static func log(
         level: LogLevelCore,
@@ -20,16 +20,22 @@ public final class MultiplexLoggerStream {
         logModule: String?,
         _ message: String
     ) {
-        logQueue.async {
+        queue.async {
+
             let file = fileName?.components(separatedBy: Constants.delimiter).last ?? Constants.placeholder
             let function = methodName ?? Constants.placeholder
-            outputStreams.values.forEach { outputStream in
-                switch outputStream.policy {
-                case .userDefined:
-                    guard LoggerSettings.logLevelToShow <= level else { return }
-                    fallthrough
+
+            streams.forEach { stream in
+
+                switch stream.policy {
+
+                case .custom(let filterFunction):
+                    if filterFunction(level)  {
+                        fallthrough
+                    }
+
                 case .all:
-                    outputStream.log(
+                    stream.log(
                         level: level,
                         fileName: file,
                         methodName: function,
@@ -42,21 +48,14 @@ public final class MultiplexLoggerStream {
     }
 
     public static func add(stream: LoggerStream) {
-        logQueue.async {
-            outputStreams[ObjectIdentifier(stream)] = stream
-        }
-    }
-
-    public static func remove(stream: LoggerStream) {
-        logQueue.async {
-            outputStreams.removeValue(forKey: ObjectIdentifier(stream))
+        queue.async {
+            streams.append(stream)
         }
     }
 
     public static func mutateStreams(mutator: @escaping (MutableLoggerStream) -> Void) {
-        logQueue.async {
-            outputStreams
-                .values
+        queue.async {
+            streams
                 .compactMap { $0 as? MutableLoggerStream }
                 .forEach (mutator)
         }

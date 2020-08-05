@@ -13,13 +13,7 @@ final class LoggerInitializator {
 
     func initialize() {
         MultiplexLoggerStream.add(stream: ConsoleLoggerStream())
-        if SdkEnvironment.isDebugEnabled {
-            MultiplexLoggerStream.add(stream: RemoteLoggerStream(tenantId: storage.siteID ?? -1))
-        } else {
-            Logger.warn(
-                "To enable debug logging set the application argument: \(SdkEnvironment.Constants.Key.debugEnabled)"
-            )
-        }
+        MultiplexLoggerStream.add(stream: RemoteLoggerStream(tenantId: storage.tenantID ?? -1))
     }
 
 }

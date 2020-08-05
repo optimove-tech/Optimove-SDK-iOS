@@ -12,10 +12,15 @@ public final class RemoteLoggerStream: MutableLoggerStream {
         static let httpMethod = "POST"
     }
 
-    public var policy: LoggerStreamPolicy = .all
+    public var policy: LoggerStreamFilter {
+        return LoggerStreamFilter.custom { [unowned self] (level) -> Bool in
+            return self.isAllowedByFiltring(level: level)
+        }
+    }
 
     public var tenantId: Int
     public var endpoint: URL = Endpoints.Logger.defaultEndpint
+    public var isProductionLogsEnabled: Bool = false
 
     private let appNs: String
     private let platform: SdkPlatform = .ios
@@ -36,8 +41,8 @@ public final class RemoteLoggerStream: MutableLoggerStream {
         message: String
     ) {
         let data = LogBody(
-            tenantId: self.tenantId,
-            appNs: self.appNs,
+            tenantId: tenantId,
+            appNs: appNs,
             sdkPlatform: platform,
             level: level,
             logModule: nil,
@@ -46,7 +51,7 @@ public final class RemoteLoggerStream: MutableLoggerStream {
             message: message
         )
         do {
-            let request = try self.buildLogRequest(data)
+            let request = try buildLogRequest(data)
             let task = URLSession.shared.dataTask(with: request) { [log] (data, response, error) in
                 if error != nil {
                     os_log("Logger: data task returns an error '%s'", log: log, type: .error, error!.localizedDescription)
@@ -60,12 +65,18 @@ public final class RemoteLoggerStream: MutableLoggerStream {
 
     private func buildLogRequest(_ data: LogBody) throws -> URLRequest {
         let logBody = try JSONEncoder().encode(data)
-        var request = URLRequest(url: self.endpoint)
+        var request = URLRequest(url: endpoint)
         request.httpBody = logBody
         request.httpMethod = Constants.httpMethod
         Constants.httpHeaders.forEach { (header) in
             request.setValue(header.value, forHTTPHeaderField: header.key)
         }
         return request
+    }
+
+    private func isAllowedByFiltring(level: LogLevelCore) -> Bool {
+        let defaultState = level == .fatal
+        let isSuitedForProduction = isProductionLogsEnabled && level >= .error
+        return defaultState || isSuitedForProduction
     }
 }

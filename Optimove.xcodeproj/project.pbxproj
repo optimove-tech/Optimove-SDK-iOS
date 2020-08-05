@@ -110,7 +110,6 @@
 		567FF1C790FA8B2A7FAC4F7F /* InstallationIdTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 809CCE6596151864378607B5 /* InstallationIdTests.swift */; };
 		574C8292CC812A34F86B8892 /* NotificationOpenedEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5BB6E717D62FCA403815BF /* NotificationOpenedEventTests.swift */; };
 		57DFD79E50682E5EBECA7F4C /* OptInOutObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90C9509F668ABF2A4746946D /* OptInOutObserverTests.swift */; };
-		58B394186CECA09885F686F3 /* LoggerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3CF3C568D77B634AFD35B8 /* LoggerSettings.swift */; };
 		599FA52041C9CB1EDAD6D399 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89E7B8102C3B8854279817C1 /* Notification.swift */; };
 		5A08B9EDBA80168AC667425D /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC23809D9F4BD02A13F8C661 /* RingBuffer.swift */; };
 		5AF8B551D48AF8A7B37B2054 /* SDKInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 147C9BEF1567B21AF4FB6CB4 /* SDKInitializer.swift */; };
@@ -521,7 +520,6 @@
 		895B87C7AB14141916C00840 /* notificationWithDeepLinkPersonalizationValues.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = notificationWithDeepLinkPersonalizationValues.json; sourceTree = "<group>"; };
 		89C367AE59E4A760791343DE /* FileManager+Optimove.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+Optimove.swift"; sourceTree = "<group>"; };
 		89E7B8102C3B8854279817C1 /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
-		8A3CF3C568D77B634AFD35B8 /* LoggerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerSettings.swift; sourceTree = "<group>"; };
 		8D20E38059A2569DC11EADD4 /* NotificationPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPayload.swift; sourceTree = "<group>"; };
 		8DAFF173166A96219F652DE6 /* ApiNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiNetworking.swift; sourceTree = "<group>"; };
 		8E0C43BC7A683ABFD56EE6F3 /* MigrationWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationWork.swift; sourceTree = "<group>"; };
@@ -1399,7 +1397,6 @@
 				8228C916C97D8339F724B907 /* ConsoleLoggerStream.swift */,
 				FD7C8A11E380D28029ED47E5 /* LogBody.swift */,
 				38596994C26D889219B1828C /* Logger.swift */,
-				8A3CF3C568D77B634AFD35B8 /* LoggerSettings.swift */,
 				ADF1A285E540507DACCA9630 /* LoggerStream.swift */,
 				F43F7C2632F53C9F5CD85B4E /* LogLevelCore.swift */,
 				B4713C0DA9400A929216B24D /* MultiplexLoggerStream.swift */,
@@ -1890,21 +1887,21 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		"TEMP_89FC78BB-72E4-4A55-AB24-68F2C11ED3EE" /* Tests */ = {
+		"TEMP_6C9BD4F2-3729-4C0B-8BFF-E72216C8C1DC" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_BC686873-055F-417A-9ABD-5265110CBCE7" /* Tests */ = {
+		"TEMP_7BEEFA56-F4F3-4111-8A81-CC164A9658BB" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_D20CD3B3-6FDB-4609-BCE0-861D44ECEEF3" /* Tests */ = {
+		"TEMP_DC34ABAA-4E92-496A-B5B3-6BB62BD6260A" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -2360,7 +2357,6 @@
 				C85F44214432563BCCDAFED5 /* LogBody.swift in Sources */,
 				C9B146D3726AFD48A46265DA /* LogLevelCore.swift in Sources */,
 				CDD3242FB03DDCFDBA27E186 /* Logger.swift in Sources */,
-				58B394186CECA09885F686F3 /* LoggerSettings.swift in Sources */,
 				75DB09C4A3AD43DB5FDF2384 /* LoggerStream.swift in Sources */,
 				DAD792DD77AF77B7D95DD74D /* Merging.swift in Sources */,
 				0B72803435C92BA78FD76BD0 /* MultiplexLoggerStream.swift in Sources */,

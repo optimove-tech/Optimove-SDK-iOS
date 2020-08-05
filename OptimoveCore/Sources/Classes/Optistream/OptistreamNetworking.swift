@@ -78,10 +78,11 @@ private extension OptistreamNetworkingImpl {
             Logger.debug(
                 """
                 Optistream succeed:
-                    request:
-                    \(events.map { $0.event }.joined(separator: "\n"))
-                    response:
-                    \(response)
+                request:
+                    \(events.map { $0.event }.joined(separator: "\n\t"))
+                response:
+                    status code: \(response.statusCode)
+                    body: \(response.description)
                 """
             )
             completion(.success(()))

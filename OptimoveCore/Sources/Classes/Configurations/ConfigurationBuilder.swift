@@ -38,7 +38,8 @@ private extension ConfigurationBuilder {
     func buildLoggerConfig() -> LoggerConfig {
         return LoggerConfig(
             tenantID: tenantConfig.optitrack.siteId,
-            logServiceEndpoint: globalConfig.general.logsServiceEndpoint
+            logServiceEndpoint: globalConfig.general.logsServiceEndpoint,
+            isProductionLogsEnabled: tenantConfig.isProductionLogsEnabled
         )
     }
 

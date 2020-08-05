@@ -8,6 +8,7 @@ import Foundation
     case info = 1
     case warn = 2
     case error = 3
+    case fatal = 4
 
     init?(string: String) {
         switch string {
@@ -19,6 +20,8 @@ import Foundation
             self = .warn
         case CodingKeys.error.rawValue:
             self = .error
+        case CodingKeys.fatal.rawValue:
+            self = .fatal
         default:
             return nil
         }
@@ -40,6 +43,7 @@ extension LogLevelCore: Codable {
         case info
         case warn
         case error
+        case fatal
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -49,6 +53,7 @@ extension LogLevelCore: Codable {
         case .info: try container.encode(CodingKeys.info.rawValue)
         case .warn: try container.encode(CodingKeys.warn.rawValue)
         case .error: try container.encode(CodingKeys.error.rawValue)
+        case .fatal: try container.encode(CodingKeys.fatal.rawValue)
         }
     }
 }

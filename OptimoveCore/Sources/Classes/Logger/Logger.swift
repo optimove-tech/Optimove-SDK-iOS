@@ -38,4 +38,9 @@ public final class Logger {
         log(level: .error, message(), file: file, function: function, line: line)
     }
 
+    public static func fatal(_ message: @autoclosure () -> String,
+                      file: String = #file, function: String = #function, line: UInt = #line) {
+        log(level: .fatal, message(), file: file, function: function, line: line)
+    }
+
 }
