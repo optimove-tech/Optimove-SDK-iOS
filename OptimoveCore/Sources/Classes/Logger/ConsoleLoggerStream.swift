@@ -5,7 +5,7 @@ import os.log
 
 public final class ConsoleLoggerStream: LoggerStream {
 
-    public var policy: LoggerStreamPolicy = .userDefined
+    public var policy: LoggerStreamFilter = .all
 
     public init() {}
 
@@ -20,6 +20,8 @@ public final class ConsoleLoggerStream: LoggerStream {
 
     private func convert(logLevel: LogLevelCore) -> OSLogType {
         switch logLevel {
+        case .fatal:
+            return .fault
         case .error:
             return .error
         case .warn:
