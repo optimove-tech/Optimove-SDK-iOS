@@ -18,11 +18,9 @@ struct UserIDValidator {
 
     func validateNewUserID(_ userId: String) -> UserIDValidator.Result {
         guard UserIDValidator.isValid(userId) else {
-            Logger.error("Optimove: User id '\(userId)' is not valid.")
             return .notValid
         }
         guard userId != storage.customerID else {
-            Logger.warn("Optimove: User id '\(userId)' was already set in.")
             return .alreadySetIn
         }
         return .valid

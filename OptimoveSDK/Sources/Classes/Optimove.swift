@@ -324,7 +324,7 @@ private extension Optimove {
                     Logger.info("Initialization finished. ✅")
                     completion(.success(()))
                 case let .failure(error):
-                    Logger.error("Initialization failed. 🛑\nReason: \(error.localizedDescription)")
+                    Logger.fatal("Initialization failed. 🛑\nReason: \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }
