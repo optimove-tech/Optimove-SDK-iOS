@@ -5,7 +5,11 @@ import os.log
 
 public final class ConsoleLoggerStream: LoggerStream {
 
-    public var policy: LoggerStreamFilter = .all
+    public var policy: LoggerStreamFilter {
+        return LoggerStreamFilter.custom { [unowned self] (level) -> Bool in
+            return self.isAllowedByFiltring(level: level)
+        }
+    }
 
     public init() {}
 
@@ -13,24 +17,15 @@ public final class ConsoleLoggerStream: LoggerStream {
         os_log(
             "%{public}@",
             log: OSLog.consoleStream,
-            type: convert(logLevel: level),
+            type: OSLogType(logLevel: level),
             message
         )
     }
 
-    private func convert(logLevel: LogLevelCore) -> OSLogType {
-        switch logLevel {
-        case .fatal:
-            return .fault
-        case .error:
-            return .error
-        case .warn:
-            return .info
-        case .info:
-            return .info
-        case .debug:
-            return .default
-        }
+    private func isAllowedByFiltring(level: LogLevelCore) -> Bool {
+        let defaultState = level == .fatal
+        let isSuitedForConsole = level >= (SdkEnvironment.isDebugEnabled ? LogLevelCore.debug : LogLevelCore.warn)
+        return defaultState || isSuitedForConsole
     }
 }
 
@@ -40,4 +35,22 @@ public extension OSLog {
 
 extension OSLog {
     static let consoleStream = OSLog(subsystem: subsystem, category: "Optimove")
+}
+
+extension OSLogType {
+
+    init(logLevel: LogLevelCore) {
+        switch logLevel {
+        case .fatal:
+            self = .fault
+        case .error:
+            self = .error
+        case .warn:
+            self = .info
+        case .info:
+            self = .info
+        case .debug:
+            self = .default
+        }
+    }
 }

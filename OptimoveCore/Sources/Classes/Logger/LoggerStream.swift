@@ -2,22 +2,24 @@
 
 import Foundation
 
-@objc(OptimoveLoggerStream)
 public protocol LoggerStream: AnyObject {
-    var policy: LoggerStreamPolicy { get }
+    var policy: LoggerStreamFilter { get }
     func log(level: LogLevelCore, fileName: String, methodName: String, logModule: String?, message: String)
 }
 
+/// Allow to mutate loggers, when the tenant's config file was successfully fetched.
 public protocol MutableLoggerStream: LoggerStream {
     var tenantId: Int { get set }
     var endpoint: URL { get set }
+    /// Configurable value that used by log filters. Default state is `false`.
+    var isProductionLogsEnabled: Bool { get set }
 }
 
 /// Define a log level that passes a filter before it will be sent to the stream's destination target.
 ///
 /// - all: Allow all logs.
-/// - userDefined: Allow logs that pass level filter defined by user's `OPTIMOVE_MIN_LOG_LEVEL` key.
-@objc public enum LoggerStreamPolicy: Int {
+/// - custom: Use a custom filtering
+public enum LoggerStreamFilter {
     case all
-    case userDefined
+    case custom(filter: (LogLevelCore) -> Bool)
 }
