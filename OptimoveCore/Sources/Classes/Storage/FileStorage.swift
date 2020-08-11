@@ -99,7 +99,7 @@ extension FileStorageImpl: FileStorage {
             Logger.debug("Load file at \(fileName)")
             return contents
         } catch {
-            Logger.error("Unable to load file \(fileName) at \(fileUrl.path). Reason: \(error.localizedDescription)")
+            Logger.warn("Unable to load file \(fileName) at \(fileUrl.path). Reason: \(error.localizedDescription)")
             throw error
         }
     }
