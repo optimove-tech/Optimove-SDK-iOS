@@ -46,6 +46,7 @@ public struct TenantConfig: Codable, Equatable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(isSupportedAirship, forKey: .supportAirship)
+        try container.encodeIfPresent(isProductionLogsEnabled, forKey: .prodLogsEnabled)
         try container.encode(isEnableRealtime, forKey: .enableRealtime)
         try container.encodeIfPresent(isEnableRealtimeThroughOptistream, forKey: .enableRealtimeThroughOptistream)
         try container.encode(realtime, forKey: .realtime)
