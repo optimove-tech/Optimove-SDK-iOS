@@ -16,7 +16,7 @@ final class CoreDataMigrator: CoreDataMigratorProtocol {
             let metadata = try NSPersistentStoreCoordinator.metadata(at: storeURL)
             return (CoreDataMigrationVersion.compatibleVersionForStoreMetadata(metadata) != version)
         } catch {
-            Logger.error(error.localizedDescription)
+            Logger.warn(error.localizedDescription)
             return false
         }
     }
