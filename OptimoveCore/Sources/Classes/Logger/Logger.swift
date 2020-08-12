@@ -7,19 +7,21 @@ public final class Logger {
         _ message: @autoclosure () -> String,
         file: String = #file,
         function: String = #function,
-        line: UInt = #line
+        line: UInt = #line,
+        isRemote: Bool = true
     ) {
         MultiplexLoggerStream.log(
             level: level,
             fileName: file,
             methodName: function,
             logModule: nil,
-            message()
+            message(),
+            isRemote: isRemote
         )
     }
 
     public static func debug(_ message: @autoclosure () -> String,
-                      file: String = #file, function: String = #function, line: UInt = #line) {
+                             file: String = #file, function: String = #function, line: UInt = #line) {
         log(level: .debug, message(), file: file, function: function, line: line)
     }
 
@@ -41,6 +43,11 @@ public final class Logger {
     public static func fatal(_ message: @autoclosure () -> String,
                       file: String = #file, function: String = #function, line: UInt = #line) {
         log(level: .fatal, message(), file: file, function: function, line: line)
+    }
+
+    public static func buisnessLogicError(_ message: @autoclosure () -> String,
+                      file: String = #file, function: String = #function, line: UInt = #line) {
+        log(level: .fatal, message(), file: file, function: function, line: line, isRemote: false)
     }
 
 }

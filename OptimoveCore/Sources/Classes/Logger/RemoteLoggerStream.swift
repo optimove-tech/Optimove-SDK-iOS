@@ -13,8 +13,8 @@ public final class RemoteLoggerStream: MutableLoggerStream {
     }
 
     public var policy: LoggerStreamFilter {
-        return LoggerStreamFilter.custom { [unowned self] (level) -> Bool in
-            return self.isAllowedByFiltring(level: level)
+        return LoggerStreamFilter.custom { [unowned self] (level, isRemote) -> Bool in
+            return self.isAllowedByFiltring(level: level) && isRemote
         }
     }
 
@@ -75,8 +75,7 @@ public final class RemoteLoggerStream: MutableLoggerStream {
     }
 
     private func isAllowedByFiltring(level: LogLevelCore) -> Bool {
-        let defaultState = level == .fatal
-        let isSuitedForProduction = isProductionLogsEnabled && level >= .error
-        return defaultState || isSuitedForProduction
+        let defaultState = level >= .error
+        return defaultState || isProductionLogsEnabled
     }
 }

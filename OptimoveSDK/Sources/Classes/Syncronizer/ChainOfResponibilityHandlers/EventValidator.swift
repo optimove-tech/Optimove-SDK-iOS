@@ -36,6 +36,9 @@ final class EventValidator: Node {
             case let .report(events: events):
                 let validatedEvents: [Event] = try events.map { event in
                     let errors = try self.validate(event: event, withConfigs: configuration.events)
+                    errors.forEach { (error) in
+                        Logger.buisnessLogicError(error.localizedDescription)
+                    }
                     event.validations = errors.map(EventValidator.translateToValidationIssue)
                     return event
                 }
@@ -94,9 +97,7 @@ final class EventValidator: Node {
             case .valid:
                 NewUserIDHandler(storage: storage).handle(userID: userID)
             case .alreadySetIn:
-                let msg = "Optimove: User id '\(userID)' was already set in."
-                Logger.warn(msg)
-                throw GuardError.custom(msg)
+                throw GuardError.custom("Optimove: User id '\(userID)' was already set in.")
             case .notValid:
                 errors.append(ValidationError.invalidUserId(userId: userID))
             }
@@ -112,9 +113,7 @@ final class EventValidator: Node {
             case .valid:
                 NewEmailHandler(storage: storage).handle(email: email)
             case .alreadySetIn:
-                let msg = "Optimove: Email '\(email)' was already set in."
-                Logger.warn(msg)
-                throw GuardError.custom(msg)
+                throw GuardError.custom("Optimove: Email '\(email)' was already set in.")
             case .notValid:
                 errors.append(ValidationError.invalidEmail(email: email))
             }

@@ -6,7 +6,7 @@ import os.log
 public final class ConsoleLoggerStream: LoggerStream {
 
     public var policy: LoggerStreamFilter {
-        return LoggerStreamFilter.custom { [unowned self] (level) -> Bool in
+        return LoggerStreamFilter.custom { [unowned self] (level, _) -> Bool in
             return self.isAllowedByFiltring(level: level)
         }
     }

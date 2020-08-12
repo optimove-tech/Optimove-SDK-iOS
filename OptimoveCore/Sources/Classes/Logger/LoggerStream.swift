@@ -21,5 +21,5 @@ public protocol MutableLoggerStream: LoggerStream {
 /// - custom: Use a custom filtering
 public enum LoggerStreamFilter {
     case all
-    case custom(filter: (LogLevelCore) -> Bool)
+    case custom(filter: (_ level: LogLevelCore, _ isRemote: Bool) -> Bool)
 }

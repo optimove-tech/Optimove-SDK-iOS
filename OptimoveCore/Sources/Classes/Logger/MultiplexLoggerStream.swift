@@ -18,7 +18,8 @@ public final class MultiplexLoggerStream {
         fileName: String?,
         methodName: String?,
         logModule: String?,
-        _ message: String
+        _ message: String,
+        isRemote: Bool
     ) {
         queue.async {
 
@@ -30,7 +31,7 @@ public final class MultiplexLoggerStream {
                 switch stream.policy {
 
                 case .custom(let filterFunction):
-                    if filterFunction(level)  {
+                    if filterFunction(level, isRemote)  {
                         fallthrough
                     }
 
