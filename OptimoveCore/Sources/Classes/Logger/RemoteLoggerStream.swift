@@ -76,6 +76,6 @@ public final class RemoteLoggerStream: MutableLoggerStream {
 
     private func isAllowedByFiltring(level: LogLevelCore) -> Bool {
         let defaultState = level >= .error
-        return defaultState || isProductionLogsEnabled
+        return defaultState && isProductionLogsEnabled
     }
 }

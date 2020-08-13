@@ -23,9 +23,8 @@ public final class ConsoleLoggerStream: LoggerStream {
     }
 
     private func isAllowedByFiltring(level: LogLevelCore) -> Bool {
-        let defaultState = level == .fatal
-        let isSuitedForConsole = level >= (SdkEnvironment.isDebugEnabled ? LogLevelCore.debug : LogLevelCore.warn)
-        return defaultState || isSuitedForConsole
+        let defaultState = SdkEnvironment.isDebugEnabled ? LogLevelCore.debug : LogLevelCore.warn
+        return level >= defaultState
     }
 }
 
