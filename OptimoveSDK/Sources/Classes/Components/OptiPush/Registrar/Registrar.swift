@@ -47,7 +47,6 @@ private extension Registrar {
     func handleFailed(_ operation: ApiOperation, _ error: Error) {
        switch operation {
         case .setInstallation:
-            Logger.error("Set User operation was failed. \(error.localizedDescription)")
             storage.isSettingUserSuccess = false
         }
     }
