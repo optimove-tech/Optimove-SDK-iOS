@@ -10,6 +10,7 @@ enum CommonOperation {
     case deviceToken(token: Data)
     case optIn
     case optOut
+    case none
 }
 
 enum OptistreamOperation {

@@ -31,18 +31,26 @@ final class EventValidator: Node {
     }
 
     override func execute(_ operation: CommonOperation) throws {
-        let validationFunction = { [configuration] () -> CommonOperation in
+        let validationFunction = { [configuration] () throws -> CommonOperation in
             switch operation {
             case let .report(events: events):
-                let validatedEvents: [Event] = try events.map { event in
-                    let errors = try self.validate(event: event, withConfigs: configuration.events)
-                    errors.forEach { (error) in
-                        Logger.buisnessLogicError(error.localizedDescription)
+                do {
+                    let validatedEvents: [Event] = try events.map { event in
+                        let errors = try self.validate(event: event, withConfigs: configuration.events)
+                        errors.forEach { (error) in
+                            Logger.buisnessLogicError(error.localizedDescription)
+                        }
+                        event.validations = errors.map(EventValidator.translateToValidationIssue)
+                        return event
                     }
-                    event.validations = errors.map(EventValidator.translateToValidationIssue)
-                    return event
+                    return CommonOperation.report(events: validatedEvents)
+                } catch {
+                    if error is ValidationError {
+                        Logger.buisnessLogicError(error.localizedDescription)
+                        return CommonOperation.none
+                    }
+                    throw error
                 }
-                return CommonOperation.report(events: validatedEvents)
             default:
                 return operation
             }
@@ -97,7 +105,7 @@ final class EventValidator: Node {
             case .valid:
                 NewUserIDHandler(storage: storage).handle(userID: userID)
             case .alreadySetIn:
-                throw GuardError.custom("Optimove: User id '\(userID)' was already set in.")
+                throw ValidationError.alreadySetInUserId(userId: userID)
             case .notValid:
                 errors.append(ValidationError.invalidUserId(userId: userID))
             }
@@ -113,7 +121,7 @@ final class EventValidator: Node {
             case .valid:
                 NewEmailHandler(storage: storage).handle(email: email)
             case .alreadySetIn:
-                throw GuardError.custom("Optimove: Email '\(email)' was already set in.")
+                throw ValidationError.alreadySetInUserEmail(email: email)
             case .notValid:
                 errors.append(ValidationError.invalidEmail(email: email))
             }
@@ -152,7 +160,7 @@ final class EventValidator: Node {
             try verifySetUserIdEvent(event),
             try verifySetEmailEvent(event),
             try verifyEventParameters(event, eventConfiguration)
-        ].flatMap { $0 }
+            ].flatMap { $0 }
     }
 
     static func translateToValidationIssue(error: ValidationError) -> ValidationIssue {
@@ -204,6 +212,10 @@ enum ValidationError: LocalizedError, Equatable {
     case tooLongUserId(userId: String, limit: Int)
     case invalidEmail(email: String)
 
+    /// The errors below don't have official status, they're related only to the current implementation.
+    case alreadySetInUserId(userId: String)
+    case alreadySetInUserEmail(email: String)
+
     var errorDescription: String? {
         switch self {
         case let .undefinedName(name):
@@ -238,26 +250,32 @@ enum ValidationError: LocalizedError, Equatable {
             return """
             userId, '\(userId)', is too long, the userId limit is \(limit).
             """
+        case let .alreadySetInUserId(userID):
+            return "Optimove: User id '\(userID)' was already set in."
         case let .invalidEmail(email):
             return """
             email, '\(email)', is invalid.
             """
+        case let .alreadySetInUserEmail(email):
+            return "Optimove: Email '\(email)' was already set in."
         }
     }
 
     var status: Int {
-         switch self {
-         case .undefinedName: return 1_010
-         case .limitOfParameters: return 1_020
-         case .undefinedParameter: return 1_030
-         case .undefinedMandatoryParameter: return 1_040
-         case .limitOfCharacters: return 1_050
-         case .wrongType: return 1_060
-         case .invalidUserId: return 1_070
-         case .tooLongUserId: return 1_071
-         case .invalidEmail: return 1_080
-         }
-     }
+        switch self {
+        case .undefinedName: return 1_010
+        case .limitOfParameters: return 1_020
+        case .undefinedParameter: return 1_030
+        case .undefinedMandatoryParameter: return 1_040
+        case .limitOfCharacters: return 1_050
+        case .wrongType: return 1_060
+        case .invalidUserId: return 1_070
+        case .tooLongUserId: return 1_071
+        case .alreadySetInUserId: return 1_072
+        case .invalidEmail: return 1_080
+        case .alreadySetInUserEmail: return 1_081
+        }
+    }
 
 }
 
