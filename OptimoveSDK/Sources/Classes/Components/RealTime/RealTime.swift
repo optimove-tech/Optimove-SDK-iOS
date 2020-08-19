@@ -56,7 +56,9 @@ extension RealTime: OptistreamComponent {
 private extension RealTime {
 
     func isAllowedToReport(_ event: OptistreamEvent) -> Bool {
-        return event.metadata.realtime && !configuration.isEnableRealtimeThroughOptistream
+        return event.metadata.realtime &&
+            !configuration.isEnableRealtimeThroughOptistream &&
+            !event.metadata.validations.map { $0.isError }.contains(true)
     }
 
     func report(_ events: [OptistreamEvent]) {

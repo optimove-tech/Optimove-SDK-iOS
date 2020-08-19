@@ -36,11 +36,26 @@ open class Event {
 
 public struct ValidationIssue: Codable, Hashable {
 
+    private struct Constants {
+        static let errorStatuses = [
+            1_010,
+            1_040,
+            1_050,
+            1_060,
+            1_070,
+            1_080
+        ]
+    }
+
     public let status: Int
     public let message: String
 
     public init(status: Int, message: String) {
         self.status = status
         self.message = message
+    }
+
+    public var isError: Bool {
+        return Constants.errorStatuses.contains(status)
     }
 }
