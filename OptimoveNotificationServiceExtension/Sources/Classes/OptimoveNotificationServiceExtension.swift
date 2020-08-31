@@ -18,7 +18,7 @@ import OptimoveCore
     /// In this case Optimove will fetch the bundle identifier automatically.
     /// - Parameter appBundleId: Bundle indentifier
     @objc public convenience init(appBundleId: String) {
-        self.init(bundleIdentifier: appBundleId)
+        self.init(service: Service.init(bundleIdentifier: appBundleId))
     }
 
     /// The convenience init will fetch the bundle identifier automatically.
@@ -28,14 +28,14 @@ import OptimoveCore
                 Bundle.hostAppBundle()?.bundleIdentifier,
                 CastError.customMessage(message: "Unable to find a bundle identifier.")
             )
-            self.init(bundleIdentifier: bundleIdentifier)
+            self.init(service: Service.init(bundleIdentifier: bundleIdentifier))
         } catch {
             fatalError(error.localizedDescription)
         }
     }
 
-    init(bundleIdentifier: String) {
-        self.service = Service.init(bundleIdentifier: bundleIdentifier)
+    init(service: Service?) {
+        self.service = service
     }
 
     /// The method verified that a request belong to Optimove channel. The Oprimove request might be modified.
@@ -157,22 +157,31 @@ final class Service {
     let storage: OptimoveStorage
     let networking: OptistreamNetworking
 
-    init?(bundleIdentifier: String) {
+    required init(
+        bundleIdentifier: String,
+        storage: OptimoveStorage,
+        networking: OptistreamNetworking) {
+        self.bundleIdentifier = bundleIdentifier
+        self.storage = storage
+        self.networking = networking
+        operationQueue = OperationQueue()
+        operationQueue.qualityOfService = .userInitiated
+    }
+
+    convenience init?(bundleIdentifier: String) {
         do {
-            self.storage = StorageFacade(
+            let storage = StorageFacade(
                 groupedStorage: try UserDefaults.grouped(
                     tenantBundleIdentifier: bundleIdentifier
                 ),
                 sharedStorage: nil,
                 fileStorage: nil
             )
-            self.networking = OptistreamNetworkingImpl(
+            let networking = OptistreamNetworkingImpl(
                 networkClient: NetworkClientImpl(),
                 endpoint: try unwrap(storage.optitrackEndpoint)
             )
-            self.bundleIdentifier = bundleIdentifier
-            operationQueue = OperationQueue()
-            operationQueue.qualityOfService = .userInitiated
+            self.init(bundleIdentifier: bundleIdentifier, storage: storage, networking: networking)
         } catch {
             os_log(
                 "Service initialization error: %{PUBLIC}@",

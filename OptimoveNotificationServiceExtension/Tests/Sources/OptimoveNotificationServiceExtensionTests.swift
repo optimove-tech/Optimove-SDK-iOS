@@ -12,10 +12,13 @@ class OptimoveNotificationServiceExtensionTests: OptimoveTestCase, FileAccessibl
     var notificationServiceExtension: OptimoveNotificationServiceExtension!
 
     override func setUp() {
-        notificationServiceExtension = OptimoveNotificationServiceExtension(
+        let service = Service.init(
             bundleIdentifier: "com.apple.dt.xctest.tool",
             storage: storage,
             networking: networking
+        )
+        notificationServiceExtension = OptimoveNotificationServiceExtension(
+            service: service
         )
     }
 
