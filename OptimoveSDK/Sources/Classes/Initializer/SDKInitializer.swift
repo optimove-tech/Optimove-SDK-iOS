@@ -95,7 +95,6 @@ final class OptimoveStrorageSDKInitializerDependency: SDKInitializerDependency {
     }
 
     func onConfigurationFetch(_ configuration: Configuration) {
-        storage.set(value: configuration.tenantID, key: .siteID)
         storage.siteID = configuration.tenantID
         storage.tenantID = configuration.tenantID
         storage.optitrackEndpoint = configuration.optitrack.optitrackEndpoint
