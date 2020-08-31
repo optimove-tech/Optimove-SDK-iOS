@@ -9,12 +9,8 @@ import OptimoveCore
 
     @objc public private(set) var isHandledByOptimove: Bool = false
 
-    let bundleIdentifier: String
-    let operationQueue: OperationQueue
-    // FIXME: Remove these dependencies
-    let storage: OptimoveStorage
-    let networking: OptistreamNetworking
-    //
+    let service: Service?
+
     var bestAttemptContent: UNMutableNotificationContent?
     var contentHandler: ((UNNotificationContent) -> Void)?
 
@@ -38,39 +34,8 @@ import OptimoveCore
         }
     }
 
-    convenience init(bundleIdentifier: String) {
-        do {
-            let storage = StorageFacade(
-                groupedStorage: try UserDefaults.grouped(
-                    tenantBundleIdentifier: bundleIdentifier
-                ),
-                sharedStorage: nil,
-                fileStorage: try FileStorageImpl(
-                    bundleIdentifier: bundleIdentifier,
-                    fileManager: FileManager.default
-                )
-            )
-            let networking = OptistreamNetworkingImpl(
-                networkClient: NetworkClientImpl(),
-                endpoint: try unwrap(storage.optitrackEndpoint)
-            )
-            self.init(bundleIdentifier: bundleIdentifier, storage: storage, networking: networking)
-        } catch {
-            fatalError(error.localizedDescription)
-        }
-    }
-
-    required init(
-        bundleIdentifier: String,
-        storage: OptimoveStorage,
-        networking: OptistreamNetworking
-    ) {
-        self.storage = storage
-        self.networking = networking
-        self.bundleIdentifier = bundleIdentifier
-
-        operationQueue = OperationQueue()
-        operationQueue.qualityOfService = .userInitiated
+    init(bundleIdentifier: String) {
+        self.service = Service.init(bundleIdentifier: bundleIdentifier)
     }
 
     /// The method verified that a request belong to Optimove channel. The Oprimove request might be modified.
@@ -84,6 +49,10 @@ import OptimoveCore
         withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void
     ) -> Bool {
         do {
+            guard let service = self.service else {
+                os_log("Service not found", log: OSLog.notification, type: .fault)
+                return false
+            }
             isHandledByOptimove = false
             let payload = try verifyAndCreatePayload(request)
             isHandledByOptimove = true
@@ -93,10 +62,10 @@ import OptimoveCore
 
             let operations = [
                 NotificationDeliveryReporter(
-                    bundleIdentifier: bundleIdentifier,
+                    bundleIdentifier: service.bundleIdentifier,
                     notificationPayload: payload,
-                    networking: networking,
-                    storage: storage
+                    networking: service.networking,
+                    storage: service.storage
                 ),
                 MediaAttachmentDownloader(
                     notificationPayload: payload,
@@ -121,7 +90,7 @@ import OptimoveCore
             operations.forEach {
                 // Set the completion operation as dependent for all operations before they start executing.
                 completionOperation.addDependency($0)
-                operationQueue.addOperation($0)
+                service.operationQueue.addOperation($0)
             }
 
             // The completion operation is performing on the main queue.
@@ -142,7 +111,7 @@ import OptimoveCore
     /// The method called by system in case if `didReceive(_:withContentHandler:)` takes to long to execute or
     /// out of memory.
     @objc public func serviceExtensionTimeWillExpire() {
-        operationQueue.cancelAllOperations()
+        self.service?.operationQueue.cancelAllOperations()
         if let bestAttemptContent = bestAttemptContent {
             contentHandler?(bestAttemptContent)
         }
@@ -179,4 +148,37 @@ extension OptimoveNotificationServiceExtension {
 extension OSLog {
     static var subsystem = Bundle.main.bundleIdentifier!
     static let notification = OSLog(subsystem: subsystem, category: "notification")
+}
+
+final class Service {
+
+    let bundleIdentifier: String
+    let operationQueue: OperationQueue
+    let storage: OptimoveStorage
+    let networking: OptistreamNetworking
+
+    init?(bundleIdentifier: String) {
+        do {
+            self.storage = StorageFacade(
+                groupedStorage: try UserDefaults.grouped(
+                    tenantBundleIdentifier: bundleIdentifier
+                ),
+                sharedStorage: nil,
+                fileStorage: nil
+            )
+            self.networking = OptistreamNetworkingImpl(
+                networkClient: NetworkClientImpl(),
+                endpoint: try unwrap(storage.optitrackEndpoint)
+            )
+            self.bundleIdentifier = bundleIdentifier
+            operationQueue = OperationQueue()
+            operationQueue.qualityOfService = .userInitiated
+        } catch {
+            os_log(
+                "Service initialization error: %{PUBLIC}@",
+                log: OSLog.notification,
+                type: .error, error.localizedDescription)
+            return nil
+        }
+    }
 }
