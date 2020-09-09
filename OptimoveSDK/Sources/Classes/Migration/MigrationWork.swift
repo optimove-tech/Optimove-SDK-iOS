@@ -14,10 +14,10 @@ class MigrationWorker: MigrationWork {
 
     init(
         storage: OptimoveStorage,
-        version: Version
+        newVersion: Version
     ) {
         self.storage = storage
-        self.version = version
+        self.version = newVersion
     }
 
     func isAllowToMiragte(_ currentVersion: String) -> Bool {
@@ -35,34 +35,80 @@ class MigrationWorker: MigrationWork {
     func runMigration() {}
 }
 
-final class MigrationWork_2_10_0: MigrationWorker {
+class MigrationWorkerBase: MigrationWorker {
+
+    /// Have call `super.runMigration()` in an overrided method.
+    override func runMigration() {
+        storage.finishedMigration(to: version.rawValue)
+    }
+
+}
+
+final class MigrationWork_2_10_0: MigrationWorkerBase {
 
     private let synchronizer: Synchronizer
 
     init(synchronizer: Synchronizer,
          storage: OptimoveStorage) {
         self.synchronizer = synchronizer
-        super.init(storage: storage, version: .v_2_10_0)
+        super.init(storage: storage, newVersion: .v_2_10_0)
     }
 
     override func runMigration() {
         synchronizer.handle(.setInstallation)
-        storage.finishedMigration(to: version.rawValue)
+        super.runMigration()
     }
 
 }
 
-final class MigrationWork_3_0_0: MigrationWorker {
+final class MigrationWork_3_0_0: MigrationWorkerBase {
 
     init(storage: OptimoveStorage) {
-        super.init(storage: storage, version: .v_3_0_0)
+        super.init(storage: storage, newVersion: .v_3_0_0)
     }
 
     override func runMigration() {
         if storage.firstRunTimestamp == nil {
             storage.firstRunTimestamp = storage.firstVisitTimestamp
         }
-        storage.finishedMigration(to: version.rawValue)
+        super.runMigration()
+    }
+
+}
+
+final class MigrationWork_3_4_0: MigrationWorkerBase {
+
+    init(storage: OptimoveStorage) {
+        super.init(storage: storage, newVersion: .v_3_4_0)
+    }
+
+    override func runMigration() {
+        let replacers: [Replacer] = [
+            AppGroupReplacer(),
+            UserDefaultsReplacer()
+        ]
+        replacers.forEach { $0.replace() }
+        super.runMigration()
+    }
+
+}
+
+private protocol Replacer {
+    func replace()
+}
+
+extension MigrationWork_3_4_0 {
+
+    final class AppGroupReplacer: Replacer {
+        func replace() {
+            // TODO: Merge appgroup values to UserDefaults.shared, also move files to the main container!
+        }
+    }
+
+    final class UserDefaultsReplacer: Replacer {
+        func replace() {
+            // TODO: Allocate a new, optimove own, UserDefaults plist and move all the data from UserDefaults.shared
+        }
     }
 
 }
