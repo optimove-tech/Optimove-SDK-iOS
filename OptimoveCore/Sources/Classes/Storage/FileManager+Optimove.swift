@@ -4,8 +4,18 @@ import Foundation
 
 public extension FileManager {
 
+    static func optimoveURL() throws -> URL {
+        return try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+    }
+
     /* Returns the container directory associated with the Optimove SDK group.
      */
+    @available(swift, deprecated: 3.4.0, message: "Use `FileManager.optimove()` instead.")
     func groupContainer(tenantBundleIdentifier: String) throws -> URL {
         let groupIdentifier = "group.\(tenantBundleIdentifier).optimove"
         guard let url = self.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier) else {

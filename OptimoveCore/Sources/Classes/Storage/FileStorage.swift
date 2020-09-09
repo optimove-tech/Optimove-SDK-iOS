@@ -60,15 +60,11 @@ public final class FileStorageImpl {
     }
 
     private let fileManager: FileManager
-    private let groupedDirectoryURL: URL
-    private let sharedDirectoryURL: URL
+    private let directoryURL: URL
 
-    public init(bundleIdentifier: String,
-                fileManager: FileManager) throws {
-        self.fileManager = fileManager
-
-        groupedDirectoryURL = try fileManager.groupContainer(tenantBundleIdentifier: bundleIdentifier)
-        sharedDirectoryURL = try unwrap(fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first)
+    public init(url: URL) throws {
+        self.fileManager = FileManager.default
+        directoryURL = try unwrap(FileManager.optimoveURL())
     }
 
     private func addSkipBackupAttributeToItemAtURL(fileURL: URL) throws {
@@ -79,8 +75,7 @@ public final class FileStorageImpl {
     }
 
     private func getDirectory(isGroupContainer: Bool) -> URL {
-        let url = isGroupContainer ? groupedDirectoryURL : sharedDirectoryURL
-        return url.appendingPathComponent(Constants.folderName)
+        return directoryURL.appendingPathComponent(Constants.folderName)
     }
 }
 

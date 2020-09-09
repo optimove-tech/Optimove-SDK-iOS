@@ -4,8 +4,21 @@ import Foundation
 
 public extension UserDefaults {
 
+    struct Constants {
+        static let suiteName: String = "com.optimove.sdk"
+    }
+
+    static func optimove() throws -> UserDefaults {
+        let suiteName = Constants.suiteName
+        guard let userDefaults = UserDefaults(suiteName: suiteName) else {
+            throw GuardError.custom("Unable to initialize UserDefault with suit name \(suiteName).")
+        }
+        return userDefaults
+    }
+
     /* Returns the UserDefaults associated with the Optimove SDK group.
      */
+    @available(swift, deprecated: 3.4.0, message: "Use `UserDefaults.optimove()` instead.")
     static func grouped(tenantBundleIdentifier: String) throws -> UserDefaults {
         let suiteName = "group.\(tenantBundleIdentifier).optimove"
         guard let userDefaults = UserDefaults(suiteName: suiteName) else {
@@ -22,6 +35,7 @@ public extension UserDefaults {
 
     /* Returns the UserDefaults associated with a host application.
      */
+    @available(swift, deprecated: 3.4.0, message: "Use `UserDefaults.optimove()` instead.")
     static func shared(tenantBundleIdentifier: String) throws -> UserDefaults {
         guard let userDefaults = UserDefaults(suiteName: tenantBundleIdentifier) else {
             throw GuardError.custom(
