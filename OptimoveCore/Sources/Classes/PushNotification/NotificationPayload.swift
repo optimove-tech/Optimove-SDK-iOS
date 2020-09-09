@@ -11,6 +11,7 @@ public struct NotificationPayload: Decodable {
     public let campaign: NotificationCampaignContainer?
     public let isOptipush: Bool
     public let media: MediaAttachment?
+    public let eventVariables: EventVariables
 
     enum CodingKeys: String, CodingKey {
         case title
@@ -20,6 +21,7 @@ public struct NotificationPayload: Decodable {
         case isOptipush = "is_optipush"
         case media
         case userAction = "user_action"
+        case eventVariables
     }
 
     public init(from decoder: Decoder) throws {
@@ -30,6 +32,7 @@ public struct NotificationPayload: Decodable {
         self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder)
         self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
         self.media = try? MediaAttachment(firebaseFrom: decoder)
+        self.eventVariables = try container.decode(EventVariables.self, forKey: .eventVariables)
     }
 }
 
@@ -113,6 +116,14 @@ public struct MediaAttachment: Decodable {
         self = try JSONDecoder().decode(MediaAttachment.self, from: data)
     }
 
+}
+
+public struct EventVariables: Decodable {
+    public let tenant: Int
+    public let customer: String
+    public let updatedVisitor: String
+    public let firstRunTimestamp: Int64
+    public let optitrackEndpoint: URL
 }
 
 /// https://stackoverflow.com/a/44596291
