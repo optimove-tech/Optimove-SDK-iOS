@@ -128,7 +128,6 @@ extension MigrationWork_3_3_0 {
             let oldDefaults = try UserDefaults.grouped(tenantBundleIdentifier: bundleID)
             let newDefaults = try UserDefaults.optimove()
             newDefaults.setValuesForKeys(oldDefaults.dictionaryRepresentation())
-            let key = StorageKey.migrationVersions
         }
 
         func moveFilesFromAppGroup() throws {
@@ -150,7 +149,7 @@ extension MigrationWork_3_3_0 {
             guard var versions = newDefaults.object(forKey: key.rawValue) as? [String] else {
                 return
             }
-            versions.append(Version.v_3_4_0.rawValue)
+            versions.append(Version.v_3_3_0.rawValue)
             newDefaults.set(value: versions, key: key)
         }
     }
@@ -186,7 +185,7 @@ extension MigrationWork_3_3_0 {
                     oldDefaults.removeObject(forKey: key.rawValue)
                 })
             } catch {
-                fatalError(error.localizedDescription)
+                Logger.error(error.localizedDescription)
             }
         }
     }
