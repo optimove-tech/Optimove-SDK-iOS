@@ -37,14 +37,7 @@ public extension UserDefaults {
      */
     @available(swift, deprecated: 3.4.0, message: "Use `UserDefaults.optimove()` instead.")
     static func shared(tenantBundleIdentifier: String) throws -> UserDefaults {
-        guard let userDefaults = UserDefaults(suiteName: tenantBundleIdentifier) else {
-            throw GuardError.custom(
-                """
-                The passed bundle identifier does not have any related UserDefault's container.
-                """
-            )
-        }
-        return userDefaults
+        return UserDefaults.standard
     }
 
 }
