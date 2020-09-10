@@ -157,8 +157,7 @@ extension MigrationWork_3_3_0 {
     final class UserDefaultsReplacer: Replacer {
         func replace() {
             do {
-                let bundleID =  try Bundle.getApplicationNameSpace()
-                let oldDefaults = try UserDefaults.shared(tenantBundleIdentifier: bundleID)
+                let oldDefaults = UserDefaults.shared()
                 let newDefaults = try UserDefaults.optimove()
                 let groupKeys: Set<StorageKey> = [
                     .optitrackEndpoint,

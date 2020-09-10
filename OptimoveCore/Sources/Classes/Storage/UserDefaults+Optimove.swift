@@ -36,7 +36,7 @@ public extension UserDefaults {
     /* Returns the UserDefaults associated with a host application.
      */
     @available(swift, deprecated: 3.4.0, message: "Use `UserDefaults.optimove()` instead.")
-    static func shared(tenantBundleIdentifier: String) throws -> UserDefaults {
+    static func shared() -> UserDefaults {
         return UserDefaults.standard
     }
 
