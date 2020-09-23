@@ -7,6 +7,13 @@
         },
         "mutable-content": "1"
     },
-    "is_optipush": "true"
+    "is_optipush": "true",
+    "eventVariables": {
+        "tenant": 2590,
+        "customer": "customer",
+        "updatedVisitor": "b39f008e318efd2b",
+        "firstRunTimestamp": 1600860143,
+        "optitrackEndpoint": "https://stream-2590.optimove.net"
+    }
 }
 

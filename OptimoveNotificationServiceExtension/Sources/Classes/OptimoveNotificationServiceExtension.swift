@@ -11,6 +11,7 @@ import OptimoveCore
 
     let bundleIdentifier: String
     let operationQueue: OperationQueue
+    let networking: OptistreamNetworking?
 
     var bestAttemptContent: UNMutableNotificationContent?
     var contentHandler: ((UNNotificationContent) -> Void)?
@@ -35,8 +36,13 @@ import OptimoveCore
         }
     }
 
-    init(bundleIdentifier: String) {
+    /// The main NSE initalizer.s
+    /// - Parameters:
+    ///   - bundleIdentifier: The application bundle identifier
+    ///   - networking: For testing
+    init(bundleIdentifier: String, networking: OptistreamNetworking? = nil) {
         self.bundleIdentifier = bundleIdentifier
+        self.networking = networking
         operationQueue = OperationQueue()
         operationQueue.qualityOfService = .userInitiated
     }
@@ -143,6 +149,9 @@ extension OptimoveNotificationServiceExtension {
     }
 
     func makeNetworking(optitrackEndpoint: URL) -> OptistreamNetworking {
+        if let networking = networking {
+            return networking
+        }
         return OptistreamNetworkingImpl(
             networkClient: NetworkClientImpl(),
             endpoint: optitrackEndpoint

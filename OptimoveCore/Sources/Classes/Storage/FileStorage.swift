@@ -64,7 +64,7 @@ public final class FileStorageImpl {
 
     public init(url: URL) throws {
         self.fileManager = FileManager.default
-        directoryURL = try unwrap(FileManager.optimoveURL())
+        directoryURL = url
     }
 
     private func addSkipBackupAttributeToItemAtURL(fileURL: URL) throws {

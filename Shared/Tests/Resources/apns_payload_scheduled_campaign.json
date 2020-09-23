@@ -11,5 +11,12 @@
     "scheduled_campaign": "{ \"campaign_id\": 456, \"action_serial\": 456, \"template_id\": 456, \"engagement_id\": 456, \"campaign_type\": 1 }",
     "is_optipush": "true",
     "dynamic_links": "{\"android\":{},\"ios\":{\"com_optimove_sdk_optimovemobileclientnofirebase\":\"https:\\/\\/x33fn.app.goo.gl\\/XjQ8AGSF77Nm4KwE6\"}}",
-    "dl": "https://com.optimove.sdk.optimovemobileclientnofirebase/demo_screen?Param_Name_iOS1=ParamVal_iOS+A++Hulio+🚀&Param_Name_iOS2=ParamVal_iOS+B+Template_Name+☘&Param_Name_iOS3=ParamVal_iOS+C+1234+👀"
+    "dl": "https://com.optimove.sdk.optimovemobileclientnofirebase/demo_screen?Param_Name_iOS1=ParamVal_iOS+A++Hulio+🚀&Param_Name_iOS2=ParamVal_iOS+B+Template_Name+☘&Param_Name_iOS3=ParamVal_iOS+C+1234+👀",
+    "eventVariables": {
+        "tenant": 2590,
+        "customer": "customer",
+        "updatedVisitor": "b39f008e318efd2b",
+        "firstRunTimestamp": 1600860143,
+        "optitrackEndpoint": "https://stream-2590.optimove.net"
+    }
 }
