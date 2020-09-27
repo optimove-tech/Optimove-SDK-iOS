@@ -12,12 +12,12 @@
     "is_optipush": "true",
     "dl": "https://com.optimove.sdk.optimovemobileclientnofirebase/demo_screen?Param_Name_iOS1=ParamVal_iOS+A++Hulio+🚀&Param_Name_iOS2=ParamVal_iOS+B+Template_Name+☘&Param_Name_iOS3=ParamVal_iOS+C+1234+👀",
     "media": "{\"url\": \"https:\\/\\/1s8lcx2foe0o2oxwuk1gp3pf-wpengine.netdna-ssl.com\\/wp-content\\/uploads\\/2016\\/11\\/Optimove_logo.svg\", \"media_type\": \"image\"}",
-    "eventVariables": {
-        "tenant": 2590,
-        "customer": "customer",
-        "updatedVisitor": "b39f008e318efd2b",
-        "firstRunTimestamp": 1600860143,
-        "optitrackEndpoint": "https://stream-2590.optimove.net"
+    "ev": {
+        "t": 2590,
+        "c": "customer",
+        "v": "b39f008e318efd2b",
+        "frt": 1600860143,
+        "oe": "https://stream-2590.optimove.net"
     }
 }
 
