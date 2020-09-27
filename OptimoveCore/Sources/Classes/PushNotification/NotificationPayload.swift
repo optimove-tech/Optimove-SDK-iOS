@@ -28,11 +28,11 @@ public struct NotificationPayload: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder)
         self.media = try? MediaAttachment(firebaseFrom: decoder)
-        self.title = try container.decodeIfPresent(String.self, forKey: .title)
+        self.deepLink = try? DeepLink(firebaseFrom: decoder).url
         self.content = try container.decode(String.self, forKey: .content)
-        self.deepLink = try container.decodeIfPresent(URL.self, forKey: .deepLink)
         self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
         self.eventVariables = try container.decode(EventVariables.self, forKey: .eventVariables)
+        self.title = try container.decodeIfPresent(String.self, forKey: .title)
     }
 }
 
@@ -73,6 +73,22 @@ public struct NotificationCampaignContainer {
         self.identityToken = decoded.identityToken
     }
 
+}
+
+// MARK: - Deep link
+
+public struct DeepLink: Decodable {
+
+    public let url: URL?
+
+    init(firebaseFrom decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
+        guard let string = try container.decodeIfPresent(String.self, forKey: .deepLink) else {
+            throw GuardError.custom("Not found value for key \(NotificationPayload.CodingKeys.deepLink.rawValue)")
+        }
+        let data: Data = try cast(string.data(using: .utf8))
+        self.url = URL(dataRepresentation: data, relativeTo: nil)
+    }
 }
 
 // MARK: - Media
