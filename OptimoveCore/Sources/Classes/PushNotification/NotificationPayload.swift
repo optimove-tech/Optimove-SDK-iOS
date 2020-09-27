@@ -21,17 +21,17 @@ public struct NotificationPayload: Decodable {
         case isOptipush = "is_optipush"
         case media
         case userAction = "user_action"
-        case eventVariables
+        case eventVariables = "ev"
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder)
+        self.media = try? MediaAttachment(firebaseFrom: decoder)
         self.title = try container.decodeIfPresent(String.self, forKey: .title)
         self.content = try container.decode(String.self, forKey: .content)
-        self.deepLink = try? DeepLink(firebaseFrom: decoder).url
-        self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder)
+        self.deepLink = try container.decodeIfPresent(URL.self, forKey: .deepLink)
         self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
-        self.media = try? MediaAttachment(firebaseFrom: decoder)
         self.eventVariables = try container.decode(EventVariables.self, forKey: .eventVariables)
     }
 }
@@ -75,22 +75,6 @@ public struct NotificationCampaignContainer {
 
 }
 
-// MARK: - Deep link
-
-public struct DeepLink: Decodable {
-
-    public let url: URL?
-
-    init(firebaseFrom decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: NotificationPayload.CodingKeys.self)
-        guard let string = try container.decodeIfPresent(String.self, forKey: .deepLink) else {
-            throw GuardError.custom("Not found value for key \(NotificationPayload.CodingKeys.deepLink.rawValue)")
-        }
-        let data: Data = try cast(string.data(using: .utf8))
-        self.url = URL(dataRepresentation: data, relativeTo: nil)
-    }
-}
-
 // MARK: - Media
 
 public struct MediaAttachment: Decodable {
@@ -120,10 +104,18 @@ public struct MediaAttachment: Decodable {
 
 public struct EventVariables: Decodable {
     public let tenant: Int
-    public let customer: String
-    public let updatedVisitor: String
+    public let customer: String?
+    public let visitor: String
     public let firstRunTimestamp: Int64
     public let optitrackEndpoint: URL
+
+    enum CodingKeys: String, CodingKey {
+        case tenant = "t"
+        case customer = "c"
+        case visitor = "v"
+        case firstRunTimestamp = "frt"
+        case optitrackEndpoint = "oe"
+    }
 }
 
 /// https://stackoverflow.com/a/44596291

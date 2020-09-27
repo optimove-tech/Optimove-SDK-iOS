@@ -38,7 +38,7 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
                 event: event.name,
                 origin: "sdk",
                 customer: notificationPayload.eventVariables.customer,
-                visitor: notificationPayload.eventVariables.updatedVisitor,
+                visitor: notificationPayload.eventVariables.visitor,
                 timestamp: Formatter.iso8601withFractionalSeconds.string(from: event.timestamp),
                 context: try JSON(event.context),
                 metadata: OptistreamEvent.Metadata(
