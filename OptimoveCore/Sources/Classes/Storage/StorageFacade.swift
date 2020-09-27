@@ -10,10 +10,6 @@ public typealias OptimoveStorage = KeyValueStorage & FileStorage & StorageValue
 /// MARK: - StorageKey
 
 public enum StorageKey: String, CaseIterable {
-
-    // MARK: Grouped keys
-    /// Placed in optimove group container
-
     case installationID
     case customerID
     case configurationEndPoint
@@ -31,10 +27,6 @@ public enum StorageKey: String, CaseIterable {
     case firstRunTimestamp
     case optitrackEndpoint
     case tenantID
-
-    // MARK: Shared keys
-    /// Placed in tenant container (legacy)
-
     case userEmail
     case apnsToken
     case siteID /// Legacy: See tenantID
@@ -48,9 +40,6 @@ public enum StorageKey: String, CaseIterable {
 
 /// The protocol used as convenience accessor to storage values.
 public protocol StorageValue {
-
-    // MARK: Grouped values
-
     var installationID: String? { get set }
     var customerID: String? { get set }
     var configurationEndPoint: URL? { get set }
@@ -67,6 +56,15 @@ public protocol StorageValue {
     var arePushCampaignsDisabled: Bool { get set }
     var optitrackEndpoint: URL? { get set }
     var tenantID: Int? { get set }
+    var userEmail: String? { get set }
+    var apnsToken: Data? { get set }
+    /// Legacy: See tenantID
+    var siteID: Int? { get set }
+    var isSettingUserSuccess: Bool? { get set }
+    /// Legacy. Use `firstRunTimestamp` instead
+    var firstVisitTimestamp: Int64? { get set }
+    var realtimeSetUserIdFailed: Bool { get set }
+    var realtimeSetEmailFailed: Bool { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -78,24 +76,10 @@ public protocol StorageValue {
     func getDeviceResolutionWidth() throws -> Float
     func getDeviceResolutionHeight() throws -> Float
     func getAdvertisingIdentifier() throws -> String
-
     /// Called when a migration is finished for the version.
     mutating func finishedMigration(to version: String)
     /// Use for checking if a migration was applied for the version.
     func isAlreadyMigrated(to version: String) -> Bool
-
-    // MARK: Shared values
-
-    var userEmail: String? { get set }
-    var apnsToken: Data? { get set }
-    /// Legacy: See tenantID
-    var siteID: Int? { get set }
-    var isSettingUserSuccess: Bool? { get set }
-    /// Legacy. Use `firstRunTimestamp` instead
-    var firstVisitTimestamp: Int64? { get set }
-    var realtimeSetUserIdFailed: Bool { get set }
-    var realtimeSetEmailFailed: Bool { get set }
-
     func getUserEmail() throws -> String
     func getApnsToken() throws -> Data
     func getSiteID() throws -> Int
@@ -108,56 +92,49 @@ public protocol KeyValueStorage {
     subscript<T>(key: StorageKey) -> T? { get set }
 }
 
+extension UserDefaults: KeyValueStorage {
+
+    public func set(value: Any?, key: StorageKey) {
+        self.set(value, forKey: key.rawValue)
+    }
+
+    public func value(for key: StorageKey) -> Any? {
+        return self.value(forKey: key.rawValue)
+    }
+
+    public subscript<T>(key: StorageKey) -> T? {
+        get {
+            return value(for: key) as? T
+        }
+        set {
+            set(value: newValue, key: key)
+        }
+    }
+
+}
+
+public enum StorageError: LocalizedError {
+    case noValue(StorageKey)
+
+    public var errorDescription: String? {
+        switch self {
+        case let .noValue(key):
+            return "StorageError: No value for key \(key.rawValue)"
+        }
+    }
+}
+
 /// Class implements the Façade pattern for hiding complexity of the OptimoveStorage protocol.
 public final class StorageFacade: OptimoveStorage {
 
-    // Use for constants that are used in the grouped "group.<bundle-main-id>.optimove" container.
-    private let groupedStorage: KeyValueStorage?
-    static let groupKeys: Set<StorageKey> = [
-        .optitrackEndpoint,
-        .tenantID,
-        .installationID,
-        .customerID,
-        .configurationEndPoint,
-        .initialVisitorId,
-        .tenantToken,
-        .visitorID,
-        .version,
-        .userAgent,
-        .deviceResolutionWidth,
-        .deviceResolutionHeight,
-        .advertisingIdentifier,
-        .optFlag,
-        .migrationVersions,
-        .arePushCampaignsDisabled,
-        .firstRunTimestamp
-    ]
-
-    // Use for constants that are used in the shared "<bundle-main-id>" container.
-    private let sharedStorage: KeyValueStorage?
-    static let sharedKeys: Set<StorageKey> = [
-        .userEmail,
-        .apnsToken,
-        .siteID,
-        .settingUserSuccess,
-        .firstVisitTimestamp,
-        .realtimeSetUserIdFailed,
-        .realtimeSetEmailFailed
-    ]
-
-    private let fileStorage: FileStorage?
+    private let keyValureStorage: KeyValueStorage
+    private let fileStorage: FileStorage
 
     public init(
-        groupedStorage: KeyValueStorage?,
-        sharedStorage: KeyValueStorage?,
-        fileStorage: FileStorage?) {
-        self.groupedStorage = groupedStorage
-        self.sharedStorage = sharedStorage
+        keyValureStorage: KeyValueStorage,
+        fileStorage: FileStorage) {
+        self.keyValureStorage = keyValureStorage
         self.fileStorage = fileStorage
-    }
-
-    private func storage(for key: StorageKey) -> KeyValueStorage? {
-        return StorageFacade.sharedKeys.contains(key) ? sharedStorage : groupedStorage
     }
 
 }
@@ -169,19 +146,19 @@ extension StorageFacade {
     /// Use `storage.key` instead.
     /// Some variable have formatters, implemented in own setters. Set unformatted value could cause an issue.
     public func set(value: Any?, key: StorageKey) {
-        storage(for: key)?.set(value: value, key: key)
+        keyValureStorage.set(value: value, key: key)
     }
 
     public func value(for key: StorageKey) -> Any? {
-        return storage(for: key)?.value(for: key)
+        return keyValureStorage.value(for: key)
     }
 
     public subscript<T>(key: StorageKey) -> T? {
         get {
-            return storage(for: key)?.value(for: key) as? T
+            return keyValureStorage.value(for: key) as? T
         }
         set {
-            storage(for: key)?.set(value: newValue, key: key)
+            keyValureStorage.set(value: newValue, key: key)
         }
     }
 
@@ -202,27 +179,27 @@ extension StorageFacade {
 extension StorageFacade {
 
     public func isExist(fileName: String, isGroupContainer: Bool) -> Bool {
-        return fileStorage?.isExist(fileName: fileName, isGroupContainer: isGroupContainer) ?? false
+        return fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer)
     }
 
     public func save<T: Codable>(data: T, toFileName: String, isGroupContainer: Bool) throws {
-        try fileStorage?.save(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
+        try fileStorage.save(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
     }
 
     public func saveData(data: Data, toFileName: String, isGroupContainer: Bool) throws {
-        try fileStorage?.saveData(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
+        try fileStorage.saveData(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
     }
 
     public func load<T: Codable>(fileName: String, isGroupContainer: Bool) throws -> T {
-        return try unwrap(fileStorage?.load(fileName: fileName, isGroupContainer: isGroupContainer))
+        return try unwrap(fileStorage.load(fileName: fileName, isGroupContainer: isGroupContainer))
     }
 
     public func loadData(fileName: String, isGroupContainer: Bool) throws -> Data {
-        return try unwrap(fileStorage?.loadData(fileName: fileName, isGroupContainer: isGroupContainer))
+        return try unwrap(fileStorage.loadData(fileName: fileName, isGroupContainer: isGroupContainer))
     }
 
     public func delete(fileName: String, isGroupContainer: Bool) throws {
-        try fileStorage?.delete(fileName: fileName, isGroupContainer: isGroupContainer)
+        try fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer)
     }
 
 }
@@ -230,8 +207,6 @@ extension StorageFacade {
 // MARK: - StorageValue
 
 public extension KeyValueStorage where Self: StorageValue {
-
-    // MARK: Grouped values
 
     var installationID: String? {
         get {
@@ -394,7 +369,68 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    // MARK: Group values getters
+    var userEmail: String? {
+        get {
+            return self[.userEmail]
+        }
+        set {
+            self[.userEmail] = newValue
+        }
+    }
+
+    var apnsToken: Data? {
+        get {
+            return self[.apnsToken]
+        }
+        set {
+            self[.apnsToken] = newValue
+        }
+    }
+
+    var siteID: Int? {
+        get {
+            return self[.siteID]
+        }
+        set {
+            self[.siteID] = newValue
+        }
+    }
+
+    var isSettingUserSuccess: Bool? {
+        get {
+            return self[.settingUserSuccess]
+        }
+        set {
+            return self[.settingUserSuccess] = newValue
+        }
+    }
+
+    var firstVisitTimestamp: Int64? {
+        get {
+            return self[.firstVisitTimestamp]
+        }
+        set {
+            self[.firstVisitTimestamp] = newValue
+        }
+    }
+
+    var realtimeSetUserIdFailed: Bool {
+        get {
+            return self[.realtimeSetUserIdFailed] ?? false
+        }
+        set {
+            self[.realtimeSetUserIdFailed] = newValue
+        }
+    }
+
+    var realtimeSetEmailFailed: Bool {
+        get {
+            return self[.realtimeSetEmailFailed] ?? false
+        }
+        set {
+            self[.realtimeSetEmailFailed] = newValue
+        }
+    }
 
     func getConfigurationEndPoint() throws -> URL {
         guard let value = configurationEndPoint else {
@@ -497,73 +533,6 @@ public extension KeyValueStorage where Self: StorageValue {
         return migrationVersions.contains(version)
     }
 
-    // MARK: Shared values
-
-    var userEmail: String? {
-        get {
-            return self[.userEmail]
-        }
-        set {
-            self[.userEmail] = newValue
-        }
-    }
-
-    var apnsToken: Data? {
-        get {
-            return self[.apnsToken]
-        }
-        set {
-            self[.apnsToken] = newValue
-        }
-    }
-
-    var siteID: Int? {
-        get {
-            return self[.siteID]
-        }
-        set {
-            self[.siteID] = newValue
-        }
-    }
-
-    var isSettingUserSuccess: Bool? {
-        get {
-            return self[.settingUserSuccess]
-        }
-        set {
-            return self[.settingUserSuccess] = newValue
-        }
-    }
-
-    var firstVisitTimestamp: Int64? {
-        get {
-            return self[.firstVisitTimestamp]
-        }
-        set {
-            self[.firstVisitTimestamp] = newValue
-        }
-    }
-
-    var realtimeSetUserIdFailed: Bool {
-        get {
-            return self[.realtimeSetUserIdFailed] ?? false
-        }
-        set {
-            self[.realtimeSetUserIdFailed] = newValue
-        }
-    }
-
-    var realtimeSetEmailFailed: Bool {
-        get {
-            return self[.realtimeSetEmailFailed] ?? false
-        }
-        set {
-            self[.realtimeSetEmailFailed] = newValue
-        }
-    }
-
-    // MARK: Shared values getters
-
     func getUserEmail() throws -> String {
         guard let value = userEmail else {
             throw StorageError.noValue(.userEmail)
@@ -583,38 +552,6 @@ public extension KeyValueStorage where Self: StorageValue {
             throw StorageError.noValue(.siteID)
         }
         return value
-    }
-
-}
-
-public enum StorageError: LocalizedError {
-    case noValue(StorageKey)
-
-    public var errorDescription: String? {
-        switch self {
-        case let .noValue(key):
-            return "StorageError: No value for key \(key.rawValue)"
-        }
-    }
-}
-
-extension UserDefaults: KeyValueStorage {
-
-    public func set(value: Any?, key: StorageKey) {
-        self.set(value, forKey: key.rawValue)
-    }
-
-    public func value(for key: StorageKey) -> Any? {
-        return self.value(forKey: key.rawValue)
-    }
-
-    public subscript<T>(key: StorageKey) -> T? {
-        get {
-            return value(for: key) as? T
-        }
-        set {
-            set(value: newValue, key: key)
-        }
     }
 
 }

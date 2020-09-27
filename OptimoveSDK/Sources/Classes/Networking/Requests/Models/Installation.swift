@@ -21,5 +21,6 @@ struct Installation: Codable {
     let optIn, isDev: Bool
     let metadata: Metadata
     let isPushCampaignsDisabled: Bool
+    let firstRunTime: Int64
 
 }

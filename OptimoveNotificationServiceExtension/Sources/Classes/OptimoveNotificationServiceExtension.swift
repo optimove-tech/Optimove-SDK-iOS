@@ -9,7 +9,9 @@ import OptimoveCore
 
     @objc public private(set) var isHandledByOptimove: Bool = false
 
-    let service: Service?
+    let bundleIdentifier: String
+    let operationQueue: OperationQueue
+    let networking: OptistreamNetworking?
 
     var bestAttemptContent: UNMutableNotificationContent?
     var contentHandler: ((UNNotificationContent) -> Void)?
@@ -18,7 +20,7 @@ import OptimoveCore
     /// In this case Optimove will fetch the bundle identifier automatically.
     /// - Parameter appBundleId: Bundle indentifier
     @objc public convenience init(appBundleId: String) {
-        self.init(service: Service.init(bundleIdentifier: appBundleId))
+        self.init(bundleIdentifier: appBundleId)
     }
 
     /// The convenience init will fetch the bundle identifier automatically.
@@ -28,14 +30,21 @@ import OptimoveCore
                 Bundle.hostAppBundle()?.bundleIdentifier,
                 CastError.customMessage(message: "Unable to find a bundle identifier.")
             )
-            self.init(service: Service.init(bundleIdentifier: bundleIdentifier))
+            self.init(bundleIdentifier: bundleIdentifier)
         } catch {
             fatalError(error.localizedDescription)
         }
     }
 
-    init(service: Service?) {
-        self.service = service
+    /// The main NSE initalizer.s
+    /// - Parameters:
+    ///   - bundleIdentifier: The application bundle identifier
+    ///   - networking: For testing
+    init(bundleIdentifier: String, networking: OptistreamNetworking? = nil) {
+        self.bundleIdentifier = bundleIdentifier
+        self.networking = networking
+        operationQueue = OperationQueue()
+        operationQueue.qualityOfService = .userInitiated
     }
 
     /// The method verified that a request belong to Optimove channel. The Oprimove request might be modified.
@@ -49,12 +58,9 @@ import OptimoveCore
         withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void
     ) -> Bool {
         do {
-            guard let service = self.service else {
-                os_log("Service not found", log: OSLog.notification, type: .fault)
-                return false
-            }
             isHandledByOptimove = false
             let payload = try verifyAndCreatePayload(request)
+            let networking = self.makeNetworking(optitrackEndpoint: payload.eventVariables.optitrackEndpoint)
             isHandledByOptimove = true
 
             self.bestAttemptContent = createBestAttemptContent(request: request, payload: payload)
@@ -62,10 +68,9 @@ import OptimoveCore
 
             let operations = [
                 NotificationDeliveryReporter(
-                    bundleIdentifier: service.bundleIdentifier,
+                    bundleIdentifier: bundleIdentifier,
                     notificationPayload: payload,
-                    networking: service.networking,
-                    storage: service.storage
+                    networking: networking
                 ),
                 MediaAttachmentDownloader(
                     notificationPayload: payload,
@@ -90,7 +95,7 @@ import OptimoveCore
             operations.forEach {
                 // Set the completion operation as dependent for all operations before they start executing.
                 completionOperation.addDependency($0)
-                service.operationQueue.addOperation($0)
+                self.operationQueue.addOperation($0)
             }
 
             // The completion operation is performing on the main queue.
@@ -111,7 +116,7 @@ import OptimoveCore
     /// The method called by system in case if `didReceive(_:withContentHandler:)` takes to long to execute or
     /// out of memory.
     @objc public func serviceExtensionTimeWillExpire() {
-        self.service?.operationQueue.cancelAllOperations()
+        self.operationQueue.cancelAllOperations()
         if let bestAttemptContent = bestAttemptContent {
             contentHandler?(bestAttemptContent)
         }
@@ -143,51 +148,19 @@ extension OptimoveNotificationServiceExtension {
         return bestAttemptContent
     }
 
+    func makeNetworking(optitrackEndpoint: URL) -> OptistreamNetworking {
+        if let networking = networking {
+            return networking
+        }
+        return OptistreamNetworkingImpl(
+            networkClient: NetworkClientImpl(),
+            endpoint: optitrackEndpoint
+        )
+    }
+
 }
 
 extension OSLog {
     static var subsystem = Bundle.main.bundleIdentifier!
     static let notification = OSLog(subsystem: subsystem, category: "notification")
-}
-
-final class Service {
-
-    let bundleIdentifier: String
-    let operationQueue: OperationQueue
-    let storage: OptimoveStorage
-    let networking: OptistreamNetworking
-
-    required init(
-        bundleIdentifier: String,
-        storage: OptimoveStorage,
-        networking: OptistreamNetworking) {
-        self.bundleIdentifier = bundleIdentifier
-        self.storage = storage
-        self.networking = networking
-        operationQueue = OperationQueue()
-        operationQueue.qualityOfService = .userInitiated
-    }
-
-    convenience init?(bundleIdentifier: String) {
-        do {
-            let storage = StorageFacade(
-                groupedStorage: try UserDefaults.grouped(
-                    tenantBundleIdentifier: bundleIdentifier
-                ),
-                sharedStorage: nil,
-                fileStorage: nil
-            )
-            let networking = OptistreamNetworkingImpl(
-                networkClient: NetworkClientImpl(),
-                endpoint: try unwrap(storage.optitrackEndpoint)
-            )
-            self.init(bundleIdentifier: bundleIdentifier, storage: storage, networking: networking)
-        } catch {
-            os_log(
-                "Service initialization error: %{PUBLIC}@",
-                log: OSLog.notification,
-                type: .error, error.localizedDescription)
-            return nil
-        }
-    }
 }

@@ -27,8 +27,7 @@ class OptimoveFileManagerTests: XCTestCase {
 
     override func setUp() {
         fileStorage = try! FileStorageImpl(
-            bundleIdentifier: Bundle.main.bundleIdentifier!,
-            fileManager: fileManager
+            url: try! FileManager.optimoveURL()
         )
     }
 

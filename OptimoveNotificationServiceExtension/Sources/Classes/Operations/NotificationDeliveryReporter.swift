@@ -9,16 +9,13 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
     private let bundleIdentifier: String
     private let notificationPayload: NotificationPayload
     private let networking: OptistreamNetworking
-    private let storage: OptimoveStorage
 
     init(bundleIdentifier: String,
          notificationPayload: NotificationPayload,
-         networking: OptistreamNetworking,
-         storage: OptimoveStorage) {
+         networking: OptistreamNetworking) {
         self.bundleIdentifier = bundleIdentifier
         self.notificationPayload = notificationPayload
         self.networking = networking
-        self.storage = storage
     }
 
     override func main() {
@@ -36,23 +33,20 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
                 identityToken: campaign.identityToken
             )
             let optistreamEvent = OptistreamEvent(
-                tenant: try storage.getTenantID(),
+                tenant: notificationPayload.eventVariables.tenant,
                 category: event.category,
                 event: event.name,
                 origin: "sdk",
-                customer: storage.customerID,
-                visitor: try storage.getVisitorID(),
+                customer: notificationPayload.eventVariables.customer,
+                visitor: notificationPayload.eventVariables.visitor,
                 timestamp: Formatter.iso8601withFractionalSeconds.string(from: event.timestamp),
                 context: try JSON(event.context),
                 metadata: OptistreamEvent.Metadata(
                     channel: OptistreamEvent.Metadata.Channel(
-                        airship: try? OptimoveAirshipIntegration(
-                            storage: storage,
-                            isSupportedAirship: true
-                        ).loadAirshipIntegration()
+                        airship: nil
                     ),
                     realtime: event.isRealtime,
-                    firstVisitorDate: try storage.getFirstRunTimestamp(),
+                    firstVisitorDate: notificationPayload.eventVariables.firstRunTimestamp,
                     eventId: event.eventId.uuidString,
                     validations: []
                 )
