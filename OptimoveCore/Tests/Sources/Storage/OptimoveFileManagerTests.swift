@@ -108,9 +108,9 @@ class OptimoveFileManagerTests: XCTestCase {
 }
 
 private struct StubCodable: Codable {
-    let name = "name"
-    let value = "value"
-    let parameters: [String: String] = [
+    var name = "name"
+    var value = "value"
+    var parameters: [String: String] = [
         "key": "value"
     ]
 }
