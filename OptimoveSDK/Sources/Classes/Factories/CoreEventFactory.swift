@@ -10,7 +10,6 @@ enum CoreEventType {
     case metaData
     case setUserAgent
     case setUserEmail(email: String)
-    case setAdvertisingId
     case setUserId(userId: String)
     case pageVisit(title: String, category: String?)
 }
@@ -58,8 +57,6 @@ extension CoreEventFactoryImpl: CoreEventFactory {
             return self.createPageVisitEvent(title: t, category: c)
         case .setUserAgent:
             return try createSetUserAgentEvent()
-        case .setAdvertisingId:
-            return try createSetAdvertisingIdEvent()
         case let .setUserEmail(email):
             return try createSetUserEmailEvent(email: email)
         }
@@ -129,14 +126,6 @@ private extension CoreEventFactoryImpl {
     func createSetUserAgentEvent() throws -> SetUserAgent {
         return SetUserAgent(
             userAgent: try storage.getUserAgent()
-        )
-    }
-
-    func createSetAdvertisingIdEvent() throws -> SetAdvertisingIdEvent {
-        return SetAdvertisingIdEvent(
-            advertisingId: getAdvertisingIdentifier(),
-            deviceId: try storage.getInstallationID(),
-            appNs: try getApplicationNamespace()
         )
     }
 

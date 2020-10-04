@@ -25,8 +25,7 @@ final class OnStartEventGenerator {
     private func generateEvents() {
         tryCatch {
             let metaDataEvent = try coreEventFactory.createEvent(.metaData)
-            let setAdvertisingIdEvent = try coreEventFactory.createEvent(.setAdvertisingId)
-            self.synchronizer.handle(.report(events: [metaDataEvent, setAdvertisingIdEvent]))
+            self.synchronizer.handle(.report(events: [metaDataEvent]))
         }
     }
 
