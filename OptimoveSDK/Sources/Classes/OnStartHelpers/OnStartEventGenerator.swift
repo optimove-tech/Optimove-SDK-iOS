@@ -19,10 +19,10 @@ final class OnStartEventGenerator {
 
     func generate() {
         asyncGenerate()
-        generateEvents()
+        syncGenerate()
     }
 
-    private func generateEvents() {
+    private func syncGenerate() {
         tryCatch {
             let metaDataEvent = try coreEventFactory.createEvent(.metaData)
             self.synchronizer.handle(.report(events: [metaDataEvent]))
