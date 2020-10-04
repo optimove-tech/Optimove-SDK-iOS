@@ -31,7 +31,6 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
         storage.configurationEndPoint = URL(string: "http://optimove.net")
 
         // then
-        let ifdaEventExpectation = expectation(description: "SetAdvertisingIdEvent was not generated.")
         let metaDataEventExpectation = expectation(description: "MetaDataEvent was not generated.")
         let userAgentEventExpectation = expectation(description: "SetUserAgent was not generated.")
         let appOpenEventExpectation = expectation(description: "AppOpenEvent was not generated.")
@@ -40,8 +39,6 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
             case let .report(events: events):
                 events.forEach { event in
                     switch event.name {
-                    case SetAdvertisingIdEvent.Constants.name:
-                        ifdaEventExpectation.fulfill()
                     case MetaDataEvent.Constants.name:
                         metaDataEventExpectation.fulfill()
                     case SetUserAgent.Constants.name:
@@ -62,7 +59,6 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
 
         wait(
             for: [
-                ifdaEventExpectation,
                 metaDataEventExpectation,
                 userAgentEventExpectation,
                 appOpenEventExpectation
