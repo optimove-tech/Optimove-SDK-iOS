@@ -44,7 +44,7 @@ class MigrationWorkerWithStorage: MigrationWorker {
     }
 
     override func isAllowToMiragte(_ currentVersion: String) -> Bool {
-        guard !storage.isAlreadyMigrated(to: currentVersion) else {
+        guard !storage.isAlreadyMigrated(to: version.rawValue) else {
             return false
         }
         return super.isAllowToMiragte(currentVersion)
@@ -96,6 +96,15 @@ final class MigrationWork_3_3_0: MigrationWorker {
         super.init(newVersion: .v_3_3_0)
     }
 
+    override func isAllowToMiragte(_ currentVersion: String) -> Bool {
+        guard let storage = try? UserDefaults.optimove() else {
+            return true
+        }
+        let key = StorageKey.migrationVersions
+        let versions = storage.object(forKey: key.rawValue) as? [String] ?? []
+        return !versions.contains(self.version.rawValue)
+    }
+
     override func runMigration() {
         let replacers: [Replacer] = [
             UserDefaultsReplacer(),
@@ -128,7 +137,20 @@ extension MigrationWork_3_3_0 {
             let bundleID =  try Bundle.getApplicationNameSpace()
             let oldDefaults = try UserDefaults.grouped(tenantBundleIdentifier: bundleID)
             let newDefaults = try UserDefaults.optimove()
-            newDefaults.setValuesForKeys(oldDefaults.dictionaryRepresentation())
+            let groupKeys: Set<StorageKey> = [
+                .userEmail,
+                .apnsToken,
+                .siteID,
+                .settingUserSuccess,
+                .firstVisitTimestamp,
+                .realtimeSetUserIdFailed,
+                .realtimeSetEmailFailed,
+            ]
+            groupKeys.forEach({ key in
+                let value = oldDefaults.value(for: key)
+                newDefaults.set(value: value, key: key)
+                oldDefaults.removeObject(forKey: key.rawValue)
+            })
         }
 
         func moveFilesFromAppGroup() throws {
@@ -136,6 +158,11 @@ extension MigrationWork_3_3_0 {
             let oldURL = try FileManager.default.groupContainer(tenantBundleIdentifier: bundleID).appendingPathComponent("OptimoveSDK")
             let newURL = try FileManager.optimoveURL()
             let fileManager = FileManager.default
+            var isDirectory: ObjCBool = false
+            let exists = FileManager.default.fileExists(atPath: oldURL.absoluteString, isDirectory: &isDirectory)
+            guard exists && isDirectory.boolValue else {
+                return
+            }
             let files = try FileManager.default.contentsOfDirectory(atPath: oldURL.absoluteString)
             try files.forEach({ file in
                 let oldPath = oldURL.appendingPathComponent(file)
@@ -147,9 +174,7 @@ extension MigrationWork_3_3_0 {
         func markMigrationAsCompleted() throws {
             let newDefaults = try UserDefaults.optimove()
             let key = StorageKey.migrationVersions
-            guard var versions = newDefaults.object(forKey: key.rawValue) as? [String] else {
-                return
-            }
+            var versions = newDefaults.object(forKey: key.rawValue) as? [String] ?? []
             versions.append(Version.v_3_3_0.rawValue)
             newDefaults.set(value: versions, key: key)
         }
@@ -160,7 +185,7 @@ extension MigrationWork_3_3_0 {
             do {
                 let oldDefaults = UserDefaults.shared()
                 let newDefaults = try UserDefaults.optimove()
-                let groupKeys: Set<StorageKey> = [
+                let sharedKeys: Set<StorageKey> = [
                     .optitrackEndpoint,
                     .tenantID,
                     .installationID,
@@ -179,7 +204,7 @@ extension MigrationWork_3_3_0 {
                     .arePushCampaignsDisabled,
                     .firstRunTimestamp
                 ]
-                groupKeys.forEach({ key in
+                sharedKeys.forEach({ key in
                     let value = oldDefaults.value(for: key)
                     newDefaults.set(value: value, key: key)
                     oldDefaults.removeObject(forKey: key.rawValue)
