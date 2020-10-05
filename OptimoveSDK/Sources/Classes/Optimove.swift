@@ -106,9 +106,10 @@ extension Optimove {
     @objc public func registerUser(sdkId userID: String, email: String) {
         let function: (ServiceLocator) -> Void = { serviceLocator in
             tryCatch {
-                let setUserIdEvent = try self._setUserId(userID, serviceLocator)
+                let user = User(userID: userID)
+                let setUserIdEvent = try self._setUser(user, serviceLocator)
                 let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
-                if UserIDValidator(storage: serviceLocator.storage()).validateNewUserID(userID) == .valid {
+                if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
                     serviceLocator.synchronizer().handle(.setInstallation)
                 }
                 serviceLocator.synchronizer().handle(.report(events: [setUserIdEvent, setUserEmailEvent]))
@@ -123,9 +124,10 @@ extension Optimove {
     @objc public func setUserId(_ userID: String) {
         let function: (ServiceLocator) -> Void = { serviceLocator in
             tryCatch {
-                let event = try self._setUserId(userID, serviceLocator)
+                let user = User(userID: userID)
+                let event = try self._setUser(user, serviceLocator)
                 serviceLocator.synchronizer().handle(.report(events: [event]))
-                if UserIDValidator(storage: serviceLocator.storage()).validateNewUserID(userID) == .valid {
+                if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
                     serviceLocator.synchronizer().handle(.setInstallation)
                 }
             }
@@ -133,8 +135,8 @@ extension Optimove {
         container.resolve(function)
     }
 
-    private func _setUserId(_ userID: String, _ serviceLocator: ServiceLocator) throws -> Event {
-        return try serviceLocator.coreEventFactory().createEvent(.setUserId(userId: userID))
+    private func _setUser(_ user: User, _ serviceLocator: ServiceLocator) throws -> Event {
+        return try serviceLocator.coreEventFactory().createEvent(.setUser(user: user))
     }
 
     /// Set a user email to the Optimove SDK.

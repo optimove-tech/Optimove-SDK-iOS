@@ -2,7 +2,7 @@
 
 import OptimoveCore
 
-struct UserIDValidator {
+struct UserValidator {
 
     enum Result: String {
         case valid
@@ -16,11 +16,12 @@ struct UserIDValidator {
         self.storage = storage
     }
 
-    func validateNewUserID(_ userId: String) -> UserIDValidator.Result {
-        guard UserIDValidator.isValid(userId) else {
+    func validateNewUser(_ user: User) -> UserValidator.Result {
+        let userID = user.userID
+        guard UserValidator.isValid(userID) else {
             return .notValid
         }
-        guard userId != storage.customerID else {
+        guard userID != storage.customerID else {
             return .alreadySetIn
         }
         return .valid
