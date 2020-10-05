@@ -117,6 +117,7 @@
 		5E053F49077A89C08CF54B5F /* OptimoveCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2764B249D4CC9907122D2773 /* OptimoveCore.framework */; };
 		5EFB943F708BFECD8C7122C4 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04629380902B7E31CF43D52 /* Container.swift */; };
 		5F119B4AEB28CE16E8700C14 /* NotificationPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D20E38059A2569DC11EADD4 /* NotificationPayload.swift */; };
+		5FB638A83055FE9E9C60CD30 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7456596A7D6237B0B0725A /* User.swift */; };
 		626B1AF99FD89EB1053D308D /* FileAccessible.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FFBD8E3E3EC13859EAA9E9 /* FileAccessible.swift */; };
 		63485C3731D0062C1A21A186 /* NewEmailHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4A12120BA5D1C6934AA0FA /* NewEmailHandler.swift */; };
 		64C373178EC3796339003DA1 /* String+SHA1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0743DA20AB28DD7E78A80384 /* String+SHA1.swift */; };
@@ -484,6 +485,7 @@
 		6CB578140EEA0C61258F4C95 /* ProcessInfo+OsVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessInfo+OsVersion.swift"; sourceTree = "<group>"; };
 		6E3C5B3C925979A600092193 /* TenantConfigurationDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantConfigurationDownloader.swift; sourceTree = "<group>"; };
 		6E5BB6E717D62FCA403815BF /* NotificationOpenedEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationOpenedEventTests.swift; sourceTree = "<group>"; };
+		6E7456596A7D6237B0B0725A /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		6EC3FB80E72AC19A2DD93153 /* apns_payload_triggered_campaign.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = apns_payload_triggered_campaign.json; sourceTree = "<group>"; };
 		7050C386BF1D5D2C1991ACDF /* RemoteConfigurationRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationRequestBuilder.swift; sourceTree = "<group>"; };
 		70EC39175948194604CEA34B /* StringSplitByLenghtExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringSplitByLenghtExtensionsTests.swift; sourceTree = "<group>"; };
@@ -770,6 +772,7 @@
 				EA38BCA90CA160B46A3B5692 /* Legacy */,
 				1A6565B66BC70AFB47005124 /* Migration */,
 				67EB23423FC05DC191C8148A /* Networking */,
+				7FCDDCEEA03F63C3AE062934 /* Objects */,
 				0CEE3CCD7B14A0976E778A76 /* Observers */,
 				6B5BFEAF9F7D336231486959 /* OnStartHelpers */,
 				555940095A8E06805647E039 /* Operations */,
@@ -1421,6 +1424,14 @@
 			path = Configurations;
 			sourceTree = "<group>";
 		};
+		7FCDDCEEA03F63C3AE062934 /* Objects */ = {
+			isa = PBXGroup;
+			children = (
+				6E7456596A7D6237B0B0725A /* User.swift */,
+			);
+			path = Objects;
+			sourceTree = "<group>";
+		};
 		83B95874A3BCF31B5E3A8455 /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1881,21 +1892,21 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		"TEMP_38842462-61A7-4DF8-AEB6-7B6BE2705787" /* Tests */ = {
+		"TEMP_3337439F-05A2-45D3-AE94-303269897A0B" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_5D1E2B3A-625B-4699-A1E0-30D933E4D229" /* Tests */ = {
+		"TEMP_932BCEB5-43A1-4104-A59C-355018E18D3D" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_E282F6C5-9EA8-4D93-879D-7162E02EDF46" /* Tests */ = {
+		"TEMP_A701F398-213E-43B2-BFD9-6E2C8A2E05BC" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -2260,6 +2271,7 @@
 				3F914AEC67178E83B132E387 /* Syncronizer.swift in Sources */,
 				E965C7402C8DCA4FAB3940D2 /* TenantConfigurationDownloader.swift in Sources */,
 				DDD6774A89DE3F27E8F12D0B /* TenantEvent.swift in Sources */,
+				5FB638A83055FE9E9C60CD30 /* User.swift in Sources */,
 				6F2F6C1080B6763E7EE538D2 /* UserAgentGenerator.swift in Sources */,
 				695F98AE4990411750376C41 /* UserValidator.swift in Sources */,
 				AAB7C3B91AA0AD65E7A6AC9B /* Version.swift in Sources */,
