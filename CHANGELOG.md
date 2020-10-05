@@ -2,14 +2,15 @@
 
 ## 3.3.0
 
-- **change** stop using App Group
-- **support** iOS 14
+- **change** stop using the App Group.
+- **support** iOS 14.
+- **fix** a generation of an update visitor id.
 
 ## 3.2.0
 
 - **add** new deeplinks - no need to convert from dynamic links.
 - **fix** do not send events with errors to realtime.
-- **fix** crash in NSE
+- **fix** crash in NSE.
 
 ## 3.1.1
 
