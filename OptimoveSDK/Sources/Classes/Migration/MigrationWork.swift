@@ -123,6 +123,7 @@ private protocol Replacer {
 extension MigrationWork_3_3_0 {
 
     final class AppGroupReplacer: Replacer {
+
         func replace() {
             do {
                 try moveDefautlsFromAppGroup()
@@ -135,7 +136,7 @@ extension MigrationWork_3_3_0 {
 
         func moveDefautlsFromAppGroup() throws {
             let bundleID =  try Bundle.getApplicationNameSpace()
-            let oldDefaults = try UserDefaults.grouped(tenantBundleIdentifier: bundleID)
+            let oldDefaults = try getDeprecatedUserDefaultsGrouped(tenantBundleIdentifier: bundleID)
             let newDefaults = try UserDefaults.optimove()
             let groupKeys: Set<StorageKey> = [
                 .optitrackEndpoint,
@@ -165,7 +166,7 @@ extension MigrationWork_3_3_0 {
 
         func moveFilesFromAppGroup() throws {
             let bundleID =  try Bundle.getApplicationNameSpace()
-            let oldURL = try FileManager.default.groupContainer(tenantBundleIdentifier: bundleID).appendingPathComponent("OptimoveSDK")
+            let oldURL = try getDeprecatedFileManagerGroupContainerURL(tenantBundleIdentifier: bundleID).appendingPathComponent("OptimoveSDK")
             let newURL = try FileManager.optimoveURL()
             let fileManager = FileManager.default
             var isDirectory: ObjCBool = false
@@ -188,12 +189,40 @@ extension MigrationWork_3_3_0 {
             versions.append(Version.v_3_3_0.rawValue)
             newDefaults.set(value: versions, key: key)
         }
+
+        private func getDeprecatedUserDefaultsGrouped(tenantBundleIdentifier: String) throws -> UserDefaults {
+            let suiteName = "group.\(tenantBundleIdentifier).optimove"
+            guard let userDefaults = UserDefaults(suiteName: suiteName) else {
+                throw GuardError.custom(
+                """
+                Unable to initialize UserDefault with suit name "\(suiteName)".
+                Highly possible that the client forgot to add the app group as described in the documentation.
+                Link: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Setup#3-setting-up-capabilities
+                """
+                )
+            }
+            return userDefaults
+        }
+
+        private func getDeprecatedFileManagerGroupContainerURL(tenantBundleIdentifier: String) throws -> URL {
+            let groupIdentifier = "group.\(tenantBundleIdentifier).optimove"
+            guard let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier) else {
+                throw GuardError.custom(
+                    """
+                    Unable to initialize FileManager container for the application group identifier "\(groupIdentifier)".
+                    Highly possible that the client forgot to add the app group as described in the documentation.
+                    Link: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Setup#3-setting-up-capabilities
+                    """
+                )
+            }
+            return url
+        }
     }
 
     final class UserDefaultsReplacer: Replacer {
         func replace() {
             do {
-                let oldDefaults = UserDefaults.shared()
+                let oldDefaults = UserDefaults.standard
                 let newDefaults = try UserDefaults.optimove()
                 let sharedKeys: Set<StorageKey> = [
                     .userEmail,

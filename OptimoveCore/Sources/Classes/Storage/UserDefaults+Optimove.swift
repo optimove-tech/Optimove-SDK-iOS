@@ -16,28 +16,4 @@ public extension UserDefaults {
         return userDefaults
     }
 
-    /* Returns the UserDefaults associated with the Optimove SDK group.
-     */
-    @available(swift, deprecated: 3.4.0, message: "Use `UserDefaults.optimove()` instead.")
-    static func grouped(tenantBundleIdentifier: String) throws -> UserDefaults {
-        let suiteName = "group.\(tenantBundleIdentifier).optimove"
-        guard let userDefaults = UserDefaults(suiteName: suiteName) else {
-            throw GuardError.custom(
-            """
-            Unable to initialize UserDefault with suit name "\(suiteName)".
-            Highly possible that the client forgot to add the app group as described in the documentation.
-            Link: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Setup#3-setting-up-capabilities
-            """
-            )
-        }
-        return userDefaults
-    }
-
-    /* Returns the UserDefaults associated with a host application.
-     */
-    @available(swift, deprecated: 3.4.0, message: "Use `UserDefaults.optimove()` instead.")
-    static func shared() -> UserDefaults {
-        return UserDefaults.standard
-    }
-
 }
