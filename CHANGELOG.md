@@ -2,7 +2,7 @@
 
 ## 3.3.0
 
-- **change** stop using the App Group.
+- **change** migrate the storage from an App Group to an main container.
 - **support** iOS 14.
 - **fix** a generation of an update visitor id.
 
