@@ -32,8 +32,6 @@ public enum StorageKey: String, CaseIterable {
     case siteID /// Legacy: See tenantID
     case settingUserSuccess
     case firstVisitTimestamp /// Legacy
-    case realtimeSetUserIdFailed
-    case realtimeSetEmailFailed
 }
 
 // MARK: - StorageValue
@@ -63,8 +61,6 @@ public protocol StorageValue {
     var isSettingUserSuccess: Bool? { get set }
     /// Legacy. Use `firstRunTimestamp` instead
     var firstVisitTimestamp: Int64? { get set }
-    var realtimeSetUserIdFailed: Bool { get set }
-    var realtimeSetEmailFailed: Bool { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -411,24 +407,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             self[.firstVisitTimestamp] = newValue
-        }
-    }
-
-    var realtimeSetUserIdFailed: Bool {
-        get {
-            return self[.realtimeSetUserIdFailed] ?? false
-        }
-        set {
-            self[.realtimeSetUserIdFailed] = newValue
-        }
-    }
-
-    var realtimeSetEmailFailed: Bool {
-        get {
-            return self[.realtimeSetEmailFailed] ?? false
-        }
-        set {
-            self[.realtimeSetEmailFailed] = newValue
         }
     }
 
