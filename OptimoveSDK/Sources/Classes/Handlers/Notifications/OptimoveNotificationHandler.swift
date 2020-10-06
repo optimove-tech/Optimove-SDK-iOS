@@ -24,12 +24,8 @@ private extension OptimoveNotificationHandler {
         tryCatch {
             switch actionIdentifier {
             case UNNotificationDefaultActionIdentifier:
-                let task = UIApplication.shared.beginBackgroundTask(withName: "Optimove SDK report notification event")
                 let event = try createEvent(from: notification)
                 synchronizer.handle(.report(events: [event]))
-                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(20)) {
-                    UIApplication.shared.endBackgroundTask(task)
-                }
             default:
                 break
             }
