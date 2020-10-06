@@ -178,28 +178,28 @@ extension StorageFacade {
 
 extension StorageFacade {
 
-    public func isExist(fileName: String, isGroupContainer: Bool) -> Bool {
-        return fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer)
+    public func isExist(fileName: String) -> Bool {
+        return fileStorage.isExist(fileName: fileName)
     }
 
-    public func save<T: Codable>(data: T, toFileName: String, isGroupContainer: Bool) throws {
-        try fileStorage.save(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
+    public func save<T: Codable>(data: T, toFileName: String) throws {
+        try fileStorage.save(data: data, toFileName: toFileName)
     }
 
-    public func saveData(data: Data, toFileName: String, isGroupContainer: Bool) throws {
-        try fileStorage.saveData(data: data, toFileName: toFileName, isGroupContainer: isGroupContainer)
+    public func saveData(data: Data, toFileName: String) throws {
+        try fileStorage.saveData(data: data, toFileName: toFileName)
     }
 
-    public func load<T: Codable>(fileName: String, isGroupContainer: Bool) throws -> T {
-        return try unwrap(fileStorage.load(fileName: fileName, isGroupContainer: isGroupContainer))
+    public func load<T: Codable>(fileName: String) throws -> T {
+        return try unwrap(fileStorage.load(fileName: fileName))
     }
 
-    public func loadData(fileName: String, isGroupContainer: Bool) throws -> Data {
-        return try unwrap(fileStorage.loadData(fileName: fileName, isGroupContainer: isGroupContainer))
+    public func loadData(fileName: String) throws -> Data {
+        return try unwrap(fileStorage.loadData(fileName: fileName))
     }
 
-    public func delete(fileName: String, isGroupContainer: Bool) throws {
-        try fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer)
+    public func delete(fileName: String) throws {
+        try fileStorage.delete(fileName: fileName)
     }
 
 }

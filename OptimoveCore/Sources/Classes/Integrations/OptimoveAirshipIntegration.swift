@@ -39,14 +39,11 @@ public class OptimoveAirshipIntegration {
     }
 
     private func isAirshipExistInStorage() -> Bool {
-        return storage.isExist(fileName: Constants.airshipFile, isGroupContainer: Constants.isGroupContainer)
+        return storage.isExist(fileName: Constants.airshipFile)
     }
 
     private func load() throws -> Airship {
-        let airship: Airship = try storage.load(
-            fileName: Constants.airshipFile,
-            isGroupContainer: Constants.isGroupContainer
-        )
+        let airship: Airship = try storage.load(fileName: Constants.airshipFile)
         self.airship = airship
         return airship
     }
@@ -55,8 +52,7 @@ public class OptimoveAirshipIntegration {
         guard let channelId = secretChannelIdentifier(), let appKey = secretAppKey() else { return }
         try storage.save(
             data: Airship(channelId: channelId, appKey: appKey),
-            toFileName: Constants.airshipFile,
-            isGroupContainer: Constants.isGroupContainer
+            toFileName: Constants.airshipFile
         )
     }
 

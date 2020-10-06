@@ -28,7 +28,6 @@ public final class ConfigurationRepositoryImpl {
         }
         struct Configuration {
             static let fileName = "configuration" + fileExtension
-            static let isGroupContainer = true
         }
     }
 
@@ -43,39 +42,30 @@ public final class ConfigurationRepositoryImpl {
 extension ConfigurationRepositoryImpl: ConfigurationRepository {
 
     public func getConfiguration() throws -> Configuration {
-        return try storage.load(fileName: Constants.Configuration.fileName,
-                                isGroupContainer: Constants.Configuration.isGroupContainer)
+        return try storage.load(fileName: Constants.Configuration.fileName)
     }
 
     public func setConfiguration(_ config: Configuration) throws {
-        try storage.save(data: config,
-                         toFileName: Constants.Configuration.fileName,
-                         isGroupContainer: Constants.Configuration.isGroupContainer)
+        try storage.save(data: config, toFileName: Constants.Configuration.fileName)
     }
 
     public func getGlobal() throws -> GlobalConfig {
-        return try storage.load(fileName: Constants.Global.fileName,
-                                isGroupContainer: Constants.Global.isGroupContainer)
+        return try storage.load(fileName: Constants.Global.fileName)
     }
 
     public func saveGlobal(_ config: GlobalConfig) throws {
-        try storage.save(data: config,
-                         toFileName: Constants.Global.fileName,
-                         isGroupContainer: Constants.Global.isGroupContainer)
+        try storage.save(data: config, toFileName: Constants.Global.fileName)
     }
 
     public func getTenant() throws -> TenantConfig {
         let version = try storage.getVersion()
         let fileName = version + Constants.fileExtension
-        return try storage.load(fileName: fileName,
-                                isGroupContainer: Constants.Tenant.isGroupContainer)
+        return try storage.load(fileName: fileName)
     }
 
     public func saveTenant(_ config: TenantConfig) throws {
         let version = try storage.getVersion()
         let fileName = version + Constants.fileExtension
-        try storage.save(data: config,
-                         toFileName: fileName,
-                         isGroupContainer: Constants.Tenant.isGroupContainer)
+        try storage.save(data: config, toFileName: fileName)
     }
 }
