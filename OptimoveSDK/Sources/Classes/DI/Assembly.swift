@@ -10,6 +10,7 @@ final class Assembly {
     }
 
     private func makeServiceLocator() -> ServiceLocator? {
+        /// A special storage migration, before an actual storage going to be in use.
         migrate()
         do {
             let keyValureStorage = try UserDefaults.optimove()

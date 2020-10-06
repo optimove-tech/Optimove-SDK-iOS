@@ -138,13 +138,23 @@ extension MigrationWork_3_3_0 {
             let oldDefaults = try UserDefaults.grouped(tenantBundleIdentifier: bundleID)
             let newDefaults = try UserDefaults.optimove()
             let groupKeys: Set<StorageKey> = [
-                .userEmail,
-                .apnsToken,
-                .siteID,
-                .settingUserSuccess,
-                .firstVisitTimestamp,
-                .realtimeSetUserIdFailed,
-                .realtimeSetEmailFailed,
+                .optitrackEndpoint,
+                .tenantID,
+                .installationID,
+                .customerID,
+                .configurationEndPoint,
+                .initialVisitorId,
+                .tenantToken,
+                .visitorID,
+                .version,
+                .userAgent,
+                .deviceResolutionWidth,
+                .deviceResolutionHeight,
+                .advertisingIdentifier,
+                .optFlag,
+                .migrationVersions,
+                .arePushCampaignsDisabled,
+                .firstRunTimestamp
             ]
             groupKeys.forEach({ key in
                 let value = oldDefaults.value(for: key)
@@ -186,23 +196,13 @@ extension MigrationWork_3_3_0 {
                 let oldDefaults = UserDefaults.shared()
                 let newDefaults = try UserDefaults.optimove()
                 let sharedKeys: Set<StorageKey> = [
-                    .optitrackEndpoint,
-                    .tenantID,
-                    .installationID,
-                    .customerID,
-                    .configurationEndPoint,
-                    .initialVisitorId,
-                    .tenantToken,
-                    .visitorID,
-                    .version,
-                    .userAgent,
-                    .deviceResolutionWidth,
-                    .deviceResolutionHeight,
-                    .advertisingIdentifier,
-                    .optFlag,
-                    .migrationVersions,
-                    .arePushCampaignsDisabled,
-                    .firstRunTimestamp
+                    .userEmail,
+                    .apnsToken,
+                    .siteID,
+                    .settingUserSuccess,
+                    .firstVisitTimestamp,
+                    .realtimeSetUserIdFailed,
+                    .realtimeSetEmailFailed,
                 ]
                 sharedKeys.forEach({ key in
                     let value = oldDefaults.value(for: key)
