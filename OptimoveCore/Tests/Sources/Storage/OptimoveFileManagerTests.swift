@@ -27,28 +27,27 @@ class OptimoveFileManagerTests: XCTestCase {
 
     override func setUp() {
         fileStorage = try! FileStorageImpl(
-            bundleIdentifier: Bundle.main.bundleIdentifier!,
-            fileManager: fileManager
+            url: try! FileManager.optimoveURL()
         )
     }
 
     func test_save_encodable_shared() {
-        save_encodable(isGroupContainer: true)
+        save_encodable()
     }
 
     func test_save_encodable_no_shared() {
-        save_encodable(isGroupContainer: false)
+        save_encodable()
     }
 
-    func save_encodable(isGroupContainer: Bool) {
+    func save_encodable() {
         // given
         let model = StubCodable()
 
         // when
-        XCTAssertNoThrow(try fileStorage.save(data: model, toFileName: fileName, isGroupContainer: isGroupContainer))
+        XCTAssertNoThrow(try fileStorage.save(data: model, toFileName: fileName))
 
         // then
-        XCTAssert(fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer))
+        XCTAssert(fileStorage.isExist(fileName: fileName))
     }
 
     func test_load_data_shared() throws {
@@ -61,11 +60,11 @@ class OptimoveFileManagerTests: XCTestCase {
 
     func load_data(isGroupContainer: Bool) throws {
         // given
-        save_encodable(isGroupContainer: isGroupContainer)
+        save_encodable()
 
         // then
-        XCTAssertNotNil(try fileStorage.loadData(fileName: fileName, isGroupContainer: isGroupContainer))
-        let stub: StubCodable = try fileStorage.load(fileName: fileName, isGroupContainer: isGroupContainer)
+        XCTAssertNotNil(try fileStorage.loadData(fileName: fileName))
+        let stub: StubCodable = try fileStorage.load(fileName: fileName)
         XCTAssertNotNil(stub)
     }
 
@@ -79,39 +78,39 @@ class OptimoveFileManagerTests: XCTestCase {
 
     func delete_file(isGroupContainer: Bool) {
         // given
-        save_encodable(isGroupContainer: isGroupContainer)
+        save_encodable()
 
         // when
-        XCTAssertNoThrow(try fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer))
+        XCTAssertNoThrow(try fileStorage.delete(fileName: fileName))
 
         // then
-        XCTAssert(fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer) == false)
+        XCTAssert(fileStorage.isExist(fileName: fileName) == false)
     }
 
     func test_delete_not_existed_file_shared() {
-        delete_not_existed_file(isGroupContainer: true)
+        delete_not_existed_file()
     }
 
     func test_delete_not_existed_file_no_shared() {
-        delete_not_existed_file(isGroupContainer: false)
+        delete_not_existed_file()
     }
 
-    func delete_not_existed_file(isGroupContainer: Bool) {
+    func delete_not_existed_file() {
         // check if file exist as result of an another test.
-        if fileStorage.isExist(fileName: fileName, isGroupContainer: isGroupContainer) {
-            try? fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer)
+        if fileStorage.isExist(fileName: fileName) {
+            try? fileStorage.delete(fileName: fileName)
         }
 
         // then
-        XCTAssertThrowsError(try fileStorage.delete(fileName: fileName, isGroupContainer: isGroupContainer))
+        XCTAssertThrowsError(try fileStorage.delete(fileName: fileName))
     }
 
 }
 
 private struct StubCodable: Codable {
-    let name = "name"
-    let value = "value"
-    let parameters: [String: String] = [
+    var name = "name"
+    var value = "value"
+    var parameters: [String: String] = [
         "key": "value"
     ]
 }

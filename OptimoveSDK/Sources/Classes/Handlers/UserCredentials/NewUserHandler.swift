@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class NewUserIDHandler {
+final class NewUserHandler {
 
     private var storage: OptimoveStorage
 
@@ -11,9 +11,9 @@ final class NewUserIDHandler {
         self.storage = storage
     }
 
-    func handle(userID: String) {
-        storage.visitorID = userID.sha1().prefix(16).description.lowercased()
-        storage.customerID = userID
+    func handle(user: User) {
+        storage.customerID = user.userID
+        storage.visitorID = user.visitorID
     }
 
 }

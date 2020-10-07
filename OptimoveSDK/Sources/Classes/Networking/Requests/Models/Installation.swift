@@ -14,12 +14,13 @@ struct Installation: Codable {
         let deviceModel: String
     }
 
-    let os = Constants.os
-    let pushProvider = Constants.pushProvider
+    var os = Constants.os
+    var pushProvider = Constants.pushProvider
     let customerID: String?
     let deviceToken, installationID, appNS, visitorID: String
     let optIn, isDev: Bool
     let metadata: Metadata
     let isPushCampaignsDisabled: Bool
+    let firstRunTime: Int64
 
 }

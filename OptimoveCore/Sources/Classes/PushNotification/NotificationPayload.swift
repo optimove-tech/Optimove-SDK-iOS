@@ -11,6 +11,7 @@ public struct NotificationPayload: Decodable {
     public let campaign: NotificationCampaignContainer?
     public let isOptipush: Bool
     public let media: MediaAttachment?
+    public let eventVariables: EventVariables
 
     enum CodingKeys: String, CodingKey {
         case title
@@ -20,16 +21,18 @@ public struct NotificationPayload: Decodable {
         case isOptipush = "is_optipush"
         case media
         case userAction = "user_action"
+        case eventVariables = "ev"
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.title = try container.decodeIfPresent(String.self, forKey: .title)
-        self.content = try container.decode(String.self, forKey: .content)
-        self.deepLink = try? DeepLink(firebaseFrom: decoder).url
         self.campaign = try? NotificationCampaignContainer(firebaseFrom: decoder)
-        self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
         self.media = try? MediaAttachment(firebaseFrom: decoder)
+        self.deepLink = try? DeepLink(firebaseFrom: decoder).url
+        self.content = try container.decode(String.self, forKey: .content)
+        self.isOptipush = try container.decode(StringCodableMap<Bool>.self, forKey: .isOptipush).decoded
+        self.eventVariables = try container.decode(EventVariables.self, forKey: .eventVariables)
+        self.title = try container.decodeIfPresent(String.self, forKey: .title)
     }
 }
 
@@ -113,6 +116,22 @@ public struct MediaAttachment: Decodable {
         self = try JSONDecoder().decode(MediaAttachment.self, from: data)
     }
 
+}
+
+public struct EventVariables: Decodable {
+    public let tenant: Int
+    public let customer: String?
+    public let visitor: String
+    public let firstRunTimestamp: Int64
+    public let optitrackEndpoint: URL
+
+    enum CodingKeys: String, CodingKey {
+        case tenant = "t"
+        case customer = "c"
+        case visitor = "v"
+        case firstRunTimestamp = "frt"
+        case optitrackEndpoint = "oe"
+    }
 }
 
 /// https://stackoverflow.com/a/44596291

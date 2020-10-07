@@ -30,27 +30,27 @@ class MockFileStorage: FileStorage {
 
     var storage: [String: Data] = [:]
 
-    func isExist(fileName: String, isGroupContainer: Bool) -> Bool {
+    func isExist(fileName: String) -> Bool {
         return storage[fileName] != nil
     }
 
-    func save<T: Codable>(data: T, toFileName: String, isGroupContainer: Bool) throws {
+    func save<T: Codable>(data: T, toFileName: String) throws {
         storage[toFileName] = try JSONEncoder().encode(data)
     }
 
-    func saveData(data: Data, toFileName: String, isGroupContainer: Bool) throws {
+    func saveData(data: Data, toFileName: String) throws {
         storage[toFileName] = data
     }
 
-    func load<T: Codable>(fileName: String, isGroupContainer: Bool) throws -> T {
+    func load<T: Codable>(fileName: String) throws -> T {
         return try JSONDecoder().decode(T.self, from: try unwrap(storage[fileName]))
     }
 
-    func loadData(fileName: String, isGroupContainer: Bool) throws -> Data {
+    func loadData(fileName: String) throws -> Data {
         return try unwrap(storage[fileName])
     }
 
-    func delete(fileName: String, isGroupContainer: Bool) throws {
+    func delete(fileName: String) throws {
         return storage[fileName] = nil
     }
 
@@ -64,8 +64,7 @@ class KeyValueStorageTests: XCTestCase {
     override func setUp() {
 
         storage = StorageFacade(
-            groupedStorage: MockKeyValueStorage(),
-            sharedStorage: MockKeyValueStorage(),
+            keyValureStorage: MockKeyValueStorage(),
             fileStorage: MockFileStorage()
         )
     }
@@ -273,34 +272,6 @@ class KeyValueStorageTests: XCTestCase {
     func test_optFlag_get() {
         // then
         XCTAssert(storage.optFlag == false)
-    }
-
-    func test_realtimeSetUserIdFailed() {
-        // when
-        let value = StubVariables.bool
-        storage.realtimeSetUserIdFailed = value
-
-        // then
-        XCTAssert(storage.realtimeSetUserIdFailed == value)
-    }
-
-    func test_no_realtimeSetUserIdFailed() {
-        // then
-        XCTAssert(storage.realtimeSetUserIdFailed == false)
-    }
-
-    func test_realtimeSetEmailFailed() {
-        // when
-        let value = StubVariables.bool
-        storage.realtimeSetEmailFailed = value
-
-        // then
-        XCTAssert(storage.realtimeSetEmailFailed == value)
-    }
-
-    func test_no_realtimeSetEmailFailed() {
-        // then
-        XCTAssert(storage.realtimeSetEmailFailed == false)
     }
 
     func test_push_campaign_disabled_default_value() {

@@ -10,8 +10,7 @@ enum CoreEventType {
     case metaData
     case setUserAgent
     case setUserEmail(email: String)
-    case setAdvertisingId
-    case setUserId(userId: String)
+    case setUser(user: User)
     case pageVisit(title: String, category: String?)
 }
 
@@ -46,8 +45,8 @@ extension CoreEventFactoryImpl: CoreEventFactory {
         switch type {
         case .appOpen:
             return try createAppOpenEvent()
-        case let .setUserId(userId):
-            return try createSetUserIdEvent(userId: userId)
+        case let .setUser(user):
+            return try createSetUserEvent(user: user)
         case .optipushOptIn:
             return try createOptipushOptInEvent()
         case .optipushOptOut:
@@ -58,8 +57,6 @@ extension CoreEventFactoryImpl: CoreEventFactory {
             return self.createPageVisitEvent(title: t, category: c)
         case .setUserAgent:
             return try createSetUserAgentEvent()
-        case .setAdvertisingId:
-            return try createSetAdvertisingIdEvent()
         case let .setUserEmail(email):
             return try createSetUserEmailEvent(email: email)
         }
@@ -132,14 +129,6 @@ private extension CoreEventFactoryImpl {
         )
     }
 
-    func createSetAdvertisingIdEvent() throws -> SetAdvertisingIdEvent {
-        return SetAdvertisingIdEvent(
-            advertisingId: getAdvertisingIdentifier(),
-            deviceId: try storage.getInstallationID(),
-            appNs: try getApplicationNamespace()
-        )
-    }
-
     func createPageVisitEvent(title: String, category: String?) -> PageVisitEvent {
         return PageVisitEvent(
             title: title,
@@ -147,11 +136,11 @@ private extension CoreEventFactoryImpl {
         )
     }
 
-    func createSetUserIdEvent(userId: String) throws -> SetUserIdEvent {
+    func createSetUserEvent(user: User) throws -> SetUserIdEvent {
         return SetUserIdEvent(
             originalVistorId: try storage.getInitialVisitorId(),
-            userId: userId,
-            updateVisitorId: try storage.getVisitorID()
+            userId: user.userID,
+            updateVisitorId: user.visitorID
         )
     }
 

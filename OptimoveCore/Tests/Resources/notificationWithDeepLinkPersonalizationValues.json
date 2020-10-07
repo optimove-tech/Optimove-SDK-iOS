@@ -10,5 +10,12 @@
     },
     "triggered_campaign": "{\"action_serial\": 123, \"action_id\": 123, \"template_id\": 123 }",
     "is_optipush": "true",
-    "dl": "https://com.optimove.sdk.optimovemobileclientnofirebase/demo_screen?Param_Name_iOS1=ParamVal_iOS+A++Hulio+🚀&Param_Name_iOS2=ParamVal_iOS+B+Template_Name+☘&Param_Name_iOS3=ParamVal_iOS+C+1234+👀"
+    "dl": "https://com.optimove.sdk.optimovemobileclientnofirebase/demo_screen?Param_Name_iOS1=ParamVal_iOS+A++Hulio+🚀&Param_Name_iOS2=ParamVal_iOS+B+Template_Name+☘&Param_Name_iOS3=ParamVal_iOS+C+1234+👀",
+    "ev": {
+        "t": 2590,
+        "c": "customer",
+        "v": "b39f008e318efd2b",
+        "frt": 1600860143,
+        "oe": "https://stream-2590.optimove.net"
+    }
 }

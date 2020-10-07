@@ -26,7 +26,7 @@ public struct OptistreamEvent: Codable {
 
         public let channel: Channel?
         public var realtime: Bool
-        public var firstVisitorDate: Int64
+        public var firstVisitorDate: Int64?
         public let eventId: String
         public let platform: String = "ios"
         public let version: String = SDKVersion
@@ -45,7 +45,7 @@ public struct OptistreamEvent: Codable {
         public init(
             channel: OptistreamEvent.Metadata.Channel?,
             realtime: Bool,
-            firstVisitorDate: Int64,
+            firstVisitorDate: Int64?,
             eventId: String,
             validations: [ValidationIssue]
         ) {

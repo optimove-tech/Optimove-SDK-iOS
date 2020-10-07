@@ -12,8 +12,7 @@ final class EventValidator: Node {
             case boolean = "Boolean"
 
             init?(rawValue: String) {
-                guard let type = AllowedType.allCases.first(where: { $0.rawValue == rawValue })
-                    else { return nil }
+                guard let type = AllowedType.allCases.first(where: { $0.rawValue == rawValue }) else { return nil }
                 self = type
             }
         }
@@ -95,15 +94,17 @@ final class EventValidator: Node {
         var errors: [ValidationError] = []
         if event.name == SetUserIdEvent.Constants.name,
             let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
-            let userID = userID.trimmingCharacters(in: .whitespaces)
+
+            let user = User(userID: userID)
+            let userID = user.userID.trimmingCharacters(in: .whitespaces)
             if userID.count > Constants.legalUserIdLength {
                 errors.append(ValidationError.tooLongUserId(userId: userID, limit: Constants.legalUserIdLength))
                 return errors
             }
-            let validationResult = UserIDValidator(storage: storage).validateNewUserID(userID)
+            let validationResult = UserValidator(storage: storage).validateNewUser(user)
             switch validationResult {
             case .valid:
-                NewUserIDHandler(storage: storage).handle(userID: userID)
+                NewUserHandler(storage: storage).handle(user: user)
             case .alreadySetIn:
                 throw ValidationError.alreadySetInUserId(userId: userID)
             case .notValid:

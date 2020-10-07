@@ -9,24 +9,23 @@ class NewUserIDHandlerTests: XCTestCase {
     var storage = MockOptimoveStorage()
 
     func test_first_login() {
-        let userID = "userID"
-        let expectedVisitorID = "9ef8254d9456fc23"
-        let handler = NewUserIDHandler(storage: storage)
+        let user = User(userID: "userID")
+        let handler = NewUserHandler(storage: storage)
 
         let visitorIDExpectation = expectation(description: "visitorID was not generated")
         let customerIDExpectation = expectation(description: "customerID was not generated")
         storage.assertFunction = { (value, key) in
             if key == .visitorID {
-                XCTAssertEqual(value as? String, expectedVisitorID)
+                XCTAssertEqual(value as? String, user.visitorID)
                 visitorIDExpectation.fulfill()
             }
             if key == .customerID {
-                XCTAssertEqual(value as? String, userID)
+                XCTAssertEqual(value as? String, user.userID)
                 customerIDExpectation.fulfill()
             }
         }
 
-        handler.handle(userID: userID)
+        handler.handle(user: user)
 
         wait(
             for: [
@@ -40,24 +39,23 @@ class NewUserIDHandlerTests: XCTestCase {
     func test_second_login() {
         storage.customerID = "old_userID"
         storage.isSettingUserSuccess = true
-        let userID = "userID"
-        let expectedVisitorID = "9ef8254d9456fc23"
-        let handler = NewUserIDHandler(storage: storage)
+        let user = User(userID: "userID")
+        let handler = NewUserHandler(storage: storage)
 
         let visitorIDExpectation = expectation(description: "visitorID was not generated")
         let customerIDExpectation = expectation(description: "customerID was not generated")
         storage.assertFunction = { (value, key) in
             if key == .visitorID {
-                XCTAssertEqual(value as? String, expectedVisitorID)
+                XCTAssertEqual(value as? String, user.visitorID)
                 visitorIDExpectation.fulfill()
             }
             if key == .customerID {
-                XCTAssertEqual(value as? String, userID)
+                XCTAssertEqual(value as? String, user.userID)
                 customerIDExpectation.fulfill()
             }
         }
 
-        handler.handle(userID: userID)
+        handler.handle(user: user)
 
         wait(
             for: [
@@ -71,24 +69,23 @@ class NewUserIDHandlerTests: XCTestCase {
     func test_no_previous_registration_has_succeeded() {
         storage.customerID = "old_userID"
         storage.isSettingUserSuccess = false
-        let userID = "userID"
-        let expectedVisitorID = "9ef8254d9456fc23"
-        let handler = NewUserIDHandler(storage: storage)
+        let user = User(userID: "userID")
+        let handler = NewUserHandler(storage: storage)
 
         let visitorIDExpectation = expectation(description: "visitorID was not generated")
         let customerIDExpectation = expectation(description: "customerID was not generated")
         storage.assertFunction = { (value, key) in
             if key == .visitorID {
-                XCTAssertEqual(value as? String, expectedVisitorID)
+                XCTAssertEqual(value as? String, user.visitorID)
                 visitorIDExpectation.fulfill()
             }
             if key == .customerID {
-                XCTAssertEqual(value as? String, userID)
+                XCTAssertEqual(value as? String, user.userID)
                 customerIDExpectation.fulfill()
             }
         }
 
-        handler.handle(userID: userID)
+        handler.handle(user: user)
 
         wait(
             for: [

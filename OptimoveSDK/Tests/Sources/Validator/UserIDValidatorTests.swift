@@ -8,27 +8,28 @@ class UserIDValidatorTests: XCTestCase {
     var storage = MockOptimoveStorage()
 
     func test_valid() {
-        let userID = "userID"
-        let validator = UserIDValidator(storage: storage)
+        let user = User(userID: "userID")
+        let validator = UserValidator(storage: storage)
 
-        XCTAssertEqual(validator.validateNewUserID(userID), UserIDValidator.Result.valid)
+        XCTAssertEqual(validator.validateNewUser(user), UserValidator.Result.valid)
     }
 
     func test_not_valid() {
         let userIDs = ["", "none", "undefined", "undefine", "null", "undefine_foo", "undefinebar"]
-        let validator = UserIDValidator(storage: storage)
+        let validator = UserValidator(storage: storage)
 
         userIDs.forEach { userID in
-            XCTAssertEqual(validator.validateNewUserID(userID), UserIDValidator.Result.notValid)
+            let user = User(userID: userID)
+            XCTAssertEqual(validator.validateNewUser(user), UserValidator.Result.notValid)
         }
     }
 
     func test_already_set() {
-        let userID = "userID"
-        storage.customerID = userID
-        let validator = UserIDValidator(storage: storage)
+        let user = User(userID: "userID")
+        storage.customerID = user.userID
+        let validator = UserValidator(storage: storage)
 
-        XCTAssertEqual(validator.validateNewUserID(userID), UserIDValidator.Result.alreadySetIn)
+        XCTAssertEqual(validator.validateNewUser(user), UserValidator.Result.alreadySetIn)
     }
 
 }

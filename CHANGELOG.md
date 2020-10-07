@@ -1,5 +1,21 @@
 # Changelog
 
+## 3.3.0
+
+- **change** migrate the storage from an App Group to an main container.
+- **support** iOS 14.
+- **fix** a generation of an update visitor id.
+
+## 3.2.0
+
+- **add** new deeplinks - no need to convert from dynamic links.
+- **fix** do not send events with errors to realtime.
+- **fix** crash in NSE.
+
+## 3.1.1
+
+- **fix** Attempted to dereference garbage pointer: #16.
+
 ## 3.1.0
 
 - **add** events flow visibility (validation results as a part of an event).

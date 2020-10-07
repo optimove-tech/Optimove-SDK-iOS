@@ -7,6 +7,13 @@
         },
         "mutable-content": "1"
     },
-    "is_optipush": "true"
+    "is_optipush": "true",
+    "ev": {
+        "t": 2590,
+        "c": "customer",
+        "v": "b39f008e318efd2b",
+        "frt": 1600860143,
+        "oe": "https://stream-2590.optimove.net"
+    }
 }
 

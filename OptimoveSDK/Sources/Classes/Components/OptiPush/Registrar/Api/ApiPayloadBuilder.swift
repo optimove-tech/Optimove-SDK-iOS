@@ -33,7 +33,8 @@ final class ApiPayloadBuilder {
             optIn: storage.optFlag,
             isDev: AppEnvironment.isSandboxAps,
             metadata: metadata,
-            isPushCampaignsDisabled: storage.arePushCampaignsDisabled
+            isPushCampaignsDisabled: storage.arePushCampaignsDisabled,
+            firstRunTime: try storage.getFirstRunTimestamp()
         )
     }
 

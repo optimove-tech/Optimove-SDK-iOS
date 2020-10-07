@@ -10,14 +10,15 @@ final class Assembly {
     }
 
     private func makeServiceLocator() -> ServiceLocator? {
+        /// A special storage migration, before an actual storage going to be in use.
+        migrate()
         do {
-            let bundleIdentifier = try Bundle.getApplicationNameSpace()
-            let groupStorage = try UserDefaults.grouped(tenantBundleIdentifier: bundleIdentifier)
-            let fileStorage = try FileStorageImpl(bundleIdentifier: bundleIdentifier, fileManager: .default)
+            let keyValureStorage = try UserDefaults.optimove()
+            let optimoveURL = try FileManager.optimoveURL()
+            let fileStorage = try FileStorageImpl(url: optimoveURL)
             return ServiceLocator(
                 storageFacade: StorageFacade(
-                    groupedStorage: groupStorage,
-                    sharedStorage: UserDefaults.standard,
+                    keyValureStorage: keyValureStorage,
                     fileStorage: fileStorage
                 )
             )
@@ -25,6 +26,15 @@ final class Assembly {
             Logger.error(error.localizedDescription)
             return nil
         }
+    }
+
+    private func migrate() {
+        let migrations: [MigrationWork] = [
+            MigrationWork_3_3_0()
+        ]
+        migrations
+            .filter({ $0.isAllowToMiragte(SDKVersion) })
+            .forEach({ $0.runMigration() })
     }
 
 }

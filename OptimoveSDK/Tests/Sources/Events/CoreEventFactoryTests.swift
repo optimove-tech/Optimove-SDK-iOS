@@ -30,7 +30,8 @@ class CoreEventFactoryTests: OptimoveTestCase {
     func test_create_SetUserIdEvent() throws {
         prefillStorageAsVisitor()
         let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
-        let event = try self.factory.createEvent(.setUserId(userId: StubConstants.customerID))
+        let user = User(userID: StubConstants.customerID)
+        let event = try self.factory.createEvent(.setUser(user: user))
         XCTAssert(event.name == SetUserIdEvent.Constants.name)
         expectation.fulfill()
         wait(for: [expectation], timeout: defaultTimeout)
@@ -62,15 +63,6 @@ class CoreEventFactoryTests: OptimoveTestCase {
         let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
         let event = try self.factory.createEvent(.optipushOptOut)
         XCTAssert(event.name == OptEvent.Constants.optOutName)
-        expectation.fulfill()
-        wait(for: [expectation], timeout: defaultTimeout)
-    }
-
-    func test_create_setAdvertisingId() throws {
-        prefillStorageAsVisitor()
-        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
-        let event = try self.factory.createEvent(.setAdvertisingId)
-        XCTAssert(event.name == SetAdvertisingIdEvent.Constants.name)
         expectation.fulfill()
         wait(for: [expectation], timeout: defaultTimeout)
     }
