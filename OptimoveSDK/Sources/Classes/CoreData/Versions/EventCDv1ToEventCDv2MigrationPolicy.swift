@@ -28,6 +28,7 @@ final class EventCDv1ToEventCDv2MigrationPolicy: NSEntityMigrationPolicy {
                     realtime: sObject.metadata.realtime,
                     firstVisitorDate: sObject.metadata.firstVisitorDate,
                     eventId: sObject.metadata.uuid,
+                    requestId: sObject.metadata.uuid,
                     validations: []
                 )
             )

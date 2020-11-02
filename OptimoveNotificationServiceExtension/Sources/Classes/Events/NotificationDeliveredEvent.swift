@@ -26,8 +26,10 @@ final class NotificationDeliveredEvent: Event {
     init(bundleId: String,
          notificationType: NotificationCampaignType,
          identityToken: String,
-         timestamp: Date = Date()) {
+         timestamp: Date = Date(),
+         requestId: String) {
         super.init(
+            requestId: requestId,
             name: notificationType.eventName,
             category: "optipush",
             context: [

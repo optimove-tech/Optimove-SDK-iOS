@@ -30,7 +30,8 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
             let event = NotificationDeliveredEvent(
                 bundleId: bundleIdentifier,
                 notificationType: campaign.type,
-                identityToken: campaign.identityToken
+                identityToken: campaign.identityToken,
+                requestId: notificationPayload.eventVariables.requestId
             )
             let optistreamEvent = OptistreamEvent(
                 tenant: notificationPayload.eventVariables.tenant,
@@ -48,6 +49,7 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
                     realtime: event.isRealtime,
                     firstVisitorDate: notificationPayload.eventVariables.firstRunTimestamp,
                     eventId: event.eventId.uuidString,
+                    requestId: event.requestId,
                     validations: []
                 )
             )

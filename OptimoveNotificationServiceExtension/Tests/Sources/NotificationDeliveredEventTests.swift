@@ -16,7 +16,8 @@ class NotificationDeliveredEventTests: XCTestCase {
             bundleId: bundleIdentifier,
             notificationType: notificationType,
             identityToken: identityToken,
-            timestamp: timestamp
+            timestamp: timestamp,
+            requestId: UUID().uuidString
         )
 
         XCTAssertEqual(notificationType.eventName, event.name)
@@ -39,7 +40,8 @@ class NotificationDeliveredEventTests: XCTestCase {
             bundleId: bundleIdentifier,
             notificationType: notificationType,
             identityToken: identityToken,
-            timestamp: timestamp
+            timestamp: timestamp,
+            requestId: UUID().uuidString
         )
 
         XCTAssertEqual(notificationType.eventName, event.name)

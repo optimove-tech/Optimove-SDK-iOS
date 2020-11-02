@@ -7,6 +7,7 @@ open class Event {
     public static let category = "track"
 
     public let eventId: UUID
+    public let requestId: String
     public let name: String
     public let timestamp: Date
     public let category: String
@@ -15,7 +16,8 @@ open class Event {
     public var validations: [ValidationIssue]
 
     public init(
-        eventId: UUID = UUID(),
+        eventId: UUID? = nil,
+        requestId: String? = nil,
         name: String,
         category: String = category,
         context: [String: Any],
@@ -23,7 +25,9 @@ open class Event {
         isRealtime: Bool = false,
         validations: [ValidationIssue] = []
     ) {
-        self.eventId = eventId
+        let uuid = UUID()
+        self.eventId = eventId ?? uuid
+        self.requestId = requestId ?? uuid.uuidString
         self.name = name
         self.category = category
         self.context = context

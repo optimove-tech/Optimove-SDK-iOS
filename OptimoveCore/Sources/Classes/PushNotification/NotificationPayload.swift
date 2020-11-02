@@ -124,6 +124,7 @@ public struct EventVariables: Decodable {
     public let visitor: String
     public let firstRunTimestamp: Int64
     public let optitrackEndpoint: URL
+    public let requestId: String
 
     enum CodingKeys: String, CodingKey {
         case tenant = "t"
@@ -131,6 +132,7 @@ public struct EventVariables: Decodable {
         case visitor = "v"
         case firstRunTimestamp = "frt"
         case optitrackEndpoint = "oe"
+        case requestId = "rid"
     }
 }
 

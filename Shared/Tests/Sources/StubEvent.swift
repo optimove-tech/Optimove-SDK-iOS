@@ -36,6 +36,7 @@ public let StubOptistreamEvent = OptistreamEvent(
         realtime: true,
         firstVisitorDate: Date().timeIntervalSince1970.seconds,
         eventId: UUID().uuidString,
+        requestId: UUID().uuidString,
         validations: []
     )
 )
