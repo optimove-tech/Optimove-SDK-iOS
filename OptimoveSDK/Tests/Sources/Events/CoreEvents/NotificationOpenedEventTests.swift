@@ -17,6 +17,7 @@ class NotificationOpenedEventTests: XCTestCase {
             bundleIdentifier: bundleIdentifier,
             notificationType: campaign,
             identityToken: identityToken,
+            requestId: "request_id",
             timestamp: timestamp
         )
 
@@ -38,6 +39,7 @@ class NotificationOpenedEventTests: XCTestCase {
             bundleIdentifier: bundleIdentifier,
             notificationType: campaign,
             identityToken: identityToken,
+            requestId: "request_id",
             timestamp: timestamp
         )
 
