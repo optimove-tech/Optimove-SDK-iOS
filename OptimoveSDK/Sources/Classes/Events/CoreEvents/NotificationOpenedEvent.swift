@@ -18,9 +18,11 @@ final class NotificationOpenedEvent: Event {
         bundleIdentifier: String,
         notificationType: NotificationCampaignType,
         identityToken: String,
+        requestId: String,
         timestamp: Date = Date()
     ) {
         super.init(
+            requestId: requestId,
             name: notificationType.eventName,
             category: Constants.category,
             context: [

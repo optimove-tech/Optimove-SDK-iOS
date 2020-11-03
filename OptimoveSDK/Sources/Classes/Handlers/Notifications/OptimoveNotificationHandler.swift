@@ -44,7 +44,8 @@ private extension OptimoveNotificationHandler {
         return NotificationOpenedEvent(
             bundleIdentifier: try Bundle.getApplicationNameSpace(),
             notificationType: campaign.type,
-            identityToken: campaign.identityToken
+            identityToken: campaign.identityToken,
+            requestId: notification.eventVariables.requestId
         )
     }
 
