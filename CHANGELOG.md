@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.0
+
+- **added** generating and handling of a request tracing ID.
+
 ## 3.3.0
 
 - **change** migrate the storage from an App Group to an main container.
