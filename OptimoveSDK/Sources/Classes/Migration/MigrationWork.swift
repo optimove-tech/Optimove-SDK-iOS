@@ -130,6 +130,7 @@ extension MigrationWork_3_3_0 {
                 try moveFilesFromAppGroup()
                 try markMigrationAsCompleted()
             } catch {
+                try? markMigrationAsCompleted()
                 Logger.error(error.localizedDescription)
             }
         }
@@ -158,9 +159,10 @@ extension MigrationWork_3_3_0 {
                 .firstRunTimestamp
             ]
             groupKeys.forEach({ key in
-                let value = oldDefaults.value(for: key)
-                newDefaults.set(value: value, key: key)
-                oldDefaults.removeObject(forKey: key.rawValue)
+                if let value = oldDefaults.value(for: key) {
+                    newDefaults.set(value: value, key: key)
+                    oldDefaults.removeObject(forKey: key.rawValue)
+                }
             })
         }
 
