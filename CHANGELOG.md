@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.4.1
+
+- **fix** AppGroup migration.
 ## 3.4.0
 
 - **added** generating and handling of a request tracing ID.
