@@ -22,11 +22,9 @@ final class ApiPayloadBuilder {
     }
 
     func createInstallation() throws -> Installation {
-        let token = try storage.getApnsToken()
-        let tokenToStringFormat = "%02.2hhx"
         return Installation(
             customerID: storage.customerID,
-            deviceToken: token.map { String(format: tokenToStringFormat, $0) }.joined(),
+            deviceToken: try storage.getApnsTokenString(),
             installationID: try storage.getInstallationID(),
             appNS: appNamespace,
             visitorID: try storage.getInitialVisitorId(),

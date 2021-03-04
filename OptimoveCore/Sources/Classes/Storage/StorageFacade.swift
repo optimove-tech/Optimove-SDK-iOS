@@ -30,6 +30,7 @@ public enum StorageKey: String, CaseIterable {
     case tenantID
     case userEmail
     case apnsToken
+    case apnsTokenString
     case siteID /// Legacy: See tenantID
     case settingUserSuccess
     case firstVisitTimestamp /// Legacy
@@ -57,6 +58,7 @@ public protocol StorageValue {
     var tenantID: Int? { get set }
     var userEmail: String? { get set }
     var apnsToken: Data? { get set }
+    var apnsTokenString: String? { get }
     /// Legacy: See tenantID
     var siteID: Int? { get set }
     var isSettingUserSuccess: Bool? { get set }
@@ -81,6 +83,7 @@ public protocol StorageValue {
     func isAlreadyMigrated(to version: String) -> Bool
     func getUserEmail() throws -> String
     func getApnsToken() throws -> Data
+    func getApnsTokenString() throws -> String
     func getSiteID() throws -> Int
 }
 
@@ -392,6 +395,14 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             self[.apnsToken] = newValue
+            let tokenToStringFormat = "%02.2hhx"
+            self[.apnsTokenString] = newValue?.map { String(format: tokenToStringFormat, $0) }.joined()
+        }
+    }
+
+    var apnsTokenString: String? {
+        get {
+            return self[.apnsTokenString]
         }
     }
 
@@ -533,6 +544,13 @@ public extension KeyValueStorage where Self: StorageValue {
     func getApnsToken() throws -> Data {
         guard let value = apnsToken else {
             throw StorageError.noValue(.apnsToken)
+        }
+        return value
+    }
+
+    func getApnsTokenString() throws -> String {
+        guard let value = apnsTokenString else {
+            throw StorageError.noValue(.apnsTokenString)
         }
         return value
     }
