@@ -298,6 +298,22 @@ extension Optimove: OptimoveDeepLinkResponding {
     }
 }
 
+// MARK: - Push notification channels
+
+extension Optimove {
+
+    /// The API provides an ability for the user to allow or disallow receiving specific push notifications.
+    /// You can pass an array of permitted Push Notification channels for the current user.
+    /// - Note: Pass `nil` to reset the current channel preferences and remove restrictions.
+    /// - Parameter channels: Allowed channels names, case insensitive , or `nil`.
+    @objc public func setPushotificationChannels(channels: [String]?) {
+        container.resolve { serviceLocator in
+            serviceLocator.synchronizer().handle(.setPushNotificaitonChannels(channels: channels))
+        }
+    }
+
+}
+
 // MARK: - Private
 
 private extension Optimove {

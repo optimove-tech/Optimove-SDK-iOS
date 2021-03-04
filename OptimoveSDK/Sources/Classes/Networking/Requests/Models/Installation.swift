@@ -22,5 +22,5 @@ struct Installation: Codable {
     let metadata: Metadata
     let isPushCampaignsDisabled: Bool
     let firstRunTime: Int64
-
+    let pushNotificationChannels: [String]?
 }

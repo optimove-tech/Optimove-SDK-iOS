@@ -25,6 +25,7 @@ public enum StorageKey: String, CaseIterable {
     case migrationVersions /// For storing a migration history
     case arePushCampaignsDisabled
     case firstRunTimestamp
+    case pushNotificationChannels
     case optitrackEndpoint
     case tenantID
     case userEmail
@@ -61,6 +62,8 @@ public protocol StorageValue {
     var isSettingUserSuccess: Bool? { get set }
     /// Legacy. Use `firstRunTimestamp` instead
     var firstVisitTimestamp: Int64? { get set }
+    /// Store user's allowed push notification channels.
+    var pushNotificationChannels: [String]? { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -340,6 +343,15 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             self[.firstRunTimestamp] = newValue
+        }
+    }
+
+    var pushNotificationChannels: [String]? {
+        get {
+            return self[.pushNotificationChannels]
+        }
+        set {
+            self[.pushNotificationChannels] = newValue
         }
     }
 

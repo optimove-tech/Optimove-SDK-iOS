@@ -34,7 +34,8 @@ final class ApiPayloadBuilder {
             isDev: AppEnvironment.isSandboxAps,
             metadata: metadata,
             isPushCampaignsDisabled: storage.arePushCampaignsDisabled,
-            firstRunTime: try storage.getFirstRunTimestamp()
+            firstRunTime: try storage.getFirstRunTimestamp(),
+            pushNotificationChannels: storage.pushNotificationChannels
         )
     }
 
