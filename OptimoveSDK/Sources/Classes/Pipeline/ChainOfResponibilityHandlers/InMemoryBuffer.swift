@@ -3,28 +3,28 @@
 import Foundation
 import OptimoveCore
 
-final class InMemoryBuffer: Node {
+final class InMemoryBuffer: Pipe {
 
     private var buffer = RingBuffer<CommonOperation>(count: 100)
 
-    override var next: Node? {
+    override var next: Pipe? {
         didSet {
             dispatchBuffer()
         }
     }
 
-    override func execute(_ operation: CommonOperation) throws {
-        if next == nil {
+    override func deliver(_ operation: CommonOperation) throws {
+        guard let next = next else {
             buffer.write(operation)
-        } else {
-            try next?.execute(operation)
+            return
         }
+        try next.deliver(operation)
     }
 
     private func dispatchBuffer() {
         while let context = buffer.read() {
             do {
-                try next?.execute(context)
+                try next?.deliver(context)
             } catch {
                 Logger.error(error.localizedDescription)
             }

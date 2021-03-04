@@ -6,18 +6,18 @@ import OptimoveCore
 final class SDKInitializer {
 
     private let componentFactory: ComponentFactory
-    private let chain: ChainMutator
+    private let pipeline: PipelineMutator
     private let dependencies: [SDKInitializerDependency]
     private let storage: OptimoveStorage
 
     // MARK: - Construction
 
     init(componentFactory: ComponentFactory,
-         chainMutator: ChainMutator,
+         pipeline: PipelineMutator,
          dependencies: [SDKInitializerDependency],
          storage: OptimoveStorage) {
         self.componentFactory = componentFactory
-        self.chain = chainMutator
+        self.pipeline = pipeline
         self.dependencies = dependencies
         self.storage = storage
     }
@@ -26,9 +26,9 @@ final class SDKInitializer {
         dependencies.forEach { $0.onConfigurationFetch(configuration) }
         do {
             try setupOptimoveComponents(configuration)
-            Logger.debug("SDK is initialized.")
+            Logger.debug("Optimove SDK is initialized.")
         } catch {
-            Logger.error("🚨 SDK failed on initialization. Error: \(error.localizedDescription)")
+            Logger.error("🚨 Optimove SDK failed on initialization. Error: \(error.localizedDescription)")
         }
     }
 
@@ -71,7 +71,7 @@ private extension SDKInitializer {
         validator.next = decorator
         normalizer.next = validator
 
-        chain.addNode(normalizer)
+        pipeline.addNextPipe(normalizer)
 
         Logger.info("All components setup finished.")
     }

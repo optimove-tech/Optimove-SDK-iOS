@@ -22,7 +22,7 @@ class EventValidatorTests: OptimoveTestCase {
         let event = StubEvent(context: [
             "nondefined_key": "nondefined_value"
         ])
-        XCTAssertNoThrow( try validator.execute(.report(events: [event])))
+        XCTAssertNoThrow( try validator.deliver(.report(events: [event])))
     }
 
     func test_cutting_mandatory_params() throws {

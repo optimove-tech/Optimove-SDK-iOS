@@ -49,7 +49,7 @@ final class OptiTrackMockQueueTests: OptimoveTestCase {
         }
 
         // when
-        try optitrack.handle(.report(events: [stubEvent]))
+        try optitrack.serve(.report(events: [stubEvent]))
         wait(for: [networkExpectation], timeout: defaultTimeout + dispatchInterval * 2)
     }
 
@@ -67,7 +67,7 @@ final class OptiTrackMockQueueTests: OptimoveTestCase {
         }
 
         // when
-        try optitrack.handle(.dispatchNow)
+        try optitrack.serve(.dispatchNow)
         wait(for: [networkExpectation], timeout: defaultTimeout + dispatchInterval)
     }
 }

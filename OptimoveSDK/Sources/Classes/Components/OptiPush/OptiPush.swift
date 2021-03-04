@@ -30,7 +30,7 @@ final class OptiPush {
 
 extension OptiPush: CommonComponent {
 
-    func handle(_ operation: CommonOperation) throws {
+    func serve(_ operation: CommonOperation) throws {
         switch operation {
         case let .deviceToken(token: token):
             storage.apnsToken = token

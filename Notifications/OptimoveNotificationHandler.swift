@@ -7,10 +7,10 @@ import OptimoveCore
 
 final class OptimoveNotificationHandler {
 
-    private let synchronizer: Synchronizer
+    private let synchronizer: Pipeline
     private let deeplinkService: DeeplinkService
 
-    init(synchronizer: Synchronizer,
+    init(synchronizer: Pipeline,
          deeplinkService: DeeplinkService) {
         self.synchronizer = synchronizer
         self.deeplinkService = deeplinkService
@@ -25,7 +25,7 @@ private extension OptimoveNotificationHandler {
             switch actionIdentifier {
             case UNNotificationDefaultActionIdentifier:
                 let event = try createEvent(from: notification)
-                synchronizer.handle(.report(events: [event]))
+                synchronizer.deliver(.report(events: [event]))
             default:
                 break
             }

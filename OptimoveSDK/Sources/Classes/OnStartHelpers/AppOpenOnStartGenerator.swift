@@ -6,10 +6,10 @@ import UIKit.UIApplication
 
 final class AppOpenOnStartGenerator {
 
-    private let synchronizer: Synchronizer
+    private let synchronizer: Pipeline
     private let coreEventFactory: CoreEventFactory
 
-    init(synchronizer: Synchronizer,
+    init(synchronizer: Pipeline,
          coreEventFactory: CoreEventFactory) {
         self.synchronizer = synchronizer
         self.coreEventFactory = coreEventFactory
@@ -25,7 +25,7 @@ final class AppOpenOnStartGenerator {
         guard UIApplication.shared.applicationState != .background else { return }
         tryCatch {
             let event = try coreEventFactory.createEvent(.appOpen)
-            self.synchronizer.handle(.report(events: [event]))
+            self.synchronizer.deliver(.report(events: [event]))
         }
     }
 

@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class ParametersDecorator: Node {
+final class ParametersDecorator: Pipe {
 
     private struct Constants {
         struct Key {
@@ -28,7 +28,7 @@ final class ParametersDecorator: Node {
         self.configuration = configuration
     }
 
-    override func execute(_ operation: CommonOperation) throws {
+    override func deliver(_ operation: CommonOperation) throws {
         let decorationFunction = { [configuration] () -> CommonOperation in
             switch operation {
             case let .report(events: events):
@@ -37,7 +37,7 @@ final class ParametersDecorator: Node {
                 return operation
             }
         }
-        try next?.execute(decorationFunction())
+        try next?.deliver(decorationFunction())
     }
 
     private static func decoratedEvents(

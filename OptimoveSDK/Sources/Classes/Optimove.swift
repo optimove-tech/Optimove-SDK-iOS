@@ -55,7 +55,7 @@ extension Optimove {
     @objc public func reportEvent(name: String, parameters: [String: Any] = [:]) {
         container.resolve { serviceLocator in
             let tenantEvent = TenantEvent(name: name, context: parameters)
-            serviceLocator.synchronizer().handle(.report(events: [tenantEvent]))
+            serviceLocator.pipeline().deliver(.report(events: [tenantEvent]))
         }
     }
 
@@ -75,7 +75,7 @@ extension Optimove {
     @objc public func reportEvent(_ event: OptimoveEvent) {
         container.resolve { serviceLocator in
             let tenantEvent = TenantEvent(name: event.name, context: event.parameters)
-            serviceLocator.synchronizer().handle(.report(events: [tenantEvent]))
+            serviceLocator.pipeline().deliver(.report(events: [tenantEvent]))
         }
     }
 
@@ -105,7 +105,7 @@ extension Optimove {
             tryCatch {
                 let factory = serviceLocator.coreEventFactory()
                 let event = try factory.createEvent(.pageVisit(title: title, category: category))
-                serviceLocator.synchronizer().handle(.report(events: [event]))
+                serviceLocator.pipeline().deliver(.report(events: [event]))
             }
         }
     }
@@ -135,9 +135,9 @@ extension Optimove {
                 let setUserIdEvent = try self._setUser(user, serviceLocator)
                 let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
                 if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-                    serviceLocator.synchronizer().handle(.setInstallation)
+                    serviceLocator.pipeline().deliver(.setInstallation)
                 }
-                serviceLocator.synchronizer().handle(.report(events: [setUserIdEvent, setUserEmailEvent]))
+                serviceLocator.pipeline().deliver(.report(events: [setUserIdEvent, setUserEmailEvent]))
             }
         }
         container.resolve(function)
@@ -160,9 +160,9 @@ extension Optimove {
             tryCatch {
                 let user = User(userID: userID)
                 let event = try self._setUser(user, serviceLocator)
-                serviceLocator.synchronizer().handle(.report(events: [event]))
+                serviceLocator.pipeline().deliver(.report(events: [event]))
                 if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-                    serviceLocator.synchronizer().handle(.setInstallation)
+                    serviceLocator.pipeline().deliver(.setInstallation)
                 }
             }
         }
@@ -187,7 +187,7 @@ extension Optimove {
         let function: (ServiceLocator) -> Void = { serviceLocator in
             tryCatch {
                 let event: Event = try self._setUserEmail(email, serviceLocator)
-                serviceLocator.synchronizer().handle(.report(events: [event]))
+                serviceLocator.pipeline().deliver(.report(events: [event]))
             }
         }
         container.resolve(function)
@@ -211,7 +211,7 @@ extension Optimove {
     /// you have to call the `enablePushCampaigns` method.
     @objc public func disablePushCampaigns() {
         let function: (ServiceLocator) -> Void = { serviceLocator in
-            serviceLocator.synchronizer().handle(.togglePushCampaigns(areDisabled: true))
+            serviceLocator.pipeline().deliver(.togglePushCampaigns(areDisabled: true))
         }
         container.resolve(function)
     }
@@ -232,7 +232,7 @@ extension Optimove {
     /// you have to call the `disablePushCampaigns` method.
     @objc public func enablePushCampaigns() {
         let function: (ServiceLocator) -> Void = { serviceLocator in
-            serviceLocator.synchronizer().handle(.togglePushCampaigns(areDisabled: false))
+            serviceLocator.pipeline().deliver(.togglePushCampaigns(areDisabled: false))
         }
         container.resolve(function)
     }
@@ -366,7 +366,7 @@ extension Optimove {
             let validationResult = APNsTokenValidator(storage: serviceLocator.storage())
             if validationResult.validate(token: deviceToken) == .new {
                 Logger.debug("New APNS token: \(deviceToken.map { String(format: "%02.2hhx", $0) }.joined())")
-                serviceLocator.synchronizer().handle(.deviceToken(token: deviceToken))
+                serviceLocator.pipeline().deliver(.deviceToken(token: deviceToken))
             }
         }
         container.resolve(function)
@@ -443,7 +443,7 @@ extension Optimove {
     /// - Parameter channels: Allowed channels names, case insensitive , or `nil`.
     @objc public static func setAllowedPushNotificationChannels(channels: [String]?) {
         shared.container.resolve { serviceLocator in
-            serviceLocator.synchronizer().handle(.setPushNotificaitonChannels(channels: channels))
+            serviceLocator.pipeline().deliver(.setPushNotificaitonChannels(channels: channels))
         }
     }
 
@@ -493,7 +493,7 @@ private extension Optimove {
         let function: (ServiceLocator) -> Void = { serviceLocator in
             let onStartEventGenerator = OnStartEventGenerator(
                 coreEventFactory: serviceLocator.coreEventFactory(),
-                synchronizer: serviceLocator.synchronizer(),
+                synchronizer: serviceLocator.pipeline(),
                 storage: serviceLocator.storage()
             )
             onStartEventGenerator.generate()

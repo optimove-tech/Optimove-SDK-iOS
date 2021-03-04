@@ -60,7 +60,7 @@ final class OptiTrack {
 
 extension OptiTrack: OptistreamComponent {
 
-    func handle(_ operation: OptistreamOperation) throws {
+    func serve(_ operation: OptistreamOperation) throws {
         dispatchQueue.async { [weak self] in
             guard let self = self else { return }
             switch operation {

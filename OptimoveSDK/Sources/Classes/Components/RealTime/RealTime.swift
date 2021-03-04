@@ -37,7 +37,7 @@ final class RealTime {
 
 extension RealTime: OptistreamComponent {
 
-    func handle(_ operation: OptistreamOperation) throws {
+    func serve(_ operation: OptistreamOperation) throws {
         let handleOperationOnQueue: () -> Void = { [weak self] in
             guard let self = self else { return }
             switch operation {

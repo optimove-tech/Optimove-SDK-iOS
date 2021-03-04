@@ -13,12 +13,12 @@ final class AppOpenObserver {
         }
     }
 
-    private let synchronizer: Synchronizer
+    private let synchronizer: Pipeline
     private var statisticService: StatisticService
     private let dateTimeProvider: DateTimeProvider
     private let coreEventFactory: CoreEventFactory
 
-    init(synchronizer: Synchronizer,
+    init(synchronizer: Pipeline,
          statisticService: StatisticService,
          dateTimeProvider: DateTimeProvider,
          coreEventFactory: CoreEventFactory) {
@@ -34,7 +34,7 @@ final class AppOpenObserver {
         let appOpenTime = statisticService.applicationOpenTime
         if (now - appOpenTime) > threshold {
             let event = try coreEventFactory.createEvent(.appOpen)
-            self.synchronizer.handle(.report(events: [event]))
+            self.synchronizer.deliver(.report(events: [event]))
             self.statisticService.applicationOpenTime = self.dateTimeProvider.now.timeIntervalSince1970
         }
     }
