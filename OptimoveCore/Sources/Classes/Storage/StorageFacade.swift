@@ -395,7 +395,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             self[.apnsToken] = newValue
-            let tokenToStringFormat = "%02.2hhx"
             self[.apnsTokenString] = newValue?.map { String(format: tokenToStringFormat, $0) }.joined()
         }
     }
@@ -549,10 +548,13 @@ public extension KeyValueStorage where Self: StorageValue {
     }
 
     func getApnsTokenString() throws -> String {
-        guard let value = apnsTokenString else {
+        if let value = apnsTokenString {
+            return value
+        }
+        guard let value = apnsToken else {
             throw StorageError.noValue(.apnsTokenString)
         }
-        return value
+        return value.map { String(format: tokenToStringFormat, $0) }.joined()
     }
 
     func getSiteID() throws -> Int {
