@@ -43,7 +43,7 @@ extension OptiPush: CommonComponent {
             guard storage.apnsToken != nil else { return }
             registrar.handle(.setInstallation)
         case let .setPushNotificaitonChannels(channels: channels):
-            storage.pushNotificationChannels = channels?.map { $0.lowercased() }
+            storage.pushNotificationChannels = channels?.map(transform: { $0.lowercased() })
             registrar.handle(.setInstallation)
         default:
             break

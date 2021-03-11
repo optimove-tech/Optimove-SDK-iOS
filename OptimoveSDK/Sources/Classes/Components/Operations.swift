@@ -11,7 +11,7 @@ enum CommonOperation {
     case optIn
     case optOut
     case none
-    case setPushNotificaitonChannels(channels: [String]?)
+    case setPushNotificaitonChannels(channels: Set<String>?)
 }
 
 enum OptistreamOperation {

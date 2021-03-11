@@ -65,7 +65,7 @@ public protocol StorageValue {
     /// Legacy. Use `firstRunTimestamp` instead
     var firstVisitTimestamp: Int64? { get set }
     /// Store user's allowed push notification channels.
-    var pushNotificationChannels: [String]? { get set }
+    var pushNotificationChannels: Set<String>? { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -349,7 +349,7 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var pushNotificationChannels: [String]? {
+    var pushNotificationChannels: Set<String>? {
         get {
             return self[.pushNotificationChannels]
         }

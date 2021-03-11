@@ -441,7 +441,7 @@ extension Optimove {
     /// You can pass an array of permitted Push Notification channels for the current user.
     /// - Note: Pass `nil` to reset the current channel preferences and remove restrictions.
     /// - Parameter channels: Allowed channels names, case insensitive , or `nil`.
-    @objc public static func setAllowedPushNotificationChannels(channels: [String]?) {
+    @objc public static func setAllowedPushNotificationChannels(channels: Set<String>?) {
         shared.container.resolve { serviceLocator in
             serviceLocator.pipeline().deliver(.setPushNotificaitonChannels(channels: channels))
         }
