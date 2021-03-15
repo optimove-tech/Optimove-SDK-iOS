@@ -33,7 +33,7 @@ final class ApiPayloadBuilder {
             metadata: metadata,
             isPushCampaignsDisabled: storage.arePushCampaignsDisabled,
             firstRunTime: try storage.getFirstRunTimestamp(),
-            pushNotificationChannels: storage.pushNotificationChannels
+            iosChannels: storage.pushNotificationChannels
         )
     }
 
