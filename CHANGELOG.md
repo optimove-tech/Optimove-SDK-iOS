@@ -1,8 +1,13 @@
 # Changelog
 
+## 3.4.2
+
+- added a safe way of preforming CoreData Context's operations.
+
 ## 3.4.1
 
 - **fix** AppGroup migration.
+
 ## 3.4.0
 
 - **added** generating and handling of a request tracing ID.
