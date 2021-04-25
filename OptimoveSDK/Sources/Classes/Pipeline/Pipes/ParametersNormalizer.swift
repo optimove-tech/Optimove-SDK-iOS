@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class ParametersNormalizer: Node {
+final class ParametersNormalizer: Pipe {
 
     private let configuration: Configuration
 
@@ -13,7 +13,7 @@ final class ParametersNormalizer: Node {
 
     // MARK: - EventableHandler
 
-    override func execute(_ operation: CommonOperation) throws {
+    override func deliver(_ operation: CommonOperation) throws {
         let normilizeFunction = { () -> CommonOperation in
             switch operation {
             case let .report(events: events):
@@ -24,7 +24,7 @@ final class ParametersNormalizer: Node {
                 return operation
             }
         }
-        try next?.execute(normilizeFunction())
+        try next?.deliver(normilizeFunction())
     }
 
     private func normilize(_ events: [Event]) throws -> [Event] {

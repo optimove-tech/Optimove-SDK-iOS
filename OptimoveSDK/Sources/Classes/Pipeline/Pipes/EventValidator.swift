@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-final class EventValidator: Node {
+final class EventValidator: Pipe {
 
     struct Constants {
         enum AllowedType: String, CaseIterable, RawRepresentable {
@@ -29,7 +29,7 @@ final class EventValidator: Node {
         self.storage = storage
     }
 
-    override func execute(_ operation: CommonOperation) throws {
+    override func deliver(_ operation: CommonOperation) throws {
         let validationFunction = { [configuration] () throws -> CommonOperation in
             switch operation {
             case let .report(events: events):
@@ -54,7 +54,7 @@ final class EventValidator: Node {
                 return operation
             }
         }
-        try next?.execute(validationFunction())
+        try next?.deliver(validationFunction())
     }
 
     func verifyAllowedNumberOfParameters(_ event: Event) -> [ValidationError] {

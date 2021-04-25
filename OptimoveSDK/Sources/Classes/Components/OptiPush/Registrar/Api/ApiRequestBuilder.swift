@@ -11,20 +11,20 @@ final class ApiRequestBuilder {
         static let installationPath = "installation"
     }
 
-    private let optipushConfig: OptipushConfig
+    private let baseURL: URL
 
     init(optipushConfig: OptipushConfig) {
-        self.optipushConfig = optipushConfig
+        baseURL = optipushConfig.mbaasEndpoint
+            .appendingPathComponent(Constants.versionPath)
+            .appendingPathComponent(Constants.tenantsPath)
+            .appendingPathComponent(String(optipushConfig.tenantID))
+            .appendingPathComponent(Constants.installationPath)
     }
 
     func postSetInstallation(model: Installation) throws -> NetworkRequest {
         return try NetworkRequest(
             method: .post,
-            baseURL: optipushConfig.mbaasEndpoint
-                .appendingPathComponent(Constants.versionPath)
-                .appendingPathComponent(Constants.tenantsPath)
-                .appendingPathComponent(String(optipushConfig.tenantID))
-                .appendingPathComponent(Constants.installationPath),
+            baseURL: baseURL,
             body: model,
             keyEncodingStrategy: .convertToSnakeCase
         )

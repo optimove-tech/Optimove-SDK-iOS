@@ -2,16 +2,16 @@
 
 @testable import OptimoveSDK
 
-final class MockSynchronizer: Synchronizer {
+final class MockSynchronizer: Pipeline, PipelineMutator {
 
     var assertFunction: ((CommonOperation) -> Void)?
 
-    func handle(_ op: CommonOperation) {
+    func deliver(_ op: CommonOperation) {
         assertFunction?(op)
     }
 
-    func addNode(_: Node) {
-
+    func addNextPipe(_: Pipe) {
+        
     }
 
     func onResignActive() {

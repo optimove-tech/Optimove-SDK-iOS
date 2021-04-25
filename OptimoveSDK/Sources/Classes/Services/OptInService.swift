@@ -5,12 +5,12 @@ import UIKit
 
 final class OptInService {
 
-    private let synchronizer: Synchronizer
+    private let synchronizer: Pipeline
     private var storage: OptimoveStorage
     private let coreEventFactory: CoreEventFactory
     private var subscribers: [OptInOutSubscriber]
 
-    init(synchronizer: Synchronizer,
+    init(synchronizer: Pipeline,
          coreEventFactory: CoreEventFactory,
          storage: OptimoveStorage,
          subscribers: [OptInOutSubscriber]) {
@@ -51,16 +51,16 @@ private extension OptInService {
         Logger.info("OptiPush: User AUTHORIZED notifications.")
         storage.optFlag = true
         let event = try coreEventFactory.createEvent(.optipushOptIn)
-        self.synchronizer.handle(.report(events: [event]))
-        synchronizer.handle(.optIn)
+        self.synchronizer.deliver(.report(events: [event]))
+        synchronizer.deliver(.optIn)
     }
 
     func executeOptOut() throws {
         Logger.info("OptiPush: User UNAUTHORIZED notifications.")
         storage.optFlag = false
         let event = try coreEventFactory.createEvent(.optipushOptOut)
-        self.synchronizer.handle(.report(events: [event]))
-        synchronizer.handle(.optOut)
+        self.synchronizer.deliver(.report(events: [event]))
+        synchronizer.deliver(.optOut)
     }
 
     func requestTokenIfNeeded(status: OptStatus) {

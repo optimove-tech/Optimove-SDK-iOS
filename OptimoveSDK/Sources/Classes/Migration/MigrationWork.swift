@@ -59,16 +59,16 @@ class MigrationWorkerWithStorage: MigrationWorker {
 
 final class MigrationWork_2_10_0: MigrationWorkerWithStorage {
 
-    private let synchronizer: Synchronizer
+    private let synchronizer: Pipeline
 
-    init(synchronizer: Synchronizer,
+    init(synchronizer: Pipeline,
          storage: OptimoveStorage) {
         self.synchronizer = synchronizer
         super.init(storage: storage, newVersion: .v_2_10_0)
     }
 
     override func runMigration() {
-        synchronizer.handle(.setInstallation)
+        synchronizer.deliver(.setInstallation)
         super.runMigration()
     }
 

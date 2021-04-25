@@ -85,7 +85,7 @@ class OptitrackTests: OptimoveTestCase {
             completion(.success(()))
         }
 
-        try optitrack?.handle(.report(events: events))
+        try optitrack?.serve(.report(events: events))
         waitForExpectations(timeout: 10, handler: { (error) -> Void in
             print("Number of procceded events \(eventIds.count), with error: \(error.debugDescription)")
         })

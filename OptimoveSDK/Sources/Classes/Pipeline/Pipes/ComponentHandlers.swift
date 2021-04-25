@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-class ComponentHandler: Node {
+class ComponentHandler: Pipe {
     private let commonComponents: [CommonComponent]
     private let optistreamComponents: [OptistreamComponent]
     private let optirstreamEventBuilder: OptistreamEventBuilder
@@ -17,7 +17,7 @@ class ComponentHandler: Node {
         self.optirstreamEventBuilder = optirstreamEventBuilder
     }
 
-    override func execute(_ operation: CommonOperation) throws {
+    override func deliver(_ operation: CommonOperation) throws {
         sendToCommonComponents(operation)
         sendToStreamComponents(operation)
     }
@@ -25,7 +25,7 @@ class ComponentHandler: Node {
     private func sendToCommonComponents(_ operation: CommonOperation) {
         commonComponents.forEach { component in
             tryCatch {
-                try component.handle(operation)
+                try component.serve(operation)
             }
         }
     }
@@ -43,13 +43,13 @@ class ComponentHandler: Node {
             }
             optistreamComponents.forEach { (component) in
                 tryCatch {
-                    try component.handle(.report(events: streamEvents))
+                    try component.serve(.report(events: streamEvents))
                 }
             }
         case .dispatchNow:
             optistreamComponents.forEach { (component) in
                 tryCatch {
-                    try component.handle(.dispatchNow)
+                    try component.serve(.dispatchNow)
                 }
             }
         default:

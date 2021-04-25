@@ -7,12 +7,12 @@ import WebKit
 final class UserAgentGenerator {
 
     private var storage: OptimoveStorage
-    private let synchronizer: Synchronizer
+    private let synchronizer: Pipeline
     private let coreEventFactory: CoreEventFactory
     private var webView: WKWebView?
 
     init(storage: OptimoveStorage,
-         synchronizer: Synchronizer,
+         synchronizer: Pipeline,
          coreEventFactory: CoreEventFactory) {
         self.storage = storage
         self.synchronizer = synchronizer
@@ -34,7 +34,7 @@ final class UserAgentGenerator {
             self.storage.userAgent = (result as? String) ?? "user_agent_undefined"
             tryCatch {
                 let event = try self.coreEventFactory.createEvent(.setUserAgent)
-                self.synchronizer.handle(.report(events: [event]))
+                self.synchronizer.deliver(.report(events: [event]))
             }
             self.webView = nil
         }

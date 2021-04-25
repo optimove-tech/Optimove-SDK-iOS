@@ -35,7 +35,7 @@ class RealtimeComponentTests: OptimoveTestCase {
                 }
             }
         }
-        try realtime.handle(.report(events: [event1, event2]))
+        try realtime.serve(.report(events: [event1, event2]))
         wait(
             for: [event1Expectation, event2Expectation],
             timeout: defaultTimeout,
@@ -69,7 +69,7 @@ class RealtimeComponentTests: OptimoveTestCase {
                 }
             }
         }
-        try realtime.handle(.report(events: [event1]))
+        try realtime.serve(.report(events: [event1]))
         wait(
             for: [event1Expectation],
             timeout: defaultTimeout

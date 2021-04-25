@@ -30,7 +30,7 @@ final class OptiPush {
 
 extension OptiPush: CommonComponent {
 
-    func handle(_ operation: CommonOperation) throws {
+    func serve(_ operation: CommonOperation) throws {
         switch operation {
         case let .deviceToken(token: token):
             storage.apnsToken = token
@@ -41,6 +41,9 @@ extension OptiPush: CommonComponent {
         case let .togglePushCampaigns(areDisabled: areDisabled):
             storage.arePushCampaignsDisabled = areDisabled
             guard storage.apnsToken != nil else { return }
+            registrar.handle(.setInstallation)
+        case let .setPushNotificaitonChannels(channels: channels):
+            storage.pushNotificationChannels = channels?.map { $0.lowercased() }
             registrar.handle(.setInstallation)
         default:
             break

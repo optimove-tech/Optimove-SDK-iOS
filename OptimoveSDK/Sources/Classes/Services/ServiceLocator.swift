@@ -21,11 +21,9 @@ final class ServiceLocator {
     }()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _synchronizer: Synchronizer = {
-        return SynchronizerImpl(
-            chain: Chain(
-                next: InMemoryBuffer()
-            )
+    private lazy var _pipelineSinglton: PipelineMutator = {
+        return PipelineImpl(
+            pipe: InMemoryBuffer()
         )
     }()
 
@@ -37,7 +35,7 @@ final class ServiceLocator {
     private lazy var _deviceStateObserver: DeviceStateObserver = {
         return DeviceStateObserverFactory(
             statisticService: statisticService(),
-            synchronizer: synchronizer(),
+            synchronizer: pipeline(),
             optInService: optInService(),
             dateTimeProvider: dateTimeProvider(),
             coreEventFactory: coreEventFactory(),
@@ -63,7 +61,7 @@ final class ServiceLocator {
 
     func notificationListener() -> OptimoveNotificationHandling {
         return OptimoveNotificationHandler(
-            synchronizer: synchronizer(),
+            synchronizer: pipeline(),
             deeplinkService: deeplinkService()
         )
     }
@@ -88,8 +86,8 @@ final class ServiceLocator {
         return _deeplinkService
     }
 
-    func synchronizer() -> Synchronizer {
-        return _synchronizer
+    func pipeline() -> Pipeline {
+        return _pipelineSinglton
     }
 
     func configurationFetcher() -> ConfigurationFetcher {
@@ -102,7 +100,7 @@ final class ServiceLocator {
     func initializer() -> SDKInitializer {
         return SDKInitializer(
             componentFactory: componentFactory(),
-            chainMutator: _synchronizer,
+            pipeline: _pipelineSinglton,
             dependencies: [
                 OptimoveStrorageSDKInitializerDependency(storage: storage()),
                 MultiplexLoggerStreamSDKInitializerDependency()
@@ -133,7 +131,7 @@ final class ServiceLocator {
 
     func optInService() -> OptInService {
         return OptInService(
-            synchronizer: synchronizer(),
+            synchronizer: pipeline(),
             coreEventFactory: coreEventFactory(),
             storage: storage(),
             subscribers: []

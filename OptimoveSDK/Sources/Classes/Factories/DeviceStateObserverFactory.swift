@@ -5,14 +5,14 @@ import OptimoveCore
 final class DeviceStateObserverFactory {
 
     private let statisticService: StatisticService
-    private let synchronizer: Synchronizer
+    private let synchronizer: Pipeline
     private let optInService: OptInService
     private let dateTimeProvider: DateTimeProvider
     private let coreEventFactory: CoreEventFactory
     private let storage: OptimoveStorage
 
     init(statisticService: StatisticService,
-         synchronizer: Synchronizer,
+         synchronizer: Pipeline,
          optInService: OptInService,
          dateTimeProvider: DateTimeProvider,
          coreEventFactory: CoreEventFactory,
