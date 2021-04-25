@@ -38,6 +38,7 @@ In this guide we will discuss the steps necessary to implement the Optimove iOS 
 2. [Testing](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Testing)
 3. [Deep links](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Deep-links)
 4. [Disable push campaign](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Disable-push-campaign)
+5. [iOS push channels](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/iOS-push-channels)
 
 ## License
 
