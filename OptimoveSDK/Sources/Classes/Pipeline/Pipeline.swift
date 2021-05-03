@@ -29,7 +29,7 @@ extension PipelineImpl: Pipeline {
     func deliver(_ operation: CommonOperation) {
         queue.async { [pipe] in
             tryCatch {
-                try pipe.next?.deliver(operation)
+                try pipe.deliver(operation)
             }
         }
     }
