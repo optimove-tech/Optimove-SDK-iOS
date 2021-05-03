@@ -1,7 +1,7 @@
 # Optimove SDK iOS
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/optimove-tech/Optimove-SDK-iOS?style=flat-square)](https://github.com/optimove-tech/Optimove-SDK-iOS/releases/latest)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/optimove-tech/Optimove-SDK-iOS/CI?style=flat-square)
+[![CI](https://github.com/optimove-tech/Optimove-SDK-iOS/actions/workflows/main.yml/badge.svg)](https://github.com/optimove-tech/Optimove-SDK-iOS/actions/workflows/main.yml)
 ![Cocoapods platforms](https://img.shields.io/cocoapods/p/OptimoveSDK?color=brightgreen&label=CocoaPods&style=flat-square)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
 ![SwiftPM comppatible](https://img.shields.io/badge/SwiftPM-compatible-success?style=flat-square)
