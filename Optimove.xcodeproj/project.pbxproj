@@ -253,7 +253,6 @@
 		D40627451576BB6978A11EB0 /* StubEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432D5D39398212165A5C8188 /* StubEvent.swift */; };
 		D450B85E3B94ED96ED2F3849 /* CoreDataMigrationStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC2D600BED2FFBD180627A1 /* CoreDataMigrationStep.swift */; };
 		D73383EB2FB7DEA9BF737FD1 /* RegistrarNetworkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B37466FDED9BB6674CCDD83 /* RegistrarNetworkingTests.swift */; };
-		D768B18A5B6CEDF723BA0962 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A61B16F0E90FF2BF28B2CB25 /* AdSupport.framework */; };
 		D7F26C4990CB175F51361BF7 /* Mocker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D4DD62415D8168FE58AAE959 /* Mocker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D84FA7E0419D5AA96CE24553 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = B250C7CF8C880EF6A147DE7E /* Components.swift */; };
 		D88E575BBA436CE7BD3ED0D3 /* GlobalConfigFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558B0FF7FB691AD7EF1BC356 /* GlobalConfigFixture.swift */; };
@@ -548,7 +547,6 @@
 		A506CE7C768F77DF1C031E7D /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		A50E294635F099DB396E68C2 /* Events-2590.sqlite */ = {isa = PBXFileReference; path = "Events-2590.sqlite"; sourceTree = "<group>"; };
 		A5BA51C5F38A24977889480C /* ProcessInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessInfo.swift; sourceTree = "<group>"; };
-		A61B16F0E90FF2BF28B2CB25 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		A6952311F3B4BB669CE43372 /* TenantEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantEvent.swift; sourceTree = "<group>"; };
 		A71DCE5364C57C6B818A76F9 /* OptInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptInService.swift; sourceTree = "<group>"; };
 		A7F57DE7E2FE4814F1B86846 /* ConfigurationBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationBuilder.swift; sourceTree = "<group>"; };
@@ -684,7 +682,6 @@
 				5E053F49077A89C08CF54B5F /* OptimoveCore.framework in Frameworks */,
 				AC09D26D395648106E7CA59C /* UIKit.framework in Frameworks */,
 				EEA726E93CBE99DE605ECBC4 /* UserNotifications.framework in Frameworks */,
-				D768B18A5B6CEDF723BA0962 /* AdSupport.framework in Frameworks */,
 				A7120A539838969384DDA733 /* Foundation.framework in Frameworks */,
 				2C574877A3CB27755321D077 /* CoreData.framework in Frameworks */,
 			);
@@ -1413,7 +1410,6 @@
 		8D2AF8410718437694C833BA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A61B16F0E90FF2BF28B2CB25 /* AdSupport.framework */,
 				C91AEC3B6BA8441109CBF58E /* CoreData.framework */,
 				FC92AA41EF0FDB2098B2E829 /* Foundation.framework */,
 				5FC57145A54E5033A5CECAF0 /* UIKit.framework */,
@@ -1846,21 +1842,21 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		"TEMP_1BCB9A53-CB36-49C4-BEA3-BEAF9714CAA6" /* Tests */ = {
+		"TEMP_0173FD67-69D7-4E52-9658-E93E19495CA9" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_3DE45AF3-64D2-476B-BF0A-E50AA36C537A" /* Tests */ = {
+		"TEMP_A12210F5-FE60-4017-AF46-21453FC0241B" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_C33A1842-35F6-4899-9390-1DD67AA3329F" /* Tests */ = {
+		"TEMP_CFD7F576-8351-4761-A601-4A1A19BD7EAF" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);

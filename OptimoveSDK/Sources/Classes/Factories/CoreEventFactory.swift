@@ -18,8 +18,6 @@ protocol CoreEventFactory {
     func createEvent(_ type: CoreEventType) throws -> Event
 }
 
-import AdSupport
-
 final class CoreEventFactoryImpl {
 
     private var storage: OptimoveStorage
@@ -160,19 +158,6 @@ private extension CoreEventFactoryImpl {
 
     func getSdkVersion() -> String {
         return SDKVersion
-    }
-
-    func getAdvertisingIdentifier() -> String {
-        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
-            return ASIdentifierManager.shared().advertisingIdentifier.uuidString
-        }
-        if let storedAdvertisingIdentifier = storage.advertisingIdentifier {
-            return storedAdvertisingIdentifier
-        } else {
-            let newAdvertisingIdentifier = UUID().uuidString
-            storage.advertisingIdentifier = newAdvertisingIdentifier
-            return newAdvertisingIdentifier
-        }
     }
 
 }

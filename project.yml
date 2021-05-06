@@ -60,7 +60,6 @@ targets:
       - target: OptimoveCore
       - sdk: UIKit.framework
       - sdk: UserNotifications.framework
-      - sdk: AdSupport.framework
       - sdk: Foundation.framework
       - sdk: CoreData.framework
 

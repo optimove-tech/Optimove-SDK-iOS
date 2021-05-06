@@ -76,7 +76,6 @@ public protocol StorageValue {
     func getUserAgent() throws -> String
     func getDeviceResolutionWidth() throws -> Float
     func getDeviceResolutionHeight() throws -> Float
-    func getAdvertisingIdentifier() throws -> String
     /// Called when a migration is finished for the version.
     mutating func finishedMigration(to version: String)
     /// Use for checking if a migration was applied for the version.
@@ -498,13 +497,6 @@ public extension KeyValueStorage where Self: StorageValue {
     func getDeviceResolutionHeight() throws -> Float {
         guard let value = deviceResolutionHeight else {
             throw StorageError.noValue(.deviceResolutionHeight)
-        }
-        return value
-    }
-
-    func getAdvertisingIdentifier() throws -> String {
-        guard let value = advertisingIdentifier else {
-            throw StorageError.noValue(.advertisingIdentifier)
         }
         return value
     }
