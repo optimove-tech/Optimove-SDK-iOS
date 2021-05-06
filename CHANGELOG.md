@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.5.2
+
+- **remove** AdSupport dependencies.
+
+## 3.5.1
+
+- **fix** using the pipeline before configs are ready.
+
 ## 3.5.0
 
 - **added** push notifications channels.
