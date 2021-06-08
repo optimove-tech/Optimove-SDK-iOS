@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.5.3
+
+- **fix** using `registerUser` call.
+
 ## 3.5.2
 
 - **remove** AdSupport dependencies.
