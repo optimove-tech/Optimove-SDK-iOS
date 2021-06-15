@@ -43,9 +43,7 @@ final class OptistreamQueueImpl {
     }
 
     @objc func save() {
-        context.perform {
-            self.context.saveOrRollback()
-        }
+        context.safeSaveOrRollback()
     }
 
 }
@@ -54,7 +52,11 @@ extension OptistreamQueueImpl: OptistreamQueue {
 
     var isEmpty: Bool {
         do {
-            return try context.performAndWait {
+            return try context.safeTryPerformAndWait { isSafe in
+                if !isSafe {
+                    Logger.error("Unable to get events count. Persistent store unavailable")
+                    return true
+                }
                 return try context.count(for: EventCDv2.sortedFetchRequest) == 0
             }
         } catch {
@@ -63,7 +65,11 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func enqueue(events: [OptistreamEvent]) {
-        context.performAndWait {
+        context.safePerformAndWait { isSafe in
+            if !isSafe {
+                Logger.error("Unable to enqueue events. Persistent store unavailable")
+                return
+            }
             events.forEach { event in
                 tryCatch {
                     _ = try EventCDv2.insert(into: self.context, event: event, of: self.queueType)
@@ -74,7 +80,11 @@ extension OptistreamQueueImpl: OptistreamQueue {
 
     func first(limit: Int) -> [OptistreamEvent] {
         do {
-            return try context.performAndWait {
+            return try context.safeTryPerformAndWait { isSafe in
+                if !isSafe {
+                    Logger.error("Unable to fetch events. Persistent store unavailable")
+                    return []
+                }
                 let events = try EventCDv2.fetch(in: context) { request in
                     request.predicate = EventCDv2.queueTypePredicate(queueType: queueType)
                     request.sortDescriptors = EventCDv2.defaultSortDescriptors
@@ -102,7 +112,11 @@ extension OptistreamQueueImpl: OptistreamQueue {
     func remove(events: [OptistreamEvent]) {
         let eventIds = events.map { $0.metadata.eventId }
         let predicate = EventCDv2.queueTypeAndEventIdsPredicate(eventIds: eventIds, queueType: queueType)
-        context.performAndWait {
+        context.safePerformAndWait { isSafe in
+            if !isSafe {
+                Logger.error("Unable to remove events. Persistent store unavailable")
+                return
+            }
             let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: EventCDv2.entityName)
             fetch.predicate = predicate
             tryCatch {
