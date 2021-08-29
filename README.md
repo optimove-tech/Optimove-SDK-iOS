@@ -40,6 +40,10 @@ In this guide we will discuss the steps necessary to implement the Optimove iOS 
 4. [Disable push campaign](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Disable-push-campaign)
 5. [iOS push channels](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/iOS-push-channels)
 
+### Migrations
+
+1. [Migration from 2.x to 3.x](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Migration-guide-from-2.x-to-3.x)
+
 ## License
 
 OptimoveSDK for iOS is available under the [MIT license](LICENSE).

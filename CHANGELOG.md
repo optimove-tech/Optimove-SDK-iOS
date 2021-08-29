@@ -58,6 +58,8 @@
 
 ## 3.0.0
 
+Major breaking update - [Migration guide](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Migration-guide-from-2.x-to-3.x)
+
 - **add** a support of the new Optistream events.
 - **add** Airship integration.
 - **improve** persistent layer for events.
