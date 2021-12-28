@@ -89,12 +89,12 @@ final class EventValidator: Pipe {
         }
         return errors
     }
-
+    
     func verifySetUserIdEvent(_ event: Event) throws -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserIdEvent.Constants.name,
-            let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
-
+           let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
+            
             let user = User(userID: userID)
             let userID = user.userID.trimmingCharacters(in: .whitespaces)
             if userID.count > Constants.legalUserIdLength {
@@ -106,14 +106,14 @@ final class EventValidator: Pipe {
             case .valid:
                 NewUserHandler(storage: storage).handle(user: user)
             case .alreadySetIn:
-                throw ValidationError.alreadySetInUserId(userId: userID)
+                errors.append(ValidationError.alreadySetInUserId(userId: userID))
             case .notValid:
                 errors.append(ValidationError.invalidUserId(userId: userID))
             }
         }
         return errors
     }
-
+    
     func verifySetEmailEvent(_ event: Event) throws -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserEmailEvent.Constants.name, let email = event.context[SetUserEmailEvent.Constants.Key.email] as? String {
@@ -122,7 +122,7 @@ final class EventValidator: Pipe {
             case .valid:
                 NewEmailHandler(storage: storage).handle(email: email)
             case .alreadySetIn:
-                throw ValidationError.alreadySetInUserEmail(email: email)
+                errors.append(ValidationError.alreadySetInUserEmail(email: email))
             case .notValid:
                 errors.append(ValidationError.invalidEmail(email: email))
             }
