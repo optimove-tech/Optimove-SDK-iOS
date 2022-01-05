@@ -106,7 +106,7 @@ final class EventValidator: Pipe {
             case .valid:
                 NewUserHandler(storage: storage).handle(user: user)
             case .alreadySetIn:
-                errors.append(ValidationError.alreadySetInUserId(userId: userID))
+                throw ValidationError.alreadySetInUserId(userId: userID)
             case .notValid:
                 errors.append(ValidationError.invalidUserId(userId: userID))
             }
@@ -122,7 +122,7 @@ final class EventValidator: Pipe {
             case .valid:
                 NewEmailHandler(storage: storage).handle(email: email)
             case .alreadySetIn:
-                errors.append(ValidationError.alreadySetInUserEmail(email: email))
+                throw ValidationError.alreadySetInUserEmail(email: email)
             case .notValid:
                 errors.append(ValidationError.invalidEmail(email: email))
             }
