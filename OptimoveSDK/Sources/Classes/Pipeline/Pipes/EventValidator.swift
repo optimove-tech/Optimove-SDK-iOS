@@ -34,13 +34,24 @@ final class EventValidator: Pipe {
             switch operation {
             case let .report(events: events):
                 do {
-                    let validatedEvents: [Event] = try events.map { event in
+                    let validatedEvents: [Event] = try events.compactMap { event in
                         let errors = try self.validate(event: event, withConfigs: configuration.events)
-                        errors.forEach { (error) in
+                        var filteringOutConditionFound = false;
+                        var validations: [ValidationIssue] = []
+                        errors.forEach { error in
                             Logger.buisnessLogicError(error.localizedDescription)
+                            switch error {
+                            case .alreadySetInUserEmail, .alreadySetInUserId:
+                                filteringOutConditionFound = true
+                            default:
+                                validations.append(ValidationIssue(
+                                    status: error.status,
+                                    message: error.localizedDescription
+                                ))
+                            }
                         }
-                        event.validations = errors.map(EventValidator.translateToValidationIssue)
-                        return event
+                        
+                        return filteringOutConditionFound ? nil : event
                     }
                     return CommonOperation.report(events: validatedEvents)
                 } catch {
@@ -90,7 +101,7 @@ final class EventValidator: Pipe {
         return errors
     }
     
-    func verifySetUserIdEvent(_ event: Event) throws -> [ValidationError] {
+    func verifySetUserIdEvent(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserIdEvent.Constants.name,
            let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
@@ -106,7 +117,7 @@ final class EventValidator: Pipe {
             case .valid:
                 NewUserHandler(storage: storage).handle(user: user)
             case .alreadySetIn:
-                throw ValidationError.alreadySetInUserId(userId: userID)
+                errors.append(ValidationError.alreadySetInUserId(userId: userID))
             case .notValid:
                 errors.append(ValidationError.invalidUserId(userId: userID))
             }
@@ -114,7 +125,7 @@ final class EventValidator: Pipe {
         return errors
     }
     
-    func verifySetEmailEvent(_ event: Event) throws -> [ValidationError] {
+    func verifySetEmailEvent(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserEmailEvent.Constants.name, let email = event.context[SetUserEmailEvent.Constants.Key.email] as? String {
             let validationResult = EmailValidator(storage: storage).isValid(email)
@@ -122,7 +133,7 @@ final class EventValidator: Pipe {
             case .valid:
                 NewEmailHandler(storage: storage).handle(email: email)
             case .alreadySetIn:
-                throw ValidationError.alreadySetInUserEmail(email: email)
+                errors.append(ValidationError.alreadySetInUserEmail(email: email))
             case .notValid:
                 errors.append(ValidationError.invalidEmail(email: email))
             }
@@ -158,19 +169,12 @@ final class EventValidator: Pipe {
         return [
             verifyAllowedNumberOfParameters(event),
             verifyMandatoryParameters(eventConfiguration, event),
-            try verifySetUserIdEvent(event),
-            try verifySetEmailEvent(event),
+            verifySetUserIdEvent(event),
+            verifySetEmailEvent(event),
             try verifyEventParameters(event, eventConfiguration)
             ].flatMap { $0 }
     }
-
-    static func translateToValidationIssue(error: ValidationError) -> ValidationIssue {
-        return ValidationIssue(
-            status: error.status,
-            message: error.localizedDescription
-        )
-    }
-
+    
     func validateParameter(
         _ parameter: Parameter,
         _ key: String,
