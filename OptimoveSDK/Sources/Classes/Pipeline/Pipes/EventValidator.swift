@@ -4,13 +4,13 @@ import Foundation
 import OptimoveCore
 
 final class EventValidator: Pipe {
-
+    
     struct Constants {
         enum AllowedType: String, CaseIterable, RawRepresentable {
             case string = "String"
             case number = "Number"
             case boolean = "Boolean"
-
+            
             init?(rawValue: String) {
                 guard let type = AllowedType.allCases.first(where: { $0.rawValue == rawValue }) else { return nil }
                 self = type
@@ -19,30 +19,30 @@ final class EventValidator: Pipe {
         static let legalParameterLength = 4_000
         static let legalUserIdLength = 200
     }
-
+    
     private let configuration: Configuration
     private let storage: OptimoveStorage
-
+    
     init(configuration: Configuration,
          storage: OptimoveStorage) {
         self.configuration = configuration
         self.storage = storage
     }
-
+    
     override func deliver(_ operation: CommonOperation) throws {
         let validationFunction = { [configuration] () throws -> CommonOperation in
             switch operation {
             case let .report(events: events):
                 do {
-                    let validatedEvents: [Event] = try events.compactMap { event in
+                    let validatedEvents: [Event] = try events.filter { event in
                         let errors = try self.validate(event: event, withConfigs: configuration.events)
-                        var filteringOutConditionFound = false;
+                        var include = true
                         var validations: [ValidationIssue] = []
                         errors.forEach { error in
                             Logger.buisnessLogicError(error.localizedDescription)
                             switch error {
                             case .alreadySetInUserEmail, .alreadySetInUserId:
-                                filteringOutConditionFound = true
+                                include = false
                             default:
                                 validations.append(ValidationIssue(
                                     status: error.status,
@@ -51,7 +51,7 @@ final class EventValidator: Pipe {
                             }
                         }
                         
-                        return filteringOutConditionFound ? nil : event
+                        return include
                     }
                     return CommonOperation.report(events: validatedEvents)
                 } catch {
@@ -67,7 +67,7 @@ final class EventValidator: Pipe {
         }
         try next?.deliver(validationFunction())
     }
-
+    
     func verifyAllowedNumberOfParameters(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         let numberOfParamaters = event.context.count
