@@ -2,6 +2,10 @@
 
 ## 3.5.3
 
+- **fix** calling `registerUser` API with previously reported email resulted in user id report failure.
+
+## 3.5.3
+
 - **fix** using `registerUser` call.
 
 ## 3.5.2
