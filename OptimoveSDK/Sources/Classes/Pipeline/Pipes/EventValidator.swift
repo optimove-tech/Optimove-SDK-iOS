@@ -4,13 +4,13 @@ import Foundation
 import OptimoveCore
 
 final class EventValidator: Pipe {
-
+    
     struct Constants {
         enum AllowedType: String, CaseIterable, RawRepresentable {
             case string = "String"
             case number = "Number"
             case boolean = "Boolean"
-
+            
             init?(rawValue: String) {
                 guard let type = AllowedType.allCases.first(where: { $0.rawValue == rawValue }) else { return nil }
                 self = type
@@ -19,28 +19,39 @@ final class EventValidator: Pipe {
         static let legalParameterLength = 4_000
         static let legalUserIdLength = 200
     }
-
+    
     private let configuration: Configuration
     private let storage: OptimoveStorage
-
+    
     init(configuration: Configuration,
          storage: OptimoveStorage) {
         self.configuration = configuration
         self.storage = storage
     }
-
+    
     override func deliver(_ operation: CommonOperation) throws {
         let validationFunction = { [configuration] () throws -> CommonOperation in
             switch operation {
             case let .report(events: events):
                 do {
-                    let validatedEvents: [Event] = try events.map { event in
+                    let validatedEvents: [Event] = try events.filter { event in
                         let errors = try self.validate(event: event, withConfigs: configuration.events)
-                        errors.forEach { (error) in
+                        var include = true
+                        var validations: [ValidationIssue] = []
+                        errors.forEach { error in
                             Logger.buisnessLogicError(error.localizedDescription)
+                            switch error {
+                            case .alreadySetInUserEmail, .alreadySetInUserId:
+                                include = false
+                            default:
+                                validations.append(ValidationIssue(
+                                    status: error.status,
+                                    message: error.localizedDescription
+                                ))
+                            }
                         }
-                        event.validations = errors.map(EventValidator.translateToValidationIssue)
-                        return event
+                        
+                        return include
                     }
                     return CommonOperation.report(events: validatedEvents)
                 } catch {
@@ -56,7 +67,7 @@ final class EventValidator: Pipe {
         }
         try next?.deliver(validationFunction())
     }
-
+    
     func verifyAllowedNumberOfParameters(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         let numberOfParamaters = event.context.count
@@ -89,12 +100,12 @@ final class EventValidator: Pipe {
         }
         return errors
     }
-
-    func verifySetUserIdEvent(_ event: Event) throws -> [ValidationError] {
+    
+    func verifySetUserIdEvent(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserIdEvent.Constants.name,
-            let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
-
+           let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
+            
             let user = User(userID: userID)
             let userID = user.userID.trimmingCharacters(in: .whitespaces)
             if userID.count > Constants.legalUserIdLength {
@@ -106,15 +117,15 @@ final class EventValidator: Pipe {
             case .valid:
                 NewUserHandler(storage: storage).handle(user: user)
             case .alreadySetIn:
-                throw ValidationError.alreadySetInUserId(userId: userID)
+                errors.append(ValidationError.alreadySetInUserId(userId: userID))
             case .notValid:
                 errors.append(ValidationError.invalidUserId(userId: userID))
             }
         }
         return errors
     }
-
-    func verifySetEmailEvent(_ event: Event) throws -> [ValidationError] {
+    
+    func verifySetEmailEvent(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserEmailEvent.Constants.name, let email = event.context[SetUserEmailEvent.Constants.Key.email] as? String {
             let validationResult = EmailValidator(storage: storage).isValid(email)
@@ -122,7 +133,7 @@ final class EventValidator: Pipe {
             case .valid:
                 NewEmailHandler(storage: storage).handle(email: email)
             case .alreadySetIn:
-                throw ValidationError.alreadySetInUserEmail(email: email)
+                errors.append(ValidationError.alreadySetInUserEmail(email: email))
             case .notValid:
                 errors.append(ValidationError.invalidEmail(email: email))
             }
@@ -158,19 +169,12 @@ final class EventValidator: Pipe {
         return [
             verifyAllowedNumberOfParameters(event),
             verifyMandatoryParameters(eventConfiguration, event),
-            try verifySetUserIdEvent(event),
-            try verifySetEmailEvent(event),
+            verifySetUserIdEvent(event),
+            verifySetEmailEvent(event),
             try verifyEventParameters(event, eventConfiguration)
             ].flatMap { $0 }
     }
-
-    static func translateToValidationIssue(error: ValidationError) -> ValidationIssue {
-        return ValidationIssue(
-            status: error.status,
-            message: error.localizedDescription
-        )
-    }
-
+    
     func validateParameter(
         _ parameter: Parameter,
         _ key: String,

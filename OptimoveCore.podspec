@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveCore'
-  s.version          = '3.5.3'
+  s.version          = '3.5.4'
   s.summary          = 'Official Optimove SDK for iOS. Core framework.'
   s.description      = 'The core framework is used to share code-base between other Optimove frameworks.'
   s.homepage         = 'https://github.com/optimove-tech/Optimove-SDK-iOS'
