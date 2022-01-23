@@ -545,7 +545,7 @@
 		A483534D00B52DA236BB0B05 /* NewVisitorIdGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewVisitorIdGenerator.swift; sourceTree = "<group>"; };
 		A4D0445351BA8E72B53C89A3 /* NewEmailHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEmailHandlerTests.swift; sourceTree = "<group>"; };
 		A506CE7C768F77DF1C031E7D /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
-		A50E294635F099DB396E68C2 /* Events-2590.sqlite */ = {isa = PBXFileReference; path = "Events-2590.sqlite"; sourceTree = "<group>"; };
+		A50E294635F099DB396E68C2 /* Events-2590.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Events-2590.sqlite"; sourceTree = "<group>"; };
 		A5BA51C5F38A24977889480C /* ProcessInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessInfo.swift; sourceTree = "<group>"; };
 		A6952311F3B4BB669CE43372 /* TenantEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantEvent.swift; sourceTree = "<group>"; };
 		A71DCE5364C57C6B818A76F9 /* OptInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptInService.swift; sourceTree = "<group>"; };
@@ -1842,21 +1842,21 @@
 			path = Validators;
 			sourceTree = "<group>";
 		};
-		"TEMP_30D605E7-EF4B-4FE2-A78C-3BF87D6EFE80" /* Tests */ = {
+		"TEMP_10A0C5E3-1E6C-4A00-A72A-41D3D7AAA264" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_3FDDC547-4DF4-4326-B411-415DBDADF6E0" /* Tests */ = {
+		"TEMP_2B41396A-EF2D-4EBB-B45C-4D2A94A28ED0" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		"TEMP_8098AF22-7523-40E6-AA68-467401D78710" /* Tests */ = {
+		"TEMP_597889C8-D046-45C2-967F-CA409570CEC5" /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 			);
