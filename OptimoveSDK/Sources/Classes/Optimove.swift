@@ -168,6 +168,16 @@ extension Optimove {
         }
         container.resolve(function)
     }
+    
+    /// get visitor id of optimove SDK.
+
+    @objc public static func getVisitorID() -> String? {
+        return shared.getVisitorID()
+    }
+    
+    private func getVisitorID() -> String? {
+        return serviceLocator.storage().getVisitorID()
+    }
 
     /// Set a user ID to the Optimove SDK.
     ///
