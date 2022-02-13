@@ -31,7 +31,6 @@ public struct OptistreamEvent: Codable {
         public let requestId: String
         public let platform: String = "ios"
         public let version: String = SDKVersion
-        public let validations: [ValidationIssue]
 
         enum CodingKeys: String, CodingKey {
             case channel
@@ -41,7 +40,6 @@ public struct OptistreamEvent: Codable {
             case requestId
             case platform = "sdk_platform"
             case version = "sdk_version"
-            case validations
         }
 
         public init(
@@ -49,15 +47,13 @@ public struct OptistreamEvent: Codable {
             realtime: Bool,
             firstVisitorDate: Int64?,
             eventId: String,
-            requestId: String,
-            validations: [ValidationIssue]
+            requestId: String
         ) {
             self.channel = channel
             self.realtime = realtime
             self.firstVisitorDate = firstVisitorDate
             self.eventId = eventId
             self.requestId = requestId
-            self.validations = validations
         }
 
     }

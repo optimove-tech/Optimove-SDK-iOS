@@ -37,17 +37,13 @@ final class EventValidator: Pipe {
                     let validatedEvents: [Event] = try events.filter { event in
                         let errors = try self.validate(event: event, withConfigs: configuration.events)
                         var include = true
-                        var validations: [ValidationIssue] = []
                         errors.forEach { error in
                             Logger.buisnessLogicError(error.localizedDescription)
                             switch error {
                             case .alreadySetInUserEmail, .alreadySetInUserId:
                                 include = false
                             default:
-                                validations.append(ValidationIssue(
-                                    status: error.status,
-                                    message: error.localizedDescription
-                                ))
+                               break
                             }
                         }
                         
