@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - run: carthage update --platform ios --cache-builds
+    - run: carthage update --use-xcframeworks --cache-builds
       name: Carthage
     - run: xcodebuild build-for-testing -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11"
       name: Build
