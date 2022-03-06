@@ -170,13 +170,13 @@ extension Optimove {
     }
     
     /// get visitor id of optimove SDK.
-    /// call this function if you need the internal visitor Id of Optipmove
+    /// call this function if you need the internal visitor Id of Optimove
     @objc public static func getVisitorID() -> String? {
         return shared.getVisitorID()
     }
     
     private func getVisitorID() -> String? {
-        return serviceLocator.storage().getVisitorID()
+        return try? Assembly().makeServiceLocator()?.storage().getVisitorID()
     }
 
     /// Set a user ID to the Optimove SDK.

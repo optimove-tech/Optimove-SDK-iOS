@@ -9,7 +9,7 @@ final class Assembly {
         return Container(serviceLocator: makeServiceLocator())
     }
 
-    private func makeServiceLocator() -> ServiceLocator? {
+    func makeServiceLocator() -> ServiceLocator? {
         /// A special storage migration, before an actual storage going to be in use.
         migrate()
         do {
