@@ -176,7 +176,11 @@ extension Optimove {
     }
     
     private func getVisitorID() -> String? {
-        return try? Assembly().makeServiceLocator()?.storage().getVisitorID()
+        let function: (ServiceLocator) -> String? = { serviceLocator in
+            return try? serviceLocator.storage().getVisitorID()
+        }
+        guard let id = container.resolve(function) else { return nil }
+        return id
     }
 
     /// Set a user ID to the Optimove SDK.
