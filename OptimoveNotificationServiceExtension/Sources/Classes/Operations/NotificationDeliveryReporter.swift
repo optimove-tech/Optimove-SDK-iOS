@@ -49,8 +49,7 @@ internal final class NotificationDeliveryReporter: AsyncOperation {
                     realtime: event.isRealtime,
                     firstVisitorDate: notificationPayload.eventVariables.firstRunTimestamp,
                     eventId: event.eventId.uuidString,
-                    requestId: event.requestId,
-                    validations: []
+                    requestId: event.requestId
                 )
             )
             try report(optistreamEvent)
