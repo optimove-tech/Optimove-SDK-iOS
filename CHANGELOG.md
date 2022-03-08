@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.6.0
+
+- **added** `getVisitorID` API.
+
 ## 3.5.4
 
 - **fix** calling `registerUser` API with previously reported email resulted in user id report failure.
