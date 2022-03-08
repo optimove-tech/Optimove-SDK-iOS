@@ -168,6 +168,20 @@ extension Optimove {
         }
         container.resolve(function)
     }
+    
+    /// get visitor id of optimove SDK.
+    /// call this function if you need the internal visitor Id of Optimove
+    @objc public static func getVisitorID() -> String? {
+        return shared.getVisitorID()
+    }
+    
+    private func getVisitorID() -> String? {
+        let function: (ServiceLocator) -> String? = { serviceLocator in
+            return try? serviceLocator.storage().getVisitorID()
+        }
+        guard let id = container.resolve(function) else { return nil }
+        return id
+    }
 
     /// Set a user ID to the Optimove SDK.
     ///
