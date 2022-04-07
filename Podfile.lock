@@ -1,0 +1,100 @@
+PODS:
+  - KumulosKSCrash (1.15.21-kumulos1):
+    - KumulosKSCrash/Installations (= 1.15.21-kumulos1)
+  - KumulosKSCrash/Installations (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting
+  - KumulosKSCrash/Recording (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording/Tools (= 1.15.21-kumulos1)
+  - KumulosKSCrash/Recording/Tools (1.15.21-kumulos1)
+  - KumulosKSCrash/Reporting (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting/Filters (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/MessageUI (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/Sinks (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/Tools (= 1.15.21-kumulos1)
+  - KumulosKSCrash/Reporting/Filters (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting/Filters/Alert (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/Filters/AppleFmt (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/Filters/Base (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/Filters/Basic (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/Filters/GZip (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/Filters/JSON (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/Filters/Sets (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/Filters/Stringify (= 1.15.21-kumulos1)
+    - KumulosKSCrash/Reporting/Filters/Tools (= 1.15.21-kumulos1)
+  - KumulosKSCrash/Reporting/Filters/Alert (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting/Filters/Base
+  - KumulosKSCrash/Reporting/Filters/AppleFmt (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting/Filters/Base
+  - KumulosKSCrash/Reporting/Filters/Base (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+  - KumulosKSCrash/Reporting/Filters/Basic (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting/Filters/Base
+  - KumulosKSCrash/Reporting/Filters/GZip (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting/Filters/Base
+  - KumulosKSCrash/Reporting/Filters/JSON (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting/Filters/Base
+  - KumulosKSCrash/Reporting/Filters/Sets (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting/Filters/AppleFmt
+    - KumulosKSCrash/Reporting/Filters/Base
+    - KumulosKSCrash/Reporting/Filters/Basic
+    - KumulosKSCrash/Reporting/Filters/GZip
+    - KumulosKSCrash/Reporting/Filters/JSON
+    - KumulosKSCrash/Reporting/Filters/Stringify
+  - KumulosKSCrash/Reporting/Filters/Stringify (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting/Filters/Base
+  - KumulosKSCrash/Reporting/Filters/Tools (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+  - KumulosKSCrash/Reporting/MessageUI (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+  - KumulosKSCrash/Reporting/Sinks (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+    - KumulosKSCrash/Reporting/Filters
+    - KumulosKSCrash/Reporting/Tools
+  - KumulosKSCrash/Reporting/Tools (1.15.21-kumulos1):
+    - KumulosKSCrash/Recording
+  - KumulosSdkSwift (9.2.5):
+    - KumulosKSCrash (= 1.15.21-kumulos1)
+  - KumulosSdkSwiftExtension (9.2.5)
+  - OptimoveCore (3.5.4)
+  - OptimoveNotificationServiceExtension (3.5.4):
+    - OptimoveCore (= 3.5.4)
+  - OptimoveSDK (3.5.4):
+    - OptimoveCore (= 3.5.4)
+
+DEPENDENCIES:
+  - KumulosSdkSwift (~> 9.2)
+  - KumulosSdkSwiftExtension (~> 9.2)
+  - OptimoveCore
+  - OptimoveNotificationServiceExtension
+  - OptimoveSDK
+
+SPEC REPOS:
+  trunk:
+    - KumulosKSCrash
+    - KumulosSdkSwift
+    - KumulosSdkSwiftExtension
+    - OptimoveCore
+    - OptimoveNotificationServiceExtension
+    - OptimoveSDK
+
+SPEC CHECKSUMS:
+  KumulosKSCrash: 714fddecf87b113134a1b1256d9949ab2b3085d8
+  KumulosSdkSwift: ed143b77b4857262f26f8413cf2e4bf1060656b4
+  KumulosSdkSwiftExtension: 0427f60d5dba5030427b3f942ffd202688b612a4
+  OptimoveCore: 4ee572494539d723b70fbe1093988f805706efad
+  OptimoveNotificationServiceExtension: fc9c426070b253006934a8d52b7dc7d7498b8163
+  OptimoveSDK: 6b3a170900ecbedd9f2a25326214230417c79ef7
+
+PODFILE CHECKSUM: aa9c1bfee408a13c6cf819e51a39fa27206b10b6
+
+COCOAPODS: 1.11.2
