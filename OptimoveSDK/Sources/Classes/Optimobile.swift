@@ -9,7 +9,7 @@ import UIKit
 import OptimoveCore
 import CoreLocation
 
-class Optimobile {
+public class Optimobile {
     
     private static let internalQueue = DispatchQueue(label: "com.singletioninternal.queue",
                                                      qos: .default,
