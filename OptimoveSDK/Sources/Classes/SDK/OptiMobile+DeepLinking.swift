@@ -139,7 +139,7 @@ class DeepLinkHelper {
                 self.invokeDeepLinkHandler(.linkMatched(link))
 
                 let linkProps = ["url": url.absoluteString, "wasDeferred": wasDeferred] as [String : Any]
-                Kumulos.getInstance().analyticsHelper.trackEvent(eventType: KumulosEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
+                Kumulos.getInstance().analyticsHelper.trackEvent(eventType: OptiMobileEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
                 break
             default:
                 self.invokeDeepLinkHandler(.lookupFailed(url))
@@ -242,7 +242,7 @@ class DeepLinkHelper {
 
 }
 
-public extension OptiMobile {
+extension OptiMobile {
     static func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return getInstance().deepLinkHelper?.handleContinuation(for: userActivity) ?? false
     }

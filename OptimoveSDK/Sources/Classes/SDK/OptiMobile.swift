@@ -3,7 +3,7 @@
 import Foundation
 import UserNotifications
 
-internal enum KumulosEvent : String {
+internal enum OptiMobileEvent : String {
     case STATS_FOREGROUND = "k.fg"
     case STATS_BACKGROUND = "k.bg"
     case STATS_CALL_HOME = "k.stats.installTracked"
@@ -22,10 +22,10 @@ internal enum KumulosEvent : String {
 }
 
 public typealias InAppDeepLinkHandlerBlock = (InAppButtonPress) -> Void
-public typealias PushOpenedHandlerBlock = (KSPushNotification) -> Void
+public typealias PushOpenedHandlerBlock = (PushNotification) -> Void
 
 @available(iOS 10.0, *)
-public typealias PushReceivedInForegroundHandlerBlock = (KSPushNotification, (UNNotificationPresentationOptions)->Void) -> Void
+public typealias PushReceivedInForegroundHandlerBlock = (PushNotification, (UNNotificationPresentationOptions)->Void) -> Void
 
 public enum InAppConsentStrategy : String {
     case NotEnabled = "NotEnabled"
@@ -34,7 +34,7 @@ public enum InAppConsentStrategy : String {
 }
 
 // MARK: class
-open class OptiMobile {
+internal class OptiMobile {
     internal let urlBuilder:UrlBuilder
 
     internal let pushHttpClient:KSHttpClient
@@ -45,11 +45,11 @@ open class OptiMobile {
 
     internal let sdkVersion : String = "9.2.5"
 
-    fileprivate static var instance:Kumulos?
+    fileprivate static var instance:OptiMobile?
 
     internal var notificationCenter:Any?
 
-    internal static var sharedInstance:Kumulos {
+    internal static var sharedInstance:OptiMobile {
         get {
             if(false == isInitialized()) {
                 assertionFailure("The KumulosSDK has not been initialized")
@@ -59,12 +59,12 @@ open class OptiMobile {
         }
     }
 
-    public static func getInstance() -> Kumulos
+    public static func getInstance() -> OptiMobile
     {
         return sharedInstance;
     }
 
-    fileprivate(set) var config : KSConfig
+    fileprivate(set) var config : Config
     fileprivate(set) var apiKey: String
     fileprivate(set) var secretKey: String
     fileprivate(set) var inAppConsentStrategy:InAppConsentStrategy = InAppConsentStrategy.NotEnabled
@@ -118,9 +118,9 @@ open class OptiMobile {
         - Parameters:
               - config: An instance of KSConfig
     */
-    public static func initialize(config: KSConfig) {
+    public static func initialize(config: Config) {
         if (instance !== nil) {
-            assertionFailure("The KumulosSDK has already been initialized")
+            assertionFailure("The OptiMobile has already been initialized")
         }
 
         KeyValPersistenceHelper.maybeMigrateUserDefaultsToAppGroups()
@@ -129,7 +129,7 @@ open class OptiMobile {
         KeyValPersistenceHelper.set(config.baseUrlMap[.events], forKey: KumulosUserDefaultsKey.EVENTS_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: KumulosUserDefaultsKey.MEDIA_BASE_URL.rawValue)
 
-        instance = Kumulos(config: config)
+        instance = OptiMobile(config: config)
 
         instance!.initializeHelpers()
 
@@ -144,7 +144,7 @@ open class OptiMobile {
         }
     }
 
-    fileprivate init(config: KSConfig) {
+    fileprivate init(config: Config) {
         self.config = config
         apiKey = config.apiKey
         secretKey = config.secretKey

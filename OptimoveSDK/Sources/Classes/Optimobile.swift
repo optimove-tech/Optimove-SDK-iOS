@@ -37,8 +37,8 @@ public class Optimobile {
         Optimove.configure(for: tenantInfo)
         builder = ConfigBuilder(region: region, apiKey: apiKey, secretKey: secretKey)
         if let abilities = abilities {
-            for abilitie in abilities {
-                switch abilitie {
+            for ability in abilities {
+                switch ability {
                 case .deepLinking(let responder):
                     registerDeepLink(deepLinkResponder: responder)
                 case .inApp(responder: let responder, let inAppConsentStrategy):
@@ -89,14 +89,6 @@ public class Optimobile {
         OptiMobile.pushRequestDeviceToken()
     }
     
-//    public static func sendLocationUpdate(location: CLLocation) {
-//        Kumulos.sendLocationUpdate(location: location)
-//    }
-//
-//    public static func sendiBeaconProximity(beacon: CLBeacon) {
-//        Kumulos.sendiBeaconProximity(beacon: beacon)
-//    }
-    
     private func registerDeepLink(deepLinkResponder responder: deepLinkCompletion? = nil) {
         builder.enableDeepLinking({ (resolution) in
             responder?(resolution)
@@ -113,7 +105,7 @@ public class Optimobile {
     }
 
     private func registerPushOpenedHandler(inAppResponder responder: pushOpenedCompletion? = nil) {
-        builder.setPushOpenedHandler(pushOpenedHandlerBlock: { (notification : KSPushNotification) -> Void in
+        builder.setPushOpenedHandler(pushOpenedHandlerBlock: { (notification : PushNotification) -> Void in
             if let action = notification.actionIdentifier {
                 responder?(action, notification.data)
             } else {

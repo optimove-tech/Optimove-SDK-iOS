@@ -76,21 +76,21 @@ public struct InAppInboxSummary {
 public typealias InboxUpdatedHandlerBlock = () -> Void
 public typealias InboxSummaryBlock = (InAppInboxSummary?) -> Void
 
-public class KumulosInApp {
+public class InApp {
     private static var _inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?
     
     public static func updateConsent(forUser consentGiven: Bool) {
-        if Kumulos.inAppConsentStrategy != InAppConsentStrategy.ExplicitByUser {
+        if OptiMobile.inAppConsentStrategy != InAppConsentStrategy.ExplicitByUser {
             NSException(name:NSExceptionName(rawValue: "Kumulos: Invalid In-app consent strategy"), reason:"You can only manage in-app messaging consent when the feature is enabled and strategy is set to KSInAppConsentStrategyExplicitByUser", userInfo:nil).raise()
             
             return
         }
 
-        Kumulos.sharedInstance.inAppHelper.updateUserConsent(consentGiven: consentGiven)
+        OptiMobile.sharedInstance.inAppHelper.updateUserConsent(consentGiven: consentGiven)
     }
     
     public static func getInboxItems() -> [InAppInboxItem] {
-        guard let context = Kumulos.sharedInstance.inAppHelper.messagesContext else {
+        guard let context = OptiMobile.sharedInstance.inAppHelper.messagesContext else {
             return []
         }
     
@@ -134,27 +134,27 @@ public class KumulosInApp {
             return InAppMessagePresentationResult.EXPIRED
         }
 
-        let result = Kumulos.sharedInstance.inAppHelper.presentMessage(withId: item.id)
+        let result = OptiMobile.sharedInstance.inAppHelper.presentMessage(withId: item.id)
         
         return result ? InAppMessagePresentationResult.PRESENTED : InAppMessagePresentationResult.FAILED 
     }
     
     public static func deleteMessageFromInbox(item: InAppInboxItem) -> Bool {
-        return Kumulos.sharedInstance.inAppHelper.deleteMessageFromInbox(withId: item.id)
+        return OptiMobile.sharedInstance.inAppHelper.deleteMessageFromInbox(withId: item.id)
     }
     
     public static func markAsRead(item: InAppInboxItem) -> Bool {
         if (item.isRead()){
             return false
         }
-        let res = Kumulos.sharedInstance.inAppHelper.markInboxItemRead(withId: item.id, shouldWait: true)
+        let res = OptiMobile.sharedInstance.inAppHelper.markInboxItemRead(withId: item.id, shouldWait: true)
         maybeRunInboxUpdatedHandler(inboxNeedsUpdate: res)
         
         return res
     }
     
     public static func markAllInboxItemsAsRead() -> Bool {
-        return Kumulos.sharedInstance.inAppHelper.markAllInboxItemsAsRead()
+        return OptiMobile.sharedInstance.inAppHelper.markAllInboxItemsAsRead()
     }
     
     public static func setOnInboxUpdated(inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?) -> Void {
@@ -162,7 +162,7 @@ public class KumulosInApp {
     }
     
     public static func getInboxSummaryAsync(inboxSummaryBlock: @escaping InboxSummaryBlock){
-        Kumulos.sharedInstance.inAppHelper.readInboxSummary(inboxSummaryBlock: inboxSummaryBlock)
+        OptiMobile.sharedInstance.inAppHelper.readInboxSummary(inboxSummaryBlock: inboxSummaryBlock)
     }
 
     // Internal helpers

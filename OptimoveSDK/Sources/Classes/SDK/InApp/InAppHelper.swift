@@ -33,7 +33,7 @@ internal class InAppHelper {
     init() {
         presenter = InAppPresenter()
         syncBarrier = DispatchSemaphore(value: 0)
-        syncQueue = DispatchQueue(label: "kumulos.in-app.sync")
+        syncQueue = DispatchQueue(label: "optimobile.in-app.sync")
     }
     
     func initialize() {
@@ -114,8 +114,8 @@ internal class InAppHelper {
                 fetchBarrier.signal()
             }
             
-            if (Kumulos.sharedInstance.inAppHelper.inAppEnabled()){
-                Kumulos.sharedInstance.inAppHelper.sync { (result:Int) in
+            if (OptiMobile.sharedInstance.inAppHelper.inAppEnabled()){
+                OptiMobile.sharedInstance.inAppHelper.sync { (result:Int) in
                     _ = fetchBarrier.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(20))
                     
                     if result < 0 {
@@ -138,7 +138,7 @@ internal class InAppHelper {
     
     // MARK: State helpers
     func inAppEnabled() -> Bool {
-        return Kumulos.sharedInstance.inAppConsentStrategy != InAppConsentStrategy.NotEnabled && userConsented();
+        return OptiMobile.sharedInstance.inAppConsentStrategy != InAppConsentStrategy.NotEnabled && userConsented();
     }
     
     func userConsented() -> Bool {
@@ -148,7 +148,7 @@ internal class InAppHelper {
     func updateUserConsent(consentGiven: Bool) {
         let props: [String: Any] = ["consented":consentGiven]
         
-        Kumulos.trackEventImmediately(eventType: KumulosEvent.IN_APP_CONSENT_CHANGED.rawValue, properties: props)
+        OptiMobile.trackEventImmediately(eventType: KumulosEvent.IN_APP_CONSENT_CHANGED.rawValue, properties: props)
         
         if (consentGiven) {
             UserDefaults.standard.set(consentGiven, forKey: KumulosUserDefaultsKey.IN_APP_CONSENTED.rawValue)
@@ -162,7 +162,7 @@ internal class InAppHelper {
     }
     
     func handleAssociatedUserChange() -> Void {
-        if (Kumulos.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.NotEnabled) {
+        if (OptiMobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.NotEnabled) {
             DispatchQueue.global(qos: .default).async(execute: {
                 self.updateUserConsent(consentGiven: false)
             })
@@ -176,11 +176,11 @@ internal class InAppHelper {
     }
     
     private func handleEnrollmentAndSyncSetup() -> Void {
-        if (Kumulos.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.AutoEnroll && userConsented() == false) {
+        if (OptiMobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.AutoEnroll && userConsented() == false) {
             updateUserConsent(consentGiven: true)
             return;
         }
-        else if (Kumulos.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.NotEnabled && userConsented() == true) {
+        else if (OptiMobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.NotEnabled && userConsented() == true) {
             updateUserConsent(consentGiven: false)
             return;
         }
@@ -650,7 +650,7 @@ internal class InAppHelper {
         return result
     }
     
-    func handlePushOpen(notification: KSPushNotification) -> Void {
+    func handlePushOpen(notification: PushNotification) -> Void {
         let deepLink: [AnyHashable:Any]? = notification.inAppDeepLink();
         if (!inAppEnabled() || deepLink == nil){
             return;
@@ -682,7 +682,7 @@ internal class InAppHelper {
     
     func deleteMessageFromInbox(withId : Int64) -> Bool {
         let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":withId]
-        Kumulos.trackEvent(eventType: KumulosEvent.MESSAGE_DELETED_FROM_INBOX, properties: props)
+        OptiMobile.trackEvent(eventType: OptiMobileEvent.MESSAGE_DELETED_FROM_INBOX, properties: props)
         
         removeNotificationTickle(id: withId)
         
@@ -726,7 +726,7 @@ internal class InAppHelper {
             }
         });
         
-        KumulosInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: result);
+        InApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: result);
         
         return result
     }
@@ -778,7 +778,7 @@ internal class InAppHelper {
         }
         
         let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":withId]
-        Kumulos.trackEvent(eventType: KumulosEvent.MESSAGE_READ, properties: props)
+        OptiMobile.trackEvent(eventType: OptiMobileEvent.MESSAGE_READ, properties: props)
         
         removeNotificationTickle(id: withId)
         
@@ -810,7 +810,7 @@ internal class InAppHelper {
     }
     
     func readInboxSummary(inboxSummaryBlock: @escaping InboxSummaryBlock) -> Void {
-        guard let context = Kumulos.sharedInstance.inAppHelper.messagesContext else {
+        guard let context = OptiMobile.sharedInstance.inAppHelper.messagesContext else {
             self.fireInboxSummaryCallback(callback: inboxSummaryBlock, summary: nil)
             return
         }
