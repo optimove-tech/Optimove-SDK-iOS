@@ -1,13 +1,8 @@
-//
-//  Kumulos+Analytics.swift
-//  KumulosSDK
-//
-//  Copyright © 2018 Kumulos. All rights reserved.
-//
+// Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 
-public extension Kumulos {
+public extension OptiMobile {
     internal static func trackEvent(eventType: KumulosEvent, properties: [String:Any]?, immediateFlush: Bool = false) {
         getInstance().analyticsHelper.trackEvent(eventType: eventType.rawValue, properties: properties, immediateFlush: immediateFlush)
     }

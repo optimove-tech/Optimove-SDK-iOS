@@ -1,9 +1,4 @@
-//
-//  InAppPresenter.swift
-//  KumulosSDK
-//
-//  Copyright © 2019 Kumulos. All rights reserved.
-//
+// Copyright © 2022 Optimove. All rights reserved.
 
 import UIKit
 import WebKit

@@ -1,10 +1,4 @@
-//
-//  SessionHelper.swift
-//  KumulosSDK
-//
-//  Created by Vladislav Voicehovics on 20/03/2020.
-//  Copyright © 2020 Kumulos. All rights reserved.
-//
+// Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UIKit

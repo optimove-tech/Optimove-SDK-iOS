@@ -1,7 +1,4 @@
-//
-//  Kumulos.swift
-//  Copyright © 2016 Kumulos. All rights reserved.
-//
+// Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UserNotifications
@@ -37,7 +34,7 @@ public enum InAppConsentStrategy : String {
 }
 
 // MARK: class
-open class Kumulos {
+open class OptiMobile {
     internal let urlBuilder:UrlBuilder
 
     internal let pushHttpClient:KSHttpClient
