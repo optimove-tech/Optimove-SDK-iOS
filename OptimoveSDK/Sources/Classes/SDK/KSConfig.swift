@@ -33,6 +33,7 @@ public struct KSConfig {
 }
 
 open class KSConfigBuilder: NSObject {
+    private var _region: String
     private var _apiKey: String
     private var _secretKey: String
     private var _sessionIdleTimeout: UInt
@@ -44,11 +45,12 @@ open class KSConfigBuilder: NSObject {
     private var _deepLinkHandler : DeepLinkHandler?
     private var _baseUrlMap : ServiceUrlMap
     
-    public init(apiKey: String, secretKey: String) {
+    public init(region: String, apiKey: String, secretKey: String) {
+        _region = region
         _apiKey = apiKey
         _secretKey = secretKey
         _sessionIdleTimeout = 23
-        _baseUrlMap = UrlBuilder.defaultMapping()
+        _baseUrlMap = UrlBuilder.defaultMapping(region: region)
     }
     
     @discardableResult public func setSessionIdleTimeout(seconds: UInt) -> KSConfigBuilder {
