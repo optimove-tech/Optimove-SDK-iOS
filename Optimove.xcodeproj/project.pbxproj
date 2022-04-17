@@ -241,7 +241,6 @@
 		4F585C9E27FECD4F005E7BB4 /* PendingNotificationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C9527FECD4F005E7BB4 /* PendingNotificationHelper.swift */; };
 		4F585C9F27FECD4F005E7BB4 /* MediaHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C9627FECD4F005E7BB4 /* MediaHelper.swift */; };
 		4FA8F61727FEE872005CB88E /* KSBadgeObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8F61627FEE872005CB88E /* KSBadgeObserver.swift */; };
-		4FA8FABF280C2831005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FABE280C2831005CB88E /* KumulosNotificationService.swift */; };
 		4FE394EB27C78933005FABB0 /* Mocker.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; };
 		4FE394EC27C78933005FABB0 /* Mocker.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4FE394EE27C78942005FABB0 /* Mocker.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; };
@@ -679,7 +678,6 @@
 		4F585C6627FECCFA005E7BB4 /* KumulosPushChannels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosPushChannels.swift; sourceTree = "<group>"; };
 		4F585C8727FECD3E005E7BB4 /* Shared */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Shared; sourceTree = "<group>"; };
 		4F585C8827FECD3E005E7BB4 /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
-		4F585C8A27FECD3E005E7BB4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4F585C8E27FECD4F005E7BB4 /* KSHttp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KSHttp.swift; sourceTree = "<group>"; };
 		4F585C8F27FECD4F005E7BB4 /* AnalyticsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
 		4F585C9027FECD4F005E7BB4 /* KeyValPersistenceHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyValPersistenceHelper.swift; sourceTree = "<group>"; };
@@ -690,7 +688,6 @@
 		4F585C9527FECD4F005E7BB4 /* PendingNotificationHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingNotificationHelper.swift; sourceTree = "<group>"; };
 		4F585C9627FECD4F005E7BB4 /* MediaHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHelper.swift; sourceTree = "<group>"; };
 		4FA8F61627FEE872005CB88E /* KSBadgeObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KSBadgeObserver.swift; sourceTree = "<group>"; };
-		4FA8FABE280C2831005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
 		4FD4BAAECE0E2C8D6DAD6232 /* RemoteConfigurationNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationNetworking.swift; sourceTree = "<group>"; };
 		4FE394EA27C78933005FABB0 /* Mocker.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Mocker.xcframework; path = Carthage/Build/Mocker.xcframework; sourceTree = "<group>"; };
 		506941ABF70087E99952FFD6 /* AppOpenEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenEvent.swift; sourceTree = "<group>"; };
@@ -1440,7 +1437,6 @@
 			children = (
 				4F585C8727FECD3E005E7BB4 /* Shared */,
 				4F585C8827FECD3E005E7BB4 /* CategoryHelper.swift */,
-				4F585C8A27FECD3E005E7BB4 /* Info.plist */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -1798,7 +1794,6 @@
 		98D7458B42CE10B8BAFDE51B /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				4FA8FABE280C2831005CB88E /* KumulosNotificationService.swift */,
 				325B5F8B3BDBB034C3516AAB /* .gitkeep */,
 				517F8BBB89498042BB4C4B44 /* Coding */,
 				9D17BEB9C45081815BEF5D44 /* Configurations */,
@@ -2468,7 +2463,6 @@
 				96C32363670FDF6E770C8FF6 /* ApiPayloadBuilder.swift in Sources */,
 				C607C639CF24CABA62C6162C /* ApiRequestBuilder.swift in Sources */,
 				4F585C8B27FECD3E005E7BB4 /* CategoryHelper.swift in Sources */,
-				4FA8FABF280C2831005CB88E /* KumulosNotificationService.swift in Sources */,
 				9D794BA3BA46E08DC6E67F65 /* ApiRequestFactory.swift in Sources */,
 				167EF8E42EABC80FEB2D2A1A /* AppOpenEvent.swift in Sources */,
 				4F585C9927FECD4F005E7BB4 /* KeyValPersistenceHelper.swift in Sources */,
