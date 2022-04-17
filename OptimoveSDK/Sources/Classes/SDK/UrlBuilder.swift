@@ -1,8 +1,4 @@
-//
-//  UrlBuilder.swift
-//  KumulosSDK
-//  Copyright © 2021 Kumulos. All rights reserved.
-//
+// Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 
@@ -35,14 +31,14 @@ class UrlBuilder {
         return baseUrl
     }
 
-    static func defaultMapping() -> ServiceUrlMap {
+    static func defaultMapping(region: String) -> ServiceUrlMap {
         return [
-            .crm : "https://crm.kumulos.com",
-            .ddl : "https://links.kumulos.com",
-            .events : "https://events.kumulos.com",
+            .crm : "https://crm-" + region + ".kumulos.com",
+            .ddl : "https://links-" + region + ".kumulos.com",
+            .events : "https://events-" + region + ".kumulos.com",
+            .push : "https://push-" + region + ".kumulos.com",
             .iar : "https://iar.app.delivery",
             .media : "https://i.app.delivery",
-            .push : "https://push.kumulos.com"
         ]
     }
 }

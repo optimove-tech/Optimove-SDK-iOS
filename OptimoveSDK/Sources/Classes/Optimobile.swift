@@ -1,9 +1,4 @@
-//
-//  ViewController.swift
-//  Optimobile
-//
-//  Created by Barak Ben Hur on 04/04/2022.
-//
+// Copyright © 2022 Optimove. All rights reserved.
 
 import UIKit
 import OptimoveCore
@@ -14,37 +9,37 @@ public class Optimobile {
     private static let internalQueue = DispatchQueue(label: "com.singletioninternal.queue",
                                                      qos: .default,
                                                      attributes: .concurrent)
-    private static let _sheard = Optimobile()
+    private static let _shared = Optimobile()
     
-    public static var sheard: Optimobile {
+    public static var shared: Optimobile {
         get {
             return internalQueue.sync {
-                _sheard
+                _shared
             }
         }
     }
     
-    public typealias deepLinkComplition = (_ deepLinkResolution: DeepLinkResolution) -> ()
-    public typealias inAppComplition = (_ deepLink: [AnyHashable : Any], _ message: NSDictionary?) -> ()
-    public typealias pushOpenedComplition = (_ action: String? , _ data: [AnyHashable : Any]?) -> ()
+    public typealias deepLinkCompletion = (_ deepLinkResolution: DeepLinkResolution) -> ()
+    public typealias inAppCompletion = (_ deepLink: [AnyHashable : Any], _ message: NSDictionary?) -> ()
+    public typealias pushOpenedCompletion = (_ action: String? , _ data: [AnyHashable : Any]?) -> ()
     
     public enum Abilities {
-        case deppLinking(responder: deepLinkComplition?),
-             inApp(responder: inAppComplition?, inAppConsentStrategy: InAppConsentStrategy),
-             pushOpened(responder: pushOpenedComplition?)
+        case deepLinking(responder: deepLinkCompletion?),
+             inApp(responder: inAppCompletion?, inAppConsentStrategy: InAppConsentStrategy),
+             pushOpened(responder: pushOpenedCompletion?)
     }
     
-    private var builder: KSConfigBuilder!
+    private var builder: ConfigBuilder!
     
     private init() {}
     
-    public func configure(for tenantInfo: OptimoveTenantInfo, apiKey: String, secretKey: String, abilities: [Abilities]? = nil) {
+    public func configure(for tenantInfo: OptimoveTenantInfo, region: String, apiKey: String, secretKey: String, abilities: [Abilities]? = nil) {
         Optimove.configure(for: tenantInfo)
-        builder = KSConfigBuilder(apiKey: apiKey, secretKey: secretKey)
+        builder = ConfigBuilder(region: region, apiKey: apiKey, secretKey: secretKey)
         if let abilities = abilities {
-            for abilitie in abilities {
-                switch abilitie {
-                case .deppLinking(let responder):
+            for ability in abilities {
+                switch ability {
+                case .deepLinking(let responder):
                     registerDeepLink(deepLinkResponder: responder)
                 case .inApp(responder: let responder, let inAppConsentStrategy):
                     registerInApp(inAppResponder: responder, inAppConsentStrategy: inAppConsentStrategy)
@@ -54,24 +49,24 @@ public class Optimobile {
             }
         }
         
-        Kumulos.initialize(config: builder.build())
+        OptiMobile.initialize(config: builder.build())
     }
     
     public func registerUser(sdkId userID: String, email: String) {
         Optimove.shared.registerUser(sdkId: userID, email: email)
-        Kumulos.associateUserWithInstall(userIdentifier: userID, attributes: [
+        OptiMobile.associateUserWithInstall(userIdentifier: userID, attributes: [
             "email": email as AnyObject
         ])
     }
     
     public func setUserId(_ userID: String) {
         Optimove.shared.setUserId(userID)
-        Kumulos.associateUserWithInstall(userIdentifier: userID)
+        OptiMobile.associateUserWithInstall(userIdentifier: userID)
     }
     
     public func setUserEmail(email: String) {
         Optimove.shared.setUserEmail(email: email)
-        Kumulos.associateUserWithInstall(userIdentifier: email)
+        OptiMobile.associateUserWithInstall(userIdentifier: email)
     }
     
     public func reportEvent(name: String, parameters: [String: Any] = [:]) {
@@ -87,28 +82,20 @@ public class Optimobile {
     }
     
     public func disablePushCampaigns() {
-        Kumulos.pushUnregister()
+        OptiMobile.pushUnregister()
     }
     
     public func enablePushCampaigns() {
-        Kumulos.pushRequestDeviceToken()
+        OptiMobile.pushRequestDeviceToken()
     }
     
-//    public static func sendLocationUpdate(location: CLLocation) {
-//        Kumulos.sendLocationUpdate(location: location)
-//    }
-//
-//    public static func sendiBeaconProximity(beacon: CLBeacon) {
-//        Kumulos.sendiBeaconProximity(beacon: beacon)
-//    }
-    
-    private func registerDeepLink(deepLinkResponder responder: deepLinkComplition? = nil) {
+    private func registerDeepLink(deepLinkResponder responder: deepLinkCompletion? = nil) {
         builder.enableDeepLinking({ (resolution) in
             responder?(resolution)
         })
     }
     
-    private func registerInApp(inAppResponder responder: inAppComplition? = nil, inAppConsentStrategy: InAppConsentStrategy) {
+    private func registerInApp(inAppResponder responder: inAppCompletion? = nil, inAppConsentStrategy: InAppConsentStrategy) {
         builder.enableInAppMessaging(inAppConsentStrategy: inAppConsentStrategy).setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: { buttonPress in
             let deepLink = buttonPress.deepLinkData
             let messageData = buttonPress.messageData
@@ -117,8 +104,8 @@ public class Optimobile {
         })
     }
 
-    private func registerPushOpenedHandler(inAppResponder responder: pushOpenedComplition? = nil) {
-        builder.setPushOpenedHandler(pushOpenedHandlerBlock: { (notification : KSPushNotification) -> Void in
+    private func registerPushOpenedHandler(inAppResponder responder: pushOpenedCompletion? = nil) {
+        builder.setPushOpenedHandler(pushOpenedHandlerBlock: { (notification : PushNotification) -> Void in
             if let action = notification.actionIdentifier {
                 responder?(action, notification.data)
             } else {

@@ -1,9 +1,4 @@
-//
-//  Kumulos+Deeplinks.swift
-//  KumulosSDK
-//
-//  Copyright © 2020 Kumulos. All rights reserved.
-//
+// Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UIKit
@@ -44,11 +39,11 @@ public typealias DeepLinkHandler = (DeepLinkResolution) -> Void
 class DeepLinkHelper {
     fileprivate static let deferredLinkCheckedKey = "KUMULOS_DDL_CHECKED"
 
-    let config : KSConfig
+    let config : Config
     let httpClient: KSHttpClient
     var anyContinuationHandled : Bool
 
-    init(_ config: KSConfig, urlBuilder:UrlBuilder) {
+    init(_ config: Config, urlBuilder:UrlBuilder) {
         self.config = config
         httpClient = KSHttpClient(
             baseUrl: URL(string: urlBuilder.urlForService(.ddl))!,
@@ -144,7 +139,7 @@ class DeepLinkHelper {
                 self.invokeDeepLinkHandler(.linkMatched(link))
 
                 let linkProps = ["url": url.absoluteString, "wasDeferred": wasDeferred] as [String : Any]
-                Kumulos.getInstance().analyticsHelper.trackEvent(eventType: KumulosEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
+                Kumulos.getInstance().analyticsHelper.trackEvent(eventType: OptiMobileEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
                 break
             default:
                 self.invokeDeepLinkHandler(.lookupFailed(url))
@@ -247,7 +242,7 @@ class DeepLinkHelper {
 
 }
 
-public extension Kumulos {
+extension OptiMobile {
     static func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return getInstance().deepLinkHelper?.handleContinuation(for: userActivity) ?? false
     }

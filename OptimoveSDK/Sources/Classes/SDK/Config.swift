@@ -1,14 +1,8 @@
-//
-//  KSConfig.swift
-//  KumulosSDK
-//
-//  Created by Andy on 05/10/2017.
-//  Copyright © 2017 Kumulos. All rights reserved.
-//
+// Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 
-public struct KSConfig {
+public struct Config {
     let apiKey: String
     let secretKey: String
 
@@ -32,7 +26,8 @@ public struct KSConfig {
     let baseUrlMap : ServiceUrlMap
 }
 
-open class KSConfigBuilder: NSObject {
+open class ConfigBuilder: NSObject {
+    private var _region: String
     private var _apiKey: String
     private var _secretKey: String
     private var _sessionIdleTimeout: UInt
@@ -44,40 +39,41 @@ open class KSConfigBuilder: NSObject {
     private var _deepLinkHandler : DeepLinkHandler?
     private var _baseUrlMap : ServiceUrlMap
     
-    public init(apiKey: String, secretKey: String) {
+    public init(region: String, apiKey: String, secretKey: String) {
+        _region = region
         _apiKey = apiKey
         _secretKey = secretKey
         _sessionIdleTimeout = 23
-        _baseUrlMap = UrlBuilder.defaultMapping()
+        _baseUrlMap = UrlBuilder.defaultMapping(region: region)
     }
     
-    @discardableResult public func setSessionIdleTimeout(seconds: UInt) -> KSConfigBuilder {
+    @discardableResult public func setSessionIdleTimeout(seconds: UInt) -> ConfigBuilder {
         _sessionIdleTimeout = seconds
         return self
     }
     
-    @discardableResult public func enableInAppMessaging(inAppConsentStrategy: InAppConsentStrategy) -> KSConfigBuilder {
+    @discardableResult public func enableInAppMessaging(inAppConsentStrategy: InAppConsentStrategy) -> ConfigBuilder {
         _inAppConsentStrategy = inAppConsentStrategy
         return self
     }
     
-    @discardableResult public func setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: @escaping InAppDeepLinkHandlerBlock) -> KSConfigBuilder {
+    @discardableResult public func setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: @escaping InAppDeepLinkHandlerBlock) -> ConfigBuilder {
         _inAppDeepLinkHandlerBlock = inAppDeepLinkHandlerBlock
         return self
     }
     
-    @discardableResult public func setPushOpenedHandler(pushOpenedHandlerBlock: @escaping PushOpenedHandlerBlock) -> KSConfigBuilder {
+    @discardableResult public func setPushOpenedHandler(pushOpenedHandlerBlock: @escaping PushOpenedHandlerBlock) -> ConfigBuilder {
         _pushOpenedHandlerBlock = pushOpenedHandlerBlock
         return self
     }
     
     @available(iOS 10.0, *)
-    @discardableResult public func setPushReceivedInForegroundHandler(pushReceivedInForegroundHandlerBlock: @escaping PushReceivedInForegroundHandlerBlock) -> KSConfigBuilder {
+    @discardableResult public func setPushReceivedInForegroundHandler(pushReceivedInForegroundHandlerBlock: @escaping PushReceivedInForegroundHandlerBlock) -> ConfigBuilder {
         _pushReceivedInForegroundHandlerBlock = pushReceivedInForegroundHandlerBlock
         return self
     }
 
-   @discardableResult public func enableDeepLinking(cname: String? = nil, _ handler: @escaping DeepLinkHandler) -> KSConfigBuilder {
+   @discardableResult public func enableDeepLinking(cname: String? = nil, _ handler: @escaping DeepLinkHandler) -> ConfigBuilder {
         _deepLinkCname = URL(string: cname ?? "")
         _deepLinkHandler = handler
 
@@ -87,14 +83,14 @@ open class KSConfigBuilder: NSObject {
     /**
      Internal SDK embedding API, do not call or depend on this method in your app
      */
-    @discardableResult public func setBaseUrlMapping(baseUrlMap:ServiceUrlMap) -> KSConfigBuilder {
+    @discardableResult public func setBaseUrlMapping(baseUrlMap:ServiceUrlMap) -> ConfigBuilder {
         _baseUrlMap = baseUrlMap
 
         return self
     }
     
-    @discardableResult public func build() -> KSConfig {
-        return KSConfig(
+    @discardableResult public func build() -> Config {
+        return Config(
             apiKey: _apiKey,
             secretKey: _secretKey,
             sessionIdleTimeout: _sessionIdleTimeout,

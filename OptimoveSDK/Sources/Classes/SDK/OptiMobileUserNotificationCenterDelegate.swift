@@ -1,9 +1,4 @@
-//
-//  KSUserNotificationCenterDelegate.swift
-//  KumulosSDK
-//
-//  Copyright © 2019 Kumulos. All rights reserved.
-//
+// Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UserNotifications
@@ -18,19 +13,19 @@ class KSUserNotificationCenterDelegate : NSObject, UNUserNotificationCenterDeleg
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        let push = KSPushNotification.init(userInfo: notification.request.content.userInfo, response: nil)
+        let push = PushNotification.init(userInfo: notification.request.content.userInfo, response: nil)
 
         if push.id == 0 {
             chainCenter(center, willPresent: notification, with: completionHandler)
             return
         }
 
-        if (Kumulos.sharedInstance.config.pushReceivedInForegroundHandlerBlock == nil) {
+        if (OptiMobile.sharedInstance.config.pushReceivedInForegroundHandlerBlock == nil) {
             completionHandler(.alert)
             return
         }
 
-        Kumulos.sharedInstance.config.pushReceivedInForegroundHandlerBlock?(push, completionHandler)
+        OptiMobile.sharedInstance.config.pushReceivedInForegroundHandlerBlock?(push, completionHandler)
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -42,7 +37,7 @@ class KSUserNotificationCenterDelegate : NSObject, UNUserNotificationCenterDeleg
         }
 
         if (response.actionIdentifier == UNNotificationDismissActionIdentifier) {
-            let handled = Kumulos.sharedInstance.pushHandleDismissed(withUserInfo: userInfo, response: response)
+            let handled = OptiMobile.sharedInstance.pushHandleDismissed(withUserInfo: userInfo, response: response)
             if (!handled) {
                 chainCenter(center, didReceive: response, with: completionHandler)
                 return
@@ -52,7 +47,7 @@ class KSUserNotificationCenterDelegate : NSObject, UNUserNotificationCenterDeleg
             return
         }
 
-        let handled = Kumulos.sharedInstance.pushHandleOpen(withUserInfo: userInfo, response: response)
+        let handled = OptiMobile.sharedInstance.pushHandleOpen(withUserInfo: userInfo, response: response)
 
         if (!handled) {
             chainCenter(center, didReceive: response, with: completionHandler)
