@@ -34,11 +34,12 @@ public class Optimobile {
              pushOpened(responder: pushOpenedComplition?)
     }
     
-    private static var builder: KSConfigBuilder!
+    private var builder: KSConfigBuilder!
     
     private init() {}
     
-    public static func configure(for tenantInfo: OptimoveTenantInfo, apiKey: String, secretKey: String, abilities: [Abilities]? = nil) {
+    public func configure(for tenantInfo: OptimoveTenantInfo, apiKey: String, secretKey: String, abilities: [Abilities]? = nil) {
+        Optimove.configure(for: tenantInfo)
         builder = KSConfigBuilder(apiKey: apiKey, secretKey: secretKey)
         if let abilities = abilities {
             for abilitie in abilities {
@@ -53,7 +54,6 @@ public class Optimobile {
             }
         }
         
-        Optimove.configure(for: tenantInfo)
         Kumulos.initialize(config: builder.build())
     }
     
@@ -102,13 +102,13 @@ public class Optimobile {
 //        Kumulos.sendiBeaconProximity(beacon: beacon)
 //    }
     
-    private static func registerDeepLink(deepLinkResponder responder: deepLinkComplition? = nil) {
+    private func registerDeepLink(deepLinkResponder responder: deepLinkComplition? = nil) {
         builder.enableDeepLinking({ (resolution) in
             responder?(resolution)
         })
     }
     
-    private static func registerInApp(inAppResponder responder: inAppComplition? = nil, inAppConsentStrategy: InAppConsentStrategy) {
+    private func registerInApp(inAppResponder responder: inAppComplition? = nil, inAppConsentStrategy: InAppConsentStrategy) {
         builder.enableInAppMessaging(inAppConsentStrategy: inAppConsentStrategy).setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: { buttonPress in
             let deepLink = buttonPress.deepLinkData
             let messageData = buttonPress.messageData
@@ -117,7 +117,7 @@ public class Optimobile {
         })
     }
 
-    private static func registerPushOpenedHandler(inAppResponder responder: pushOpenedComplition? = nil) {
+    private func registerPushOpenedHandler(inAppResponder responder: pushOpenedComplition? = nil) {
         builder.setPushOpenedHandler(pushOpenedHandlerBlock: { (notification : KSPushNotification) -> Void in
             if let action = notification.actionIdentifier {
                 responder?(action, notification.data)
