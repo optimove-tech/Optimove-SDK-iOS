@@ -1927,11 +1927,6 @@
 		AD1BDA0F0066C3B2A1E28935 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				4FA8FB26280C381B005CB88E /* Shared */,
-				4FA8F61527FEE148005CB88E /* Objc_Swift */,
-				4F585C8627FECD3E005E7BB4 /* Extension */,
-				4F585C7A27FECD23005E7BB4 /* ObjC */,
-				5D6DF0914BBAC519FC285464 /* Assets */,
 				F0A78A1C04EE5B35E132F42B /* Classes */,
 			);
 			path = Sources;
@@ -2157,6 +2152,11 @@
 			children = (
 				72CF66E4BD3D9F58D52640AE /* .gitkeep */,
 				71A9D3341C3268497BDCBED0 /* OptimoveNotificationServiceExtension.swift */,
+				4FA8FB26280C381B005CB88E /* Shared */,
+				4FA8F61527FEE148005CB88E /* Objc_Swift */,
+				4F585C8627FECD3E005E7BB4 /* Extension */,
+				4F585C7A27FECD23005E7BB4 /* ObjC */,
+				5D6DF0914BBAC519FC285464 /* Assets */,
 				9CD8C589B6559DF263D4C039 /* Events */,
 				F25041FFF14656B70D47B422 /* Extensions */,
 				7089F7E5EBFA9E6A1FFA1464 /* Operations */,
