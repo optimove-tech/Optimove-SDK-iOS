@@ -1438,7 +1438,6 @@
 		4F585C8627FECD3E005E7BB4 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
-				4FA8FABE280C2831005CB88E /* KumulosNotificationService.swift */,
 				4F585C8727FECD3E005E7BB4 /* Shared */,
 				4F585C8827FECD3E005E7BB4 /* CategoryHelper.swift */,
 				4F585C8A27FECD3E005E7BB4 /* Info.plist */,
@@ -1790,6 +1789,7 @@
 		927AE68A807CDE5763F8AFC4 /* OptimoveCore */ = {
 			isa = PBXGroup;
 			children = (
+				4FA8FABE280C2831005CB88E /* KumulosNotificationService.swift */,
 				DCD4DEFD23225D3D5FDDAF5B /* Info.plist */,
 				142A73B100EA48488907672A /* Sources */,
 			);
