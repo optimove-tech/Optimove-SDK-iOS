@@ -1500,7 +1500,7 @@
 				4FA8FACA280C2D76005CB88E /* MediaHelper.swift */,
 			);
 			name = Shared;
-			path = OptimoveSDK/Sources/Classes/Shared;
+			path = OptimoveNotificationServiceExtension/Sources/Shared;
 			sourceTree = SOURCE_ROOT;
 		};
 		517F8BBB89498042BB4C4B44 /* Coding */ = {
@@ -1932,6 +1932,7 @@
 		AD1BDA0F0066C3B2A1E28935 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				4FA8FAC0280C2D76005CB88E /* Shared */,
 				5D6DF0914BBAC519FC285464 /* Assets */,
 				F0A78A1C04EE5B35E132F42B /* Classes */,
 			);
@@ -2053,7 +2054,6 @@
 		CB3C39A7EDBD99408369C4D0 /* OptimoveNotificationServiceExtension */ = {
 			isa = PBXGroup;
 			children = (
-				4FA8FAC0280C2D76005CB88E /* Shared */,
 				738B25C939FAE2104D09DB7B /* Info.plist */,
 				AD1BDA0F0066C3B2A1E28935 /* Sources */,
 			);
