@@ -241,8 +241,6 @@
 		4F585C9E27FECD4F005E7BB4 /* PendingNotificationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C9527FECD4F005E7BB4 /* PendingNotificationHelper.swift */; };
 		4F585C9F27FECD4F005E7BB4 /* MediaHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C9627FECD4F005E7BB4 /* MediaHelper.swift */; };
 		4FA8F61727FEE872005CB88E /* KSBadgeObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8F61627FEE872005CB88E /* KSBadgeObserver.swift */; };
-		4FA8FAD6280C2F93005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FAD5280C2F93005CB88E /* KumulosNotificationService.swift */; };
-		4FA8FAD7280C2F93005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FAD5280C2F93005CB88E /* KumulosNotificationService.swift */; };
 		4FA8FAD8280C2F93005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FAD5280C2F93005CB88E /* KumulosNotificationService.swift */; };
 		4FE394EB27C78933005FABB0 /* Mocker.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; };
 		4FE394EC27C78933005FABB0 /* Mocker.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -1002,10 +1000,6 @@
 		073DE8112B0BD3298C0B0748 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				4F585C8D27FECD4F005E7BB4 /* Shared */,
-				4FA8F61527FEE148005CB88E /* Objc_Swift */,
-				4F585C8627FECD3E005E7BB4 /* Extension */,
-				4F585C7A27FECD23005E7BB4 /* ObjC */,
 				4F585C5027FECCFA005E7BB4 /* SDK */,
 				4F585BC627FECAD8005E7BB4 /* Optimobile.swift */,
 				329CE901655C81D4751CB22B /* .gitkeep */,
@@ -1459,7 +1453,8 @@
 				4F585C9527FECD4F005E7BB4 /* PendingNotificationHelper.swift */,
 				4F585C9627FECD4F005E7BB4 /* MediaHelper.swift */,
 			);
-			path = Shared;
+			name = Shared;
+			path = ../../OptimoveSDK/Sources/Classes/Shared;
 			sourceTree = "<group>";
 		};
 		4FA8F61527FEE148005CB88E /* Objc_Swift */ = {
@@ -1899,6 +1894,10 @@
 		AD1BDA0F0066C3B2A1E28935 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				4F585C8D27FECD4F005E7BB4 /* Shared */,
+				4FA8F61527FEE148005CB88E /* Objc_Swift */,
+				4F585C8627FECD3E005E7BB4 /* Extension */,
+				4F585C7A27FECD23005E7BB4 /* ObjC */,
 				5D6DF0914BBAC519FC285464 /* Assets */,
 				F0A78A1C04EE5B35E132F42B /* Classes */,
 			);
@@ -2643,7 +2642,6 @@
 				0849C08D2D2D8A6740E060C0 /* Global.swift in Sources */,
 				A6A60814F2CD611D41BF2F13 /* Locale.swift in Sources */,
 				9947047DC4A73C5151B2328A /* MediaAttachmentDownloader.swift in Sources */,
-				4FA8FAD6280C2F93005CB88E /* KumulosNotificationService.swift in Sources */,
 				4A65C0ABA1ED79C7C36D83A4 /* NotificationDeliveredEvent.swift in Sources */,
 				9AFEC62F7778B86862C6573D /* NotificationDeliveryReporter.swift in Sources */,
 				0F92260CFD871186FDEBEFDB /* OptimoveNotificationServiceExtension.swift in Sources */,
@@ -2662,7 +2660,6 @@
 				FD6B210141F97A6B47D3B50B /* MockOptimoveStorage.swift in Sources */,
 				9EB9FC58A3176E7F60D226D9 /* NotificationDeliveredEventTests.swift in Sources */,
 				49CF203CF09FBC2F4578AF84 /* OptimoveNotificationServiceExtensionTests.swift in Sources */,
-				4FA8FAD7280C2F93005CB88E /* KumulosNotificationService.swift in Sources */,
 				2BBFB2D03A135BE343DCB352 /* OptimoveTestCase.swift in Sources */,
 				28892C11EFABDB720CA7F4DE /* OptistreamNetworkingMock.swift in Sources */,
 				D40627451576BB6978A11EB0 /* StubEvent.swift in Sources */,
