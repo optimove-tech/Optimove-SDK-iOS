@@ -999,7 +999,6 @@
 			isa = PBXGroup;
 			children = (
 				4FA8F61527FEE148005CB88E /* Objc_Swift */,
-				4F585C8D27FECD4F005E7BB4 /* Shared */,
 				4F585C8627FECD3E005E7BB4 /* Extension */,
 				4F585C7A27FECD23005E7BB4 /* ObjC */,
 				4F585C5027FECCFA005E7BB4 /* SDK */,
@@ -2015,6 +2014,7 @@
 		CB3C39A7EDBD99408369C4D0 /* OptimoveNotificationServiceExtension */ = {
 			isa = PBXGroup;
 			children = (
+				4F585C8D27FECD4F005E7BB4 /* Shared */,
 				738B25C939FAE2104D09DB7B /* Info.plist */,
 				AD1BDA0F0066C3B2A1E28935 /* Sources */,
 			);
