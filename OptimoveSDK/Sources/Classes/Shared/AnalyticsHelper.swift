@@ -8,8 +8,6 @@
 import Foundation
 import CoreData
 
-
-
 class KSEventModel : NSManagedObject {
     @NSManaged var uuid : String
     @NSManaged var userIdentifier : String
