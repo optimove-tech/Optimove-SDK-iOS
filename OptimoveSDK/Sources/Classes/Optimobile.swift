@@ -39,7 +39,6 @@ public class Optimobile {
     private init() {}
     
     public static func configure(for tenantInfo: OptimoveTenantInfo, apiKey: String, secretKey: String, abilities: [Abilities]? = nil) {
-        Optimove.configure(for: tenantInfo)
         builder = KSConfigBuilder(apiKey: apiKey, secretKey: secretKey)
         if let abilities = abilities {
             for abilitie in abilities {
@@ -54,6 +53,7 @@ public class Optimobile {
             }
         }
         
+        Optimove.configure(for: tenantInfo)
         Kumulos.initialize(config: builder.build())
     }
     
