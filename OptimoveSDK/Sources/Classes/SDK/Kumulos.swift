@@ -36,7 +36,7 @@ public enum InAppConsentStrategy : String {
     case ExplicitByUser = "ExplicitByUser"
 }
 
-// MARK: class
+// MARK: class 
 open class Kumulos {
     internal let urlBuilder:UrlBuilder
 
