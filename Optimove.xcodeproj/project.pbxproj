@@ -242,16 +242,74 @@
 		4F585C9F27FECD4F005E7BB4 /* MediaHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C9627FECD4F005E7BB4 /* MediaHelper.swift */; };
 		4FA8F61727FEE872005CB88E /* KSBadgeObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8F61627FEE872005CB88E /* KSBadgeObserver.swift */; };
 		4FA8FC50280C410B005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC4F280C410B005CB88E /* KumulosNotificationService.swift */; };
-		4FA8FC5C280C41AC005CB88E /* KSHttp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC52280C41AC005CB88E /* KSHttp.swift */; };
-		4FA8FC5D280C41AC005CB88E /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC53280C41AC005CB88E /* AnalyticsHelper.swift */; };
-		4FA8FC5E280C41AC005CB88E /* KeyValPersistenceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC54280C41AC005CB88E /* KeyValPersistenceHelper.swift */; };
-		4FA8FC5F280C41AC005CB88E /* KumulosUserDefaultsKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC55280C41AC005CB88E /* KumulosUserDefaultsKey.swift */; };
-		4FA8FC60280C41AC005CB88E /* AppGroupsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC56280C41AC005CB88E /* AppGroupsHelper.swift */; };
-		4FA8FC61280C41AC005CB88E /* KumulosHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC57280C41AC005CB88E /* KumulosHelper.swift */; };
-		4FA8FC62280C41AD005CB88E /* PendingNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC58280C41AC005CB88E /* PendingNotification.swift */; };
-		4FA8FC63280C41AD005CB88E /* PendingNotificationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC59280C41AC005CB88E /* PendingNotificationHelper.swift */; };
 		4FA8FC64280C41AD005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC5A280C41AC005CB88E /* KumulosNotificationService.swift */; };
-		4FA8FC65280C41AD005CB88E /* MediaHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC5B280C41AC005CB88E /* MediaHelper.swift */; };
+		4FA8FE2A280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDE7280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE2B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDE8280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE2C280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDE9280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE2D280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDEA280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE2E280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDEB280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE2F280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDEC280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE30280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDED280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE31280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDEE280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE32280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDEF280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE33280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDF0280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE34280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDF1280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE35280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDF2280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE36280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDF3280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE37280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDF4280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE38280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDF5280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE39280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDF6280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE3A280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDF7280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE3B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDF8280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE3C280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDF9280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE3D280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDFA280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE3E280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDFB280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE3F280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDFC280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE40280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDFD280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE41280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDFE280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE42280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FDFF280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE43280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE00280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE44280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE01280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE45280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE02280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE46280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE03280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE47280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE04280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE48280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE05280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE49280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE06280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE4A280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE07280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE4B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE08280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE4C280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE09280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE4D280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE0A280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE4E280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE0B280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE4F280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE0C280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE50280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE0D280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE51280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE0E280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE52280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE0F280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE53280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE10280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE54280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE11280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE55280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE12280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE56280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE13280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE57280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE14280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE58280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE15280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE59280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE16280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE5A280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE17280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE5B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE18280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE5C280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE19280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE5D280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE1A280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE5E280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE1B280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE5F280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE1C280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE60280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE1D280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE61280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE1E280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE62280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE1F280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE63280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE20280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE64280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE21280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE65280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE22280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE66280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE23280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE67280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE24280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE68280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE25280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE69280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE26280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE6A280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE27280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE6B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE28280D9DE4005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE6C280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE29280D9DE4005CB88E /* CategoryHelper.swift */; };
 		4FE394EB27C78933005FABB0 /* Mocker.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; };
 		4FE394EC27C78933005FABB0 /* Mocker.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4FE394EE27C78942005FABB0 /* Mocker.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; };
@@ -701,16 +759,75 @@
 		4F585C9627FECD4F005E7BB4 /* MediaHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHelper.swift; sourceTree = "<group>"; };
 		4FA8F61627FEE872005CB88E /* KSBadgeObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KSBadgeObserver.swift; sourceTree = "<group>"; };
 		4FA8FC4F280C410B005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
-		4FA8FC52280C41AC005CB88E /* KSHttp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KSHttp.swift; sourceTree = "<group>"; };
-		4FA8FC53280C41AC005CB88E /* AnalyticsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
-		4FA8FC54280C41AC005CB88E /* KeyValPersistenceHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyValPersistenceHelper.swift; sourceTree = "<group>"; };
-		4FA8FC55280C41AC005CB88E /* KumulosUserDefaultsKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosUserDefaultsKey.swift; sourceTree = "<group>"; };
-		4FA8FC56280C41AC005CB88E /* AppGroupsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppGroupsHelper.swift; sourceTree = "<group>"; };
-		4FA8FC57280C41AC005CB88E /* KumulosHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosHelper.swift; sourceTree = "<group>"; };
-		4FA8FC58280C41AC005CB88E /* PendingNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingNotification.swift; sourceTree = "<group>"; };
-		4FA8FC59280C41AC005CB88E /* PendingNotificationHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingNotificationHelper.swift; sourceTree = "<group>"; };
 		4FA8FC5A280C41AC005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
-		4FA8FC5B280C41AC005CB88E /* MediaHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHelper.swift; sourceTree = "<group>"; };
+		4FA8FDE6280D9DE4005CB88E /* Shared */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Shared; sourceTree = "<group>"; };
+		4FA8FDE7280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDE8280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDE9280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDEA280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDEB280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDEC280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDED280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDEE280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDEF280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDF0280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDF1280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDF2280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDF3280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDF4280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDF5280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDF6280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDF7280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDF8280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDF9280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDFA280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDFB280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDFC280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDFD280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FDFE280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FDFF280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE00280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE01280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE02280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE03280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE04280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE05280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE06280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE07280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE08280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE09280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE0A280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE0B280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE0C280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE0D280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE0E280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE0F280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE10280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE11280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE12280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE13280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE14280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE15280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE16280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE17280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE18280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE19280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE1A280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE1B280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE1C280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE1D280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE1E280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE1F280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE20280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE21280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE22280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE23280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE24280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE25280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE26280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE27280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE28280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE29280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
 		4FD4BAAECE0E2C8D6DAD6232 /* RemoteConfigurationNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationNetworking.swift; sourceTree = "<group>"; };
 		4FE394EA27C78933005FABB0 /* Mocker.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Mocker.xcframework; path = Carthage/Build/Mocker.xcframework; sourceTree = "<group>"; };
 		506941ABF70087E99952FFD6 /* AppOpenEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenEvent.swift; sourceTree = "<group>"; };
@@ -1461,16 +1578,339 @@
 		4FA8FC51280C41AC005CB88E /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				4FA8FC52280C41AC005CB88E /* KSHttp.swift */,
-				4FA8FC53280C41AC005CB88E /* AnalyticsHelper.swift */,
-				4FA8FC54280C41AC005CB88E /* KeyValPersistenceHelper.swift */,
-				4FA8FC55280C41AC005CB88E /* KumulosUserDefaultsKey.swift */,
-				4FA8FC56280C41AC005CB88E /* AppGroupsHelper.swift */,
-				4FA8FC57280C41AC005CB88E /* KumulosHelper.swift */,
-				4FA8FC58280C41AC005CB88E /* PendingNotification.swift */,
-				4FA8FC59280C41AC005CB88E /* PendingNotificationHelper.swift */,
+				4FA8FDC5280D9DE4005CB88E /* Shared */,
 				4FA8FC5A280C41AC005CB88E /* KumulosNotificationService.swift */,
-				4FA8FC5B280C41AC005CB88E /* MediaHelper.swift */,
+				4FA8FE29280D9DE4005CB88E /* CategoryHelper.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDC5280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDC6280D9DE4005CB88E /* Shared */,
+				4FA8FE27280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE28280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDC6280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDC7280D9DE4005CB88E /* Shared */,
+				4FA8FE25280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE26280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDC7280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDC8280D9DE4005CB88E /* Shared */,
+				4FA8FE23280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE24280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDC8280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDC9280D9DE4005CB88E /* Shared */,
+				4FA8FE21280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE22280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDC9280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDCA280D9DE4005CB88E /* Shared */,
+				4FA8FE1F280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE20280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDCA280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDCB280D9DE4005CB88E /* Shared */,
+				4FA8FE1D280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE1E280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDCB280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDCC280D9DE4005CB88E /* Shared */,
+				4FA8FE1B280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE1C280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDCC280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDCD280D9DE4005CB88E /* Shared */,
+				4FA8FE19280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE1A280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDCD280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDCE280D9DE4005CB88E /* Shared */,
+				4FA8FE17280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE18280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDCE280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDCF280D9DE4005CB88E /* Shared */,
+				4FA8FE15280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE16280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDCF280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDD0280D9DE4005CB88E /* Shared */,
+				4FA8FE13280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE14280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDD0280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDD1280D9DE4005CB88E /* Shared */,
+				4FA8FE11280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE12280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDD1280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDD2280D9DE4005CB88E /* Shared */,
+				4FA8FE0F280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE10280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDD2280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDD3280D9DE4005CB88E /* Shared */,
+				4FA8FE0D280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE0E280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDD3280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDD4280D9DE4005CB88E /* Shared */,
+				4FA8FE0B280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE0C280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDD4280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDD5280D9DE4005CB88E /* Shared */,
+				4FA8FE09280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE0A280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDD5280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDD6280D9DE4005CB88E /* Shared */,
+				4FA8FE07280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE08280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDD6280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDD7280D9DE4005CB88E /* Shared */,
+				4FA8FE05280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE06280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDD7280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDD8280D9DE4005CB88E /* Shared */,
+				4FA8FE03280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE04280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDD8280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDD9280D9DE4005CB88E /* Shared */,
+				4FA8FE01280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE02280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDD9280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDDA280D9DE4005CB88E /* Shared */,
+				4FA8FDFF280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FE00280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDDA280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDDB280D9DE4005CB88E /* Shared */,
+				4FA8FDFD280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDFE280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDDB280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDDC280D9DE4005CB88E /* Shared */,
+				4FA8FDFB280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDFC280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDDC280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDDD280D9DE4005CB88E /* Shared */,
+				4FA8FDF9280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDFA280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDDD280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDDE280D9DE4005CB88E /* Shared */,
+				4FA8FDF7280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDF8280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDDE280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDDF280D9DE4005CB88E /* Shared */,
+				4FA8FDF5280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDF6280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDDF280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDE0280D9DE4005CB88E /* Shared */,
+				4FA8FDF3280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDF4280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDE0280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDE1280D9DE4005CB88E /* Shared */,
+				4FA8FDF1280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDF2280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDE1280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDE2280D9DE4005CB88E /* Shared */,
+				4FA8FDEF280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDF0280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDE2280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDE3280D9DE4005CB88E /* Shared */,
+				4FA8FDED280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDEE280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDE3280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDE4280D9DE4005CB88E /* Shared */,
+				4FA8FDEB280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDEC280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDE4280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDE5280D9DE4005CB88E /* Shared */,
+				4FA8FDE9280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDEA280D9DE4005CB88E /* KumulosNotificationService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4FA8FDE5280D9DE4005CB88E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4FA8FDE6280D9DE4005CB88E /* Shared */,
+				4FA8FDE7280D9DE4005CB88E /* CategoryHelper.swift */,
+				4FA8FDE8280D9DE4005CB88E /* KumulosNotificationService.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -2645,25 +3085,83 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4FA8FC62280C41AD005CB88E /* PendingNotification.swift in Sources */,
-				4FA8FC5F280C41AC005CB88E /* KumulosUserDefaultsKey.swift in Sources */,
+				4FA8FE6A280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE4C280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE38280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE48280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE5C280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE2E280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE66280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE67280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				FCD558DB8A246765390ED64E /* DateFormatter.swift in Sources */,
-				4FA8FC65280C41AD005CB88E /* MediaHelper.swift in Sources */,
+				4FA8FE5F280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				0849C08D2D2D8A6740E060C0 /* Global.swift in Sources */,
-				4FA8FC60280C41AC005CB88E /* AppGroupsHelper.swift in Sources */,
-				4FA8FC63280C41AD005CB88E /* PendingNotificationHelper.swift in Sources */,
+				4FA8FE4F280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE5D280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				4FA8FC64280C41AD005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE42280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE64280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE58280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE43280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE35280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE3F280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE4A280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE30280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE37280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE56280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE60280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				A6A60814F2CD611D41BF2F13 /* Locale.swift in Sources */,
+				4FA8FE6C280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE44280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE65280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE31280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE47280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE50280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE3B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE52280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE2A280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE2F280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE63280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE39280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE5A280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE51280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE4D280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE4E280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE40280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE32280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE3E280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				9947047DC4A73C5151B2328A /* MediaAttachmentDownloader.swift in Sources */,
+				4FA8FE68280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE49280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE4B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE36280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE2B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE62280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE34280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE57280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE3A280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE54280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE53280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE61280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE69280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE2C280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4A65C0ABA1ED79C7C36D83A4 /* NotificationDeliveredEvent.swift in Sources */,
+				4FA8FE55280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE59280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE3C280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE33280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE3D280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				9AFEC62F7778B86862C6573D /* NotificationDeliveryReporter.swift in Sources */,
+				4FA8FE5E280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE45280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE46280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
+				4FA8FE5B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE6B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE2D280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE41280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				0F92260CFD871186FDEBEFDB /* OptimoveNotificationServiceExtension.swift in Sources */,
-				4FA8FC5D280C41AC005CB88E /* AnalyticsHelper.swift in Sources */,
 				0A8E1C292F26A3E2CD65106C /* ProcessInfo.swift in Sources */,
-				4FA8FC5E280C41AC005CB88E /* KeyValPersistenceHelper.swift in Sources */,
 				1BB7FB1E6F938682646B2084 /* String.swift in Sources */,
-				4FA8FC61280C41AC005CB88E /* KumulosHelper.swift in Sources */,
-				4FA8FC5C280C41AC005CB88E /* KSHttp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
