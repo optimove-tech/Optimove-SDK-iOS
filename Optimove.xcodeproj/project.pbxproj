@@ -305,11 +305,8 @@
 		4FA8FE65280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE22280D9DE4005CB88E /* KumulosNotificationService.swift */; };
 		4FA8FE66280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE23280D9DE4005CB88E /* CategoryHelper.swift */; };
 		4FA8FE67280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE24280D9DE4005CB88E /* KumulosNotificationService.swift */; };
-		4FA8FE68280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE25280D9DE4005CB88E /* CategoryHelper.swift */; };
-		4FA8FE69280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE26280D9DE4005CB88E /* KumulosNotificationService.swift */; };
-		4FA8FE6A280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE27280D9DE4005CB88E /* CategoryHelper.swift */; };
 		4FA8FE6B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE28280D9DE4005CB88E /* KumulosNotificationService.swift */; };
-		4FA8FE6C280D9DE5005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE29280D9DE4005CB88E /* CategoryHelper.swift */; };
+		4FA8FE72280EA71C005CB88E /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE71280EA71C005CB88E /* CategoryHelper.swift */; };
 		4FE394EB27C78933005FABB0 /* Mocker.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; };
 		4FE394EC27C78933005FABB0 /* Mocker.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4FE394EE27C78942005FABB0 /* Mocker.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; };
@@ -823,11 +820,8 @@
 		4FA8FE22280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
 		4FA8FE23280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
 		4FA8FE24280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
-		4FA8FE25280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
-		4FA8FE26280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
-		4FA8FE27280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
 		4FA8FE28280D9DE4005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
-		4FA8FE29280D9DE4005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4FA8FE71280EA71C005CB88E /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
 		4FD4BAAECE0E2C8D6DAD6232 /* RemoteConfigurationNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationNetworking.swift; sourceTree = "<group>"; };
 		4FE394EA27C78933005FABB0 /* Mocker.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Mocker.xcframework; path = Carthage/Build/Mocker.xcframework; sourceTree = "<group>"; };
 		506941ABF70087E99952FFD6 /* AppOpenEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenEvent.swift; sourceTree = "<group>"; };
@@ -1580,7 +1574,6 @@
 			children = (
 				4FA8FDC5280D9DE4005CB88E /* Shared */,
 				4FA8FC5A280C41AC005CB88E /* KumulosNotificationService.swift */,
-				4FA8FE29280D9DE4005CB88E /* CategoryHelper.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -1589,7 +1582,6 @@
 			isa = PBXGroup;
 			children = (
 				4FA8FDC6280D9DE4005CB88E /* Shared */,
-				4FA8FE27280D9DE4005CB88E /* CategoryHelper.swift */,
 				4FA8FE28280D9DE4005CB88E /* KumulosNotificationService.swift */,
 			);
 			name = Shared;
@@ -1598,9 +1590,8 @@
 		4FA8FDC6280D9DE4005CB88E /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				4FA8FE71280EA71C005CB88E /* CategoryHelper.swift */,
 				4FA8FDC7280D9DE4005CB88E /* Shared */,
-				4FA8FE25280D9DE4005CB88E /* CategoryHelper.swift */,
-				4FA8FE26280D9DE4005CB88E /* KumulosNotificationService.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -3085,7 +3076,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4FA8FE6A280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4FA8FE4C280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4FA8FE38280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4FA8FE48280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
@@ -3095,6 +3085,7 @@
 				4FA8FE67280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				FCD558DB8A246765390ED64E /* DateFormatter.swift in Sources */,
 				4FA8FE5F280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
+				4FA8FE72280EA71C005CB88E /* CategoryHelper.swift in Sources */,
 				0849C08D2D2D8A6740E060C0 /* Global.swift in Sources */,
 				4FA8FE4F280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				4FA8FE5D280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
@@ -3111,7 +3102,6 @@
 				4FA8FE56280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4FA8FE60280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				A6A60814F2CD611D41BF2F13 /* Locale.swift in Sources */,
-				4FA8FE6C280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4FA8FE44280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4FA8FE65280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				4FA8FE31280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
@@ -3131,7 +3121,6 @@
 				4FA8FE32280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4FA8FE3E280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				9947047DC4A73C5151B2328A /* MediaAttachmentDownloader.swift in Sources */,
-				4FA8FE68280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4FA8FE49280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				4FA8FE4B280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				4FA8FE36280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
@@ -3143,7 +3132,6 @@
 				4FA8FE54280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4FA8FE53280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				4FA8FE61280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
-				4FA8FE69280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
 				4FA8FE2C280D9DE5005CB88E /* CategoryHelper.swift in Sources */,
 				4A65C0ABA1ED79C7C36D83A4 /* NotificationDeliveredEvent.swift in Sources */,
 				4FA8FE55280D9DE5005CB88E /* KumulosNotificationService.swift in Sources */,
@@ -3556,7 +3544,7 @@
 		4A27E1E9D26058C86424147C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
+				APPLICATION_EXTENSION_API_ONLY = NO;
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -3792,7 +3780,7 @@
 		B0F2997F877D21FFF64C1DC7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
+				APPLICATION_EXTENSION_API_ONLY = NO;
 				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
