@@ -86,16 +86,12 @@ extension MobileProvision {
         }
         
         var binaryString: String? = nil
-        if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            
-            let fileURL = dir.appendingPathComponent(provisioningPath!)
-            
             //reading
             do {
-                binaryString = try String(contentsOf: fileURL, encoding: .utf8)
+                binaryString = try String(contentsOfFile: provisioningPath!, encoding: .isoLatin1)
             }
             catch {/* error handling here */}
-        }
+//        }
         
         // NSISOLatin1 keeps the binary wrapper from being parsed as unicode and dropped as invalid
         if (binaryString == nil) {
@@ -106,10 +102,9 @@ extension MobileProvision {
             let scanner = Scanner(string: binaryString!)
             var ok = scanner.scanUpToString("<plist")
             if ((ok == nil)) { print("unable to find beginning of plist"); return nil; }
-            var plistString = ""
-            ok = scanner.scanUpToString(plistString)
+            ok = scanner.scanUpToString("</plist>")
             if ((ok == nil)) { print("unable to find end of plist"); return nil; }
-            plistString = String.localizedStringWithFormat("%@</plist>", plistString)
+            let plistString = String.localizedStringWithFormat("%@</plist>", ok!)
             // juggle latin1 back to utf-8!
             let plistdata_latin1 = plistString.data(using: .isoLatin1)
             //        plistString = [NSString stringWithUTF8String:[plistdata_latin1 bytes]];
