@@ -7,6 +7,6 @@
 
 import UIKit
 
-class TenantInfo {
-    let tenantInfo: OptimoveTenantInfo, apiKey: String, secretKey: String
+public struct TenantInfo {
+    let apiKey: String, secretKey: String, tenantToken: String, configName: String
 }

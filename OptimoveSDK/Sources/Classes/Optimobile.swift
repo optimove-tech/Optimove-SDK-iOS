@@ -34,8 +34,9 @@ public class Optimobile {
         builder = KSConfigBuilder(apiKey: tenantInfo.apiKey, secretKey: tenantInfo.secretKey)
     }
     
-    public static initilize() {
-        Optimove.configure(for: tenantInfo.tenantInfo)
+    public static func initilize() {
+        let optimoveTenantInfo = OptimoveTenantInfo(tenantToken: tenantInfo.tenantToken, configName: tenantInfo.configName)
+        Optimove.configure(for: optimoveTenantInfo)
         Kumulos.initialize(config: builder.build())
     }
     
@@ -84,18 +85,18 @@ public class Optimobile {
     //        Kumulos.sendiBeaconProximity(beacon: beacon)
     //    }
     
-    @discardableResult static public func registerInApp(inAppResponder responder: inAppComplition? = nil, inAppConsentStrategy: InAppConsentStrategy) -> Optimobile {
+    @discardableResult static public func registerInApp(inAppResponder responder: @escaping InAppDeepLinkHandlerBlock, inAppConsentStrategy: InAppConsentStrategy) -> Optimobile {
         builder.enableInAppMessaging(inAppConsentStrategy: inAppConsentStrategy).setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: responder)
-        return self
+        return sheard
     }
     
-    @discardableResult static public func registerDeepLink(inAppDeepLinkHandlerBlock: @escaping InAppDeepLinkHandlerBlock? = nil) -> Optimobile {
+    @discardableResult static public func registerDeepLink(inAppDeepLinkHandlerBlock: @escaping DeepLinkHandler) -> Optimobile {
         builder.enableDeepLinking(inAppDeepLinkHandlerBlock)
-        return self
+        return sheard
     }
     
-    @discardableResult static public func registerPushOpenedHandler(inAppResponder responder: pushOpenedComplition? = nil) -> Optimobile {
+    @discardableResult static public func registerPushOpenedHandler(inAppResponder responder: @escaping PushOpenedHandlerBlock) -> Optimobile {
         builder.setPushOpenedHandler(pushOpenedHandlerBlock: responder)
-        return self
+        return sheard
     }
 }
