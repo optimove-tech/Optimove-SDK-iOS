@@ -1,6 +1,6 @@
 //
 //  NotificationService.swift
-//  NotificationService
+//  OptimoveNotificationExtension
 //
 //  Created by Barak Ben Hur on 04/04/2022.
 //
