@@ -542,7 +542,6 @@
 		4E527862BE390ACDCE2EE444 /* EmailValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailValidator.swift; sourceTree = "<group>"; };
 		4F0710E98EE949C1E5B12D69 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		4F585BC627FECAD8005E7BB4 /* Optimobile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Optimobile.swift; sourceTree = "<group>"; };
-		4F585C4F27FECB5C005E7BB4 /* OptimoveSDK copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "OptimoveSDK copy-Info.plist"; path = "/Users/barakbenhur/Desktop/Projects/Optimove-SDK-iOS copy/OptimoveSDK copy-Info.plist"; sourceTree = "<absolute>"; };
 		4F585C5127FECCFA005E7BB4 /* Kumulos+Engage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Kumulos+Engage.swift"; sourceTree = "<group>"; };
 		4F585C5327FECCFA005E7BB4 /* InAppPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InAppPresenter.swift; sourceTree = "<group>"; };
 		4F585C5427FECCFA005E7BB4 /* InAppHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InAppHelper.swift; sourceTree = "<group>"; };
@@ -1008,7 +1007,6 @@
 				BF01C3C8DA3E3AB555E387A5 /* Shared-Unit */,
 				8D2AF8410718437694C833BA /* Frameworks */,
 				29EA001D961347964D199369 /* Products */,
-				4F585C4F27FECB5C005E7BB4 /* OptimoveSDK copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
