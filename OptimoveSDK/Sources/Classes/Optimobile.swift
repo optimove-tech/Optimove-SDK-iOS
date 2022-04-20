@@ -87,7 +87,7 @@ public class Optimobile {
     //        Kumulos.sendiBeaconProximity(beacon: beacon)
     //    }
     
-    @discardableResult public func registerInApp(inAppResponder responder: @escaping InAppDeepLinkHandlerBlock, inAppConsentStrategy: InAppConsentStrategy) -> Optimobile {
+    @discardableResult public func registerInApp(inAppConsentStrategy: InAppConsentStrategy, inAppResponder responder: @escaping InAppDeepLinkHandlerBlock) -> Optimobile {
         builder.enableInAppMessaging(inAppConsentStrategy: inAppConsentStrategy).setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: responder)
         return self
     }
