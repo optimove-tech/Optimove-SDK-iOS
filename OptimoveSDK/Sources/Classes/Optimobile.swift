@@ -24,36 +24,18 @@ public class Optimobile {
         }
     }
     
-    public typealias deepLinkComplition = (_ deepLinkResolution: DeepLinkResolution) -> ()
-    public typealias inAppComplition = (_ deepLink: [AnyHashable : Any], _ message: NSDictionary?) -> ()
-    public typealias pushOpenedComplition = (_ action: String? , _ data: [AnyHashable : Any]?) -> ()
-    
-    public enum Abilities {
-        case deppLinking(responder: deepLinkComplition?),
-             inApp(responder: inAppComplition?, inAppConsentStrategy: InAppConsentStrategy),
-             pushOpened(responder: pushOpenedComplition?)
-    }
-    
     private static var builder: KSConfigBuilder!
+    private static var tenantInfo: TenantInfo!
     
     private init() {}
     
-    public static func configure(for tenantInfo: OptimoveTenantInfo, apiKey: String, secretKey: String, abilities: [Abilities]? = nil) {
-        Optimove.configure(for: tenantInfo)
-        builder = KSConfigBuilder(apiKey: apiKey, secretKey: secretKey)
-        if let abilities = abilities {
-            for abilitie in abilities {
-                switch abilitie {
-                case .deppLinking(let responder):
-                    registerDeepLink(deepLinkResponder: responder)
-                case .inApp(responder: let responder, let inAppConsentStrategy):
-                    registerInApp(inAppResponder: responder, inAppConsentStrategy: inAppConsentStrategy)
-                case .pushOpened(responder: let responder):
-                    registerPushOpenedHandler(inAppResponder: responder)
-                }
-            }
-        }
-        
+    public static func configure(for tenantInfo: TenantInfo) {
+        self.tenantInfo = tenantInfo
+        builder = KSConfigBuilder(apiKey: tenantInfo.apiKey, secretKey: tenantInfo.secretKey)
+    }
+    
+    public static initilize() {
+        Optimove.configure(for: tenantInfo.tenantInfo)
         Kumulos.initialize(config: builder.build())
     }
     
@@ -94,36 +76,26 @@ public class Optimobile {
         Kumulos.pushRequestDeviceToken()
     }
     
-//    public static func sendLocationUpdate(location: CLLocation) {
-//        Kumulos.sendLocationUpdate(location: location)
-//    }
-//
-//    public static func sendiBeaconProximity(beacon: CLBeacon) {
-//        Kumulos.sendiBeaconProximity(beacon: beacon)
-//    }
+    //    public static func sendLocationUpdate(location: CLLocation) {
+    //        Kumulos.sendLocationUpdate(location: location)
+    //    }
+    //
+    //    public static func sendiBeaconProximity(beacon: CLBeacon) {
+    //        Kumulos.sendiBeaconProximity(beacon: beacon)
+    //    }
     
-    private static func registerDeepLink(deepLinkResponder responder: deepLinkComplition? = nil) {
-        builder.enableDeepLinking({ (resolution) in
-            responder?(resolution)
-        })
+    @discardableResult static public func registerInApp(inAppResponder responder: inAppComplition? = nil, inAppConsentStrategy: InAppConsentStrategy) -> Optimobile {
+        builder.enableInAppMessaging(inAppConsentStrategy: inAppConsentStrategy).setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: responder)
+        return self
     }
     
-    private static func registerInApp(inAppResponder responder: inAppComplition? = nil, inAppConsentStrategy: InAppConsentStrategy) {
-        builder.enableInAppMessaging(inAppConsentStrategy: inAppConsentStrategy).setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: { buttonPress in
-            let deepLink = buttonPress.deepLinkData
-            let messageData = buttonPress.messageData
-    
-            responder?(deepLink, messageData)
-        })
+    @discardableResult static public func registerDeepLink(inAppDeepLinkHandlerBlock: @escaping InAppDeepLinkHandlerBlock? = nil) -> Optimobile {
+        builder.enableDeepLinking(inAppDeepLinkHandlerBlock)
+        return self
     }
-
-    private static func registerPushOpenedHandler(inAppResponder responder: pushOpenedComplition? = nil) {
-        builder.setPushOpenedHandler(pushOpenedHandlerBlock: { (notification : KSPushNotification) -> Void in
-            if let action = notification.actionIdentifier {
-                responder?(action, notification.data)
-            } else {
-                responder?(nil, nil)
-            }
-        })
+    
+    @discardableResult static public func registerPushOpenedHandler(inAppResponder responder: pushOpenedComplition? = nil) -> Optimobile {
+        builder.setPushOpenedHandler(pushOpenedHandlerBlock: responder)
+        return self
     }
 }

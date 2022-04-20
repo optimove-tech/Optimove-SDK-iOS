@@ -132,6 +132,7 @@
 		4FA8FE8B28104004005CB88E /* PendingNotificationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE8128104004005CB88E /* PendingNotificationHelper.swift */; };
 		4FA8FE8C28104004005CB88E /* MediaHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE8228104004005CB88E /* MediaHelper.swift */; };
 		4FA8FE8E28104098005CB88E /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE8D28104098005CB88E /* KumulosNotificationService.swift */; };
+		4FA8FE9028104BF7005CB88E /* TenantInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FE8F28104BF7005CB88E /* TenantInfo.swift */; };
 		50B6E591AC81B656E87934F7 /* NetworkRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A8F39D35D2D3237AD0F678 /* NetworkRequestFactory.swift */; };
 		5231F567663FDB98A45B2BB7 /* CoreDataFetchIndexDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48695180D12E3F6E69B27A64 /* CoreDataFetchIndexDescription.swift */; };
 		529587C2B105ADD76A48F003 /* String+alphanumeric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877F4A8A9B50FDB1E7C91CF4 /* String+alphanumeric.swift */; };
@@ -533,6 +534,7 @@
 		4FA8FE8128104004005CB88E /* PendingNotificationHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingNotificationHelper.swift; sourceTree = "<group>"; };
 		4FA8FE8228104004005CB88E /* MediaHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHelper.swift; sourceTree = "<group>"; };
 		4FA8FE8D28104098005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FE8F28104BF7005CB88E /* TenantInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TenantInfo.swift; sourceTree = "<group>"; };
 		4FD4BAAECE0E2C8D6DAD6232 /* RemoteConfigurationNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationNetworking.swift; sourceTree = "<group>"; };
 		4FE394EA27C78933005FABB0 /* Mocker.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Mocker.xcframework; path = Carthage/Build/Mocker.xcframework; sourceTree = "<group>"; };
 		506941ABF70087E99952FFD6 /* AppOpenEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenEvent.swift; sourceTree = "<group>"; };
@@ -857,6 +859,7 @@
 				15D585D36C5DBE64170F3791 /* Provisioning */,
 				4A802689AFE69F115DC0B92F /* Services */,
 				FFFC29B1AC74FAB765D1156E /* Validators */,
+				4FA8FE8F28104BF7005CB88E /* TenantInfo.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -2366,6 +2369,7 @@
 				F9A93090DC0B4B5ABC51C35F /* RemoteConfigurationNetworking.swift in Sources */,
 				4FA8F61727FEE872005CB88E /* KSBadgeObserver.swift in Sources */,
 				8C71F306E9E7351F124BE516 /* RemoteConfigurationRequestBuilder.swift in Sources */,
+				4FA8FE9028104BF7005CB88E /* TenantInfo.swift in Sources */,
 				C3054B47A6ED4A4BF2277F02 /* ResignActiveObserver.swift in Sources */,
 				5A08B9EDBA80168AC667425D /* RingBuffer.swift in Sources */,
 				D3C3D981332E7956C784F156 /* RunningFlagsContainer.swift in Sources */,
