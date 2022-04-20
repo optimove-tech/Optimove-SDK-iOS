@@ -29,9 +29,11 @@ public class Optimobile {
     
     private init() {}
     
-    public static func configure(for tenantInfo: TenantInfo) {
-        self.tenantInfo = tenantInfo
-        builder = KSConfigBuilder(apiKey: tenantInfo.apiKey, secretKey: tenantInfo.secretKey)
+    public static func configure(for tenantInfo: TenantInfo) -> Optimobile {
+        Optimobile.tenantInfo = tenantInfo
+        Optimobile.builder = KSConfigBuilder(apiKey: tenantInfo.apiKey, secretKey: tenantInfo.secretKey)
+        
+        return sheard
     }
     
     public static func initilize() {
