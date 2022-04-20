@@ -24,19 +24,19 @@ public class Optimobile {
         }
     }
     
-    private static var builder: KSConfigBuilder!
-    private static var tenantInfo: TenantInfo!
+    private var builder: KSConfigBuilder!
+    private var tenantInfo: TenantInfo!
     
     private init() {}
     
     public static func configure(for tenantInfo: TenantInfo) -> Optimobile {
-        Optimobile.tenantInfo = tenantInfo
-        Optimobile.builder = KSConfigBuilder(apiKey: tenantInfo.apiKey, secretKey: tenantInfo.secretKey)
+        _sheard.tenantInfo = tenantInfo
+        _sheard.builder = KSConfigBuilder(apiKey: tenantInfo.apiKey, secretKey: tenantInfo.secretKey)
         
-        return sheard
+        return _sheard
     }
     
-    public static func initilize() {
+    public func initilize() {
         let optimoveTenantInfo = OptimoveTenantInfo(tenantToken: tenantInfo.tenantToken, configName: tenantInfo.configName)
         Optimove.configure(for: optimoveTenantInfo)
         Kumulos.initialize(config: builder.build())
@@ -87,18 +87,18 @@ public class Optimobile {
     //        Kumulos.sendiBeaconProximity(beacon: beacon)
     //    }
     
-    @discardableResult static public func registerInApp(inAppResponder responder: @escaping InAppDeepLinkHandlerBlock, inAppConsentStrategy: InAppConsentStrategy) -> Optimobile {
+    @discardableResult public func registerInApp(inAppResponder responder: @escaping InAppDeepLinkHandlerBlock, inAppConsentStrategy: InAppConsentStrategy) -> Optimobile {
         builder.enableInAppMessaging(inAppConsentStrategy: inAppConsentStrategy).setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: responder)
-        return sheard
+        return self
     }
     
-    @discardableResult static public func registerDeepLink(inAppDeepLinkHandlerBlock: @escaping DeepLinkHandler) -> Optimobile {
+    @discardableResult public func registerDeepLink(inAppDeepLinkHandlerBlock: @escaping DeepLinkHandler) -> Optimobile {
         builder.enableDeepLinking(inAppDeepLinkHandlerBlock)
-        return sheard
+        return self
     }
     
-    @discardableResult static public func registerPushOpenedHandler(inAppResponder responder: @escaping PushOpenedHandlerBlock) -> Optimobile {
+    @discardableResult public func registerPushOpenedHandler(inAppResponder responder: @escaping PushOpenedHandlerBlock) -> Optimobile {
         builder.setPushOpenedHandler(pushOpenedHandlerBlock: responder)
-        return sheard
+        return self
     }
 }
