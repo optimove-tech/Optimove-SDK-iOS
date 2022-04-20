@@ -8,5 +8,5 @@
 import UIKit
 
 public struct TenantInfo {
-    let apiKey: String, secretKey: String, tenantToken: String, configName: String
+    public let apiKey: String, secretKey: String, tenantToken: String, configName: String
 }
