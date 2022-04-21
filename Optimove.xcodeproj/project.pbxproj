@@ -397,7 +397,7 @@
 		12C35628281194D500672B42 /* PendingNotificationHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingNotificationHelper.swift; sourceTree = "<group>"; };
 		12C35629281194D500672B42 /* MediaHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHelper.swift; sourceTree = "<group>"; };
 		12C35652281196AB00672B42 /* OptimoveNotificationExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OptimoveNotificationExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		12C35659281196AB00672B42 /* OptimoveNotificationExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OptimoveNotificationExtensionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		12C35659281196AB00672B42 /* OptimoveNotificationExtension-Unit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OptimoveNotificationExtension-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		12C35668281197A800672B42 /* OptimoveNotificationExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OptimoveNotificationExtension.h; sourceTree = "<group>"; };
 		12C3566F2811981300672B42 /* OptimoveNotificationExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationExtensionTests.swift; sourceTree = "<group>"; };
 		12C3567D28119AD600672B42 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
@@ -1018,7 +1018,7 @@
 				313AF75BEDDE3C3411F01615 /* OptimoveSDK-Unit.xctest */,
 				F195D6A74F16DC039009B692 /* OptimoveSDK.framework */,
 				12C35652281196AB00672B42 /* OptimoveNotificationExtension.framework */,
-				12C35659281196AB00672B42 /* OptimoveNotificationExtensionTests.xctest */,
+				12C35659281196AB00672B42 /* OptimoveNotificationExtension-Unit.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1900,9 +1900,9 @@
 			productReference = 12C35652281196AB00672B42 /* OptimoveNotificationExtension.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		12C35658281196AB00672B42 /* OptimoveNotificationExtensionTests */ = {
+		12C35658281196AB00672B42 /* OptimoveNotificationExtension-Unit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 12C35664281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationExtensionTests" */;
+			buildConfigurationList = 12C35664281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationExtension-Unit" */;
 			buildPhases = (
 				12C35655281196AB00672B42 /* Sources */,
 				12C35656281196AB00672B42 /* Frameworks */,
@@ -1913,9 +1913,9 @@
 			dependencies = (
 				12C3565C281196AB00672B42 /* PBXTargetDependency */,
 			);
-			name = OptimoveNotificationExtensionTests;
+			name = "OptimoveNotificationExtension-Unit";
 			productName = OptimoveNotificationExtensionTests;
-			productReference = 12C35659281196AB00672B42 /* OptimoveNotificationExtensionTests.xctest */;
+			productReference = 12C35659281196AB00672B42 /* OptimoveNotificationExtension-Unit.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		4E6035250BAA805CC4049A9E /* OptimoveSDK */ = {
@@ -2023,7 +2023,7 @@
 				4E6035250BAA805CC4049A9E /* OptimoveSDK */,
 				7D5D7FF23E7F4742889FFFED /* OptimoveSDK-Unit */,
 				12C35651281196AB00672B42 /* OptimoveNotificationExtension */,
-				12C35658281196AB00672B42 /* OptimoveNotificationExtensionTests */,
+				12C35658281196AB00672B42 /* OptimoveNotificationExtension-Unit */,
 			);
 		};
 /* End PBXProject section */
@@ -2834,7 +2834,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		12C35664281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationExtensionTests" */ = {
+		12C35664281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationExtension-Unit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				12C35665281196AB00672B42 /* Debug */,

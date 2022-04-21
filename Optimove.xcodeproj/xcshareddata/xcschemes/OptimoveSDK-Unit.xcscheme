@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "12C35651281196AB00672B42"
-               BuildableName = "OptimoveNotificationExtension.framework"
-               BlueprintName = "OptimoveNotificationExtension"
+               BlueprintIdentifier = "7D5D7FF23E7F4742889FFFED"
+               BuildableName = "OptimoveSDK-Unit.xctest"
+               BlueprintName = "OptimoveSDK-Unit"
                ReferencedContainer = "container:Optimove.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "12C35658281196AB00672B42"
-               BuildableName = "OptimoveNotificationExtension-Unit.xctest"
-               BlueprintName = "OptimoveNotificationExtension-Unit"
+               BlueprintIdentifier = "7D5D7FF23E7F4742889FFFED"
+               BuildableName = "OptimoveSDK-Unit.xctest"
+               BlueprintName = "OptimoveSDK-Unit"
                ReferencedContainer = "container:Optimove.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -60,9 +60,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "12C35651281196AB00672B42"
-            BuildableName = "OptimoveNotificationExtension.framework"
-            BlueprintName = "OptimoveNotificationExtension"
+            BlueprintIdentifier = "7D5D7FF23E7F4742889FFFED"
+            BuildableName = "OptimoveSDK-Unit.xctest"
+            BlueprintName = "OptimoveSDK-Unit"
             ReferencedContainer = "container:Optimove.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
