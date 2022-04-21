@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -23,6 +23,10 @@
 		106BA1705BF376B6A7D81815 /* EventValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0C85115B44FC36030D67CE /* EventValidatorTests.swift */; };
 		10D8FDCAB2DEDFDC34E715E9 /* MobileProvision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D52112BF287F638A45398EB /* MobileProvision.swift */; };
 		119C46043A9CD7F3871C57A6 /* apns_payload_triggered_campaign.json in Resources */ = {isa = PBXBuildFile; fileRef = 6EC3FB80E72AC19A2DD93153 /* apns_payload_triggered_campaign.json */; };
+		1277E48A2811B2AA0097AC3B /* Mocker.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; };
+		1277E48B2811B2AF0097AC3B /* Mocker.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; };
+		1277E48C2811B39C0097AC3B /* Mocker.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1277E48D2811B3A80097AC3B /* Mocker.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		12C3562A281194D500672B42 /* KSHttp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35621281194D500672B42 /* KSHttp.swift */; };
 		12C3562B281194D500672B42 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35622281194D500672B42 /* AnalyticsHelper.swift */; };
 		12C3562C281194D500672B42 /* KeyValPersistenceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35623281194D500672B42 /* KeyValPersistenceHelper.swift */; };
@@ -97,10 +101,8 @@
 		45E8890FB696618F19DE0E1C /* OptimoveSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F195D6A74F16DC039009B692 /* OptimoveSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4706D362A1B3BD2B148D9DDE /* NetworkResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB19792511783857E3051963 /* NetworkResponse.swift */; };
 		499D5BF06BBCC8EBB94263E4 /* Optimove.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA418E3FDBEB318519B1F183 /* Optimove.swift */; };
-		4A11B57152FB7677DD379DE1 /* Mocker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4DD62415D8168FE58AAE959 /* Mocker.framework */; };
 		4B583BA9BF1C2FA8274AACD3 /* String+Split.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB8B22F680152DE4E7C00A7 /* String+Split.swift */; };
 		4C7AA28A09CA23B070FFB281 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EC09BC1C5CB77E5AD50317 /* NetworkError.swift */; };
-		4D00A84B5E6DD748540A1DCF /* Mocker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4DD62415D8168FE58AAE959 /* Mocker.framework */; };
 		4E1437373721EFA52C894174 /* OptistreamQueueImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BC4935D2FE2C45DF3CE8086 /* OptistreamQueueImpl.swift */; };
 		4F2C212ED09A0819A1B2CDED /* OptEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF827CC59D9B56C6588A4C57 /* OptEvent.swift */; };
 		4F585BC727FECAD8005E7BB4 /* Optimobile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585BC627FECAD8005E7BB4 /* Optimobile.swift */; };
@@ -272,7 +274,6 @@
 		D3C3D981332E7956C784F156 /* RunningFlagsContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0D8804B2EC84EE6FC4B506 /* RunningFlagsContainer.swift */; };
 		D450B85E3B94ED96ED2F3849 /* CoreDataMigrationStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC2D600BED2FFBD180627A1 /* CoreDataMigrationStep.swift */; };
 		D73383EB2FB7DEA9BF737FD1 /* RegistrarNetworkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B37466FDED9BB6674CCDD83 /* RegistrarNetworkingTests.swift */; };
-		D7F26C4990CB175F51361BF7 /* Mocker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D4DD62415D8168FE58AAE959 /* Mocker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D84FA7E0419D5AA96CE24553 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = B250C7CF8C880EF6A147DE7E /* Components.swift */; };
 		D88E575BBA436CE7BD3ED0D3 /* GlobalConfigFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558B0FF7FB691AD7EF1BC356 /* GlobalConfigFixture.swift */; };
 		D9E82D512D6810F3203A98D4 /* MergeRemoteConfigurationOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD3B739367D0848F4CB234E /* MergeRemoteConfigurationOperationTests.swift */; };
@@ -308,7 +309,6 @@
 		F4463BD44A499220DDE80852 /* SetUserIdEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79935407BEFEEDD1A3D2B0A9 /* SetUserIdEvent.swift */; };
 		F7D485257EA33486539D87E8 /* ConfigurationBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7F57DE7E2FE4814F1B86846 /* ConfigurationBuilder.swift */; };
 		F9A93090DC0B4B5ABC51C35F /* RemoteConfigurationNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FD4BAAECE0E2C8D6DAD6232 /* RemoteConfigurationNetworking.swift */; };
-		F9DA1D65325C33449E6B3E53 /* Mocker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D4DD62415D8168FE58AAE959 /* Mocker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FCC20433D011E60F2C404BA8 /* LogLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2F5EA13B0969C648189790E /* LogLevel.swift */; };
 		FE6961AE12E4BCB6A294FB85 /* OptimoveEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECA51F0B0A4A890AD8AC1B7 /* OptimoveEvent.swift */; };
 		FF21D2585D696E2119159E34 /* NetworkResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436C5AA2215F8E91D2D754E3 /* NetworkResult.swift */; };
@@ -352,8 +352,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				1277E48D2811B3A80097AC3B /* Mocker.xcframework in Embed Frameworks */,
 				DA7ADBC1984F1D3213CEE5E9 /* OptimoveCore.framework in Embed Frameworks */,
-				F9DA1D65325C33449E6B3E53 /* Mocker.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -364,8 +364,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				1277E48C2811B39C0097AC3B /* Mocker.xcframework in Embed Frameworks */,
 				45E8890FB696618F19DE0E1C /* OptimoveSDK.framework in Embed Frameworks */,
-				D7F26C4990CB175F51361BF7 /* Mocker.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -612,7 +612,6 @@
 		D1F2CF1316A8FD7BEFB64F3C /* OptistreamNetworkingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptistreamNetworkingMock.swift; sourceTree = "<group>"; };
 		D25EB6C661F60FE6CF3A0D20 /* RegistrarNetworkingRequestBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrarNetworkingRequestBuilderTests.swift; sourceTree = "<group>"; };
 		D3C7E4CB736102AA3142CF32 /* Bundle+AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+AppVersion.swift"; sourceTree = "<group>"; };
-		D4DD62415D8168FE58AAE959 /* Mocker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Mocker.framework; sourceTree = "<group>"; };
 		D5217E6590AD8BD80A6985CC /* LoggerInitializator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerInitializator.swift; sourceTree = "<group>"; };
 		D5D46EC93293B7579E9D7389 /* ConfigurationFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationFetcher.swift; sourceTree = "<group>"; };
 		D5DCCD1C9CFAC7AA464E02A4 /* Pipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pipeline.swift; sourceTree = "<group>"; };
@@ -693,8 +692,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1277E48B2811B2AF0097AC3B /* Mocker.xcframework in Frameworks */,
 				14F57E7FCA077C242AAE0A3C /* OptimoveSDK.framework in Frameworks */,
-				4D00A84B5E6DD748540A1DCF /* Mocker.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -714,8 +713,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1277E48A2811B2AA0097AC3B /* Mocker.xcframework in Frameworks */,
 				87034323076ABC016360E1A9 /* OptimoveCore.framework in Frameworks */,
-				4A11B57152FB7677DD379DE1 /* Mocker.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -999,15 +998,6 @@
 				CC0EB99EF51D86C5B64583FB /* CoreDataMigrator.swift */,
 			);
 			path = Migration;
-			sourceTree = "<group>";
-		};
-		29B37896896681ECE543C846 /* Carthage */ = {
-			isa = PBXGroup;
-			children = (
-				B74FD061E7669E6BD9911EEA /* iOS */,
-			);
-			name = Carthage;
-			path = Carthage/Build;
 			sourceTree = "<group>";
 		};
 		29EA001D961347964D199369 /* Products */ = {
@@ -1490,7 +1480,6 @@
 				FC92AA41EF0FDB2098B2E829 /* Foundation.framework */,
 				5FC57145A54E5033A5CECAF0 /* UIKit.framework */,
 				63C7EC2263685823B37EC99A /* UserNotifications.framework */,
-				29B37896896681ECE543C846 /* Carthage */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1640,14 +1629,6 @@
 				615F8FAE93C5D0A6AC301070 /* .gitkeep */,
 			);
 			path = Assets;
-			sourceTree = "<group>";
-		};
-		B74FD061E7669E6BD9911EEA /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				D4DD62415D8168FE58AAE959 /* Mocker.framework */,
-			);
-			path = iOS;
 			sourceTree = "<group>";
 		};
 		B7E0C4FAAB0D1A333D7859D0 /* CoreEvents */ = {
