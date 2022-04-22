@@ -26,6 +26,10 @@ typealias Logger = OptimoveCore.Logger
 
     private override init() {
         self.container = Assembly().makeContainer()
+        container.resolve { serviceLocator in
+            serviceLocator.loggerInitializator().initialize()
+            serviceLocator.newVisitorIdGenerator().generate()
+        }
         super.init()
     }
 
@@ -35,7 +39,6 @@ typealias Logger = OptimoveCore.Logger
     @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
         /// FUTURE: To merge configure call with init.
         shared.container.resolve { serviceLocator in
-            serviceLocator.loggerInitializator().initialize()
             serviceLocator.newTenantInfoHandler().handle(tenantInfo)
             serviceLocator.deviceStateObserver().start()
             shared.startSDK { _ in }
@@ -50,7 +53,13 @@ typealias Logger = OptimoveCore.Logger
         }
 
         if config.isOptimobileConfigured(), let optimobileConfig = config.optimobileConfig {
-            Kumulos.initialize(config: optimobileConfig)
+            shared.container.resolve { serviceLocator in
+                guard let visitorId = try? serviceLocator.storage().getInitialVisitorId() else {
+                    return
+                }
+
+                Kumulos.initialize(config: optimobileConfig, initialVisitorId: visitorId)
+            }
         }
     }
 
@@ -543,7 +552,6 @@ private extension Optimove {
             }
             RunningFlagsIndication.isInitializerRunning.toggle()
             serviceLocator.installationIdGenerator().generate()
-            serviceLocator.newVisitorIdGenerator().generate()
             serviceLocator.firstTimeVisitGenerator().generate()
             let configurationFetcher = serviceLocator.configurationFetcher()
             configurationFetcher.fetch { [weak self] result in

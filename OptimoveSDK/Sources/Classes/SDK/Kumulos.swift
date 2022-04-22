@@ -121,7 +121,7 @@ open class Kumulos {
         - Parameters:
               - config: An instance of KSConfig
     */
-    internal static func initialize(config: OptimobileConfig) {
+    internal static func initialize(config: OptimobileConfig, initialVisitorId: String) {
         if (instance !== nil) {
             assertionFailure("The KumulosSDK has already been initialized")
         }
@@ -131,6 +131,7 @@ open class Kumulos {
         KeyValPersistenceHelper.set(config.secretKey, forKey: KumulosUserDefaultsKey.SECRET_KEY.rawValue)
         KeyValPersistenceHelper.set(config.baseUrlMap[.events], forKey: KumulosUserDefaultsKey.EVENTS_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: KumulosUserDefaultsKey.MEDIA_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(initialVisitorId, forKey: KumulosUserDefaultsKey.INSTALL_UUID.rawValue)
 
         instance = Kumulos(config: config)
 
