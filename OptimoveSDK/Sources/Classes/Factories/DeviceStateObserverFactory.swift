@@ -33,6 +33,12 @@ final class DeviceStateObserverFactory {
                 ),
                 ResignActiveObserver(
                     subscriber: synchronizer
+                ),
+                AppOpenObserver(
+                    synchronizer: synchronizer,
+                    statisticService: statisticService,
+                    dateTimeProvider: dateTimeProvider,
+                    coreEventFactory: coreEventFactory
                 )
             ]
         )

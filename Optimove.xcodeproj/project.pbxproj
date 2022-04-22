@@ -27,6 +27,7 @@
 		1277E48B2811B2AF0097AC3B /* Mocker.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; };
 		1277E48C2811B39C0097AC3B /* Mocker.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1277E48D2811B3A80097AC3B /* Mocker.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1277E48F2812AF650097AC3B /* AppOpenObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1277E48E2812AF650097AC3B /* AppOpenObserver.swift */; };
 		12C3562A281194D500672B42 /* KSHttp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35621281194D500672B42 /* KSHttp.swift */; };
 		12C3562B281194D500672B42 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35622281194D500672B42 /* AnalyticsHelper.swift */; };
 		12C3562C281194D500672B42 /* KeyValPersistenceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35623281194D500672B42 /* KeyValPersistenceHelper.swift */; };
@@ -385,6 +386,7 @@
 		0E1E54304B64D97CC42E8D49 /* NewTenantInfoHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTenantInfoHandlerTests.swift; sourceTree = "<group>"; };
 		0FA5B03E91EC1B9C8B7A921A /* core_events.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = core_events.json; sourceTree = "<group>"; };
 		111ED6383A53D5F33F54CEFF /* ConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationRepository.swift; sourceTree = "<group>"; };
+		1277E48E2812AF650097AC3B /* AppOpenObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenObserver.swift; sourceTree = "<group>"; };
 		12C1E626E9F4FECB13D350B0 /* MockDateTimeProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDateTimeProvider.swift; sourceTree = "<group>"; };
 		12C35621281194D500672B42 /* KSHttp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KSHttp.swift; sourceTree = "<group>"; };
 		12C35622281194D500672B42 /* AnalyticsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
@@ -790,6 +792,7 @@
 				F19A915CFE10EE5B80BD3AC2 /* DeviceStateObserver.swift */,
 				2CAFA8674D956078D45613FD /* MigrationObserver.swift */,
 				EAE898BE82A77234095B3BE0 /* ResignActiveObserver.swift */,
+				1277E48E2812AF650097AC3B /* AppOpenObserver.swift */,
 			);
 			path = Observers;
 			sourceTree = "<group>";
@@ -2136,6 +2139,7 @@
 				321BFE49BBD5B3C8C0F24618 /* CoreDataMigrationVersion.swift in Sources */,
 				B177625EF698C25631CC290E /* CoreDataMigrator.swift in Sources */,
 				7896AC2FA8B7D13761660979 /* CoreDataModelDescription.swift in Sources */,
+				1277E48F2812AF650097AC3B /* AppOpenObserver.swift in Sources */,
 				6E486EE6C7212E4017EE5F1A /* CoreDataRelationshipDescription.swift in Sources */,
 				1D3E9806CE83FC237BAD4EB4 /* CoreEventFactory.swift in Sources */,
 				79B848B05EF3742A8A5F5BED /* DateTimeProvider.swift in Sources */,
