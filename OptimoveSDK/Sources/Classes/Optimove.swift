@@ -151,6 +151,8 @@ extension Optimove {
             }
         }
         container.resolve(function)
+
+        Kumulos.associateUserWithInstall(userIdentifier: userID)
     }
 
     /// Set a user ID and a user email.
@@ -177,6 +179,8 @@ extension Optimove {
             }
         }
         container.resolve(function)
+
+        Kumulos.associateUserWithInstall(userIdentifier: userID)
     }
     
     /// get visitor id of optimove SDK.
@@ -270,6 +274,64 @@ extension Optimove {
         shared.enablePushCampaigns()
     }
 
+}
+
+// MARK: - Optimobile APIs
+
+extension Optimove {
+
+    /**
+        Helper method for requesting the device token with alert, badge and sound permissions.
+
+        On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+    */
+    @objc public func pushRequestDeviceToken() {
+        Kumulos.pushRequestDeviceToken()
+    }
+
+    /**
+        Helper method for requesting the device token with alert, badge and sound permissions.
+
+        On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+    */
+    @available(iOS 10.0, *)
+    @objc public func pushRequestDeviceToken(_ onAuthorizationStatus: KSUNAuthorizationCheckedHandler? = nil) {
+        Kumulos.pushRequestDeviceToken(onAuthorizationStatus)
+    }
+
+    /**
+        Unsubscribe your device from the Kumulos Push service
+    */
+    @objc public func pushUnregister() {
+        Kumulos.pushUnregister()
+    }
+
+    /**
+        Register a device token with the Kumulos Push service.
+
+        Note you shouldn't normally need to call this method.
+
+        Parameters:
+            - deviceToken: The push token returned by the device
+    */
+    @objc public func pushRegister(_ deviceToken: Data) {
+        Kumulos.pushRegister(deviceToken)
+    }
+
+    /**
+     Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed.
+     */
+    @objc public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        return Kumulos.application(application, continue: userActivity, restorationHandler: restorationHandler)
+    }
+
+    /**
+     Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed in scene-based apps.
+     */
+    @available(iOS 13.0, *)
+    @objc public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        Kumulos.scene(scene, continue: userActivity)
+    }
 }
 
 // MARK: - OptiPush API call
