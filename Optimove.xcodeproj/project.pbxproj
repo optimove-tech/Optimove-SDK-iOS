@@ -174,7 +174,6 @@
 		7896AC2FA8B7D13761660979 /* CoreDataModelDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7296983D1D2B5111D175002E /* CoreDataModelDescription.swift */; };
 		78B7E961DD94BC6F19DF9A86 /* PersistentContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4712B5B2BEABC3056055F6 /* PersistentContainer.swift */; };
 		7946547A4A94770AE03156AE /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035801D597864BD02A3F3C22 /* LocationService.swift */; };
-		794AABCA624F604F26CF9F78 /* MockNotificationPermissionFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CAE2FCEA5FEDA23AA726A0E /* MockNotificationPermissionFetcher.swift */; };
 		79B848B05EF3742A8A5F5BED /* DateTimeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7BE307B3A9F9AABA03961C /* DateTimeProvider.swift */; };
 		79CD25EC4E940F6CEC7C0F03 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = F521F3899C0EF7438BF1B510 /* String.swift */; };
 		7A0EA2106501AF83CA31D429 /* Bundle+HostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 902802B4E5C089844C2664BB /* Bundle+HostApp.swift */; };
@@ -440,7 +439,6 @@
 		38596994C26D889219B1828C /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		386CFDC67E4A51F2F2442815 /* OptimoveNotificationHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationHandling.swift; sourceTree = "<group>"; };
 		38D5D03A189D6E46D85E120B /* configs.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = configs.json; sourceTree = "<group>"; };
-		3CAE2FCEA5FEDA23AA726A0E /* MockNotificationPermissionFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNotificationPermissionFetcher.swift; sourceTree = "<group>"; };
 		3E1C1A66CA07D50B6692CA7B /* MockConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationRepository.swift; sourceTree = "<group>"; };
 		402BB9498BB39F670471DC50 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		41F1FDC6F647A5DD31FCB29D /* NewUserHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewUserHandler.swift; sourceTree = "<group>"; };
@@ -1460,7 +1458,6 @@
 				3E1C1A66CA07D50B6692CA7B /* MockConfigurationRepository.swift */,
 				12C1E626E9F4FECB13D350B0 /* MockDateTimeProvider.swift */,
 				1CED5C535C1EC8A385B8976A /* MockLocationService.swift */,
-				3CAE2FCEA5FEDA23AA726A0E /* MockNotificationPermissionFetcher.swift */,
 				FD86A64C2F3772F4CCCBB335 /* MockOptistreamQueue.swift */,
 				2142B0ABEFD0A0EDFEE3E12C /* MockRegistrarNetworking.swift */,
 				E1C9108020CAF36768579AA7 /* MockStatisticService.swift */,
@@ -2074,7 +2071,6 @@
 				19FAAD1B5B8F3A83CCE1681A /* MockConfigurationRepository.swift in Sources */,
 				1EC0331B7F3631CAFF5B4BE7 /* MockDateTimeProvider.swift in Sources */,
 				98F9B9E29920E18313F20771 /* MockLocationService.swift in Sources */,
-				794AABCA624F604F26CF9F78 /* MockNotificationPermissionFetcher.swift in Sources */,
 				A6D704D18C74065D0101020A /* MockOptimoveStorage.swift in Sources */,
 				94F0C89849632523B9598FA4 /* MockOptistreamQueue.swift in Sources */,
 				2FE3D649B0C8E0C8DD98F124 /* MockRegistrarNetworking.swift in Sources */,
