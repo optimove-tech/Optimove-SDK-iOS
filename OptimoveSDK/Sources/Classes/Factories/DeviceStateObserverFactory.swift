@@ -21,7 +21,7 @@ final class DeviceStateObserverFactory {
         self.coreEventFactory = coreEventFactory
         self.storage = storage
     }
-    
+
     func build() -> DeviceStateObserver {
         return DeviceStateObserver(
             observers: [
@@ -43,5 +43,5 @@ final class DeviceStateObserverFactory {
             ]
         )
     }
-    
+
 }
