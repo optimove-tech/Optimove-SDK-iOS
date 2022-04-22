@@ -41,6 +41,16 @@ typealias Logger = OptimoveCore.Logger
         }
     }
 
+    public static func initialize(with config: OptimoveConfig) {
+        if config.isOptimoveConfigured(), let tenantInfo = config.tenantInfo {
+            Optimove.configure(for: tenantInfo)
+        }
+
+        if config.isOptimobileConfigured(), let optimobileConfig = config.optimobileConfig {
+            Kumulos.initialize(config: optimobileConfig)
+        }
+    }
+
 }
 
 // MARK: - Event API call

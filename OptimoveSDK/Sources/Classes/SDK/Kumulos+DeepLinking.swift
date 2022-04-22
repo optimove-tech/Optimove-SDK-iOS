@@ -44,11 +44,11 @@ public typealias DeepLinkHandler = (DeepLinkResolution) -> Void
 class DeepLinkHelper {
     fileprivate static let deferredLinkCheckedKey = "KUMULOS_DDL_CHECKED"
 
-    let config : KSConfig
+    let config : OptimobileConfig
     let httpClient: KSHttpClient
     var anyContinuationHandled : Bool
 
-    init(_ config: KSConfig, urlBuilder:UrlBuilder) {
+    init(_ config: OptimobileConfig, urlBuilder:UrlBuilder) {
         self.config = config
         httpClient = KSHttpClient(
             baseUrl: URL(string: urlBuilder.urlForService(.ddl))!,
