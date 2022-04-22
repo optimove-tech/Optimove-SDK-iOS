@@ -67,7 +67,7 @@ open class Kumulos {
         return sharedInstance;
     }
 
-    fileprivate(set) var config : KSConfig
+    fileprivate(set) var config : OptimobileConfig
     fileprivate(set) var apiKey: String
     fileprivate(set) var secretKey: String
     fileprivate(set) var inAppConsentStrategy:InAppConsentStrategy = InAppConsentStrategy.NotEnabled
@@ -121,7 +121,7 @@ open class Kumulos {
         - Parameters:
               - config: An instance of KSConfig
     */
-    public static func initialize(config: KSConfig) {
+    internal static func initialize(config: OptimobileConfig) {
         if (instance !== nil) {
             assertionFailure("The KumulosSDK has already been initialized")
         }
@@ -147,7 +147,7 @@ open class Kumulos {
         }
     }
 
-    fileprivate init(config: KSConfig) {
+    fileprivate init(config: OptimobileConfig) {
         self.config = config
         apiKey = config.apiKey
         secretKey = config.secretKey
