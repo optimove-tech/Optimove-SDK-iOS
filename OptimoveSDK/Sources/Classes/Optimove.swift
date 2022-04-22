@@ -22,6 +22,7 @@ typealias Logger = OptimoveCore.Logger
     }()
 
     private let container: Container
+    private var config: OptimoveConfig!
 
     private override init() {
         self.container = Assembly().makeContainer()
@@ -42,6 +43,8 @@ typealias Logger = OptimoveCore.Logger
     }
 
     public static func initialize(with config: OptimoveConfig) {
+        shared.config = config
+
         if config.isOptimoveConfigured(), let tenantInfo = config.tenantInfo {
             Optimove.configure(for: tenantInfo)
         }
@@ -139,18 +142,24 @@ extension Optimove {
     ///   - sdkId: The user unique identifier.
     ///   - email: The user email.
     @objc public func registerUser(sdkId userID: String, email: String) {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            tryCatch {
-                let user = User(userID: userID)
-                let setUserIdEvent = try self._setUser(user, serviceLocator)
-                let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
-                serviceLocator.pipeline().deliver(.report(events: [setUserIdEvent, setUserEmailEvent]))
-                if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-                    serviceLocator.pipeline().deliver(.setInstallation)
+        if config.isOptimoveConfigured() {
+            let function: (ServiceLocator) -> Void = { serviceLocator in
+                tryCatch {
+                    let user = User(userID: userID)
+                    let setUserIdEvent = try self._setUser(user, serviceLocator)
+                    let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
+                    serviceLocator.pipeline().deliver(.report(events: [setUserIdEvent, setUserEmailEvent]))
+                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
+                        serviceLocator.pipeline().deliver(.setInstallation)
+                    }
                 }
             }
+            container.resolve(function)
         }
-        container.resolve(function)
+
+        if config.isOptimobileConfigured() {
+            Kumulos.associateUserWithInstall(userIdentifier: userID)
+        }
     }
 
     /// Set a user ID and a user email.
@@ -166,17 +175,23 @@ extension Optimove {
     ///
     /// - Parameter userID: The user unique identifier.
     @objc public func setUserId(_ userID: String) {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            tryCatch {
-                let user = User(userID: userID)
-                let event = try self._setUser(user, serviceLocator)
-                serviceLocator.pipeline().deliver(.report(events: [event]))
-                if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-                    serviceLocator.pipeline().deliver(.setInstallation)
+        if config.isOptimoveConfigured() {
+            let function: (ServiceLocator) -> Void = { serviceLocator in
+                tryCatch {
+                    let user = User(userID: userID)
+                    let event = try self._setUser(user, serviceLocator)
+                    serviceLocator.pipeline().deliver(.report(events: [event]))
+                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
+                        serviceLocator.pipeline().deliver(.setInstallation)
+                    }
                 }
             }
+            container.resolve(function)
         }
-        container.resolve(function)
+
+        if config.isOptimobileConfigured() {
+            Kumulos.associateUserWithInstall(userIdentifier: userID)
+        }
     }
     
     /// get visitor id of optimove SDK.
@@ -270,6 +285,64 @@ extension Optimove {
         shared.enablePushCampaigns()
     }
 
+}
+
+// MARK: - Optimobile APIs
+
+extension Optimove {
+
+    /**
+        Helper method for requesting the device token with alert, badge and sound permissions.
+
+        On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+    */
+    @objc public func pushRequestDeviceToken() {
+        Kumulos.pushRequestDeviceToken()
+    }
+
+    /**
+        Helper method for requesting the device token with alert, badge and sound permissions.
+
+        On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+    */
+    @available(iOS 10.0, *)
+    @objc public func pushRequestDeviceToken(_ onAuthorizationStatus: KSUNAuthorizationCheckedHandler? = nil) {
+        Kumulos.pushRequestDeviceToken(onAuthorizationStatus)
+    }
+
+    /**
+        Unsubscribe your device from the Kumulos Push service
+    */
+    @objc public func pushUnregister() {
+        Kumulos.pushUnregister()
+    }
+
+    /**
+        Register a device token with the Kumulos Push service.
+
+        Note you shouldn't normally need to call this method.
+
+        Parameters:
+            - deviceToken: The push token returned by the device
+    */
+    @objc public func pushRegister(_ deviceToken: Data) {
+        Kumulos.pushRegister(deviceToken)
+    }
+
+    /**
+     Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed.
+     */
+    @objc public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        return Kumulos.application(application, continue: userActivity, restorationHandler: restorationHandler)
+    }
+
+    /**
+     Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed in scene-based apps.
+     */
+    @available(iOS 13.0, *)
+    @objc public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        Kumulos.scene(scene, continue: userActivity)
+    }
 }
 
 // MARK: - OptiPush API call
