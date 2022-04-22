@@ -36,7 +36,6 @@ final class ServiceLocator {
         return DeviceStateObserverFactory(
             statisticService: statisticService(),
             synchronizer: pipeline(),
-            optInService: optInService(),
             dateTimeProvider: dateTimeProvider(),
             coreEventFactory: coreEventFactory(),
             storage: storage()
@@ -128,16 +127,7 @@ final class ServiceLocator {
     func installationIdGenerator() -> InstallationIdGenerator {
         return InstallationIdGenerator(storage: storage())
     }
-
-    func optInService() -> OptInService {
-        return OptInService(
-            synchronizer: pipeline(),
-            coreEventFactory: coreEventFactory(),
-            storage: storage(),
-            subscribers: []
-        )
-    }
-
+    
     func deviceStateObserver() -> DeviceStateObserver {
         return _deviceStateObserver
     }

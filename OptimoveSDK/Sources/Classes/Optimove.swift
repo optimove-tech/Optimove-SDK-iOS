@@ -41,6 +41,16 @@ typealias Logger = OptimoveCore.Logger
         }
     }
 
+    public static func initialize(with config: OptimoveConfig) {
+        if config.isOptimoveConfigured(), let tenantInfo = config.tenantInfo {
+            Optimove.configure(for: tenantInfo)
+        }
+
+        if config.isOptimobileConfigured(), let optimobileConfig = config.optimobileConfig {
+            Kumulos.initialize(config: optimobileConfig)
+        }
+    }
+
 }
 
 // MARK: - Event API call
@@ -392,26 +402,6 @@ extension Optimove {
     @objc public static func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         shared.application(didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
     }
-
-    /// User authorization is required for applications to notify the user using UNUserNotificationCenter via both local and remote notifications.
-    ///
-    /// - Parameter fromUserNotificationCenter: A response from
-    @objc public func didReceivePushAuthorization(fromUserNotificationCenter granted: Bool) {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            tryCatch {
-                try serviceLocator.optInService().didPushAuthorization(isGranted: granted)
-            }
-        }
-        container.resolve(function)
-    }
-
-    /// User authorization is required for applications to notify the user using UNUserNotificationCenter via both local and remote notifications.
-    ///
-    /// - Parameter fromUserNotificationCenter: A response from
-    @objc public static func didReceivePushAuthorization(fromUserNotificationCenter granted: Bool) {
-        shared.didReceivePushAuthorization(fromUserNotificationCenter: granted)
-    }
-
 }
 
 // MARK: - OptimoveDeepLinkResponding
