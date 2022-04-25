@@ -59,6 +59,7 @@ public struct OptimobileConfig {
 open class OptimoveConfigBuilder: NSObject {
     private var _tenantToken: String?
     private var _configName: String?
+    private var _region: String?
     private var _apiKey: String?
     private var _secretKey: String?
     private var _sessionIdleTimeout: UInt
@@ -68,7 +69,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var _pushReceivedInForegroundHandlerBlock: Any?
     private var _deepLinkCname : URL?
     private var _deepLinkHandler : DeepLinkHandler?
-    private var _baseUrlMap : ServiceUrlMap
+    private var _baseUrlMap : ServiceUrlMap?
     
     public init(optimoveCredentials: String?, optimobileCredentials: String?) {
         if let optimoveCredentialsTuple = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials) {
@@ -79,10 +80,10 @@ open class OptimoveConfigBuilder: NSObject {
         if let optimobileCredentialsTuple = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials) {
             _apiKey = optimobileCredentialsTuple.apiKey
             _secretKey = optimobileCredentialsTuple.secretKey
+            _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentialsTuple.region)
         }
 
         _sessionIdleTimeout = 23
-        _baseUrlMap = UrlBuilder.defaultMapping()
     }
     
     @discardableResult public func setSessionIdleTimeout(seconds: UInt) -> OptimoveConfigBuilder {
@@ -135,7 +136,7 @@ open class OptimoveConfigBuilder: NSObject {
             tenantInfo = OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
         }
 
-        if let _apiKey = _apiKey, let _secretKey = _secretKey {
+        if let _apiKey = _apiKey, let _secretKey = _secretKey, let _baseUrlMap = _baseUrlMap {
             optimobileConfig = OptimobileConfig(
                 apiKey: _apiKey,
                 secretKey: _secretKey,

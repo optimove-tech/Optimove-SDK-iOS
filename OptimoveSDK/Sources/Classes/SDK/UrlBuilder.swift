@@ -35,14 +35,14 @@ class UrlBuilder {
         return baseUrl
     }
 
-    static func defaultMapping() -> ServiceUrlMap {
+    static func defaultMapping(for region: String) -> ServiceUrlMap {
         return [
-            .crm : "https://crm.kumulos.com",
-            .ddl : "https://links.kumulos.com",
-            .events : "https://events.kumulos.com",
+            .crm : "https://crm-\(region).kumulos.com",
+            .ddl : "https://links-\(region).kumulos.com",
+            .events : "https://events-\(region).kumulos.com",
             .iar : "https://iar.app.delivery",
-            .media : "https://i.app.delivery",
-            .push : "https://push.kumulos.com"
+            .media : "https://i-\(region).app.delivery",
+            .push : "https://push-\(region).kumulos.com"
         ]
     }
 }
