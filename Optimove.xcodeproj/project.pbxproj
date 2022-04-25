@@ -1141,16 +1141,16 @@
 			isa = PBXGroup;
 			children = (
 				4F585C5227FECCFA005E7BB4 /* InApp */,
+				4F585C6027FECCFA005E7BB4 /* Optimobile.swift */,
+				4F585C5A27FECCFA005E7BB4 /* OptimoveInApp.swift */,
+				4F585C5E27FECCFA005E7BB4 /* Optimobile+Stats.swift */,
+				4F585C6427FECCFA005E7BB4 /* Optimobile+Analytics.swift */,
+				4F585C5D27FECCFA005E7BB4 /* Optimobile+Push.swift */,
 				4F585C5727FECCFA005E7BB4 /* Optimobile+DeepLinking.swift */,
 				4F585C5827FECCFA005E7BB4 /* SessionHelper.swift */,
-				4F585C5A27FECCFA005E7BB4 /* OptimoveInApp.swift */,
 				4F585C5B27FECCFA005E7BB4 /* CwlSysctl.swift */,
-				4F585C5D27FECCFA005E7BB4 /* Optimobile+Push.swift */,
-				4F585C5E27FECCFA005E7BB4 /* Optimobile+Stats.swift */,
-				4F585C6027FECCFA005E7BB4 /* Optimobile.swift */,
 				4F585C6127FECCFA005E7BB4 /* UrlBuilder.swift */,
 				4F585C6327FECCFA005E7BB4 /* OptimoveUserNotificationCenterDelegate.swift */,
-				4F585C6427FECCFA005E7BB4 /* Optimobile+Analytics.swift */,
 				4F585C6527FECCFA005E7BB4 /* DeepLinkFingerprinter.swift */,
 				4FA8F61627FEE872005CB88E /* OptimobileBadgeObserver.swift */,
 			);
