@@ -5,7 +5,7 @@ import UserNotifications
 import OptimoveCore
 import UIKit
 
-final class OptiPush {
+final class Push {
 
     private let registrar: Registrable
     private var storage: OptimoveStorage
@@ -28,7 +28,7 @@ final class OptiPush {
 
 }
 
-extension OptiPush: CommonComponent {
+extension Push: CommonComponent {
 
     func serve(_ operation: CommonOperation) throws {
         switch operation {

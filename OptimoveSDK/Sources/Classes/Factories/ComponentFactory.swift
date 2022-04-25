@@ -33,8 +33,8 @@ final class ComponentFactory {
         )
     }
 
-    func createOptipushComponent(configuration: Configuration) -> OptiPush {
-        return OptiPush(
+    func createOptipushComponent(configuration: Configuration) -> Push {
+        return Push(
             registrar: serviceLocator.registrar(configuration: configuration),
             storage: serviceLocator.storage(),
             application: UIApplication.shared

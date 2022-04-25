@@ -30,7 +30,7 @@ internal class KumulosHelper {
                return existingID as! String
            }
 
-           let newID = UUID().uuidString
+           let newID = Optimove.getVisitorID() ?? ""
            KeyValPersistenceHelper.set(newID, forKey: KumulosUserDefaultsKey.INSTALL_UUID.rawValue)
            
            return newID
