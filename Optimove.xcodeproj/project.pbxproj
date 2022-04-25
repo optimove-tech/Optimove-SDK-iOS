@@ -749,8 +749,7 @@
 			children = (
 				4F585C5627FECCFA005E7BB4 /* OptimoveConfig.swift */,
 				DA418E3FDBEB318519B1F183 /* Optimove.swift */,
-				4FA8F61527FEE148005CB88E /* Objc_Swift */,
-				4F585C5027FECCFA005E7BB4 /* SDK */,
+				4F585C5027FECCFA005E7BB4 /* Optimobile */,
 				329CE901655C81D4751CB22B /* .gitkeep */,
 				A506CE7C768F77DF1C031E7D /* Environment.swift */,
 				7A701B350A9A47124CB6F501 /* Components */,
@@ -1144,7 +1143,7 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		4F585C5027FECCFA005E7BB4 /* SDK */ = {
+		4F585C5027FECCFA005E7BB4 /* Optimobile */ = {
 			isa = PBXGroup;
 			children = (
 				4F585C5227FECCFA005E7BB4 /* InApp */,
@@ -1162,8 +1161,9 @@
 				4F585C6427FECCFA005E7BB4 /* Kumulos+Analytics.swift */,
 				4F585C6527FECCFA005E7BB4 /* DeepLinkFingerprinter.swift */,
 				4F585C6627FECCFA005E7BB4 /* KumulosPushChannels.swift */,
+				4FA8F61627FEE872005CB88E /* KSBadgeObserver.swift */,
 			);
-			path = SDK;
+			path = Optimobile;
 			sourceTree = "<group>";
 		};
 		4F585C5227FECCFA005E7BB4 /* InApp */ = {
@@ -1174,14 +1174,6 @@
 				4F585C5527FECCFA005E7BB4 /* InAppModels.swift */,
 			);
 			path = InApp;
-			sourceTree = "<group>";
-		};
-		4FA8F61527FEE148005CB88E /* Objc_Swift */ = {
-			isa = PBXGroup;
-			children = (
-				4FA8F61627FEE872005CB88E /* KSBadgeObserver.swift */,
-			);
-			path = Objc_Swift;
 			sourceTree = "<group>";
 		};
 		517F8BBB89498042BB4C4B44 /* Coding */ = {
