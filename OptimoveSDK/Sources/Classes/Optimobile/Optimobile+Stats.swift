@@ -109,7 +109,7 @@ extension Optimobile {
             "ios": self.getiOSAttrs()
         ]
         
-        Optimobile.trackEvent(eventType: KumulosEvent.STATS_CALL_HOME.rawValue, properties: finalParameters)
+        Optimobile.trackEvent(eventType: OptimobileEvent.STATS_CALL_HOME.rawValue, properties: finalParameters)
     }
 
     private func getiOSAttrs() -> [String:Any] {

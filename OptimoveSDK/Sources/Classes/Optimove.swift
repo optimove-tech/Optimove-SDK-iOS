@@ -315,7 +315,7 @@ extension Optimove {
         On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
     */
     @available(iOS 10.0, *)
-    @objc public func pushRequestDeviceToken(_ onAuthorizationStatus: KSUNAuthorizationCheckedHandler? = nil) {
+    @objc public func pushRequestDeviceToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
         Optimobile.pushRequestDeviceToken(onAuthorizationStatus)
     }
 

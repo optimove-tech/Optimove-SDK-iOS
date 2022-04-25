@@ -8,7 +8,7 @@
 import Foundation
 
 extension Optimobile {
-    static func trackEvent(eventType: KumulosEvent, properties: [String:Any]?, immediateFlush: Bool = false) {
+    static func trackEvent(eventType: OptimobileEvent, properties: [String:Any]?, immediateFlush: Bool = false) {
         getInstance().analyticsHelper.trackEvent(eventType: eventType.rawValue, properties: properties, immediateFlush: immediateFlush)
     }
     
@@ -69,7 +69,7 @@ extension Optimobile {
     */
     static var currentUserIdentifier : String {
         get {
-            return KumulosHelper.currentUserIdentifier
+            return OptimobileHelper.currentUserIdentifier
         }
     }
 
@@ -79,15 +79,15 @@ extension Optimobile {
      See associateUserWithInstall and currentUserIdentifier for further information.
      */
     static func clearUserAssociation() {
-        KumulosHelper.userIdLock.wait()
-        let currentUserId = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.USER_ID.rawValue) as! String?
-        KumulosHelper.userIdLock.signal()
+        OptimobileHelper.userIdLock.wait()
+        let currentUserId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue) as! String?
+        OptimobileHelper.userIdLock.signal()
 
-        Optimobile.trackEvent(eventType: KumulosEvent.STATS_USER_ASSOCIATION_CLEARED, properties: ["oldUserIdentifier": currentUserId ?? NSNull()])
+        Optimobile.trackEvent(eventType: OptimobileEvent.STATS_USER_ASSOCIATION_CLEARED, properties: ["oldUserIdentifier": currentUserId ?? NSNull()])
 
-        KumulosHelper.userIdLock.wait()
-        KeyValPersistenceHelper.removeObject(forKey: KumulosUserDefaultsKey.USER_ID.rawValue)
-        KumulosHelper.userIdLock.signal()
+        OptimobileHelper.userIdLock.wait()
+        KeyValPersistenceHelper.removeObject(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue)
+        OptimobileHelper.userIdLock.signal()
 
         if (currentUserId != nil && currentUserId != Optimobile.installId) {
             getInstance().inAppHelper.handleAssociatedUserChange();
@@ -108,12 +108,12 @@ extension Optimobile {
             params = ["id": userIdentifier]
         }
 
-        KumulosHelper.userIdLock.wait()
-        let currentUserId = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.USER_ID.rawValue) as! String?
-        KeyValPersistenceHelper.set(userIdentifier, forKey: KumulosUserDefaultsKey.USER_ID.rawValue)
-        KumulosHelper.userIdLock.signal()
+        OptimobileHelper.userIdLock.wait()
+        let currentUserId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue) as! String?
+        KeyValPersistenceHelper.set(userIdentifier, forKey: OptimobileUserDefaultsKey.USER_ID.rawValue)
+        OptimobileHelper.userIdLock.signal()
 
-        Optimobile.trackEvent(eventType: KumulosEvent.STATS_ASSOCIATE_USER, properties: params, immediateFlush: true)
+        Optimobile.trackEvent(eventType: OptimobileEvent.STATS_ASSOCIATE_USER, properties: params, immediateFlush: true)
 
         if (currentUserId == nil || currentUserId != userIdentifier) {
             getInstance().inAppHelper.handleAssociatedUserChange();

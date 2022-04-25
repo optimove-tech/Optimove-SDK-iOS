@@ -34,7 +34,7 @@ internal class PendingNotificationHelper {
     static func readAll() -> [PendingNotification]
     {
         var pendingNotifications = [PendingNotification]();
-        if let data = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.PENDING_NOTIFICATIONS.rawValue),
+        if let data = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.PENDING_NOTIFICATIONS.rawValue),
            let decoded = try? JSONDecoder().decode([PendingNotification].self, from: data as! Data){
             pendingNotifications = decoded
         }
@@ -58,7 +58,7 @@ internal class PendingNotificationHelper {
     fileprivate static func save(pendingNotifications: [PendingNotification])
     {
         if let data = try? JSONEncoder().encode(pendingNotifications) {
-            KeyValPersistenceHelper.set(data, forKey: KumulosUserDefaultsKey.PENDING_NOTIFICATIONS.rawValue)
+            KeyValPersistenceHelper.set(data, forKey: OptimobileUserDefaultsKey.PENDING_NOTIFICATIONS.rawValue)
         }
     }
 }

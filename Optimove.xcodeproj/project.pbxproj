@@ -31,9 +31,9 @@
 		12C3562A281194D500672B42 /* KSHttp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35621281194D500672B42 /* KSHttp.swift */; };
 		12C3562B281194D500672B42 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35622281194D500672B42 /* AnalyticsHelper.swift */; };
 		12C3562C281194D500672B42 /* KeyValPersistenceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35623281194D500672B42 /* KeyValPersistenceHelper.swift */; };
-		12C3562D281194D500672B42 /* KumulosUserDefaultsKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35624281194D500672B42 /* KumulosUserDefaultsKey.swift */; };
+		12C3562D281194D500672B42 /* OptimobileUserDefaultsKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35624281194D500672B42 /* OptimobileUserDefaultsKey.swift */; };
 		12C3562E281194D500672B42 /* AppGroupsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35625281194D500672B42 /* AppGroupsHelper.swift */; };
-		12C3562F281194D500672B42 /* KumulosHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35626281194D500672B42 /* KumulosHelper.swift */; };
+		12C3562F281194D500672B42 /* OptimobileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35626281194D500672B42 /* OptimobileHelper.swift */; };
 		12C35630281194D500672B42 /* PendingNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35627281194D500672B42 /* PendingNotification.swift */; };
 		12C35631281194D500672B42 /* PendingNotificationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35628281194D500672B42 /* PendingNotificationHelper.swift */; };
 		12C35632281194D500672B42 /* MediaHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35629281194D500672B42 /* MediaHelper.swift */; };
@@ -45,9 +45,9 @@
 		12C356742811992800672B42 /* KSHttp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35621281194D500672B42 /* KSHttp.swift */; };
 		12C356752811992B00672B42 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35622281194D500672B42 /* AnalyticsHelper.swift */; };
 		12C356762811992E00672B42 /* KeyValPersistenceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35623281194D500672B42 /* KeyValPersistenceHelper.swift */; };
-		12C356772811993100672B42 /* KumulosUserDefaultsKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35624281194D500672B42 /* KumulosUserDefaultsKey.swift */; };
+		12C356772811993100672B42 /* OptimobileUserDefaultsKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35624281194D500672B42 /* OptimobileUserDefaultsKey.swift */; };
 		12C356782811993400672B42 /* AppGroupsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35625281194D500672B42 /* AppGroupsHelper.swift */; };
-		12C356792811993700672B42 /* KumulosHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35626281194D500672B42 /* KumulosHelper.swift */; };
+		12C356792811993700672B42 /* OptimobileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35626281194D500672B42 /* OptimobileHelper.swift */; };
 		12C3567A2811993A00672B42 /* PendingNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35627281194D500672B42 /* PendingNotification.swift */; };
 		12C3567B2811993C00672B42 /* PendingNotificationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35628281194D500672B42 /* PendingNotificationHelper.swift */; };
 		12C3567C2811993F00672B42 /* MediaHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35629281194D500672B42 /* MediaHelper.swift */; };
@@ -385,9 +385,9 @@
 		12C35621281194D500672B42 /* KSHttp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KSHttp.swift; sourceTree = "<group>"; };
 		12C35622281194D500672B42 /* AnalyticsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
 		12C35623281194D500672B42 /* KeyValPersistenceHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyValPersistenceHelper.swift; sourceTree = "<group>"; };
-		12C35624281194D500672B42 /* KumulosUserDefaultsKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosUserDefaultsKey.swift; sourceTree = "<group>"; };
+		12C35624281194D500672B42 /* OptimobileUserDefaultsKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimobileUserDefaultsKey.swift; sourceTree = "<group>"; };
 		12C35625281194D500672B42 /* AppGroupsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppGroupsHelper.swift; sourceTree = "<group>"; };
-		12C35626281194D500672B42 /* KumulosHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosHelper.swift; sourceTree = "<group>"; };
+		12C35626281194D500672B42 /* OptimobileHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimobileHelper.swift; sourceTree = "<group>"; };
 		12C35627281194D500672B42 /* PendingNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingNotification.swift; sourceTree = "<group>"; };
 		12C35628281194D500672B42 /* PendingNotificationHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingNotificationHelper.swift; sourceTree = "<group>"; };
 		12C35629281194D500672B42 /* MediaHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHelper.swift; sourceTree = "<group>"; };
@@ -819,9 +819,9 @@
 				12C35621281194D500672B42 /* KSHttp.swift */,
 				12C35622281194D500672B42 /* AnalyticsHelper.swift */,
 				12C35623281194D500672B42 /* KeyValPersistenceHelper.swift */,
-				12C35624281194D500672B42 /* KumulosUserDefaultsKey.swift */,
+				12C35624281194D500672B42 /* OptimobileUserDefaultsKey.swift */,
 				12C35625281194D500672B42 /* AppGroupsHelper.swift */,
-				12C35626281194D500672B42 /* KumulosHelper.swift */,
+				12C35626281194D500672B42 /* OptimobileHelper.swift */,
 				12C35627281194D500672B42 /* PendingNotification.swift */,
 				12C35628281194D500672B42 /* PendingNotificationHelper.swift */,
 				12C35629281194D500672B42 /* MediaHelper.swift */,
@@ -2100,7 +2100,7 @@
 				41E93887039BA10C580D3F60 /* ComponentFactory.swift in Sources */,
 				C323AD127E24F3444D868D46 /* ComponentHandlers.swift in Sources */,
 				D84FA7E0419D5AA96CE24553 /* Components.swift in Sources */,
-				12C3562F281194D500672B42 /* KumulosHelper.swift in Sources */,
+				12C3562F281194D500672B42 /* OptimobileHelper.swift in Sources */,
 				1A4FD956C218500F124C94B1 /* ConfigurationFetcher.swift in Sources */,
 				5EFB943F708BFECD8C7122C4 /* Container.swift in Sources */,
 				A6CC7197F19B7D0922575FC4 /* CoreDataAttributeDescription.swift in Sources */,
@@ -2207,7 +2207,7 @@
 				F4463BD44A499220DDE80852 /* SetUserIdEvent.swift in Sources */,
 				BDB72CFA372352BF226C045D /* StatisticService.swift in Sources */,
 				64C373178EC3796339003DA1 /* String+SHA1.swift in Sources */,
-				12C3562D281194D500672B42 /* KumulosUserDefaultsKey.swift in Sources */,
+				12C3562D281194D500672B42 /* OptimobileUserDefaultsKey.swift in Sources */,
 				4F585C7527FECCFA005E7BB4 /* UrlBuilder.swift in Sources */,
 				4B583BA9BF1C2FA8274AACD3 /* String+Split.swift in Sources */,
 				4F585C6C27FECCFA005E7BB4 /* Optimobile+DeepLinking.swift in Sources */,
@@ -2232,14 +2232,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				12C356752811992B00672B42 /* AnalyticsHelper.swift in Sources */,
-				12C356772811993100672B42 /* KumulosUserDefaultsKey.swift in Sources */,
+				12C356772811993100672B42 /* OptimobileUserDefaultsKey.swift in Sources */,
 				12C356722811987C00672B42 /* KumulosNotificationService.swift in Sources */,
 				12C356782811993400672B42 /* AppGroupsHelper.swift in Sources */,
 				12C356732811987C00672B42 /* CategoryHelper.swift in Sources */,
 				12C356762811992E00672B42 /* KeyValPersistenceHelper.swift in Sources */,
 				12C3567C2811993F00672B42 /* MediaHelper.swift in Sources */,
 				12C3567A2811993A00672B42 /* PendingNotification.swift in Sources */,
-				12C356792811993700672B42 /* KumulosHelper.swift in Sources */,
+				12C356792811993700672B42 /* OptimobileHelper.swift in Sources */,
 				12C3567B2811993C00672B42 /* PendingNotificationHelper.swift in Sources */,
 				12C356742811992800672B42 /* KSHttp.swift in Sources */,
 			);

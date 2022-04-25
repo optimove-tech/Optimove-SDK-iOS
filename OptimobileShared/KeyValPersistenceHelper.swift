@@ -27,7 +27,7 @@ internal class KeyValPersistenceHelper {
 
     internal static func maybeMigrateUserDefaultsToAppGroups() {
         let standardDefaults = UserDefaults.standard
-        let haveMigratedKey : String = KumulosUserDefaultsKey.MIGRATED_TO_GROUPS.rawValue
+        let haveMigratedKey : String = OptimobileUserDefaultsKey.MIGRATED_TO_GROUPS.rawValue
         if (!AppGroupsHelper.isKumulosAppGroupDefined()){
             standardDefaults.set(false, forKey: haveMigratedKey)
             return;
@@ -39,7 +39,7 @@ internal class KeyValPersistenceHelper {
         }
         
         let defaultsAsDict : [String: Any] = standardDefaults.dictionaryRepresentation()
-        for key in KumulosUserDefaultsKey.sharedKeys{
+        for key in OptimobileUserDefaultsKey.sharedKeys{
             groupDefaults.set(defaultsAsDict[key.rawValue], forKey: key.rawValue)
         }
         

@@ -8,7 +8,7 @@ import UserNotifications
 import ObjectiveC.runtime
 import UIKit
 
-public class KSPushNotification: NSObject {
+public class PushNotification: NSObject {
     internal static let DeepLinkTypeInApp : Int = 1;
 
     internal(set) open var id: Int
@@ -73,7 +73,7 @@ public class KSPushNotification: NSObject {
             return nil
         }
 
-        if deepLink["type"] as? Int != KSPushNotification.DeepLinkTypeInApp {
+        if deepLink["type"] as? Int != PushNotification.DeepLinkTypeInApp {
             return nil
         }
 
@@ -82,7 +82,7 @@ public class KSPushNotification: NSObject {
 }
 
 @available(iOS 10.0, *)
-public typealias KSUNAuthorizationCheckedHandler = (UNAuthorizationStatus, Error?) -> Void
+public typealias OptimoveUNAuthorizationCheckedHandler = (UNAuthorizationStatus, Error?) -> Void
 
 extension Optimobile {
 
@@ -92,7 +92,7 @@ extension Optimobile {
         On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
     */
     @available(iOS 10.0, *)
-    static func pushRequestDeviceToken(_ onAuthorizationStatus: KSUNAuthorizationCheckedHandler? = nil) {
+    static func pushRequestDeviceToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
         requestToken(onAuthorizationStatus)
     }
 
@@ -112,7 +112,7 @@ extension Optimobile {
     }
 
     @available(iOS 10.0, *)
-    fileprivate static func requestToken(_ onAuthorizationStatus: KSUNAuthorizationCheckedHandler? = nil) {
+    fileprivate static func requestToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
         let center = UNUserNotificationCenter.current()
 
         let requestToken : () -> Void = {
@@ -195,14 +195,14 @@ extension Optimobile {
                           "iosTokenType" : iosTokenType,
                           "bundleId": bundleId] as [String : Any]
         
-        Optimobile.trackEvent(eventType: KumulosEvent.PUSH_DEVICE_REGISTER, properties: parameters as [String : AnyObject], immediateFlush: true)
+        Optimobile.trackEvent(eventType: OptimobileEvent.PUSH_DEVICE_REGISTER, properties: parameters as [String : AnyObject], immediateFlush: true)
     }
     
     /**
         Unsubscribe your device from the Kumulos Push service
     */
     static func pushUnregister() {
-        Optimobile.trackEvent(eventType: KumulosEvent.DEVICE_UNSUBSCRIBED, properties: [:], immediateFlush: true)
+        Optimobile.trackEvent(eventType: OptimobileEvent.DEVICE_UNSUBSCRIBED, properties: [:], immediateFlush: true)
     }
  
 // MARK: Open handling
@@ -212,13 +212,13 @@ extension Optimobile {
         Parameters:
             - notification: The notification which triggered the action
     */
-    static func pushTrackOpen(notification: KSPushNotification?) {
+    static func pushTrackOpen(notification: PushNotification?) {
         guard let notification = notification else {
             return
         }
 
         let params = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.id]
-        Optimobile.trackEvent(eventType: KumulosEvent.MESSAGE_OPENED, properties:params)
+        Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_OPENED, properties:params)
     }
     
     @available(iOS 9.0, *)
@@ -227,7 +227,7 @@ extension Optimobile {
             return
         }
 
-        let notification = KSPushNotification(userInfo: userInfo)
+        let notification = PushNotification(userInfo: userInfo)
         if notification.id == 0 {
             return
         }
@@ -237,7 +237,7 @@ extension Optimobile {
   
     @available(iOS 10.0, *)
     internal func pushHandleOpen(withUserInfo: [AnyHashable: Any]?, response: UNNotificationResponse?) -> Bool {
-        let notification = KSPushNotification(userInfo: withUserInfo, response: response)
+        let notification = PushNotification(userInfo: withUserInfo, response: response)
 
         if notification.id == 0 {
             return false
@@ -250,7 +250,7 @@ extension Optimobile {
         return true
     }
     
-    private func pushHandleOpen(notification: KSPushNotification) {
+    private func pushHandleOpen(notification: PushNotification) {
         Optimobile.pushTrackOpen(notification: notification)
         
        // Handle URL pushes
@@ -279,7 +279,7 @@ extension Optimobile {
 // MARK: Dismissed handling
     @available(iOS 10.0, *)
     internal func pushHandleDismissed(withUserInfo: [AnyHashable: Any]?, response: UNNotificationResponse?) -> Bool {
-        let notification = KSPushNotification(userInfo: withUserInfo, response: response)
+        let notification = PushNotification(userInfo: withUserInfo, response: response)
 
         if notification.id == 0 {
             return false
@@ -301,10 +301,10 @@ extension Optimobile {
         let params = ["type": KS_MESSAGE_TYPE_PUSH, "id": notificationId]
               
         if let unwrappedDismissedAt = dismissedAt {
-            Optimobile.trackEvent(eventType: KumulosEvent.MESSAGE_DISMISSED.rawValue, atTime: unwrappedDismissedAt, properties:params)
+            Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DISMISSED.rawValue, atTime: unwrappedDismissedAt, properties:params)
         }
         else{
-            Optimobile.trackEvent(eventType: KumulosEvent.MESSAGE_DISMISSED, properties:params)
+            Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DISMISSED, properties:params)
         }
     }
     
@@ -317,7 +317,7 @@ extension Optimobile {
         UNUserNotificationCenter.current().getDeliveredNotifications { (notifications: [UNNotification]) in
             var actualPendingNotificationIds: [Int] = []
             for notification in notifications {
-                let notification = KSPushNotification(userInfo: notification.request.content.userInfo)
+                let notification = PushNotification(userInfo: notification.request.content.userInfo)
                 if (notification.id == 0){
                     continue
                 }
@@ -470,14 +470,14 @@ class PushHelper {
     }()
     
     fileprivate func setBadge(userInfo: [AnyHashable:Any]){
-        let badge: NSNumber? = KumulosHelper.getBadgeFromUserInfo(userInfo: userInfo)
+        let badge: NSNumber? = OptimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
         if let newBadge = badge {
             UIApplication.shared.applicationIconBadgeNumber = newBadge.intValue
         }
     }
     
     fileprivate func trackPushDelivery(userInfo: [AnyHashable : Any]){
-        let notification = KSPushNotification(userInfo: userInfo)
+        let notification = PushNotification(userInfo: userInfo)
         if (notification.id == 0) {
             return
         }

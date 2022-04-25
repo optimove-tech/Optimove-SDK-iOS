@@ -18,7 +18,7 @@ class OptimoveUserNotificationCenterDelegate : NSObject, UNUserNotificationCente
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        let push = KSPushNotification.init(userInfo: notification.request.content.userInfo, response: nil)
+        let push = PushNotification.init(userInfo: notification.request.content.userInfo, response: nil)
 
         if push.id == 0 {
             chainCenter(center, willPresent: notification, with: completionHandler)
