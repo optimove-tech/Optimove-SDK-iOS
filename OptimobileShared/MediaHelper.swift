@@ -1,10 +1,4 @@
-//
-//  MediaHelper.swift
-//  KumulosSDK
-//
-//  Created by Vladislav Voicehovics on 05/07/2021.
-//  Copyright © 2021 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 

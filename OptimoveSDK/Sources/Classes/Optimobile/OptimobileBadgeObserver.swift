@@ -1,9 +1,4 @@
-//
-//  KSBadgeObserver.swift
-//  OptimoveSDK
-//
-//  Created by Barak Ben Hur on 07/04/2022.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UIKit
