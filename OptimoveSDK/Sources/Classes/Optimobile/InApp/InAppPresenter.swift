@@ -14,7 +14,6 @@ internal enum InAppAction : String {
     case CLOSE_MESSAGE = "closeMessage"
     case TRACK_EVENT = "trackConversionEvent"
     case PROMPT_PUSH_PERMISSION = "promptPushPermission"
-    case SUBSCRIBE_CHANNEL = "subscribeToChannel"
     case OPEN_URL = "openUrl"
     case DEEP_LINK = "deepLink"
     case REQUEST_RATING = "requestAppStoreRating"
@@ -384,7 +383,6 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
             var hasClose = false;
             var conversionEvent : String?
             var conversionEventData : [String:Any]?
-            var subscribeToChannelUuid : String?
             var userAction : NSDictionary?
             
             for action in actions {
@@ -397,8 +395,6 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
                 case .TRACK_EVENT:
                     conversionEvent = data?["eventType"] as? String
                     conversionEventData = data?["data"] as? [String:Any]
-                case .SUBSCRIBE_CHANNEL:
-                    subscribeToChannelUuid = data?["channelUuid"] as? String
                 default:
                     userAction = action
                 }
@@ -411,11 +407,6 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
 
             if let conversionEvent = conversionEvent {
                 Kumulos.trackEventImmediately(eventType: conversionEvent, properties: conversionEventData);
-            }
-
-            if let subscribeToChannelUuid = subscribeToChannelUuid {
-                let psm = KumulosPushChannels(sdkInstance: Kumulos.sharedInstance)
-                _ = psm.subscribe(uuids: [subscribeToChannelUuid])
             }
 
             if (userAction != nil) {
