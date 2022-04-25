@@ -51,9 +51,9 @@ struct Platform {
     }()
 }
 
-public extension Optimobile{
+extension Optimobile {
     
-    internal func sendDeviceInformation() {
+    func sendDeviceInformation() {
         
         var target = TargetType.targetTypeRelease
         
@@ -112,7 +112,7 @@ public extension Optimobile{
         Optimobile.trackEvent(eventType: KumulosEvent.STATS_CALL_HOME.rawValue, properties: finalParameters)
     }
 
-    fileprivate func getiOSAttrs() -> [String:Any] {
+    private func getiOSAttrs() -> [String:Any] {
         var push = [
             "scheduled": false,
             "timeSensitive": false

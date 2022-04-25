@@ -7,16 +7,16 @@
 
 import Foundation
 
-public extension Optimobile {
-    internal static func trackEvent(eventType: KumulosEvent, properties: [String:Any]?, immediateFlush: Bool = false) {
+extension Optimobile {
+    static func trackEvent(eventType: KumulosEvent, properties: [String:Any]?, immediateFlush: Bool = false) {
         getInstance().analyticsHelper.trackEvent(eventType: eventType.rawValue, properties: properties, immediateFlush: immediateFlush)
     }
     
-    internal static func trackEvent(eventType: KumulosSharedEvent, properties: [String:Any]?, immediateFlush: Bool = false) {
+    static func trackEvent(eventType: KumulosSharedEvent, properties: [String:Any]?, immediateFlush: Bool = false) {
         getInstance().analyticsHelper.trackEvent(eventType: eventType.rawValue, properties: properties, immediateFlush: immediateFlush)
     }
     
-    internal static func trackEvent(eventType: String, atTime: Date, properties: [String:Any]?, immediateFlush: Bool = false, onSyncComplete:SyncCompletedBlock? = nil) {
+    static func trackEvent(eventType: String, atTime: Date, properties: [String:Any]?, immediateFlush: Bool = false, onSyncComplete:SyncCompletedBlock? = nil) {
         getInstance().analyticsHelper.trackEvent(eventType: eventType, atTime: atTime, properties: properties, immediateFlush: immediateFlush, onSyncComplete: onSyncComplete)
     }
     

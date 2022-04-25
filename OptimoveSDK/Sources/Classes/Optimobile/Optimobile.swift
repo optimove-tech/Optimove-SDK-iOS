@@ -37,23 +37,23 @@ public enum InAppConsentStrategy : String {
 }
 
 // MARK: class
-open class Optimobile {
-    internal let urlBuilder:UrlBuilder
+class Optimobile {
+    let urlBuilder:UrlBuilder
 
-    internal let pushHttpClient:KSHttpClient
-    internal let coreHttpClient:KSHttpClient
+    let pushHttpClient:KSHttpClient
+    let coreHttpClient:KSHttpClient
 
-    internal let pushNotificationDeviceType = 1
-    internal let pushNotificationProductionTokenType:Int = 1
+    let pushNotificationDeviceType = 1
+    let pushNotificationProductionTokenType:Int = 1
 
-    internal let sdkVersion : String = "4.0.0"
-    internal let sdkType : Int = 101;
+    let sdkVersion : String = "4.0.0"
+    let sdkType : Int = 101;
 
     fileprivate static var instance:Optimobile?
 
-    internal var notificationCenter:Any?
+    var notificationCenter:Any?
 
-    internal static var sharedInstance:Optimobile {
+    static var sharedInstance:Optimobile {
         get {
             if(false == isInitialized()) {
                 assertionFailure("The KumulosSDK has not been initialized")
@@ -63,7 +63,7 @@ open class Optimobile {
         }
     }
 
-    public static func getInstance() -> Optimobile
+    static func getInstance() -> Optimobile
     {
         return sharedInstance;
     }
@@ -73,7 +73,7 @@ open class Optimobile {
     fileprivate(set) var secretKey: String
     fileprivate(set) var inAppConsentStrategy:InAppConsentStrategy = InAppConsentStrategy.NotEnabled
 
-    internal static var inAppConsentStrategy : InAppConsentStrategy {
+    static var inAppConsentStrategy : InAppConsentStrategy {
         get {
             return sharedInstance.inAppConsentStrategy
         }
@@ -89,13 +89,13 @@ open class Optimobile {
 
     fileprivate(set) var deepLinkHelper : DeepLinkHelper?
 
-    public static var apiKey:String {
+    static var apiKey:String {
         get {
             return sharedInstance.apiKey
         }
     }
 
-    public static var secretKey:String {
+    static var secretKey:String {
         get {
             return sharedInstance.secretKey
         }
@@ -106,13 +106,13 @@ open class Optimobile {
 
         - Returns: String - UUID
     */
-    public static var installId :String {
+    static var installId :String {
         get {
             return KumulosHelper.installId
         }
     }
 
-    internal static func isInitialized() -> Bool {
+    static func isInitialized() -> Bool {
         return instance != nil
     }
 
@@ -122,7 +122,7 @@ open class Optimobile {
         - Parameters:
               - config: An instance of KSConfig
     */
-    internal static func initialize(config: OptimobileConfig, initialVisitorId: String) {
+    static func initialize(config: OptimobileConfig, initialVisitorId: String) {
         if (instance !== nil) {
             assertionFailure("The KumulosSDK has already been initialized")
         }

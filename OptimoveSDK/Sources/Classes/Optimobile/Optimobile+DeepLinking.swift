@@ -247,7 +247,7 @@ class DeepLinkHelper {
 
 }
 
-public extension Optimobile {
+extension Optimobile {
     static func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return getInstance().deepLinkHelper?.handleContinuation(for: userActivity) ?? false
     }

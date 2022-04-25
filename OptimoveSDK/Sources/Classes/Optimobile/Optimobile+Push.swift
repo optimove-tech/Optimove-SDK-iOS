@@ -84,7 +84,7 @@ public class KSPushNotification: NSObject {
 @available(iOS 10.0, *)
 public typealias KSUNAuthorizationCheckedHandler = (UNAuthorizationStatus, Error?) -> Void
 
-public extension Optimobile {
+extension Optimobile {
 
     /**
         Helper method for requesting the device token with alert, badge and sound permissions.
