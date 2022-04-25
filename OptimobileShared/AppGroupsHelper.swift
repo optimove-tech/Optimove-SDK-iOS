@@ -9,7 +9,7 @@
 import Foundation
 
 public struct AppGroupConfig {
-    public static var suffix : String = ".kumulos"
+    public static var suffix : String = ".optimove"
 }
 
 internal class AppGroupsHelper {

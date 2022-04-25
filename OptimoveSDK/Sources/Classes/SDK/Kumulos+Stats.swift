@@ -18,13 +18,6 @@ enum OSTypeID: NSNumber {
     case osTypeIDWindow
 }
 
-enum SDKTypeID: NSNumber {
-    case sdkTypeObjC = 1
-    case sdkTypeJavaSDK
-    case sdkTypeCSharp
-    case sdkTypeSwift
-}
-
 enum RuntimeType: NSNumber {
     case runtimeTypeUnknown = 0
     case runtimeTypeNative
@@ -76,7 +69,7 @@ public extension Kumulos{
         
         
         var sdk = [String : AnyObject]()
-        sdk["id"] = SDKTypeID.sdkTypeSwift.rawValue
+        sdk["id"] = sdkType as AnyObject
         sdk["version"] = sdkVersion as AnyObject
         
         var runtime = [String : AnyObject]()
