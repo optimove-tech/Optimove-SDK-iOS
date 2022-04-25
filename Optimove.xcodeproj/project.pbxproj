@@ -40,8 +40,8 @@
 		12C3565A281196AB00672B42 /* OptimoveNotificationExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12C35652281196AB00672B42 /* OptimoveNotificationExtension.framework */; };
 		12C35669281197A800672B42 /* OptimoveNotificationExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 12C35668281197A800672B42 /* OptimoveNotificationExtension.h */; };
 		12C356702811981300672B42 /* OptimoveNotificationExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C3566F2811981300672B42 /* OptimoveNotificationExtensionTests.swift */; };
-		12C356722811987C00672B42 /* KumulosNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC4F280C410B005CB88E /* KumulosNotificationService.swift */; };
-		12C356732811987C00672B42 /* CategoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C8827FECD3E005E7BB4 /* CategoryHelper.swift */; };
+		12C356722811987C00672B42 /* OptimoveNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC4F280C410B005CB88E /* OptimoveNotificationService.swift */; };
+		12C356732811987C00672B42 /* CategoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C8827FECD3E005E7BB4 /* CategoryManager.swift */; };
 		12C356742811992800672B42 /* KSHttp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35621281194D500672B42 /* KSHttp.swift */; };
 		12C356752811992B00672B42 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35622281194D500672B42 /* AnalyticsHelper.swift */; };
 		12C356762811992E00672B42 /* KeyValPersistenceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35623281194D500672B42 /* KeyValPersistenceHelper.swift */; };
@@ -465,9 +465,9 @@
 		4F585C6327FECCFA005E7BB4 /* OptimoveUserNotificationCenterDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveUserNotificationCenterDelegate.swift; sourceTree = "<group>"; };
 		4F585C6427FECCFA005E7BB4 /* Optimobile+Analytics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Optimobile+Analytics.swift"; sourceTree = "<group>"; };
 		4F585C6527FECCFA005E7BB4 /* DeepLinkFingerprinter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeepLinkFingerprinter.swift; sourceTree = "<group>"; };
-		4F585C8827FECD3E005E7BB4 /* CategoryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryHelper.swift; sourceTree = "<group>"; };
+		4F585C8827FECD3E005E7BB4 /* CategoryManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CategoryManager.swift; sourceTree = "<group>"; };
 		4FA8F61627FEE872005CB88E /* OptimobileBadgeObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimobileBadgeObserver.swift; sourceTree = "<group>"; };
-		4FA8FC4F280C410B005CB88E /* KumulosNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KumulosNotificationService.swift; sourceTree = "<group>"; };
+		4FA8FC4F280C410B005CB88E /* OptimoveNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationService.swift; sourceTree = "<group>"; };
 		4FD4BAAECE0E2C8D6DAD6232 /* RemoteConfigurationNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationNetworking.swift; sourceTree = "<group>"; };
 		4FE394EA27C78933005FABB0 /* Mocker.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Mocker.xcframework; path = Carthage/Build/Mocker.xcframework; sourceTree = "<group>"; };
 		506941ABF70087E99952FFD6 /* AppOpenEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenEvent.swift; sourceTree = "<group>"; };
@@ -841,8 +841,8 @@
 			isa = PBXGroup;
 			children = (
 				12C35668281197A800672B42 /* OptimoveNotificationExtension.h */,
-				4FA8FC4F280C410B005CB88E /* KumulosNotificationService.swift */,
-				4F585C8827FECD3E005E7BB4 /* CategoryHelper.swift */,
+				4FA8FC4F280C410B005CB88E /* OptimoveNotificationService.swift */,
+				4F585C8827FECD3E005E7BB4 /* CategoryManager.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -2233,9 +2233,9 @@
 			files = (
 				12C356752811992B00672B42 /* AnalyticsHelper.swift in Sources */,
 				12C356772811993100672B42 /* OptimobileUserDefaultsKey.swift in Sources */,
-				12C356722811987C00672B42 /* KumulosNotificationService.swift in Sources */,
+				12C356722811987C00672B42 /* OptimoveNotificationService.swift in Sources */,
 				12C356782811993400672B42 /* AppGroupsHelper.swift in Sources */,
-				12C356732811987C00672B42 /* CategoryHelper.swift in Sources */,
+				12C356732811987C00672B42 /* CategoryManager.swift in Sources */,
 				12C356762811992E00672B42 /* KeyValPersistenceHelper.swift in Sources */,
 				12C3567C2811993F00672B42 /* MediaHelper.swift in Sources */,
 				12C3567A2811993A00672B42 /* PendingNotification.swift in Sources */,

@@ -320,14 +320,14 @@ extension Optimove {
     }
 
     /**
-        Unsubscribe your device from the Kumulos Push service
+        Unsubscribe your device from the Optimove Push service
     */
     @objc public func pushUnregister() {
         Optimobile.pushUnregister()
     }
 
     /**
-        Register a device token with the Kumulos Push service.
+        Register a device token with the Optimove Push service.
 
         Note you shouldn't normally need to call this method.
 

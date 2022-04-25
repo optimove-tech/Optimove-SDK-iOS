@@ -114,10 +114,7 @@ class Optimobile {
     }
 
     /**
-        Initialize the KumulosSDK.
-
-        - Parameters:
-              - config: An instance of KSConfig
+        Initialize the Optimobile SDK.
     */
     static func initialize(config: OptimobileConfig, initialVisitorId: String) {
         if (instance !== nil) {

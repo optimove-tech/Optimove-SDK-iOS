@@ -177,7 +177,7 @@ extension Optimobile {
     }
 
     /**
-        Register a device token with the Kumulos Push service
+        Register a device token with the Optimobile Push service
 
         Parameters:
             - deviceToken: The push token returned by the device
@@ -196,7 +196,7 @@ extension Optimobile {
     }
     
     /**
-        Unsubscribe your device from the Kumulos Push service
+        Unsubscribe your device from the Optimobile Push service
     */
     static func pushUnregister() {
         Optimobile.trackEvent(eventType: OptimobileEvent.DEVICE_UNSUBSCRIBED, properties: [:], immediateFlush: true)

@@ -224,7 +224,7 @@ class DeepLinkHelper {
     @discardableResult
     fileprivate func handleContinuation(for userActivity: NSUserActivity) -> Bool {
         if config.deepLinkHandler == nil {
-            print("Kumulos deep link handler not configured, aborting...")
+            print("Optimobile deep link handler not configured, aborting...")
             return false
         }
 

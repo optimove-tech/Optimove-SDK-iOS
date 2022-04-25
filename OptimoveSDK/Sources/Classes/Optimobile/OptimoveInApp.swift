@@ -81,7 +81,7 @@ public class OptimoveInApp {
     
     public static func updateConsent(forUser consentGiven: Bool) {
         if Optimobile.inAppConsentStrategy != InAppConsentStrategy.ExplicitByUser {
-            NSException(name:NSExceptionName(rawValue: "Kumulos: Invalid In-app consent strategy"), reason:"You can only manage in-app messaging consent when the feature is enabled and strategy is set to KSInAppConsentStrategyExplicitByUser", userInfo:nil).raise()
+            NSException(name:NSExceptionName(rawValue: "Optimobile: Invalid In-app consent strategy"), reason:"You can only manage in-app messaging consent when the feature is enabled and strategy is set to InAppConsentStrategyExplicitByUser", userInfo:nil).raise()
             
             return
         }
