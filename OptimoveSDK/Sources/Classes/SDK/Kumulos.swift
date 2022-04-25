@@ -46,7 +46,8 @@ open class Kumulos {
     internal let pushNotificationDeviceType = 1
     internal let pushNotificationProductionTokenType:Int = 1
 
-    internal let sdkVersion : String = "9.2.5"
+    internal let sdkVersion : String = "4.0.0"
+    internal let sdkType : Int = 101;
 
     fileprivate static var instance:Kumulos?
 
