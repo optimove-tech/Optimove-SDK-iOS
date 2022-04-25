@@ -8,13 +8,13 @@
 import Foundation
 import UIKit
 
-class KSBadgeObserver: NSObject {
+class OptimobileBadgeObserver: NSObject {
     
-    typealias KSBadgeChangedCallback = (Int) -> ()
+    typealias BadgeChangedCallback = (Int) -> ()
     
-    var _callback: KSBadgeChangedCallback!
+    var _callback: BadgeChangedCallback!
     
-    init(callback: @escaping KSBadgeChangedCallback) {
+    init(callback: @escaping BadgeChangedCallback) {
         super.init()
         _callback = callback
         

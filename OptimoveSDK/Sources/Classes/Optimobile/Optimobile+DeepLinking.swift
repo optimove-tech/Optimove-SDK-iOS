@@ -144,7 +144,7 @@ class DeepLinkHelper {
                 self.invokeDeepLinkHandler(.linkMatched(link))
 
                 let linkProps = ["url": url.absoluteString, "wasDeferred": wasDeferred] as [String : Any]
-                Kumulos.getInstance().analyticsHelper.trackEvent(eventType: KumulosEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
+                Optimobile.getInstance().analyticsHelper.trackEvent(eventType: KumulosEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
                 break
             default:
                 self.invokeDeepLinkHandler(.lookupFailed(url))
@@ -192,7 +192,7 @@ class DeepLinkHelper {
                 self.invokeDeepLinkHandler(.linkMatched(link))
 
                 let linkProps = ["url": url.absoluteString, "wasDeferred": false] as [String : Any]
-                Kumulos.getInstance().analyticsHelper.trackEvent(eventType: KumulosEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
+                Optimobile.getInstance().analyticsHelper.trackEvent(eventType: KumulosEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
                 break
             default:
                 // Noop
@@ -247,7 +247,7 @@ class DeepLinkHelper {
 
 }
 
-public extension Kumulos {
+public extension Optimobile {
     static func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return getInstance().deepLinkHelper?.handleContinuation(for: userActivity) ?? false
     }

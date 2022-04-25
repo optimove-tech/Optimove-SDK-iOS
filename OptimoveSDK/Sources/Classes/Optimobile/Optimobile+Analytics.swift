@@ -7,7 +7,7 @@
 
 import Foundation
 
-public extension Kumulos {
+public extension Optimobile {
     internal static func trackEvent(eventType: KumulosEvent, properties: [String:Any]?, immediateFlush: Bool = false) {
         getInstance().analyticsHelper.trackEvent(eventType: eventType.rawValue, properties: properties, immediateFlush: immediateFlush)
     }
@@ -83,13 +83,13 @@ public extension Kumulos {
         let currentUserId = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.USER_ID.rawValue) as! String?
         KumulosHelper.userIdLock.signal()
 
-        Kumulos.trackEvent(eventType: KumulosEvent.STATS_USER_ASSOCIATION_CLEARED, properties: ["oldUserIdentifier": currentUserId ?? NSNull()])
+        Optimobile.trackEvent(eventType: KumulosEvent.STATS_USER_ASSOCIATION_CLEARED, properties: ["oldUserIdentifier": currentUserId ?? NSNull()])
 
         KumulosHelper.userIdLock.wait()
         KeyValPersistenceHelper.removeObject(forKey: KumulosUserDefaultsKey.USER_ID.rawValue)
         KumulosHelper.userIdLock.signal()
 
-        if (currentUserId != nil && currentUserId != Kumulos.installId) {
+        if (currentUserId != nil && currentUserId != Optimobile.installId) {
             getInstance().inAppHelper.handleAssociatedUserChange();
         }
     }
@@ -113,7 +113,7 @@ public extension Kumulos {
         KeyValPersistenceHelper.set(userIdentifier, forKey: KumulosUserDefaultsKey.USER_ID.rawValue)
         KumulosHelper.userIdLock.signal()
 
-        Kumulos.trackEvent(eventType: KumulosEvent.STATS_ASSOCIATE_USER, properties: params, immediateFlush: true)
+        Optimobile.trackEvent(eventType: KumulosEvent.STATS_ASSOCIATE_USER, properties: params, immediateFlush: true)
 
         if (currentUserId == nil || currentUserId != userIdentifier) {
             getInstance().inAppHelper.handleAssociatedUserChange();

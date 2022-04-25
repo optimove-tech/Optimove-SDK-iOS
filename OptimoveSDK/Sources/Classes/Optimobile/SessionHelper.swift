@@ -73,7 +73,7 @@ internal class SessionHelper {
 
     @objc private func appBecameActive() {
         if startNewSession {
-            Kumulos.trackEvent(eventType: KumulosEvent.STATS_FOREGROUND, properties: nil)
+            Optimobile.trackEvent(eventType: KumulosEvent.STATS_FOREGROUND, properties: nil)
             startNewSession = false
             return
         }
@@ -125,7 +125,7 @@ internal class SessionHelper {
         startNewSession = true
         sessionIdleTimer = nil
 
-        Kumulos.trackEvent(eventType: KumulosEvent.STATS_BACKGROUND.rawValue, atTime: sessionEndTime, properties: nil, immediateFlush: true, onSyncComplete: {err in
+        Optimobile.trackEvent(eventType: KumulosEvent.STATS_BACKGROUND.rawValue, atTime: sessionEndTime, properties: nil, immediateFlush: true, onSyncComplete: {err in
             self.becameInactiveAt = nil
 
             if self.bgTask != UIBackgroundTaskIdentifier.invalid {

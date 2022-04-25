@@ -9,7 +9,7 @@ import Foundation
 import UserNotifications
 
 @available(iOS 10.0, *)
-class KSUserNotificationCenterDelegate : NSObject, UNUserNotificationCenterDelegate {
+class OptimoveUserNotificationCenterDelegate : NSObject, UNUserNotificationCenterDelegate {
 
     let existingDelegate: UNUserNotificationCenterDelegate?
 
@@ -25,12 +25,12 @@ class KSUserNotificationCenterDelegate : NSObject, UNUserNotificationCenterDeleg
             return
         }
 
-        if (Kumulos.sharedInstance.config.pushReceivedInForegroundHandlerBlock == nil) {
+        if (Optimobile.sharedInstance.config.pushReceivedInForegroundHandlerBlock == nil) {
             completionHandler(.alert)
             return
         }
 
-        Kumulos.sharedInstance.config.pushReceivedInForegroundHandlerBlock?(push, completionHandler)
+        Optimobile.sharedInstance.config.pushReceivedInForegroundHandlerBlock?(push, completionHandler)
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -42,7 +42,7 @@ class KSUserNotificationCenterDelegate : NSObject, UNUserNotificationCenterDeleg
         }
 
         if (response.actionIdentifier == UNNotificationDismissActionIdentifier) {
-            let handled = Kumulos.sharedInstance.pushHandleDismissed(withUserInfo: userInfo, response: response)
+            let handled = Optimobile.sharedInstance.pushHandleDismissed(withUserInfo: userInfo, response: response)
             if (!handled) {
                 chainCenter(center, didReceive: response, with: completionHandler)
                 return
@@ -52,7 +52,7 @@ class KSUserNotificationCenterDelegate : NSObject, UNUserNotificationCenterDeleg
             return
         }
 
-        let handled = Kumulos.sharedInstance.pushHandleOpen(withUserInfo: userInfo, response: response)
+        let handled = Optimobile.sharedInstance.pushHandleOpen(withUserInfo: userInfo, response: response)
 
         if (!handled) {
             chainCenter(center, didReceive: response, with: completionHandler)

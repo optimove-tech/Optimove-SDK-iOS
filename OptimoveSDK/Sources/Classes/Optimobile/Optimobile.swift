@@ -37,7 +37,7 @@ public enum InAppConsentStrategy : String {
 }
 
 // MARK: class
-open class Kumulos {
+open class Optimobile {
     internal let urlBuilder:UrlBuilder
 
     internal let pushHttpClient:KSHttpClient
@@ -49,11 +49,11 @@ open class Kumulos {
     internal let sdkVersion : String = "4.0.0"
     internal let sdkType : Int = 101;
 
-    fileprivate static var instance:Kumulos?
+    fileprivate static var instance:Optimobile?
 
     internal var notificationCenter:Any?
 
-    internal static var sharedInstance:Kumulos {
+    internal static var sharedInstance:Optimobile {
         get {
             if(false == isInitialized()) {
                 assertionFailure("The KumulosSDK has not been initialized")
@@ -63,7 +63,7 @@ open class Kumulos {
         }
     }
 
-    public static func getInstance() -> Kumulos
+    public static func getInstance() -> Optimobile
     {
         return sharedInstance;
     }
@@ -83,7 +83,7 @@ open class Kumulos {
 
     fileprivate(set) var analyticsHelper: AnalyticsHelper
     fileprivate(set) var sessionHelper: SessionHelper
-    fileprivate(set) var badgeObserver: KSBadgeObserver
+    fileprivate(set) var badgeObserver: OptimobileBadgeObserver
 
     fileprivate var pushHelper: PushHelper
 
@@ -134,7 +134,7 @@ open class Kumulos {
         KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: KumulosUserDefaultsKey.MEDIA_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(initialVisitorId, forKey: KumulosUserDefaultsKey.INSTALL_UUID.rawValue)
 
-        instance = Kumulos(config: config)
+        instance = Optimobile(config: config)
 
         instance!.initializeHelpers()
 
@@ -166,7 +166,7 @@ open class Kumulos {
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
         inAppHelper = InAppHelper()
         pushHelper = PushHelper()
-        badgeObserver = KSBadgeObserver(callback: { (newBadgeCount) in
+        badgeObserver = OptimobileBadgeObserver(callback: { (newBadgeCount) in
            KeyValPersistenceHelper.set(newBadgeCount, forKey: KumulosUserDefaultsKey.BADGE_COUNT.rawValue)
         })
 

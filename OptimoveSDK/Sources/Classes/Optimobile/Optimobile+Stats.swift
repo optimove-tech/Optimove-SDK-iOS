@@ -51,7 +51,7 @@ struct Platform {
     }()
 }
 
-public extension Kumulos{
+public extension Optimobile{
     
     internal func sendDeviceInformation() {
         
@@ -109,7 +109,7 @@ public extension Kumulos{
             "ios": self.getiOSAttrs()
         ]
         
-        Kumulos.trackEvent(eventType: KumulosEvent.STATS_CALL_HOME.rawValue, properties: finalParameters)
+        Optimobile.trackEvent(eventType: KumulosEvent.STATS_CALL_HOME.rawValue, properties: finalParameters)
     }
 
     fileprivate func getiOSAttrs() -> [String:Any] {
