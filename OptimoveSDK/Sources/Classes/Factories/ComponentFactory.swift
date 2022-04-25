@@ -33,13 +33,13 @@ final class ComponentFactory {
         )
     }
 
-    func createOptipushComponent(configuration: Configuration) -> Push {
-        return Push(
-            registrar: serviceLocator.registrar(configuration: configuration),
-            storage: serviceLocator.storage(),
-            application: UIApplication.shared
-        )
-    }
+//    func createOptipushComponent(configuration: Configuration) -> Push {
+//        return Push(
+//            registrar: serviceLocator.registrar(configuration: configuration),
+//            storage: serviceLocator.storage(),
+//            application: UIApplication.shared
+//        )
+//    }
 
     func createOptitrackComponent(configuration: Configuration) throws -> OptiTrack {
         return OptiTrack(
