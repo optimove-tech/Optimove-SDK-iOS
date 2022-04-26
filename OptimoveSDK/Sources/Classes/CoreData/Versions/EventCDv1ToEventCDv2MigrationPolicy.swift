@@ -22,9 +22,6 @@ final class EventCDv1ToEventCDv2MigrationPolicy: NSEntityMigrationPolicy {
                 timestamp: sObject.timestamp,
                 context: sObject.context,
                 metadata: OptistreamEvent.Metadata(
-                    channel: OptistreamEvent.Metadata.Channel(
-                        airship: sObject.metadata.channel?.airship
-                    ),
                     realtime: sObject.metadata.realtime,
                     firstVisitorDate: sObject.metadata.firstVisitorDate,
                     eventId: sObject.metadata.uuid,
@@ -57,27 +54,15 @@ private struct MigrationSource_OptistreamEvent_v1: Codable {
 
     public struct Metadata: Codable, Hashable {
 
-        public struct Channel: Codable, Hashable {
-
-            public let airship: OptimoveAirshipIntegration.Airship?
-
-            public init(airship: OptimoveAirshipIntegration.Airship?) {
-                self.airship = airship
-            }
-        }
-
-        public let channel: Channel?
         public var realtime: Bool
         public var firstVisitorDate: Int64
         public let uuid: String
 
         public init(
-            channel: MigrationSource_OptistreamEvent_v1.Metadata.Channel?,
             realtime: Bool,
             firstVisitorDate: Int64,
             uuid: String
         ) {
-            self.channel = channel
             self.realtime = realtime
             self.firstVisitorDate = firstVisitorDate
             self.uuid = uuid

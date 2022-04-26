@@ -22,11 +22,7 @@ final class OptiTrackMockQueueTests: OptimoveTestCase {
         )
         builder = OptistreamEventBuilder(
             tenantID: configuration.optitrack.tenantID,
-            storage: storage,
-            airshipIntegration: OptimoveAirshipIntegration(
-                storage: storage,
-                isSupportedAirship: configuration.isSupportedAirship
-            )
+            storage: storage
         )
         optitrack = OptiTrack(
             queue: queue,

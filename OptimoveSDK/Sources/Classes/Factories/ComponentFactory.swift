@@ -51,11 +51,7 @@ final class ComponentFactory {
     func createOptistreamEventBuilder(configuration: Configuration) -> OptistreamEventBuilder {
         return OptistreamEventBuilder(
             tenantID: configuration.optitrack.tenantID,
-            storage: serviceLocator.storage(),
-            airshipIntegration: OptimoveAirshipIntegration(
-                storage: serviceLocator.storage(),
-                isSupportedAirship: configuration.isSupportedAirship
-            )
+            storage: serviceLocator.storage()
         )
     }
 

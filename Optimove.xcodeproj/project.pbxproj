@@ -74,7 +74,6 @@
 		321BFE49BBD5B3C8C0F24618 /* CoreDataMigrationVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = F317F849DA6211A6DBB52A93 /* CoreDataMigrationVersion.swift */; };
 		34F891B25C0607047E535D8D /* PageVisitEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8411A92C5ADEF8363F217CD /* PageVisitEventTests.swift */; };
 		370BDBC6F608BEE16E9B7439 /* StubVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2A46DD2F42545E3AD9B152 /* StubVariables.swift */; };
-		3999235100145AE553898385 /* OptimoveAirshipIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 645827DC38A5B11688962537 /* OptimoveAirshipIntegration.swift */; };
 		39EC499624AEE7CFC0B677B5 /* CoreDataMigratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBAAF543B9FFEE56AFCA272 /* CoreDataMigratorTests.swift */; };
 		39F0A8EF590E06C63B8AA931 /* Operations.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2913A221183842BA07EF8F5 /* Operations.swift */; };
 		3A758813E0D3A1DFD74286FB /* OptimoveFileManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F0DCFD3F00AA505DC781F4 /* OptimoveFileManagerTests.swift */; };
@@ -437,7 +436,6 @@
 		615F8FAE93C5D0A6AC301070 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		63C7EC2263685823B37EC99A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		6424915844F66E0315561874 /* RealTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTime.swift; sourceTree = "<group>"; };
-		645827DC38A5B11688962537 /* OptimoveAirshipIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveAirshipIntegration.swift; sourceTree = "<group>"; };
 		64AAD2B0BFFF64DCB3907ECE /* OptimoveCore-Unit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OptimoveCore-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65CA140085BC23AFEE47F451 /* Dictionary+CompactMapKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+CompactMapKeys.swift"; sourceTree = "<group>"; };
 		669DFBB1484B628AAF9DB0DB /* PageVisitEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageVisitEvent.swift; sourceTree = "<group>"; };
@@ -1337,7 +1335,6 @@
 				C3F03E5274C14B699912BF84 /* Events */,
 				397BA35C85B5B3A82E6E7611 /* Extension */,
 				7662316982793EED67541C0F /* GlobalScope */,
-				CC9A34E5F2FD33D559A69941 /* Integrations */,
 				6F6FFC9B91E6C9D52749E6A7 /* JSON */,
 				79FDF8132462002D922A9465 /* Logger */,
 				DB1649375EE0F07134ABB0B1 /* NetworkClient */,
@@ -1491,14 +1488,6 @@
 				BBF221484A7B1A433DB7FAD1 /* GlobalConfigTests.swift */,
 			);
 			path = Global;
-			sourceTree = "<group>";
-		};
-		CC9A34E5F2FD33D559A69941 /* Integrations */ = {
-			isa = PBXGroup;
-			children = (
-				645827DC38A5B11688962537 /* OptimoveAirshipIntegration.swift */,
-			);
-			path = Integrations;
 			sourceTree = "<group>";
 		};
 		D85980716F84947A9D9B2474 /* Sources */ = {
@@ -2074,7 +2063,6 @@
 				02DBEFA60A144B6092D92082 /* NetworkRequest.swift in Sources */,
 				4706D362A1B3BD2B148D9DDE /* NetworkResponse.swift in Sources */,
 				FF21D2585D696E2119159E34 /* NetworkResult.swift in Sources */,
-				3999235100145AE553898385 /* OptimoveAirshipIntegration.swift in Sources */,
 				BBE68E031DE089BC52731ED4 /* OptistreamEvent.swift in Sources */,
 				5518455C199FC2B155304797 /* OptistreamEventBuilder.swift in Sources */,
 				B3E5EED7F6260DCCE332FAFD /* OptistreamNetworking.swift in Sources */,
