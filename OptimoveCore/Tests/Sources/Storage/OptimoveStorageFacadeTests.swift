@@ -17,7 +17,7 @@ class OptimoveStorageFacadeTests: XCTestCase {
     func test_set_get_value() {
         // given
         let stub_string = "stub_string"
-        let key: StorageKey = .apnsToken
+        let key: StorageKey = .tenantToken
 
         // when
         storage.set(value: stub_string, key: key)
@@ -29,7 +29,7 @@ class OptimoveStorageFacadeTests: XCTestCase {
     func test_set_get_subscript() {
         // given
         let stub_string = "stub_string"
-        let key: StorageKey = .apnsToken
+        let key: StorageKey = .tenantToken
 
         // when
         storage[key] = stub_string

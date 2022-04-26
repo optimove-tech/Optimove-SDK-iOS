@@ -60,9 +60,7 @@ private extension SDKInitializer {
 
         // 4 responder
         let componentHanlder = ComponentHandler(
-            commonComponents: [
-                componentFactory.createOptipushComponent(configuration: configuration)
-            ],
+            commonComponents: [],
             optistreamComponents: optistreamComponents.compactMap { $0 },
             optirstreamEventBuilder: componentFactory.createOptistreamEventBuilder(configuration: configuration)
         )
