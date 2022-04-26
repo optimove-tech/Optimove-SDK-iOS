@@ -138,7 +138,7 @@ internal class InAppHelper {
     
     // MARK: State helpers
     func inAppEnabled() -> Bool {
-        return Optimobile.sharedInstance.inAppConsentStrategy != InAppConsentStrategy.NotEnabled && userConsented();
+        return Optimobile.sharedInstance.inAppConsentStrategy != InAppConsentStrategy.notEnabled && userConsented();
     }
     
     func userConsented() -> Bool {
@@ -162,7 +162,7 @@ internal class InAppHelper {
     }
     
     func handleAssociatedUserChange() -> Void {
-        if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.NotEnabled) {
+        if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.notEnabled) {
             DispatchQueue.global(qos: .default).async(execute: {
                 self.updateUserConsent(consentGiven: false)
             })
@@ -176,11 +176,11 @@ internal class InAppHelper {
     }
     
     private func handleEnrollmentAndSyncSetup() -> Void {
-        if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.AutoEnroll && userConsented() == false) {
+        if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.autoEnroll && userConsented() == false) {
             updateUserConsent(consentGiven: true)
             return;
         }
-        else if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.NotEnabled && userConsented() == true) {
+        else if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.notEnabled && userConsented() == true) {
             updateUserConsent(consentGiven: false)
             return;
         }

@@ -58,7 +58,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var _apiKey: String?
     private var _secretKey: String?
     private var _sessionIdleTimeout: UInt
-    private var _inAppConsentStrategy = InAppConsentStrategy.NotEnabled
+    private var _inAppConsentStrategy = InAppConsentStrategy.notEnabled
     private var _inAppDeepLinkHandlerBlock: InAppDeepLinkHandlerBlock?
     private var _pushOpenedHandlerBlock: PushOpenedHandlerBlock?
     private var _pushReceivedInForegroundHandlerBlock: Any?

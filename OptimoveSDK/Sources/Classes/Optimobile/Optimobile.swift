@@ -28,9 +28,9 @@ public typealias PushOpenedHandlerBlock = (PushNotification) -> Void
 public typealias PushReceivedInForegroundHandlerBlock = (PushNotification, (UNNotificationPresentationOptions)->Void) -> Void
 
 public enum InAppConsentStrategy : String {
-    case NotEnabled = "NotEnabled"
-    case AutoEnroll = "AutoEnroll"
-    case ExplicitByUser = "ExplicitByUser"
+    case notEnabled = "NotEnabled"
+    case autoEnroll = "AutoEnroll"
+    case explicitByUser = "ExplicitByUser"
 }
 
 // MARK: class
@@ -68,7 +68,7 @@ class Optimobile {
     fileprivate(set) var config : OptimobileConfig
     fileprivate(set) var apiKey: String
     fileprivate(set) var secretKey: String
-    fileprivate(set) var inAppConsentStrategy:InAppConsentStrategy = InAppConsentStrategy.NotEnabled
+    fileprivate(set) var inAppConsentStrategy:InAppConsentStrategy = InAppConsentStrategy.notEnabled
 
     static var inAppConsentStrategy : InAppConsentStrategy {
         get {
