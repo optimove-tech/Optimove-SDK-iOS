@@ -111,7 +111,10 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         }
 
         self.currentMessage = (self.messageQueue[0] as! InAppMessage)
-        self.postClientMessage(type: "PRESENT_MESSAGE", data: self.currentMessage?.content)
+        let content = NSMutableDictionary(dictionary: self.currentMessage!.content)
+        content["region"] = Optimobile.sharedInstance.config.region
+
+        self.postClientMessage(type: "PRESENT_MESSAGE", data: content)
     }
 
     func handleMessageClosed() -> Void {

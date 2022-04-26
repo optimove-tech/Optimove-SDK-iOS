@@ -80,7 +80,7 @@ public class OptimoveInApp {
     private static var _inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?
     
     public static func updateConsent(forUser consentGiven: Bool) {
-        if Optimobile.inAppConsentStrategy != InAppConsentStrategy.ExplicitByUser {
+        if Optimobile.inAppConsentStrategy != InAppConsentStrategy.explicitByUser {
             NSException(name:NSExceptionName(rawValue: "Optimobile: Invalid In-app consent strategy"), reason:"You can only manage in-app messaging consent when the feature is enabled and strategy is set to InAppConsentStrategyExplicitByUser", userInfo:nil).raise()
             
             return
