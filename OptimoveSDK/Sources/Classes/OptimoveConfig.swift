@@ -1,10 +1,4 @@
-//
-//  KSConfig.swift
-//  KumulosSDK
-//
-//  Created by Andy on 05/10/2017.
-//  Copyright © 2017 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 

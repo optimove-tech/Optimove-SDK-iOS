@@ -1,9 +1,4 @@
-//
-//  InAppHelper.swift
-//  KumulosSDK
-//
-//  Copyright © 2019 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import CoreData
@@ -119,8 +114,8 @@ internal class InAppHelper {
                 fetchBarrier.signal()
             }
             
-            if (Kumulos.sharedInstance.inAppHelper.inAppEnabled()){
-                Kumulos.sharedInstance.inAppHelper.sync { (result:Int) in
+            if (Optimobile.sharedInstance.inAppHelper.inAppEnabled()){
+                Optimobile.sharedInstance.inAppHelper.sync { (result:Int) in
                     _ = fetchBarrier.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(20))
                     
                     if result < 0 {
@@ -143,20 +138,20 @@ internal class InAppHelper {
     
     // MARK: State helpers
     func inAppEnabled() -> Bool {
-        return Kumulos.sharedInstance.inAppConsentStrategy != InAppConsentStrategy.NotEnabled && userConsented();
+        return Optimobile.sharedInstance.inAppConsentStrategy != InAppConsentStrategy.NotEnabled && userConsented();
     }
     
     func userConsented() -> Bool {
-        return UserDefaults.standard.bool(forKey: KumulosUserDefaultsKey.IN_APP_CONSENTED.rawValue)
+        return UserDefaults.standard.bool(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
     }
     
     func updateUserConsent(consentGiven: Bool) {
         let props: [String: Any] = ["consented":consentGiven]
         
-        Kumulos.trackEventImmediately(eventType: KumulosEvent.IN_APP_CONSENT_CHANGED.rawValue, properties: props)
+        Optimobile.trackEventImmediately(eventType: OptimobileEvent.IN_APP_CONSENT_CHANGED.rawValue, properties: props)
         
         if (consentGiven) {
-            UserDefaults.standard.set(consentGiven, forKey: KumulosUserDefaultsKey.IN_APP_CONSENTED.rawValue)
+            UserDefaults.standard.set(consentGiven, forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
             handleEnrollmentAndSyncSetup()
         }
         else {
@@ -167,7 +162,7 @@ internal class InAppHelper {
     }
     
     func handleAssociatedUserChange() -> Void {
-        if (Kumulos.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.NotEnabled) {
+        if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.NotEnabled) {
             DispatchQueue.global(qos: .default).async(execute: {
                 self.updateUserConsent(consentGiven: false)
             })
@@ -181,11 +176,11 @@ internal class InAppHelper {
     }
     
     private func handleEnrollmentAndSyncSetup() -> Void {
-        if (Kumulos.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.AutoEnroll && userConsented() == false) {
+        if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.AutoEnroll && userConsented() == false) {
             updateUserConsent(consentGiven: true)
             return;
         }
-        else if (Kumulos.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.NotEnabled && userConsented() == true) {
+        else if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.NotEnabled && userConsented() == true) {
             updateUserConsent(consentGiven: false)
             return;
         }
@@ -221,8 +216,8 @@ internal class InAppHelper {
     
     private func resetMessagingState() -> Void {
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
-        UserDefaults.standard.removeObject(forKey: KumulosUserDefaultsKey.IN_APP_CONSENTED.rawValue)
-        UserDefaults.standard.removeObject(forKey: KumulosUserDefaultsKey.MESSAGES_LAST_SYNC_TIME.rawValue)
+        UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
+        UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.MESSAGES_LAST_SYNC_TIME.rawValue)
         
         messagesContext!.performAndWait({
             let context = self.messagesContext
@@ -251,7 +246,7 @@ internal class InAppHelper {
     // MARK: Message management
     func sync(_ onComplete: ((_ result: Int) -> Void)? = nil) {
         syncQueue.async(execute: {
-            let lastSyncTime = UserDefaults.standard.object(forKey: KumulosUserDefaultsKey.MESSAGES_LAST_SYNC_TIME.rawValue) as? NSDate
+            let lastSyncTime = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.MESSAGES_LAST_SYNC_TIME.rawValue) as? NSDate
             var after = ""
             
             if lastSyncTime != nil {
@@ -265,10 +260,10 @@ internal class InAppHelper {
                 }
             }
             
-            let encodedIdentifier = KSHttpUtil.urlEncode(KumulosHelper.currentUserIdentifier)
+            let encodedIdentifier = KSHttpUtil.urlEncode(OptimobileHelper.currentUserIdentifier)
             let path = "/v1/users/\(encodedIdentifier!)/messages\(after)"
             
-            Kumulos.sharedInstance.pushHttpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { response, decodedBody in
+            Optimobile.sharedInstance.pushHttpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { response, decodedBody in
                 let messagesToPersist = decodedBody as? [[AnyHashable : Any]]
                 if (messagesToPersist == nil || messagesToPersist!.count == 0) {
                     if onComplete != nil {
@@ -422,12 +417,12 @@ internal class InAppHelper {
                 removeNotificationTickle(id: idEvicted)
             }
             
-            UserDefaults.standard.set(lastSyncTime, forKey: KumulosUserDefaultsKey.MESSAGES_LAST_SYNC_TIME.rawValue)
+            UserDefaults.standard.set(lastSyncTime, forKey: OptimobileUserDefaultsKey.MESSAGES_LAST_SYNC_TIME.rawValue)
             
             trackMessageDelivery(messages: messages)
             
             let inboxUpdated = fetchedWithInbox || evictedWithInbox || evictedExceedersWithInbox
-            KumulosInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: inboxUpdated)
+            OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: inboxUpdated)
         })
     }
     
@@ -554,17 +549,17 @@ internal class InAppHelper {
         }
        
         if (message.inboxConfig != nil){
-            KumulosInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: markedRead);
+            OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: markedRead);
         }
         
         let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":message.id]
-        Kumulos.trackEvent(eventType: KumulosEvent.MESSAGE_OPENED, properties: props)
+        Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_OPENED, properties: props)
     }
     
     internal func markMessageDismissed(message: InAppMessage) -> Void {
         
         let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":message.id]
-        Kumulos.trackEvent(eventType: KumulosEvent.MESSAGE_DISMISSED, properties: props)
+        Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DISMISSED, properties: props)
         
         if (pendingTickleIds.contains(message.id)){
             pendingTickleIds.remove(message.id)
@@ -608,7 +603,7 @@ internal class InAppHelper {
     private func trackMessageDelivery(messages: [[AnyHashable : Any]]) -> Void {
         for message in messages {
             let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":message["id"] as! Int]
-            Kumulos.trackEvent(eventType: KumulosSharedEvent.MESSAGE_DELIVERED.rawValue, properties: props)
+            Optimobile.trackEvent(eventType: KumulosSharedEvent.MESSAGE_DELIVERED.rawValue, properties: props)
         }
     }
     
@@ -655,7 +650,7 @@ internal class InAppHelper {
         return result
     }
     
-    func handlePushOpen(notification: KSPushNotification) -> Void {
+    func handlePushOpen(notification: PushNotification) -> Void {
         let deepLink: [AnyHashable:Any]? = notification.inAppDeepLink();
         if (!inAppEnabled() || deepLink == nil){
             return;
@@ -687,7 +682,7 @@ internal class InAppHelper {
     
     func deleteMessageFromInbox(withId : Int64) -> Bool {
         let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":withId]
-        Kumulos.trackEvent(eventType: KumulosEvent.MESSAGE_DELETED_FROM_INBOX, properties: props)
+        Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELETED_FROM_INBOX, properties: props)
         
         removeNotificationTickle(id: withId)
         
@@ -731,7 +726,7 @@ internal class InAppHelper {
             }
         });
         
-        KumulosInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: result);
+        OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: result);
         
         return result
     }
@@ -783,7 +778,7 @@ internal class InAppHelper {
         }
         
         let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":withId]
-        Kumulos.trackEvent(eventType: KumulosEvent.MESSAGE_READ, properties: props)
+        Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_READ, properties: props)
         
         removeNotificationTickle(id: withId)
         
@@ -792,7 +787,7 @@ internal class InAppHelper {
     
     func markAllInboxItemsAsRead() -> Bool {
         var result = true;
-        let inboxItems = KumulosInApp.getInboxItems()
+        let inboxItems = OptimoveInApp.getInboxItems()
         var inboxNeedsUpdate = false
         for item in inboxItems {
             if (item.isRead()){
@@ -809,13 +804,13 @@ internal class InAppHelper {
             }
         }
         
-        KumulosInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: inboxNeedsUpdate);
+        OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: inboxNeedsUpdate);
         
         return result
     }
     
     func readInboxSummary(inboxSummaryBlock: @escaping InboxSummaryBlock) -> Void {
-        guard let context = Kumulos.sharedInstance.inAppHelper.messagesContext else {
+        guard let context = Optimobile.sharedInstance.inAppHelper.messagesContext else {
             self.fireInboxSummaryCallback(callback: inboxSummaryBlock, summary: nil)
             return
         }

@@ -1,10 +1,4 @@
-//
-//  SessionHelper.swift
-//  KumulosSDK
-//
-//  Created by Vladislav Voicehovics on 20/03/2020.
-//  Copyright © 2020 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UIKit
@@ -73,7 +67,7 @@ internal class SessionHelper {
 
     @objc private func appBecameActive() {
         if startNewSession {
-            Kumulos.trackEvent(eventType: KumulosEvent.STATS_FOREGROUND, properties: nil)
+            Optimobile.trackEvent(eventType: OptimobileEvent.STATS_FOREGROUND, properties: nil)
             startNewSession = false
             return
         }
@@ -125,7 +119,7 @@ internal class SessionHelper {
         startNewSession = true
         sessionIdleTimer = nil
 
-        Kumulos.trackEvent(eventType: KumulosEvent.STATS_BACKGROUND.rawValue, atTime: sessionEndTime, properties: nil, immediateFlush: true, onSyncComplete: {err in
+        Optimobile.trackEvent(eventType: OptimobileEvent.STATS_BACKGROUND.rawValue, atTime: sessionEndTime, properties: nil, immediateFlush: true, onSyncComplete: {err in
             self.becameInactiveAt = nil
 
             if self.bgTask != UIBackgroundTaskIdentifier.invalid {

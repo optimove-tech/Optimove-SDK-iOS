@@ -1,10 +1,4 @@
-//
-//  MediaHelper.swift
-//  KumulosSDK
-//
-//  Created by Vladislav Voicehovics on 05/07/2021.
-//  Copyright © 2021 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 
@@ -17,7 +11,7 @@ public class MediaHelper {
             return URL(string: pictureUrl)
         }
 
-        let baseUrl = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.MEDIA_BASE_URL.rawValue) as? String ?? mediaResizerBaseUrl;
+        let baseUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue) as? String ?? mediaResizerBaseUrl;
 
         let completeString = String(format: "%@%@%ld%@%@", baseUrl, "/", width, "x/", pictureUrl)
         return URL(string: completeString)

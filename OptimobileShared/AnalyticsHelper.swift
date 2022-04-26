@@ -1,9 +1,4 @@
-//
-//  AnalyticsHelper.swift
-//  KumulosSDK
-//
-//  Copyright © 2018 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import CoreData
@@ -135,7 +130,7 @@ internal class AnalyticsHelper {
             event.uuid = UUID().uuidString.lowercased()
             event.happenedAt = NSNumber(value: Int64(atTime.timeIntervalSince1970 * 1000))
             event.eventType = eventType
-            event.userIdentifier = KumulosHelper.currentUserIdentifier
+            event.userIdentifier = OptimobileHelper.currentUserIdentifier
 
             if properties != nil {
                 let propsJson = try? JSONSerialization.data(withJSONObject: properties as Any, options: JSONSerialization.WritingOptions(rawValue: 0))
@@ -226,7 +221,7 @@ internal class AnalyticsHelper {
             eventIds.append(event.objectID)
         }
 
-        let path = "/v1/app-installs/\(KumulosHelper.installId)/events"
+        let path = "/v1/app-installs/\(OptimobileHelper.installId)/events"
 
         self.eventsHttpClient.sendRequest(.POST, toPath: path, data: data, onSuccess: { (response, data) in
             if let err = self.pruneEventsBatch(context, eventIds) {

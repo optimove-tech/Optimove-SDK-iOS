@@ -1,15 +1,10 @@
-//
-//  Kumulos.swift
-//  KumulosSDKExtension
-//
-//  Copyright © 2019 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UIKit
 import UserNotifications
 
-public class KumulosNotificationService {
+public class OptimoveNotificationService {
     fileprivate static var analyticsHelper: AnalyticsHelper?
     private static let syncBarrier = DispatchSemaphore(value: 0)
 
@@ -116,11 +111,11 @@ public class KumulosNotificationService {
     }
 
     fileprivate class func addCategory(bestAttemptContent: UNMutableNotificationContent, actionArray:NSMutableArray, id: Int) {
-        let categoryIdentifier = CategoryHelper.getCategoryIdForMessageId(messageId: id)
+        let categoryIdentifier = CategoryManager.getCategoryIdForMessageId(messageId: id)
 
         let category = UNNotificationCategory(identifier: categoryIdentifier, actions: actionArray as! [UNNotificationAction], intentIdentifiers: [],  options: .customDismissAction)
 
-        CategoryHelper.registerCategory(category: category)
+        CategoryManager.registerCategory(category: category)
 
         bestAttemptContent.categoryIdentifier = categoryIdentifier
     }

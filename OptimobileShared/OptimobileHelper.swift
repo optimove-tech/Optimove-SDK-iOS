@@ -1,10 +1,4 @@
-//
-//  KumulosProtocol.swift
-//  KumulosSDK
-//
-//  Created by Vladislav Voicehovics on 19/03/2020.
-//  Copyright © 2020 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 
@@ -14,7 +8,7 @@ internal enum KumulosSharedEvent : String {
     case MESSAGE_DELIVERED = "k.message.delivered"
 }
 
-internal class KumulosHelper {
+internal class OptimobileHelper {
     
     private static let installIdLock = DispatchSemaphore(value: 1)
     static let userIdLock = DispatchSemaphore(value: 1)
@@ -26,12 +20,12 @@ internal class KumulosHelper {
                installIdLock.signal()
            }
            
-           if let existingID = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.INSTALL_UUID.rawValue) {
+           if let existingID = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue) {
                return existingID as! String
            }
 
            let newID = UUID().uuidString
-           KeyValPersistenceHelper.set(newID, forKey: KumulosUserDefaultsKey.INSTALL_UUID.rawValue)
+           KeyValPersistenceHelper.set(newID, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
            
            return newID
        }
@@ -46,11 +40,11 @@ internal class KumulosHelper {
         get {
             userIdLock.wait()
             defer { userIdLock.signal() }
-            if let userId = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.USER_ID.rawValue) as! String? {
+            if let userId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue) as! String? {
                 return userId;
             }
 
-            return KumulosHelper.installId
+            return OptimobileHelper.installId
         }
     }
     
@@ -70,7 +64,7 @@ internal class KumulosHelper {
         }
         
         var newBadge: NSNumber? = badge
-        if let incrementBy = incrementBy, let currentVal = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.BADGE_COUNT.rawValue) as? NSNumber {
+        if let incrementBy = incrementBy, let currentVal = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue) as? NSNumber {
             newBadge = NSNumber(value: currentVal.intValue + incrementBy.intValue)
 
             if newBadge!.intValue < 0 {

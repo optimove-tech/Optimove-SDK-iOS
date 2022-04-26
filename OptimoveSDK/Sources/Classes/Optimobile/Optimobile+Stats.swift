@@ -1,7 +1,4 @@
-//
-//  Kumulos+Stats.swift
-//  Copyright © 2016 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UserNotifications
@@ -51,9 +48,9 @@ struct Platform {
     }()
 }
 
-public extension Kumulos{
+extension Optimobile {
     
-    internal func sendDeviceInformation() {
+    func sendDeviceInformation() {
         
         var target = TargetType.targetTypeRelease
         
@@ -109,10 +106,10 @@ public extension Kumulos{
             "ios": self.getiOSAttrs()
         ]
         
-        Kumulos.trackEvent(eventType: KumulosEvent.STATS_CALL_HOME.rawValue, properties: finalParameters)
+        Optimobile.trackEvent(eventType: OptimobileEvent.STATS_CALL_HOME.rawValue, properties: finalParameters)
     }
 
-    fileprivate func getiOSAttrs() -> [String:Any] {
+    private func getiOSAttrs() -> [String:Any] {
         var push = [
             "scheduled": false,
             "timeSensitive": false

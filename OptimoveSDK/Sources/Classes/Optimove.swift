@@ -58,7 +58,7 @@ typealias Logger = OptimoveCore.Logger
                     return
                 }
 
-                Kumulos.initialize(config: optimobileConfig, initialVisitorId: visitorId)
+                Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId)
             }
         }
     }
@@ -167,7 +167,7 @@ extension Optimove {
         }
 
         if config.isOptimobileConfigured() {
-            Kumulos.associateUserWithInstall(userIdentifier: userID)
+            Optimobile.associateUserWithInstall(userIdentifier: userID)
         }
     }
 
@@ -199,7 +199,7 @@ extension Optimove {
         }
 
         if config.isOptimobileConfigured() {
-            Kumulos.associateUserWithInstall(userIdentifier: userID)
+            Optimobile.associateUserWithInstall(userIdentifier: userID)
         }
     }
     
@@ -306,7 +306,7 @@ extension Optimove {
         On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
     */
     @objc public func pushRequestDeviceToken() {
-        Kumulos.pushRequestDeviceToken()
+        Optimobile.pushRequestDeviceToken()
     }
 
     /**
@@ -315,19 +315,19 @@ extension Optimove {
         On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
     */
     @available(iOS 10.0, *)
-    @objc public func pushRequestDeviceToken(_ onAuthorizationStatus: KSUNAuthorizationCheckedHandler? = nil) {
-        Kumulos.pushRequestDeviceToken(onAuthorizationStatus)
+    @objc public func pushRequestDeviceToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
+        Optimobile.pushRequestDeviceToken(onAuthorizationStatus)
     }
 
     /**
-        Unsubscribe your device from the Kumulos Push service
+        Unsubscribe your device from the Optimove Push service
     */
     @objc public func pushUnregister() {
-        Kumulos.pushUnregister()
+        Optimobile.pushUnregister()
     }
 
     /**
-        Register a device token with the Kumulos Push service.
+        Register a device token with the Optimove Push service.
 
         Note you shouldn't normally need to call this method.
 
@@ -335,14 +335,14 @@ extension Optimove {
             - deviceToken: The push token returned by the device
     */
     @objc public func pushRegister(_ deviceToken: Data) {
-        Kumulos.pushRegister(deviceToken)
+        Optimobile.pushRegister(deviceToken)
     }
 
     /**
      Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed.
      */
     @objc public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        return Kumulos.application(application, continue: userActivity, restorationHandler: restorationHandler)
+        return Optimobile.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
 
     /**
@@ -350,7 +350,7 @@ extension Optimove {
      */
     @available(iOS 13.0, *)
     @objc public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        Kumulos.scene(scene, continue: userActivity)
+        Optimobile.scene(scene, continue: userActivity)
     }
 }
 

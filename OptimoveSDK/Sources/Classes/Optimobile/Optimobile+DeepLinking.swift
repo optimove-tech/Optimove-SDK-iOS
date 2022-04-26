@@ -1,9 +1,4 @@
-//
-//  Kumulos+Deeplinks.swift
-//  KumulosSDK
-//
-//  Copyright © 2020 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UIKit
@@ -144,7 +139,7 @@ class DeepLinkHelper {
                 self.invokeDeepLinkHandler(.linkMatched(link))
 
                 let linkProps = ["url": url.absoluteString, "wasDeferred": wasDeferred] as [String : Any]
-                Kumulos.getInstance().analyticsHelper.trackEvent(eventType: KumulosEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
+                Optimobile.getInstance().analyticsHelper.trackEvent(eventType: OptimobileEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
                 break
             default:
                 self.invokeDeepLinkHandler(.lookupFailed(url))
@@ -192,7 +187,7 @@ class DeepLinkHelper {
                 self.invokeDeepLinkHandler(.linkMatched(link))
 
                 let linkProps = ["url": url.absoluteString, "wasDeferred": false] as [String : Any]
-                Kumulos.getInstance().analyticsHelper.trackEvent(eventType: KumulosEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
+                Optimobile.getInstance().analyticsHelper.trackEvent(eventType: OptimobileEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
                 break
             default:
                 // Noop
@@ -229,7 +224,7 @@ class DeepLinkHelper {
     @discardableResult
     fileprivate func handleContinuation(for userActivity: NSUserActivity) -> Bool {
         if config.deepLinkHandler == nil {
-            print("Kumulos deep link handler not configured, aborting...")
+            print("Optimobile deep link handler not configured, aborting...")
             return false
         }
 
@@ -247,7 +242,7 @@ class DeepLinkHelper {
 
 }
 
-public extension Kumulos {
+extension Optimobile {
     static func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return getInstance().deepLinkHelper?.handleContinuation(for: userActivity) ?? false
     }

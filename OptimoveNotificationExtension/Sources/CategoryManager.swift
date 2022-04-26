@@ -1,9 +1,4 @@
-//
-//  CategoryHelper.swift
-//  KumulosSDK
-//
-//  Copyright © 2020 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UserNotifications
@@ -12,16 +7,16 @@ internal let MAX_DYNAMIC_CATEGORIES = 128
 internal let DYNAMIC_CATEGORY_IDENTIFIER = "__kumulos_category_%d__"
 
 @available(iOS 10.0, *)
-internal class CategoryHelper {
+internal class CategoryManager {
     let categoryReadLock = DispatchSemaphore(value: 0)
     let dynamicCategoryLock = DispatchSemaphore(value: 1)
     
-    fileprivate static var instance:CategoryHelper?
+    fileprivate static var instance:CategoryManager?
     
-    internal static var sharedInstance:CategoryHelper {
+    internal static var sharedInstance:CategoryManager {
        get {
            if(instance == nil) {
-               instance = CategoryHelper()
+               instance = CategoryManager()
            }
 
            return instance!

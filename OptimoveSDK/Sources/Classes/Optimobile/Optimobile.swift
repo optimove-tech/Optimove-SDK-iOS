@@ -1,12 +1,9 @@
-//
-//  Kumulos.swift
-//  Copyright © 2016 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import UserNotifications
 
-internal enum KumulosEvent : String {
+internal enum OptimobileEvent : String {
     case STATS_FOREGROUND = "k.fg"
     case STATS_BACKGROUND = "k.bg"
     case STATS_CALL_HOME = "k.stats.installTracked"
@@ -25,10 +22,10 @@ internal enum KumulosEvent : String {
 }
 
 public typealias InAppDeepLinkHandlerBlock = (InAppButtonPress) -> Void
-public typealias PushOpenedHandlerBlock = (KSPushNotification) -> Void
+public typealias PushOpenedHandlerBlock = (PushNotification) -> Void
 
 @available(iOS 10.0, *)
-public typealias PushReceivedInForegroundHandlerBlock = (KSPushNotification, (UNNotificationPresentationOptions)->Void) -> Void
+public typealias PushReceivedInForegroundHandlerBlock = (PushNotification, (UNNotificationPresentationOptions)->Void) -> Void
 
 public enum InAppConsentStrategy : String {
     case NotEnabled = "NotEnabled"
@@ -37,33 +34,33 @@ public enum InAppConsentStrategy : String {
 }
 
 // MARK: class
-open class Kumulos {
-    internal let urlBuilder:UrlBuilder
+class Optimobile {
+    let urlBuilder:UrlBuilder
 
-    internal let pushHttpClient:KSHttpClient
-    internal let coreHttpClient:KSHttpClient
+    let pushHttpClient:KSHttpClient
+    let coreHttpClient:KSHttpClient
 
-    internal let pushNotificationDeviceType = 1
-    internal let pushNotificationProductionTokenType:Int = 1
+    let pushNotificationDeviceType = 1
+    let pushNotificationProductionTokenType:Int = 1
 
-    internal let sdkVersion : String = "4.0.0"
-    internal let sdkType : Int = 101;
+    let sdkVersion : String = "4.0.0"
+    let sdkType : Int = 101;
 
-    fileprivate static var instance:Kumulos?
+    fileprivate static var instance:Optimobile?
 
-    internal var notificationCenter:Any?
+    var notificationCenter:Any?
 
-    internal static var sharedInstance:Kumulos {
+    static var sharedInstance:Optimobile {
         get {
             if(false == isInitialized()) {
-                assertionFailure("The KumulosSDK has not been initialized")
+                assertionFailure("The OptimobileSDK has not been initialized")
             }
 
             return instance!
         }
     }
 
-    public static func getInstance() -> Kumulos
+    static func getInstance() -> Optimobile
     {
         return sharedInstance;
     }
@@ -73,7 +70,7 @@ open class Kumulos {
     fileprivate(set) var secretKey: String
     fileprivate(set) var inAppConsentStrategy:InAppConsentStrategy = InAppConsentStrategy.NotEnabled
 
-    internal static var inAppConsentStrategy : InAppConsentStrategy {
+    static var inAppConsentStrategy : InAppConsentStrategy {
         get {
             return sharedInstance.inAppConsentStrategy
         }
@@ -83,19 +80,19 @@ open class Kumulos {
 
     fileprivate(set) var analyticsHelper: AnalyticsHelper
     fileprivate(set) var sessionHelper: SessionHelper
-    fileprivate(set) var badgeObserver: KSBadgeObserver
+    fileprivate(set) var badgeObserver: OptimobileBadgeObserver
 
     fileprivate var pushHelper: PushHelper
 
     fileprivate(set) var deepLinkHelper : DeepLinkHelper?
 
-    public static var apiKey:String {
+    static var apiKey:String {
         get {
             return sharedInstance.apiKey
         }
     }
 
-    public static var secretKey:String {
+    static var secretKey:String {
         get {
             return sharedInstance.secretKey
         }
@@ -106,35 +103,32 @@ open class Kumulos {
 
         - Returns: String - UUID
     */
-    public static var installId :String {
+    static var installId :String {
         get {
-            return KumulosHelper.installId
+            return OptimobileHelper.installId
         }
     }
 
-    internal static func isInitialized() -> Bool {
+    static func isInitialized() -> Bool {
         return instance != nil
     }
 
     /**
-        Initialize the KumulosSDK.
-
-        - Parameters:
-              - config: An instance of KSConfig
+        Initialize the Optimobile SDK.
     */
-    internal static func initialize(config: OptimobileConfig, initialVisitorId: String) {
+    static func initialize(config: OptimobileConfig, initialVisitorId: String) {
         if (instance !== nil) {
-            assertionFailure("The KumulosSDK has already been initialized")
+            assertionFailure("The OptimobileSDK has already been initialized")
         }
 
         KeyValPersistenceHelper.maybeMigrateUserDefaultsToAppGroups()
-        KeyValPersistenceHelper.set(config.apiKey, forKey: KumulosUserDefaultsKey.API_KEY.rawValue)
-        KeyValPersistenceHelper.set(config.secretKey, forKey: KumulosUserDefaultsKey.SECRET_KEY.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.events], forKey: KumulosUserDefaultsKey.EVENTS_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: KumulosUserDefaultsKey.MEDIA_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(initialVisitorId, forKey: KumulosUserDefaultsKey.INSTALL_UUID.rawValue)
+        KeyValPersistenceHelper.set(config.apiKey, forKey: OptimobileUserDefaultsKey.API_KEY.rawValue)
+        KeyValPersistenceHelper.set(config.secretKey, forKey: OptimobileUserDefaultsKey.SECRET_KEY.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.events], forKey: OptimobileUserDefaultsKey.EVENTS_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
 
-        instance = Kumulos(config: config)
+        instance = Optimobile(config: config)
 
         instance!.initializeHelpers()
 
@@ -166,8 +160,8 @@ open class Kumulos {
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
         inAppHelper = InAppHelper()
         pushHelper = PushHelper()
-        badgeObserver = KSBadgeObserver(callback: { (newBadgeCount) in
-           KeyValPersistenceHelper.set(newBadgeCount, forKey: KumulosUserDefaultsKey.BADGE_COUNT.rawValue)
+        badgeObserver = OptimobileBadgeObserver(callback: { (newBadgeCount) in
+           KeyValPersistenceHelper.set(newBadgeCount, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
         })
 
         if config.deepLinkHandler != nil {

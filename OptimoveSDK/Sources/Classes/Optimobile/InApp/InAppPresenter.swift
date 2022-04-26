@@ -1,9 +1,4 @@
-//
-//  InAppPresenter.swift
-//  KumulosSDK
-//
-//  Copyright © 2019 Kumulos. All rights reserved.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import UIKit
 import WebKit
@@ -14,7 +9,6 @@ internal enum InAppAction : String {
     case CLOSE_MESSAGE = "closeMessage"
     case TRACK_EVENT = "trackConversionEvent"
     case PROMPT_PUSH_PERMISSION = "promptPushPermission"
-    case SUBSCRIBE_CHANNEL = "subscribeToChannel"
     case OPEN_URL = "openUrl"
     case DEEP_LINK = "deepLink"
     case REQUEST_RATING = "requestAppStoreRating"
@@ -251,7 +245,7 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         #else
         let cachePolicy = URLRequest.CachePolicy.reloadIgnoringCacheData
         #endif
-        let url = Kumulos.getInstance().urlBuilder.urlForService(.iar)
+        let url = Optimobile.getInstance().urlBuilder.urlForService(.iar)
         let request = URLRequest(url: URL(string: url)!, cachePolicy: cachePolicy, timeoutInterval: 8)
         webView.load(request)
         
@@ -330,7 +324,7 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         }
        else if (type == "MESSAGE_OPENED") {
             loadingSpinner?.stopAnimating()
-            Kumulos.sharedInstance.inAppHelper.handleMessageOpened(message: self.currentMessage!)
+            Optimobile.sharedInstance.inAppHelper.handleMessageOpened(message: self.currentMessage!)
        } else if (type  == "MESSAGE_CLOSED") {
             self.handleMessageClosed()
        } else if (type == "EXECUTE_ACTIONS") {
@@ -363,7 +357,7 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         // Handles HTTP responses for all status codes
         if let httpResponse = navigationResponse.response as? HTTPURLResponse,
            let url = httpResponse.url {
-            let baseUrl = Kumulos.getInstance().urlBuilder.urlForService(.iar)
+            let baseUrl = Optimobile.getInstance().urlBuilder.urlForService(.iar)
             if url.absoluteString.starts(with: baseUrl) && httpResponse.statusCode >= 400 {
                 decisionHandler(.cancel)
                 cancelCurrentPresentationQueue(waitForViewCleanup: false)
@@ -384,7 +378,6 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
             var hasClose = false;
             var conversionEvent : String?
             var conversionEventData : [String:Any]?
-            var subscribeToChannelUuid : String?
             var userAction : NSDictionary?
             
             for action in actions {
@@ -397,25 +390,18 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
                 case .TRACK_EVENT:
                     conversionEvent = data?["eventType"] as? String
                     conversionEventData = data?["data"] as? [String:Any]
-                case .SUBSCRIBE_CHANNEL:
-                    subscribeToChannelUuid = data?["channelUuid"] as? String
                 default:
                     userAction = action
                 }
             }
 
             if hasClose {
-                Kumulos.sharedInstance.inAppHelper.markMessageDismissed(message: message)
+                Optimobile.sharedInstance.inAppHelper.markMessageDismissed(message: message)
                 self.postClientMessage(type: "CLOSE_MESSAGE", data: nil)
             }
 
             if let conversionEvent = conversionEvent {
-                Kumulos.trackEventImmediately(eventType: conversionEvent, properties: conversionEventData);
-            }
-
-            if let subscribeToChannelUuid = subscribeToChannelUuid {
-                let psm = KumulosPushChannels(sdkInstance: Kumulos.sharedInstance)
-                _ = psm.subscribe(uuids: [subscribeToChannelUuid])
+                Optimobile.trackEventImmediately(eventType: conversionEvent, properties: conversionEventData);
             }
 
             if (userAction != nil) {
@@ -429,15 +415,15 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         let type = userAction["type"] as! String
                 
         if (type == InAppAction.PROMPT_PUSH_PERMISSION.rawValue) {
-            Kumulos.pushRequestDeviceToken()
+            Optimobile.pushRequestDeviceToken()
         } else if (type == InAppAction.DEEP_LINK.rawValue) {
-            if (Kumulos.sharedInstance.config.inAppDeepLinkHandlerBlock == nil) {
+            if (Optimobile.sharedInstance.config.inAppDeepLinkHandlerBlock == nil) {
                 return;
             }
             DispatchQueue.main.async {
                 let data = userAction.value(forKeyPath: "data.deepLink") as? [AnyHashable:Any] ?? [:]
                 let buttonPress = InAppButtonPress(deepLinkData: data, messageId: message.id, messageData: message.data)
-                Kumulos.sharedInstance.config.inAppDeepLinkHandlerBlock?(buttonPress)
+                Optimobile.sharedInstance.config.inAppDeepLinkHandlerBlock?(buttonPress)
             }
         } else if (type == InAppAction.OPEN_URL.rawValue) {
             guard let url = URL(string: userAction.value(forKeyPath: "data.url") as! String) else {
