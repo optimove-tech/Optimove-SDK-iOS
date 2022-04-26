@@ -29,6 +29,7 @@ public struct OptimoveConfig {
 public struct OptimobileConfig {
     let apiKey: String
     let secretKey: String
+    let region: String
 
     let sessionIdleTimeout: UInt
 
@@ -74,6 +75,7 @@ open class OptimoveConfigBuilder: NSObject {
         if let optimobileCredentialsTuple = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials) {
             _apiKey = optimobileCredentialsTuple.apiKey
             _secretKey = optimobileCredentialsTuple.secretKey
+            _region = optimobileCredentialsTuple.region
             _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentialsTuple.region)
         }
 
@@ -130,10 +132,14 @@ open class OptimoveConfigBuilder: NSObject {
             tenantInfo = OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
         }
 
-        if let _apiKey = _apiKey, let _secretKey = _secretKey, let _baseUrlMap = _baseUrlMap {
+        if let _apiKey = _apiKey,
+           let _secretKey = _secretKey,
+           let _baseUrlMap = _baseUrlMap,
+           let _region = _region {
             optimobileConfig = OptimobileConfig(
                 apiKey: _apiKey,
                 secretKey: _secretKey,
+                region: _region,
                 sessionIdleTimeout: _sessionIdleTimeout,
                 inAppConsentStrategy: _inAppConsentStrategy,
                 inAppDeepLinkHandlerBlock: _inAppDeepLinkHandlerBlock,
