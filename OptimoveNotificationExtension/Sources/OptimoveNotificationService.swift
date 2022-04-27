@@ -202,13 +202,13 @@ public class OptimoveNotificationService {
             return
         }
 
-        let newBadge: NSNumber? = KumulosHelper.getBadgeFromUserInfo(userInfo: userInfo)
+        let newBadge: NSNumber? = OptimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
         if (newBadge == nil){
             return;
         }
 
         bestAttemptContent.badge = newBadge
-        KeyValPersistenceHelper.set(newBadge, forKey: KumulosUserDefaultsKey.BADGE_COUNT.rawValue)
+        KeyValPersistenceHelper.set(newBadge, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
     }
 
     fileprivate class func trackDeliveredEvent(dispatchGroup: DispatchGroup, userInfo: [AnyHashable:Any], notificationId: Int) {
@@ -234,15 +234,15 @@ public class OptimoveNotificationService {
     }
 
     fileprivate class func initializeAnalyticsHelper() {
-        let apiKey = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.API_KEY.rawValue)
-        let secretKey = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.SECRET_KEY.rawValue)
+        let apiKey = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.API_KEY.rawValue)
+        let secretKey = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.SECRET_KEY.rawValue)
 
         guard let apiKey = apiKey as? String, let secretKey = secretKey as? String else {
             print("Extension: authorization credentials not present")
             return;
         }
 
-        let eventsBaseUrl = KeyValPersistenceHelper.object(forKey: KumulosUserDefaultsKey.EVENTS_BASE_URL.rawValue) as? String ?? "https://events.kumulos.com";
+        let eventsBaseUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.EVENTS_BASE_URL.rawValue) as? String ?? "https://events.kumulos.com";
 
         analyticsHelper = AnalyticsHelper(apiKey: apiKey, secretKey: secretKey, baseEventsUrl: eventsBaseUrl)
     }

@@ -88,7 +88,7 @@ internal class InAppHelper {
         #if DEBUG
         sync(onComplete)
         #else
-        let lastSyncTime = UserDefaults.standard.object(forKey: KumulosUserDefaultsKey.MESSAGES_LAST_SYNC_TIME.rawValue) as? Date
+        let lastSyncTime = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.MESSAGES_LAST_SYNC_TIME.rawValue) as? Date
         if lastSyncTime != nil && lastSyncTime!.timeIntervalSinceNow < -3600 as Double {
             sync(onComplete)
         }
