@@ -24,6 +24,7 @@
 		1277E48C2811B39C0097AC3B /* Mocker.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1277E48D2811B3A80097AC3B /* Mocker.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE394EA27C78933005FABB0 /* Mocker.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1277E48F2812AF650097AC3B /* AppOpenObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1277E48E2812AF650097AC3B /* AppOpenObserver.swift */; };
+		129D63E428199276005DCB7F /* OptimoveNotificationExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129D63E328199276005DCB7F /* OptimoveNotificationExtensionTests.swift */; };
 		12C3562A281194D500672B42 /* KSHttp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35621281194D500672B42 /* KSHttp.swift */; };
 		12C3562B281194D500672B42 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35622281194D500672B42 /* AnalyticsHelper.swift */; };
 		12C3562C281194D500672B42 /* KeyValPersistenceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35623281194D500672B42 /* KeyValPersistenceHelper.swift */; };
@@ -33,9 +34,8 @@
 		12C35630281194D500672B42 /* PendingNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35627281194D500672B42 /* PendingNotification.swift */; };
 		12C35631281194D500672B42 /* PendingNotificationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35628281194D500672B42 /* PendingNotificationHelper.swift */; };
 		12C35632281194D500672B42 /* MediaHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35629281194D500672B42 /* MediaHelper.swift */; };
-		12C3565A281196AB00672B42 /* OptimoveNotificationExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12C35652281196AB00672B42 /* OptimoveNotificationExtension.framework */; };
+		12C3565A281196AB00672B42 /* OptimoveNotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12C35652281196AB00672B42 /* OptimoveNotificationServiceExtension.framework */; };
 		12C35669281197A800672B42 /* OptimoveNotificationExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 12C35668281197A800672B42 /* OptimoveNotificationExtension.h */; };
-		12C356702811981300672B42 /* OptimoveNotificationExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C3566F2811981300672B42 /* OptimoveNotificationExtensionTests.swift */; };
 		12C356722811987C00672B42 /* OptimoveNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8FC4F280C410B005CB88E /* OptimoveNotificationService.swift */; };
 		12C356732811987C00672B42 /* CategoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C8827FECD3E005E7BB4 /* CategoryManager.swift */; };
 		12C356742811992800672B42 /* KSHttp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C35621281194D500672B42 /* KSHttp.swift */; };
@@ -341,6 +341,7 @@
 		0FA5B03E91EC1B9C8B7A921A /* core_events.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = core_events.json; sourceTree = "<group>"; };
 		111ED6383A53D5F33F54CEFF /* ConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationRepository.swift; sourceTree = "<group>"; };
 		1277E48E2812AF650097AC3B /* AppOpenObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenObserver.swift; sourceTree = "<group>"; };
+		129D63E328199276005DCB7F /* OptimoveNotificationExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationExtensionTests.swift; sourceTree = "<group>"; };
 		12C1E626E9F4FECB13D350B0 /* MockDateTimeProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDateTimeProvider.swift; sourceTree = "<group>"; };
 		12C35621281194D500672B42 /* KSHttp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KSHttp.swift; sourceTree = "<group>"; };
 		12C35622281194D500672B42 /* AnalyticsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
@@ -351,10 +352,9 @@
 		12C35627281194D500672B42 /* PendingNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingNotification.swift; sourceTree = "<group>"; };
 		12C35628281194D500672B42 /* PendingNotificationHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PendingNotificationHelper.swift; sourceTree = "<group>"; };
 		12C35629281194D500672B42 /* MediaHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHelper.swift; sourceTree = "<group>"; };
-		12C35652281196AB00672B42 /* OptimoveNotificationExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OptimoveNotificationExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		12C35659281196AB00672B42 /* OptimoveNotificationExtension-Unit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OptimoveNotificationExtension-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		12C35652281196AB00672B42 /* OptimoveNotificationServiceExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OptimoveNotificationServiceExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		12C35659281196AB00672B42 /* OptimoveNotificationServiceExtension-Unit.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "OptimoveNotificationServiceExtension-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		12C35668281197A800672B42 /* OptimoveNotificationExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OptimoveNotificationExtension.h; sourceTree = "<group>"; };
-		12C3566F2811981300672B42 /* OptimoveNotificationExtensionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationExtensionTests.swift; sourceTree = "<group>"; };
 		12C3567D28119AD600672B42 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
 		12C3567F28119AFC00672B42 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/UserNotifications.framework; sourceTree = DEVELOPER_DIR; };
 		12C3568128119B0200672B42 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/iOSSupport/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -586,7 +586,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				12C3565A281196AB00672B42 /* OptimoveNotificationExtension.framework in Frameworks */,
+				12C3565A281196AB00672B42 /* OptimoveNotificationServiceExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -713,11 +713,28 @@
 				68DACECC39D7663A9751DF27 /* OptimoveSDK */,
 				73AB4DC2F7D8C311EF1E8D81 /* OptimoveSDK-Unit */,
 				BF01C3C8DA3E3AB555E387A5 /* Shared-Unit */,
-				12C35653281196AB00672B42 /* OptimoveNotificationExtension */,
-				12C3566D2811981300672B42 /* OptimoveNotificationExtension-Unit */,
+				12C35653281196AB00672B42 /* OptimoveNotificationServiceExtension */,
+				129D63E128199276005DCB7F /* OptimoveNotificationServiceExtension-Unit */,
 				8D2AF8410718437694C833BA /* Frameworks */,
 				29EA001D961347964D199369 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		129D63E128199276005DCB7F /* OptimoveNotificationServiceExtension-Unit */ = {
+			isa = PBXGroup;
+			children = (
+				129D63E228199276005DCB7F /* Sources */,
+			);
+			name = "OptimoveNotificationServiceExtension-Unit";
+			path = OptimoveNotificationServiceExtension/Tests;
+			sourceTree = "<group>";
+		};
+		129D63E228199276005DCB7F /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				129D63E328199276005DCB7F /* OptimoveNotificationExtensionTests.swift */,
+			);
+			path = Sources;
 			sourceTree = "<group>";
 		};
 		12C35620281194D500672B42 /* OptimobileShared */ = {
@@ -736,12 +753,12 @@
 			path = OptimobileShared;
 			sourceTree = "<group>";
 		};
-		12C35653281196AB00672B42 /* OptimoveNotificationExtension */ = {
+		12C35653281196AB00672B42 /* OptimoveNotificationServiceExtension */ = {
 			isa = PBXGroup;
 			children = (
 				12C35667281197A800672B42 /* Sources */,
 			);
-			path = OptimoveNotificationExtension;
+			path = OptimoveNotificationServiceExtension;
 			sourceTree = "<group>";
 		};
 		12C35667281197A800672B42 /* Sources */ = {
@@ -750,23 +767,6 @@
 				12C35668281197A800672B42 /* OptimoveNotificationExtension.h */,
 				4FA8FC4F280C410B005CB88E /* OptimoveNotificationService.swift */,
 				4F585C8827FECD3E005E7BB4 /* CategoryManager.swift */,
-			);
-			path = Sources;
-			sourceTree = "<group>";
-		};
-		12C3566D2811981300672B42 /* OptimoveNotificationExtension-Unit */ = {
-			isa = PBXGroup;
-			children = (
-				12C3566E2811981300672B42 /* Sources */,
-			);
-			name = "OptimoveNotificationExtension-Unit";
-			path = "OptimoveNotificationExtension/OptimoveNotificationExtension-Unit";
-			sourceTree = "<group>";
-		};
-		12C3566E2811981300672B42 /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				12C3566F2811981300672B42 /* OptimoveNotificationExtensionTests.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -890,8 +890,8 @@
 				2764B249D4CC9907122D2773 /* OptimoveCore.framework */,
 				313AF75BEDDE3C3411F01615 /* OptimoveSDK-Unit.xctest */,
 				F195D6A74F16DC039009B692 /* OptimoveSDK.framework */,
-				12C35652281196AB00672B42 /* OptimoveNotificationExtension.framework */,
-				12C35659281196AB00672B42 /* OptimoveNotificationExtension-Unit.xctest */,
+				12C35652281196AB00672B42 /* OptimoveNotificationServiceExtension.framework */,
+				12C35659281196AB00672B42 /* OptimoveNotificationServiceExtension-Unit.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1625,9 +1625,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		12C35651281196AB00672B42 /* OptimoveNotificationExtension */ = {
+		12C35651281196AB00672B42 /* OptimoveNotificationServiceExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 12C35661281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationExtension" */;
+			buildConfigurationList = 12C35661281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationServiceExtension" */;
 			buildPhases = (
 				12C3564D281196AB00672B42 /* Headers */,
 				12C3564E281196AB00672B42 /* Sources */,
@@ -1638,14 +1638,14 @@
 			);
 			dependencies = (
 			);
-			name = OptimoveNotificationExtension;
+			name = OptimoveNotificationServiceExtension;
 			productName = OptimoveNotificationExtension;
-			productReference = 12C35652281196AB00672B42 /* OptimoveNotificationExtension.framework */;
+			productReference = 12C35652281196AB00672B42 /* OptimoveNotificationServiceExtension.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		12C35658281196AB00672B42 /* OptimoveNotificationExtension-Unit */ = {
+		12C35658281196AB00672B42 /* OptimoveNotificationServiceExtension-Unit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 12C35664281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationExtension-Unit" */;
+			buildConfigurationList = 12C35664281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationServiceExtension-Unit" */;
 			buildPhases = (
 				12C35655281196AB00672B42 /* Sources */,
 				12C35656281196AB00672B42 /* Frameworks */,
@@ -1656,9 +1656,9 @@
 			dependencies = (
 				12C3565C281196AB00672B42 /* PBXTargetDependency */,
 			);
-			name = "OptimoveNotificationExtension-Unit";
+			name = "OptimoveNotificationServiceExtension-Unit";
 			productName = OptimoveNotificationExtensionTests;
-			productReference = 12C35659281196AB00672B42 /* OptimoveNotificationExtension-Unit.xctest */;
+			productReference = 12C35659281196AB00672B42 /* OptimoveNotificationServiceExtension-Unit.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		4E6035250BAA805CC4049A9E /* OptimoveSDK */ = {
@@ -1765,8 +1765,8 @@
 				CBCF3AE39B9CAAD0103EC2B2 /* OptimoveCore-Unit */,
 				4E6035250BAA805CC4049A9E /* OptimoveSDK */,
 				7D5D7FF23E7F4742889FFFED /* OptimoveSDK-Unit */,
-				12C35651281196AB00672B42 /* OptimoveNotificationExtension */,
-				12C35658281196AB00672B42 /* OptimoveNotificationExtension-Unit */,
+				12C35651281196AB00672B42 /* OptimoveNotificationServiceExtension */,
+				12C35658281196AB00672B42 /* OptimoveNotificationServiceExtension-Unit */,
 			);
 		};
 /* End PBXProject section */
@@ -2004,7 +2004,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				12C356702811981300672B42 /* OptimoveNotificationExtensionTests.swift in Sources */,
+				129D63E428199276005DCB7F /* OptimoveNotificationExtensionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2090,7 +2090,7 @@
 /* Begin PBXTargetDependency section */
 		12C3565C281196AB00672B42 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 12C35651281196AB00672B42 /* OptimoveNotificationExtension */;
+			target = 12C35651281196AB00672B42 /* OptimoveNotificationServiceExtension */;
 			targetProxy = 12C3565B281196AB00672B42 /* PBXContainerItemProxy */;
 		};
 		1332D7EEA2D30F7BC962489A /* PBXTargetDependency */ = {
@@ -2518,7 +2518,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		12C35661281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationExtension" */ = {
+		12C35661281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationServiceExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				12C35662281196AB00672B42 /* Debug */,
@@ -2527,7 +2527,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		12C35664281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationExtension-Unit" */ = {
+		12C35664281196AB00672B42 /* Build configuration list for PBXNativeTarget "OptimoveNotificationServiceExtension-Unit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				12C35665281196AB00672B42 /* Debug */,

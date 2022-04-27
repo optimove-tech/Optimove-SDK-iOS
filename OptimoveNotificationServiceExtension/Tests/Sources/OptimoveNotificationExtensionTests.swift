@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import OptimoveNotificationExtension
+@testable import OptimoveNotificationServiceExtension
 
 class OptimoveNotificationExtensionTests: XCTestCase {
 
