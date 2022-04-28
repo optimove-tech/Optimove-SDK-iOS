@@ -4,11 +4,12 @@ import Foundation
 import OptimoveCore
 
 struct MobileProvision: Decodable {
-
-    var entitlements: Entitlements
+    let entitlements: Entitlements
+    let provisionsAllDevices: Bool?
 
     private enum CodingKeys: String, CodingKey {
         case entitlements = "Entitlements"
+        case provisionsAllDevices = "ProvisionsAllDevices"
     }
 
     struct Entitlements: Decodable {
@@ -77,74 +78,20 @@ extension MobileProvision {
         return String(try unwrap(extractedPlist))
     }
     
-    static func getMobileProvision() -> NSDictionary? {
-        var mobileProvision: NSDictionary?
-        
-        let provisioningPath = Bundle.main.path(forResource: "embedded", ofType: "mobileprovision")
-        if (provisioningPath == nil) {
-            return [:];
-        }
-        
-        var binaryString: String? = nil
-            //reading
-            do {
-                binaryString = try String(contentsOfFile: provisioningPath!, encoding: .isoLatin1)
-            }
-            catch {/* error handling here */}
-//        }
-        
-        // NSISOLatin1 keeps the binary wrapper from being parsed as unicode and dropped as invalid
-        if (binaryString == nil) {
-            return nil;
-        }
-        
-        if #available(iOS 13.0, *) {
-            let scanner = Scanner(string: binaryString!)
-            var ok = scanner.scanUpToString("<plist")
-            if ((ok == nil)) { print("unable to find beginning of plist"); return nil; }
-            ok = scanner.scanUpToString("</plist>")
-            if ((ok == nil)) { print("unable to find end of plist"); return nil; }
-            let plistString = String.localizedStringWithFormat("%@</plist>", ok!)
-            // juggle latin1 back to utf-8!
-            let plistdata_latin1 = plistString.data(using: .isoLatin1)
-            //        plistString = [NSString stringWithUTF8String:[plistdata_latin1 bytes]];
-            //        NSData *plistdata2_latin1 = [plistString dataUsingEncoding:NSISOLatin1StringEncoding];
-            mobileProvision = try! PropertyListSerialization.propertyList(from:plistdata_latin1!, format: nil) as! NSDictionary
-            
-            if (mobileProvision == nil) {
-                return nil;
-            }
-        }
-        else {
-            return nil
-        }
-        return mobileProvision;
-    }
-    
     static func releaseMode() -> UIApplicationReleaseMode {
-        var entitlements: NSDictionary
-        let mobileProvision = getMobileProvision()
-        
-        guard mobileProvision != nil else { return .unknown }
-        
-        entitlements = mobileProvision!.object(forKey: "Entitlements") as! NSDictionary
-        
-        if mobileProvision!.count == 0 {
-#if TARGET_IPHONE_SIMULATOR
-            return .releaseSim;
-#else
-            return .releaseAppStore;
-#endif
+        guard let mobileProvision = try? MobileProvision.read() else { return .unknown }
+
+        if mobileProvision.provisionsAllDevices ?? false {
+            return .releaseEnterprise
         }
-        else if mobileProvision!.object(forKey: "ProvisionsAllDevices") != nil {
-            return .releaseEnterprise;
-        }
-        else if "development".isEqual(entitlements["aps-environment"]) {
-            return .releaseDev;
-        }
-        else {
-            // app store contains no UDIDs (if the file exists at all?)
-            return .releaseAppStore;
+
+        switch mobileProvision.entitlements.apsEnvironment {
+        case .disabled:
+            return .unknown
+        case .development:
+            return .releaseDev
+        case .production:
+            return .releaseAppStore
         }
     }
 }
