@@ -11,11 +11,10 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '10.0'
   s.swift_version = '5'
   base_dir = "OptimoveNotificationServiceExtension/"
-  s.source_files = base_dir + 'Sources/Classes/**/*'
-  s.dependency 'OptimoveCore', s.version.to_s
+  s.source_files = base_dir + 'Sources/**/*', 'OptimobileShared/**/*'
   s.frameworks = 'Foundation', 'UserNotifications', 'UIKit'
-  s.test_spec 'unit' do |unit_tests|
-    unit_tests.source_files = base_dir + 'Tests/Sources/**/*', 'Shared/Tests/Sources/**/*'
-    unit_tests.resources = base_dir + 'Tests/Resources/**/*', 'Shared/Tests/Resources/**/*'
-  end
+  # s.test_spec 'unit' do |unit_tests|
+  #   unit_tests.source_files = base_dir + 'Tests/Sources/**/*', 'Shared/Tests/Sources/**/*'
+  #   unit_tests.resources = base_dir + 'Tests/Resources/**/*', 'Shared/Tests/Resources/**/*'
+  # end
 end

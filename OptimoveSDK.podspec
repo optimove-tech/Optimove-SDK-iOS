@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   # s.static_framework = true
   s.swift_version = '5'
   base_dir = "OptimoveSDK/"
-  s.source_files = base_dir + 'Sources/Classes/**/*'
+  s.source_files = base_dir + 'Sources/Classes/**/*', 'OptimobileShared/**/*'
   s.dependency 'OptimoveCore', s.version.to_s
   s.frameworks = 'Foundation', 'UIKit', 'SystemConfiguration', 'UserNotifications', 'CoreData'
   s.test_spec 'unit' do |unit_tests|

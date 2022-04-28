@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "12C35651281196AB00672B42"
-               BuildableName = "OptimoveNotificationExtension.framework"
-               BlueprintName = "OptimoveNotificationExtension"
+               BuildableName = "OptimoveNotificationServiceExtension.framework"
+               BlueprintName = "OptimoveNotificationServiceExtension"
                ReferencedContainer = "container:Optimove.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,8 +33,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "12C35658281196AB00672B42"
-               BuildableName = "OptimoveNotificationExtension-Unit.xctest"
-               BlueprintName = "OptimoveNotificationExtension-Unit"
+               BuildableName = "OptimoveNotificationServiceExtension-Unit.xctest"
+               BlueprintName = "OptimoveNotificationServiceExtension-Unit"
                ReferencedContainer = "container:Optimove.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -61,8 +61,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "12C35651281196AB00672B42"
-            BuildableName = "OptimoveNotificationExtension.framework"
-            BlueprintName = "OptimoveNotificationExtension"
+            BuildableName = "OptimoveNotificationServiceExtension.framework"
+            BlueprintName = "OptimoveNotificationServiceExtension"
             ReferencedContainer = "container:Optimove.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

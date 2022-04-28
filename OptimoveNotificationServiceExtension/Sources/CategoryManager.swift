@@ -60,13 +60,13 @@ internal class CategoryManager {
             dynamicCategoryLock.signal()
         }
             
-        if let existingArray = UserDefaults.standard.object(forKey: KumulosUserDefaultsKey.DYNAMIC_CATEGORY.rawValue) {
+        if let existingArray = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.DYNAMIC_CATEGORY.rawValue) {
             return existingArray as! [String]
         }
 
         let newArray = [String]()
         
-        UserDefaults.standard.set(newArray, forKey: KumulosUserDefaultsKey.DYNAMIC_CATEGORY.rawValue)
+        UserDefaults.standard.set(newArray, forKey: OptimobileUserDefaultsKey.DYNAMIC_CATEGORY.rawValue)
         
         return newArray
     }
@@ -74,7 +74,7 @@ internal class CategoryManager {
     fileprivate func pruneCategoriesAndSave(categories: Set<UNNotificationCategory>, dynamicCategories: [String]) -> Void {
         if (dynamicCategories.count <= MAX_DYNAMIC_CATEGORIES) {
             UNUserNotificationCenter.current().setNotificationCategories(categories)
-            UserDefaults.standard.set(dynamicCategories, forKey: KumulosUserDefaultsKey.DYNAMIC_CATEGORY.rawValue)
+            UserDefaults.standard.set(dynamicCategories, forKey: OptimobileUserDefaultsKey.DYNAMIC_CATEGORY.rawValue)
             return
         }
         
@@ -89,6 +89,6 @@ internal class CategoryManager {
         }
         
         UNUserNotificationCenter.current().setNotificationCategories(prunedCategories)
-        UserDefaults.standard.set(prunedDynamicCategories, forKey: KumulosUserDefaultsKey.DYNAMIC_CATEGORY.rawValue)
+        UserDefaults.standard.set(prunedDynamicCategories, forKey: OptimobileUserDefaultsKey.DYNAMIC_CATEGORY.rawValue)
     }
 }
