@@ -76,7 +76,7 @@ class Optimobile {
         }
     }
 
-    fileprivate(set) var inAppHelper: InAppHelper
+    fileprivate(set) var inAppManager: InAppManager
 
     fileprivate(set) var analyticsHelper: AnalyticsHelper
     fileprivate(set) var sessionHelper: SessionHelper
@@ -158,7 +158,7 @@ class Optimobile {
 
         analyticsHelper = AnalyticsHelper(apiKey: apiKey, secretKey: secretKey, baseEventsUrl: urlBuilder.urlForService(.events))
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
-        inAppHelper = InAppHelper()
+        inAppManager = InAppManager()
         pushHelper = PushHelper()
         badgeObserver = OptimobileBadgeObserver(callback: { (newBadgeCount) in
            KeyValPersistenceHelper.set(newBadgeCount, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
@@ -171,7 +171,7 @@ class Optimobile {
 
     private func initializeHelpers() {
         sessionHelper.initialize()
-        inAppHelper.initialize()
+        inAppManager.initialize()
         _ = pushHelper.pushInit
         deepLinkHelper?.checkForNonContinuationLinkMatch()
     }

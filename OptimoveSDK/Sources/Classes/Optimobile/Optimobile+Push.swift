@@ -264,7 +264,7 @@ extension Optimobile {
            }
        }
 
-       self.inAppHelper.handlePushOpen(notification: notification)
+       self.inAppManager.handlePushOpen(notification: notification)
 
        if let userOpenedHandler = self.config.pushOpenedHandlerBlock {
            DispatchQueue.main.async {
@@ -443,7 +443,7 @@ class PushHelper {
             self.setBadge(userInfo: userInfo)
             self.trackPushDelivery(userInfo: userInfo)
             
-            Optimobile.sharedInstance.inAppHelper.sync { (result:Int) in
+            Optimobile.sharedInstance.inAppManager.sync { (result:Int) in
                 _ = fetchBarrier.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(20))
 
                 if result < 0 {

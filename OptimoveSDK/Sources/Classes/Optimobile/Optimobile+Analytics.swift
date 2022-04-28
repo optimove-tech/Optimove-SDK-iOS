@@ -85,7 +85,7 @@ extension Optimobile {
         OptimobileHelper.userIdLock.signal()
 
         if (currentUserId != nil && currentUserId != Optimobile.installId) {
-            getInstance().inAppHelper.handleAssociatedUserChange();
+            getInstance().inAppManager.handleAssociatedUserChange();
         }
     }
 
@@ -111,7 +111,7 @@ extension Optimobile {
         Optimobile.trackEvent(eventType: OptimobileEvent.STATS_ASSOCIATE_USER, properties: params, immediateFlush: true)
 
         if (currentUserId == nil || currentUserId != userIdentifier) {
-            getInstance().inAppHelper.handleAssociatedUserChange();
+            getInstance().inAppManager.handleAssociatedUserChange();
         }
     }
 
