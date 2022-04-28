@@ -23,8 +23,7 @@ internal class InAppManager {
     var messagesContext: NSManagedObjectContext? = nil;
     
     internal let MESSAGE_TYPE_IN_APP = 2
-    
-    private var syncBarrier: DispatchSemaphore
+
     private var syncQueue: DispatchQueue
     private let STORED_IN_APP_LIMIT = 50;
     
@@ -32,7 +31,6 @@ internal class InAppManager {
     
     init() {
         presenter = InAppPresenter()
-        syncBarrier = DispatchSemaphore(value: 0)
         syncQueue = DispatchQueue(label: "kumulos.in-app.sync")
     }
     
@@ -246,6 +244,8 @@ internal class InAppManager {
     // MARK: Message management
     func sync(_ onComplete: ((_ result: Int) -> Void)? = nil) {
         syncQueue.async(execute: {
+            let syncBarrier = DispatchSemaphore(value: 0)
+
             let lastSyncTime = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.MESSAGES_LAST_SYNC_TIME.rawValue) as? NSDate
             var after = ""
             
@@ -262,25 +262,20 @@ internal class InAppManager {
             
             let encodedIdentifier = KSHttpUtil.urlEncode(OptimobileHelper.currentUserIdentifier)
             let path = "/v1/users/\(encodedIdentifier!)/messages\(after)"
-            
+
             Optimobile.sharedInstance.pushHttpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { response, decodedBody in
+                defer { syncBarrier.signal() }
+
                 let messagesToPersist = decodedBody as? [[AnyHashable : Any]]
                 if (messagesToPersist == nil || messagesToPersist!.count == 0) {
-                    if onComplete != nil {
-                        onComplete?(0)
-                    }
-                    
-                    self.syncBarrier.signal()
+                    onComplete?(0)
                     return
                 }
                 
                 self.persistInAppMessages(messages: messagesToPersist!)
+                onComplete?(1)
                 
-                if onComplete != nil {
-                    onComplete?(1)
-                }
-                
-                DispatchQueue.main.async(execute: {
+                DispatchQueue.main.async {
                     if UIApplication.shared.applicationState != .active {
                         return
                     }
@@ -289,19 +284,14 @@ internal class InAppManager {
                         let messagesToPresent = self.getMessagesToPresent([InAppPresented.IMMEDIATELY.rawValue])
                         self.presenter.queueMessagesForPresentation(messages: messagesToPresent, tickleIds: self.pendingTickleIds)
                     })
-                })
-                
-                self.syncBarrier.signal()
-                
-            }, onFailure: { response, error, data in
-                if onComplete != nil {
-                    onComplete?(-1)
                 }
-                
-                self.syncBarrier.signal()
+            }, onFailure: { response, error, data in
+                onComplete?(-1)
+                syncBarrier.signal()
             })
+
+            syncBarrier.wait()
         })
-        _ = syncBarrier.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(20))
     }
     
     private func persistInAppMessages(messages: [[AnyHashable : Any]]) {
