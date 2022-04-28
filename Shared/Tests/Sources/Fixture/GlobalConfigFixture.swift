@@ -16,7 +16,6 @@ final class GlobalConfigFixture: FileAccessible {
         return GlobalConfig(
             general: generalConfigFuxture(),
             optitrack: optitrackConfigFixture(),
-            optipush: optipushConfigFixture(),
             coreEvents: coreEventFixture()
         )
     }
@@ -30,12 +29,6 @@ final class GlobalConfigFixture: FileAccessible {
     func optitrackConfigFixture() -> GlobalOptitrackConfig {
         return GlobalOptitrackConfig(
             eventCategoryName: "event_category_name"
-        )
-    }
-
-    func optipushConfigFixture() -> GlobalOptipushConfig {
-        return GlobalOptipushConfig(
-            mbaasEndpoint: StubVariables.url
         )
     }
 

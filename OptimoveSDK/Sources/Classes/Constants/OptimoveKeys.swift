@@ -24,27 +24,8 @@ struct OptimoveKeys {
         case userId = "user_id"
         case realtimeUserId = "userId"
         case realtimeupdatedVisitorId = "updatedVisitorId"
-        case optipushOptIn = "optipush_opt_in"
-        case optipushOptOut = "optipush_opt_out"
         case setUserAgent = "user_agent_header_event"
         case email = "email"
-    }
-
-    enum Notification: String {
-        case title = "title"
-        case body = "content"
-        case dynamicLinks = "dynamic_links"
-        case ios = "ios"
-        case campaignId = "campaign_id"
-        case actionSerial = "action_serial"
-        case templateId = "template_id"
-        case actionId = "action_id"
-        case engagementId = "engagement_id"
-        case campaignType = "campaign_type"
-        case isOptipush = "is_optipush"
-        case collapseId = "collapse_Key"
-        case dynamicLink = "dynamic_link"
-        case command = "command"
     }
 
 }

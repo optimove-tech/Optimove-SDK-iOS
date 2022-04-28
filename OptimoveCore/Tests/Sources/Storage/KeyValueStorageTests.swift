@@ -167,22 +167,6 @@ class KeyValueStorageTests: XCTestCase {
         XCTAssertThrowsError(try storage.getUserEmail())
     }
 
-    func test_apnsToken() {
-        // when
-        storage.apnsToken = stub_data
-
-        // then
-        XCTAssertNoThrow(try storage.getApnsToken())
-    }
-
-    func test_no_apnsToken() {
-        // when
-        storage.apnsToken = nil
-
-        // then
-        XCTAssertThrowsError(try storage.getApnsToken())
-    }
-
     func test_firstRunTimestamp() {
         // when
         storage.firstRunTimestamp = 42
@@ -260,29 +244,4 @@ class KeyValueStorageTests: XCTestCase {
         XCTAssertNil(storage.isSettingUserSuccess)
     }
 
-    func test_optFlag_set() {
-        // when
-        let value = StubVariables.bool
-        storage.optFlag = value
-
-        // then
-        XCTAssert(storage.optFlag == value)
-    }
-
-    func test_optFlag_get() {
-        // then
-        XCTAssert(storage.optFlag == false)
-    }
-
-    func test_push_campaign_disabled_default_value() {
-        // then
-        XCTAssert(!storage.arePushCampaignsDisabled)
-    }
-
-    func test_push_campaign_disabled_toggle() {
-        storage.arePushCampaignsDisabled.toggle()
-
-        // then
-        XCTAssert(storage.arePushCampaignsDisabled)
-    }
 }

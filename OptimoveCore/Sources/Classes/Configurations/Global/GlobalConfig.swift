@@ -7,23 +7,19 @@ import Foundation
 public struct GlobalConfig: Codable, Equatable {
     public let general: GlobalGeneralConfig
     public let optitrack: GlobalOptitrackConfig
-    public let optipush: GlobalOptipushConfig
     public let coreEvents: [String: EventsConfig]
 
     public init(general: GlobalGeneralConfig,
          optitrack: GlobalOptitrackConfig,
-         optipush: GlobalOptipushConfig,
          coreEvents: [String: EventsConfig]) {
         self.general = general
         self.optitrack = optitrack
-        self.optipush = optipush
         self.coreEvents = coreEvents
     }
 
     enum CodingKeys: String, CodingKey {
         case general = "general"
         case optitrack = "optitrack"
-        case optipush = "optipush"
         case coreEvents = "core_events"
     }
 
@@ -31,7 +27,6 @@ public struct GlobalConfig: Codable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         general = try container.decode(GlobalGeneralConfig.self, forKey: .general)
         optitrack = try container.decode(GlobalOptitrackConfig.self, forKey: .optitrack)
-        optipush = try container.decode(GlobalOptipushConfig.self, forKey: .optipush)
         coreEvents = try container.decode([String: EventsConfig].self, forKey: .coreEvents)
     }
 
@@ -39,7 +34,6 @@ public struct GlobalConfig: Codable, Equatable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(general, forKey: .general)
         try container.encode(optitrack, forKey: .optitrack)
-        try container.encode(optipush, forKey: .optipush)
         try container.encode(coreEvents, forKey: .coreEvents)
     }
 }
@@ -57,18 +51,6 @@ public struct GlobalGeneralConfig: Codable, Equatable {
     }
 }
 
-// MARK: - Optipush
-public struct GlobalOptipushConfig: Codable, Equatable {
-    public let mbaasEndpoint: URL
-
-    public init(mbaasEndpoint: URL) {
-        self.mbaasEndpoint = mbaasEndpoint
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case mbaasEndpoint = "mbaas_endpoint"
-    }
-}
 
 // MARK: - Optitrack
 public struct GlobalOptitrackConfig: Codable, Equatable {

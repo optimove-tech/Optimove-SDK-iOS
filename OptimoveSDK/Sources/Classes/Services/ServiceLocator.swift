@@ -8,11 +8,6 @@ final class ServiceLocator {
     // MARK: - Singletons
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _deeplinkService: DeeplinkService = {
-        return DeeplinkService()
-    }()
-
-    /// Keeps as singleton in reason to share a session state between a service consumers.
     private let _storage: StorageFacade
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
@@ -58,13 +53,6 @@ final class ServiceLocator {
         return NetworkClientImpl(configuration: .default)
     }
 
-    func notificationListener() -> OptimoveNotificationHandling {
-        return OptimoveNotificationHandler(
-            synchronizer: pipeline(),
-            deeplinkService: deeplinkService()
-        )
-    }
-
     func dateTimeProvider() -> DateTimeProvider {
         return DateTimeProviderImpl()
     }
@@ -79,10 +67,6 @@ final class ServiceLocator {
 
     func configurationRepository() -> ConfigurationRepository {
         return ConfigurationRepositoryImpl(storage: storage())
-    }
-
-    func deeplinkService() -> DeeplinkService {
-        return _deeplinkService
     }
 
     func pipeline() -> Pipeline {
@@ -162,27 +146,6 @@ final class ServiceLocator {
         return OperationFactory(
             configurationRepository: configurationRepository(),
             networking: networkingFactory().createRemoteConfigurationNetworking()
-        )
-    }
-
-    func registrar(configuration: Configuration) -> Registrable {
-        let requestFactory = ApiRequestFactory(
-            storage: storage(),
-            payloadBuilder: ApiPayloadBuilder(
-                storage: storage(),
-                appNamespace: try! Bundle.getApplicationNameSpace()
-            ),
-            requestBuilder: ApiRequestBuilder(
-                optipushConfig: configuration.optipush
-            )
-        )
-        let apiNetworking = ApiNetworkingImpl(
-            networkClient: networking(),
-            requestFactory: requestFactory
-        )
-        return Registrar(
-            storage: storage(),
-            networking: apiNetworking
         )
     }
 

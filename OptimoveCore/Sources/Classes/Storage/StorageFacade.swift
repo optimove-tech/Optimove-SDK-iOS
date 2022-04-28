@@ -21,16 +21,12 @@ public enum StorageKey: String, CaseIterable {
     case deviceResolutionWidth
     case deviceResolutionHeight
     case advertisingIdentifier
-    case optFlag
     case migrationVersions /// For storing a migration history
-    case arePushCampaignsDisabled
     case firstRunTimestamp
     case pushNotificationChannels
     case optitrackEndpoint
     case tenantID
     case userEmail
-    case apnsToken
-    case apnsTokenString
     case siteID /// Legacy: See tenantID
     case settingUserSuccess
     case firstVisitTimestamp /// Legacy
@@ -51,21 +47,14 @@ public protocol StorageValue {
     var deviceResolutionWidth: Float? { get set }
     var deviceResolutionHeight: Float? { get set }
     var advertisingIdentifier: String? { get set }
-    var optFlag: Bool { get set }
-    /// Store indication of disabled push campaigns for this installation.
-    var arePushCampaignsDisabled: Bool { get set }
     var optitrackEndpoint: URL? { get set }
     var tenantID: Int? { get set }
     var userEmail: String? { get set }
-    var apnsToken: Data? { get set }
-    var apnsTokenString: String? { get }
     /// Legacy: See tenantID
     var siteID: Int? { get set }
     var isSettingUserSuccess: Bool? { get set }
     /// Legacy. Use `firstRunTimestamp` instead
     var firstVisitTimestamp: Int64? { get set }
-    /// Store user's allowed push notification channels.
-    var pushNotificationChannels: [String]? { get set }
 
     func getConfigurationEndPoint() throws -> URL
     func getCustomerID() throws -> String
@@ -81,8 +70,6 @@ public protocol StorageValue {
     /// Use for checking if a migration was applied for the version.
     func isAlreadyMigrated(to version: String) -> Bool
     func getUserEmail() throws -> String
-    func getApnsToken() throws -> Data
-    func getApnsTokenString() throws -> String
     func getSiteID() throws -> Int
 }
 
@@ -312,30 +299,12 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var optFlag: Bool {
-        get {
-            return self[.optFlag] ?? false
-        }
-        set {
-            self[.optFlag] = newValue
-        }
-    }
-
     var migrationVersions: [String] {
         get {
             return self[.migrationVersions] ?? []
         }
         set {
             self[.migrationVersions] = newValue
-        }
-    }
-
-    var arePushCampaignsDisabled: Bool {
-        get {
-            return self[.arePushCampaignsDisabled] ?? false
-        }
-        set {
-            self[.arePushCampaignsDisabled] = newValue
         }
     }
 
@@ -385,22 +354,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         set {
             self[.userEmail] = newValue
-        }
-    }
-
-    var apnsToken: Data? {
-        get {
-            return self[.apnsToken]
-        }
-        set {
-            self[.apnsToken] = newValue
-            self[.apnsTokenString] = newValue?.map { String(format: tokenToStringFormat, $0) }.joined()
-        }
-    }
-
-    var apnsTokenString: String? {
-        get {
-            return self[.apnsTokenString]
         }
     }
 
@@ -530,23 +483,6 @@ public extension KeyValueStorage where Self: StorageValue {
             throw StorageError.noValue(.userEmail)
         }
         return value
-    }
-
-    func getApnsToken() throws -> Data {
-        guard let value = apnsToken else {
-            throw StorageError.noValue(.apnsToken)
-        }
-        return value
-    }
-
-    func getApnsTokenString() throws -> String {
-        if let value = apnsTokenString {
-            return value
-        }
-        guard let value = apnsToken else {
-            throw StorageError.noValue(.apnsTokenString)
-        }
-        return value.map { String(format: tokenToStringFormat, $0) }.joined()
     }
 
     func getSiteID() throws -> Int {

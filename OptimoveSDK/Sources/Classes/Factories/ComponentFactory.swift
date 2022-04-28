@@ -33,14 +33,6 @@ final class ComponentFactory {
         )
     }
 
-    func createOptipushComponent(configuration: Configuration) -> OptiPush {
-        return OptiPush(
-            registrar: serviceLocator.registrar(configuration: configuration),
-            storage: serviceLocator.storage(),
-            application: UIApplication.shared
-        )
-    }
-
     func createOptitrackComponent(configuration: Configuration) throws -> OptiTrack {
         return OptiTrack(
             queue: try OptistreamQueueImpl(
@@ -59,11 +51,7 @@ final class ComponentFactory {
     func createOptistreamEventBuilder(configuration: Configuration) -> OptistreamEventBuilder {
         return OptistreamEventBuilder(
             tenantID: configuration.optitrack.tenantID,
-            storage: serviceLocator.storage(),
-            airshipIntegration: OptimoveAirshipIntegration(
-                storage: serviceLocator.storage(),
-                isSupportedAirship: configuration.isSupportedAirship
-            )
+            storage: serviceLocator.storage()
         )
     }
 
