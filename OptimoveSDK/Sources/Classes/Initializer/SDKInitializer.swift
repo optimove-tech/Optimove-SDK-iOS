@@ -59,13 +59,13 @@ private extension SDKInitializer {
         }
 
         // 4 responder
-        let componentHanlder = ComponentHandler(
+        let componentHandler = ComponentHandler(
             commonComponents: [],
             optistreamComponents: optistreamComponents.compactMap { $0 },
             optirstreamEventBuilder: componentFactory.createOptistreamEventBuilder(configuration: configuration)
         )
 
-        decorator.next = componentHanlder
+        decorator.next = componentHandler
         validator.next = decorator
         normalizer.next = validator
 
