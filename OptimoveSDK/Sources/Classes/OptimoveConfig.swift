@@ -67,12 +67,19 @@ open class OptimoveConfigBuilder: NSObject {
     private var _baseUrlMap : ServiceUrlMap?
     
     public init(optimoveCredentials: String?, optimobileCredentials: String?) {
-        if let optimoveCredentialsTuple = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials) {
+        let optimoveCredentialsTuple = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials)
+        let optimobileCredentialsTuple = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials)
+
+        if optimoveCredentialsTuple == nil && optimobileCredentialsTuple == nil {
+            assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
+        }
+
+        if let optimoveCredentialsTuple = optimoveCredentialsTuple {
             _tenantToken = optimoveCredentialsTuple.tenantToken
             _configName = optimoveCredentialsTuple.configName
         }
 
-        if let optimobileCredentialsTuple = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials) {
+        if let optimobileCredentialsTuple = optimobileCredentialsTuple  {
             _apiKey = optimobileCredentialsTuple.apiKey
             _secretKey = optimobileCredentialsTuple.secretKey
             _region = optimobileCredentialsTuple.region
