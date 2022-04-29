@@ -130,7 +130,7 @@ internal class SessionHelper {
             self.syncBarrier.signal()
         })
 
-        _ = syncBarrier.wait(timeout: .now() + .seconds(10))
+        _ = syncBarrier.wait(timeout: .now() + .seconds(3))
     }
     
 }
