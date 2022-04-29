@@ -327,7 +327,7 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         }
        else if (type == "MESSAGE_OPENED") {
             loadingSpinner?.stopAnimating()
-            Optimobile.sharedInstance.inAppHelper.handleMessageOpened(message: self.currentMessage!)
+            Optimobile.sharedInstance.inAppManager.handleMessageOpened(message: self.currentMessage!)
        } else if (type  == "MESSAGE_CLOSED") {
             self.handleMessageClosed()
        } else if (type == "EXECUTE_ACTIONS") {
@@ -399,7 +399,7 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
             }
 
             if hasClose {
-                Optimobile.sharedInstance.inAppHelper.markMessageDismissed(message: message)
+                Optimobile.sharedInstance.inAppManager.markMessageDismissed(message: message)
                 self.postClientMessage(type: "CLOSE_MESSAGE", data: nil)
             }
 

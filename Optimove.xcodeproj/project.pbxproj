@@ -95,7 +95,7 @@
 		4C7AA28A09CA23B070FFB281 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87EC09BC1C5CB77E5AD50317 /* NetworkError.swift */; };
 		4E1437373721EFA52C894174 /* OptistreamQueueImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BC4935D2FE2C45DF3CE8086 /* OptistreamQueueImpl.swift */; };
 		4F585C6827FECCFA005E7BB4 /* InAppPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C5327FECCFA005E7BB4 /* InAppPresenter.swift */; };
-		4F585C6927FECCFA005E7BB4 /* InAppHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C5427FECCFA005E7BB4 /* InAppHelper.swift */; };
+		4F585C6927FECCFA005E7BB4 /* InAppManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C5427FECCFA005E7BB4 /* InAppManager.swift */; };
 		4F585C6A27FECCFA005E7BB4 /* InAppModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C5527FECCFA005E7BB4 /* InAppModels.swift */; };
 		4F585C6B27FECCFA005E7BB4 /* OptimoveConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C5627FECCFA005E7BB4 /* OptimoveConfig.swift */; };
 		4F585C6C27FECCFA005E7BB4 /* Optimobile+DeepLinking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C5727FECCFA005E7BB4 /* Optimobile+DeepLinking.swift */; };
@@ -402,7 +402,7 @@
 		4E527862BE390ACDCE2EE444 /* EmailValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailValidator.swift; sourceTree = "<group>"; };
 		4F0710E98EE949C1E5B12D69 /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		4F585C5327FECCFA005E7BB4 /* InAppPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InAppPresenter.swift; sourceTree = "<group>"; };
-		4F585C5427FECCFA005E7BB4 /* InAppHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InAppHelper.swift; sourceTree = "<group>"; };
+		4F585C5427FECCFA005E7BB4 /* InAppManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InAppManager.swift; sourceTree = "<group>"; };
 		4F585C5527FECCFA005E7BB4 /* InAppModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InAppModels.swift; sourceTree = "<group>"; };
 		4F585C5627FECCFA005E7BB4 /* OptimoveConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveConfig.swift; sourceTree = "<group>"; };
 		4F585C5727FECCFA005E7BB4 /* Optimobile+DeepLinking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Optimobile+DeepLinking.swift"; sourceTree = "<group>"; };
@@ -1042,7 +1042,7 @@
 			isa = PBXGroup;
 			children = (
 				4F585C5327FECCFA005E7BB4 /* InAppPresenter.swift */,
-				4F585C5427FECCFA005E7BB4 /* InAppHelper.swift */,
+				4F585C5427FECCFA005E7BB4 /* InAppManager.swift */,
 				4F585C5527FECCFA005E7BB4 /* InAppModels.swift */,
 			);
 			path = InApp;
@@ -1932,7 +1932,7 @@
 				39F0A8EF590E06C63B8AA931 /* Operations.swift in Sources */,
 				4F585C6D27FECCFA005E7BB4 /* SessionHelper.swift in Sources */,
 				432EE244D778884AEA4A9208 /* OptiLoggerOutputStream.swift in Sources */,
-				4F585C6927FECCFA005E7BB4 /* InAppHelper.swift in Sources */,
+				4F585C6927FECCFA005E7BB4 /* InAppManager.swift in Sources */,
 				2EA9D0284826D6D32BFA3219 /* OptiLoggerStreamsContainer.swift in Sources */,
 				8D24DBF32623CCCAB9652019 /* OptiTrack.swift in Sources */,
 				499D5BF06BBCC8EBB94263E4 /* Optimove.swift in Sources */,

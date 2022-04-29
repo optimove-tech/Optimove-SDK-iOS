@@ -14,7 +14,7 @@ typealias kumulos_applicationPerformFetchWithCompletionHandler = @convention(c) 
 typealias fetchBlock = @convention(block) (_ obj:Any, _ application:UIApplication, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void;
 private var ks_existingBackgroundFetchDelegate: IMP? = nil
 
-internal class InAppHelper {
+internal class InAppManager {
     
     private var presenter: InAppPresenter
     private var pendingTickleIds: NSMutableOrderedSet = NSMutableOrderedSet(capacity: 1)
@@ -114,8 +114,8 @@ internal class InAppHelper {
                 fetchBarrier.signal()
             }
             
-            if (Optimobile.sharedInstance.inAppHelper.inAppEnabled()){
-                Optimobile.sharedInstance.inAppHelper.sync { (result:Int) in
+            if (Optimobile.sharedInstance.inAppManager.inAppEnabled()){
+                Optimobile.sharedInstance.inAppManager.sync { (result:Int) in
                     _ = fetchBarrier.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(20))
                     
                     if result < 0 {
@@ -810,7 +810,7 @@ internal class InAppHelper {
     }
     
     func readInboxSummary(inboxSummaryBlock: @escaping InboxSummaryBlock) -> Void {
-        guard let context = Optimobile.sharedInstance.inAppHelper.messagesContext else {
+        guard let context = Optimobile.sharedInstance.inAppManager.messagesContext else {
             self.fireInboxSummaryCallback(callback: inboxSummaryBlock, summary: nil)
             return
         }

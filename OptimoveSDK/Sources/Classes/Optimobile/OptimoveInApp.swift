@@ -86,11 +86,11 @@ public class OptimoveInApp {
             return
         }
 
-        Optimobile.sharedInstance.inAppHelper.updateUserConsent(consentGiven: consentGiven)
+        Optimobile.sharedInstance.inAppManager.updateUserConsent(consentGiven: consentGiven)
     }
     
     public static func getInboxItems() -> [InAppInboxItem] {
-        guard let context = Optimobile.sharedInstance.inAppHelper.messagesContext else {
+        guard let context = Optimobile.sharedInstance.inAppManager.messagesContext else {
             return []
         }
     
@@ -134,27 +134,27 @@ public class OptimoveInApp {
             return InAppMessagePresentationResult.EXPIRED
         }
 
-        let result = Optimobile.sharedInstance.inAppHelper.presentMessage(withId: item.id)
+        let result = Optimobile.sharedInstance.inAppManager.presentMessage(withId: item.id)
         
         return result ? InAppMessagePresentationResult.PRESENTED : InAppMessagePresentationResult.FAILED 
     }
     
     public static func deleteMessageFromInbox(item: InAppInboxItem) -> Bool {
-        return Optimobile.sharedInstance.inAppHelper.deleteMessageFromInbox(withId: item.id)
+        return Optimobile.sharedInstance.inAppManager.deleteMessageFromInbox(withId: item.id)
     }
     
     public static func markAsRead(item: InAppInboxItem) -> Bool {
         if (item.isRead()){
             return false
         }
-        let res = Optimobile.sharedInstance.inAppHelper.markInboxItemRead(withId: item.id, shouldWait: true)
+        let res = Optimobile.sharedInstance.inAppManager.markInboxItemRead(withId: item.id, shouldWait: true)
         maybeRunInboxUpdatedHandler(inboxNeedsUpdate: res)
         
         return res
     }
     
     public static func markAllInboxItemsAsRead() -> Bool {
-        return Optimobile.sharedInstance.inAppHelper.markAllInboxItemsAsRead()
+        return Optimobile.sharedInstance.inAppManager.markAllInboxItemsAsRead()
     }
     
     public static func setOnInboxUpdated(inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?) -> Void {
@@ -162,7 +162,7 @@ public class OptimoveInApp {
     }
     
     public static func getInboxSummaryAsync(inboxSummaryBlock: @escaping InboxSummaryBlock){
-        Optimobile.sharedInstance.inAppHelper.readInboxSummary(inboxSummaryBlock: inboxSummaryBlock)
+        Optimobile.sharedInstance.inAppManager.readInboxSummary(inboxSummaryBlock: inboxSummaryBlock)
     }
 
     // Internal helpers
