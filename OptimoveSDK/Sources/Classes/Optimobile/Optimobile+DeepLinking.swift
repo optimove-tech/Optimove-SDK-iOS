@@ -43,7 +43,7 @@ class DeepLinkHelper {
     let httpClient: KSHttpClient
     var anyContinuationHandled : Bool
 
-    init(_ config: OptimobileConfig, urlBuilder:UrlBuilder) {
+    init(_ config: OptimobileConfig, urlBuilder: UrlBuilder) {
         self.config = config
         httpClient = KSHttpClient(
             baseUrl: URL(string: urlBuilder.urlForService(.ddl))!,

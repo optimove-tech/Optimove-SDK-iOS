@@ -3,7 +3,7 @@
 import Foundation
 import CoreData
 
-public class InAppInboxItem {
+@objc public class InAppInboxItem :NSObject {
     internal(set) open var id: Int64
     internal(set) open var title: String
     internal(set) open var subtitle: String

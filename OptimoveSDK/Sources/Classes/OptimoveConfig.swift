@@ -2,9 +2,14 @@
 
 import Foundation
 
-public struct OptimoveConfig {
+@objc public class OptimoveConfig: NSObject {
     let tenantInfo: OptimoveTenantInfo?
     let optimobileConfig: OptimobileConfig?
+    
+    public init(tenantInfo: OptimoveTenantInfo?, optimobileConfig: OptimobileConfig?) {
+        self.tenantInfo = tenantInfo
+        self.optimobileConfig = optimobileConfig
+    }
 
     internal func isOptimoveConfigured() -> Bool {
         return tenantInfo != nil
@@ -26,7 +31,7 @@ public struct OptimoveConfig {
     }
 }
 
-public struct OptimobileConfig {
+public class OptimobileConfig: NSObject {
     let apiKey: String
     let secretKey: String
     let region: String
@@ -47,11 +52,39 @@ public struct OptimobileConfig {
 
     let deepLinkCname : URL?
     let deepLinkHandler : DeepLinkHandler?
+    let objCdeepLinkHandler : ((NSDictionary) -> Void)?
 
     let baseUrlMap : ServiceUrlMap
+    
+    init(apiKey: String,
+         secretKey: String,
+         region: String,
+         sessionIdleTimeout: UInt,
+         inAppConsentStrategy: InAppConsentStrategy,
+         inAppDeepLinkHandlerBlock: InAppDeepLinkHandlerBlock?,
+         pushOpenedHandlerBlock: PushOpenedHandlerBlock?,
+         pushReceivedInForegroundHandlerBlock: Any,
+         deepLinkCname: URL?,
+         deepLinkHandler: DeepLinkHandler?,
+         objCdeepLinkHandler:  ((NSDictionary) -> Void)?,
+         baseUrlMap: ServiceUrlMap) {
+        self.apiKey = apiKey
+        self.secretKey = secretKey
+        self.region = region
+        self.sessionIdleTimeout = sessionIdleTimeout
+        self.inAppConsentStrategy = inAppConsentStrategy
+        self.inAppDeepLinkHandlerBlock = inAppDeepLinkHandlerBlock
+        self.pushOpenedHandlerBlock = pushOpenedHandlerBlock
+        self._pushReceivedInForegroundHandlerBlock = pushReceivedInForegroundHandlerBlock
+        self.deepLinkCname = deepLinkCname
+        self.deepLinkHandler = deepLinkHandler
+        self.objCdeepLinkHandler = objCdeepLinkHandler
+        self.baseUrlMap = baseUrlMap
+        super.init()
+    }
 }
 
-open class OptimoveConfigBuilder: NSObject {
+@objc open class OptimoveConfigBuilder: NSObject {
     private var _tenantToken: String?
     private var _configName: String?
     private var _region: String?
@@ -64,6 +97,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var _pushReceivedInForegroundHandlerBlock: Any?
     private var _deepLinkCname : URL?
     private var _deepLinkHandler : DeepLinkHandler?
+    private var _objCdeepLinkHandler : ((NSDictionary) -> Void)?
     private var _baseUrlMap : ServiceUrlMap?
     
     public init(optimoveCredentials: String?, optimobileCredentials: String?) {
@@ -121,6 +155,14 @@ open class OptimoveConfigBuilder: NSObject {
 
         return self
     }
+    
+    
+    @objc @discardableResult public func enableDeepLinkingObjC(cname: String? = nil, _ objCHandler: @escaping (NSDictionary) -> Void) -> OptimoveConfigBuilder {
+         _deepLinkCname = URL(string: cname ?? "")
+         _objCdeepLinkHandler = objCHandler
+
+         return self
+     }
 
     /**
      Internal SDK embedding API, do not call or depend on this method in your app
@@ -151,9 +193,10 @@ open class OptimoveConfigBuilder: NSObject {
                 inAppConsentStrategy: _inAppConsentStrategy,
                 inAppDeepLinkHandlerBlock: _inAppDeepLinkHandlerBlock,
                 pushOpenedHandlerBlock: _pushOpenedHandlerBlock,
-                _pushReceivedInForegroundHandlerBlock: _pushReceivedInForegroundHandlerBlock,
+                pushReceivedInForegroundHandlerBlock: _pushReceivedInForegroundHandlerBlock as Any,
                 deepLinkCname: _deepLinkCname,
                 deepLinkHandler: _deepLinkHandler,
+                objCdeepLinkHandler: _objCdeepLinkHandler,
                 baseUrlMap: _baseUrlMap)
         }
 
