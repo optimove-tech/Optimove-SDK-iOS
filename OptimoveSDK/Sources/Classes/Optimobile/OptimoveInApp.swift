@@ -68,15 +68,20 @@ import CoreData
     }
 }
 
-public struct InAppInboxSummary {
+@objc public class InAppInboxSummary: NSObject {
     public let totalCount: Int64
     public let unreadCount: Int64
+    
+    init(totalCount: Int64, unreadCount: Int64) {
+        self.totalCount = totalCount
+        self.unreadCount = unreadCount
+    }
 }
 
 public typealias InboxUpdatedHandlerBlock = () -> Void
 public typealias InboxSummaryBlock = (InAppInboxSummary?) -> Void
 
-public class OptimoveInApp {
+@objc public class OptimoveInApp: NSObject {
     private static var _inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?
     
     public static func updateConsent(forUser consentGiven: Bool) {

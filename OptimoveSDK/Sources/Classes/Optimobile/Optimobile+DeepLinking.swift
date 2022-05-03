@@ -34,19 +34,14 @@ public enum DeepLinkResolution {
     case linkMatched(_ data:DeepLink)
     
     func toDict() -> NSDictionary {
-        var dict = NSDictionary()
+        let dict = NSDictionary()
         
         switch self {
-        case let .lookupFailed(url):
-            dict.setValue(url, forKey: "lookupFailed")
-        case let .linkNotFound(url):
-            dict.setValue(url, forKey: "linkNotFound")
-        case let .linkExpired(url):
-            dict.setValue(url, forKey: "linkExpired")
-        case let .linkLimitExceeded(url):
-            dict.setValue(url, forKey: "linkLimitExceeded")
-        case let .linkMatched(data):
-            dict.setValue(data, forKey: "linkMatched")
+        case let .lookupFailed(url): dict.setValue(url, forKey: "lookupFailed")
+        case let .linkNotFound(url): dict.setValue(url, forKey: "linkNotFound")
+        case let .linkExpired(url): dict.setValue(url, forKey: "linkExpired")
+        case let .linkLimitExceeded(url): dict.setValue(url, forKey: "linkLimitExceeded")
+        case let .linkMatched(data): dict.setValue(data, forKey: "linkMatched")
         }
         
         return dict
