@@ -156,13 +156,11 @@ public class OptimobileConfig: NSObject {
         return self
     }
     
-    
-    @objc @discardableResult public func enableDeepLinkingObjC(cname: String? = nil, _ objCHandler: @escaping (NSDictionary) -> Void) -> OptimoveConfigBuilder {
-         _deepLinkCname = URL(string: cname ?? "")
-         _objCdeepLinkHandler = objCHandler
-
-         return self
-     }
+    @objc @discardableResult public func enableDeepLinking(cname: String? = nil, _ objcHandler: @escaping (NSDictionary) -> Void) -> OptimoveConfigBuilder {
+        return self.enableDeepLinking(cname: cname, { resolution in
+            objcHandler(resolution.toDict())
+        })
+    }
 
     /**
      Internal SDK embedding API, do not call or depend on this method in your app

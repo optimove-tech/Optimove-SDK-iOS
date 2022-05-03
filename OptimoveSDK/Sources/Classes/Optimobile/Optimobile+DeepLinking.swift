@@ -32,6 +32,25 @@ public enum DeepLinkResolution {
     case linkExpired(_ url:URL)
     case linkLimitExceeded(_ url:URL)
     case linkMatched(_ data:DeepLink)
+    
+    func toDict() -> NSDictionary {
+        var dict = NSDictionary()
+        
+        switch self {
+        case let .lookupFailed(url):
+            dict.setValue(url, forKey: "lookupFailed")
+        case let .linkNotFound(url):
+            dict.setValue(url, forKey: "linkNotFound")
+        case let .linkExpired(url):
+            dict.setValue(url, forKey: "linkExpired")
+        case let .linkLimitExceeded(url):
+            dict.setValue(url, forKey: "linkLimitExceeded")
+        case let .linkMatched(data):
+            dict.setValue(data, forKey: "linkMatched")
+        }
+        
+        return dict
+    }
 }
 
 public typealias DeepLinkHandler = (DeepLinkResolution) -> Void
