@@ -157,8 +157,9 @@ public class OptimobileConfig: NSObject {
     }
     
     @objc @discardableResult public func enableDeepLinking(cname: String? = nil, _ objcHandler: @escaping (NSDictionary) -> Void) -> OptimoveConfigBuilder {
-        return self.enableDeepLinking(cname: cname, { resolution in
-            objcHandler(resolution.toDict())
+        _objCdeepLinkHandler = objcHandler
+        return self.enableDeepLinking(cname: cname, { [weak self] resolution in
+            self?._objCdeepLinkHandler?(resolution.toDict())
         })
     }
 
