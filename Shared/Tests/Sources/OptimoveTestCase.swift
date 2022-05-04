@@ -3,7 +3,7 @@
 import XCTest
 import OptimoveCore
 
-let defaultTimeout: TimeInterval = 0.8
+let defaultTimeout: TimeInterval = 1.2
 
 class OptimoveTestCase: XCTestCase {
 
