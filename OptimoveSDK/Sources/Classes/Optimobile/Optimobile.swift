@@ -43,7 +43,6 @@ class Optimobile {
     let pushNotificationDeviceType = 1
     let pushNotificationProductionTokenType:Int = 1
 
-    let sdkVersion : String = "4.0.0"
     let sdkType : Int = 101;
 
     fileprivate static var instance:Optimobile?
