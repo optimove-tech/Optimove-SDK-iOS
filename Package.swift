@@ -12,17 +12,14 @@ let package = Package(
     products: [
         .library(
             name: "OptimoveSDK",
-            type: .dynamic,
             targets: ["OptimoveSDK"]
         ),
         .library(
             name: "OptimoveCore",
-            type: .dynamic,
             targets: ["OptimoveCore"]
         ),
         .library(
             name: "OptimoveNotificationServiceExtension",
-            type: .dynamic,
             targets: ["OptimoveNotificationServiceExtension"]
         )
     ],
@@ -40,9 +37,6 @@ let package = Package(
         ),
         .target(
             name: "OptimoveNotificationServiceExtension",
-            dependencies: [
-                "OptimoveCore"
-            ],
             path: "OptimoveNotificationServiceExtension/Sources"
         )
     ],

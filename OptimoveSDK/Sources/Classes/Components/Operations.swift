@@ -6,12 +6,9 @@ enum CommonOperation {
     case report(events: [Event])
     case dispatchNow
     case setInstallation
-    case togglePushCampaigns(areDisabled: Bool)
-    case deviceToken(token: Data)
     case optIn
     case optOut
     case none
-    case setPushNotificaitonChannels(channels: Set<String>?)
 }
 
 enum OptistreamOperation {

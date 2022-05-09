@@ -7,7 +7,6 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
     public let logger: LoggerConfig
     public let realtime: RealtimeConfig
     public let optitrack: OptitrackConfig
-    public let optipush: OptipushConfig
     public let events: [String: EventsConfig]
     public let isEnableRealtime: Bool
     public let isSupportedAirship: Bool
@@ -17,7 +16,6 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
         logger: LoggerConfig,
         realtime: RealtimeConfig,
         optitrack: OptitrackConfig,
-        optipush: OptipushConfig,
         events: [String: EventsConfig],
         isEnableRealtime: Bool,
         isSupportedAirship: Bool
@@ -26,7 +24,6 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
         self.logger = logger
         self.realtime = realtime
         self.optitrack = optitrack
-        self.optipush = optipush
         self.events = events
         self.isEnableRealtime = isEnableRealtime
         self.isSupportedAirship = isSupportedAirship
@@ -92,18 +89,6 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
         self.events = events
         self.isEnableRealtime = isEnableRealtime
         self.maxActionCustomDimensions = maxActionCustomDimensions
-    }
-}
-
-public struct OptipushConfig: Codable, TenantInfo {
-    public let tenantID: Int
-    public let mbaasEndpoint: URL
-
-    public init(
-        tenantID: Int,
-        mbaasEndpoint: URL) {
-        self.tenantID = tenantID
-        self.mbaasEndpoint = mbaasEndpoint
     }
 }
 

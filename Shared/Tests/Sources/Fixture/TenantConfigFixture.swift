@@ -13,7 +13,6 @@ final class TenantConfigFixture {
         return TenantConfig(
             realtime: tenantRealtimeConfigFixture(),
             optitrack: tenantOptitrackConfigFixture(),
-            optipush: tenantOptipushConfigFixture(),
             events: createTenantEventFixture(),
             isEnableRealtime: options.isEnableRealtime,
             isSupportedAirship: false,
@@ -33,12 +32,6 @@ final class TenantConfigFixture {
             optitrackEndpoint: StubVariables.url,
             siteId: StubVariables.int,
             maxActionCustomDimensions: Constants.maxActionCustomDimensions
-        )
-    }
-
-    func tenantOptipushConfigFixture() -> TenantOptipushConfig {
-        return TenantOptipushConfig(
-            enableAdvertisingIdReport: StubVariables.bool
         )
     }
 

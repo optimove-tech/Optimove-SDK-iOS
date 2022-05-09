@@ -15,49 +15,32 @@ public struct OptistreamEvent: Codable {
 
     public struct Metadata: Codable, Hashable {
 
-        public struct Channel: Codable, Hashable {
-
-            public let airship: OptimoveAirshipIntegration.Airship?
-
-            public init(airship: OptimoveAirshipIntegration.Airship?) {
-                self.airship = airship
-            }
-        }
-
-        public let channel: Channel?
         public var realtime: Bool
         public var firstVisitorDate: Int64?
         public let eventId: String
         public let requestId: String
         public let platform: String = "ios"
         public let version: String = SDKVersion
-        public let validations: [ValidationIssue]
 
         enum CodingKeys: String, CodingKey {
-            case channel
             case realtime
             case firstVisitorDate
             case eventId
             case requestId
             case platform = "sdk_platform"
             case version = "sdk_version"
-            case validations
         }
 
         public init(
-            channel: OptistreamEvent.Metadata.Channel?,
             realtime: Bool,
             firstVisitorDate: Int64?,
             eventId: String,
-            requestId: String,
-            validations: [ValidationIssue]
+            requestId: String
         ) {
-            self.channel = channel
             self.realtime = realtime
             self.firstVisitorDate = firstVisitorDate
             self.eventId = eventId
             self.requestId = requestId
-            self.validations = validations
         }
 
     }

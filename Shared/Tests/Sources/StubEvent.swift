@@ -32,11 +32,9 @@ public let StubOptistreamEvent = OptistreamEvent(
     timestamp: Formatter.iso8601withFractionalSeconds.string(from: Date()),
     context: [],
     metadata: OptistreamEvent.Metadata(
-        channel: nil,
         realtime: true,
         firstVisitorDate: Date().timeIntervalSince1970.seconds,
         eventId: UUID().uuidString,
-        requestId: UUID().uuidString,
-        validations: []
+        requestId: UUID().uuidString
     )
 )

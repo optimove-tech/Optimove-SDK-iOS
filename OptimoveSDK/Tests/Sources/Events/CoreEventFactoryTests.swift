@@ -49,24 +49,6 @@ class CoreEventFactoryTests: OptimoveTestCase {
         wait(for: [expectation], timeout: defaultTimeout)
     }
 
-    func test_create_optipushOptIn() throws {
-        prefillStorageAsVisitor()
-        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
-        let event = try self.factory.createEvent(.optipushOptIn)
-        XCTAssert(event.name == OptEvent.Constants.optInName)
-        expectation.fulfill()
-        wait(for: [expectation], timeout: defaultTimeout)
-    }
-
-    func test_create_optipushOptOut() throws {
-        prefillStorageAsVisitor()
-        let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
-        let event = try self.factory.createEvent(.optipushOptOut)
-        XCTAssert(event.name == OptEvent.Constants.optOutName)
-        expectation.fulfill()
-        wait(for: [expectation], timeout: defaultTimeout)
-    }
-
     func test_create_setUserAgent() throws {
         prefillStorageAsVisitor()
         let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")

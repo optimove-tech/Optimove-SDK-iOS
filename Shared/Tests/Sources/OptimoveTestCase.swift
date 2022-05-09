@@ -44,10 +44,6 @@ class OptimoveTestCase: XCTestCase {
         storage.initialVisitorId = StubConstants.initialVisitorId
     }
 
-    func prefillPushToken() {
-        storage.apnsToken = StubConstants.apnsToken
-    }
-
 }
 
 extension String {
