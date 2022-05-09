@@ -8,7 +8,7 @@ public struct DeepLinkContent {
     public let description: String?
 }
 
-public struct DeepLink {
+public class DeepLink: NSObject {
     public let url: URL
     public let content: DeepLinkContent
     public let data: [AnyHashable:Any?]
