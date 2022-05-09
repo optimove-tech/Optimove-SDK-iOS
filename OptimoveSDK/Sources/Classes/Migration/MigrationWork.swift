@@ -153,9 +153,7 @@ extension MigrationWork_3_3_0 {
                 .deviceResolutionWidth,
                 .deviceResolutionHeight,
                 .advertisingIdentifier,
-                .optFlag,
                 .migrationVersions,
-                .arePushCampaignsDisabled,
                 .firstRunTimestamp
             ]
             groupKeys.forEach({ key in
@@ -199,7 +197,6 @@ extension MigrationWork_3_3_0 {
                 """
                 Unable to initialize UserDefault with suit name "\(suiteName)".
                 Highly possible that the client forgot to add the app group as described in the documentation.
-                Link: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Setup#3-setting-up-capabilities
                 """
                 )
             }
@@ -213,7 +210,6 @@ extension MigrationWork_3_3_0 {
                     """
                     Unable to initialize FileManager container for the application group identifier "\(groupIdentifier)".
                     Highly possible that the client forgot to add the app group as described in the documentation.
-                    Link: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Optipush-Setup#3-setting-up-capabilities
                     """
                 )
             }
@@ -228,7 +224,6 @@ extension MigrationWork_3_3_0 {
                 let newDefaults = try UserDefaults.optimove()
                 let sharedKeys: Set<StorageKey> = [
                     .userEmail,
-                    .apnsToken,
                     .siteID,
                     .settingUserSuccess,
                     .firstVisitTimestamp,

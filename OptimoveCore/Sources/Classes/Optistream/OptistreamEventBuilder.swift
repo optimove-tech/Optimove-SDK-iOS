@@ -14,16 +14,13 @@ public final class OptistreamEventBuilder {
 
     private let tenantID: Int
     private let storage: OptimoveStorage
-    private let airshipIntegration: OptimoveAirshipIntegration
 
     public init(
         tenantID: Int,
-        storage: OptimoveStorage,
-        airshipIntegration: OptimoveAirshipIntegration
+        storage: OptimoveStorage
     ) {
         self.tenantID = tenantID
         self.storage = storage
-        self.airshipIntegration = airshipIntegration
     }
 
     public func build(event: Event) throws -> OptistreamEvent {
@@ -37,14 +34,10 @@ public final class OptistreamEventBuilder {
             timestamp: Formatter.iso8601withFractionalSeconds.string(from: event.timestamp),
             context: try JSON(event.context),
             metadata: OptistreamEvent.Metadata(
-                channel: OptistreamEvent.Metadata.Channel(
-                    airship: try? airshipIntegration.loadAirshipIntegration()
-                ),
                 realtime: event.isRealtime,
                 firstVisitorDate: try storage.getFirstRunTimestamp(),
                 eventId: event.eventId.uuidString,
-                requestId: event.requestId,
-                validations: event.validations
+                requestId: event.requestId
             )
         )
     }

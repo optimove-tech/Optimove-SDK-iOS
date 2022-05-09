@@ -6,20 +6,17 @@ final class DeviceStateObserverFactory {
 
     private let statisticService: StatisticService
     private let synchronizer: Pipeline
-    private let optInService: OptInService
     private let dateTimeProvider: DateTimeProvider
     private let coreEventFactory: CoreEventFactory
     private let storage: OptimoveStorage
 
     init(statisticService: StatisticService,
          synchronizer: Pipeline,
-         optInService: OptInService,
          dateTimeProvider: DateTimeProvider,
          coreEventFactory: CoreEventFactory,
          storage: OptimoveStorage) {
         self.statisticService = statisticService
         self.synchronizer = synchronizer
-        self.optInService = optInService
         self.dateTimeProvider = dateTimeProvider
         self.coreEventFactory = coreEventFactory
         self.storage = storage
@@ -36,10 +33,6 @@ final class DeviceStateObserverFactory {
                 ),
                 ResignActiveObserver(
                     subscriber: synchronizer
-                ),
-                OptInOutObserver(
-                    optInService: optInService,
-                    notificationPermissionFetcher: NotificationPermissionFetcherImpl()
                 ),
                 AppOpenObserver(
                     synchronizer: synchronizer,

@@ -22,22 +22,44 @@ typealias Logger = OptimoveCore.Logger
     }()
 
     private let container: Container
+    private var config: OptimoveConfig!
 
     private override init() {
         self.container = Assembly().makeContainer()
+        container.resolve { serviceLocator in
+            serviceLocator.loggerInitializator().initialize()
+            serviceLocator.newVisitorIdGenerator().generate()
+        }
         super.init()
     }
 
     /// The starting point of the Optimove SDK.
     ///
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
-    @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
+    @objc static func configure(for tenantInfo: OptimoveTenantInfo) {
         /// FUTURE: To merge configure call with init.
         shared.container.resolve { serviceLocator in
-            serviceLocator.loggerInitializator().initialize()
             serviceLocator.newTenantInfoHandler().handle(tenantInfo)
             serviceLocator.deviceStateObserver().start()
             shared.startSDK { _ in }
+        }
+    }
+
+    public static func initialize(with config: OptimoveConfig) {
+        shared.config = config
+
+        if config.isOptimoveConfigured(), let tenantInfo = config.tenantInfo {
+            Optimove.configure(for: tenantInfo)
+        }
+
+        if config.isOptimobileConfigured(), let optimobileConfig = config.optimobileConfig {
+            shared.container.resolve { serviceLocator in
+                guard let visitorId = try? serviceLocator.storage().getInitialVisitorId() else {
+                    return
+                }
+
+                Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId)
+            }
         }
     }
 
@@ -129,18 +151,24 @@ extension Optimove {
     ///   - sdkId: The user unique identifier.
     ///   - email: The user email.
     @objc public func registerUser(sdkId userID: String, email: String) {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            tryCatch {
-                let user = User(userID: userID)
-                let setUserIdEvent = try self._setUser(user, serviceLocator)
-                let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
-                serviceLocator.pipeline().deliver(.report(events: [setUserIdEvent, setUserEmailEvent]))
-                if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-                    serviceLocator.pipeline().deliver(.setInstallation)
+        if config.isOptimoveConfigured() {
+            let function: (ServiceLocator) -> Void = { serviceLocator in
+                tryCatch {
+                    let user = User(userID: userID)
+                    let setUserIdEvent = try self._setUser(user, serviceLocator)
+                    let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
+                    serviceLocator.pipeline().deliver(.report(events: [setUserIdEvent, setUserEmailEvent]))
+                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
+                        serviceLocator.pipeline().deliver(.setInstallation)
+                    }
                 }
             }
+            container.resolve(function)
         }
-        container.resolve(function)
+
+        if config.isOptimobileConfigured() {
+            Optimobile.associateUserWithInstall(userIdentifier: userID)
+        }
     }
 
     /// Set a user ID and a user email.
@@ -156,17 +184,37 @@ extension Optimove {
     ///
     /// - Parameter userID: The user unique identifier.
     @objc public func setUserId(_ userID: String) {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            tryCatch {
-                let user = User(userID: userID)
-                let event = try self._setUser(user, serviceLocator)
-                serviceLocator.pipeline().deliver(.report(events: [event]))
-                if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-                    serviceLocator.pipeline().deliver(.setInstallation)
+        if config.isOptimoveConfigured() {
+            let function: (ServiceLocator) -> Void = { serviceLocator in
+                tryCatch {
+                    let user = User(userID: userID)
+                    let event = try self._setUser(user, serviceLocator)
+                    serviceLocator.pipeline().deliver(.report(events: [event]))
+                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
+                        serviceLocator.pipeline().deliver(.setInstallation)
+                    }
                 }
             }
+            container.resolve(function)
         }
-        container.resolve(function)
+
+        if config.isOptimobileConfigured() {
+            Optimobile.associateUserWithInstall(userIdentifier: userID)
+        }
+    }
+    
+    /// get visitor id of optimove SDK.
+    /// call this function if you need the internal visitor Id of Optimove
+    @objc public static func getVisitorID() -> String? {
+        return shared.getVisitorID()
+    }
+    
+    private func getVisitorID() -> String? {
+        let function: (ServiceLocator) -> String? = { serviceLocator in
+            return try? serviceLocator.storage().getVisitorID()
+        }
+        guard let id = container.resolve(function) else { return nil }
+        return id
     }
 
     /// Set a user ID to the Optimove SDK.
@@ -204,249 +252,57 @@ extension Optimove {
         return try serviceLocator.coreEventFactory().createEvent(.setUserEmail(email: email))
     }
 
-    /// A call to this method will stop executions of any push campaign
-    /// targeted to this installation.
-    /// By default, receiving a push campaign is enabled.
-    /// To continue receiving push campaigns after disabling,
-    /// you have to call the `enablePushCampaigns` method.
-    @objc public func disablePushCampaigns() {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            serviceLocator.pipeline().deliver(.togglePushCampaigns(areDisabled: true))
-        }
-        container.resolve(function)
-    }
-
-    /// A call to this method will stop executions of any push campaign
-    /// targeted to this installation.
-    /// By default, receiving a push campaign is enabled.
-    /// To continue receiving push campaigns after disabling,
-    /// you have to call the `enablePushCampaigns` method.
-    @objc public static func disablePushCampaigns() {
-        shared.disablePushCampaigns()
-    }
-
-    /// A call to this method will resume executions of any push campaign
-    /// targeted to this installation.
-    /// By default, receiving a push campaign is enabled.
-    /// To stop receiving push campaigns after enabling,
-    /// you have to call the `disablePushCampaigns` method.
-    @objc public func enablePushCampaigns() {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            serviceLocator.pipeline().deliver(.togglePushCampaigns(areDisabled: false))
-        }
-        container.resolve(function)
-    }
-
-    /// A call to this method will resume executions of any push campaign
-    /// targeted to this installation.
-    /// By default, receiving a push campaign is enabled.
-    /// To stop receiving push campaigns after enabling,
-    /// you have to call the `disablePushCampaigns` method.
-    @objc public static func enablePushCampaigns() {
-        shared.enablePushCampaigns()
-    }
-
 }
 
-// MARK: - OptiPush API call
+// MARK: - Optimobile APIs
 
 extension Optimove {
 
-    /// Tells the Optimove SDK that a remote notification arrived that indicates there is data to be fetched.
-    ///
-    /// - Parameters:
-    ///   - userInfo: A dictionary that contains information related to the remote notification.
-    ///   - completionHandler: The block to execute when the download operation is complete.
-    /// - Returns: Returns `true` if the Optimove SDK could handle a notification.
-    @objc public func didReceiveRemoteNotification(
-        userInfo: [AnyHashable: Any],
-        didComplete: @escaping (UIBackgroundFetchResult) -> Void
-        ) -> Bool {
-        Logger.info("Receive a remote notification.")
-        return false
+    /**
+        Helper method for requesting the device token with alert, badge and sound permissions.
+
+        On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+    */
+    @objc public func pushRequestDeviceToken() {
+        Optimobile.pushRequestDeviceToken()
     }
 
-    /// Tells the Optimove SDK that a remote notification arrived that indicates there is data to be fetched.
-    ///
-    /// - Parameters:
-    ///   - userInfo: A dictionary that contains information related to the remote notification.
-    ///   - completionHandler: The block to execute when the download operation is complete.
-    /// - Returns: Returns `true` if the Optimove SDK could handle a notification.
-    @objc public static func didReceiveRemoteNotification(
-        userInfo: [AnyHashable: Any],
-        didComplete: @escaping (UIBackgroundFetchResult) -> Void
-        ) -> Bool {
-        return shared.didReceiveRemoteNotification(userInfo: userInfo, didComplete: didComplete)
+    /**
+        Helper method for requesting the device token with alert, badge and sound permissions.
+
+        On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+    */
+    @available(iOS 10.0, *)
+    @objc public func pushRequestDeviceToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
+        Optimobile.pushRequestDeviceToken(onAuthorizationStatus)
     }
 
-    /// Asks the Optimove SDK how to handle a notification that arrived while the app was running in the foreground.
-    ///
-    /// - Parameters:
-    ///   - notification: The notification that is about to be delivered.
-    ///   - completionHandler: The block to execute when the download operation is complete.
-    /// - Returns: Returns `true` if the Optimove SDK could handle a notification.
-    @objc public func willPresent(
-        notification: UNNotification,
-        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
-        ) -> Bool {
-        Logger.info("Received a notification in foreground mode.")
-        let function: (ServiceLocator) -> (Bool) = { serviceLocator in
-            let notificationListener = serviceLocator.notificationListener()
-            let result = notificationListener.isOptipush(notification: notification)
-            if result {
-                notificationListener.willPresent(
-                    notification: notification,
-                    withCompletionHandler: completionHandler
-                )
-            }
-            return result
-        }
-        return container.resolve(function) ?? false
+    /**
+        Register a device token with the Optimove Push service.
+
+        Note you shouldn't normally need to call this method, registration is handled by the SDK.
+
+        Parameters:
+            - deviceToken: The push token returned by the device
+    */
+    @objc public func pushRegister(_ deviceToken: Data) {
+        Optimobile.pushRegister(deviceToken)
     }
 
-    /// Asks the Optimove SDK how to handle a notification that arrived while the app was running in the foreground.
-    ///
-    /// - Parameters:
-    ///   - notification: The notification that is about to be delivered.
-    ///   - completionHandler: The block to execute when the download operation is complete.
-    /// - Returns: Returns `true` if the Optimove SDK could handle a notification.
-    @objc public static func willPresent(
-        notification: UNNotification,
-        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
-        ) -> Bool {
-        return shared.willPresent(notification: notification, withCompletionHandler: completionHandler)
+    /**
+     Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed.
+     */
+    @objc public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        return Optimobile.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
 
-    /// Asks the Optimove SDK to process the user's response to a delivered notification.
-    ///
-    /// - Parameters:
-    ///   - response: The user’s response to the notification.
-    ///   - completionHandler: The block to execute when you have finished processing the user’s response.
-    /// - Returns: Returns `true` if the Optimove SDK could handle a notification.
-    @objc public func didReceive(
-        response: UNNotificationResponse,
-        withCompletionHandler completionHandler: @escaping () -> Void
-        ) -> Bool {
-        Logger.info("User produced the response for the notificaiton.")
-        let function: (ServiceLocator) -> (Bool) = { serviceLocator in
-            let notificationListener = serviceLocator.notificationListener()
-            let result = notificationListener.isOptipush(notification: response.notification)
-            if result {
-                Optimove.shared.startSDK { result in
-                    guard result.isSuccessful else { return }
-                    notificationListener.didReceive(
-                        response: response,
-                        withCompletionHandler: completionHandler
-                    )
-                }
-            }
-            return result
-        }
-        return container.resolve(function) ?? false
+    /**
+     Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed in scene-based apps.
+     */
+    @available(iOS 13.0, *)
+    @objc public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        Optimobile.scene(scene, continue: userActivity)
     }
-
-    /// Asks the Optimove SDK to process the user's response to a delivered notification.
-    ///
-    /// - Parameters:
-    ///   - response: The user’s response to the notification.
-    ///   - completionHandler: The block to execute when you have finished processing the user’s response.
-    /// - Returns: Returns `true` if the Optimove SDK could handle a notification.
-    @objc public static func didReceive(
-        response: UNNotificationResponse,
-        withCompletionHandler completionHandler: @escaping () -> Void
-        ) -> Bool {
-        return shared.didReceive(response: response, withCompletionHandler: completionHandler)
-    }
-
-    /// Tells the Optimove SDK that the app successfully registered with Apple Push Notification service (APNs).
-    ///
-    /// - Parameter deviceToken: A token that was received from the AppDelegate.
-    @objc public func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            let validationResult = APNsTokenValidator(storage: serviceLocator.storage())
-            if validationResult.validate(token: deviceToken) == .new {
-                Logger.debug("New APNS token: \(deviceToken.map { String(format: "%02.2hhx", $0) }.joined())")
-                serviceLocator.pipeline().deliver(.deviceToken(token: deviceToken))
-            }
-        }
-        container.resolve(function)
-    }
-
-    /// Tells the Optimove SDK that the app successfully registered with Apple Push Notification service (APNs).
-    ///
-    /// - Parameter deviceToken: A token that was received from the AppDelegate.
-    @objc public static func application(didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        shared.application(didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
-    }
-
-    /// User authorization is required for applications to notify the user using UNUserNotificationCenter via both local and remote notifications.
-    ///
-    /// - Parameter fromUserNotificationCenter: A response from
-    @objc public func didReceivePushAuthorization(fromUserNotificationCenter granted: Bool) {
-        let function: (ServiceLocator) -> Void = { serviceLocator in
-            tryCatch {
-                try serviceLocator.optInService().didPushAuthorization(isGranted: granted)
-            }
-        }
-        container.resolve(function)
-    }
-
-    /// User authorization is required for applications to notify the user using UNUserNotificationCenter via both local and remote notifications.
-    ///
-    /// - Parameter fromUserNotificationCenter: A response from
-    @objc public static func didReceivePushAuthorization(fromUserNotificationCenter granted: Bool) {
-        shared.didReceivePushAuthorization(fromUserNotificationCenter: granted)
-    }
-
-}
-
-// MARK: - OptimoveDeepLinkResponding
-
-extension Optimove: OptimoveDeepLinkResponding {
-
-    /// The subcription on a deeplink from a Optimove push notification.
-    /// - Parameter responder: Subscriber
-    @objc public func register(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-        container.resolve { serviceLocator in
-            serviceLocator.deeplinkService().register(deepLinkResponder: responder)
-        }
-    }
-
-    /// The subcription on a deeplink from a Optimove push notification.
-    /// - Parameter responder: Subscriber
-    @objc public static func register(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-        shared.register(deepLinkResponder: responder)
-    }
-
-    /// The unsubcription on a deeplink from a Optimove push notification.
-    /// - Parameter responder: Subscriber
-    @objc public func unregister(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-        container.resolve { serviceLocator in
-            serviceLocator.deeplinkService().unregister(deepLinkResponder: responder)
-        }
-    }
-
-    /// The unsubcription on a deeplink from a Optimove push notification.
-    /// - Parameter responder: Subscriber
-    @objc public static func unregister(deepLinkResponder responder: OptimoveDeepLinkResponder) {
-        shared.unregister(deepLinkResponder: responder)
-    }
-}
-
-// MARK: - Push notification channels
-
-extension Optimove {
-
-    /// The API provides an ability for the user to allow or disallow receiving specific push notifications.
-    /// You can pass an array of permitted Push Notification channels for the current user.
-    /// - Note: Pass `nil` to reset the current channel preferences and remove restrictions.
-    /// - Parameter channels: Allowed channels names, case insensitive , or `nil`.
-    @objc public static func setAllowedPushNotificationChannels(channels: Set<String>?) {
-        shared.container.resolve { serviceLocator in
-            serviceLocator.pipeline().deliver(.setPushNotificaitonChannels(channels: channels))
-        }
-    }
-
 }
 
 // MARK: - Private
@@ -466,7 +322,6 @@ private extension Optimove {
             }
             RunningFlagsIndication.isInitializerRunning.toggle()
             serviceLocator.installationIdGenerator().generate()
-            serviceLocator.newVisitorIdGenerator().generate()
             serviceLocator.firstTimeVisitGenerator().generate()
             let configurationFetcher = serviceLocator.configurationFetcher()
             configurationFetcher.fetch { [weak self] result in

@@ -8,11 +8,11 @@ jobs:
     runs-on: macOS-latest
 
     env:
-        DEVELOPER_DIR: /Applications/Xcode_11.4.1.app/Contents/Developer
+        DEVELOPER_DIR: /Applications/Xcode_13.2.1.app/Contents/Developer
 
     steps:
     - uses: actions/checkout@v1
-    - run: carthage update --platform ios --cache-builds
+    - run: carthage update --use-xcframeworks --cache-builds
       name: Carthage
     - run: xcodebuild build-for-testing -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11"
       name: Build

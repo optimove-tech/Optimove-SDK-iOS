@@ -5,8 +5,6 @@ import OptimoveCore
 
 enum CoreEventType {
     case appOpen
-    case optipushOptIn
-    case optipushOptOut
     case metaData
     case setUserAgent
     case setUserEmail(email: String)
@@ -45,10 +43,6 @@ extension CoreEventFactoryImpl: CoreEventFactory {
             return try createAppOpenEvent()
         case let .setUser(user):
             return try createSetUserEvent(user: user)
-        case .optipushOptIn:
-            return try createOptipushOptInEvent()
-        case .optipushOptOut:
-            return try createOptipushOptOutEvent()
         case .metaData:
             return try createMetaDataEvent()
         case let .pageVisit(title: t, category: c):
@@ -69,22 +63,6 @@ private extension CoreEventFactoryImpl {
             deviceID: try storage.getInstallationID(),
             visitorID: storage.visitorID,
             customerID: storage.customerID
-        )
-    }
-
-    func createOptipushOptInEvent() throws -> OptipushOptInEvent {
-        return OptipushOptInEvent(
-            timestamp: timestamp,
-            applicationNameSpace: try getApplicationNamespace(),
-            deviceId: try storage.getInstallationID()
-        )
-    }
-
-    func createOptipushOptOutEvent() throws -> OptipushOptOutEvent {
-        return OptipushOptOutEvent(
-            timestamp: timestamp,
-            applicationNameSpace: try getApplicationNamespace(),
-            deviceId: try storage.getInstallationID()
         )
     }
 
