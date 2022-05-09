@@ -278,16 +278,9 @@ extension Optimove {
     }
 
     /**
-        Unsubscribe your device from the Optimove Push service
-    */
-    @objc public func pushUnregister() {
-        Optimobile.pushUnregister()
-    }
-
-    /**
         Register a device token with the Optimove Push service.
 
-        Note you shouldn't normally need to call this method.
+        Note you shouldn't normally need to call this method, registration is handled by the SDK.
 
         Parameters:
             - deviceToken: The push token returned by the device
