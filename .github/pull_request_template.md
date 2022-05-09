@@ -16,11 +16,14 @@
 
 ### Bump versions in:
 
-
+- [ ] `OptimoveCore.podspec`
+- [ ] `OptimoveNotificationServiceExtension.podspec`
 - [ ] `OptimoveSDK.podspec`
-- [ ] `OptimoveSwiftExtension.podspec`
-- [ ] `Build target version for plist`
+
+- [ ] `OptimoveCore/Sources/Classes/Constants/SDKVersion.swift`
+
 - [ ] `README.md`
+- [ ] `CHANGELOG.md`
 
 ### Integration tests
 
