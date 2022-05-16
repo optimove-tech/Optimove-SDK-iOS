@@ -15,12 +15,15 @@ class OptimobileBadgeObserver: NSObject {
         
         UIApplication.shared.addObserver(self, forKeyPath: "applicationIconBadgeNumber",options: .new, context: nil)
     }
-
+    
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-       
+        
         if ((keyPath?.elementsEqual("applicationIconBadgeNumber")) != nil) {
             let newBadgeCount = change![NSKeyValueChangeKey(rawValue: "new")]
             _callback(newBadgeCount as! Int)
+        }
+        else {
+            _callback(-1)
         }
     }
 }
