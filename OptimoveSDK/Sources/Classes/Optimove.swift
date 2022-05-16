@@ -20,6 +20,8 @@ typealias Logger = OptimoveCore.Logger
     @objc public static let shared: Optimove = {
         return Optimove()
     }()
+    
+    @objc public static var initialized: Bool = false
 
     private let container: Container
     private var config: OptimoveConfig!
@@ -44,25 +46,26 @@ typealias Logger = OptimoveCore.Logger
             shared.startSDK { _ in }
         }
     }
-
-    public static func initialize(with config: OptimoveConfig) {
+    
+    public static func initialize(with config: OptimoveConfig, state: ((_ otimove: Bool, _ optimobile: Bool) -> ())? = nil) {
         shared.config = config
-
+        
         if config.isOptimoveConfigured(), let tenantInfo = config.tenantInfo {
             Optimove.configure(for: tenantInfo)
         }
-
+        
         if config.isOptimobileConfigured(), let optimobileConfig = config.optimobileConfig {
             shared.container.resolve { serviceLocator in
                 guard let visitorId = try? serviceLocator.storage().getInitialVisitorId() else {
                     return
                 }
-
+                
                 Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId)
             }
+            
+            state?(Optimove.initialized ,Optimobile.isInitialized())
         }
     }
-
 }
 
 // MARK: - Event API call
@@ -336,6 +339,7 @@ private extension Optimove {
                 switch result {
                 case let .success(configuration):
                     self.initialize(with: configuration)
+                    Optimove.initialized = true
                     Logger.info("Initialization finished. ✅")
                     completion(.success(()))
                 case let .failure(error):

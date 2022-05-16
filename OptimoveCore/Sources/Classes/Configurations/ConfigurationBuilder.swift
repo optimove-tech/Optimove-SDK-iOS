@@ -25,8 +25,7 @@ public final class ConfigurationBuilder {
             realtime: buildRealtimeConfig(),
             optitrack: buildOptitrackConfig(),
             events: events,
-            isEnableRealtime: tenantConfig.isEnableRealtime,
-            isSupportedAirship: tenantConfig.isSupportedAirship
+            isEnableRealtime: tenantConfig.isEnableRealtime
         )
     }
 

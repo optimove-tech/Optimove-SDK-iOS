@@ -208,12 +208,9 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         
         if #available(iOS 10.0, *) {
             config.mediaTypesRequiringUserActionForPlayback = []
-        } else {
-            if #available(iOS 9.0, *) {
-                config.requiresUserActionForMediaPlayback = false
-            } else {
-                config.mediaPlaybackRequiresUserAction = false
-            }
+        }
+        else {
+            config.requiresUserActionForMediaPlayback = false
         }
         
         #if DEBUG

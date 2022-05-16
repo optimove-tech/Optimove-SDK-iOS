@@ -42,13 +42,7 @@ import CoreData
     }
 
     public func isAvailable() -> Bool {
-        if (self.availableFrom != nil && self.availableFrom!.timeIntervalSinceNow > 0) {
-            return false;
-        } else if (self.availableTo != nil && self.availableTo!.timeIntervalSinceNow < 0) {
-            return false;
-        }
-
-        return true;
+        return self.availableFrom == nil || self.availableTo!.timeIntervalSinceNow == 0
     }
     
     public func isRead() -> Bool {

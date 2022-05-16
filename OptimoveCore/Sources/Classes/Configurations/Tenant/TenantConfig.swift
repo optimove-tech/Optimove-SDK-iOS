@@ -1,7 +1,6 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
 public struct TenantConfig: Codable, Equatable {
-    public let isSupportedAirship: Bool
     public let isEnableRealtime: Bool
     public let isEnableRealtimeThroughOptistream: Bool
     public let isProductionLogsEnabled: Bool
@@ -14,7 +13,6 @@ public struct TenantConfig: Codable, Equatable {
         optitrack: TenantOptitrackConfig,
         events: [String: EventsConfig],
         isEnableRealtime: Bool,
-        isSupportedAirship: Bool,
         isEnableRealtimeThroughOptistream: Bool,
         isProductionLogsEnabled: Bool
     ) {
@@ -22,14 +20,12 @@ public struct TenantConfig: Codable, Equatable {
         self.optitrack = optitrack
         self.events = events
         self.isEnableRealtime = isEnableRealtime
-        self.isSupportedAirship = isSupportedAirship
         self.isEnableRealtimeThroughOptistream = isEnableRealtimeThroughOptistream
         self.isProductionLogsEnabled = isProductionLogsEnabled
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        isSupportedAirship = try container.decodeIfPresent(Bool.self, forKey: .supportAirship) ?? false
         isEnableRealtime = try container.decode(Bool.self, forKey: .enableRealtime)
         isProductionLogsEnabled = try container.decodeIfPresent(Bool.self, forKey: .prodLogsEnabled) ?? false
         isEnableRealtimeThroughOptistream = try container.decodeIfPresent(Bool.self, forKey: .enableRealtimeThroughOptistream) ?? false
@@ -40,7 +36,6 @@ public struct TenantConfig: Codable, Equatable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(isSupportedAirship, forKey: .supportAirship)
         try container.encodeIfPresent(isProductionLogsEnabled, forKey: .prodLogsEnabled)
         try container.encode(isEnableRealtime, forKey: .enableRealtime)
         try container.encodeIfPresent(isEnableRealtimeThroughOptistream, forKey: .enableRealtimeThroughOptistream)
@@ -50,7 +45,6 @@ public struct TenantConfig: Codable, Equatable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case supportAirship
         case enableRealtime
         case enableRealtimeThroughOptistream
         case prodLogsEnabled

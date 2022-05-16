@@ -9,7 +9,6 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
     public let optitrack: OptitrackConfig
     public let events: [String: EventsConfig]
     public let isEnableRealtime: Bool
-    public let isSupportedAirship: Bool
 
     public init(
         tenantID: Int,
@@ -17,8 +16,7 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
         realtime: RealtimeConfig,
         optitrack: OptitrackConfig,
         events: [String: EventsConfig],
-        isEnableRealtime: Bool,
-        isSupportedAirship: Bool
+        isEnableRealtime: Bool
     ) {
         self.tenantID = tenantID
         self.logger = logger
@@ -26,7 +24,6 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
         self.optitrack = optitrack
         self.events = events
         self.isEnableRealtime = isEnableRealtime
-        self.isSupportedAirship = isSupportedAirship
     }
 }
 
