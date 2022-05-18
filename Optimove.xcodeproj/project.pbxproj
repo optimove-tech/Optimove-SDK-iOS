@@ -110,10 +110,6 @@
 		4F585C7727FECCFA005E7BB4 /* Optimobile+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C6427FECCFA005E7BB4 /* Optimobile+Analytics.swift */; };
 		4F585C7827FECCFA005E7BB4 /* DeepLinkFingerprinter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F585C6527FECCFA005E7BB4 /* DeepLinkFingerprinter.swift */; };
 		4FA8F61727FEE872005CB88E /* OptimobileBadgeObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA8F61627FEE872005CB88E /* OptimobileBadgeObserver.swift */; };
-		4FD7113E2832670800AB5EE2 /* Optimobile+Push_Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FD7113D2832670800AB5EE2 /* Optimobile+Push_Test.swift */; };
-		4FD71140283277B900AB5EE2 /* OptimobileBadgeObserverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FD7113F283277B900AB5EE2 /* OptimobileBadgeObserverTest.swift */; };
-		4FF27DEF282BE0A00044EA55 /* OptimoveInAppTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF27DEE282BE0A00044EA55 /* OptimoveInAppTest.swift */; };
-		4FF27DF0282BE0A60044EA55 /* OptimobileInitTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF27DEC282A5CDC0044EA55 /* OptimobileInitTest.swift */; };
 		50B6E591AC81B656E87934F7 /* NetworkRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A8F39D35D2D3237AD0F678 /* NetworkRequestFactory.swift */; };
 		5231F567663FDB98A45B2BB7 /* CoreDataFetchIndexDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48695180D12E3F6E69B27A64 /* CoreDataFetchIndexDescription.swift */; };
 		529587C2B105ADD76A48F003 /* String+alphanumeric.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877F4A8A9B50FDB1E7C91CF4 /* String+alphanumeric.swift */; };
@@ -424,11 +420,7 @@
 		4FA8F61627FEE872005CB88E /* OptimobileBadgeObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimobileBadgeObserver.swift; sourceTree = "<group>"; };
 		4FA8FC4F280C410B005CB88E /* OptimoveNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimoveNotificationService.swift; sourceTree = "<group>"; };
 		4FD4BAAECE0E2C8D6DAD6232 /* RemoteConfigurationNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationNetworking.swift; sourceTree = "<group>"; };
-		4FD7113D2832670800AB5EE2 /* Optimobile+Push_Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optimobile+Push_Test.swift"; sourceTree = "<group>"; };
-		4FD7113F283277B900AB5EE2 /* OptimobileBadgeObserverTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimobileBadgeObserverTest.swift; sourceTree = "<group>"; };
 		4FE394EA27C78933005FABB0 /* Mocker.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Mocker.xcframework; path = Carthage/Build/Mocker.xcframework; sourceTree = "<group>"; };
-		4FF27DEC282A5CDC0044EA55 /* OptimobileInitTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimobileInitTest.swift; sourceTree = "<group>"; };
-		4FF27DEE282BE0A00044EA55 /* OptimoveInAppTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveInAppTest.swift; sourceTree = "<group>"; };
 		506941ABF70087E99952FFD6 /* AppOpenEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenEvent.swift; sourceTree = "<group>"; };
 		5120297307C3C5A364386C92 /* CoreDataEntityDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEntityDescription.swift; sourceTree = "<group>"; };
 		558B0FF7FB691AD7EF1BC356 /* GlobalConfigFixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConfigFixture.swift; sourceTree = "<group>"; };
@@ -839,7 +831,6 @@
 		1ABA1417B2D66EECF3AD47FA /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				4FF27DEB282A5C7E0044EA55 /* Optimobile */,
 				E8DD9ABEF7740FCB8768F6D8 /* OptiTrack */,
 				63F6334316D17AF57E0ABF5E /* Realtime */,
 			);
@@ -1055,17 +1046,6 @@
 				4F585C5527FECCFA005E7BB4 /* InAppModels.swift */,
 			);
 			path = InApp;
-			sourceTree = "<group>";
-		};
-		4FF27DEB282A5C7E0044EA55 /* Optimobile */ = {
-			isa = PBXGroup;
-			children = (
-				4FF27DEC282A5CDC0044EA55 /* OptimobileInitTest.swift */,
-				4FF27DEE282BE0A00044EA55 /* OptimoveInAppTest.swift */,
-				4FD7113D2832670800AB5EE2 /* Optimobile+Push_Test.swift */,
-				4FD7113F283277B900AB5EE2 /* OptimobileBadgeObserverTest.swift */,
-			);
-			path = Optimobile;
 			sourceTree = "<group>";
 		};
 		517F8BBB89498042BB4C4B44 /* Coding */ = {
@@ -1837,7 +1817,6 @@
 			files = (
 				2D5CC37EBB1EFCC1DAB9C396 /* AppOpenEventTests.swift in Sources */,
 				24AB2C2FB4F38FB0FFA4F61F /* ConfigurationFixture.swift in Sources */,
-				4FF27DEF282BE0A00044EA55 /* OptimoveInAppTest.swift in Sources */,
 				39EC499624AEE7CFC0B677B5 /* CoreDataMigratorTests.swift in Sources */,
 				B0B632040ED242B1CFAB93E2 /* CoreEventFactoryTests.swift in Sources */,
 				03A06957E14DE9C264FD3BF4 /* EnterForegroundObserverTests.swift in Sources */,
@@ -1847,7 +1826,6 @@
 				EC6FCE53F6000850B92B2511 /* GlobalConfigurationDownloaderTests.swift in Sources */,
 				567FF1C790FA8B2A7FAC4F7F /* InstallationIdTests.swift in Sources */,
 				9839623196598C955928FEA0 /* KVOExpectation.swift in Sources */,
-				4FF27DF0282BE0A60044EA55 /* OptimobileInitTest.swift in Sources */,
 				D9E82D512D6810F3203A98D4 /* MergeRemoteConfigurationOperationTests.swift in Sources */,
 				19FAAD1B5B8F3A83CCE1681A /* MockConfigurationRepository.swift in Sources */,
 				1EC0331B7F3631CAFF5B4BE7 /* MockDateTimeProvider.swift in Sources */,
@@ -1858,11 +1836,9 @@
 				CF0221B39C0839E2FEE69AE5 /* MockSynchronizer.swift in Sources */,
 				E7B65A20C54C58E9FE0572A1 /* NewEmailHandlerTests.swift in Sources */,
 				6D08783D81F2B6D01BC5EA96 /* NewTenantInfoHandlerTests.swift in Sources */,
-				4FD7113E2832670800AB5EE2 /* Optimobile+Push_Test.swift in Sources */,
 				9FD12FE96EA86F95AFBF7824 /* NewUserIDHandlerTests.swift in Sources */,
 				45AEE0276D250CF2208C644E /* OnStartEventGeneratorTests.swift in Sources */,
 				86D018D4B3FDD1E5654A80B3 /* OptiTrackMockQueueTests.swift in Sources */,
-				4FD71140283277B900AB5EE2 /* OptimobileBadgeObserverTest.swift in Sources */,
 				CB4AC43D9576A580D0C217DA /* OptimoveTestCase.swift in Sources */,
 				DBD21C31B247D71522605231 /* OptistreamNetworkingMock.swift in Sources */,
 				94CE3D9CC6C61823F42F022E /* OptitrackTests.swift in Sources */,
