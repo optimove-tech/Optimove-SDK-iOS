@@ -1,6 +1,13 @@
 # Changelog
 
-## 3.6.0
+## 5.0.0
+
+Major breaking update - [Migration guide](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Migration-guide-from-3.x-to-5.x)
+
+- Deprecated OptiPush and implemented new messaging platform
+- Added In-App Messaging, Message Inbox and Deferred Deep Linking features
+
+## 3.6.0 (unreleased)
 
 - **added** `getVisitorID` API.
 

@@ -38,7 +38,7 @@ typealias Logger = OptimoveCore.Logger
     /// The starting point of the Optimove SDK.
     ///
     /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
-    @objc public static func configure(for tenantInfo: OptimoveTenantInfo) {
+    @objc static func configure(for tenantInfo: OptimoveTenantInfo) {
         /// FUTURE: To merge configure call with init.
         shared.container.resolve { serviceLocator in
             serviceLocator.newTenantInfoHandler().handle(tenantInfo)
@@ -281,16 +281,9 @@ extension Optimove {
     }
 
     /**
-        Unsubscribe your device from the Optimove Push service
-    */
-    @objc public func pushUnregister() {
-        Optimobile.pushUnregister()
-    }
-
-    /**
         Register a device token with the Optimove Push service.
 
-        Note you shouldn't normally need to call this method.
+        Note you shouldn't normally need to call this method, registration is handled by the SDK.
 
         Parameters:
             - deviceToken: The push token returned by the device

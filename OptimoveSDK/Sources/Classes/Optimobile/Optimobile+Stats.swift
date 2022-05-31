@@ -2,6 +2,7 @@
 
 import Foundation
 import UserNotifications
+import OptimoveCore
 
 #if os(iOS) || os(watchOS) || os(tvOS)
     import UIKit
@@ -67,7 +68,7 @@ extension Optimobile {
         
         var sdk = [String : AnyObject]()
         sdk["id"] = sdkType as AnyObject
-        sdk["version"] = sdkVersion as AnyObject
+        sdk["version"] = SDKVersion as AnyObject
         
         var runtime = [String : AnyObject]()
         var os = [String : AnyObject]()
