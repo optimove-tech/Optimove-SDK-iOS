@@ -2,7 +2,7 @@
 
 import Foundation
 
-internal enum OptimobileUserDefaultsKey : String {
+public enum OptimobileUserDefaultsKey : String {
     
     case API_KEY = "KumulosApiKey"
     case SECRET_KEY = "KumulosSecretKey"

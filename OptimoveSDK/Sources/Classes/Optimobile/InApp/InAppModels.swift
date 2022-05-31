@@ -9,7 +9,7 @@ public enum InAppPresented : String {
     case NEVER = "never"
 }
 
-class InAppMessageEntity : NSManagedObject {
+public class InAppMessageEntity : NSManagedObject {
     @NSManaged var id : Int64
     @NSManaged var updatedAt: NSDate
     @NSManaged var presentedWhen: String
