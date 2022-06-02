@@ -209,14 +209,10 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         if #available(iOS 10.0, *) {
             config.mediaTypesRequiringUserActionForPlayback = []
         } else {
-            if #available(iOS 9.0, *) {
-                config.requiresUserActionForMediaPlayback = false
-            } else {
-                config.mediaPlaybackRequiresUserAction = false
-            }
+            config.requiresUserActionForMediaPlayback = false
         }
         
-        #if DEBUG
+#if DEBUG
             config.preferences.setValue(true, forKey:"developerExtrasEnabled")
         #endif
 
