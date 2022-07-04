@@ -58,11 +58,27 @@ typealias Logger = OptimoveCore.Logger
                     return
                 }
 
+                maybeAlignUserAssociation();
+                
                 Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId)
             }
         }
     }
+    
+    private static func maybeAlignUserAssociation() {
+        shared.container.resolve { serviceLocator in
+            guard let userId = try? serviceLocator.storage().getCustomerID() else {
+                return
+            }
 
+            String optimobileUserId = Optimobile.currentUserIdentifier
+            if (optimobileUserId == customerId) {
+                return
+            }
+                
+            Optimobile.associateUserWithInstall(userIdentifier: userId)
+        }
+    }
 }
 
 // MARK: - Event API call
