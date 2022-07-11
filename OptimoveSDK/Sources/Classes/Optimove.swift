@@ -58,9 +58,7 @@ typealias Logger = OptimoveCore.Logger
                     return
                 }
                 
-                guard let userId = try? serviceLocator.storage().getCustomerID() else {
-                    userId = nil
-                }
+                let userId = try? serviceLocator.storage().getCustomerID()
 
                 Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId, initialUserId: userId)
             }
