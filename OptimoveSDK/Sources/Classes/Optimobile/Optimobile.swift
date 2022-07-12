@@ -141,20 +141,20 @@ class Optimobile {
             instance!.sendDeviceInformation()
         }
         
-        maybeAlignUserAssociation(initialUserId)
+        maybeAlignUserAssociation(initialUserId: initialUserId)
     }
     
-    fileprivate static func maybeAlignUserAssociation(instance: Optimobile, initialUserId: String?) {
+    fileprivate static func maybeAlignUserAssociation(initialUserId: String?) {
         if (initialUserId == nil) {
             return
         }
         
-        String optimobileUserId = instance.currentUserIdentifier
+        let optimobileUserId = OptimobileHelper.currentUserIdentifier
         if (optimobileUserId == initialUserId) {
             return
         }
             
-        instance.associateUserWithInstall(userIdentifier: initialUserId)
+        Optimobile.associateUserWithInstall(userIdentifier: initialUserId!)
     }
 
     fileprivate init(config: OptimobileConfig) {
