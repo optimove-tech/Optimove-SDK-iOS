@@ -253,7 +253,27 @@ extension Optimove {
     private func _setUserEmail(_ email: String, _ serviceLocator: ServiceLocator) throws -> Event {
         return try serviceLocator.coreEventFactory().createEvent(.setUserEmail(email: email))
     }
+    
+    /// Signout the user from the app
+    ///  Call this function to unset the customerID and revert to an anonymous visitor
+    @objc public static func signout() {
+        shared.signout()
+    }
 
+    private func signout() {
+        let function: (ServiceLocator) -> String? = { serviceLocator in
+            return try? serviceLocator.storage().getCustomerID()()
+        }
+        
+        // Clear customerID from storage
+        // Set VisitorID to InitialVisitorID
+        
+        Optimobile.clearUserAssociation()
+    }
+    
+    @objc public static func pushUnregister() {
+        Optimobile.pushUnregister()
+    }
 }
 
 // MARK: - Optimobile APIs
