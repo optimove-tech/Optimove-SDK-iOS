@@ -14,7 +14,9 @@ jobs:
     - uses: actions/checkout@v1
     - run: carthage update --use-xcframeworks --cache-builds
       name: Carthage
-    - run: xcodebuild build-for-testing -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11"
+    - name: Install xcbeautify
+      run: brew install xcbeautify
+    - run: set -o pipefail && xcodebuild build-for-testing -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11" | xcbeautify
       name: Build
-    - run: xcodebuild test-without-building -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11"
+    - run: set -o pipefail && xcodebuild test-without-building -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11" | xcbeautify
       name: Test
