@@ -57,8 +57,10 @@ typealias Logger = OptimoveCore.Logger
                 guard let visitorId = try? serviceLocator.storage().getInitialVisitorId() else {
                     return
                 }
+                
+                let userId = try? serviceLocator.storage().getCustomerID()
 
-                Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId)
+                Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId, initialUserId: userId)
             }
         }
     }
@@ -359,5 +361,5 @@ private extension Optimove {
         }
         container.resolve(function)
     }
-
+    
 }

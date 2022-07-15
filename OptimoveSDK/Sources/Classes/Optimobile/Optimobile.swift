@@ -115,7 +115,7 @@ class Optimobile {
     /**
         Initialize the Optimobile SDK.
     */
-    static func initialize(config: OptimobileConfig, initialVisitorId: String) {
+    static func initialize(config: OptimobileConfig, initialVisitorId: String, initialUserId: String?) {
         if (instance !== nil) {
             assertionFailure("The OptimobileSDK has already been initialized")
         }
@@ -140,6 +140,21 @@ class Optimobile {
         DispatchQueue.global().async {
             instance!.sendDeviceInformation()
         }
+        
+        maybeAlignUserAssociation(initialUserId: initialUserId)
+    }
+    
+    fileprivate static func maybeAlignUserAssociation(initialUserId: String?) {
+        if (initialUserId == nil) {
+            return
+        }
+        
+        let optimobileUserId = OptimobileHelper.currentUserIdentifier
+        if (optimobileUserId == initialUserId) {
+            return
+        }
+            
+        Optimobile.associateUserWithInstall(userIdentifier: initialUserId!)
     }
 
     fileprivate init(config: OptimobileConfig) {
@@ -179,5 +194,5 @@ class Optimobile {
         pushHttpClient.invalidateSessionCancellingTasks(true)
         coreHttpClient.invalidateSessionCancellingTasks(true)
     }
-
+    
 }
