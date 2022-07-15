@@ -271,11 +271,6 @@ extension Optimove {
         Optimobile.clearUserAssociation()
     }
     
-    @objc public static func pushUnregister() {
-        Optimobile.pushUnregister()
-    }
-}
-
 // MARK: - Optimobile APIs
 
 extension Optimove {
@@ -309,6 +304,15 @@ extension Optimove {
     */
     @objc public func pushRegister(_ deviceToken: Data) {
         Optimobile.pushRegister(deviceToken)
+    }
+
+    /**
+        Unregister the device token with the Optimove Push service.
+     
+        Notifications will no longer be received until pushRequestDeviceToken is called again
+     */
+    @objc public static func pushUnregister() {
+        Optimobile.pushUnregister()
     }
 
     /**
