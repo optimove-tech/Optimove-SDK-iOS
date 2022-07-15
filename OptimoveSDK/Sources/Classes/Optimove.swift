@@ -261,15 +261,12 @@ extension Optimove {
     }
 
     private func signout() {
-        let function: (ServiceLocator) -> String? = { serviceLocator in
-            return try? serviceLocator.storage().getCustomerID()()
-        }
-        
         // Clear customerID from storage
         // Set VisitorID to InitialVisitorID
         
         Optimobile.clearUserAssociation()
     }
+}
     
 // MARK: - Optimobile APIs
 
