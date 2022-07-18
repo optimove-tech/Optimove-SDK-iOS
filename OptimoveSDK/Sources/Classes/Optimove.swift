@@ -261,10 +261,27 @@ extension Optimove {
     }
 
     private func signout() {
-        // Clear customerID from storage
-        // Set VisitorID to InitialVisitorID
         
-        Optimobile.clearUserAssociation()
+        if config.isOptimoveConfigured() {
+            // Clear customerID from storage
+            // Set VisitorID to InitialVisitorID
+            // ?
+//            let function: (ServiceLocator) -> Void = { serviceLocator in
+//                tryCatch {
+//                    let user = User(userID: userID)
+//                    let event = try self._setUser(user, serviceLocator)
+//                    serviceLocator.pipeline().deliver(.report(events: [event]))
+//                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
+//                        serviceLocator.pipeline().deliver(.setInstallation)
+//                    }
+//                }
+//            }
+//            container.resolve(function)
+        }
+        
+        if config.isOptimobileConfigured() {
+            Optimobile.clearUserAssociation()
+        }
     }
 }
     
