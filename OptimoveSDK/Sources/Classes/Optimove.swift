@@ -264,8 +264,8 @@ extension Optimove {
         if config.isOptimoveConfigured() {
             let function: (ServiceLocator) -> Void = { serviceLocator in
                 tryCatch {
-                    serviceLocator.storage().customerID = nil
-                    serviceLocator.storage().visitorId = service.storage().initialVisitorId
+                    serviceLocator.storage().set(value: nil, key: StorageKey.customerID)
+                    serviceLocator.storage().set(value: serviceLocator.storage().initialVisitorId, key: StorageKey.visitorID)
                 }
             }
             container.resolve(function)
