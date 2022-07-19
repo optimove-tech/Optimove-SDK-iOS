@@ -192,9 +192,9 @@ extension Optimove {
                     let user = User(userID: userID)
                     let event = try self._setUser(user, serviceLocator)
                     serviceLocator.pipeline().deliver(.report(events: [event]))
-                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-                        serviceLocator.pipeline().deliver(.setInstallation)
-                    }
+//                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
+//                        serviceLocator.pipeline().deliver(.setInstallation)
+//                    }
                 }
             }
             container.resolve(function)
@@ -256,27 +256,19 @@ extension Optimove {
     
     /// Signout the user from the app
     ///  Call this function to unset the customerID and revert to an anonymous visitor
-    @objc public static func signout() {
-        shared.signout()
+    @objc public static func signOutUser() {
+        shared.signOutUser()
     }
 
-    private func signout() {
-        
+    private func signOutUser() {
         if config.isOptimoveConfigured() {
-            // Clear customerID from storage
-            // Set VisitorID to InitialVisitorID
-            // ?
-//            let function: (ServiceLocator) -> Void = { serviceLocator in
-//                tryCatch {
-//                    let user = User(userID: userID)
-//                    let event = try self._setUser(user, serviceLocator)
-//                    serviceLocator.pipeline().deliver(.report(events: [event]))
-//                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-//                        serviceLocator.pipeline().deliver(.setInstallation)
-//                    }
-//                }
-//            }
-//            container.resolve(function)
+            let function: (ServiceLocator) -> Void = { serviceLocator in
+                tryCatch {
+                    serviceLocator.storage().customerID = nil
+                    serviceLocator.storage().visitorId = service.storage().initialVisitorId
+                }
+            }
+            container.resolve(function)
         }
         
         if config.isOptimobileConfigured() {
