@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.1.0
+
+- **added** `signOutUser` API - Unassociate the current customer with the device, returning to a anonymous visitor state
+
+- **added** `pushUnregister` API - Opt the device out from push notifications
+
 ## 5.0.0
 
 Major breaking update - [Migration guide](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Migration-guide-from-3.x-to-5.x)
