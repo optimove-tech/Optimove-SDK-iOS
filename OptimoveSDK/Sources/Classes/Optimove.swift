@@ -260,7 +260,9 @@ extension Optimove {
         shared.signOutUser()
     }
 
-    private func signOutUser() {
+    /// Signout the user from the app
+    /// Call this function to unset the customerID and revert to an anonymous visitor
+    public func signOutUser() {
         if config.isOptimoveConfigured() {
             let function: (ServiceLocator) -> Void = { serviceLocator in
                 tryCatch {
