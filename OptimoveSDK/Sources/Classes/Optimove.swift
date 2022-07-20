@@ -192,9 +192,9 @@ extension Optimove {
                     let user = User(userID: userID)
                     let event = try self._setUser(user, serviceLocator)
                     serviceLocator.pipeline().deliver(.report(events: [event]))
-//                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-//                        serviceLocator.pipeline().deliver(.setInstallation)
-//                    }
+                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
+                        serviceLocator.pipeline().deliver(.setInstallation)
+                    }
                 }
             }
             container.resolve(function)
