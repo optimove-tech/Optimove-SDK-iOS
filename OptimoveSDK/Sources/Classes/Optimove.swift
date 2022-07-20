@@ -319,7 +319,7 @@ extension Optimove {
      
         Notifications will no longer be received until pushRequestDeviceToken is called again
      */
-    @objc public static func pushUnregister() {
+    @objc public func pushUnregister() {
         Optimobile.pushUnregister()
     }
 
