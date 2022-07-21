@@ -57,8 +57,10 @@ typealias Logger = OptimoveCore.Logger
                 guard let visitorId = try? serviceLocator.storage().getInitialVisitorId() else {
                     return
                 }
+                
+                let userId = try? serviceLocator.storage().getCustomerID()
 
-                Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId)
+                Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId, initialUserId: userId)
             }
         }
     }
@@ -251,9 +253,32 @@ extension Optimove {
     private func _setUserEmail(_ email: String, _ serviceLocator: ServiceLocator) throws -> Event {
         return try serviceLocator.coreEventFactory().createEvent(.setUserEmail(email: email))
     }
+    
+    /// Signout the user from the app
+    ///  Call this function to unset the customerID and revert to an anonymous visitor
+    @objc public static func signOutUser() {
+        shared.signOutUser()
+    }
 
+    /// Signout the user from the app
+    /// Call this function to unset the customerID and revert to an anonymous visitor
+    public func signOutUser() {
+        if config.isOptimoveConfigured() {
+            let function: (ServiceLocator) -> Void = { serviceLocator in
+                tryCatch {
+                    serviceLocator.storage().set(value: nil, key: StorageKey.customerID)
+                    serviceLocator.storage().set(value: serviceLocator.storage().initialVisitorId, key: StorageKey.visitorID)
+                }
+            }
+            container.resolve(function)
+        }
+        
+        if config.isOptimobileConfigured() {
+            Optimobile.clearUserAssociation()
+        }
+    }
 }
-
+    
 // MARK: - Optimobile APIs
 
 extension Optimove {
@@ -287,6 +312,15 @@ extension Optimove {
     */
     @objc public func pushRegister(_ deviceToken: Data) {
         Optimobile.pushRegister(deviceToken)
+    }
+
+    /**
+        Unregister the device token with the Optimove Push service.
+     
+        Notifications will no longer be received until pushRequestDeviceToken is called again
+     */
+    @objc public func pushUnregister() {
+        Optimobile.pushUnregister()
     }
 
     /**
@@ -359,5 +393,5 @@ private extension Optimove {
         }
         container.resolve(function)
     }
-
+    
 }

@@ -3,7 +3,7 @@
 import Foundation
 
 /// Helps to fetch JSON files.
-protocol FileAccessible: class {
+protocol FileAccessible: AnyObject {
     /// The name of the json name.
     var fileName: String { get }
     /// Returns Data from JSON file if exists.
