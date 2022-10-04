@@ -14,7 +14,7 @@ public class PushNotification: NSObject {
     internal(set) open var url: URL?
     internal(set) open var actionIdentifier: String?
 
-    public init(userInfo: [AnyHashable:Any]?) {
+    init(userInfo: [AnyHashable:Any]?) {
         self.id = 0
         self.aps = [:]
         self.data = [:]
