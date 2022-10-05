@@ -138,22 +138,22 @@ class Optimobile {
         }
 
         DispatchQueue.global().async {
-            instance!.sendDeviceInformation()
+            instance!.sendDeviceInformation(config: config)
         }
-        
+
         maybeAlignUserAssociation(initialUserId: initialUserId)
     }
-    
+
     fileprivate static func maybeAlignUserAssociation(initialUserId: String?) {
         if (initialUserId == nil) {
             return
         }
-        
+
         let optimobileUserId = OptimobileHelper.currentUserIdentifier
         if (optimobileUserId == initialUserId) {
             return
         }
-            
+
         Optimobile.associateUserWithInstall(userIdentifier: initialUserId!)
     }
 
@@ -194,5 +194,5 @@ class Optimobile {
         pushHttpClient.invalidateSessionCancellingTasks(true)
         coreHttpClient.invalidateSessionCancellingTasks(true)
     }
-    
+
 }

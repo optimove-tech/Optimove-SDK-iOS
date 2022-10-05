@@ -53,7 +53,7 @@ public class PushNotification: NSObject {
             url = nil
         }
     }
-    
+
     @available(iOS 10.0, *)
     convenience init(userInfo: [AnyHashable:Any]?, response: UNNotificationResponse?) {
         self.init(userInfo: userInfo)
@@ -191,17 +191,17 @@ extension Optimobile {
                           "type" : sharedInstance.pushNotificationDeviceType,
                           "iosTokenType" : iosTokenType,
                           "bundleId": bundleId] as [String : Any]
-        
+
         Optimobile.trackEvent(eventType: OptimobileEvent.PUSH_DEVICE_REGISTER, properties: parameters as [String : AnyObject], immediateFlush: true)
     }
-    
+
     /**
         Unsubscribe your device from the Optimobile Push service
     */
     static func pushUnregister() {
         Optimobile.trackEvent(eventType: OptimobileEvent.DEVICE_UNSUBSCRIBED, properties: [:], immediateFlush: true)
     }
- 
+
 // MARK: Open handling
     /**
         Track a user action triggered by a push notification
@@ -217,7 +217,7 @@ extension Optimobile {
         let params = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_OPENED, properties:params)
     }
-    
+
     @available(iOS 9.0, *)
     internal func pushHandleOpen(withUserInfo: [AnyHashable: Any]?) {
         guard let userInfo = withUserInfo else {
@@ -231,7 +231,7 @@ extension Optimobile {
 
         self.pushHandleOpen(notification: notification)
     }
-  
+
     @available(iOS 10.0, *)
     internal func pushHandleOpen(withUserInfo: [AnyHashable: Any]?, response: UNNotificationResponse?) -> Bool {
         let notification = PushNotification(userInfo: withUserInfo, response: response)
@@ -241,15 +241,15 @@ extension Optimobile {
         }
 
         self.pushHandleOpen(notification: notification)
-        
+
         PendingNotificationHelper.remove(id: notification.id)
-       
+
         return true
     }
-    
+
     private func pushHandleOpen(notification: PushNotification) {
         Optimobile.pushTrackOpen(notification: notification)
-        
+
        // Handle URL pushes
 
        if let url = notification.url {
@@ -286,17 +286,17 @@ extension Optimobile {
 
         return true
     }
-    
+
     @available(iOS 10.0, *)
     private func pushHandleDismissed(notificationId: Int, dismissedAt: Date? = nil) {
         PendingNotificationHelper.remove(id: notificationId)
         self.pushTrackDismissed(notificationId: notificationId, dismissedAt: dismissedAt)
     }
-    
+
     @available(iOS 10.0, *)
     private func pushTrackDismissed(notificationId: Int, dismissedAt: Date? = nil) {
         let params = ["type": KS_MESSAGE_TYPE_PUSH, "id": notificationId]
-              
+
         if let unwrappedDismissedAt = dismissedAt {
             Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DISMISSED.rawValue, atTime: unwrappedDismissedAt, properties:params)
         }
@@ -304,13 +304,13 @@ extension Optimobile {
             Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DISMISSED, properties:params)
         }
     }
-    
+
     @available(iOS 10.0, *)
     internal func maybeTrackPushDismissedEvents() {
         if (!AppGroupsHelper.isKumulosAppGroupDefined()){
             return;
         }
-        
+
         UNUserNotificationCenter.current().getDeliveredNotifications { (notifications: [UNNotification]) in
             var actualPendingNotificationIds: [Int] = []
             for notification in notifications {
@@ -318,20 +318,20 @@ extension Optimobile {
                 if (notification.id == 0){
                     continue
                 }
-                
+
                 actualPendingNotificationIds.append(notification.id)
             }
-            
+
             let recordedPendingNotifications = PendingNotificationHelper.readAll()
-           
+
             let deletions = recordedPendingNotifications.filter({ !actualPendingNotificationIds.contains( $0.id ) })
             for deletion in deletions {
                 self.pushHandleDismissed(notificationId: deletion.id, dismissedAt: deletion.deliveredAt)
             }
-            
+
         }
     }
-    
+
 // MARK: Token handling
     fileprivate static func serializeDeviceToken(_ deviceToken: Data) -> String {
         var token: String = ""
@@ -344,7 +344,7 @@ extension Optimobile {
 
     fileprivate static func getTokenType() -> Int {
         let releaseMode = MobileProvision.releaseMode()
-        
+
         if let index =  [
             .releaseAdHoc,
             .releaseDev,
@@ -352,7 +352,7 @@ extension Optimobile {
             ].firstIndex(of: releaseMode), index > -1 {
             return releaseMode.rawValue + 1;
         }
-        
+
         return Optimobile.sharedInstance.pushNotificationProductionTokenType
     }
 }
@@ -466,24 +466,24 @@ class PushHelper {
         existingDidReceive = class_replaceMethod(klass, didReceiveSelector, kumulosDidReceive, receiveType)
         if #available(iOS 10, *) {
             let delegate = OptimoveUserNotificationCenterDelegate()
-            
+
             Optimobile.sharedInstance.notificationCenter = delegate
             UNUserNotificationCenter.current().delegate = delegate
         }
     }()
-    
+
     fileprivate func setBadge(userInfo: [AnyHashable:Any]){
         let badge: NSNumber? = OptimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
         if let newBadge = badge {
             UIApplication.shared.applicationIconBadgeNumber = newBadge.intValue
         }
     }
-    
+
     fileprivate func trackPushDelivery(notification: PushNotification) {
         if (notification.id == 0) {
             return
         }
-        
+
         let props: [String:Any] = ["type" : KS_MESSAGE_TYPE_PUSH, "id": notification.id]
         Optimobile.trackEvent(eventType: KumulosSharedEvent.MESSAGE_DELIVERED, properties:props, immediateFlush: true)
     }

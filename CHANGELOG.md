@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.1.1
+
+- Expose methods to support hybrid SDKs
+
 ## 5.1.0
 
 - **added** `signOutUser` API - Unassociate the current customer with the device, returning to a anonymous visitor state
