@@ -49,6 +49,10 @@ public struct OptimobileConfig {
     let deepLinkHandler : DeepLinkHandler?
 
     let baseUrlMap : ServiceUrlMap
+
+    let runtimeInfo: [String : AnyObject]?
+    let sdkInfo: [String : AnyObject]?
+    let isRelease: Bool?
 }
 
 open class OptimoveConfigBuilder: NSObject {
@@ -65,7 +69,11 @@ open class OptimoveConfigBuilder: NSObject {
     private var _deepLinkCname : URL?
     private var _deepLinkHandler : DeepLinkHandler?
     private var _baseUrlMap : ServiceUrlMap?
-    
+
+    private var _runtimeInfo : [String : AnyObject]?
+    private var _sdkInfo : [String : AnyObject]?
+    private var _isRelease : Bool?
+
     public init(optimoveCredentials: String?, optimobileCredentials: String?) {
         let optimoveCredentialsTuple = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials)
         let optimobileCredentialsTuple = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials)
@@ -88,36 +96,63 @@ open class OptimoveConfigBuilder: NSObject {
 
         _sessionIdleTimeout = 23
     }
-    
+
     @discardableResult public func setSessionIdleTimeout(seconds: UInt) -> OptimoveConfigBuilder {
         _sessionIdleTimeout = seconds
         return self
     }
-    
+
     @discardableResult public func enableInAppMessaging(inAppConsentStrategy: InAppConsentStrategy) -> OptimoveConfigBuilder {
         _inAppConsentStrategy = inAppConsentStrategy
         return self
     }
-    
+
     @discardableResult public func setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: @escaping InAppDeepLinkHandlerBlock) -> OptimoveConfigBuilder {
         _inAppDeepLinkHandlerBlock = inAppDeepLinkHandlerBlock
         return self
     }
-    
+
     @discardableResult public func setPushOpenedHandler(pushOpenedHandlerBlock: @escaping PushOpenedHandlerBlock) -> OptimoveConfigBuilder {
         _pushOpenedHandlerBlock = pushOpenedHandlerBlock
         return self
     }
-    
+
     @available(iOS 10.0, *)
     @discardableResult public func setPushReceivedInForegroundHandler(pushReceivedInForegroundHandlerBlock: @escaping PushReceivedInForegroundHandlerBlock) -> OptimoveConfigBuilder {
         _pushReceivedInForegroundHandlerBlock = pushReceivedInForegroundHandlerBlock
         return self
     }
 
-   @discardableResult public func enableDeepLinking(cname: String? = nil, _ handler: @escaping DeepLinkHandler) -> OptimoveConfigBuilder {
+    @discardableResult public func enableDeepLinking(cname: String? = nil, _ handler: @escaping DeepLinkHandler) -> OptimoveConfigBuilder {
         _deepLinkCname = URL(string: cname ?? "")
         _deepLinkHandler = handler
+
+        return self
+    }
+
+    /**
+     Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
+     */
+    @discardableResult public func setRuntimeInfo(runtimeInfo: [String : AnyObject]) -> OptimoveConfigBuilder {
+         _runtimeInfo = runtimeInfo
+
+         return self
+    }
+
+    /**
+     Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
+     */
+    @discardableResult public func setSdkInfo(sdkInfo: [String : AnyObject]) -> OptimoveConfigBuilder {
+        _sdkInfo = sdkInfo
+
+        return self
+    }
+
+    /**
+     Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
+     */
+    @discardableResult public func setTargetType(isRelease: Bool) -> OptimoveConfigBuilder {
+        _isRelease = isRelease
 
         return self
     }
@@ -130,7 +165,7 @@ open class OptimoveConfigBuilder: NSObject {
 
         return self
     }
-    
+
     @discardableResult public func build() -> OptimoveConfig {
         var tenantInfo : OptimoveTenantInfo?
         var optimobileConfig : OptimobileConfig?
@@ -154,7 +189,10 @@ open class OptimoveConfigBuilder: NSObject {
                 _pushReceivedInForegroundHandlerBlock: _pushReceivedInForegroundHandlerBlock,
                 deepLinkCname: _deepLinkCname,
                 deepLinkHandler: _deepLinkHandler,
-                baseUrlMap: _baseUrlMap)
+                baseUrlMap: _baseUrlMap,
+                runtimeInfo: _runtimeInfo,
+                sdkInfo: _sdkInfo,
+                isRelease: _isRelease)
         }
 
         return OptimoveConfig(

@@ -2,7 +2,7 @@
 
 ## 5.1.1
 
-- Expose method to support hybrid SDKs
+- Expose methods to support hybrid SDKs
 
 ## 5.1.0
 
