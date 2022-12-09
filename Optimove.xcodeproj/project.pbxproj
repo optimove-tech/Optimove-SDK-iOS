@@ -206,6 +206,7 @@
 		B177625EF698C25631CC290E /* CoreDataMigrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0EB99EF51D86C5B64583FB /* CoreDataMigrator.swift */; };
 		B3E5EED7F6260DCCE332FAFD /* OptistreamNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = F723E006AF5D7BDA0DBF4DC0 /* OptistreamNetworking.swift */; };
 		B44B56B11935E11D4A3DFDAC /* ServiceLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92ADAFC4543BF9DE8E088E61 /* ServiceLocator.swift */; };
+		B6E63EA62943734C001959E5 /* Optimobile+Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E63EA52943734C001959E5 /* Optimobile+Location.swift */; };
 		B7CAF22D462BF215234052A2 /* SDKVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B41BBBBB921C848D02E2BE6B /* SDKVersion.swift */; };
 		B9D3F1723BB20889FD2817A6 /* AppOpenOnStartGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB486286AFEC603E2B5A5B71 /* AppOpenOnStartGenerator.swift */; };
 		BBC3825F222CB6EDD09E8B11 /* RealtimeComponentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D1D1DEC05E2AED5EB69424 /* RealtimeComponentTests.swift */; };
@@ -502,6 +503,7 @@
 		B250C7CF8C880EF6A147DE7E /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		B41BBBBB921C848D02E2BE6B /* SDKVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKVersion.swift; sourceTree = "<group>"; };
 		B4713C0DA9400A929216B24D /* MultiplexLoggerStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiplexLoggerStream.swift; sourceTree = "<group>"; };
+		B6E63EA52943734C001959E5 /* Optimobile+Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optimobile+Location.swift"; sourceTree = "<group>"; };
 		B8467A40C1D544CA8220AAE2 /* OptimoveStorageFacadeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimoveStorageFacadeTests.swift; sourceTree = "<group>"; };
 		B8CF0105BA68C767A4105F8B /* MetaDataEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetaDataEvent.swift; sourceTree = "<group>"; };
 		B90E69482E5CEF73C23265A7 /* SetUserEmailEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetUserEmailEventTests.swift; sourceTree = "<group>"; };
@@ -1034,6 +1036,7 @@
 				4F585C6327FECCFA005E7BB4 /* OptimoveUserNotificationCenterDelegate.swift */,
 				4F585C6527FECCFA005E7BB4 /* DeepLinkFingerprinter.swift */,
 				4FA8F61627FEE872005CB88E /* OptimobileBadgeObserver.swift */,
+				B6E63EA52943734C001959E5 /* Optimobile+Location.swift */,
 			);
 			path = Optimobile;
 			sourceTree = "<group>";
@@ -1916,6 +1919,7 @@
 				10D8FDCAB2DEDFDC34E715E9 /* MobileProvision.swift in Sources */,
 				1FB88D00B177B21B5D2C3BC2 /* NSManagedObjectContext+Utilities.swift in Sources */,
 				50B6E591AC81B656E87934F7 /* NetworkRequestFactory.swift in Sources */,
+				B6E63EA62943734C001959E5 /* Optimobile+Location.swift in Sources */,
 				0E86E3145ADEEE0A91734327 /* NetworkingFactory.swift in Sources */,
 				A8F415A6B21DA9A79ACC8546 /* NewEmailHandler.swift in Sources */,
 				8A615E8D19A27C22DC4DF552 /* NewTenantInfoHandler.swift in Sources */,

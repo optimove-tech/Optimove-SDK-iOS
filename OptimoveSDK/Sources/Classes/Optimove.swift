@@ -3,6 +3,7 @@
 import UIKit.UIApplication
 import UserNotifications
 import OptimoveCore
+import CoreLocation
 
 public typealias Event = OptimoveCore.Event
 typealias Logger = OptimoveCore.Logger
@@ -336,6 +337,20 @@ extension Optimove {
     @available(iOS 13.0, *)
     @objc public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         Optimobile.scene(scene, continue: userActivity)
+    }
+    
+    /**
+        Updates the location of the current installation in Optimove. Accurate locaiton information is used for geofencing.
+    */
+    @objc public func sendLocationUpdate(location: CLLocation) {
+        Optimobile.sendLocationUpdate(location)
+    }
+    
+    /**
+        Records a proximity event for an iBeacon.
+    */
+    @objc public func sendiBeaconProximity(beacon: CLBeacon) {
+        Optimobile.sendiBeaconProximity(beacon)
     }
 }
 
