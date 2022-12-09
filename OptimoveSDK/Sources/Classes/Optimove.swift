@@ -325,14 +325,14 @@ extension Optimove {
     }
 
     /**
-     Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed.
+        Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed.
      */
     @objc public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return Optimobile.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
 
     /**
-     Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed in scene-based apps.
+        Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed in scene-based apps.
      */
     @available(iOS 13.0, *)
     @objc public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
@@ -343,14 +343,14 @@ extension Optimove {
         Updates the location of the current installation in Optimove. Accurate locaiton information is used for geofencing.
     */
     @objc public func sendLocationUpdate(location: CLLocation) {
-        Optimobile.sendLocationUpdate(location)
+        Optimobile.sendLocationUpdate(location: location)
     }
     
     /**
         Records a proximity event for an iBeacon.
     */
     @objc public func sendiBeaconProximity(beacon: CLBeacon) {
-        Optimobile.sendiBeaconProximity(beacon)
+        Optimobile.sendiBeaconProximity(beacon: beacon)
     }
 }
 
