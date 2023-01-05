@@ -349,9 +349,17 @@ extension Optimove {
     /**
         Records a proximity event for an iBeacon.
     */
-    @objc public func sendiBeaconProximity(beacon: CLBeacon) {
-        Optimobile.sendiBeaconProximity(beacon: beacon)
+    @objc public func trackIBeaconProximity(beacon: CLBeacon) {
+        Optimobile.trackIBeaconProximity(beacon: beacon)
     }
+    
+    /**
+        Records a proximity event for an Eddystone beacon.
+    */
+    @objc public func trackEddystoneBeaconProximity(hexNamespace: String, hexInstance:String, distanceMeters:NSNumber? = nil) {
+        Optimobile.trackEddystoneBeaconProximity(hexNamespace: hexNamespace, hexInstance: hexInstance, distanceMeters:  distanceMeters?.doubleValue);
+    }
+    
 }
 
 // MARK: - Private
