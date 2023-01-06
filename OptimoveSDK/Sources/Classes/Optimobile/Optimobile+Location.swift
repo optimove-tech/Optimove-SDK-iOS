@@ -16,8 +16,8 @@ extension Optimobile {
     static func trackIBeaconProximity(beacon: CLBeacon) {
         var parameters = [
             "type": 1,
-            "major": beacon.major.stringValue,
-            "minor": beacon.minor.stringValue,
+            "major": beacon.major.intValue,
+            "minor": beacon.minor.intValue,
             "proximity" : beacon.proximity.rawValue
         ] as [String : Any];
         
