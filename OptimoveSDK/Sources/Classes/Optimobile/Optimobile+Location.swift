@@ -14,13 +14,18 @@ extension Optimobile {
     }
     
     static func trackIBeaconProximity(beacon: CLBeacon) {
-        let parameters = [
+        var parameters = [
             "type": 1,
-            "uuid": beacon.proximityUUID.uuidString,
             "major": beacon.major.stringValue,
             "minor": beacon.minor.stringValue,
             "proximity" : beacon.proximity.rawValue
         ] as [String : Any];
+        
+        if #available(iOS 13, *) {
+            parameters["uuid"] = beacon.uuid.uuidString
+        } else {
+            parameters["uuid"] = beacon.proximityUUID.uuidString
+        }
         
         Optimobile.trackEvent(eventType: OptimobileEvent.ENGAGE_BEACON_ENTERED_PROXIMITY, properties: parameters, immediateFlush: true)
     }
