@@ -71,8 +71,13 @@ internal class InAppManager {
         }
         
         messagesContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        messagesContext!.performAndWait({
-            messagesContext!.persistentStoreCoordinator = storeCoordinator
+        guard let context = messagesContext else {
+            NSLog("InAppManager: NSManagedObjectContext is nil in initialization");
+            return
+        }
+        
+        context.performAndWait({
+            context.persistentStoreCoordinator = storeCoordinator
         })
     }
     
@@ -199,29 +204,33 @@ internal class InAppManager {
     }
     
     private func resetMessagingState() -> Void {
+        guard let context = messagesContext else {
+            NSLog("InAppManager: NSManagedObjectContext is nil in resetMessagingState");
+            return
+        }
+    
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
         UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
         UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue)
         UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_MOST_RECENT_UPDATED_AT.rawValue)
         
-        messagesContext!.performAndWait({
-            let context = self.messagesContext
+        context.performAndWait({
             let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
             fetchRequest.includesPendingChanges = true
             
             var messages: [InAppMessageEntity];
             do {
-                messages = try context?.fetch(fetchRequest) as! [InAppMessageEntity]
+                messages = try context.fetch(fetchRequest) as! [InAppMessageEntity]
             } catch {
                 return
             }
             
             for message in messages {
-                context?.delete(message)
+                context.delete(message)
             }
             
             do {
-                try context?.save()
+                try context.save()
             } catch let err {
                 print("Failed to clean up messages: \(err)")
             }
@@ -294,9 +303,16 @@ internal class InAppManager {
         }
     }
     
+    
+    
+    
     private func persistInAppMessages(messages: [[AnyHashable : Any]]) {
-        messagesContext!.performAndWait({
-            let context = self.messagesContext!
+        guard let context = messagesContext else {
+            NSLog("InAppManager: NSManagedObjectContext is nil in persistInAppMessages");
+            return
+        }
+        
+        context.performAndWait({
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
             
             if entity == nil {
@@ -495,9 +511,12 @@ internal class InAppManager {
     
     private func getMessagesToPresent(_ presentedWhenOptions: [String]) -> [InAppMessage] {
         var messages: [InAppMessage] = []
+        guard let context = messagesContext else {
+            NSLog("InAppManager: NSManagedObjectContext is nil in getMessagesToPresent");
+            return messages
+        }
         
-        messagesContext!.performAndWait({
-            let context = self.messagesContext!
+        context.performAndWait({
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
             
             let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
@@ -547,6 +566,10 @@ internal class InAppManager {
     }
     
     internal func markMessageDismissed(message: InAppMessage) -> Void {
+        guard let context = messagesContext else {
+            NSLog("InAppManager: NSManagedObjectContext is nil in markMessageDismissed");
+            return
+        }
         
         let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":message.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DISMISSED, properties: props)
@@ -555,8 +578,7 @@ internal class InAppManager {
             pendingTickleIds.remove(message.id)
         }
         
-        messagesContext!.performAndWait({
-            let context = self.messagesContext!
+        context.performAndWait({
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
             
             let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
@@ -607,10 +629,14 @@ internal class InAppManager {
     }
     
     func presentMessage(withId: Int64) -> Bool {
+        guard let context = messagesContext else {
+            NSLog("InAppManager: NSManagedObjectContext is nil in presentMessage");
+            return false
+        }
+        
         var result = true;
         
-        messagesContext!.performAndWait({
-            let context = self.messagesContext!
+        context.performAndWait({
             
             let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
             
@@ -671,14 +697,18 @@ internal class InAppManager {
     }
     
     func deleteMessageFromInbox(withId : Int64) -> Bool {
+        guard let context = messagesContext else {
+            NSLog("InAppManager: NSManagedObjectContext is nil in deleteMessageFromInbox");
+            return false
+        }
+        
         let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":withId]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELETED_FROM_INBOX, properties: props)
         
         removeNotificationTickle(id: withId)
         
         var result = true;
-        messagesContext!.performAndWait({
-            let context = self.messagesContext!
+        context.performAndWait({
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
             
             let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
@@ -722,9 +752,13 @@ internal class InAppManager {
     }
     
     func markInboxItemRead(withId : Int64, shouldWait: Bool) -> Bool {
+        guard let context = self.messagesContext else {
+            NSLog("InAppManager: NSManagedObjectContext is nil in markInboxItemRead");
+            return false
+        }
+        
         var result = true;
         let block = {
-            let context = self.messagesContext!
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
             
             let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
@@ -760,7 +794,7 @@ internal class InAppManager {
                 return
             }
         }
-        shouldWait ? messagesContext!.performAndWait(block) : messagesContext!.perform(block);
+        shouldWait ? context.performAndWait(block) : context.perform(block);
         
         
         if (!result){
