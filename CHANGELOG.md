@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.1
+
+- Avoid force-unwrapping of NSManagedObjectContext, which could be the reason for occasional crashes.
+
 ## 5.2.0
 
 - In order to support geofencing and beacons, add public API methods to track location and beacon proximity.
