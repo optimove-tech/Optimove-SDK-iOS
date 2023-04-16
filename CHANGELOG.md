@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.2
+
+- Fixed a crash when there are too many event parameters reported.
+
 ## 5.2.1
 
 - Avoid force-unwrapping of NSManagedObjectContext, which could be the reason for occasional crashes.
