@@ -49,11 +49,9 @@ final class ParametersDecorator: Pipe {
                 return event
             }
             event.isRealtime = eventConfiguration.supportedOnRealTime
-            let limitToAddContext = configuration.optitrack.maxActionCustomDimensions - event.context.count
             return ParametersDecorator.decorateWithDefaultParameters(
                 event: event,
-                eventConfig: eventConfiguration,
-                limit: limitToAddContext
+                eventConfig: eventConfiguration
             )
         }
         return CommonOperation.report(events: decoratedEvents)
@@ -61,8 +59,7 @@ final class ParametersDecorator: Pipe {
 
     private static func decorateWithDefaultParameters(
         event: Event,
-        eventConfig: EventsConfig,
-        limit: Int
+        eventConfig: EventsConfig
     ) -> Event {
         let defaultParameters: [String: Any] = [
             Constants.Key.eventNativeMobile: Constants.Value.eventNativeMobile,
@@ -71,7 +68,6 @@ final class ParametersDecorator: Pipe {
             Constants.Key.eventPlatform: Constants.Value.eventPlatform
         ]
         defaultParameters
-            .prefix(limit)
             .filter { defaultParameter -> Bool in
                 return eventConfig.parameters[defaultParameter.key] != nil
             }.forEach { defaultParameter in
