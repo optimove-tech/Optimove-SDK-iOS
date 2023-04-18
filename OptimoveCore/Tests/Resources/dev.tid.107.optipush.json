@@ -5,7 +5,6 @@
     "realtimeGateway": "http://173.255.119.3/",
   },
   "optitrackMetaData": {
-    "maxActionCustomDimensions": 25,
     "optitrackEndpoint": "http://104.197.238.220/",
     "siteId": 107
   },
