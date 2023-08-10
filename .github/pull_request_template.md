@@ -25,6 +25,8 @@
 - [ ] `README.md`
 - [ ] `CHANGELOG.md`
 
+- [ ] Update major version numbers in wiki (basic integration + push guides)
+
 ### Integration tests
 
 *T&T Only*
