@@ -144,6 +144,8 @@ internal class InAppManager {
     }
     
     func userConsented() -> Bool {
+        // Note if this implementation is changed there is a usage in the main Optimobile initialisation path
+        // that should be considered.
         return UserDefaults.standard.bool(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
     }
     
