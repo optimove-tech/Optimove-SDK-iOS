@@ -28,14 +28,39 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
     private var messageQueue : NSMutableOrderedSet
     private var pendingTickleIds : NSMutableOrderedSet
 
+    private var displayMode : InAppDisplayMode
     private var currentMessage : InAppMessage?
 
-    override init() {
+    init(displayMode: InAppDisplayMode) {
         self.messageQueue = NSMutableOrderedSet.init(capacity: 5)
         self.pendingTickleIds = NSMutableOrderedSet.init(capacity: 2)
         self.currentMessage = nil
+        
+        self.displayMode = displayMode
 
         super.init()
+    }
+    
+    func setDisplayMode(_ mode: InAppDisplayMode) {
+        runOnMainThreadSync {
+            let resumed = mode != displayMode && mode != .paused
+
+            displayMode = mode;
+
+            if resumed {
+                presentFromQueue()
+            }
+        }
+    }
+
+    func getDisplayMode() -> InAppDisplayMode {
+        var mode : InAppDisplayMode = .automatic
+
+        runOnMainThreadSync {
+            mode = displayMode
+        }
+
+        return mode
     }
 
     func queueMessagesForPresentation(messages: [InAppMessage], tickleIds: NSOrderedSet) {
@@ -88,29 +113,44 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
             }
         }
 
+        let notShowingCurrentTickle = self.currentMessage != nil
+            && self.currentMessage!.id != (self.messageQueue[0] as! InAppMessage).id
+            && (self.messageQueue[0] as! InAppMessage).id == self.pendingTickleIds[0] as! Int64
+
+        let queueNotEmptyAndNotShowingAnything = self.currentMessage == nil && self.messageQueue.count > 0
+
+        let shouldShowSomething = notShowingCurrentTickle || queueNotEmptyAndNotShowingAnything
+
         messageQueueLock.signal()
-      
-        DispatchQueue.main.async {
-            self.initViews()
-            
-            if (self.currentMessage != nil
-                && self.currentMessage!.id != (self.messageQueue[0] as! InAppMessage).id
-                && (self.messageQueue[0] as! InAppMessage).id == self.pendingTickleIds[0] as! Int64) {
+
+        if (shouldShowSomething) {
+            DispatchQueue.main.async {
                 self.presentFromQueue()
             }
         }
     }
     
     func presentFromQueue() -> Void {
-        if (self.messageQueue.count == 0) {
+        messageQueueLock.wait()
+        defer {
+            messageQueueLock.signal()
+        }
+
+        if (self.messageQueue.count == 0 || displayMode == .paused) {
+            DispatchQueue.main.async {
+                self.destroyViews()
+            }
+
             return;
         }
         
-        if let loadingSpinner = self.loadingSpinner {
-            loadingSpinner.performSelector(onMainThread: #selector(UIActivityIndicatorView.startAnimating), with: nil, waitUntilDone: true)
+        self.currentMessage = (self.messageQueue[0] as! InAppMessage);
+
+        runOnMainThreadSync {
+            initViews()
+            self.loadingSpinner?.startAnimating()
         }
 
-        self.currentMessage = (self.messageQueue[0] as! InAppMessage)
         let content = NSMutableDictionary(dictionary: self.currentMessage!.content)
         content["region"] = Optimobile.sharedInstance.config.region
 
@@ -130,9 +170,6 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         }
         
         messageQueueLock.wait()
-        defer {
-            messageQueueLock.signal()
-        }
         
         messageQueue.removeObject(at: 0)
         pendingTickleIds.remove(message.id)
@@ -140,28 +177,24 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         
         if messageQueue.count == 0 {
             pendingTickleIds.removeAllObjects()
-            self.destroyViews()
         }
-        else {
-            presentFromQueue()
-        }
+
+        messageQueueLock.signal()
+     
+        presentFromQueue()
    }
     
     func cancelCurrentPresentationQueue(waitForViewCleanup: Bool) -> Void {
         messageQueueLock.wait()
-        defer {
-            messageQueueLock.signal()
-        }
              
         self.messageQueue.removeAllObjects()
         self.pendingTickleIds.removeAllObjects()
         self.currentMessage = nil
+
+        messageQueueLock.signal()
       
-        if Thread.isMainThread && waitForViewCleanup == true {
-            self.destroyViews()
-        }
-        else if waitForViewCleanup == true {
-            DispatchQueue.main.sync {
+        if waitForViewCleanup == true {
+            runOnMainThreadSync {
                 self.destroyViews()
             }
         }
@@ -318,29 +351,23 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         let type = body["type"] as! String
         
         if (type == "READY") {
-              messageQueueLock.wait()
-              defer {
-                  messageQueueLock.signal()
-              }
-                          
             self.presentFromQueue()
-        }
-       else if (type == "MESSAGE_OPENED") {
+        } else if (type == "MESSAGE_OPENED") {
             loadingSpinner?.stopAnimating()
             Optimobile.sharedInstance.inAppManager.handleMessageOpened(message: self.currentMessage!)
-       } else if (type  == "MESSAGE_CLOSED") {
+        } else if (type  == "MESSAGE_CLOSED") {
             self.handleMessageClosed()
-       } else if (type == "EXECUTE_ACTIONS") {
+        } else if (type == "EXECUTE_ACTIONS") {
             guard let body = message.body as? [AnyHashable:Any],
                   let data = body["data"] as? [AnyHashable:Any],
                   let actions = data["actions"] as? [NSDictionary] else {
                 return
             }
             self.handleActions(actions: actions)
-       } else {
+        } else {
            print("Unknown message: \(message.body)")
-       }
-   }
+        }
+    }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // Noop
@@ -448,6 +475,14 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
             } else {
                 NSLog("Requesting a rating not supported on this iOS version");
             }
+        }
+    }
+    
+    private func runOnMainThreadSync(_ work: () -> Void) {
+        if Thread.isMainThread {
+            work()
+        } else {
+            DispatchQueue.main.sync(execute: work)
         }
     }
     

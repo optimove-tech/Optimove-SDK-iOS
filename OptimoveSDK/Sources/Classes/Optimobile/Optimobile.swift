@@ -33,6 +33,11 @@ public enum InAppConsentStrategy : String {
     case explicitByUser = "ExplicitByUser"
 }
 
+public enum InAppDisplayMode : String {
+    case automatic = "automatic"
+    case paused = "paused"
+}
+
 // MARK: class
 class Optimobile {
     let urlBuilder:UrlBuilder
@@ -172,7 +177,7 @@ class Optimobile {
 
         analyticsHelper = AnalyticsHelper(apiKey: apiKey, secretKey: secretKey, baseEventsUrl: urlBuilder.urlForService(.events))
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
-        inAppManager = InAppManager()
+        inAppManager = InAppManager(config)
         pushHelper = PushHelper()
         badgeObserver = OptimobileBadgeObserver(callback: { (newBadgeCount) in
            KeyValPersistenceHelper.set(newBadgeCount, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
