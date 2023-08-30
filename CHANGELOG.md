@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.3.0
+
+- Add ability to pause & resume in-app message display (#72)
+- Improve Kumulos to Optimove SDK upgrade path (#71)
+
 ## 5.2.2
 
 - Fixed a crash when there are too many event parameters reported.
