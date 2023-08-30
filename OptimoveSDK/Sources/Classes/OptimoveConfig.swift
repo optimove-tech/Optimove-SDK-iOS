@@ -34,6 +34,7 @@ public struct OptimobileConfig {
     let sessionIdleTimeout: UInt
 
     let inAppConsentStrategy : InAppConsentStrategy
+    let inAppDefaultDisplayMode : InAppDisplayMode
     let inAppDeepLinkHandlerBlock : InAppDeepLinkHandlerBlock?
 
     let pushOpenedHandlerBlock : PushOpenedHandlerBlock?
@@ -63,6 +64,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var _secretKey: String?
     private var _sessionIdleTimeout: UInt
     private var _inAppConsentStrategy = InAppConsentStrategy.notEnabled
+    private var _inAppDisplayMode = InAppDisplayMode.automatic
     private var _inAppDeepLinkHandlerBlock: InAppDeepLinkHandlerBlock?
     private var _pushOpenedHandlerBlock: PushOpenedHandlerBlock?
     private var _pushReceivedInForegroundHandlerBlock: Any?
@@ -101,10 +103,15 @@ open class OptimoveConfigBuilder: NSObject {
         _sessionIdleTimeout = seconds
         return self
     }
+    
+    @discardableResult public func enableInAppMessaging(inAppConsentStrategy: InAppConsentStrategy, defaultDisplayMode: InAppDisplayMode) -> OptimoveConfigBuilder {
+        _inAppConsentStrategy = inAppConsentStrategy
+        _inAppDisplayMode = defaultDisplayMode
+        return self
+    }
 
     @discardableResult public func enableInAppMessaging(inAppConsentStrategy: InAppConsentStrategy) -> OptimoveConfigBuilder {
-        _inAppConsentStrategy = inAppConsentStrategy
-        return self
+        return enableInAppMessaging(inAppConsentStrategy: inAppConsentStrategy, defaultDisplayMode: .automatic)
     }
 
     @discardableResult public func setInAppDeepLinkHandler(inAppDeepLinkHandlerBlock: @escaping InAppDeepLinkHandlerBlock) -> OptimoveConfigBuilder {
@@ -184,6 +191,7 @@ open class OptimoveConfigBuilder: NSObject {
                 region: _region,
                 sessionIdleTimeout: _sessionIdleTimeout,
                 inAppConsentStrategy: _inAppConsentStrategy,
+                inAppDefaultDisplayMode: _inAppDisplayMode,
                 inAppDeepLinkHandlerBlock: _inAppDeepLinkHandlerBlock,
                 pushOpenedHandlerBlock: _pushOpenedHandlerBlock,
                 _pushReceivedInForegroundHandlerBlock: _pushReceivedInForegroundHandlerBlock,

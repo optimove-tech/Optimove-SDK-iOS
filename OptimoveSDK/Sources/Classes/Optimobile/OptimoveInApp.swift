@@ -89,6 +89,14 @@ public class OptimoveInApp {
         Optimobile.sharedInstance.inAppManager.updateUserConsent(consentGiven: consentGiven)
     }
     
+    public static func setDisplayMode(mode: InAppDisplayMode) {
+        Optimobile.sharedInstance.inAppManager.presenter.setDisplayMode(mode)
+    }
+
+    public static func getDisplayMode() -> InAppDisplayMode {
+        return Optimobile.sharedInstance.inAppManager.presenter.getDisplayMode()
+    }
+    
     public static func getInboxItems() -> [InAppInboxItem] {
         guard let context = Optimobile.sharedInstance.inAppManager.messagesContext else {
             return []
@@ -130,6 +138,10 @@ public class OptimoveInApp {
     }
     
     public static func presentInboxMessage(item: InAppInboxItem) -> InAppMessagePresentationResult {
+        if getDisplayMode() == .paused {
+            return .PAUSED
+        }
+
         if item.isAvailable() == false {
             return InAppMessagePresentationResult.EXPIRED
         }

@@ -8,6 +8,7 @@ public enum InAppMessagePresentationResult : String {
     case PRESENTED = "presented"
     case EXPIRED = "expired"
     case FAILED = "failed"
+    case PAUSED = "paused"
 }
 
 typealias kumulos_applicationPerformFetchWithCompletionHandler = @convention(c) (_ obj:Any, _ _cmd:Selector, _ application:UIApplication, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void;
@@ -18,7 +19,7 @@ typealias InAppSyncCompletionHandler = (_ result:Int) -> Void
 
 internal class InAppManager {
     
-    private var presenter: InAppPresenter
+    private(set) var presenter: InAppPresenter
     private var pendingTickleIds: NSMutableOrderedSet = NSMutableOrderedSet(capacity: 1)
     
     var messagesContext: NSManagedObjectContext? = nil;
@@ -31,8 +32,8 @@ internal class InAppManager {
     
     // MARK: Initialization
     
-    init() {
-        presenter = InAppPresenter()
+    init(_ config: OptimobileConfig) {
+        presenter = InAppPresenter(displayMode: config.inAppDefaultDisplayMode)
         syncQueue = DispatchQueue(label: "kumulos.in-app.sync")
     }
     

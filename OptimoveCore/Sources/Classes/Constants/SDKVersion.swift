@@ -1,3 +1,3 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-public let SDKVersion = "5.2.2"
+public let SDKVersion = "5.3.0"
