@@ -22,6 +22,7 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
     private var loadingSpinner : UIActivityIndicatorView?
     private var frame : UIView?
     private var window : UIWindow?
+    private var webViewReady : Bool = false
     
     private var contentController : WKUserContentController?
     
@@ -146,9 +147,16 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         
         self.currentMessage = (self.messageQueue[0] as! InAppMessage);
 
+        var ready = false
+
         runOnMainThreadSync {
             initViews()
             self.loadingSpinner?.startAnimating()
+            ready = self.webViewReady
+        }
+
+        guard ready else {
+            return
         }
 
         let content = NSMutableDictionary(dictionary: self.currentMessage!.content)
@@ -299,6 +307,7 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         frame.bringSubviewToFront(loadingSpinner)
     }
 
+    // Expects to be called from the main thread
     func destroyViews() {
         if let window = self.window {
             window.isHidden = true
@@ -320,6 +329,7 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         }
         
         self.window = nil;
+        self.webViewReady = false
     }
   
     func postClientMessage(type: String, data: Any?) {
@@ -351,6 +361,10 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         let type = body["type"] as! String
         
         if (type == "READY") {
+            runOnMainThreadSync {
+                self.webViewReady = true
+            }
+
             self.presentFromQueue()
         } else if (type == "MESSAGE_OPENED") {
             loadingSpinner?.stopAnimating()
