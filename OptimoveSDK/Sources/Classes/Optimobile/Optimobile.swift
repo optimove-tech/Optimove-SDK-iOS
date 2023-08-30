@@ -120,12 +120,7 @@ class Optimobile {
             assertionFailure("The OptimobileSDK has already been initialized")
         }
 
-        KeyValPersistenceHelper.maybeMigrateUserDefaultsToAppGroups()
-        KeyValPersistenceHelper.set(config.apiKey, forKey: OptimobileUserDefaultsKey.API_KEY.rawValue)
-        KeyValPersistenceHelper.set(config.secretKey, forKey: OptimobileUserDefaultsKey.SECRET_KEY.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.events], forKey: OptimobileUserDefaultsKey.EVENTS_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
+        writeDefaultsKeys(config: config, initialVisitorId: initialVisitorId)
 
         instance = Optimobile(config: config)
 
@@ -142,6 +137,30 @@ class Optimobile {
         }
 
         maybeAlignUserAssociation(initialUserId: initialUserId)
+    }
+    
+    fileprivate static func writeDefaultsKeys(config: OptimobileConfig, initialVisitorId: String) {
+        KeyValPersistenceHelper.maybeMigrateUserDefaultsToAppGroups()
+        
+        
+        let existingInstallId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue) as? String;
+        // This block handles upgrades from Kumulos SDK users to Optimove SDK users
+        // In the case where a user was auto-enrolled into in-app messaging on the K SDK, they would not become auto-enrolled
+        // on the new Optimove SDK installation.
+        //
+        // To enable auto-enrollment on upgrade, we need to clear out the existing in-app consent key from storage when we detect
+        // we're a new install. Note comparing to `nil` isn't enough because we may have a value depending if previous storage used
+        // app groups or not.
+        if existingInstallId != initialVisitorId,
+           let _ = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue) {
+            UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
+        }
+
+        KeyValPersistenceHelper.set(config.apiKey, forKey: OptimobileUserDefaultsKey.API_KEY.rawValue)
+        KeyValPersistenceHelper.set(config.secretKey, forKey: OptimobileUserDefaultsKey.SECRET_KEY.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.events], forKey: OptimobileUserDefaultsKey.EVENTS_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
     }
 
     fileprivate static func maybeAlignUserAssociation(initialUserId: String?) {
