@@ -6,5 +6,3 @@ public enum SdkPlatform: String, Codable {
     case ios
     case unity
 }
-
-let tokenToStringFormat = "%02.2hhx"
