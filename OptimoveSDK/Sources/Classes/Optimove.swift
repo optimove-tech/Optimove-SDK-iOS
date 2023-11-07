@@ -220,12 +220,13 @@ extension Optimove {
         return id
     }
 
-    /// The initial visitor identifier getter of Optimove SDK.
+    /// Get the initial visitor identifier of Optimove SDK.
     @objc public static func getInitialVisitorID() -> String? {
         return shared.getInitialVisitorID()
     }
     
-    private func getInitialVisitorID() -> String? {
+    /// Get the initial visitor identifier of Optimove SDK.
+    @objc public func getInitialVisitorID() -> String? {
         return container.resolve({ serviceLocator in
             return try? serviceLocator.storage().getInitialVisitorId()
         })
