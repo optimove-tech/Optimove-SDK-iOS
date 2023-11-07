@@ -227,9 +227,11 @@ extension Optimove {
     
     /// Get the initial visitor identifier of Optimove SDK.
     @objc public func getInitialVisitorID() -> String? {
-        return container.resolve({ serviceLocator in
+        let function: (ServiceLocator) -> String? = { serviceLocator in
             return try? serviceLocator.storage().getInitialVisitorId()
-        })
+        }
+        guard let id = container.resolve(function) else { return nil }
+        return id
     }
 
     /// Set a user ID to the Optimove SDK.
