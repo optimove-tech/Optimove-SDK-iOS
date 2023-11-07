@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.4.0
+
+- Add the initial visitor identifier getter to public API. The new API is public available via the following methods:
+  - `Optimove.getInitialVisitorID()`.
+  - `Optimove.shared.getInitialVisitorID()`.
+
 ## 5.3.0
 
 - Add ability to pause & resume in-app message display (#72)
