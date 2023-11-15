@@ -244,7 +244,7 @@ public class OptimoveNotificationService {
 
         let eventsBaseUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.EVENTS_BASE_URL.rawValue) as? String ?? "https://events.kumulos.com";
 
-        analyticsHelper = AnalyticsHelper(apiKey: apiKey, secretKey: secretKey, baseEventsUrl: eventsBaseUrl)
+        analyticsHelper = AnalyticsHelper(baseEventsUrl: eventsBaseUrl)
     }
 
     fileprivate class func isBackgroundPush(userInfo: [AnyHashable:Any]) -> Bool{

@@ -37,6 +37,8 @@ public enum DeepLinkResolution {
 public typealias DeepLinkHandler = (DeepLinkResolution) -> Void
 
 class DeepLinkHelper {
+    
+    
     fileprivate static let deferredLinkCheckedKey = "KUMULOS_DDL_CHECKED"
 
     let config : OptimobileConfig
@@ -54,7 +56,7 @@ class DeepLinkHelper {
                 "Accept": "appliction/json"
             ]
         )
-        httpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
+//        httpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
         self.anyContinuationHandled = false
     }
 

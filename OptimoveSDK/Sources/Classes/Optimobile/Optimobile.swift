@@ -70,8 +70,8 @@ class Optimobile {
     }
 
     fileprivate(set) var config : OptimobileConfig
-    fileprivate(set) var apiKey: String
-    fileprivate(set) var secretKey: String
+//    fileprivate(set) var apiKey: String
+//    fileprivate(set) var secretKey: String
     fileprivate(set) var inAppConsentStrategy:InAppConsentStrategy = InAppConsentStrategy.notEnabled
 
     static var inAppConsentStrategy : InAppConsentStrategy {
@@ -90,17 +90,17 @@ class Optimobile {
 
     fileprivate(set) var deepLinkHelper : DeepLinkHelper?
 
-    static var apiKey:String {
-        get {
-            return sharedInstance.apiKey
-        }
-    }
-
-    static var secretKey:String {
-        get {
-            return sharedInstance.secretKey
-        }
-    }
+//    static var apiKey:String {
+//        get {
+//            return sharedInstance.apiKey
+//        }
+//    }
+//
+//    static var secretKey:String {
+//        get {
+//            return sharedInstance.secretKey
+//        }
+//    }
 
     /**
         The unique installation Id of the current app
@@ -161,8 +161,8 @@ class Optimobile {
             UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
         }
 
-        KeyValPersistenceHelper.set(config.apiKey, forKey: OptimobileUserDefaultsKey.API_KEY.rawValue)
-        KeyValPersistenceHelper.set(config.secretKey, forKey: OptimobileUserDefaultsKey.SECRET_KEY.rawValue)
+//        KeyValPersistenceHelper.set(config.apiKey, forKey: OptimobileUserDefaultsKey.API_KEY.rawValue)
+//        KeyValPersistenceHelper.set(config.secretKey, forKey: OptimobileUserDefaultsKey.SECRET_KEY.rawValue)
         KeyValPersistenceHelper.set(config.baseUrlMap[.events], forKey: OptimobileUserDefaultsKey.EVENTS_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
@@ -183,18 +183,18 @@ class Optimobile {
 
     fileprivate init(config: OptimobileConfig) {
         self.config = config
-        apiKey = config.apiKey
-        secretKey = config.secretKey
+//        apiKey = config.apiKey
+//        secretKey = config.secretKey
         inAppConsentStrategy = config.inAppConsentStrategy
 
         urlBuilder = UrlBuilder(baseUrlMap: config.baseUrlMap)
 
         pushHttpClient = KSHttpClient(baseUrl: URL(string: urlBuilder.urlForService(.push))!, requestFormat: .json, responseFormat: .json)
-        pushHttpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
+//        pushHttpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
         coreHttpClient = KSHttpClient(baseUrl: URL(string: urlBuilder.urlForService(.crm))!, requestFormat: .json, responseFormat: .json)
-        coreHttpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
+//        coreHttpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
 
-        analyticsHelper = AnalyticsHelper(apiKey: apiKey, secretKey: secretKey, baseEventsUrl: urlBuilder.urlForService(.events))
+        analyticsHelper = AnalyticsHelper(baseEventsUrl: urlBuilder.urlForService(.events))
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
         inAppManager = InAppManager(config)
         pushHelper = PushHelper()

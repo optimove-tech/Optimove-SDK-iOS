@@ -27,9 +27,14 @@ public struct OptimoveConfig {
 }
 
 public struct OptimobileConfig {
-    let apiKey: String
-    let secretKey: String
-    let region: String
+    public enum Region: String {
+        case EU = "eu"
+        case US = "us"
+    }
+    
+//    let apiKey: String
+//    let secretKey: String
+    let region: Region
 
     let sessionIdleTimeout: UInt
 
@@ -59,9 +64,9 @@ public struct OptimobileConfig {
 open class OptimoveConfigBuilder: NSObject {
     private var _tenantToken: String?
     private var _configName: String?
-    private var _region: String?
-    private var _apiKey: String?
-    private var _secretKey: String?
+    private var _region: OptimobileConfig.Region?
+//    private var _apiKey: String?
+//    private var _secretKey: String?
     private var _sessionIdleTimeout: UInt
     private var _inAppConsentStrategy = InAppConsentStrategy.notEnabled
     private var _inAppDisplayMode = InAppDisplayMode.automatic
@@ -78,25 +83,32 @@ open class OptimoveConfigBuilder: NSObject {
 
     public init(optimoveCredentials: String?, optimobileCredentials: String?) {
         let optimoveCredentialsTuple = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials)
-        let optimobileCredentialsTuple = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials)
+//        let optimobileCredentialsTuple = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials)
 
-        if optimoveCredentialsTuple == nil && optimobileCredentialsTuple == nil {
-            assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
-        }
+//        if optimoveCredentialsTuple == nil && optimobileCredentialsTuple == nil {
+//            assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
+//        }
 
         if let optimoveCredentialsTuple = optimoveCredentialsTuple {
             _tenantToken = optimoveCredentialsTuple.tenantToken
             _configName = optimoveCredentialsTuple.configName
         }
 
-        if let optimobileCredentialsTuple = optimobileCredentialsTuple  {
-            _apiKey = optimobileCredentialsTuple.apiKey
-            _secretKey = optimobileCredentialsTuple.secretKey
-            _region = optimobileCredentialsTuple.region
-            _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentialsTuple.region)
-        }
+        
+//        if let optimobileCredentialsTuple = optimobileCredentialsTuple  {
+//            _apiKey = optimobileCredentialsTuple.apiKey
+//            _secretKey = optimobileCredentialsTuple.secretKey
+//            _region = optimobileCredentialsTuple.region // TODO: replaced with `.bootOptiMobile(US|EU)`
+//            _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentialsTuple.region)
+//        }
 
         _sessionIdleTimeout = 23
+    }
+    
+    @discardableResult public func bootOptiMobile(_ region: OptimobileConfig.Region) -> OptimoveConfigBuilder {
+        _region = region
+        _baseUrlMap = UrlBuilder.defaultMapping(for: region.rawValue)
+        return self
     }
 
     @discardableResult public func setSessionIdleTimeout(seconds: UInt) -> OptimoveConfigBuilder {
@@ -181,13 +193,13 @@ open class OptimoveConfigBuilder: NSObject {
             tenantInfo = OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
         }
 
-        if let _apiKey = _apiKey,
-           let _secretKey = _secretKey,
-           let _baseUrlMap = _baseUrlMap,
+//        if let _apiKey = _apiKey,
+//           let _secretKey = _secretKey,
+          if let _baseUrlMap = _baseUrlMap,
            let _region = _region {
             optimobileConfig = OptimobileConfig(
-                apiKey: _apiKey,
-                secretKey: _secretKey,
+//                apiKey: _apiKey,
+//                secretKey: _secretKey,
                 region: _region,
                 sessionIdleTimeout: _sessionIdleTimeout,
                 inAppConsentStrategy: _inAppConsentStrategy,
