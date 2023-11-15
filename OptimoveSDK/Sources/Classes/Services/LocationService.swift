@@ -46,7 +46,7 @@ final class LocationServiceImpl {
         .authorizedWhenInUse
     ]
     private let desiredAccuracy: CLLocationAccuracy = kCLLocationAccuracyKilometer
-    private var hasDescriptions: Bool = false
+    private var hasDescriptions = false
 
     init() {
         hasDescriptions = self.hasDescriptionForMainApp()

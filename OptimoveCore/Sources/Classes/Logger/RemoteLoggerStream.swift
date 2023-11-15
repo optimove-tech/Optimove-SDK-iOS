@@ -20,7 +20,7 @@ public final class RemoteLoggerStream: MutableLoggerStream {
 
     public var tenantId: Int
     public var endpoint: URL = Endpoints.Logger.defaultEndpint
-    public var isProductionLogsEnabled: Bool = false
+    public var isProductionLogsEnabled = false
 
     private let appNs: String
     private let platform: SdkPlatform = .ios

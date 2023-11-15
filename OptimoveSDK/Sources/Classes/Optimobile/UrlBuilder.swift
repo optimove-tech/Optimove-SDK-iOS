@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum Service : CaseIterable {
+public enum Service: CaseIterable {
     case crm
     case ddl
     case events
@@ -11,12 +11,12 @@ public enum Service : CaseIterable {
     case push
 }
 
-public typealias ServiceUrlMap = [Service:String]
+public typealias ServiceUrlMap = [Service: String]
 
 class UrlBuilder {
-    let baseUrlMap : ServiceUrlMap
+    let baseUrlMap: ServiceUrlMap
 
-    init(baseUrlMap:ServiceUrlMap) {
+    init(baseUrlMap: ServiceUrlMap) {
         for s in Service.allCases {
             if baseUrlMap[s] == nil {
                 fatalError("baseUrlMap must contain an entry for all Service cases")
@@ -26,19 +26,19 @@ class UrlBuilder {
         self.baseUrlMap = baseUrlMap
     }
 
-    func urlForService(_ service:Service) -> String {
+    func urlForService(_ service: Service) -> String {
         let baseUrl = baseUrlMap[service]!
         return baseUrl
     }
 
     static func defaultMapping(for region: String) -> ServiceUrlMap {
         return [
-            .crm : "https://crm-\(region).kumulos.com",
-            .ddl : "https://links-\(region).kumulos.com",
-            .events : "https://events-\(region).kumulos.com",
-            .iar : "https://iar.app.delivery",
-            .media : "https://i-\(region).app.delivery",
-            .push : "https://push-\(region).kumulos.com"
+            .crm: "https://crm-\(region).kumulos.com",
+            .ddl: "https://links-\(region).kumulos.com",
+            .events: "https://events-\(region).kumulos.com",
+            .iar: "https://iar.app.delivery",
+            .media: "https://i-\(region).app.delivery",
+            .push: "https://push-\(region).kumulos.com"
         ]
     }
 }

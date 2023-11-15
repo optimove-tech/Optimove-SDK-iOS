@@ -7,10 +7,6 @@ struct CoreDataModelDescription {
 
     var entities: [CoreDataEntityDescription]
 
-    init(entities: [CoreDataEntityDescription]) {
-        self.entities = entities
-    }
-
     func makeModel() -> NSManagedObjectModel {
         let model = NSManagedObjectModel()
 

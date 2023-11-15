@@ -1,126 +1,124 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
-import Foundation
 import CoreData
+import Foundation
 import UIKit
 
-public enum InAppMessagePresentationResult : String {
+public enum InAppMessagePresentationResult: String {
     case PRESENTED = "presented"
     case EXPIRED = "expired"
     case FAILED = "failed"
     case PAUSED = "paused"
 }
 
-typealias kumulos_applicationPerformFetchWithCompletionHandler = @convention(c) (_ obj:Any, _ _cmd:Selector, _ application:UIApplication, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void;
-typealias fetchBlock = @convention(block) (_ obj:Any, _ application:UIApplication, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void;
-private var ks_existingBackgroundFetchDelegate: IMP? = nil
+typealias kumulos_applicationPerformFetchWithCompletionHandler = @convention(c) (_ obj: Any, _ _cmd: Selector, _ application: UIApplication, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void
+typealias fetchBlock = @convention(block) (_ obj: Any, _ application: UIApplication, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void
+private var ks_existingBackgroundFetchDelegate: IMP?
 
-typealias InAppSyncCompletionHandler = (_ result:Int) -> Void
+typealias InAppSyncCompletionHandler = (_ result: Int) -> Void
 
-internal class InAppManager {
-    
+class InAppManager {
     private(set) var presenter: InAppPresenter
-    private var pendingTickleIds: NSMutableOrderedSet = NSMutableOrderedSet(capacity: 1)
-    
-    var messagesContext: NSManagedObjectContext? = nil;
-    
-    internal let MESSAGE_TYPE_IN_APP = 2
+    private var pendingTickleIds = NSMutableOrderedSet(capacity: 1)
+
+    var messagesContext: NSManagedObjectContext?
+
+    let MESSAGE_TYPE_IN_APP = 2
 
     private var syncQueue: DispatchQueue
     private let STORED_IN_APP_LIMIT = 50
-    private let SYNC_DEBOUNCE_SECONDS = 3600 as TimeInterval
-    
+    private let SYNC_DEBOUNCE_SECONDS = 3_600 as TimeInterval
+
     // MARK: Initialization
-    
+
     init(_ config: OptimobileConfig) {
         presenter = InAppPresenter(displayMode: config.inAppDefaultDisplayMode)
         syncQueue = DispatchQueue(label: "kumulos.in-app.sync")
     }
-    
+
     func initialize() {
         initContext()
         handleEnrollmentAndSyncSetup()
     }
-    
+
     func initContext() {
-        
         let objectModel: NSManagedObjectModel? = getDataModel()
-        
+
         if objectModel == nil {
             print("Failed to create object model")
             return
         }
-        
-        var storeCoordinator: NSPersistentStoreCoordinator? = nil
+
+        var storeCoordinator: NSPersistentStoreCoordinator?
         if let objectModel = objectModel {
             storeCoordinator = NSPersistentStoreCoordinator(managedObjectModel: objectModel)
         }
-        
+
         let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last
         let storeUrl = URL(string: "KSMessagesDb.sqlite", relativeTo: docsUrl)
-        
+
         let options = [
             NSMigratePersistentStoresAutomaticallyOption: NSNumber(value: true),
             NSInferMappingModelAutomaticallyOption: NSNumber(value: true)
         ]
-        
+
         do {
             try storeCoordinator?.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeUrl, options: options)
-        } catch let err {
-            print("Failed to set up persistent store: \(err)")
-            return;
-        }
-        
-        messagesContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in initialization");
+        } catch {
+            print("Failed to set up persistent store: \(error)")
             return
         }
-        
-        context.performAndWait({
+
+        messagesContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        guard let context = messagesContext else {
+            NSLog("InAppManager: NSManagedObjectContext is nil in initialization")
+            return
+        }
+
+        context.performAndWait {
             context.persistentStoreCoordinator = storeCoordinator
-        })
+        }
     }
-    
-    @objc func appBecameActive() -> Void {
+
+    @objc func appBecameActive() {
         presentImmediateAndNextOpenContent()
-        
+
         let onComplete: InAppSyncCompletionHandler = { result in
             if result > 0 {
                 self.presentImmediateAndNextOpenContent()
             }
         }
-        
+
         #if DEBUG
         sync(onComplete)
         #else
         syncDebounced(onComplete)
         #endif
     }
-    
-    let setupSyncTask:Void = {
-        let klass : AnyClass = type(of: UIApplication.shared.delegate!)
-        
+
+    let setupSyncTask: Void = {
+        let klass: AnyClass = type(of: UIApplication.shared.delegate!)
+
         // Perform background fetch
         let performFetchSelector = #selector(UIApplicationDelegate.application(_:performFetchWithCompletionHandler:))
         let fetchType = NSString(string: "v@:@@?").utf8String
-        let block : fetchBlock = { (obj:Any, application:UIApplication, completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void in
-            var fetchResult : UIBackgroundFetchResult = .noData
+        let block: fetchBlock = { (obj: Any, application: UIApplication, completionHandler: @escaping (UIBackgroundFetchResult) -> Void) in
+            var fetchResult: UIBackgroundFetchResult = .noData
             let fetchBarrier = DispatchSemaphore(value: 0)
-            
+
             if let _ = ks_existingBackgroundFetchDelegate {
-                unsafeBitCast(ks_existingBackgroundFetchDelegate, to: kumulos_applicationPerformFetchWithCompletionHandler.self)(obj, performFetchSelector, application, { (result : UIBackgroundFetchResult) in
+                unsafeBitCast(ks_existingBackgroundFetchDelegate, to: kumulos_applicationPerformFetchWithCompletionHandler.self)(obj, performFetchSelector, application, { (result: UIBackgroundFetchResult) in
                     fetchResult = result
                     fetchBarrier.signal()
                 })
             } else {
                 fetchBarrier.signal()
             }
-            
-            if (Optimobile.sharedInstance.inAppManager.inAppEnabled()){
-                Optimobile.sharedInstance.inAppManager.sync { (result:Int) in
+
+            if Optimobile.sharedInstance.inAppManager.inAppEnabled() {
+                Optimobile.sharedInstance.inAppManager.sync { (result: Int) in
                     _ = fetchBarrier.wait(timeout: DispatchTime.now() + DispatchTimeInterval.seconds(20))
-                    
+
                     if result < 0 {
                         fetchResult = .failed
                     } else if result > 0 {
@@ -129,71 +127,69 @@ internal class InAppManager {
                     // No data case is default, allow override from other handler
                     completionHandler(fetchResult)
                 }
-            }
-            else{
+            } else {
                 completionHandler(fetchResult)
             }
         }
         let kumulosPerformFetch = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-        
+
         ks_existingBackgroundFetchDelegate = class_replaceMethod(klass, performFetchSelector, kumulosPerformFetch, fetchType)
     }()
-    
+
     // MARK: State helpers
+
     func inAppEnabled() -> Bool {
-        return Optimobile.sharedInstance.inAppConsentStrategy != InAppConsentStrategy.notEnabled && userConsented();
+        return Optimobile.sharedInstance.inAppConsentStrategy != InAppConsentStrategy.notEnabled && userConsented()
     }
-    
+
     func userConsented() -> Bool {
         // Note if this implementation is changed there is a usage in the main Optimobile initialisation path
         // that should be considered.
         return UserDefaults.standard.bool(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
     }
-    
+
     func updateUserConsent(consentGiven: Bool) {
-        let props: [String: Any] = ["consented":consentGiven]
-        
+        let props: [String: Any] = ["consented": consentGiven]
+
         Optimobile.trackEventImmediately(eventType: OptimobileEvent.IN_APP_CONSENT_CHANGED.rawValue, properties: props)
-        
-        if (consentGiven) {
+
+        if consentGiven {
             UserDefaults.standard.set(consentGiven, forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
             handleEnrollmentAndSyncSetup()
-        }
-        else {
-            DispatchQueue.global(qos: .default).async(execute: {
+        } else {
+            DispatchQueue.global(qos: .default).async {
                 self.resetMessagingState()
-            })
+            }
         }
     }
-    
-    func handleAssociatedUserChange() -> Void {
-        if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.notEnabled) {
-            DispatchQueue.global(qos: .default).async(execute: {
+
+    func handleAssociatedUserChange() {
+        if Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.notEnabled {
+            DispatchQueue.global(qos: .default).async {
                 self.updateUserConsent(consentGiven: false)
-            })
+            }
             return
         }
-        
-        DispatchQueue.global(qos: .default).async(execute: {
+
+        DispatchQueue.global(qos: .default).async {
             self.resetMessagingState()
             self.handleEnrollmentAndSyncSetup()
-        })
+        }
     }
-    
-    private func handleEnrollmentAndSyncSetup() -> Void {
-        if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.autoEnroll && userConsented() == false) {
+
+    private func handleEnrollmentAndSyncSetup() {
+        if Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.autoEnroll, userConsented() == false {
             updateUserConsent(consentGiven: true)
-            return;
-        }
-        else if (Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.notEnabled && userConsented() == true) {
+            return
+        } else if Optimobile.sharedInstance.inAppConsentStrategy == InAppConsentStrategy.notEnabled, userConsented() == true {
             updateUserConsent(consentGiven: false)
-            return;
+            return
         }
-        
-        if (!inAppEnabled()) {
-            return;
+
+        if !inAppEnabled() {
+            return
         }
-        
+
         _ = setupSyncTask
         NotificationCenter.default.addObserver(self, selector: #selector(appBecameActive), name: UIApplication.didBecomeActiveNotification, object: nil)
 
@@ -203,44 +199,45 @@ internal class InAppManager {
             }
         }
 
-        self.sync(onComplete)
+        sync(onComplete)
     }
-    
-    private func resetMessagingState() -> Void {
+
+    private func resetMessagingState() {
         guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in resetMessagingState");
+            NSLog("InAppManager: NSManagedObjectContext is nil in resetMessagingState")
             return
         }
-    
+
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
         UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
         UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue)
         UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_MOST_RECENT_UPDATED_AT.rawValue)
-        
-        context.performAndWait({
-            let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
+
+        context.performAndWait {
+            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
             fetchRequest.includesPendingChanges = true
-            
-            var messages: [InAppMessageEntity];
+
+            var messages: [InAppMessageEntity]
             do {
                 messages = try context.fetch(fetchRequest) as! [InAppMessageEntity]
             } catch {
                 return
             }
-            
+
             for message in messages {
                 context.delete(message)
             }
-            
+
             do {
                 try context.save()
-            } catch let err {
-                print("Failed to clean up messages: \(err)")
+            } catch {
+                print("Failed to clean up messages: \(error)")
             }
-        })
+        }
     }
-    
+
     // MARK: Message management
+
     func syncDebounced(_ onComplete: InAppSyncCompletionHandler? = nil) {
         syncQueue.async {
             let lastSyncedAt = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue) as? Date ?? Date(timeIntervalSince1970: 0)
@@ -272,14 +269,14 @@ internal class InAppManager {
             let encodedIdentifier = KSHttpUtil.urlEncode(OptimobileHelper.currentUserIdentifier)
             let path = "/v1/users/\(encodedIdentifier!)/messages\(after)"
 
-            Optimobile.sharedInstance.pushHttpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { response, decodedBody in
+            Optimobile.sharedInstance.pushHttpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { _, decodedBody in
                 defer {
                     UserDefaults.standard.set(Date(), forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue)
                     syncBarrier.signal()
                 }
 
-                let messagesToPersist = decodedBody as? [[AnyHashable : Any]]
-                if (messagesToPersist == nil || messagesToPersist!.count == 0) {
+                let messagesToPersist = decodedBody as? [[AnyHashable: Any]]
+                if messagesToPersist == nil || messagesToPersist!.count == 0 {
                     onComplete?(0)
                     return
                 }
@@ -292,12 +289,12 @@ internal class InAppManager {
                         return
                     }
 
-                    DispatchQueue.global(qos: .default).async(execute: {
+                    DispatchQueue.global(qos: .default).async {
                         let messagesToPresent = self.getMessagesToPresent([InAppPresented.IMMEDIATELY.rawValue])
                         self.presenter.queueMessagesForPresentation(messages: messagesToPresent, tickleIds: self.pendingTickleIds)
-                    })
+                    }
                 }
-            }, onFailure: { response, error, data in
+            }, onFailure: { _, _, _ in
                 onComplete?(-1)
                 syncBarrier.signal()
             })
@@ -305,549 +302,539 @@ internal class InAppManager {
             syncBarrier.wait()
         }
     }
-    
-    
-    
-    
-    private func persistInAppMessages(messages: [[AnyHashable : Any]]) {
+
+    private func persistInAppMessages(messages: [[AnyHashable: Any]]) {
         guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in persistInAppMessages");
+            NSLog("InAppManager: NSManagedObjectContext is nil in persistInAppMessages")
             return
         }
-        
-        context.performAndWait({
+
+        context.performAndWait {
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
-            
+
             if entity == nil {
                 print("Failed to get entity description for Message, aborting!")
                 return
             }
-            
+
             var mostRecentUpdate = NSDate(timeIntervalSince1970: 0)
             let dateParser = DateFormatter()
             dateParser.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
             dateParser.locale = Locale(identifier: "en_US_POSIX")
             dateParser.timeZone = TimeZone(secondsFromGMT: 0)
-            
+
             var fetchedWithInbox = false
             for message in messages {
                 let partId = message["id"] as! Int64
-                
-                let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
+
+                let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
                 fetchRequest.entity = entity
-                let predicate: NSPredicate = NSPredicate(format: "id = %i", partId)
+                let predicate = NSPredicate(format: "id = %i", partId)
                 fetchRequest.predicate = predicate
-                
-                var fetchedObjects: [InAppMessageEntity];
+
+                var fetchedObjects: [InAppMessageEntity]
                 do {
                     fetchedObjects = try context.fetch(fetchRequest) as! [InAppMessageEntity]
                 } catch {
-                    continue;
+                    continue
                 }
-                
+
                 // Upsert
                 let model: InAppMessageEntity = fetchedObjects.count == 1 ? fetchedObjects[0] : InAppMessageEntity(entity: entity!, insertInto: context)
-                
+
                 model.id = partId
                 model.updatedAt = dateParser.date(from: message["updatedAt"] as! String)! as NSDate
-                if (model.dismissedAt == nil){
-                    model.dismissedAt =  dateParser.date(from: message["openedAt"] as? String ?? "") as NSDate?
+                if model.dismissedAt == nil {
+                    model.dismissedAt = dateParser.date(from: message["openedAt"] as? String ?? "") as NSDate?
                 }
                 model.presentedWhen = message["presentedWhen"] as! String
-                
-                if (model.readAt == nil){
-                    model.readAt =  dateParser.date(from: message["readAt"] as? String ?? "") as NSDate?
+
+                if model.readAt == nil {
+                    model.readAt = dateParser.date(from: message["readAt"] as? String ?? "") as NSDate?
                 }
-                
-                if (model.sentAt == nil){
-                    model.sentAt =  dateParser.date(from: message["sentAt"] as? String ?? "") as NSDate?
+
+                if model.sentAt == nil {
+                    model.sentAt = dateParser.date(from: message["sentAt"] as? String ?? "") as NSDate?
                 }
-                
+
                 model.content = message["content"] as! NSDictionary
                 model.data = message["data"] as? NSDictionary
                 model.badgeConfig = message["badge"] as? NSDictionary
                 model.inboxConfig = message["inbox"] as? NSDictionary
-                
-                if (model.inboxConfig != nil){
-                    //crude way to refresh when new inbox, updated readAt, updated inbox title/subtite
-                    //may cause redundant refreshes (if message with inbox updated, but not inbox itself).
+
+                if model.inboxConfig != nil {
+                    // crude way to refresh when new inbox, updated readAt, updated inbox title/subtite
+                    // may cause redundant refreshes (if message with inbox updated, but not inbox itself).
                     fetchedWithInbox = true
-                    
+
                     let inbox = model.inboxConfig!
-                    
+
                     model.inboxFrom = dateParser.date(from: inbox["from"] as? String ?? "") as NSDate?
                     model.inboxTo = dateParser.date(from: inbox["to"] as? String ?? "") as NSDate?
                 }
-                
+
                 let inboxDeletedAt = message["inboxDeletedAt"] as? String
-                if (inboxDeletedAt != nil){
-                    model.inboxConfig = nil;
-                    model.inboxFrom = nil;
-                    model.inboxTo = nil;
-                    if (model.dismissedAt == nil){
+                if inboxDeletedAt != nil {
+                    model.inboxConfig = nil
+                    model.inboxFrom = nil
+                    model.inboxTo = nil
+                    if model.dismissedAt == nil {
                         model.dismissedAt = dateParser.date(from: inboxDeletedAt!) as NSDate?
                     }
                 }
-                
+
                 model.expiresAt = dateParser.date(from: message["expiresAt"] as? String ?? "") as NSDate?
-                
-                if (model.updatedAt.timeIntervalSince1970 > mostRecentUpdate.timeIntervalSince1970) {
+
+                if model.updatedAt.timeIntervalSince1970 > mostRecentUpdate.timeIntervalSince1970 {
                     mostRecentUpdate = model.updatedAt
                 }
             }
-            
+
             // Evict
             var (idsEvicted, evictedWithInbox) = evictMessages(context: context)
-            
-            do{
+
+            do {
                 try context.save()
-            }
-            catch let err {
-                print("Failed to persist messages: \(err)")
+            } catch {
+                print("Failed to persist messages: \(error)")
                 return
             }
-            
-            //exceeders evicted after saving because fetchOffset is ignored when have unsaved changes
-            //https://stackoverflow.com/questions/10725252/possible-issue-with-fetchlimit-and-fetchoffset-in-a-core-data-query
+
+            // exceeders evicted after saving because fetchOffset is ignored when have unsaved changes
+            // https://stackoverflow.com/questions/10725252/possible-issue-with-fetchlimit-and-fetchoffset-in-a-core-data-query
             let (exceederIdsEvicted, evictedExceedersWithInbox) = evictMessagesExceedingLimit(context: context)
-            if (exceederIdsEvicted.count > 0){
+            if exceederIdsEvicted.count > 0 {
                 idsEvicted += exceederIdsEvicted
-                
-                do{
+
+                do {
                     try context.save()
-                }
-                catch let err {
-                    print("Failed to evict exceeding messages: \(err)")
+                } catch {
+                    print("Failed to evict exceeding messages: \(error)")
                     return
                 }
             }
-            
+
             for idEvicted in idsEvicted {
                 removeNotificationTickle(id: idEvicted)
             }
-            
+
             UserDefaults.standard.set(mostRecentUpdate, forKey: OptimobileUserDefaultsKey.IN_APP_MOST_RECENT_UPDATED_AT.rawValue)
-            
+
             trackMessageDelivery(messages: messages)
-            
+
             let inboxUpdated = fetchedWithInbox || evictedWithInbox || evictedExceedersWithInbox
             OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: inboxUpdated)
-        })
+        }
     }
-    
-    private func removeNotificationTickle(id: Int64) -> Void {
-        if (pendingTickleIds.contains(id)){
+
+    private func removeNotificationTickle(id: Int64) {
+        if pendingTickleIds.contains(id) {
             pendingTickleIds.remove(id)
         }
-        
+
         if #available(iOS 10, *) {
             let tickleNotificationId = "k-in-app-message:\(id)"
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [tickleNotificationId])
             PendingNotificationHelper.remove(identifier: tickleNotificationId)
         }
     }
-    
+
     private func evictMessages(context: NSManagedObjectContext) -> ([Int64], Bool) {
-        let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
         fetchRequest.includesPendingChanges = true
-        
+
         let messageExpiredCondition = "(expiresAt != nil AND expiresAt <= %@)"
-        
+
         let noInboxAndMessageDismissed = "(inboxConfig = nil AND dismissedAt != nil)"
-        let noInboxAndMessageExpired = "(inboxConfig = nil AND "+messageExpiredCondition+")"
-        let inboxExpiredAndMessageDismissedOrExpired = "(inboxTo != nil AND inboxTo < %@ AND (dismissedAt != nil OR "+messageExpiredCondition+"))"
-        
+        let noInboxAndMessageExpired = "(inboxConfig = nil AND " + messageExpiredCondition + ")"
+        let inboxExpiredAndMessageDismissedOrExpired = "(inboxTo != nil AND inboxTo < %@ AND (dismissedAt != nil OR " + messageExpiredCondition + "))"
+
         let predicate: NSPredicate? =
-            NSPredicate(format: noInboxAndMessageDismissed+" OR "+noInboxAndMessageExpired+" OR "+inboxExpiredAndMessageDismissedOrExpired, NSDate(), NSDate(), NSDate())
+            NSPredicate(format: noInboxAndMessageDismissed + " OR " + noInboxAndMessageExpired + " OR " + inboxExpiredAndMessageDismissedOrExpired, NSDate(), NSDate(), NSDate())
         fetchRequest.predicate = predicate
-        
+
         var toEvict: [InAppMessageEntity]
         do {
             toEvict = try context.fetch(fetchRequest) as! [InAppMessageEntity]
-        } catch let err {
-            print("Failed to evict messages: \(err)")
-            return ([], false);
+        } catch {
+            print("Failed to evict messages: \(error)")
+            return ([], false)
         }
-        
+
         var idsEvicted: [Int64] = []
         var evictedInbox = false
         for messageToEvict in toEvict {
             idsEvicted.append(messageToEvict.id)
-            if (messageToEvict.inboxConfig != nil){
+            if messageToEvict.inboxConfig != nil {
                 evictedInbox = true
             }
             context.delete(messageToEvict)
         }
-        
+
         return (idsEvicted, evictedInbox)
     }
-    
+
     private func evictMessagesExceedingLimit(context: NSManagedObjectContext) -> ([Int64], Bool) {
-        let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: "sentAt", ascending: false),
             NSSortDescriptor(key: "updatedAt", ascending: false),
             NSSortDescriptor(key: "id", ascending: false)
         ]
         fetchRequest.fetchOffset = STORED_IN_APP_LIMIT
-        
+
         var toEvict: [InAppMessageEntity]
         do {
             toEvict = try context.fetch(fetchRequest) as! [InAppMessageEntity]
-        } catch let err {
-            print("Failed to evict exceeding messages: \(err)")
-            return ([], false);
+        } catch {
+            print("Failed to evict exceeding messages: \(error)")
+            return ([], false)
         }
-        
+
         var idsEvicted: [Int64] = []
         var evictedInbox = false
         for messageToEvict in toEvict {
             idsEvicted.append(messageToEvict.id)
-            if (messageToEvict.inboxConfig != nil){
+            if messageToEvict.inboxConfig != nil {
                 evictedInbox = true
             }
             context.delete(messageToEvict)
         }
-        
+
         return (idsEvicted, evictedInbox)
     }
-    
+
     private func getMessagesToPresent(_ presentedWhenOptions: [String]) -> [InAppMessage] {
         var messages: [InAppMessage] = []
         guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in getMessagesToPresent");
+            NSLog("InAppManager: NSManagedObjectContext is nil in getMessagesToPresent")
             return messages
         }
-        
-        context.performAndWait({
+
+        context.performAndWait {
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
-            
-            let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
+
+            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
             fetchRequest.entity = entity
             fetchRequest.includesPendingChanges = false
             fetchRequest.returnsObjectsAsFaults = false
-            
+
             let predicate = NSPredicate(format: "((presentedWhen IN %@) OR (id IN %@)) AND (dismissedAt = nil) AND (expiresAt = nil OR expiresAt > %@)", presentedWhenOptions, self.pendingTickleIds, NSDate())
             fetchRequest.predicate = predicate
-            
+
             fetchRequest.sortDescriptors = [
                 NSSortDescriptor(key: "sentAt", ascending: true),
                 NSSortDescriptor(key: "updatedAt", ascending: true),
                 NSSortDescriptor(key: "id", ascending: true)
             ]
-            
+
             var entities: [Any] = []
             do {
                 entities = try context.fetch(fetchRequest)
-            } catch let err {
-                print("Failed to fetch: \(err)")
-                return;
-            }
-            
-            if (entities.isEmpty){
+            } catch {
+                print("Failed to fetch: \(error)")
                 return
             }
-            
-            messages = self.mapEntitiesToModels(entities: entities as! [InAppMessageEntity] )
-        })
-        
+
+            if entities.isEmpty {
+                return
+            }
+
+            messages = self.mapEntitiesToModels(entities: entities as! [InAppMessageEntity])
+        }
+
         return messages
     }
-    
-    internal func handleMessageOpened(message: InAppMessage) -> Void {
+
+    func handleMessageOpened(message: InAppMessage) {
         var markedRead = false
-        if (message.readAt == nil){
-            markedRead = markInboxItemRead(withId: message.id, shouldWait: false);
+        if message.readAt == nil {
+            markedRead = markInboxItemRead(withId: message.id, shouldWait: false)
         }
-       
-        if (message.inboxConfig != nil){
-            OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: markedRead);
+
+        if message.inboxConfig != nil {
+            OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: markedRead)
         }
-        
-        let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":message.id]
+
+        let props: [String: Any] = ["type": MESSAGE_TYPE_IN_APP, "id": message.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_OPENED, properties: props)
     }
-    
-    internal func markMessageDismissed(message: InAppMessage) -> Void {
+
+    func markMessageDismissed(message: InAppMessage) {
         guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in markMessageDismissed");
+            NSLog("InAppManager: NSManagedObjectContext is nil in markMessageDismissed")
             return
         }
-        
-        let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":message.id]
+
+        let props: [String: Any] = ["type": MESSAGE_TYPE_IN_APP, "id": message.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DISMISSED, properties: props)
-        
-        if (pendingTickleIds.contains(message.id)){
+
+        if pendingTickleIds.contains(message.id) {
             pendingTickleIds.remove(message.id)
         }
-        
-        context.performAndWait({
+
+        context.performAndWait {
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
-            
-            let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
+
+            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
             fetchRequest.entity = entity
             fetchRequest.includesPendingChanges = false
             fetchRequest.predicate = NSPredicate(format: "id = %i", message.id)
-            
+
             var messageEntities: [InAppMessageEntity]
             do {
                 messageEntities = try context.fetch(fetchRequest) as! [InAppMessageEntity]
-            } catch let err {
-                print("Failed to evict messages: \(err)")
-                return;
+            } catch {
+                print("Failed to evict messages: \(error)")
+                return
             }
-            
-            if (messageEntities.count == 1){
+
+            if messageEntities.count == 1 {
                 messageEntities[0].dismissedAt = NSDate()
-                if (messageEntities[0].readAt == nil){
+                if messageEntities[0].readAt == nil {
                     messageEntities[0].readAt = NSDate()
                 }
             }
-            
-            do{
+
+            do {
                 try context.save()
-            }
-            catch let err {
-                print("Failed to update message: \(err)")
+            } catch {
+                print("Failed to update message: \(error)")
                 return
             }
-            
-        });
+        }
     }
-    
-    private func trackMessageDelivery(messages: [[AnyHashable : Any]]) -> Void {
+
+    private func trackMessageDelivery(messages: [[AnyHashable: Any]]) {
         for message in messages {
-            let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":message["id"] as! Int]
+            let props: [String: Any] = ["type": MESSAGE_TYPE_IN_APP, "id": message["id"] as! Int]
             Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED, properties: props)
         }
     }
-    
-    // MARK Interop with other components
-    func presentImmediateAndNextOpenContent() -> Void{
-        objc_sync_enter(self.pendingTickleIds)
+
+    // MARK: Interop with other components
+
+    func presentImmediateAndNextOpenContent() {
+        objc_sync_enter(pendingTickleIds)
         defer { objc_sync_exit(self.pendingTickleIds) }
-        
-        let messagesToPresent = self.getMessagesToPresent([InAppPresented.IMMEDIATELY.rawValue, InAppPresented.NEXT_OPEN.rawValue])
-        presenter.queueMessagesForPresentation(messages: messagesToPresent, tickleIds: self.pendingTickleIds)
+
+        let messagesToPresent = getMessagesToPresent([InAppPresented.IMMEDIATELY.rawValue, InAppPresented.NEXT_OPEN.rawValue])
+        presenter.queueMessagesForPresentation(messages: messagesToPresent, tickleIds: pendingTickleIds)
     }
-    
+
     func presentMessage(withId: Int64) -> Bool {
         guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in presentMessage");
+            NSLog("InAppManager: NSManagedObjectContext is nil in presentMessage")
             return false
         }
-        
-        var result = true;
-        
-        context.performAndWait({
-            
-            let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
-            
+
+        var result = true
+
+        context.performAndWait {
+            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
+
             fetchRequest.includesPendingChanges = false
             fetchRequest.returnsObjectsAsFaults = false
             fetchRequest.predicate = NSPredicate(format: "id = %i", withId)
-            
+
             var items: [InAppMessageEntity]
             do {
                 items = try context.fetch(fetchRequest) as! [InAppMessageEntity]
-            } catch let err {
-                result = false;
-                print("Failed to evict messages: \(err)")
-                return;
+            } catch {
+                result = false
+                print("Failed to evict messages: \(error)")
+                return
             }
-            
-            if (items.count != 1){
-                result = false;
-                return;
+
+            if items.count != 1 {
+                result = false
+                return
             }
-            
-            let message: InAppMessage = InAppMessage(entity: items[0]);
+
+            let message = InAppMessage(entity: items[0])
             let tickles = NSOrderedSet(array: [withId])
             presenter.queueMessagesForPresentation(messages: [message], tickleIds: tickles)
-        })
-        
+        }
+
         return result
     }
-    
-    func handlePushOpen(notification: PushNotification) -> Void {
-        let deepLink: [AnyHashable:Any]? = notification.inAppDeepLink();
-        if (!inAppEnabled() || deepLink == nil){
-            return;
+
+    func handlePushOpen(notification: PushNotification) {
+        let deepLink: [AnyHashable: Any]? = notification.inAppDeepLink()
+        if !inAppEnabled() || deepLink == nil {
+            return
         }
-        
-        DispatchQueue.global(qos: .default).async(execute: {
-            let data = deepLink!["data"] as! [AnyHashable:Any];
-            let inAppPartId:Int = data["id"] as! Int
-            
+
+        DispatchQueue.global(qos: .default).async {
+            let data = deepLink!["data"] as! [AnyHashable: Any]
+            let inAppPartId: Int = data["id"] as! Int
+
             objc_sync_enter(self.pendingTickleIds)
             defer { objc_sync_exit(self.pendingTickleIds) }
-            
+
             self.pendingTickleIds.add(inAppPartId)
-            
+
             let messagesToPresent = self.getMessagesToPresent([])
-            
-            let tickleMessageFound = messagesToPresent.contains(where: { (message) -> Bool in
-                return message.id == inAppPartId
+
+            let tickleMessageFound = messagesToPresent.contains(where: { message -> Bool in
+                message.id == inAppPartId
             })
-            
-            if (!tickleMessageFound) {
+
+            if !tickleMessageFound {
                 self.sync()
                 return
             }
-            
+
             self.presenter.queueMessagesForPresentation(messages: messagesToPresent, tickleIds: self.pendingTickleIds)
-        })
+        }
     }
-    
-    func deleteMessageFromInbox(withId : Int64) -> Bool {
+
+    func deleteMessageFromInbox(withId: Int64) -> Bool {
         guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in deleteMessageFromInbox");
+            NSLog("InAppManager: NSManagedObjectContext is nil in deleteMessageFromInbox")
             return false
         }
-        
-        let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":withId]
+
+        let props: [String: Any] = ["type": MESSAGE_TYPE_IN_APP, "id": withId]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELETED_FROM_INBOX, properties: props)
-        
+
         removeNotificationTickle(id: withId)
-        
-        var result = true;
-        context.performAndWait({
+
+        var result = true
+        context.performAndWait {
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
-            
-            let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
+
+            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
             fetchRequest.entity = entity
             fetchRequest.includesPendingChanges = false
             fetchRequest.predicate = NSPredicate(format: "id = %i", withId)
-            
+
             var messageEntities: [InAppMessageEntity]
             do {
                 messageEntities = try context.fetch(fetchRequest) as! [InAppMessageEntity]
-            } catch let err {
-                result = false;
-                print("Failed to delete message with id: \(withId) \(err)")
-                return;
+            } catch {
+                result = false
+                print("Failed to delete message with id: \(withId) \(error)")
+                return
             }
-            
-            //setting inbox columns to nil and dismissedAt to now turns this message into a message to be evicted
-            if (messageEntities.count == 1){
+
+            // setting inbox columns to nil and dismissedAt to now turns this message into a message to be evicted
+            if messageEntities.count == 1 {
                 messageEntities[0].inboxTo = nil
                 messageEntities[0].inboxFrom = nil
                 messageEntities[0].inboxConfig = nil
                 messageEntities[0].dismissedAt = NSDate()
-                if (messageEntities[0].readAt == nil){
+                if messageEntities[0].readAt == nil {
                     messageEntities[0].readAt = NSDate()
                 }
             }
-            
-            do{
+
+            do {
                 try context.save()
-            }
-            catch let err {
-                result = false;
-                print("Failed to delete message with id: \(withId) \(err)")
+            } catch {
+                result = false
+                print("Failed to delete message with id: \(withId) \(error)")
                 return
             }
-        });
-        
-        OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: result);
-        
+        }
+
+        OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: result)
+
         return result
     }
-    
-    func markInboxItemRead(withId : Int64, shouldWait: Bool) -> Bool {
-        guard let context = self.messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in markInboxItemRead");
+
+    func markInboxItemRead(withId: Int64, shouldWait: Bool) -> Bool {
+        guard let context = messagesContext else {
+            NSLog("InAppManager: NSManagedObjectContext is nil in markInboxItemRead")
             return false
         }
-        
-        var result = true;
+
+        var result = true
         let block = {
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
-            
-            let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
+
+            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
             fetchRequest.entity = entity
             fetchRequest.includesPendingChanges = false
             fetchRequest.includesPropertyValues = false
             fetchRequest.predicate = NSPredicate(format: "id = %i AND readAt = nil", withId)
-            
+
             var messageEntities: [InAppMessageEntity]
             do {
                 messageEntities = try context.fetch(fetchRequest) as! [InAppMessageEntity]
-            } catch let err {
-                result = false;
-                print("Failed to mark as read message with id: \(withId) \(err)")
-                return;
+            } catch {
+                result = false
+                print("Failed to mark as read message with id: \(withId) \(error)")
+                return
             }
-            
-            if (messageEntities.count == 0){
+
+            if messageEntities.count == 0 {
                 result = false
                 return
             }
-            
-            if (messageEntities.count == 1){
+
+            if messageEntities.count == 1 {
                 messageEntities[0].readAt = NSDate()
             }
-            
-            do{
+
+            do {
                 try context.save()
-            }
-            catch let err {
-                result = false;
-                print("Failed to mark as read message with id: \(withId) \(err)")
+            } catch {
+                result = false
+                print("Failed to mark as read message with id: \(withId) \(error)")
                 return
             }
         }
-        shouldWait ? context.performAndWait(block) : context.perform(block);
-        
-        
-        if (!result){
+        shouldWait ? context.performAndWait(block) : context.perform(block)
+
+        if !result {
             return result
         }
-        
-        let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":withId]
+
+        let props: [String: Any] = ["type": MESSAGE_TYPE_IN_APP, "id": withId]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_READ, properties: props)
-        
+
         removeNotificationTickle(id: withId)
-        
+
         return result
     }
-    
+
     func markAllInboxItemsAsRead() -> Bool {
-        var result = true;
+        var result = true
         let inboxItems = OptimoveInApp.getInboxItems()
         var inboxNeedsUpdate = false
         for item in inboxItems {
-            if (item.isRead()){
+            if item.isRead() {
                 continue
             }
-            
+
             let success = markInboxItemRead(withId: item.id, shouldWait: true)
-            if (success && !inboxNeedsUpdate) {
-                inboxNeedsUpdate = true;
+            if success && !inboxNeedsUpdate {
+                inboxNeedsUpdate = true
             }
-            
-            if (!success){
+
+            if !success {
                 result = false
             }
         }
-        
-        OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: inboxNeedsUpdate);
-        
+
+        OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: inboxNeedsUpdate)
+
         return result
     }
-    
-    func readInboxSummary(inboxSummaryBlock: @escaping InboxSummaryBlock) -> Void {
+
+    func readInboxSummary(inboxSummaryBlock: @escaping InboxSummaryBlock) {
         guard let context = Optimobile.sharedInstance.inAppManager.messagesContext else {
-            self.fireInboxSummaryCallback(callback: inboxSummaryBlock, summary: nil)
+            fireInboxSummaryCallback(callback: inboxSummaryBlock, summary: nil)
             return
         }
-        
-        context.perform({
+
+        context.perform {
             let request = NSFetchRequest<InAppMessageEntity>(entityName: "Message")
             request.includesPendingChanges = false
             request.predicate = NSPredicate(format: "(inboxConfig != nil)")
             request.propertiesToFetch = ["inboxFrom", "inboxTo", "readAt"]
-            
+
             var items: [InAppMessageEntity] = []
             do {
                 items = try context.fetch(request) as [InAppMessageEntity]
@@ -857,166 +844,166 @@ internal class InAppManager {
                 self.fireInboxSummaryCallback(callback: inboxSummaryBlock, summary: nil)
                 return
             }
-            
+
             var totalCount: Int64 = 0
             var unreadCount: Int64 = 0
             for item in items {
-                if (!item.isAvailable()){
+                if !item.isAvailable() {
                     continue
                 }
-                
+
                 totalCount += 1
-                if (item.readAt == nil){
+                if item.readAt == nil {
                     unreadCount += 1
                 }
             }
-            
+
             self.fireInboxSummaryCallback(callback: inboxSummaryBlock, summary: InAppInboxSummary(totalCount: totalCount, unreadCount: unreadCount))
-        })
+        }
     }
-    
-    private func fireInboxSummaryCallback(callback: @escaping InboxSummaryBlock, summary: InAppInboxSummary?){
+
+    private func fireInboxSummaryCallback(callback: @escaping InboxSummaryBlock, summary: InAppInboxSummary?) {
         DispatchQueue.main.async {
             callback(summary)
         }
     }
-    
+
     // MARK: Data model
-    
-    private func mapEntitiesToModels(entities: [InAppMessageEntity] ) -> [InAppMessage]{
-        var models: [InAppMessage] = [];
+
+    private func mapEntitiesToModels(entities: [InAppMessageEntity]) -> [InAppMessage] {
+        var models: [InAppMessage] = []
         models.reserveCapacity(entities.count)
-        
+
         for entity in entities {
-            let model = InAppMessage(entity: entity);
+            let model = InAppMessage(entity: entity)
             models.append(model)
         }
-        
-        return models;
+
+        return models
     }
-    
+
     private func getDataModel() -> NSManagedObjectModel {
-        let model = NSManagedObjectModel();
-        
-        let messageEntity = NSEntityDescription();
-        messageEntity.name = "Message";
-        messageEntity.managedObjectClassName = NSStringFromClass(InAppMessageEntity.self);
-        
-        var messageProps: [NSAttributeDescription] = [];
-        messageProps.reserveCapacity(13);
-        
-        let partId = NSAttributeDescription();
-        partId.name = "id";
-        partId.attributeType = NSAttributeType.integer64AttributeType;
-        partId.isOptional = false;
-        messageProps.append(partId);
-        
-        let updatedAt = NSAttributeDescription();
-        updatedAt.name = "updatedAt";
-        updatedAt.attributeType = NSAttributeType.dateAttributeType;
-        updatedAt.isOptional = false;
-        messageProps.append(updatedAt);
-        
-        let presentedWhen = NSAttributeDescription();
-        presentedWhen.name = "presentedWhen";
-        presentedWhen.attributeType = NSAttributeType.stringAttributeType;
-        presentedWhen.isOptional = false;
-        messageProps.append(presentedWhen);
-        
-        let content = NSAttributeDescription();
-        content.name = "content";
-        content.attributeType = NSAttributeType.transformableAttributeType;
-        content.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self);
-        content.isOptional = false;
-        messageProps.append(content);
-        
-        let data = NSAttributeDescription();
-        data.name = "data";
-        data.attributeType = NSAttributeType.transformableAttributeType;
-        data.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self);
-        data.isOptional = true;
-        messageProps.append(data);
-        
-        let badgeConfig = NSAttributeDescription();
-        badgeConfig.name = "badgeConfig";
-        badgeConfig.attributeType = NSAttributeType.transformableAttributeType;
-        badgeConfig.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self);
-        badgeConfig.isOptional = true;
-        messageProps.append(badgeConfig);
-        
-        let inboxConfig = NSAttributeDescription();
-        inboxConfig.name = "inboxConfig";
-        inboxConfig.attributeType = NSAttributeType.transformableAttributeType;
-        inboxConfig.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self);
-        inboxConfig.isOptional = true;
-        messageProps.append(inboxConfig);
-        
-        let inboxFrom = NSAttributeDescription();
-        inboxFrom.name = "inboxFrom";
-        inboxFrom.attributeType = NSAttributeType.dateAttributeType;
-        inboxFrom.isOptional = true;
-        messageProps.append(inboxFrom);
-        
-        let inboxTo = NSAttributeDescription();
-        inboxTo.name = "inboxTo";
-        inboxTo.attributeType = NSAttributeType.dateAttributeType;
-        inboxTo.isOptional = true;
-        messageProps.append(inboxTo);
-        
-        let dismissedAt = NSAttributeDescription();
-        dismissedAt.name = "dismissedAt";
-        dismissedAt.attributeType = NSAttributeType.dateAttributeType;
-        dismissedAt.isOptional = true;
-        messageProps.append(dismissedAt);
-        
-        let expiresAt = NSAttributeDescription();
-        expiresAt.name = "expiresAt";
-        expiresAt.attributeType = NSAttributeType.dateAttributeType;
-        expiresAt.isOptional = true;
-        messageProps.append(expiresAt);
-        
-        let readAt = NSAttributeDescription();
-        readAt.name = "readAt";
-        readAt.attributeType = NSAttributeType.dateAttributeType;
-        readAt.isOptional = true;
-        messageProps.append(readAt);
-        
-        let sentAt = NSAttributeDescription();
-        sentAt.name = "sentAt";
-        sentAt.attributeType = NSAttributeType.dateAttributeType;
-        sentAt.isOptional = true;
-        messageProps.append(sentAt);
-        
-        messageEntity.properties = messageProps;
-        
+        let model = NSManagedObjectModel()
+
+        let messageEntity = NSEntityDescription()
+        messageEntity.name = "Message"
+        messageEntity.managedObjectClassName = NSStringFromClass(InAppMessageEntity.self)
+
+        var messageProps: [NSAttributeDescription] = []
+        messageProps.reserveCapacity(13)
+
+        let partId = NSAttributeDescription()
+        partId.name = "id"
+        partId.attributeType = NSAttributeType.integer64AttributeType
+        partId.isOptional = false
+        messageProps.append(partId)
+
+        let updatedAt = NSAttributeDescription()
+        updatedAt.name = "updatedAt"
+        updatedAt.attributeType = NSAttributeType.dateAttributeType
+        updatedAt.isOptional = false
+        messageProps.append(updatedAt)
+
+        let presentedWhen = NSAttributeDescription()
+        presentedWhen.name = "presentedWhen"
+        presentedWhen.attributeType = NSAttributeType.stringAttributeType
+        presentedWhen.isOptional = false
+        messageProps.append(presentedWhen)
+
+        let content = NSAttributeDescription()
+        content.name = "content"
+        content.attributeType = NSAttributeType.transformableAttributeType
+        content.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self)
+        content.isOptional = false
+        messageProps.append(content)
+
+        let data = NSAttributeDescription()
+        data.name = "data"
+        data.attributeType = NSAttributeType.transformableAttributeType
+        data.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self)
+        data.isOptional = true
+        messageProps.append(data)
+
+        let badgeConfig = NSAttributeDescription()
+        badgeConfig.name = "badgeConfig"
+        badgeConfig.attributeType = NSAttributeType.transformableAttributeType
+        badgeConfig.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self)
+        badgeConfig.isOptional = true
+        messageProps.append(badgeConfig)
+
+        let inboxConfig = NSAttributeDescription()
+        inboxConfig.name = "inboxConfig"
+        inboxConfig.attributeType = NSAttributeType.transformableAttributeType
+        inboxConfig.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self)
+        inboxConfig.isOptional = true
+        messageProps.append(inboxConfig)
+
+        let inboxFrom = NSAttributeDescription()
+        inboxFrom.name = "inboxFrom"
+        inboxFrom.attributeType = NSAttributeType.dateAttributeType
+        inboxFrom.isOptional = true
+        messageProps.append(inboxFrom)
+
+        let inboxTo = NSAttributeDescription()
+        inboxTo.name = "inboxTo"
+        inboxTo.attributeType = NSAttributeType.dateAttributeType
+        inboxTo.isOptional = true
+        messageProps.append(inboxTo)
+
+        let dismissedAt = NSAttributeDescription()
+        dismissedAt.name = "dismissedAt"
+        dismissedAt.attributeType = NSAttributeType.dateAttributeType
+        dismissedAt.isOptional = true
+        messageProps.append(dismissedAt)
+
+        let expiresAt = NSAttributeDescription()
+        expiresAt.name = "expiresAt"
+        expiresAt.attributeType = NSAttributeType.dateAttributeType
+        expiresAt.isOptional = true
+        messageProps.append(expiresAt)
+
+        let readAt = NSAttributeDescription()
+        readAt.name = "readAt"
+        readAt.attributeType = NSAttributeType.dateAttributeType
+        readAt.isOptional = true
+        messageProps.append(readAt)
+
+        let sentAt = NSAttributeDescription()
+        sentAt.name = "sentAt"
+        sentAt.attributeType = NSAttributeType.dateAttributeType
+        sentAt.isOptional = true
+        messageProps.append(sentAt)
+
+        messageEntity.properties = messageProps
+
         model.entities = [messageEntity]
-        
-        return model;
+
+        return model
     }
-    
+
     @objc
     class KSJsonValueTransformer: ValueTransformer {
         override class func transformedValueClass() -> AnyClass {
             return NSDictionary.self
         }
-        
+
         override class func allowsReverseTransformation() -> Bool {
             return true
         }
-        
+
         override func transformedValue(_ value: Any?) -> Any? {
             if value == nil || value is NSNull {
                 return nil
             }
-            
+
             if let value = value {
                 if !JSONSerialization.isValidJSONObject(value) {
                     print("Object cannot be transformed to JSON data object!")
                     return nil
                 }
             }
-            
-            var data: Data? = nil
+
+            var data: Data?
             do {
                 if let value = value {
                     data = try JSONSerialization.data(withJSONObject: value, options: [])
@@ -1024,14 +1011,12 @@ internal class InAppManager {
             } catch {
                 print("Failed to transform JSON to data object")
             }
-            
-            
+
             return data
         }
-        
+
         override func reverseTransformedValue(_ value: Any?) -> Any? {
-            
-            var obj: Any? = nil
+            var obj: Any?
             do {
                 if let value = value as? Data {
                     obj = try JSONSerialization.jsonObject(with: value, options: [])
@@ -1039,7 +1024,7 @@ internal class InAppManager {
             } catch {
                 print("Failed to transform data to JSON object")
             }
-            
+
             return obj
         }
     }

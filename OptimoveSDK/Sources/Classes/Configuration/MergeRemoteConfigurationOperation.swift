@@ -7,11 +7,11 @@ internal final class MergeRemoteConfigurationOperation: AsyncOperation {
 
     private let repository: ConfigurationRepository
 
-    public init(repository: ConfigurationRepository) {
+    init(repository: ConfigurationRepository) {
         self.repository = repository
     }
 
-    public override func main() {
+    override func main() {
         guard !self.isCancelled else { return }
         state = .executing
         do {

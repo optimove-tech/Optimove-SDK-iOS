@@ -58,7 +58,7 @@ final class OptiLoggerOutputStreamAdapter: LoggerStream {
     }
 
     var policy: LoggerStreamFilter {
-        return adaptee.isVisibleToClient ? .all : .custom(filter: { _,_  in return false })
+        return adaptee.isVisibleToClient ? .all : .custom(filter: { _, _  in return false })
     }
 
     func log(level: LogLevelCore, fileName: String, methodName: String, logModule: String?, message: String) {

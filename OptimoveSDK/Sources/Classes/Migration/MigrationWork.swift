@@ -136,7 +136,7 @@ extension MigrationWork_3_3_0 {
         }
 
         func moveDefautlsFromAppGroup() throws {
-            let bundleID =  try Bundle.getApplicationNameSpace()
+            let bundleID = try Bundle.getApplicationNameSpace()
             let oldDefaults = try getDeprecatedUserDefaultsGrouped(tenantBundleIdentifier: bundleID)
             let newDefaults = try UserDefaults.optimove()
             let groupKeys: Set<StorageKey> = [
@@ -165,7 +165,7 @@ extension MigrationWork_3_3_0 {
         }
 
         func moveFilesFromAppGroup() throws {
-            let bundleID =  try Bundle.getApplicationNameSpace()
+            let bundleID = try Bundle.getApplicationNameSpace()
             let oldURL = try getDeprecatedFileManagerGroupContainerURL(tenantBundleIdentifier: bundleID).appendingPathComponent("OptimoveSDK")
             let newURL = try FileManager.optimoveURL()
             let fileManager = FileManager.default
@@ -226,7 +226,7 @@ extension MigrationWork_3_3_0 {
                     .userEmail,
                     .siteID,
                     .settingUserSuccess,
-                    .firstVisitTimestamp,
+                    .firstVisitTimestamp
                 ]
                 sharedKeys.forEach({ key in
                     let value = oldDefaults.value(for: key)

@@ -7,38 +7,38 @@ public typealias InAppDeepLinkHandlerBlock = (InAppButtonPress) -> Void
 public typealias PushOpenedHandlerBlock = (PushNotification) -> Void
 
 @available(iOS 10.0, *)
-public typealias PushReceivedInForegroundHandlerBlock = (PushNotification, (UNNotificationPresentationOptions)->Void) -> Void
+public typealias PushReceivedInForegroundHandlerBlock = (PushNotification, (UNNotificationPresentationOptions) -> Void) -> Void
 
-public enum InAppConsentStrategy : String {
+public enum InAppConsentStrategy: String {
     case notEnabled = "NotEnabled"
     case autoEnroll = "AutoEnroll"
     case explicitByUser = "ExplicitByUser"
 }
 
-public enum InAppDisplayMode : String {
+public enum InAppDisplayMode: String {
     case automatic = "automatic"
     case paused = "paused"
 }
 
 // MARK: class
 class Optimobile {
-    let urlBuilder:UrlBuilder
+    let urlBuilder: UrlBuilder
 
-    let pushHttpClient:KSHttpClient
-    let coreHttpClient:KSHttpClient
+    let pushHttpClient: KSHttpClient
+    let coreHttpClient: KSHttpClient
 
     let pushNotificationDeviceType = 1
-    let pushNotificationProductionTokenType:Int = 1
+    let pushNotificationProductionTokenType: Int = 1
 
-    let sdkType : Int = 101;
+    let sdkType: Int = 101
 
-    fileprivate static var instance:Optimobile?
+    fileprivate static var instance: Optimobile?
 
-    var notificationCenter:Any?
+    var notificationCenter: Any?
 
-    static var sharedInstance:Optimobile {
+    static var sharedInstance: Optimobile {
         get {
-            if(false == isInitialized()) {
+            if false == isInitialized() {
                 assertionFailure("The OptimobileSDK has not been initialized")
             }
 
@@ -46,17 +46,16 @@ class Optimobile {
         }
     }
 
-    static func getInstance() -> Optimobile
-    {
-        return sharedInstance;
+    static func getInstance() -> Optimobile {
+        return sharedInstance
     }
 
-    fileprivate(set) var config : OptimobileConfig
+    fileprivate(set) var config: OptimobileConfig
     fileprivate(set) var apiKey: String
     fileprivate(set) var secretKey: String
-    fileprivate(set) var inAppConsentStrategy:InAppConsentStrategy = InAppConsentStrategy.notEnabled
+    fileprivate(set) var inAppConsentStrategy = InAppConsentStrategy.notEnabled
 
-    static var inAppConsentStrategy : InAppConsentStrategy {
+    static var inAppConsentStrategy: InAppConsentStrategy {
         get {
             return sharedInstance.inAppConsentStrategy
         }
@@ -70,15 +69,15 @@ class Optimobile {
 
     fileprivate var pushHelper: PushHelper
 
-    fileprivate(set) var deepLinkHelper : DeepLinkHelper?
+    fileprivate(set) var deepLinkHelper: DeepLinkHelper?
 
-    static var apiKey:String {
+    static var apiKey: String {
         get {
             return sharedInstance.apiKey
         }
     }
 
-    static var secretKey:String {
+    static var secretKey: String {
         get {
             return sharedInstance.secretKey
         }
@@ -89,7 +88,7 @@ class Optimobile {
 
         - Returns: String - UUID
     */
-    static var installId :String {
+    static var installId: String {
         get {
             return OptimobileHelper.installId
         }
@@ -103,7 +102,7 @@ class Optimobile {
         Initialize the Optimobile SDK.
     */
     static func initialize(config: OptimobileConfig, initialVisitorId: String, initialUserId: String?) {
-        if (instance !== nil) {
+        if instance !== nil {
             assertionFailure("The OptimobileSDK has already been initialized")
         }
 
@@ -125,12 +124,11 @@ class Optimobile {
 
         maybeAlignUserAssociation(initialUserId: initialUserId)
     }
-    
+
     fileprivate static func writeDefaultsKeys(config: OptimobileConfig, initialVisitorId: String) {
         KeyValPersistenceHelper.maybeMigrateUserDefaultsToAppGroups()
-        
-        
-        let existingInstallId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue) as? String;
+
+        let existingInstallId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue) as? String
         // This block handles upgrades from Kumulos SDK users to Optimove SDK users
         // In the case where a user was auto-enrolled into in-app messaging on the K SDK, they would not become auto-enrolled
         // on the new Optimove SDK installation.
@@ -151,12 +149,12 @@ class Optimobile {
     }
 
     fileprivate static func maybeAlignUserAssociation(initialUserId: String?) {
-        if (initialUserId == nil) {
+        if initialUserId == nil {
             return
         }
 
         let optimobileUserId = OptimobileHelper.currentUserIdentifier
-        if (optimobileUserId == initialUserId) {
+        if optimobileUserId == initialUserId {
             return
         }
 

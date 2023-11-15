@@ -5,7 +5,7 @@ import WebKit
 import StoreKit
 import UserNotifications
 
-internal enum InAppAction : String {
+internal enum InAppAction: String {
     case CLOSE_MESSAGE = "closeMessage"
     case TRACK_EVENT = "trackConversionEvent"
     case PROMPT_PUSH_PERMISSION = "promptPushPermission"
@@ -14,39 +14,39 @@ internal enum InAppAction : String {
     case REQUEST_RATING = "requestAppStoreRating"
 }
 
-class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
-   
-    private let messageQueueLock = DispatchSemaphore(value: 1)
-    
-    private var webView : WKWebView?
-    private var loadingSpinner : UIActivityIndicatorView?
-    private var frame : UIView?
-    private var window : UIWindow?
-    private var webViewReady : Bool = false
-    
-    private var contentController : WKUserContentController?
-    
-    private var messageQueue : NSMutableOrderedSet
-    private var pendingTickleIds : NSMutableOrderedSet
+class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
 
-    private var displayMode : InAppDisplayMode
-    private var currentMessage : InAppMessage?
+    private let messageQueueLock = DispatchSemaphore(value: 1)
+
+    private var webView: WKWebView?
+    private var loadingSpinner: UIActivityIndicatorView?
+    private var frame: UIView?
+    private var window: UIWindow?
+    private var webViewReady = false
+
+    private var contentController: WKUserContentController?
+
+    private var messageQueue: NSMutableOrderedSet
+    private var pendingTickleIds: NSMutableOrderedSet
+
+    private var displayMode: InAppDisplayMode
+    private var currentMessage: InAppMessage?
 
     init(displayMode: InAppDisplayMode) {
-        self.messageQueue = NSMutableOrderedSet.init(capacity: 5)
-        self.pendingTickleIds = NSMutableOrderedSet.init(capacity: 2)
+        self.messageQueue = NSMutableOrderedSet(capacity: 5)
+        self.pendingTickleIds = NSMutableOrderedSet(capacity: 2)
         self.currentMessage = nil
-        
+
         self.displayMode = displayMode
 
         super.init()
     }
-    
+
     func setDisplayMode(_ mode: InAppDisplayMode) {
         runOnMainThreadSync {
             let resumed = mode != displayMode && mode != .paused
 
-            displayMode = mode;
+            displayMode = mode
 
             if resumed {
                 presentFromQueue()
@@ -55,7 +55,7 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
     }
 
     func getDisplayMode() -> InAppDisplayMode {
-        var mode : InAppDisplayMode = .automatic
+        var mode: InAppDisplayMode = .automatic
 
         runOnMainThreadSync {
             mode = displayMode
@@ -66,21 +66,20 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
 
     func queueMessagesForPresentation(messages: [InAppMessage], tickleIds: NSOrderedSet) {
         messageQueueLock.wait()
-    
-        if (messages.count == 0 && messageQueue.count == 0) {
+
+        if messages.count == 0 && messageQueue.count == 0 {
             messageQueueLock.signal()
-            return;
+            return
         }
-        
+
         for message in messages {
             if messageQueue.contains(message) {
                 continue
             }
-            
+
             messageQueue.add(message)
         }
 
-        
         for tickleId in tickleIds {
             if pendingTickleIds.contains(tickleId) {
                 continue
@@ -124,28 +123,28 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
 
         messageQueueLock.signal()
 
-        if (shouldShowSomething) {
+        if shouldShowSomething {
             DispatchQueue.main.async {
                 self.presentFromQueue()
             }
         }
     }
-    
-    func presentFromQueue() -> Void {
+
+    func presentFromQueue() {
         messageQueueLock.wait()
         defer {
             messageQueueLock.signal()
         }
 
-        if (self.messageQueue.count == 0 || displayMode == .paused) {
+        if self.messageQueue.count == 0 || displayMode == .paused {
             DispatchQueue.main.async {
                 self.destroyViews()
             }
 
-            return;
+            return
         }
-        
-        self.currentMessage = (self.messageQueue[0] as! InAppMessage);
+
+        self.currentMessage = (self.messageQueue[0] as! InAppMessage)
 
         var ready = false
 
@@ -165,64 +164,63 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         self.postClientMessage(type: "PRESENT_MESSAGE", data: content)
     }
 
-    func handleMessageClosed() -> Void {
-        guard let message = currentMessage else  {
+    func handleMessageClosed() {
+        guard let message = currentMessage else {
             return
         }
 
         if #available(iOS 10, *) {
             let tickleNotificationId = "k-in-app-message:\(message.id)"
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [tickleNotificationId])
-            
+
             PendingNotificationHelper.remove(identifier: tickleNotificationId)
         }
-        
+
         messageQueueLock.wait()
-        
+
         messageQueue.removeObject(at: 0)
         pendingTickleIds.remove(message.id)
         currentMessage = nil
-        
+
         if messageQueue.count == 0 {
             pendingTickleIds.removeAllObjects()
         }
 
         messageQueueLock.signal()
-     
+
         presentFromQueue()
    }
-    
-    func cancelCurrentPresentationQueue(waitForViewCleanup: Bool) -> Void {
+
+    func cancelCurrentPresentationQueue(waitForViewCleanup: Bool) {
         messageQueueLock.wait()
-             
+
         self.messageQueue.removeAllObjects()
         self.pendingTickleIds.removeAllObjects()
         self.currentMessage = nil
 
         messageQueueLock.signal()
-      
+
         if waitForViewCleanup == true {
             runOnMainThreadSync {
                 self.destroyViews()
             }
-        }
-        else {
+        } else {
             DispatchQueue.main.async {
                 self.destroyViews()
             }
         }
     }
-    
+
     func initViews() {
         if window != nil {
             return
         }
-        
+
         // Window / frame setup
-        window = UIWindow.init(frame: UIScreen.main.bounds)
+        window = UIWindow(frame: UIScreen.main.bounds)
         window!.windowLevel = UIWindow.Level.alert
         window!.rootViewController = UIViewController()
-              
+
         #if swift(>=5.1)
         if #available(iOS 13.0, *) {
             window?.windowScene = UIApplication.shared
@@ -230,23 +228,23 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
                 .first as? UIWindowScene
         }
         #endif
-             
-        let frame = UIView.init(frame: window!.frame)
+
+        let frame = UIView(frame: window!.frame)
         self.frame = frame
 
         frame.backgroundColor = .clear
 
         window!.isHidden = false
         window!.rootViewController!.view = frame
-        
+
         // Webview
         self.contentController = WKUserContentController()
         self.contentController!.add(self, name: "inAppHost")
-        
+
         let config = WKWebViewConfiguration()
         config.userContentController = self.contentController!
         config.allowsInlineMediaPlayback = true
-        
+
         if #available(iOS 10.0, *) {
             config.mediaTypesRequiringUserActionForPlayback = []
         } else {
@@ -256,25 +254,25 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
                 config.mediaPlaybackRequiresUserAction = false
             }
         }
-        
+
         #if DEBUG
-            config.preferences.setValue(true, forKey:"developerExtrasEnabled")
+            config.preferences.setValue(true, forKey: "developerExtrasEnabled")
         #endif
 
         let webView = WKWebView(frame: window!.frame, configuration: config)
         self.webView = webView
 
-        webView.autoresizingMask = [.flexibleWidth, .flexibleHeight];
-        webView.backgroundColor = .clear;
-        webView.scrollView.backgroundColor = .clear;
-        webView.isOpaque = false;
-        webView.navigationDelegate = self;
-        webView.scrollView.bounces = false;
-        webView.scrollView.isScrollEnabled = false;
-        webView.allowsBackForwardNavigationGestures = false;
-        
+        webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+        webView.isOpaque = false
+        webView.navigationDelegate = self
+        webView.scrollView.bounces = false
+        webView.scrollView.isScrollEnabled = false
+        webView.allowsBackForwardNavigationGestures = false
+
         if #available(iOS 9.0, *) {
-            webView.allowsLinkPreview = false;
+            webView.allowsLinkPreview = false
         }
 
         if #available(iOS 11.0.0, *) {
@@ -292,15 +290,15 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         let url = Optimobile.getInstance().urlBuilder.urlForService(.iar)
         let request = URLRequest(url: URL(string: url)!, cachePolicy: cachePolicy, timeoutInterval: 8)
         webView.load(request)
-        
+
         // Spinner
         let loadingSpinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
         self.loadingSpinner = loadingSpinner
-        
+
         loadingSpinner.translatesAutoresizingMaskIntoConstraints = true
         loadingSpinner.hidesWhenStopped = true
         loadingSpinner.startAnimating()
-        
+
         frame.addSubview(loadingSpinner)
 
         loadingSpinner.center = frame.center
@@ -311,69 +309,68 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
     func destroyViews() {
         if let window = self.window {
             window.isHidden = true
-            
+
             if let spinner = self.loadingSpinner {
                 spinner.removeFromSuperview()
                 self.loadingSpinner = nil
             }
-            
+
             if let webView = self.webView {
                 webView.removeFromSuperview()
                 self.webView = nil
             }
-            
+
             if let frame = self.frame {
                 frame.removeFromSuperview()
                 self.frame = nil
             }
         }
-        
-        self.window = nil;
+
+        self.window = nil
         self.webViewReady = false
     }
-  
+
     func postClientMessage(type: String, data: Any?) {
         guard let webView = self.webView else {
             return
         }
-        
+
         do {
-        
-            let msg: [String: Any] = ["type" : type, "data" : data != nil ? data! : NSNull()]
-            let json : Data = try JSONSerialization.data(withJSONObject: msg, options: JSONSerialization.WritingOptions(rawValue: 0))
-            
-            
+
+            let msg: [String: Any] = ["type": type, "data": data != nil ? data! : NSNull()]
+            let json: Data = try JSONSerialization.data(withJSONObject: msg, options: JSONSerialization.WritingOptions(rawValue: 0))
+
             let jsonMsg = String(data: json, encoding: .utf8)
             let evalString = String(format: "postHostMessage(%@);", jsonMsg!)
-          
+
             webView.evaluateJavaScript(evalString, completionHandler: nil)
         } catch {
-            //Noop?
+            // Noop?
         }
       }
-        
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
        if message.name != "inAppHost" {
-           return;
+           return
        }
-        
+
         let body = message.body as! NSDictionary
         let type = body["type"] as! String
-        
-        if (type == "READY") {
+
+        if type == "READY" {
             runOnMainThreadSync {
                 self.webViewReady = true
             }
 
             self.presentFromQueue()
-        } else if (type == "MESSAGE_OPENED") {
+        } else if type == "MESSAGE_OPENED" {
             loadingSpinner?.stopAnimating()
             Optimobile.sharedInstance.inAppManager.handleMessageOpened(message: self.currentMessage!)
-        } else if (type  == "MESSAGE_CLOSED") {
+        } else if type == "MESSAGE_CLOSED" {
             self.handleMessageClosed()
-        } else if (type == "EXECUTE_ACTIONS") {
-            guard let body = message.body as? [AnyHashable:Any],
-                  let data = body["data"] as? [AnyHashable:Any],
+        } else if type == "EXECUTE_ACTIONS" {
+            guard let body = message.body as? [AnyHashable: Any],
+                  let data = body["data"] as? [AnyHashable: Any],
                   let actions = data["actions"] as? [NSDictionary] else {
                 return
             }
@@ -382,16 +379,16 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
            print("Unknown message: \(message.body)")
         }
     }
-    
+
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // Noop
     }
-    
+
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         // Handles transfer errors after starting load
         self.cancelCurrentPresentationQueue(waitForViewCleanup: false)
     }
-    
+
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         // Handles connection/timeout errors for the main frame load
         self.cancelCurrentPresentationQueue(waitForViewCleanup: false)
@@ -416,24 +413,24 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
         self.cancelCurrentPresentationQueue(waitForViewCleanup: false)
     }
 
-    func handleActions(actions: [NSDictionary]) -> Void  {
+    func handleActions(actions: [NSDictionary]) {
         if let message = self.currentMessage {
-            
-            var hasClose = false;
-            var conversionEvent : String?
-            var conversionEventData : [String:Any]?
-            var userAction : NSDictionary?
-            
+
+            var hasClose = false
+            var conversionEvent: String?
+            var conversionEventData: [String: Any]?
+            var userAction: NSDictionary?
+
             for action in actions {
                 let type = InAppAction(rawValue: action["type"] as! String)!
-                let data = action["data"] as? [AnyHashable:Any]
+                let data = action["data"] as? [AnyHashable: Any]
 
                 switch type {
                 case .CLOSE_MESSAGE:
                     hasClose = true
                 case .TRACK_EVENT:
                     conversionEvent = data?["eventType"] as? String
-                    conversionEventData = data?["data"] as? [String:Any]
+                    conversionEventData = data?["data"] as? [String: Any]
                 default:
                     userAction = action
                 }
@@ -445,35 +442,35 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
             }
 
             if let conversionEvent = conversionEvent {
-                Optimobile.trackEventImmediately(eventType: conversionEvent, properties: conversionEventData);
+                Optimobile.trackEventImmediately(eventType: conversionEvent, properties: conversionEventData)
             }
 
-            if (userAction != nil) {
+            if userAction != nil {
                 self.handleUserAction(message: message, userAction: userAction!)
                 self.cancelCurrentPresentationQueue(waitForViewCleanup: true)
             }
         }
     }
 
-    func handleUserAction(message: InAppMessage, userAction: NSDictionary) -> Void {
+    func handleUserAction(message: InAppMessage, userAction: NSDictionary) {
         let type = userAction["type"] as! String
-                
-        if (type == InAppAction.PROMPT_PUSH_PERMISSION.rawValue) {
+
+        if type == InAppAction.PROMPT_PUSH_PERMISSION.rawValue {
             Optimobile.pushRequestDeviceToken()
-        } else if (type == InAppAction.DEEP_LINK.rawValue) {
-            if (Optimobile.sharedInstance.config.inAppDeepLinkHandlerBlock == nil) {
-                return;
+        } else if type == InAppAction.DEEP_LINK.rawValue {
+            if Optimobile.sharedInstance.config.inAppDeepLinkHandlerBlock == nil {
+                return
             }
             DispatchQueue.main.async {
-                let data = userAction.value(forKeyPath: "data.deepLink") as? [AnyHashable:Any] ?? [:]
+                let data = userAction.value(forKeyPath: "data.deepLink") as? [AnyHashable: Any] ?? [:]
                 let buttonPress = InAppButtonPress(deepLinkData: data, messageId: message.id, messageData: message.data)
                 Optimobile.sharedInstance.config.inAppDeepLinkHandlerBlock?(buttonPress)
             }
-        } else if (type == InAppAction.OPEN_URL.rawValue) {
+        } else if type == InAppAction.OPEN_URL.rawValue {
             guard let url = URL(string: userAction.value(forKeyPath: "data.url") as! String) else {
                 return
             }
-            
+
             if #available(iOS 10.0.0, *) {
                 UIApplication.shared.open(url, options: [:]) { (win) in
                     // noop
@@ -481,17 +478,17 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
             } else {
                 DispatchQueue.main.async {
                     UIApplication.shared.openURL(url)
-               }
+                }
            }
-        } else if (type == InAppAction.REQUEST_RATING.rawValue) {
+        } else if type == InAppAction.REQUEST_RATING.rawValue {
             if #available(iOS 10.3.0, *) {
                 SKStoreReviewController.requestReview()
             } else {
-                NSLog("Requesting a rating not supported on this iOS version");
+                NSLog("Requesting a rating not supported on this iOS version")
             }
         }
     }
-    
+
     private func runOnMainThreadSync(_ work: () -> Void) {
         if Thread.isMainThread {
             work()
@@ -499,5 +496,5 @@ class InAppPresenter : NSObject, WKScriptMessageHandler, WKNavigationDelegate{
             DispatchQueue.main.sync(execute: work)
         }
     }
-    
+
 }

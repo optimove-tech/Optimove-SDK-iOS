@@ -51,7 +51,6 @@ public struct GlobalGeneralConfig: Codable, Equatable {
     }
 }
 
-
 // MARK: - Optitrack
 public struct GlobalOptitrackConfig: Codable, Equatable {
     public let eventCategoryName: String

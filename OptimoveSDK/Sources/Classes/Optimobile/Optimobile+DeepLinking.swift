@@ -11,12 +11,12 @@ public struct DeepLinkContent {
 public struct DeepLink {
     public let url: URL
     public let content: DeepLinkContent
-    public let data: [AnyHashable:Any?]
+    public let data: [AnyHashable: Any?]
 
-    init?(for url: URL, from jsonData:Data) {
-        guard let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable:Any],
-              let linkData = response["linkData"] as? [AnyHashable:Any?],
-              let content = response["content"] as? [AnyHashable:Any?] else {
+    init?(for url: URL, from jsonData: Data) {
+        guard let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable: Any],
+              let linkData = response["linkData"] as? [AnyHashable: Any?],
+              let content = response["content"] as? [AnyHashable: Any?] else {
             return nil
         }
 
@@ -29,9 +29,9 @@ public struct DeepLink {
 public enum DeepLinkResolution {
     case lookupFailed(_ url: URL)
     case linkNotFound(_ url: URL)
-    case linkExpired(_ url:URL)
-    case linkLimitExceeded(_ url:URL)
-    case linkMatched(_ data:DeepLink)
+    case linkExpired(_ url: URL)
+    case linkLimitExceeded(_ url: URL)
+    case linkMatched(_ data: DeepLink)
 }
 
 public typealias DeepLinkHandler = (DeepLinkResolution) -> Void
@@ -39,11 +39,11 @@ public typealias DeepLinkHandler = (DeepLinkResolution) -> Void
 class DeepLinkHelper {
     fileprivate static let deferredLinkCheckedKey = "KUMULOS_DDL_CHECKED"
 
-    let config : OptimobileConfig
+    let config: OptimobileConfig
     let httpClient: KSHttpClient
-    var anyContinuationHandled : Bool
+    var anyContinuationHandled: Bool
 
-    init(_ config: OptimobileConfig, urlBuilder:UrlBuilder) {
+    init(_ config: OptimobileConfig, urlBuilder: UrlBuilder) {
         self.config = config
         httpClient = KSHttpClient(
             baseUrl: URL(string: urlBuilder.urlForService(.ddl))!,
@@ -59,7 +59,7 @@ class DeepLinkHelper {
     }
 
     func checkForNonContinuationLinkMatch() {
-        if (checkForDeferredLinkOnClipboard()) {
+        if checkForDeferredLinkOnClipboard() {
             return
         }
 
@@ -69,7 +69,7 @@ class DeepLinkHelper {
     @objc func appBecameActive() {
         NotificationCenter.default.removeObserver(self)
 
-        if (self.anyContinuationHandled) {
+        if self.anyContinuationHandled {
             return
         }
 
@@ -77,7 +77,7 @@ class DeepLinkHelper {
     }
 
     fileprivate func checkForDeferredLinkOnClipboard() -> Bool {
-        var handled = false;
+        var handled = false
 
         if let checked = KeyValPersistenceHelper.object(forKey: DeepLinkHelper.deferredLinkCheckedKey) as? Bool, checked == true {
             return handled
@@ -91,7 +91,7 @@ class DeepLinkHelper {
         }
 
         if shouldCheck, let url = UIPasteboard.general.url, urlShouldBeHandled(url) {
-            UIPasteboard.general.urls = UIPasteboard.general.urls?.filter({$0 != url})
+            UIPasteboard.general.urls = UIPasteboard.general.urls?.filter({ $0 != url })
             self.handleDeepLinkUrl(url, wasDeferred: true)
             handled = true
         }
@@ -126,8 +126,8 @@ class DeepLinkHelper {
         if let query = url.query {
             path = path + "&" + query
         }
-        
-        httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess:  { (res, data) in
+
+        httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { (res, data) in
             switch res?.statusCode {
             case 200:
                 guard let jsonData = data as? Data,
@@ -138,7 +138,7 @@ class DeepLinkHelper {
 
                 self.invokeDeepLinkHandler(.linkMatched(link))
 
-                let linkProps = ["url": url.absoluteString, "wasDeferred": wasDeferred] as [String : Any]
+                let linkProps = ["url": url.absoluteString, "wasDeferred": wasDeferred] as [String: Any]
                 Optimobile.getInstance().analyticsHelper.trackEvent(eventType: OptimobileEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
                 break
             default:
@@ -163,19 +163,19 @@ class DeepLinkHelper {
         })
     }
 
-    fileprivate func handleFingerprintComponents(components: [String:String]) {
-        guard let componentJson = try? JSONSerialization.data(withJSONObject: components, options: JSONSerialization.WritingOptions.init(rawValue: 0)),
+    fileprivate func handleFingerprintComponents(components: [String: String]) {
+        guard let componentJson = try? JSONSerialization.data(withJSONObject: components, options: JSONSerialization.WritingOptions(rawValue: 0)),
               let encodedComponents = KSHttpUtil.urlEncode(componentJson.base64EncodedString()) else {
             return
         }
 
         let path = "/v1/deeplinks/_taps?fingerprint=\(encodedComponents)"
 
-        httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess:  { (res, data) in
+        httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { (res, data) in
             switch res?.statusCode {
             case 200:
                 guard let jsonData = data as? Data,
-                      let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable:Any],
+                      let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable: Any],
                       let urlString = response["linkUrl"] as? String,
                       let url = URL(string: urlString),
                       let link = DeepLink(for: url, from: jsonData) else {
@@ -186,7 +186,7 @@ class DeepLinkHelper {
 
                 self.invokeDeepLinkHandler(.linkMatched(link))
 
-                let linkProps = ["url": url.absoluteString, "wasDeferred": false] as [String : Any]
+                let linkProps = ["url": url.absoluteString, "wasDeferred": false] as [String: Any]
                 Optimobile.getInstance().analyticsHelper.trackEvent(eventType: OptimobileEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
                 break
             default:
@@ -195,7 +195,7 @@ class DeepLinkHelper {
             }
         }, onFailure: { (res, err, data) in
             guard let jsonData = data as? Data,
-                  let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable:Any],
+                  let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable: Any],
                   let urlString = response["linkUrl"] as? String,
                   let url = URL(string: urlString) else {
                 return
@@ -234,7 +234,7 @@ class DeepLinkHelper {
             return false
         }
 
-        anyContinuationHandled = true;
+        anyContinuationHandled = true
 
         self.handleDeepLinkUrl(url)
         return true

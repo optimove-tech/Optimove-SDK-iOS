@@ -17,7 +17,7 @@ class EventValidatorTests: OptimoveTestCase {
         configuration = builder.build()
         validator = EventValidator(configuration: configuration, storage: storage)
     }
-    
+
     // MARK: - verifySetUserIdEvent
     func test_verifySetUserIdEvent_alreadySetInUserId_error() throws {
         let userId = "abc"
@@ -27,7 +27,7 @@ class EventValidatorTests: OptimoveTestCase {
             userId: userId,
             updateVisitorId: ""
         )
-        
+
         let errors = validator.verifySetUserIdEvent(event)
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(

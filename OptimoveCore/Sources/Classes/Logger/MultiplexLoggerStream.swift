@@ -31,7 +31,7 @@ public final class MultiplexLoggerStream {
                 switch stream.policy {
 
                 case .custom(let filterFunction):
-                    if filterFunction(level, isRemote)  {
+                    if filterFunction(level, isRemote) {
                         fallthrough
                     }
 
@@ -58,7 +58,7 @@ public final class MultiplexLoggerStream {
         queue.async {
             streams
                 .compactMap { $0 as? MutableLoggerStream }
-                .forEach (mutator)
+                .forEach(mutator)
         }
     }
 }

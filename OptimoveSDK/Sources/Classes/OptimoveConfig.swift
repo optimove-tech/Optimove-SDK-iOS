@@ -33,12 +33,12 @@ public struct OptimobileConfig {
 
     let sessionIdleTimeout: UInt
 
-    let inAppConsentStrategy : InAppConsentStrategy
-    let inAppDefaultDisplayMode : InAppDisplayMode
-    let inAppDeepLinkHandlerBlock : InAppDeepLinkHandlerBlock?
+    let inAppConsentStrategy: InAppConsentStrategy
+    let inAppDefaultDisplayMode: InAppDisplayMode
+    let inAppDeepLinkHandlerBlock: InAppDeepLinkHandlerBlock?
 
-    let pushOpenedHandlerBlock : PushOpenedHandlerBlock?
-    fileprivate let _pushReceivedInForegroundHandlerBlock : Any?
+    let pushOpenedHandlerBlock: PushOpenedHandlerBlock?
+    fileprivate let _pushReceivedInForegroundHandlerBlock: Any?
     @available(iOS 10.0, *)
     var pushReceivedInForegroundHandlerBlock: PushReceivedInForegroundHandlerBlock? {
         get {
@@ -46,13 +46,13 @@ public struct OptimobileConfig {
         }
     }
 
-    let deepLinkCname : URL?
-    let deepLinkHandler : DeepLinkHandler?
+    let deepLinkCname: URL?
+    let deepLinkHandler: DeepLinkHandler?
 
-    let baseUrlMap : ServiceUrlMap
+    let baseUrlMap: ServiceUrlMap
 
-    let runtimeInfo: [String : AnyObject]?
-    let sdkInfo: [String : AnyObject]?
+    let runtimeInfo: [String: AnyObject]?
+    let sdkInfo: [String: AnyObject]?
     let isRelease: Bool?
 }
 
@@ -68,13 +68,13 @@ open class OptimoveConfigBuilder: NSObject {
     private var _inAppDeepLinkHandlerBlock: InAppDeepLinkHandlerBlock?
     private var _pushOpenedHandlerBlock: PushOpenedHandlerBlock?
     private var _pushReceivedInForegroundHandlerBlock: Any?
-    private var _deepLinkCname : URL?
-    private var _deepLinkHandler : DeepLinkHandler?
-    private var _baseUrlMap : ServiceUrlMap?
+    private var _deepLinkCname: URL?
+    private var _deepLinkHandler: DeepLinkHandler?
+    private var _baseUrlMap: ServiceUrlMap?
 
-    private var _runtimeInfo : [String : AnyObject]?
-    private var _sdkInfo : [String : AnyObject]?
-    private var _isRelease : Bool?
+    private var _runtimeInfo: [String: AnyObject]?
+    private var _sdkInfo: [String: AnyObject]?
+    private var _isRelease: Bool?
 
     public init(optimoveCredentials: String?, optimobileCredentials: String?) {
         let optimoveCredentialsTuple = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials)
@@ -89,7 +89,7 @@ open class OptimoveConfigBuilder: NSObject {
             _configName = optimoveCredentialsTuple.configName
         }
 
-        if let optimobileCredentialsTuple = optimobileCredentialsTuple  {
+        if let optimobileCredentialsTuple = optimobileCredentialsTuple {
             _apiKey = optimobileCredentialsTuple.apiKey
             _secretKey = optimobileCredentialsTuple.secretKey
             _region = optimobileCredentialsTuple.region
@@ -103,7 +103,7 @@ open class OptimoveConfigBuilder: NSObject {
         _sessionIdleTimeout = seconds
         return self
     }
-    
+
     @discardableResult public func enableInAppMessaging(inAppConsentStrategy: InAppConsentStrategy, defaultDisplayMode: InAppDisplayMode) -> OptimoveConfigBuilder {
         _inAppConsentStrategy = inAppConsentStrategy
         _inAppDisplayMode = defaultDisplayMode
@@ -140,7 +140,7 @@ open class OptimoveConfigBuilder: NSObject {
     /**
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
      */
-    @discardableResult public func setRuntimeInfo(runtimeInfo: [String : AnyObject]) -> OptimoveConfigBuilder {
+    @discardableResult public func setRuntimeInfo(runtimeInfo: [String: AnyObject]) -> OptimoveConfigBuilder {
          _runtimeInfo = runtimeInfo
 
          return self
@@ -149,7 +149,7 @@ open class OptimoveConfigBuilder: NSObject {
     /**
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
      */
-    @discardableResult public func setSdkInfo(sdkInfo: [String : AnyObject]) -> OptimoveConfigBuilder {
+    @discardableResult public func setSdkInfo(sdkInfo: [String: AnyObject]) -> OptimoveConfigBuilder {
         _sdkInfo = sdkInfo
 
         return self
@@ -167,15 +167,15 @@ open class OptimoveConfigBuilder: NSObject {
     /**
      Internal SDK embedding API, do not call or depend on this method in your app
      */
-    @discardableResult public func setBaseUrlMapping(baseUrlMap:ServiceUrlMap) -> OptimoveConfigBuilder {
+    @discardableResult public func setBaseUrlMapping(baseUrlMap: ServiceUrlMap) -> OptimoveConfigBuilder {
         _baseUrlMap = baseUrlMap
 
         return self
     }
 
     @discardableResult public func build() -> OptimoveConfig {
-        var tenantInfo : OptimoveTenantInfo?
-        var optimobileConfig : OptimobileConfig?
+        var tenantInfo: OptimoveTenantInfo?
+        var optimobileConfig: OptimobileConfig?
 
         if let _tenantToken = _tenantToken, let _configName = _configName {
             tenantInfo = OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
@@ -209,7 +209,7 @@ open class OptimoveConfigBuilder: NSObject {
         )
     }
 
-    private static func parseOptimoveCredentials(creds: String?) -> (tenantToken:String,configName:String)? {
+    private static func parseOptimoveCredentials(creds: String?) -> (tenantToken: String, configName: String)? {
         guard let creds = creds,
               let tuple = parseTuple(creds: creds),
               let ver = tuple[0] as? Int else {
@@ -228,7 +228,7 @@ open class OptimoveConfigBuilder: NSObject {
         return (tenantToken, configName)
     }
 
-    private static func parseOptimobileCredentials(creds: String?) -> (region:String,apiKey:String,secretKey:String)? {
+    private static func parseOptimobileCredentials(creds: String?) -> (region: String, apiKey: String, secretKey: String)? {
         guard let creds = creds,
               let tuple = parseTuple(creds: creds),
               let ver = tuple[0] as? Int else {

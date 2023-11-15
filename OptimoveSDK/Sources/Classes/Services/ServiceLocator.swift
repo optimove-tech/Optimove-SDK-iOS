@@ -37,7 +37,7 @@ final class ServiceLocator {
         ).build()
     }()
 
-    /// MARK: - Initializer
+    // MARK: - Initializer
 
     init(storageFacade: StorageFacade) {
         _storage = storageFacade
@@ -111,12 +111,12 @@ final class ServiceLocator {
     func installationIdGenerator() -> InstallationIdGenerator {
         return InstallationIdGenerator(storage: storage())
     }
-    
+
     func deviceStateObserver() -> DeviceStateObserver {
         return _deviceStateObserver
     }
 
-    /// MARK: - Factories
+    // MARK: - Factories
 
     func componentFactory() -> ComponentFactory {
         return ComponentFactory(

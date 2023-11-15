@@ -5,9 +5,9 @@ import Foundation
 /// Combined protocol for a convenince access to stored values and files.
 public typealias OptimoveStorage = KeyValueStorage & FileStorage & StorageValue
 
-/// MARK: - StorageCase
+// MARK: - StorageCase
 
-/// MARK: - StorageKey
+// MARK: - StorageKey
 
 public enum StorageKey: String, CaseIterable {
     case installationID

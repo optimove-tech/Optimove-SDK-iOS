@@ -48,7 +48,7 @@ final class CoreDataMigrator: CoreDataMigratorProtocol {
             }
 
             if currentURL != storeURL {
-                //Destroy intermediate step's store
+                // Destroy intermediate step's store
                 try NSPersistentStoreCoordinator.destroyStore(at: currentURL)
             }
 
@@ -57,7 +57,7 @@ final class CoreDataMigrator: CoreDataMigratorProtocol {
 
         try NSPersistentStoreCoordinator.replaceStore(at: storeURL, withStoreAt: currentURL)
 
-        if (currentURL != storeURL) {
+        if currentURL != storeURL {
             try NSPersistentStoreCoordinator.destroyStore(at: currentURL)
         }
     }

@@ -2,13 +2,13 @@
 
 import Foundation
 
-enum KSHttpError : Error {
+enum KSHttpError: Error {
     case responseCastingError
     case badStatusCode
 }
 
-typealias KSHttpSuccessBlock = (_ response:HTTPURLResponse?, _ decodedBody:Any?) -> Void
-typealias KSHttpFailureBlock = (_ response:HTTPURLResponse?, _ error:Error?, _ decodedBody: Any?) -> Void
+typealias KSHttpSuccessBlock = (_ response: HTTPURLResponse?, _ decodedBody: Any?) -> Void
+typealias KSHttpFailureBlock = (_ response: HTTPURLResponse?, _ error: Error?, _ decodedBody: Any?) -> Void
 
 enum KSHttpDataFormat {
     case json
@@ -16,7 +16,7 @@ enum KSHttpDataFormat {
     case rawData
 }
 
-enum KSHttpMethod : String {
+enum KSHttpMethod: String {
     case GET = "GET"
     case POST = "POST"
     case PUT = "PUT"
@@ -24,16 +24,16 @@ enum KSHttpMethod : String {
 }
 
 internal class KSHttpClient {
-    private let baseUrl : URL
+    private let baseUrl: URL
     private let baseUrlComponents: URLComponents?
-    private let urlSession : URLSession
-    private var authHeader : String?
-    private let requestFormat : KSHttpDataFormat
-    private let responseFormat : KSHttpDataFormat
+    private let urlSession: URLSession
+    private var authHeader: String?
+    private let requestFormat: KSHttpDataFormat
+    private let responseFormat: KSHttpDataFormat
 
     // MARK: Initializers & Configs
 
-    init(baseUrl: URL, requestFormat: KSHttpDataFormat, responseFormat: KSHttpDataFormat, additionalHeaders:[AnyHashable:Any]? = nil) {
+    init(baseUrl: URL, requestFormat: KSHttpDataFormat, responseFormat: KSHttpDataFormat, additionalHeaders: [AnyHashable: Any]? = nil) {
         self.baseUrl = baseUrl
         self.baseUrlComponents = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false)
         self.requestFormat = requestFormat
@@ -53,7 +53,7 @@ internal class KSHttpClient {
         self.authHeader = nil
     }
 
-    func setBasicAuth(user:String, password:String) {
+    func setBasicAuth(user: String, password: String) {
         let creds = "\(user):\(password)"
         let data = creds.data(using: .utf8)
         let base64Creds = data?.base64EncodedString()
@@ -63,18 +63,17 @@ internal class KSHttpClient {
         }
     }
 
-    func invalidateSessionCancellingTasks(_ cancel:Bool) {
+    func invalidateSessionCancellingTasks(_ cancel: Bool) {
         if cancel {
             urlSession.invalidateAndCancel()
-        }
-        else {
+        } else {
             urlSession.finishTasksAndInvalidate()
         }
     }
 
     // MARK: HTTP Methods
 
-    @discardableResult func sendRequest(_ method:KSHttpMethod, toPath:String, data:Any?, onSuccess:@escaping KSHttpSuccessBlock, onFailure:@escaping KSHttpFailureBlock) -> URLSessionDataTask {
+    @discardableResult func sendRequest(_ method: KSHttpMethod, toPath: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) -> URLSessionDataTask {
         let request = self.newRequestToPath(toPath, method: method, body: data)
 
         return self.sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
@@ -82,7 +81,7 @@ internal class KSHttpClient {
 
     // MARK: Helpers
 
-    fileprivate func newRequestToPath(_ path:String, method:KSHttpMethod, body:Any?) -> URLRequest {
+    fileprivate func newRequestToPath(_ path: String, method: KSHttpMethod, body: Any?) -> URLRequest {
         let fullPath = "\(self.baseUrlComponents?.path ?? "")\(path)"
         let url = URL(string: fullPath, relativeTo: self.baseUrl)
 
@@ -111,7 +110,7 @@ internal class KSHttpClient {
         return urlRequest
     }
 
-    fileprivate func encodeBody(_ body:Any) -> Data? {
+    fileprivate func encodeBody(_ body: Any) -> Data? {
         switch self.requestFormat {
         case .json:
             guard JSONSerialization.isValidJSONObject(body) else {
@@ -132,12 +131,12 @@ internal class KSHttpClient {
         }
     }
 
-    fileprivate func decodeBody(_ data:Data) -> Any? {
+    fileprivate func decodeBody(_ data: Data) -> Any? {
         if data.isEmpty {
             return nil
         }
 
-        var decodedData : Any?
+        var decodedData: Any?
 
         switch self.responseFormat {
         case .json:
@@ -154,7 +153,7 @@ internal class KSHttpClient {
         return decodedData
     }
 
-    fileprivate func sendRequest(request:URLRequest, onSuccess:@escaping KSHttpSuccessBlock, onFailure:@escaping KSHttpFailureBlock) -> URLSessionDataTask {
+    fileprivate func sendRequest(request: URLRequest, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) -> URLSessionDataTask {
         let task = urlSession.dataTask(with: request) { (data, response, error) in
             guard let httpResponse = response as? HTTPURLResponse else {
                 onFailure(nil, KSHttpError.responseCastingError, nil)
@@ -166,7 +165,7 @@ internal class KSHttpClient {
                 return
             }
 
-            var decodedBody : Any?
+            var decodedBody: Any?
 
             if let body = data {
                 decodedBody = self.decodeBody(body)
@@ -174,7 +173,7 @@ internal class KSHttpClient {
 
             if httpResponse.statusCode > 299 {
                 onFailure(httpResponse, KSHttpError.badStatusCode, decodedBody)
-                return;
+                return
             }
 
             onSuccess(httpResponse, decodedBody)

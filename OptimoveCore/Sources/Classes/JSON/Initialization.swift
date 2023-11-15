@@ -38,7 +38,7 @@ extension JSON {
         switch value {
         case _ as NSNull:
             self = .null
-        case let opt as Optional<Any> where opt == nil:
+        case let opt as Any? where opt == nil:
             self = .null
         case let num as NSNumber:
             if num.isBool {

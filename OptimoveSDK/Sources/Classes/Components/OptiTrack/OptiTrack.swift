@@ -27,7 +27,7 @@ final class OptiTrack {
     private var dispatchTimer: Timer?
     private let dispatchQueue = DispatchQueue(label: "com.optimove.track")
 
-    private var isDispatching: Bool = false
+    private var isDispatching = false
 
     init(
         queue: OptistreamQueue,

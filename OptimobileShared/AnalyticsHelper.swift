@@ -3,23 +3,21 @@
 import Foundation
 import CoreData
 
-
-
-class KSEventModel : NSManagedObject {
-    @NSManaged var uuid : String
-    @NSManaged var userIdentifier : String
-    @NSManaged var happenedAt : NSNumber
-    @NSManaged var eventType : String
-    @NSManaged var properties : Data?
+class KSEventModel: NSManagedObject {
+    @NSManaged var uuid: String
+    @NSManaged var userIdentifier: String
+    @NSManaged var happenedAt: NSNumber
+    @NSManaged var eventType: String
+    @NSManaged var properties: Data?
 }
 
 typealias SyncCompletedBlock = (Error?) -> Void
 
 internal class AnalyticsHelper {
- 
-    private var analyticsContext : NSManagedObjectContext?
-    private var migrationAnalyticsContext : NSManagedObjectContext?
-    private var eventsHttpClient:KSHttpClient
+
+    private var analyticsContext: NSManagedObjectContext?
+    private var migrationAnalyticsContext: NSManagedObjectContext?
+    private var eventsHttpClient: KSHttpClient
 
     // MARK: Initialization
 
@@ -29,11 +27,11 @@ internal class AnalyticsHelper {
 
         eventsHttpClient = KSHttpClient(baseUrl: URL(string: baseEventsUrl)!, requestFormat: .json, responseFormat: .json)
         eventsHttpClient.setBasicAuth(user: apiKey, password: secretKey)
-        
+
         initContext()
 
         DispatchQueue.global().async {
-            if (self.migrationAnalyticsContext != nil){
+            if self.migrationAnalyticsContext != nil {
                 self.syncEvents(context: self.migrationAnalyticsContext)
             }
             self.syncEvents(context: self.analyticsContext)
@@ -45,7 +43,7 @@ internal class AnalyticsHelper {
     }
 
     private func getMainStoreUrl(appGroupExists: Bool) -> URL? {
-        if (!appGroupExists){
+        if !appGroupExists {
            return getAppDbUrl()
         }
 
@@ -61,7 +59,7 @@ internal class AnalyticsHelper {
 
     private func getSharedDbUrl() -> URL? {
         let sharedContainerPath: URL? = AppGroupsHelper.getSharedContainerPath()
-        if (sharedContainerPath == nil){
+        if sharedContainerPath == nil {
             return nil
         }
 
@@ -75,22 +73,21 @@ internal class AnalyticsHelper {
 
         let storeUrl = getMainStoreUrl(appGroupExists: appGroupExists)
 
-        if (appGroupExists && appDbExists){
+        if appGroupExists && appDbExists {
             migrationAnalyticsContext = getManagedObjectContext(storeUrl: appDbUrl)
         }
 
         analyticsContext = getManagedObjectContext(storeUrl: storeUrl)
     }
 
-    private func getManagedObjectContext(storeUrl : URL?) -> NSManagedObjectContext? {
+    private func getManagedObjectContext(storeUrl: URL?) -> NSManagedObjectContext? {
         let objectModel = getCoreDataModel()
         let storeCoordinator = NSPersistentStoreCoordinator(managedObjectModel: objectModel)
         let opts = [NSMigratePersistentStoresAutomaticallyOption: true, NSInferMappingModelAutomaticallyOption: true]
 
         do {
             try storeCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeUrl, options: opts)
-        }
-        catch {
+        } catch {
             print("Failed to set up persistent store: " + error.localizedDescription)
             return nil
         }
@@ -104,11 +101,11 @@ internal class AnalyticsHelper {
     }
 
     // MARK: Event Tracking
-    func trackEvent(eventType: String, properties: [String:Any]?, immediateFlush: Bool) {
+    func trackEvent(eventType: String, properties: [String: Any]?, immediateFlush: Bool) {
         trackEvent(eventType: eventType, atTime: Date(), properties: properties, immediateFlush: immediateFlush)
     }
 
-    func trackEvent(eventType: String, atTime: Date, properties: [String:Any]?, immediateFlush: Bool, onSyncComplete: SyncCompletedBlock? = nil) {
+    func trackEvent(eventType: String, atTime: Date, properties: [String: Any]?, immediateFlush: Bool, onSyncComplete: SyncCompletedBlock? = nil) {
         if eventType == "" || (properties != nil && !JSONSerialization.isValidJSONObject(properties as Any)) {
             print("Ignoring invalid event with empty type or non-serializable properties")
             return
@@ -128,7 +125,7 @@ internal class AnalyticsHelper {
             let event = KSEventModel(entity: entity, insertInto: nil)
 
             event.uuid = UUID().uuidString.lowercased()
-            event.happenedAt = NSNumber(value: Int64(atTime.timeIntervalSince1970 * 1000))
+            event.happenedAt = NSNumber(value: Int64(atTime.timeIntervalSince1970 * 1_000))
             event.eventType = eventType
             event.userIdentifier = OptimobileHelper.currentUserIdentifier
 
@@ -142,13 +139,12 @@ internal class AnalyticsHelper {
             do {
                 try context.save()
 
-                if (immediateFlush) {
+                if immediateFlush {
                     DispatchQueue.global().async {
                         self.syncEvents(context: self.analyticsContext, onSyncComplete)
                     }
                 }
-            }
-            catch {
+            } catch {
                 print("Failed to record event")
                 print(error)
             }
@@ -161,54 +157,52 @@ internal class AnalyticsHelper {
         context?.performAndWait {
             let results = fetchEventsBatch(context)
 
-            if (results.count == 0) {
+            if results.count == 0 {
                 onSyncComplete?(nil)
 
-                if (context === migrationAnalyticsContext){
+                if context === migrationAnalyticsContext {
                     removeAppDatabase()
                 }
-            }
-            else if results.count > 0 {
+            } else if results.count > 0 {
                 syncEventsBatch(context, events: results, onSyncComplete)
                 return
             }
         }
     }
-    
+
     private func removeAppDatabase() {
-        if (migrationAnalyticsContext == nil){
+        if migrationAnalyticsContext == nil {
             return
         }
-     
+
         guard let persStoreCoord = migrationAnalyticsContext!.persistentStoreCoordinator else {
             return
         }
-        
+
         guard let store = persStoreCoord.persistentStores.last else {
             return
         }
-        
+
         let storeUrl = persStoreCoord.url(for: store)
-        
+
         migrationAnalyticsContext!.performAndWait {
             migrationAnalyticsContext!.reset()
-            do{
+            do {
                 try persStoreCoord.remove(store)
                 try FileManager.default.removeItem(at: storeUrl)
-            }
-            catch{}
+            } catch {}
         }
         migrationAnalyticsContext = nil
     }
 
-    private func syncEventsBatch(_ context: NSManagedObjectContext?, events: [KSEventModel], _ onSyncComplete:SyncCompletedBlock? = nil) {
-        var data = [] as [[String : Any?]]
+    private func syncEventsBatch(_ context: NSManagedObjectContext?, events: [KSEventModel], _ onSyncComplete: SyncCompletedBlock? = nil) {
+        var data = [] as [[String: Any?]]
         var eventIds = [] as [NSManagedObjectID]
 
         for event in events {
             var jsonProps = nil as Any?
             if let props = event.properties {
-                jsonProps = try? JSONSerialization.jsonObject(with: props, options: JSONSerialization.ReadingOptions.init(rawValue: 0))
+                jsonProps = try? JSONSerialization.jsonObject(with: props, options: JSONSerialization.ReadingOptions(rawValue: 0))
             }
 
             data.append([
@@ -237,15 +231,14 @@ internal class AnalyticsHelper {
     }
 
     private func pruneEventsBatch(_ context: NSManagedObjectContext?, _ eventIds: [NSManagedObjectID]) -> Error? {
-        var err : Error? = nil
+        var err: Error?
 
         context?.performAndWait {
             let request = NSBatchDeleteRequest(objectIDs: eventIds)
 
             do {
                 try context?.execute(request)
-            }
-            catch {
+            } catch {
                 err = error
             }
         }
@@ -267,8 +260,7 @@ internal class AnalyticsHelper {
         do {
             let results = try context.fetch(request)
             return results
-        }
-        catch {
+        } catch {
             print("Failed to fetch events batch: " + error.localizedDescription)
             return []
         }
@@ -282,7 +274,7 @@ internal class AnalyticsHelper {
         eventEntity.name = "Event"
         eventEntity.managedObjectClassName = NSStringFromClass(KSEventModel.self)
 
-        var eventProps : Array<NSAttributeDescription> = []
+        var eventProps: [NSAttributeDescription] = []
 
         let eventTypeProp = NSAttributeDescription()
         eventTypeProp.name = "eventType"
@@ -307,17 +299,17 @@ internal class AnalyticsHelper {
         uuidProp.name = "uuid"
         uuidProp.attributeType = .stringAttributeType
         uuidProp.isOptional = false
-        eventProps.append(uuidProp);
+        eventProps.append(uuidProp)
 
         let userIdProp = NSAttributeDescription()
         userIdProp.name = "userIdentifier"
         userIdProp.attributeType = .stringAttributeType
         userIdProp.isOptional = true
-        eventProps.append(userIdProp);
+        eventProps.append(userIdProp)
 
         eventEntity.properties = eventProps
         model.entities = [eventEntity]
 
-        return model;
+        return model
     }
 }

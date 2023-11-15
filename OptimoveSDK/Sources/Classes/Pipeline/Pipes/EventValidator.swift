@@ -4,16 +4,16 @@ import Foundation
 import OptimoveCore
 
 final class EventValidator: Pipe {
-    
+
     private let configuration: Configuration
     private let storage: OptimoveStorage
-    
+
     init(configuration: Configuration,
          storage: OptimoveStorage) {
         self.configuration = configuration
         self.storage = storage
     }
-    
+
     override func deliver(_ operation: CommonOperation) throws {
         let validationFunction = { [configuration] () throws -> CommonOperation in
             switch operation {
@@ -30,7 +30,7 @@ final class EventValidator: Pipe {
                                 break
                             }
                         }
-                        
+
                         return include
                     }
                     return CommonOperation.report(events: validatedEvents)
@@ -47,12 +47,12 @@ final class EventValidator: Pipe {
         }
         try next?.deliver(validationFunction())
     }
-    
+
     func verifySetUserIdEvent(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserIdEvent.Constants.name,
            let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
-            
+
             let user = User(userID: userID)
             let userID = user.userID.trimmingCharacters(in: .whitespaces)
             let validationResult = UserValidator(storage: storage).validateNewUser(user)
@@ -65,7 +65,7 @@ final class EventValidator: Pipe {
         }
         return errors
     }
-    
+
     func verifySetEmailEvent(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserEmailEvent.Constants.name, let email = event.context[SetUserEmailEvent.Constants.Key.email] as? String {
@@ -84,7 +84,7 @@ final class EventValidator: Pipe {
         return [
             verifySetUserIdEvent(event),
             verifySetEmailEvent(event)
-            ].flatMap { $0 }
+        ].flatMap { $0 }
     }
 
 }

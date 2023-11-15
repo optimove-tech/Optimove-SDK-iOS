@@ -3,52 +3,52 @@
 import Foundation
 import CoreData
 
-public enum InAppPresented : String {
+public enum InAppPresented: String {
     case IMMEDIATELY = "immediately"
     case NEXT_OPEN = "next-open"
     case NEVER = "never"
 }
 
-class InAppMessageEntity : NSManagedObject {
-    @NSManaged var id : Int64
+class InAppMessageEntity: NSManagedObject {
+    @NSManaged var id: Int64
     @NSManaged var updatedAt: NSDate
     @NSManaged var presentedWhen: String
     @NSManaged var content: NSDictionary
-    @NSManaged var data : NSDictionary?
-    @NSManaged var badgeConfig : NSDictionary?
-    @NSManaged var inboxConfig : NSDictionary?
-    @NSManaged var dismissedAt : NSDate?
-    @NSManaged var inboxFrom : NSDate?
-    @NSManaged var inboxTo : NSDate?
-    @NSManaged var expiresAt : NSDate?
-    @NSManaged var readAt : NSDate?
-    @NSManaged var sentAt : NSDate?
-    
+    @NSManaged var data: NSDictionary?
+    @NSManaged var badgeConfig: NSDictionary?
+    @NSManaged var inboxConfig: NSDictionary?
+    @NSManaged var dismissedAt: NSDate?
+    @NSManaged var inboxFrom: NSDate?
+    @NSManaged var inboxTo: NSDate?
+    @NSManaged var expiresAt: NSDate?
+    @NSManaged var readAt: NSDate?
+    @NSManaged var sentAt: NSDate?
+
     internal func isAvailable() -> Bool {
         let availableFrom = inboxFrom as Date?
         let availableTo = inboxTo as Date?
-        
-        if (availableFrom != nil && availableFrom!.timeIntervalSinceNow > 0) {
-            return false;
-        } else if (availableTo != nil && availableTo!.timeIntervalSinceNow < 0) {
-            return false;
+
+        if availableFrom != nil && availableFrom!.timeIntervalSinceNow > 0 {
+            return false
+        } else if availableTo != nil && availableTo!.timeIntervalSinceNow < 0 {
+            return false
         }
 
-        return true;
+        return true
     }
 }
 
 class InAppMessage: NSObject {
-    internal(set) open var id: Int64
-    internal(set) open var updatedAt: NSDate
-    internal(set) open var content: NSDictionary
-    internal(set) open var data : NSDictionary?
-    internal(set) open var badgeConfig : NSDictionary?
-    internal(set) open var inboxConfig : NSDictionary?
-    internal(set) open var dismissedAt : NSDate?
-    internal(set) open var readAt : NSDate?
-    internal(set) open var sentAt : NSDate?
-    
+    internal(set) public var id: Int64
+    internal(set) public var updatedAt: NSDate
+    internal(set) public var content: NSDictionary
+    internal(set) public var data: NSDictionary?
+    internal(set) public var badgeConfig: NSDictionary?
+    internal(set) public var inboxConfig: NSDictionary?
+    internal(set) public var dismissedAt: NSDate?
+    internal(set) public var readAt: NSDate?
+    internal(set) public var sentAt: NSDate?
+
     init(entity: InAppMessageEntity) {
         id = Int64(entity.id)
         updatedAt = entity.updatedAt.copy() as! NSDate
@@ -61,7 +61,7 @@ class InAppMessage: NSObject {
         sentAt = entity.sentAt?.copy() as? NSDate
     }
 
-    public override func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         if let other = object as? InAppMessage {
             return self.id == other.id
         }
@@ -75,13 +75,7 @@ class InAppMessage: NSObject {
 }
 
 public struct InAppButtonPress {
-    public let deepLinkData : [AnyHashable:Any]
-    public let messageId : Int64
-    public let messageData : NSDictionary?
-
-    init(deepLinkData:[AnyHashable:Any], messageId:Int64, messageData:NSDictionary?) {
-        self.deepLinkData = deepLinkData
-        self.messageId = messageId
-        self.messageData = messageData
-    }
+    public let deepLinkData: [AnyHashable: Any]
+    public let messageId: Int64
+    public let messageData: NSDictionary?
 }

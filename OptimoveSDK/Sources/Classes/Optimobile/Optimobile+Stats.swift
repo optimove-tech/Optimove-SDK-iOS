@@ -55,17 +55,16 @@ extension Optimobile {
 
         let target = getTarget(config: config)
 
-        var app = [String : AnyObject]()
+        var app = [String: AnyObject]()
         app["bundle"] = Bundle.main.infoDictionary!["CFBundleIdentifier"] as AnyObject?
         app["version"] = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as AnyObject?
         app["target"] = target.rawValue as AnyObject?
 
-
         let sdk = getSdkInfo(config: config)
         let runtime = getRuntimeInfo(config: config)
 
-        var os = [String : AnyObject]()
-        var device = [String : AnyObject]()
+        var os = [String: AnyObject]()
+        var device = [String: AnyObject]()
 
         let timeZone = TimeZone.autoupdatingCurrent
         let tzName = timeZone.identifier
@@ -75,31 +74,30 @@ extension Optimobile {
         if Platform.isMacintosh {
             os["id"] = OSTypeID.osTypeIDOSX.rawValue
             os["version"] = ProcessInfo.processInfo.operatingSystemVersionString as AnyObject?
-         }
-        else {
+         } else {
             os["id"] = OSTypeID.osTypeIDiOS.rawValue
             os["version"] = UIDevice.current.systemVersion as AnyObject?
         }
 
-        if (NSLocale.preferredLanguages.count >= 1) {
+        if NSLocale.preferredLanguages.count >= 1 {
             device["locale"] = NSLocale.preferredLanguages[0] as AnyObject
         }
 
         device["isSimulator"] = Platform.isSimulator as AnyObject?
 
         let finalParameters = [
-            "app" : app,
-            "sdk" : sdk,
-            "runtime" : runtime,
-            "os" : os,
-            "device" : device,
+            "app": app,
+            "sdk": sdk,
+            "runtime": runtime,
+            "os": os,
+            "device": device,
             "ios": self.getiOSAttrs()
         ]
 
         Optimobile.trackEvent(eventType: OptimobileEvent.STATS_CALL_HOME.rawValue, properties: finalParameters)
     }
 
-    private func getSdkInfo(config: OptimobileConfig)  -> [String : AnyObject] {
+    private func getSdkInfo(config: OptimobileConfig) -> [String: AnyObject] {
         if let overridden = config.sdkInfo {
             return overridden
         }
@@ -110,33 +108,32 @@ extension Optimobile {
         ]
     }
 
-    private func getRuntimeInfo(config: OptimobileConfig)  -> [String : AnyObject] {
+    private func getRuntimeInfo(config: OptimobileConfig) -> [String: AnyObject] {
         if let overridden = config.runtimeInfo {
             return overridden
         }
 
         var runtime = [
-            "id": RuntimeType.runtimeTypeNative.rawValue as AnyObject,
+            "id": RuntimeType.runtimeTypeNative.rawValue as AnyObject
         ]
 
         if Platform.isMacintosh {
             runtime["version"] = ProcessInfo.processInfo.operatingSystemVersionString as AnyObject?
-        }
-        else {
+        } else {
             runtime["version"] = UIDevice.current.systemVersion as AnyObject?
         }
 
         return runtime
     }
 
-    private func getTarget(config: OptimobileConfig)  -> TargetType {
+    private func getTarget(config: OptimobileConfig) -> TargetType {
         if let overridden = config.isRelease {
             return overridden == true ? TargetType.targetTypeRelease : TargetType.targetTypeDebug
         }
 
         var target = TargetType.targetTypeRelease
 
-        //http://stackoverflow.com/questions/24111854/in-absence-of-preprocessor-macros-is-there-a-way-to-define-practical-scheme-spe
+        // http://stackoverflow.com/questions/24111854/in-absence-of-preprocessor-macros-is-there-a-way-to-define-practical-scheme-spe
         #if DEBUG
             target = TargetType.targetTypeDebug
         #endif
@@ -144,7 +141,7 @@ extension Optimobile {
         return target
     }
 
-    private func getiOSAttrs() -> [String:Any] {
+    private func getiOSAttrs() -> [String: Any] {
         var push = [
             "scheduled": false,
             "timeSensitive": false
@@ -170,4 +167,3 @@ extension Optimobile {
     }
 
 }
-

@@ -3,14 +3,14 @@
 import Foundation
 
 extension Optimobile {
-    static func trackEvent(eventType: OptimobileEvent, properties: [String:Any]?, immediateFlush: Bool = false) {
+    static func trackEvent(eventType: OptimobileEvent, properties: [String: Any]?, immediateFlush: Bool = false) {
         getInstance().analyticsHelper.trackEvent(eventType: eventType.rawValue, properties: properties, immediateFlush: immediateFlush)
     }
 
-    static func trackEvent(eventType: String, atTime: Date, properties: [String:Any]?, immediateFlush: Bool = false, onSyncComplete:SyncCompletedBlock? = nil) {
+    static func trackEvent(eventType: String, atTime: Date, properties: [String: Any]?, immediateFlush: Bool = false, onSyncComplete: SyncCompletedBlock? = nil) {
         getInstance().analyticsHelper.trackEvent(eventType: eventType, atTime: atTime, properties: properties, immediateFlush: immediateFlush, onSyncComplete: onSyncComplete)
     }
-    
+
     /**
      Logs an analytics event to the local database
 
@@ -18,7 +18,7 @@ extension Optimobile {
      - eventType: Unique identifier for the type of event
      - properties: Optional meta-data about the event
      */
-    static func trackEvent(eventType: String, properties: [String:Any]?) {
+    static func trackEvent(eventType: String, properties: [String: Any]?) {
         getInstance().analyticsHelper.trackEvent(eventType: eventType, properties: properties, immediateFlush: false)
     }
 
@@ -29,7 +29,7 @@ extension Optimobile {
      - eventType: Unique identifier for the type of event
      - properties: Optional meta-data about the event
      */
-    static func trackEventImmediately(eventType: String, properties: [String:Any]?) {
+    static func trackEventImmediately(eventType: String, properties: [String: Any]?) {
         getInstance().analyticsHelper.trackEvent(eventType: eventType, properties: properties, immediateFlush: true)
     }
 
@@ -50,15 +50,15 @@ extension Optimobile {
      - userIdentifier: Unique identifier for the current user
      - attributes: JSON encodable dictionary of attributes to store for the user
      */
-    static func associateUserWithInstall(userIdentifier: String, attributes: [String:AnyObject]) {
+    static func associateUserWithInstall(userIdentifier: String, attributes: [String: AnyObject]) {
         associateUserWithInstallImpl(userIdentifier: userIdentifier, attributes: attributes)
     }
-    
+
     /**
      Returns the identifier for the user currently associated with the Kumulos installation record
      If no user is associated, it returns the Kumulos installation ID
     */
-    static var currentUserIdentifier : String {
+    static var currentUserIdentifier: String {
         get {
             return OptimobileHelper.currentUserIdentifier
         }
@@ -80,22 +80,21 @@ extension Optimobile {
         KeyValPersistenceHelper.removeObject(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue)
         OptimobileHelper.userIdLock.signal()
 
-        if (currentUserId != nil && currentUserId != Optimobile.installId) {
-            getInstance().inAppManager.handleAssociatedUserChange();
+        if currentUserId != nil && currentUserId != Optimobile.installId {
+            getInstance().inAppManager.handleAssociatedUserChange()
         }
     }
 
-    fileprivate static func associateUserWithInstallImpl(userIdentifier: String, attributes: [String:AnyObject]?) {
+    fileprivate static func associateUserWithInstallImpl(userIdentifier: String, attributes: [String: AnyObject]?) {
         if userIdentifier == "" {
             print("User identifier cannot be empty, aborting!")
             return
         }
 
-        var params : [String:Any]
+        var params: [String: Any]
         if let attrs = attributes {
             params = ["id": userIdentifier, "attributes": attrs]
-        }
-        else {
+        } else {
             params = ["id": userIdentifier]
         }
 
@@ -106,8 +105,8 @@ extension Optimobile {
 
         Optimobile.trackEvent(eventType: OptimobileEvent.STATS_ASSOCIATE_USER, properties: params, immediateFlush: true)
 
-        if (currentUserId == nil || currentUserId != userIdentifier) {
-            getInstance().inAppManager.handleAssociatedUserChange();
+        if currentUserId == nil || currentUserId != userIdentifier {
+            getInstance().inAppManager.handleAssociatedUserChange()
         }
     }
 

@@ -42,15 +42,15 @@ final class EventCDv1ToEventCDv2MigrationPolicy: NSEntityMigrationPolicy {
 }
 
 private struct MigrationSource_OptistreamEvent_v1: Codable {
-    public let tenant: Int
-    public let category: String
-    public let event: String
-    public let origin: String
-    public let customer: String?
-    public let visitor: String
-    public let timestamp: String
-    public let context: JSON
-    public var metadata: Metadata
+    let tenant: Int
+    let category: String
+    let event: String
+    let origin: String
+    let customer: String?
+    let visitor: String
+    let timestamp: String
+    let context: JSON
+    var metadata: Metadata
 
     public struct Metadata: Codable, Hashable {
 
@@ -70,7 +70,7 @@ private struct MigrationSource_OptistreamEvent_v1: Codable {
 
     }
 
-    public init(
+    init(
         tenant: Int,
         category: String,
         event: String,

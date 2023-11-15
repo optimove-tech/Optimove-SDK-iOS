@@ -11,7 +11,7 @@ final class MockSynchronizer: Pipeline, PipelineMutator {
     }
 
     func addNextPipe(_: Pipe) {
-        
+
     }
 
     func onResignActive() {

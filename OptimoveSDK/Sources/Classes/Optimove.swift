@@ -58,7 +58,7 @@ typealias Logger = OptimoveCore.Logger
                 guard let visitorId = try? serviceLocator.storage().getInitialVisitorId() else {
                     return
                 }
-                
+
                 let userId = try? serviceLocator.storage().getCustomerID()
 
                 Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId, initialUserId: userId)
@@ -205,13 +205,13 @@ extension Optimove {
             Optimobile.associateUserWithInstall(userIdentifier: userID)
         }
     }
-    
+
     /// get visitor id of optimove SDK.
     /// call this function if you need the internal visitor Id of Optimove
     @objc public static func getVisitorID() -> String? {
         return shared.getVisitorID()
     }
-    
+
     private func getVisitorID() -> String? {
         let function: (ServiceLocator) -> String? = { serviceLocator in
             return try? serviceLocator.storage().getVisitorID()
@@ -224,7 +224,7 @@ extension Optimove {
     @objc public static func getInitialVisitorID() -> String? {
         return shared.getInitialVisitorID()
     }
-    
+
     /// Get the initial visitor identifier of Optimove SDK.
     @objc public func getInitialVisitorID() -> String? {
         let function: (ServiceLocator) -> String? = { serviceLocator in
@@ -268,7 +268,7 @@ extension Optimove {
     private func _setUserEmail(_ email: String, _ serviceLocator: ServiceLocator) throws -> Event {
         return try serviceLocator.coreEventFactory().createEvent(.setUserEmail(email: email))
     }
-    
+
     /// Signout the user from the app
     ///  Call this function to unset the customerID and revert to an anonymous visitor
     @objc public static func signOutUser() {
@@ -287,13 +287,13 @@ extension Optimove {
             }
             container.resolve(function)
         }
-        
+
         if config.isOptimobileConfigured() {
             Optimobile.clearUserAssociation()
         }
     }
 }
-    
+
 // MARK: - Optimobile APIs
 
 extension Optimove {
@@ -352,14 +352,14 @@ extension Optimove {
     @objc public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         Optimobile.scene(scene, continue: userActivity)
     }
-    
+
     /**
         Updates the location of the current installation in Optimove. Accurate locaiton information is used for geofencing.
     */
     @objc public func sendLocationUpdate(location: CLLocation) {
         Optimobile.sendLocationUpdate(location: location)
     }
-    
+
     /**
         Records a proximity event for an iBeacon.
     */
@@ -376,10 +376,10 @@ extension Optimove {
     /**
         Records a proximity event for an Eddystone beacon.
     */
-    @objc public func trackEddystoneBeaconProximity(hexNamespace: String, hexInstance:String, distanceMeters:NSNumber? = nil) {
-        Optimobile.trackEddystoneBeaconProximity(hexNamespace: hexNamespace, hexInstance: hexInstance, distanceMeters:  distanceMeters?.doubleValue);
+    @objc public func trackEddystoneBeaconProximity(hexNamespace: String, hexInstance: String, distanceMeters: NSNumber? = nil) {
+        Optimobile.trackEddystoneBeaconProximity(hexNamespace: hexNamespace, hexInstance: hexInstance, distanceMeters: distanceMeters?.doubleValue)
     }
-    
+
 }
 
 // MARK: - Private
@@ -436,5 +436,5 @@ private extension Optimove {
         }
         container.resolve(function)
     }
-    
+
 }
