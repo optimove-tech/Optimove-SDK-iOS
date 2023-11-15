@@ -6,16 +6,16 @@ import UIKit
 import UserNotifications
 
 public class PushNotification: NSObject {
-    static let DeepLinkTypeInApp: Int = 1
+    internal static let DeepLinkTypeInApp: Int = 1
 
-    public internal(set) var id: Int
-    public internal(set) var aps: [AnyHashable: Any]
-    public internal(set) var data: [AnyHashable: Any]
-    public internal(set) var url: URL?
-    public internal(set) var actionIdentifier: String?
+    internal(set) public var id: Int
+    internal(set) public var aps: [AnyHashable: Any]
+    internal(set) public var data: [AnyHashable: Any]
+    internal(set) public var url: URL?
+    internal(set) public var actionIdentifier: String?
 
     init(userInfo: [AnyHashable: Any]?) {
-        id = 0
+        self.id = 0
         self.aps = [:]
         self.data = [:]
 
@@ -340,7 +340,7 @@ extension Optimobile {
         if let index = [
             .releaseAdHoc,
             .releaseDev,
-            .releaseWildcard,
+            .releaseWildcard
         ].firstIndex(of: releaseMode), index > -1 {
             return releaseMode.rawValue + 1
         }
@@ -359,6 +359,9 @@ class PushHelper {
     typealias kumulos_applicationDidRegisterForRemoteNotifications = @convention(c) (_ obj: UIApplicationDelegate, _ _cmd: Selector, _ application: UIApplication, _ deviceToken: Data) -> Void
     typealias didRegBlock = @convention(block) (_ obj: UIApplicationDelegate, _ application: UIApplication, _ deviceToken: Data) -> Void
 
+    typealias kumulos_applicationDidRegisterForRemoteNotifications = @convention(c) (_ obj: UIApplicationDelegate, _ _cmd: Selector, _ application: UIApplication, _ deviceToken: Data) -> Void
+    typealias didRegBlock = @convention(block) (_ obj: UIApplicationDelegate, _ application: UIApplication, _ deviceToken: Data) -> Void
+
     typealias kumulos_applicationDidFailToRegisterForRemoteNotificaitons = @convention(c) (_ obj: Any, _ _cmd: Selector, _ application: UIApplication, _ error: Error) -> Void
     typealias didFailToRegBlock = @convention(block) (_ obj: Any, _ application: UIApplication, _ error: Error) -> Void
 
@@ -372,7 +375,7 @@ class PushHelper {
         let didRegisterSelector = #selector(UIApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
         let meth = class_getInstanceMethod(klass, didRegisterSelector)
         let regType = NSString(string: "v@:@@").utf8String
-        let regBlock: didRegBlock = { (obj: UIApplicationDelegate, application: UIApplication, deviceToken: Data) in
+        let regBlock: didRegBlock = { (obj: UIApplicationDelegate, application: UIApplication, deviceToken: Data) -> Void in
             if let _ = existingDidReg {
                 unsafeBitCast(existingDidReg, to: kumulos_applicationDidRegisterForRemoteNotifications.self)(obj, didRegisterSelector, application, deviceToken)
             }
@@ -385,7 +388,7 @@ class PushHelper {
         // Failed to register handler
         let didFailToRegisterSelector = #selector(UIApplicationDelegate.application(_:didFailToRegisterForRemoteNotificationsWithError:))
         let didFailToRegType = NSString(string: "v@:@@").utf8String
-        let didFailToRegBlock: didFailToRegBlock = { (obj: Any, application: UIApplication, error: Error) in
+        let didFailToRegBlock: didFailToRegBlock = { (obj: Any, application: UIApplication, error: Error) -> Void in
             if let _ = existingDidFailToReg {
                 unsafeBitCast(existingDidFailToReg, to: kumulos_applicationDidFailToRegisterForRemoteNotificaitons.self)(obj, didFailToRegisterSelector, application, error)
             }

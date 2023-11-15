@@ -216,7 +216,7 @@ extension MigrationWork_3_3_0 {
                     .userEmail,
                     .siteID,
                     .settingUserSuccess,
-                    .firstVisitTimestamp,
+                    .firstVisitTimestamp
                 ]
                 sharedKeys.forEach { key in
                     let value = oldDefaults.value(for: key)

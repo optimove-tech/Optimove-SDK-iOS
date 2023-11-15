@@ -27,7 +27,7 @@ class InAppManager {
 
     private var syncQueue: DispatchQueue
     private let STORED_IN_APP_LIMIT = 50
-    private let SYNC_DEBOUNCE_SECONDS = 3600 as TimeInterval
+    private let SYNC_DEBOUNCE_SECONDS = 3_600 as TimeInterval
 
     // MARK: Initialization
 
