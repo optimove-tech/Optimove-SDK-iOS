@@ -16,7 +16,8 @@ public struct DeepLink {
     init?(for url: URL, from jsonData: Data) {
         guard let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable: Any],
               let linkData = response["linkData"] as? [AnyHashable: Any?],
-              let content = response["content"] as? [AnyHashable: Any?] else {
+              let content = response["content"] as? [AnyHashable: Any?]
+        else {
             return nil
         }
 

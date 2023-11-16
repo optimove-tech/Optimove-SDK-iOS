@@ -125,7 +125,7 @@ class AnalyticsHelper {
             let event = KSEventModel(entity: entity, insertInto: nil)
 
             event.uuid = UUID().uuidString.lowercased()
-            event.happenedAt = NSNumber(value: Int64(atTime.timeIntervalSince1970 * 1_000))
+            event.happenedAt = NSNumber(value: Int64(atTime.timeIntervalSince1970 * 1000))
             event.eventType = eventType
             event.userIdentifier = OptimobileHelper.currentUserIdentifier
 

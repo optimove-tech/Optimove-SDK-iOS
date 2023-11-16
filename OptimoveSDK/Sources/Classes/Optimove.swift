@@ -366,12 +366,11 @@ public extension Optimove {
     
 
     /**
-        Records a proximity event for an Eddystone beacon.
-    */
-    @objc public func trackEddystoneBeaconProximity(hexNamespace: String, hexInstance: String, distanceMeters: NSNumber? = nil) {
+         Records a proximity event for an Eddystone beacon.
+     */
+    @objc func trackEddystoneBeaconProximity(hexNamespace: String, hexInstance: String, distanceMeters: NSNumber? = nil) {
         Optimobile.trackEddystoneBeaconProximity(hexNamespace: hexNamespace, hexInstance: hexInstance, distanceMeters: distanceMeters?.doubleValue)
     }
-
 }
 
 // MARK: - Private
@@ -427,5 +426,4 @@ private extension Optimove {
         }
         container.resolve(function)
     }
-
 }

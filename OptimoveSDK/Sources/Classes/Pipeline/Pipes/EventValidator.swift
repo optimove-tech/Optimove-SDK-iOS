@@ -50,7 +50,8 @@ final class EventValidator: Pipe {
     func verifySetUserIdEvent(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserIdEvent.Constants.name,
-           let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
+           let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String
+        {
             let user = User(userID: userID)
             let userID = user.userID.trimmingCharacters(in: .whitespaces)
             let validationResult = UserValidator(storage: storage).validateNewUser(user)
@@ -81,7 +82,7 @@ final class EventValidator: Pipe {
     func validate(event: Event, withConfigs _: [String: EventsConfig]) throws -> [ValidationError] {
         return [
             verifySetUserIdEvent(event),
-            verifySetEmailEvent(event)
+            verifySetEmailEvent(event),
         ].flatMap { $0 }
     }
 }

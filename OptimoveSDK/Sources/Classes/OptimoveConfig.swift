@@ -138,7 +138,7 @@ open class OptimoveConfigBuilder: NSObject {
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
      */
     @discardableResult public func setRuntimeInfo(runtimeInfo: [String: AnyObject]) -> OptimoveConfigBuilder {
-         _runtimeInfo = runtimeInfo
+        _runtimeInfo = runtimeInfo
 
         return self
     }

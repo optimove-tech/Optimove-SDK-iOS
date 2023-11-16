@@ -112,7 +112,7 @@ extension Optimobile {
         }
 
         var runtime = [
-            "id": RuntimeType.runtimeTypeNative.rawValue as AnyObject
+            "id": RuntimeType.runtimeTypeNative.rawValue as AnyObject,
         ]
 
         if Platform.isMacintosh {

@@ -38,7 +38,7 @@ class UrlBuilder {
             .events: "https://events-\(region).kumulos.com",
             .iar: "https://iar.app.delivery",
             .media: "https://i-\(region).app.delivery",
-            .push: "https://push-\(region).kumulos.com"
+            .push: "https://push-\(region).kumulos.com",
         ]
     }
 }

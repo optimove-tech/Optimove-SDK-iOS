@@ -46,7 +46,7 @@ extension MobileProvision {
              releaseEnterprise
     }
 
-    private struct PlistTags {
+    private enum PlistTags {
         static let start = "<plist"
         static let end = "</plist>"
     }
