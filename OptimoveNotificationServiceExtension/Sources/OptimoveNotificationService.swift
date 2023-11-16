@@ -63,7 +63,7 @@ public class OptimoveNotificationService {
         return true
     }
 
-    fileprivate class func getButtons(userInfo: [AnyHashable: Any], bestAttemptContent: UNMutableNotificationContent) -> NSMutableArray {
+    fileprivate class func getButtons(userInfo: [AnyHashable: Any], bestAttemptContent _: UNMutableNotificationContent) -> NSMutableArray {
         let actionArray = NSMutableArray()
 
         let custom = userInfo["custom"] as! [AnyHashable: Any]

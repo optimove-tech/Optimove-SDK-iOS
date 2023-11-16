@@ -2,7 +2,7 @@
 
 import Foundation
 
-final class RunningFlagsIndication {
+enum RunningFlagsIndication {
     static var isSdkRunning = false
     static var isInitializerRunning = false
     static var isSdkNeedInitializing: Bool {

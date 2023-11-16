@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveCore
+import XCTest
 
 class OptimoveStorageFacadeTests: XCTestCase {
-
     var storage: StorageFacade!
 
     override func setUp() {
@@ -38,5 +37,4 @@ class OptimoveStorageFacadeTests: XCTestCase {
         let value: String? = storage[key]
         XCTAssert(value == stub_string)
     }
-
 }

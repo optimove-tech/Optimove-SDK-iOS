@@ -45,10 +45,8 @@ private class Deferred<R> {
             switch self.state {
             case .pending:
                 self.pendingWatchers.append(onResult)
-                break
-            case .resolved(let result):
+            case let .resolved(result):
                 onResult(result)
-                break
             }
         }
     }
@@ -81,7 +79,7 @@ class DeepLinkFingerprinter: NSObject, WKScriptMessageHandler, WKNavigationDeleg
         fingerprint.then(onResult: onGenerated)
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.name != DeepLinkFingerprinter.printDustHandlerName {
             return
         }
@@ -92,21 +90,20 @@ class DeepLinkFingerprinter: NSObject, WKScriptMessageHandler, WKNavigationDeleg
         switch type {
         case PrintDustMessage.clientReady.rawValue:
             postClientMessage(type: PrintDustMessage.requestFingerprint.rawValue, data: nil)
-            break
         case PrintDustMessage.clientFingerprintGeneraged.rawValue:
             guard let data = body["data"] as? [String: AnyObject],
-                  let components = data["components"] as? [String: String] else {
+                  let components = data["components"] as? [String: String]
+            else {
                 return
             }
             fingerprint.resolve(result: components)
             DispatchQueue.main.async { self.cleanUpWebView() }
-            break
         default:
             print("Unhandled message: \(type)")
         }
     }
 
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    func webView(_: WKWebView, didFail _: WKNavigation!, withError _: Error) {
         DispatchQueue.main.async { self.cleanUpWebView() }
     }
 
@@ -122,7 +119,7 @@ class DeepLinkFingerprinter: NSObject, WKScriptMessageHandler, WKNavigationDeleg
         } catch {
             // Noop
         }
-      }
+    }
 
     fileprivate func cleanUpWebView() {
         webView?.stopLoading()

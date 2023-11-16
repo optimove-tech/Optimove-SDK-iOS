@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveSDK
+import XCTest
 
 class AppOpenEventTests: XCTestCase {
-
     func test_event_name() {
         // given
         let bundleIdentifier = "bundleIdentifier"
@@ -106,5 +105,4 @@ class AppOpenEventTests: XCTestCase {
         XCTAssert(event.context[AppOpenEvent.Constants.Key.userID] == nil)
         XCTAssert(event.context[AppOpenEvent.Constants.Key.visitorID] as? String == visitorID)
     }
-
 }

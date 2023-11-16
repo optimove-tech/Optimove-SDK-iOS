@@ -1,11 +1,10 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
+import CoreData
 import Foundation
 import OptimoveCore
-import CoreData
 
 final class EventCDv1ToEventCDv2MigrationPolicy: NSEntityMigrationPolicy {
-
     override func createDestinationInstances(forSource sInstance: NSManagedObject, in mapping: NSEntityMapping, manager: NSMigrationManager) throws {
         if sInstance.entity.name == EventCD.entityName {
             let queueType: String = try cast(sInstance.primitiveValue(forKey: #keyPath(EventCD.type)))
@@ -31,14 +30,13 @@ final class EventCDv1ToEventCDv2MigrationPolicy: NSEntityMigrationPolicy {
             let dInstance = try EventCDv2.insert(
                 into: manager.destinationContext,
                 event: dObject,
-                of: try cast(OptistreamQueueType(rawValue: queueType))
+                of: cast(OptistreamQueueType(rawValue: queueType))
             )
             manager.associate(sourceInstance: sInstance, withDestinationInstance: dInstance, for: mapping)
         } else {
             try super.createDestinationInstances(forSource: sInstance, in: mapping, manager: manager)
         }
     }
-
 }
 
 private struct MigrationSource_OptistreamEvent_v1: Codable {
@@ -53,7 +51,6 @@ private struct MigrationSource_OptistreamEvent_v1: Codable {
     var metadata: Metadata
 
     public struct Metadata: Codable, Hashable {
-
         public var realtime: Bool
         public var firstVisitorDate: Int64
         public let uuid: String
@@ -67,7 +64,6 @@ private struct MigrationSource_OptistreamEvent_v1: Codable {
             self.firstVisitorDate = firstVisitorDate
             self.uuid = uuid
         }
-
     }
 
     init(
@@ -94,11 +90,9 @@ private struct MigrationSource_OptistreamEvent_v1: Codable {
 }
 
 extension MigrationSource_OptistreamEvent_v1: Equatable {
-
     public static func == (lhs: MigrationSource_OptistreamEvent_v1, rhs: MigrationSource_OptistreamEvent_v1) -> Bool {
         return lhs.metadata.uuid == rhs.metadata.uuid
     }
-
 }
 
-extension MigrationSource_OptistreamEvent_v1: Hashable { }
+extension MigrationSource_OptistreamEvent_v1: Hashable {}

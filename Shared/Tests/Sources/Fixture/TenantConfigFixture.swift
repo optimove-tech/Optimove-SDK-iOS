@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class TenantConfigFixture {
-
     func build(_ options: Options = Options.default) -> TenantConfig {
         return TenantConfig(
             realtime: tenantRealtimeConfigFixture(),
@@ -56,10 +55,9 @@ final class TenantConfigFixture {
                     "event_native_mobile": Parameter(
                         type: "Boolean",
                         optional: true
-                    )
+                    ),
                 ]
-            )
+            ),
         ]
     }
-
 }

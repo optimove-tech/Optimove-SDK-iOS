@@ -4,7 +4,6 @@ import CoreData
 
 /// Used to create `NSManagedObjectModel`
 struct CoreDataModelDescription {
-
     var entities: [CoreDataEntityDescription]
 
     func makeModel() -> NSManagedObjectModel {
@@ -21,7 +20,7 @@ struct CoreDataModelDescription {
         // 4. Last step builds indexes. This must be done in the last step because changing entities hierarchy structurally drops indexes.
         // First step
         var entityNameToEntity: [String: NSEntityDescription] = [:]
-        var configurationNameToEntities: [String: Array<NSEntityDescription>] = [:]
+        var configurationNameToEntities: [String: [NSEntityDescription]] = [:]
         var entityNameToPropertyNameToProperty: [String: [String: NSPropertyDescription]] = [:]
 
         for entityDescription in entitiesDescriptions {

@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveSDK
+import XCTest
 
 class EnterForegroundObserverTests: XCTestCase {
-
     var observer: AppOpenObserver!
     var storage = MockOptimoveStorage()
     var dateProvider = MockDateTimeProvider()
@@ -24,7 +23,7 @@ class EnterForegroundObserverTests: XCTestCase {
         )
     }
 
-// Disabled test for GitHub Actions. There should apply refactoring to prevent using UIKit.
+    // Disabled test for GitHub Actions. There should apply refactoring to prevent using UIKit.
 //    func test_app_open_threshold_should_invoke() {
 //        // given
 //        /// Set the Last open time as Throttling time plus 10 sec.
@@ -90,5 +89,4 @@ class EnterForegroundObserverTests: XCTestCase {
 
         wait(for: [appOpenEventExpectation, applicationOpenTimeExpectation], timeout: defaultTimeout)
     }
-
 }

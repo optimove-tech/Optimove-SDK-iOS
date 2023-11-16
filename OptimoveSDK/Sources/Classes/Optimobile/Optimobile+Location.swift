@@ -1,11 +1,11 @@
-import Foundation
 import CoreLocation
+import Foundation
 
 extension Optimobile {
     static func sendLocationUpdate(location: CLLocation) {
         let parameters = [
             "lat": location.coordinate.latitude,
-            "lng": location.coordinate.longitude
+            "lng": location.coordinate.longitude,
         ]
 
         Optimobile.trackEvent(eventType: OptimobileEvent.ENGAGE_LOCATION_UPDATED, properties: parameters, immediateFlush: true)
@@ -16,7 +16,7 @@ extension Optimobile {
             "type": 1,
             "major": beacon.major.intValue,
             "minor": beacon.minor.intValue,
-            "proximity": beacon.proximity.rawValue
+            "proximity": beacon.proximity.rawValue,
         ] as [String: Any]
 
         if #available(iOS 13, *) {
@@ -32,7 +32,7 @@ extension Optimobile {
         var parameters = [
             "type": 2,
             "namespace": hexNamespace,
-            "instance": hexInstance
+            "instance": hexInstance,
         ] as [String: Any]
 
         if distanceMeters != nil {

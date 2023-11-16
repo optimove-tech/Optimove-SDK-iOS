@@ -3,31 +3,29 @@
 import Foundation
 import UserNotifications
 
-internal let MAX_DYNAMIC_CATEGORIES = 128
-internal let DYNAMIC_CATEGORY_IDENTIFIER = "__kumulos_category_%d__"
+let MAX_DYNAMIC_CATEGORIES = 128
+let DYNAMIC_CATEGORY_IDENTIFIER = "__kumulos_category_%d__"
 
 @available(iOS 10.0, *)
-internal class CategoryManager {
+class CategoryManager {
     let categoryReadLock = DispatchSemaphore(value: 0)
     let dynamicCategoryLock = DispatchSemaphore(value: 1)
 
     fileprivate static var instance: CategoryManager?
 
-    internal static var sharedInstance: CategoryManager {
-       get {
-           if instance == nil {
-               instance = CategoryManager()
-           }
+    static var sharedInstance: CategoryManager {
+        if instance == nil {
+            instance = CategoryManager()
+        }
 
-           return instance!
-       }
+        return instance!
     }
 
-    internal static func getCategoryIdForMessageId(messageId: Int) -> String {
+    static func getCategoryIdForMessageId(messageId: Int) -> String {
         return String(format: DYNAMIC_CATEGORY_IDENTIFIER, messageId)
     }
 
-    internal static func registerCategory(category: UNNotificationCategory) {
+    static func registerCategory(category: UNNotificationCategory) {
         var categorySet = sharedInstance.getExistingCategories()
         var storedDynamicCategories = sharedInstance.getExistingDynamicCategoriesList()
 
@@ -80,12 +78,12 @@ internal class CategoryManager {
 
         let categoriesToRemove = dynamicCategories.prefix(dynamicCategories.count - MAX_DYNAMIC_CATEGORIES)
 
-        let prunedCategories = categories.filter { (category) -> Bool in
-            return categoriesToRemove.firstIndex(of: category.identifier) == nil
+        let prunedCategories = categories.filter { category -> Bool in
+            categoriesToRemove.firstIndex(of: category.identifier) == nil
         }
 
-        let prunedDynamicCategories = dynamicCategories.filter { (cat) -> Bool in
-            return categoriesToRemove.firstIndex(of: cat) == nil
+        let prunedDynamicCategories = dynamicCategories.filter { cat -> Bool in
+            categoriesToRemove.firstIndex(of: cat) == nil
         }
 
         UNUserNotificationCenter.current().setNotificationCategories(prunedCategories)

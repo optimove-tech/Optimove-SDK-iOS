@@ -1,8 +1,8 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
-import UserNotifications
 import OptimoveCore
+import UserNotifications
 
 #if os(iOS) || os(watchOS) || os(tvOS)
     import UIKit
@@ -29,7 +29,7 @@ enum TargetType: Int {
     case targetTypeRelease
 }
 
-struct Platform {
+enum Platform {
     static let isSimulator: Bool = {
         var isSim = false
         // if mac architechture and os is iOS, WatchOS or TVOS we're on a simulator
@@ -42,7 +42,7 @@ struct Platform {
     static let isMacintosh: Bool = {
         var isMac = false
         // check architechture for mac
-        #if (arch(i386) || arch(x86_64))
+        #if arch(i386) || arch(x86_64)
             isMac = true
         #endif
         return !isSimulator && isMac
@@ -50,9 +50,7 @@ struct Platform {
 }
 
 extension Optimobile {
-
     func sendDeviceInformation(config: OptimobileConfig) {
-
         let target = getTarget(config: config)
 
         var app = [String: AnyObject]()
@@ -74,7 +72,7 @@ extension Optimobile {
         if Platform.isMacintosh {
             os["id"] = OSTypeID.osTypeIDOSX.rawValue
             os["version"] = ProcessInfo.processInfo.operatingSystemVersionString as AnyObject?
-         } else {
+        } else {
             os["id"] = OSTypeID.osTypeIDiOS.rawValue
             os["version"] = UIDevice.current.systemVersion as AnyObject?
         }
@@ -91,7 +89,7 @@ extension Optimobile {
             "runtime": runtime,
             "os": os,
             "device": device,
-            "ios": self.getiOSAttrs()
+            "ios": getiOSAttrs(),
         ]
 
         Optimobile.trackEvent(eventType: OptimobileEvent.STATS_CALL_HOME.rawValue, properties: finalParameters)
@@ -104,7 +102,7 @@ extension Optimobile {
 
         return [
             "id": sdkType as AnyObject,
-            "version": SDKVersion as AnyObject
+            "version": SDKVersion as AnyObject,
         ]
     }
 
@@ -114,7 +112,7 @@ extension Optimobile {
         }
 
         var runtime = [
-            "id": RuntimeType.runtimeTypeNative.rawValue as AnyObject
+            "id": RuntimeType.runtimeTypeNative.rawValue as AnyObject,
         ]
 
         if Platform.isMacintosh {
@@ -144,7 +142,7 @@ extension Optimobile {
     private func getiOSAttrs() -> [String: Any] {
         var push = [
             "scheduled": false,
-            "timeSensitive": false
+            "timeSensitive": false,
         ]
 
         if #available(iOS 15.0, *) {
@@ -162,8 +160,7 @@ extension Optimobile {
 
         return [
             "hasGroup": AppGroupsHelper.isKumulosAppGroupDefined(),
-            "push": push
+            "push": push,
         ]
     }
-
 }

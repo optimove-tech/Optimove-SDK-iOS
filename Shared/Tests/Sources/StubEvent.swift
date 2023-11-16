@@ -4,9 +4,8 @@ import Foundation
 @testable import OptimoveCore
 
 final class StubEvent: Event {
-
-    struct Constnats {
-        static let id = 2_000
+    enum Constnats {
+        static let id = 2000
         static let name = "stub_name"
         static let key = "stub_key"
         static let value = "stub_value"
@@ -19,7 +18,6 @@ final class StubEvent: Event {
     init(context: [String: Any]) {
         super.init(name: Constnats.name, context: context)
     }
-
 }
 
 public let StubOptistreamEvent = OptistreamEvent(

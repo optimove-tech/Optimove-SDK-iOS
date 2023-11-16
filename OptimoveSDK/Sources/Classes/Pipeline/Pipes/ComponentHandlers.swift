@@ -10,8 +10,8 @@ class ComponentHandler: Pipe {
 
     init(commonComponents: [CommonComponent],
          optistreamComponents: [OptistreamComponent],
-         optirstreamEventBuilder: OptistreamEventBuilder
-    ) {
+         optirstreamEventBuilder: OptistreamEventBuilder)
+    {
         self.commonComponents = commonComponents
         self.optistreamComponents = optistreamComponents
         self.optirstreamEventBuilder = optirstreamEventBuilder
@@ -32,22 +32,22 @@ class ComponentHandler: Pipe {
 
     private func sendToStreamComponents(_ operation: CommonOperation) {
         switch operation {
-        case .report(events: let events):
+        case let .report(events: events):
             let streamEvents: [OptistreamEvent] = events.compactMap { event in
                 do {
-                   return try optirstreamEventBuilder.build(event: event)
+                    return try optirstreamEventBuilder.build(event: event)
                 } catch {
                     Logger.error(error.localizedDescription)
                     return nil
                 }
             }
-            optistreamComponents.forEach { (component) in
+            optistreamComponents.forEach { component in
                 tryCatch {
                     try component.serve(.report(events: streamEvents))
                 }
             }
         case .dispatchNow:
-            optistreamComponents.forEach { (component) in
+            optistreamComponents.forEach { component in
                 tryCatch {
                     try component.serve(.dispatchNow)
                 }

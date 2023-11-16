@@ -13,7 +13,6 @@ public final class RuntimeCodingKey: CodingKey {
 
     public init?(intValue: Int) {
         self.intValue = intValue
-        self.stringValue = String(intValue)
+        stringValue = String(intValue)
     }
-
 }

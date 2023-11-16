@@ -17,13 +17,13 @@ enum KSHttpDataFormat {
 }
 
 enum KSHttpMethod: String {
-    case GET = "GET"
-    case POST = "POST"
-    case PUT = "PUT"
-    case DELETE = "DELETE"
+    case GET
+    case POST
+    case PUT
+    case DELETE
 }
 
-internal class KSHttpClient {
+class KSHttpClient {
     private let baseUrl: URL
     private let baseUrlComponents: URLComponents?
     private let urlSession: URLSession
@@ -35,7 +35,7 @@ internal class KSHttpClient {
 
     init(baseUrl: URL, requestFormat: KSHttpDataFormat, responseFormat: KSHttpDataFormat, additionalHeaders: [AnyHashable: Any]? = nil) {
         self.baseUrl = baseUrl
-        self.baseUrlComponents = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false)
+        baseUrlComponents = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false)
         self.requestFormat = requestFormat
         self.responseFormat = responseFormat
 
@@ -49,8 +49,8 @@ internal class KSHttpClient {
             config.httpAdditionalHeaders = additionalHeaders
         }
 
-        self.urlSession = URLSession(configuration: config)
-        self.authHeader = nil
+        urlSession = URLSession(configuration: config)
+        authHeader = nil
     }
 
     func setBasicAuth(user: String, password: String) {
@@ -59,7 +59,7 @@ internal class KSHttpClient {
         let base64Creds = data?.base64EncodedString()
 
         if let encoded = base64Creds {
-            self.authHeader = "Basic \(encoded)"
+            authHeader = "Basic \(encoded)"
         }
     }
 
@@ -74,28 +74,27 @@ internal class KSHttpClient {
     // MARK: HTTP Methods
 
     @discardableResult func sendRequest(_ method: KSHttpMethod, toPath: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) -> URLSessionDataTask {
-        let request = self.newRequestToPath(toPath, method: method, body: data)
+        let request = newRequestToPath(toPath, method: method, body: data)
 
-        return self.sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
+        return sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
     }
 
     // MARK: Helpers
 
     fileprivate func newRequestToPath(_ path: String, method: KSHttpMethod, body: Any?) -> URLRequest {
-        let fullPath = "\(self.baseUrlComponents?.path ?? "")\(path)"
-        let url = URL(string: fullPath, relativeTo: self.baseUrl)
+        let fullPath = "\(baseUrlComponents?.path ?? "")\(path)"
+        let url = URL(string: fullPath, relativeTo: baseUrl)
 
         var urlRequest = URLRequest(url: url!)
         urlRequest.httpMethod = method.rawValue
 
-        if let auth = self.authHeader {
+        if let auth = authHeader {
             urlRequest.addValue(auth, forHTTPHeaderField: "Authorization")
         }
 
-        switch self.requestFormat {
+        switch requestFormat {
         case .json:
             urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            break
         case .plist:
             break
         case .rawData:
@@ -103,7 +102,7 @@ internal class KSHttpClient {
         }
 
         if let bodyVal = body {
-            let encodedBody = self.encodeBody(bodyVal)
+            let encodedBody = encodeBody(bodyVal)
             urlRequest.httpBody = encodedBody
         }
 
@@ -111,7 +110,7 @@ internal class KSHttpClient {
     }
 
     fileprivate func encodeBody(_ body: Any) -> Data? {
-        switch self.requestFormat {
+        switch requestFormat {
         case .json:
             guard JSONSerialization.isValidJSONObject(body) else {
                 print("Cannot serialize body to JSON")
@@ -138,23 +137,20 @@ internal class KSHttpClient {
 
         var decodedData: Any?
 
-        switch self.responseFormat {
+        switch responseFormat {
         case .json:
             decodedData = try? JSONSerialization.jsonObject(with: data, options: .init(rawValue: 0))
-            break
         case .plist:
             decodedData = try? PropertyListSerialization.propertyList(from: data, options: .mutableContainers, format: nil)
-            break
         case .rawData:
             decodedData = data
-            break
         }
 
         return decodedData
     }
 
     fileprivate func sendRequest(request: URLRequest, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) -> URLSessionDataTask {
-        let task = urlSession.dataTask(with: request) { (data, response, error) in
+        let task = urlSession.dataTask(with: request) { data, response, error in
             guard let httpResponse = response as? HTTPURLResponse else {
                 onFailure(nil, KSHttpError.responseCastingError, nil)
                 return
@@ -183,10 +179,9 @@ internal class KSHttpClient {
 
         return task
     }
-
 }
 
-internal struct KSHttpUtil {
+enum KSHttpUtil {
     static func urlEncode(_ url: String) -> String? {
         let unreserved = "-._~"
         var allowed = CharacterSet.alphanumerics

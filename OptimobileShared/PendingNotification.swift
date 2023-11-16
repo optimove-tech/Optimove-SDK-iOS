@@ -2,7 +2,7 @@
 
 import Foundation
 
-internal struct PendingNotification: Codable {
+struct PendingNotification: Codable {
     let id: Int
     let deliveredAt: Date
     let identifier: String

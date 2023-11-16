@@ -3,7 +3,6 @@
 import Foundation
 
 public protocol ConfigurationRepository {
-
     func getConfiguration() throws -> Configuration
     func setConfiguration(_: Configuration) throws
 
@@ -12,21 +11,21 @@ public protocol ConfigurationRepository {
 
     func getTenant() throws -> TenantConfig
     func saveTenant(_: TenantConfig) throws
-
 }
 
 public final class ConfigurationRepositoryImpl {
-
-    private struct Constants {
+    private enum Constants {
         static let fileExtension = ".json"
-        struct Global {
+        enum Global {
             static let fileName = "global_config" + fileExtension
             static let isGroupContainer = true
         }
-        struct Tenant {
+
+        enum Tenant {
             static let isGroupContainer = true
         }
-        struct Configuration {
+
+        enum Configuration {
             static let fileName = "configuration" + fileExtension
         }
     }
@@ -36,11 +35,9 @@ public final class ConfigurationRepositoryImpl {
     public init(storage: OptimoveStorage) {
         self.storage = storage
     }
-
 }
 
 extension ConfigurationRepositoryImpl: ConfigurationRepository {
-
     public func getConfiguration() throws -> Configuration {
         return try storage.load(fileName: Constants.Configuration.fileName)
     }

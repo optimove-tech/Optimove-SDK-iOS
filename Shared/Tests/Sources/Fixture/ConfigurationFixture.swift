@@ -7,19 +7,17 @@ struct Options {
     let isEnableRealtime: Bool
     let isEnableRealtimeThroughOptistream: Bool
 
-    static var `default`: Options = Options(
+    static var `default`: Options = .init(
         isEnableRealtime: true,
         isEnableRealtimeThroughOptistream: false
     )
 }
 
-final class ConfigurationFixture {
-
+enum ConfigurationFixture {
     static func build(_ options: Options = Options.default) -> Configuration {
         return ConfigurationBuilder(
             globalConfig: GlobalConfigFixture().build(),
             tenantConfig: TenantConfigFixture().build(options)
         ).build()
     }
-
 }

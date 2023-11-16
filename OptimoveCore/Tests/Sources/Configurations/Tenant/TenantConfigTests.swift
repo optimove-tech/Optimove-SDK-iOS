@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveCore
+import XCTest
 
 class TenantConfigTests: XCTestCase, FileAccessible {
-
     // Use `com.apple.dt.xctest.tool` bundle identifier in the config file, just for this test case.
     let fileName = "dev.tid.107.optipush.json"
 
@@ -40,5 +39,4 @@ class TenantConfigTests: XCTestCase, FileAccessible {
         // then
         XCTAssertNoThrow(try decoder.decode(TenantConfig.self, from: data))
     }
-
 }

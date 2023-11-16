@@ -5,7 +5,6 @@ protocol DeviceStateObservable {
 }
 
 final class DeviceStateObserver {
-
     private let observers: [DeviceStateObservable]
 
     init(observers: [DeviceStateObservable]) {
@@ -15,5 +14,4 @@ final class DeviceStateObserver {
     func start() {
         observers.forEach { $0.observe() }
     }
-
 }

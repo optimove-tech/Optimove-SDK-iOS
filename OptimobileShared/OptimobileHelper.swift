@@ -2,46 +2,41 @@
 
 import Foundation
 
-internal let KS_MESSAGE_TYPE_PUSH = 1
+let KS_MESSAGE_TYPE_PUSH = 1
 
-internal class OptimobileHelper {
-
+enum OptimobileHelper {
     private static let installIdLock = DispatchSemaphore(value: 1)
     static let userIdLock = DispatchSemaphore(value: 1)
 
     static var installId: String {
-       get {
-           installIdLock.wait()
-           defer {
-               installIdLock.signal()
-           }
+        installIdLock.wait()
+        defer {
+            installIdLock.signal()
+        }
 
-           if let existingID = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue) {
-               return existingID as! String
-           }
+        if let existingID = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue) {
+            return existingID as! String
+        }
 
-           let newID = UUID().uuidString
-           KeyValPersistenceHelper.set(newID, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
+        let newID = UUID().uuidString
+        KeyValPersistenceHelper.set(newID, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
 
-           return newID
-       }
+        return newID
     }
 
     /**
-     Returns the identifier for the user currently associated with the Kumulos installation record
+      Returns the identifier for the user currently associated with the Kumulos installation record
 
-     If no user is associated, it returns the Kumulos installation ID
-    */
+      If no user is associated, it returns the Kumulos installation ID
+     */
     static var currentUserIdentifier: String {
-        get {
-            userIdLock.wait()
-            defer { userIdLock.signal() }
-            if let userId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue) as! String? {
-                return userId
-            }
-
-            return OptimobileHelper.installId
+        userIdLock.wait()
+        defer { userIdLock.signal() }
+        if let userId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue) as! String? {
+            return userId
         }
+
+        return OptimobileHelper.installId
     }
 
     static func getBadgeFromUserInfo(userInfo: [AnyHashable: Any]) -> NSNumber? {
@@ -70,5 +65,4 @@ internal class OptimobileHelper {
 
         return newBadge
     }
-
 }

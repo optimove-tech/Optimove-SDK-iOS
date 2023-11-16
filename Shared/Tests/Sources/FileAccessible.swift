@@ -11,7 +11,6 @@ protocol FileAccessible: AnyObject {
 }
 
 extension FileAccessible {
-
     var data: Data {
         let bundle = Bundle(for: type(of: self))
         guard let url = bundle.url(forResource: fileName, withExtension: "") else {
@@ -22,5 +21,4 @@ extension FileAccessible {
         }
         return data
     }
-
 }

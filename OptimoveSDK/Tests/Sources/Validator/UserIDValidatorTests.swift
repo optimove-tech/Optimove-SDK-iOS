@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveSDK
+import XCTest
 
 class UserIDValidatorTests: XCTestCase {
-
     var storage = MockOptimoveStorage()
 
     func test_valid() {
@@ -21,5 +20,4 @@ class UserIDValidatorTests: XCTestCase {
 
         XCTAssertEqual(validator.validateNewUser(user), UserValidator.Result.alreadySetIn)
     }
-
 }

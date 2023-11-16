@@ -1,21 +1,21 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
-import UserNotifications
 import ObjectiveC.runtime
 import UIKit
+import UserNotifications
 
 public class PushNotification: NSObject {
-    internal static let DeepLinkTypeInApp: Int = 1
+    static let DeepLinkTypeInApp: Int = 1
 
-    internal(set) public var id: Int
-    internal(set) public var aps: [AnyHashable: Any]
-    internal(set) public var data: [AnyHashable: Any]
-    internal(set) public var url: URL?
-    internal(set) public var actionIdentifier: String?
+    public internal(set) var id: Int
+    public internal(set) var aps: [AnyHashable: Any]
+    public internal(set) var data: [AnyHashable: Any]
+    public internal(set) var url: URL?
+    public internal(set) var actionIdentifier: String?
 
     init(userInfo: [AnyHashable: Any]?) {
-        self.id = 0
+        id = 0
         self.aps = [:]
         self.data = [:]
 
@@ -82,22 +82,21 @@ public class PushNotification: NSObject {
 public typealias OptimoveUNAuthorizationCheckedHandler = (UNAuthorizationStatus, Error?) -> Void
 
 extension Optimobile {
-
     /**
-        Helper method for requesting the device token with alert, badge and sound permissions.
+         Helper method for requesting the device token with alert, badge and sound permissions.
 
-        On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
-    */
+         On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+     */
     @available(iOS 10.0, *)
     static func pushRequestDeviceToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
         requestToken(onAuthorizationStatus)
     }
 
     /**
-        Helper method for requesting the device token with alert, badge and sound permissions.
+         Helper method for requesting the device token with alert, badge and sound permissions.
 
-        On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
-    */
+         On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+     */
     static func pushRequestDeviceToken() {
         if #available(iOS 10.0, *) {
             requestToken()
@@ -126,7 +125,7 @@ extension Optimobile {
                     return
                 }
 
-                center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+                center.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
                     if let err = error {
                         onAuthorizationStatus?(.notDetermined, err)
                         return
@@ -143,7 +142,7 @@ extension Optimobile {
             }
         }
 
-        center.getNotificationSettings { (settings) in
+        center.getNotificationSettings { settings in
             switch settings.authorizationStatus {
             case .denied:
                 onAuthorizationStatus?(settings.authorizationStatus, nil)
@@ -151,37 +150,35 @@ extension Optimobile {
             case .authorized:
                 onAuthorizationStatus?(settings.authorizationStatus, nil)
                 requestToken()
-                break
             default:
                 askPermission()
-                break
             }
         }
     }
 
     @available(iOS, deprecated: 10.0)
     fileprivate static func requestTokenLegacy() {
-         // Determine the type of notifications we want to ask permission for, for example we may want to alert the user, update the badge number and play a sound
-         let notificationTypes: UIUserNotificationType = [UIUserNotificationType.alert, UIUserNotificationType.badge, UIUserNotificationType.sound]
+        // Determine the type of notifications we want to ask permission for, for example we may want to alert the user, update the badge number and play a sound
+        let notificationTypes: UIUserNotificationType = [UIUserNotificationType.alert, UIUserNotificationType.badge, UIUserNotificationType.sound]
 
-         // Create settings  based on those notification types we want the user to accept
-         let pushNotificationSettings = UIUserNotificationSettings(types: notificationTypes, categories: nil)
+        // Create settings  based on those notification types we want the user to accept
+        let pushNotificationSettings = UIUserNotificationSettings(types: notificationTypes, categories: nil)
 
-         // Get the main application
-         let application = UIApplication.shared
+        // Get the main application
+        let application = UIApplication.shared
 
-         // Register the settings created above - will show alert first if the user hasn't previously done this
-         // See delegate methods in AppDelegate - the AppDelegate conforms to the UIApplicationDelegate protocol
-         application.registerUserNotificationSettings(pushNotificationSettings)
-         application.registerForRemoteNotifications()
+        // Register the settings created above - will show alert first if the user hasn't previously done this
+        // See delegate methods in AppDelegate - the AppDelegate conforms to the UIApplicationDelegate protocol
+        application.registerUserNotificationSettings(pushNotificationSettings)
+        application.registerForRemoteNotifications()
     }
 
     /**
-        Register a device token with the Optimobile Push service
+         Register a device token with the Optimobile Push service
 
-        Parameters:
-            - deviceToken: The push token returned by the device
-    */
+         Parameters:
+             - deviceToken: The push token returned by the device
+     */
     static func pushRegister(_ deviceToken: Data) {
         let token = serializeDeviceToken(deviceToken)
         let iosTokenType = getTokenType()
@@ -196,15 +193,16 @@ extension Optimobile {
     }
 
     /**
-        Unsubscribe your device from the Optimobile Push service
-    */
+         Unsubscribe your device from the Optimobile Push service
+     */
     static func pushUnregister() {
         Optimobile.trackEvent(eventType: OptimobileEvent.DEVICE_UNSUBSCRIBED, properties: [:], immediateFlush: true)
     }
 
-// MARK: Open handling
+    // MARK: Open handling
+
     /**
-        Track a user action triggered by a push notification
+         Track a user action triggered by a push notification
 
         Parameters:
             - notification: The notification which triggered the action
@@ -216,7 +214,6 @@ extension Optimobile {
             Reason: Invalid notification id (== 0).
             Payload: \(notification).
             """)
-            return
         }
         let params = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_OPENED, properties: params)
@@ -228,14 +225,14 @@ extension Optimobile {
     }
 
     @available(iOS 10.0, *)
-    internal func pushHandleOpen(withUserInfo: [AnyHashable: Any]?, response: UNNotificationResponse?) -> Bool {
+    func pushHandleOpen(withUserInfo: [AnyHashable: Any]?, response: UNNotificationResponse?) -> Bool {
         let notification = PushNotification(userInfo: withUserInfo, response: response)
 
         if notification.id == 0 {
             return false
         }
 
-        self.pushHandleOpen(notification: notification)
+        pushHandleOpen(notification: notification)
 
         PendingNotificationHelper.remove(id: notification.id)
 
@@ -245,39 +242,40 @@ extension Optimobile {
     private func pushHandleOpen(notification: PushNotification) {
         Optimobile.pushTrackOpen(notification: notification)
 
-       // Handle URL pushes
+        // Handle URL pushes
 
-       if let url = notification.url {
-           if #available(iOS 10, *) {
-               UIApplication.shared.open(url, options: [:]) { (success) in
-                   // noop
-               }
-           } else {
-               DispatchQueue.main.async {
-                   UIApplication.shared.openURL(url)
-               }
-           }
-       }
+        if let url = notification.url {
+            if #available(iOS 10, *) {
+                UIApplication.shared.open(url, options: [:]) { _ in
+                    // noop
+                }
+            } else {
+                DispatchQueue.main.async {
+                    UIApplication.shared.openURL(url)
+                }
+            }
+        }
 
-       self.inAppManager.handlePushOpen(notification: notification)
+        inAppManager.handlePushOpen(notification: notification)
 
-       if let userOpenedHandler = self.config.pushOpenedHandlerBlock {
-           DispatchQueue.main.async {
-               userOpenedHandler(notification)
-           }
-       }
+        if let userOpenedHandler = config.pushOpenedHandlerBlock {
+            DispatchQueue.main.async {
+                userOpenedHandler(notification)
+            }
+        }
     }
 
-// MARK: Dismissed handling
+    // MARK: Dismissed handling
+
     @available(iOS 10.0, *)
-    internal func pushHandleDismissed(withUserInfo: [AnyHashable: Any]?, response: UNNotificationResponse?) -> Bool {
+    func pushHandleDismissed(withUserInfo: [AnyHashable: Any]?, response: UNNotificationResponse?) -> Bool {
         let notification = PushNotification(userInfo: withUserInfo, response: response)
 
         if notification.id == 0 {
             return false
         }
 
-        self.pushHandleDismissed(notificationId: notification.id)
+        pushHandleDismissed(notificationId: notification.id)
 
         return true
     }
@@ -285,7 +283,7 @@ extension Optimobile {
     @available(iOS 10.0, *)
     private func pushHandleDismissed(notificationId: Int, dismissedAt: Date? = nil) {
         PendingNotificationHelper.remove(id: notificationId)
-        self.pushTrackDismissed(notificationId: notificationId, dismissedAt: dismissedAt)
+        pushTrackDismissed(notificationId: notificationId, dismissedAt: dismissedAt)
     }
 
     @available(iOS 10.0, *)
@@ -300,7 +298,7 @@ extension Optimobile {
     }
 
     @available(iOS 10.0, *)
-    internal func maybeTrackPushDismissedEvents() {
+    func maybeTrackPushDismissedEvents() {
         if !AppGroupsHelper.isKumulosAppGroupDefined() {
             return
         }
@@ -318,18 +316,18 @@ extension Optimobile {
 
             let recordedPendingNotifications = PendingNotificationHelper.readAll()
 
-            let deletions = recordedPendingNotifications.filter({ !actualPendingNotificationIds.contains( $0.id ) })
+            let deletions = recordedPendingNotifications.filter { !actualPendingNotificationIds.contains($0.id) }
             for deletion in deletions {
                 self.pushHandleDismissed(notificationId: deletion.id, dismissedAt: deletion.deliveredAt)
             }
-
         }
     }
 
-// MARK: Token handling
+    // MARK: Token handling
+
     fileprivate static func serializeDeviceToken(_ deviceToken: Data) -> String {
-        var token: String = ""
-        for i in 0..<deviceToken.count {
+        var token = ""
+        for i in 0 ..< deviceToken.count {
             token += String(format: "%02.2hhx", deviceToken[i] as CVarArg)
         }
 
@@ -342,7 +340,7 @@ extension Optimobile {
         if let index = [
             .releaseAdHoc,
             .releaseDev,
-            .releaseWildcard
+            .releaseWildcard,
         ].firstIndex(of: releaseMode), index > -1 {
             return releaseMode.rawValue + 1
         }
@@ -358,7 +356,6 @@ private var existingDidFailToReg: IMP?
 private var existingDidReceive: IMP?
 
 class PushHelper {
-
     typealias kumulos_applicationDidRegisterForRemoteNotifications = @convention(c) (_ obj: UIApplicationDelegate, _ _cmd: Selector, _ application: UIApplication, _ deviceToken: Data) -> Void
     typealias didRegBlock = @convention(block) (_ obj: UIApplicationDelegate, _ application: UIApplication, _ deviceToken: Data) -> Void
 
@@ -375,7 +372,7 @@ class PushHelper {
         let didRegisterSelector = #selector(UIApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
         let meth = class_getInstanceMethod(klass, didRegisterSelector)
         let regType = NSString(string: "v@:@@").utf8String
-        let regBlock: didRegBlock = { (obj: UIApplicationDelegate, application: UIApplication, deviceToken: Data) -> Void in
+        let regBlock: didRegBlock = { (obj: UIApplicationDelegate, application: UIApplication, deviceToken: Data) in
             if let _ = existingDidReg {
                 unsafeBitCast(existingDidReg, to: kumulos_applicationDidRegisterForRemoteNotifications.self)(obj, didRegisterSelector, application, deviceToken)
             }
@@ -388,7 +385,7 @@ class PushHelper {
         // Failed to register handler
         let didFailToRegisterSelector = #selector(UIApplicationDelegate.application(_:didFailToRegisterForRemoteNotificationsWithError:))
         let didFailToRegType = NSString(string: "v@:@@").utf8String
-        let didFailToRegBlock: didFailToRegBlock = { (obj: Any, application: UIApplication, error: Error) -> Void in
+        let didFailToRegBlock: didFailToRegBlock = { (obj: Any, application: UIApplication, error: Error) in
             if let _ = existingDidFailToReg {
                 unsafeBitCast(existingDidFailToReg, to: kumulos_applicationDidFailToRegisterForRemoteNotificaitons.self)(obj, didFailToRegisterSelector, application, error)
             }
@@ -408,11 +405,11 @@ class PushHelper {
             self.setBadge(userInfo: userInfo)
             self.trackPushDelivery(notification: notification)
 
-            if existingDidReceive == nil && !hasInApp {
+            if existingDidReceive == nil, !hasInApp {
                 // Nothing to do
                 completionHandler(.noData)
                 return
-            } else if existingDidReceive != nil && !hasInApp {
+            } else if existingDidReceive != nil, !hasInApp {
                 // Only existing delegate work to do
                 unsafeBitCast(existingDidReceive, to: kumulos_applicationDidReceiveRemoteNotificationFetchCompletionHandler.self)(obj, didReceiveSelector, application, userInfo, completionHandler)
                 return

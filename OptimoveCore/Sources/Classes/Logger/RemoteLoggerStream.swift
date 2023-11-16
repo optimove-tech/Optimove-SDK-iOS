@@ -4,17 +4,16 @@ import Foundation
 import os.log
 
 public final class RemoteLoggerStream: MutableLoggerStream {
-
-    private struct Constants {
+    private enum Constants {
         static let httpHeaders: [String: String] = [
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         ]
         static let httpMethod = "POST"
     }
 
     public var policy: LoggerStreamFilter {
-        return LoggerStreamFilter.custom { [unowned self] (level, isRemote) -> Bool in
-            return self.isAllowedByFiltring(level: level) && isRemote
+        return LoggerStreamFilter.custom { [unowned self] level, isRemote -> Bool in
+            self.isAllowedByFiltring(level: level) && isRemote
         }
     }
 
@@ -30,14 +29,14 @@ public final class RemoteLoggerStream: MutableLoggerStream {
 
     public init(tenantId: Int) {
         self.tenantId = tenantId
-        self.appNs = Bundle.main.bundleIdentifier!
+        appNs = Bundle.main.bundleIdentifier!
     }
 
     public func log(
         level: LogLevelCore,
         fileName: String,
         methodName: String,
-        logModule: String?,
+        logModule _: String?,
         message: String
     ) {
         let data = LogBody(
@@ -52,7 +51,7 @@ public final class RemoteLoggerStream: MutableLoggerStream {
         )
         do {
             let request = try buildLogRequest(data)
-            let task = URLSession.shared.dataTask(with: request) { [log] (data, response, error) in
+            let task = URLSession.shared.dataTask(with: request) { [log] _, _, error in
                 if error != nil {
                     os_log("Logger: data task returns an error '%s'", log: log, type: .error, error!.localizedDescription)
                 }
@@ -68,7 +67,7 @@ public final class RemoteLoggerStream: MutableLoggerStream {
         var request = URLRequest(url: endpoint)
         request.httpBody = logBody
         request.httpMethod = Constants.httpMethod
-        Constants.httpHeaders.forEach { (header) in
+        Constants.httpHeaders.forEach { header in
             request.setValue(header.value, forHTTPHeaderField: header.key)
         }
         return request

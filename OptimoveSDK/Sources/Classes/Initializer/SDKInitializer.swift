@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class SDKInitializer {
-
     private let componentFactory: ComponentFactory
     private let pipeline: PipelineMutator
     private let dependencies: [SDKInitializerDependency]
@@ -15,7 +14,8 @@ final class SDKInitializer {
     init(componentFactory: ComponentFactory,
          pipeline: PipelineMutator,
          dependencies: [SDKInitializerDependency],
-         storage: OptimoveStorage) {
+         storage: OptimoveStorage)
+    {
         self.componentFactory = componentFactory
         self.pipeline = pipeline
         self.dependencies = dependencies
@@ -31,13 +31,10 @@ final class SDKInitializer {
             Logger.error("🚨 Optimove SDK failed on initialization. Error: \(error.localizedDescription)")
         }
     }
-
 }
 
 private extension SDKInitializer {
-
     func setupOptimoveComponents(_ configuration: Configuration) throws {
-
         // MARK: Setup Eventable chain of responsibility.
 
         // 1 responder
@@ -49,12 +46,12 @@ private extension SDKInitializer {
         // 3 responder
         let decorator = ParametersDecorator(configuration: configuration)
 
-        var optistreamComponents: [OptistreamComponent?] = [
-            try componentFactory.createOptitrackComponent(configuration: configuration)
+        var optistreamComponents: [OptistreamComponent?] = try [
+            componentFactory.createOptitrackComponent(configuration: configuration),
         ]
         if isAllowedToRunRealtimeComponent(configuration) {
-            optistreamComponents.append(
-                try componentFactory.createRealtimeComponent(configuration: configuration)
+            try optistreamComponents.append(
+                componentFactory.createRealtimeComponent(configuration: configuration)
             )
         }
 
@@ -77,7 +74,6 @@ private extension SDKInitializer {
     func isAllowedToRunRealtimeComponent(_ configuration: Configuration) -> Bool {
         return configuration.isEnableRealtime && !configuration.realtime.isEnableRealtimeThroughOptistream
     }
-
 }
 
 protocol SDKInitializerDependency {
@@ -85,7 +81,6 @@ protocol SDKInitializerDependency {
 }
 
 final class OptimoveStrorageSDKInitializerDependency: SDKInitializerDependency {
-
     private var storage: OptimoveStorage
 
     init(storage: OptimoveStorage) {
@@ -100,13 +95,11 @@ final class OptimoveStrorageSDKInitializerDependency: SDKInitializerDependency {
 }
 
 final class MultiplexLoggerStreamSDKInitializerDependency: SDKInitializerDependency {
-
     func onConfigurationFetch(_ configuration: Configuration) {
-        MultiplexLoggerStream.mutateStreams(mutator: { (stream) in
+        MultiplexLoggerStream.mutateStreams(mutator: { stream in
             stream.tenantId = configuration.tenantID
             stream.endpoint = configuration.logger.logServiceEndpoint
             stream.isProductionLogsEnabled = configuration.logger.isProductionLogsEnabled
         })
     }
-
 }

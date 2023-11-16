@@ -4,7 +4,6 @@ import Foundation
 import UIKit
 
 class OptimobileBadgeObserver: NSObject {
-
     typealias BadgeChangedCallback = (Int) -> Void
 
     var _callback: BadgeChangedCallback!
@@ -16,8 +15,7 @@ class OptimobileBadgeObserver: NSObject {
         UIApplication.shared.addObserver(self, forKeyPath: "applicationIconBadgeNumber", options: .new, context: nil)
     }
 
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-
+    override func observeValue(forKeyPath keyPath: String?, of _: Any?, change: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?) {
         if (keyPath?.elementsEqual("applicationIconBadgeNumber")) != nil {
             let newBadgeCount = change![NSKeyValueChangeKey(rawValue: "new")]
             _callback(newBadgeCount as! Int)

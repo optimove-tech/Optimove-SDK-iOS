@@ -3,18 +3,18 @@
 import OptimoveCore
 
 final class GlobalConfigurationDownloader: AsyncOperation {
-
     private let networking: RemoteConfigurationNetworking
     private let repository: ConfigurationRepository
 
     init(networking: RemoteConfigurationNetworking,
-         repository: ConfigurationRepository) {
+         repository: ConfigurationRepository)
+    {
         self.networking = networking
         self.repository = repository
     }
 
     override func main() {
-        guard !self.isCancelled else { return }
+        guard !isCancelled else { return }
         state = .executing
         networking.getGlobalConfiguration { result in
             do {

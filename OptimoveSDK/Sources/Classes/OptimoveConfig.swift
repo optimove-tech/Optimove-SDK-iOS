@@ -6,17 +6,16 @@ public struct OptimoveConfig {
     let tenantInfo: OptimoveTenantInfo?
     let optimobileConfig: OptimobileConfig?
 
-    internal func isOptimoveConfigured() -> Bool {
+    func isOptimoveConfigured() -> Bool {
         return tenantInfo != nil
     }
 
-    internal func isOptimobileConfigured() -> Bool {
+    func isOptimobileConfigured() -> Bool {
         return optimobileConfig != nil
     }
 }
 
 @objc public class OptimoveTenantInfo: NSObject {
-
     @objc public var tenantToken: String
     @objc public var configName: String
 
@@ -41,9 +40,7 @@ public struct OptimobileConfig {
     fileprivate let _pushReceivedInForegroundHandlerBlock: Any?
     @available(iOS 10.0, *)
     var pushReceivedInForegroundHandlerBlock: PushReceivedInForegroundHandlerBlock? {
-        get {
-            return _pushReceivedInForegroundHandlerBlock as? PushReceivedInForegroundHandlerBlock
-        }
+        return _pushReceivedInForegroundHandlerBlock as? PushReceivedInForegroundHandlerBlock
     }
 
     let deepLinkCname: URL?
@@ -141,9 +138,9 @@ open class OptimoveConfigBuilder: NSObject {
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
      */
     @discardableResult public func setRuntimeInfo(runtimeInfo: [String: AnyObject]) -> OptimoveConfigBuilder {
-         _runtimeInfo = runtimeInfo
+        _runtimeInfo = runtimeInfo
 
-         return self
+        return self
     }
 
     /**
@@ -184,7 +181,8 @@ open class OptimoveConfigBuilder: NSObject {
         if let _apiKey = _apiKey,
            let _secretKey = _secretKey,
            let _baseUrlMap = _baseUrlMap,
-           let _region = _region {
+           let _region = _region
+        {
             optimobileConfig = OptimobileConfig(
                 apiKey: _apiKey,
                 secretKey: _secretKey,
@@ -200,7 +198,8 @@ open class OptimoveConfigBuilder: NSObject {
                 baseUrlMap: _baseUrlMap,
                 runtimeInfo: _runtimeInfo,
                 sdkInfo: _sdkInfo,
-                isRelease: _isRelease)
+                isRelease: _isRelease
+            )
         }
 
         return OptimoveConfig(
@@ -212,7 +211,8 @@ open class OptimoveConfigBuilder: NSObject {
     private static func parseOptimoveCredentials(creds: String?) -> (tenantToken: String, configName: String)? {
         guard let creds = creds,
               let tuple = parseTuple(creds: creds),
-              let ver = tuple[0] as? Int else {
+              let ver = tuple[0] as? Int
+        else {
             return nil
         }
 
@@ -221,7 +221,8 @@ open class OptimoveConfigBuilder: NSObject {
         }
 
         guard let tenantToken = tuple[1] as? String,
-              let configName = tuple[2] as? String else {
+              let configName = tuple[2] as? String
+        else {
             return nil
         }
 
@@ -231,7 +232,8 @@ open class OptimoveConfigBuilder: NSObject {
     private static func parseOptimobileCredentials(creds: String?) -> (region: String, apiKey: String, secretKey: String)? {
         guard let creds = creds,
               let tuple = parseTuple(creds: creds),
-              let ver = tuple[0] as? Int else {
+              let ver = tuple[0] as? Int
+        else {
             return nil
         }
 
@@ -241,7 +243,8 @@ open class OptimoveConfigBuilder: NSObject {
 
         guard let region = tuple[1] as? String,
               let apiKey = tuple[2] as? String,
-              let secretKey = tuple[3] as? String else {
+              let secretKey = tuple[3] as? String
+        else {
             return nil
         }
 

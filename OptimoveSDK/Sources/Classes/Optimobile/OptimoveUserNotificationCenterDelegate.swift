@@ -5,11 +5,10 @@ import UserNotifications
 
 @available(iOS 10.0, *)
 class OptimoveUserNotificationCenterDelegate: NSObject, UNUserNotificationCenterDelegate {
-
     let existingDelegate: UNUserNotificationCenterDelegate?
 
     override init() {
-        self.existingDelegate = UNUserNotificationCenter.current().delegate
+        existingDelegate = UNUserNotificationCenter.current().delegate
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
@@ -58,7 +57,7 @@ class OptimoveUserNotificationCenterDelegate: NSObject, UNUserNotificationCenter
     }
 
     fileprivate func chainCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, with completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        if self.existingDelegate != nil && self.existingDelegate?.responds(to: #selector(userNotificationCenter(_:willPresent:withCompletionHandler:))) == true {
+        if existingDelegate != nil && existingDelegate?.responds(to: #selector(userNotificationCenter(_:willPresent:withCompletionHandler:))) == true {
             self.existingDelegate?.userNotificationCenter?(center, willPresent: notification, withCompletionHandler: completionHandler)
             return
         }
@@ -67,7 +66,7 @@ class OptimoveUserNotificationCenterDelegate: NSObject, UNUserNotificationCenter
     }
 
     fileprivate func chainCenter(_ center: UNUserNotificationCenter, didReceive notificationResponse: UNNotificationResponse, with completionHandler: @escaping () -> Void) {
-        if self.existingDelegate != nil && self.existingDelegate?.responds(to: #selector(userNotificationCenter(_:didReceive:withCompletionHandler:))) == true {
+        if existingDelegate != nil && existingDelegate?.responds(to: #selector(userNotificationCenter(_:didReceive:withCompletionHandler:))) == true {
             self.existingDelegate?.userNotificationCenter?(center, didReceive: notificationResponse, withCompletionHandler: completionHandler)
             return
         }

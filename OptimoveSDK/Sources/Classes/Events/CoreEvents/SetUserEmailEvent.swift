@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 final class SetUserEmailEvent: Event {
-
-    struct Constants {
+    enum Constants {
         static let name = OptimoveKeys.Configuration.setEmail.rawValue
-        struct Key {
+        enum Key {
             static let email = OptimoveKeys.Configuration.email.rawValue
         }
     }

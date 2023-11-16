@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class NewVisitorIdGenerator {
-
     private var storage: OptimoveStorage
 
     init(storage: OptimoveStorage) {

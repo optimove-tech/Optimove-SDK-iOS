@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveSDK
+import XCTest
 
 class PageVisitEventTests: XCTestCase {
-
     func test_event_name() {
         // given
         let pageTitle = "pageTitle"
@@ -34,5 +33,4 @@ class PageVisitEventTests: XCTestCase {
         XCTAssert(event.context[PageVisitEvent.Constants.Key.pageTitle] as? String == title)
         XCTAssert(event.context[PageVisitEvent.Constants.Key.category] as? String == category)
     }
-
 }

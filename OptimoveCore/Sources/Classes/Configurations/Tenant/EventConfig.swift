@@ -10,7 +10,8 @@ public struct EventsConfig: Codable, Equatable {
         id: Int,
         supportedOnOptitrack: Bool,
         supportedOnRealTime: Bool,
-        parameters: [String: Parameter]) {
+        parameters: [String: Parameter]
+    ) {
         self.id = id
         self.supportedOnOptitrack = supportedOnOptitrack
         self.supportedOnRealTime = supportedOnRealTime

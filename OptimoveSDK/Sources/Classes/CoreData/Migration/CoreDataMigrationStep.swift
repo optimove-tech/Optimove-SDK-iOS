@@ -1,10 +1,9 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import Foundation
 import CoreData
+import Foundation
 
 struct CoreDataMigrationStep {
-
     let sourceModel: NSManagedObjectModel
     let destinationModel: NSManagedObjectModel
     let mappingModel: NSMappingModel

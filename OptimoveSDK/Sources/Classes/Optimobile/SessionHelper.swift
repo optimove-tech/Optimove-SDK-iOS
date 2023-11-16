@@ -9,8 +9,8 @@ class SessionIdleTimer {
     private var invalidated: Bool
 
     init(_ helper: SessionHelper, timeout: UInt) {
-        self.invalidationLock = DispatchSemaphore(value: 1)
-        self.invalidated = false
+        invalidationLock = DispatchSemaphore(value: 1)
+        invalidated = false
         self.helper = helper
 
         DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(Int(timeout))) {
@@ -26,14 +26,14 @@ class SessionIdleTimer {
         }
     }
 
-    internal func invalidate() {
+    func invalidate() {
         invalidationLock.wait()
         invalidated = true
         invalidationLock.signal()
     }
 }
 
-internal class SessionHelper {
+class SessionHelper {
     private var startNewSession: Bool
     private var becameInactiveAt: Date?
     private var sessionIdleTimer: SessionIdleTimer?
@@ -54,13 +54,13 @@ internal class SessionHelper {
     }
 
     private func registerListeners() {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.appBecameActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appBecameActive), name: UIApplication.didBecomeActiveNotification, object: nil)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(self.appBecameInactive), name: UIApplication.willResignActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appBecameInactive), name: UIApplication.willResignActiveNotification, object: nil)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(self.appBecameBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appBecameBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(self.appWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
     }
 
     // MARK: App lifecycle delegates
@@ -86,7 +86,7 @@ internal class SessionHelper {
     @objc private func appBecameInactive() {
         becameInactiveAt = Date()
 
-        sessionIdleTimer = SessionIdleTimer(self, timeout: self.sessionIdleTimeout)
+        sessionIdleTimer = SessionIdleTimer(self, timeout: sessionIdleTimeout)
     }
 
     @objc private func appBecameBackground() {
@@ -119,7 +119,7 @@ internal class SessionHelper {
         startNewSession = true
         sessionIdleTimer = nil
 
-        Optimobile.trackEvent(eventType: OptimobileEvent.STATS_BACKGROUND.rawValue, atTime: sessionEndTime, properties: nil, immediateFlush: true, onSyncComplete: {err in
+        Optimobile.trackEvent(eventType: OptimobileEvent.STATS_BACKGROUND.rawValue, atTime: sessionEndTime, properties: nil, immediateFlush: true, onSyncComplete: { _ in
             self.becameInactiveAt = nil
 
             if self.bgTask != UIBackgroundTaskIdentifier.invalid {
@@ -132,5 +132,4 @@ internal class SessionHelper {
 
         _ = syncBarrier.wait(timeout: .now() + .seconds(3))
     }
-
 }

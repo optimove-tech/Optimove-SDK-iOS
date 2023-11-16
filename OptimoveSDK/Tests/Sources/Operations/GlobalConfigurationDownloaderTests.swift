@@ -1,12 +1,11 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
+import Mocker
 import OptimoveCore
 @testable import OptimoveSDK
-import Mocker
+import XCTest
 
 class GlobalConfigurationDownloaderTests: XCTestCase {
-
     var repository = MockConfigurationRepository()
     var downloader: GlobalConfigurationDownloader!
 
@@ -39,5 +38,4 @@ class GlobalConfigurationDownloaderTests: XCTestCase {
 
         XCTAssertEqual(repository.global, expectedConfig)
     }
-
 }

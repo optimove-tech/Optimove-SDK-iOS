@@ -3,7 +3,6 @@
 import Foundation
 
 public protocol FileStorage {
-
     /// Check file if exist.
     ///
     /// - Parameters:
@@ -45,12 +44,10 @@ public protocol FileStorage {
     /// - Parameters:
     ///   - fileName: The file name on disk space.
     func delete(fileName: String) throws
-
 }
 
 public final class FileStorageImpl {
-
-    private struct Constants {
+    private enum Constants {
         static let folderName = "OptimoveSDK"
     }
 
@@ -58,7 +55,7 @@ public final class FileStorageImpl {
     private let directoryURL: URL
 
     public init(url: URL) throws {
-        self.fileManager = FileManager.default
+        fileManager = FileManager.default
         directoryURL = url
     }
 
@@ -75,7 +72,6 @@ public final class FileStorageImpl {
 }
 
 extension FileStorageImpl: FileStorage {
-
     public func isExist(fileName: String) -> Bool {
         let url = getDirectory()
         let fileUrl = url.appendingPathComponent(fileName)
@@ -101,14 +97,16 @@ extension FileStorageImpl: FileStorage {
 
     public func save<T: Encodable>(
         data: T,
-        toFileName fileName: String) throws {
+        toFileName fileName: String
+    ) throws {
         let data = try JSONEncoder().encode(data)
         try saveData(data: data, toFileName: fileName)
     }
 
     public func saveData(
         data: Data,
-        toFileName fileName: String) throws {
+        toFileName fileName: String
+    ) throws {
         do {
             let url = getDirectory()
             try fileManager.createDirectory(at: url, withIntermediateDirectories: true)
@@ -132,5 +130,4 @@ extension FileStorageImpl: FileStorage {
             throw error
         }
     }
-
 }

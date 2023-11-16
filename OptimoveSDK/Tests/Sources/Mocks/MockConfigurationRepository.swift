@@ -3,7 +3,6 @@
 import OptimoveCore
 
 final class MockConfigurationRepository: ConfigurationRepository {
-
     var configuration: Configuration?
     var global: GlobalConfig?
     var tenant: TenantConfig?
@@ -31,5 +30,4 @@ final class MockConfigurationRepository: ConfigurationRepository {
     func saveTenant(_ config: TenantConfig) throws {
         tenant = config
     }
-
 }

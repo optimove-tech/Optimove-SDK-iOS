@@ -16,13 +16,14 @@ public struct DeepLink {
     init?(for url: URL, from jsonData: Data) {
         guard let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable: Any],
               let linkData = response["linkData"] as? [AnyHashable: Any?],
-              let content = response["content"] as? [AnyHashable: Any?] else {
+              let content = response["content"] as? [AnyHashable: Any?]
+        else {
             return nil
         }
 
         self.url = url
         self.content = DeepLinkContent(title: content["title"] as? String, description: content["description"] as? String)
-        self.data = linkData
+        data = linkData
     }
 }
 
@@ -51,11 +52,11 @@ class DeepLinkHelper {
             responseFormat: .rawData,
             additionalHeaders: [
                 "Content-Type": "application/json",
-                "Accept": "appliction/json"
+                "Accept": "appliction/json",
             ]
         )
         httpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
-        self.anyContinuationHandled = false
+        anyContinuationHandled = false
     }
 
     func checkForNonContinuationLinkMatch() {
@@ -63,17 +64,17 @@ class DeepLinkHelper {
             return
         }
 
-        NotificationCenter.default.addObserver(self, selector: #selector(self.appBecameActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appBecameActive), name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     @objc func appBecameActive() {
         NotificationCenter.default.removeObserver(self)
 
-        if self.anyContinuationHandled {
+        if anyContinuationHandled {
             return
         }
 
-        self.checkForWebToAppBannerTap()
+        checkForWebToAppBannerTap()
     }
 
     fileprivate func checkForDeferredLinkOnClipboard() -> Bool {
@@ -91,8 +92,8 @@ class DeepLinkHelper {
         }
 
         if shouldCheck, let url = UIPasteboard.general.url, urlShouldBeHandled(url) {
-            UIPasteboard.general.urls = UIPasteboard.general.urls?.filter({ $0 != url })
-            self.handleDeepLinkUrl(url, wasDeferred: true)
+            UIPasteboard.general.urls = UIPasteboard.general.urls?.filter { $0 != url }
+            handleDeepLinkUrl(url, wasDeferred: true)
             handled = true
         }
 
@@ -127,11 +128,12 @@ class DeepLinkHelper {
             path = path + "&" + query
         }
 
-        httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { (res, data) in
+        httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { res, data in
             switch res?.statusCode {
             case 200:
                 guard let jsonData = data as? Data,
-                      let link = DeepLink(for: url, from: jsonData) else {
+                      let link = DeepLink(for: url, from: jsonData)
+                else {
                     self.invokeDeepLinkHandler(.lookupFailed(url))
                     return
                 }
@@ -140,45 +142,41 @@ class DeepLinkHelper {
 
                 let linkProps = ["url": url.absoluteString, "wasDeferred": wasDeferred] as [String: Any]
                 Optimobile.getInstance().analyticsHelper.trackEvent(eventType: OptimobileEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
-                break
             default:
                 self.invokeDeepLinkHandler(.lookupFailed(url))
-                break
             }
-        }, onFailure: { (res, err, data) in
+        }, onFailure: { res, _, _ in
             switch res?.statusCode {
             case 404:
                 self.invokeDeepLinkHandler(.linkNotFound(url))
-                break
             case 410:
                 self.invokeDeepLinkHandler(.linkExpired(url))
-                break
             case 429:
                 self.invokeDeepLinkHandler(.linkLimitExceeded(url))
-                break
             default:
                 self.invokeDeepLinkHandler(.lookupFailed(url))
-                break
             }
         })
     }
 
     fileprivate func handleFingerprintComponents(components: [String: String]) {
         guard let componentJson = try? JSONSerialization.data(withJSONObject: components, options: JSONSerialization.WritingOptions(rawValue: 0)),
-              let encodedComponents = KSHttpUtil.urlEncode(componentJson.base64EncodedString()) else {
+              let encodedComponents = KSHttpUtil.urlEncode(componentJson.base64EncodedString())
+        else {
             return
         }
 
         let path = "/v1/deeplinks/_taps?fingerprint=\(encodedComponents)"
 
-        httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { (res, data) in
+        httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { res, data in
             switch res?.statusCode {
             case 200:
                 guard let jsonData = data as? Data,
                       let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable: Any],
                       let urlString = response["linkUrl"] as? String,
                       let url = URL(string: urlString),
-                      let link = DeepLink(for: url, from: jsonData) else {
+                      let link = DeepLink(for: url, from: jsonData)
+                else {
                     // Fingerprint matches that fail to parse correctly can't know the URL so
                     // don't invoke any error handler.
                     return
@@ -188,26 +186,24 @@ class DeepLinkHelper {
 
                 let linkProps = ["url": url.absoluteString, "wasDeferred": false] as [String: Any]
                 Optimobile.getInstance().analyticsHelper.trackEvent(eventType: OptimobileEvent.DEEP_LINK_MATCHED.rawValue, properties: linkProps, immediateFlush: false)
-                break
             default:
                 // Noop
                 break
             }
-        }, onFailure: { (res, err, data) in
+        }, onFailure: { res, _, data in
             guard let jsonData = data as? Data,
                   let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable: Any],
                   let urlString = response["linkUrl"] as? String,
-                  let url = URL(string: urlString) else {
+                  let url = URL(string: urlString)
+            else {
                 return
             }
 
             switch res?.statusCode {
             case 410:
                 self.invokeDeepLinkHandler(.linkExpired(url))
-                break
             case 429:
                 self.invokeDeepLinkHandler(.linkLimitExceeded(url))
-                break
             default:
                 // Noop
                 break
@@ -229,26 +225,26 @@ class DeepLinkHelper {
         }
 
         guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-            let url = userActivity.webpageURL,
-            urlShouldBeHandled(url) else {
+              let url = userActivity.webpageURL,
+              urlShouldBeHandled(url)
+        else {
             return false
         }
 
         anyContinuationHandled = true
 
-        self.handleDeepLinkUrl(url)
+        handleDeepLinkUrl(url)
         return true
     }
-
 }
 
 extension Optimobile {
-    static func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    static func application(_: UIApplication, continue userActivity: NSUserActivity, restorationHandler _: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return getInstance().deepLinkHelper?.handleContinuation(for: userActivity) ?? false
     }
 
     @available(iOS 13.0, *)
-    static func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+    static func scene(_: UIScene, continue userActivity: NSUserActivity) {
         getInstance().deepLinkHelper?.handleContinuation(for: userActivity)
     }
 }

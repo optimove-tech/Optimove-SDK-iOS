@@ -55,13 +55,11 @@ extension Optimobile {
     }
 
     /**
-     Returns the identifier for the user currently associated with the Kumulos installation record
-     If no user is associated, it returns the Kumulos installation ID
-    */
+      Returns the identifier for the user currently associated with the Kumulos installation record
+      If no user is associated, it returns the Kumulos installation ID
+     */
     static var currentUserIdentifier: String {
-        get {
-            return OptimobileHelper.currentUserIdentifier
-        }
+        return OptimobileHelper.currentUserIdentifier
     }
 
     /**
@@ -80,7 +78,7 @@ extension Optimobile {
         KeyValPersistenceHelper.removeObject(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue)
         OptimobileHelper.userIdLock.signal()
 
-        if currentUserId != nil && currentUserId != Optimobile.installId {
+        if currentUserId != nil, currentUserId != Optimobile.installId {
             getInstance().inAppManager.handleAssociatedUserChange()
         }
     }
@@ -109,5 +107,4 @@ extension Optimobile {
             getInstance().inAppManager.handleAssociatedUserChange()
         }
     }
-
 }

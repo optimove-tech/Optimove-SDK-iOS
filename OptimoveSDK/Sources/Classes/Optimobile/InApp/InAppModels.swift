@@ -1,7 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
-import Foundation
 import CoreData
+import Foundation
 
 public enum InAppPresented: String {
     case IMMEDIATELY = "immediately"
@@ -24,7 +24,7 @@ class InAppMessageEntity: NSManagedObject {
     @NSManaged var readAt: NSDate?
     @NSManaged var sentAt: NSDate?
 
-    internal func isAvailable() -> Bool {
+    func isAvailable() -> Bool {
         let availableFrom = inboxFrom as Date?
         let availableTo = inboxTo as Date?
 
@@ -39,15 +39,15 @@ class InAppMessageEntity: NSManagedObject {
 }
 
 class InAppMessage: NSObject {
-    internal(set) public var id: Int64
-    internal(set) public var updatedAt: NSDate
-    internal(set) public var content: NSDictionary
-    internal(set) public var data: NSDictionary?
-    internal(set) public var badgeConfig: NSDictionary?
-    internal(set) public var inboxConfig: NSDictionary?
-    internal(set) public var dismissedAt: NSDate?
-    internal(set) public var readAt: NSDate?
-    internal(set) public var sentAt: NSDate?
+    public internal(set) var id: Int64
+    public internal(set) var updatedAt: NSDate
+    public internal(set) var content: NSDictionary
+    public internal(set) var data: NSDictionary?
+    public internal(set) var badgeConfig: NSDictionary?
+    public internal(set) var inboxConfig: NSDictionary?
+    public internal(set) var dismissedAt: NSDate?
+    public internal(set) var readAt: NSDate?
+    public internal(set) var sentAt: NSDate?
 
     init(entity: InAppMessageEntity) {
         id = Int64(entity.id)
@@ -63,14 +63,14 @@ class InAppMessage: NSObject {
 
     override func isEqual(_ object: Any?) -> Bool {
         if let other = object as? InAppMessage {
-            return self.id == other.id
+            return id == other.id
         }
 
         return super.isEqual(object)
     }
 
     override var hash: Int {
-        self.id.hashValue
+        id.hashValue
     }
 }
 

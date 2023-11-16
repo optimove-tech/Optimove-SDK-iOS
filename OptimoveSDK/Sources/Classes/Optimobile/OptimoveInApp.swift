@@ -1,17 +1,17 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
-import Foundation
 import CoreData
+import Foundation
 
 public class InAppInboxItem {
-    internal(set) public var id: Int64
-    internal(set) public var title: String
-    internal(set) public var subtitle: String
-    internal(set) public var availableFrom: Date?
-    internal(set) public var availableTo: Date?
-    internal(set) public var dismissedAt: Date?
-    internal(set) public var sentAt: Date
-    internal(set) public var data: NSDictionary?
+    public internal(set) var id: Int64
+    public internal(set) var title: String
+    public internal(set) var subtitle: String
+    public internal(set) var availableFrom: Date?
+    public internal(set) var availableTo: Date?
+    public internal(set) var dismissedAt: Date?
+    public internal(set) var sentAt: Date
+    public internal(set) var data: NSDictionary?
     private var readAt: Date?
     private var imagePath: String?
 
@@ -41,9 +41,9 @@ public class InAppInboxItem {
     }
 
     public func isAvailable() -> Bool {
-        if self.availableFrom != nil && self.availableFrom!.timeIntervalSinceNow > 0 {
+        if availableFrom != nil && availableFrom!.timeIntervalSinceNow > 0 {
             return false
-        } else if self.availableTo != nil && self.availableTo!.timeIntervalSinceNow < 0 {
+        } else if availableTo != nil && availableTo!.timeIntervalSinceNow < 0 {
             return false
         }
 
@@ -55,7 +55,7 @@ public class InAppInboxItem {
     }
 
     public func getImageUrl() -> URL? {
-        return self.getImageUrl(width: InAppInboxItem.defaultImageWidth)
+        return getImageUrl(width: InAppInboxItem.defaultImageWidth)
     }
 
     public func getImageUrl(width: UInt) -> URL? {
@@ -75,7 +75,7 @@ public struct InAppInboxSummary {
 public typealias InboxUpdatedHandlerBlock = () -> Void
 public typealias InboxSummaryBlock = (InAppInboxSummary?) -> Void
 
-public class OptimoveInApp {
+public enum OptimoveInApp {
     private static var _inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?
 
     public static func updateConsent(forUser consentGiven: Bool) {
@@ -102,13 +102,13 @@ public class OptimoveInApp {
         }
 
         var results: [InAppInboxItem] = []
-        context.performAndWait({
+        context.performAndWait {
             let request = NSFetchRequest<InAppMessageEntity>(entityName: "Message")
             request.includesPendingChanges = false
             request.sortDescriptors = [
                 NSSortDescriptor(key: "sentAt", ascending: false),
                 NSSortDescriptor(key: "updatedAt", ascending: false),
-                NSSortDescriptor(key: "id", ascending: false)
+                NSSortDescriptor(key: "id", ascending: false),
             ]
             request.predicate = NSPredicate(format: "(inboxConfig != nil)")
             request.propertiesToFetch = ["id", "inboxConfig", "inboxFrom", "inboxTo", "dismissedAt", "readAt", "sentAt", "data", "updatedAt"]
@@ -131,7 +131,7 @@ public class OptimoveInApp {
 
                 results.append(inboxItem)
             }
-        })
+        }
 
         return results
     }

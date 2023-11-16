@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class Assembly {
-
     func makeContainer() -> Container {
         return Container(serviceLocator: makeServiceLocator())
     }
@@ -30,11 +29,10 @@ final class Assembly {
 
     private func migrate() {
         let migrations: [MigrationWork] = [
-            MigrationWork_3_3_0()
+            MigrationWork_3_3_0(),
         ]
         migrations
-            .filter({ $0.isAllowToMiragte(SDKVersion) })
-            .forEach({ $0.runMigration() })
+            .filter { $0.isAllowToMiragte(SDKVersion) }
+            .forEach { $0.runMigration() }
     }
-
 }

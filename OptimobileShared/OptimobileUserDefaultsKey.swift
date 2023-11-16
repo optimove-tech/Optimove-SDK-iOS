@@ -2,8 +2,7 @@
 
 import Foundation
 
-internal enum OptimobileUserDefaultsKey: String {
-
+enum OptimobileUserDefaultsKey: String {
     case API_KEY = "KumulosApiKey"
     case SECRET_KEY = "KumulosSecretKey"
     case EVENTS_BASE_URL = "KumulosEventsBaseUrl"
@@ -30,6 +29,6 @@ internal enum OptimobileUserDefaultsKey: String {
         INSTALL_UUID,
         USER_ID,
         BADGE_COUNT,
-        PENDING_NOTIFICATIONS
+        PENDING_NOTIFICATIONS,
     ]
 }

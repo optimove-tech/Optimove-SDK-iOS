@@ -63,7 +63,7 @@ extension RingBuffer: Sequence {
 }
 
 extension Array {
-    subscript (wrapped index: Int) -> Element {
+    subscript(wrapped index: Int) -> Element {
         get {
             return self[index % count]
         }

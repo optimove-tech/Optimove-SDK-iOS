@@ -4,14 +4,14 @@ import Foundation
 import OptimoveCore
 
 final class OnStartEventGenerator {
-
     private let coreEventFactory: CoreEventFactory
     private let synchronizer: Pipeline
     private let storage: OptimoveStorage
 
     init(coreEventFactory: CoreEventFactory,
          synchronizer: Pipeline,
-         storage: OptimoveStorage) {
+         storage: OptimoveStorage)
+    {
         self.coreEventFactory = coreEventFactory
         self.synchronizer = synchronizer
         self.storage = storage
@@ -40,5 +40,4 @@ final class OnStartEventGenerator {
             coreEventFactory: coreEventFactory
         ).generate()
     }
-
 }

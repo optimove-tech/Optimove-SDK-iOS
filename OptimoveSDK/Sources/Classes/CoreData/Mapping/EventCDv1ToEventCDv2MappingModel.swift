@@ -1,10 +1,9 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import Foundation
 import CoreData
+import Foundation
 
-final class CoreDataCustomMappingModelFactory {
-
+enum CoreDataCustomMappingModelFactory {
     /// - Parameter destinationVersion: destinationVersion
     /// - Returns: Returns a mapping model for the passed destination version.
     static func make(for destinationVersion: CoreDataMigrationVersion) -> NSMappingModel? {
@@ -18,7 +17,6 @@ final class CoreDataCustomMappingModelFactory {
 }
 
 private final class EventCDv1ToEventCDv2MappingModelBuilder {
-
     func build() -> NSMappingModel {
         let entityMapping = NSEntityMapping()
         entityMapping.name = "EventCDv1ToEventCDv2"
@@ -35,5 +33,4 @@ private final class EventCDv1ToEventCDv2MappingModelBuilder {
 
         return mappingModel
     }
-
 }

@@ -3,7 +3,6 @@
 import Foundation
 
 public extension FileManager {
-
     static func optimoveURL() throws -> URL {
         return try FileManager.default.url(
             for: .applicationSupportDirectory,
@@ -12,5 +11,4 @@ public extension FileManager {
             create: true
         )
     }
-
 }

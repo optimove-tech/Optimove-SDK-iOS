@@ -1,7 +1,7 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import Foundation
 import CoreData
+import Foundation
 
 protocol CoreDataMigratorProtocol {
     func requiresMigration(at storeURL: URL, toVersion version: CoreDataMigrationVersion) -> Bool
@@ -9,12 +9,12 @@ protocol CoreDataMigratorProtocol {
 }
 
 final class CoreDataMigrator: CoreDataMigratorProtocol {
-
     func requiresMigration(at storeURL: URL,
-                           toVersion version: CoreDataMigrationVersion) -> Bool {
+                           toVersion version: CoreDataMigrationVersion) -> Bool
+    {
         do {
             let metadata = try NSPersistentStoreCoordinator.metadata(at: storeURL)
-            return (CoreDataMigrationVersion.compatibleVersionForStoreMetadata(metadata) != version)
+            return CoreDataMigrationVersion.compatibleVersionForStoreMetadata(metadata) != version
         } catch {
             Logger.warn(error.localizedDescription)
             return false
@@ -22,11 +22,12 @@ final class CoreDataMigrator: CoreDataMigratorProtocol {
     }
 
     func migrateStore(at storeURL: URL,
-                      toVersion version: CoreDataMigrationVersion) throws {
+                      toVersion version: CoreDataMigrationVersion) throws
+    {
         try forceWALCheckpointingForStore(at: storeURL)
 
         var currentURL = storeURL
-        let migrationSteps = self.migrationStepsForStore(at: storeURL, toVersion: version)
+        let migrationSteps = migrationStepsForStore(at: storeURL, toVersion: version)
 
         for migrationStep in migrationSteps {
             let manager = NSMigrationManager(sourceModel: migrationStep.sourceModel, destinationModel: migrationStep.destinationModel)
@@ -34,7 +35,8 @@ final class CoreDataMigrator: CoreDataMigratorProtocol {
             /// Align managedObjectClassNames. On test this value clould be missed.
             let stepDestinationClassName = migrationStep.destinationModel.entities.first?.managedObjectClassName
             if stepDestinationClassName != nil,
-                manager.destinationModel.entities.first?.managedObjectClassName != stepDestinationClassName {
+               manager.destinationModel.entities.first?.managedObjectClassName != stepDestinationClassName
+            {
                 manager.destinationModel.entities.first?.managedObjectClassName = stepDestinationClassName
             }
 
@@ -104,7 +106,6 @@ final class CoreDataMigrator: CoreDataMigratorProtocol {
 }
 
 private extension CoreDataMigrationVersion {
-
     static func compatibleVersionForStoreMetadata(_ metadata: [String: Any]) -> CoreDataMigrationVersion? {
         let compatibleVersion = CoreDataMigrationVersion.allCases.first { version in
             let model = CoreDataModelDescription.makeOptistreamEventModel(version: version)
@@ -117,7 +118,6 @@ private extension CoreDataMigrationVersion {
 }
 
 extension NSPersistentStoreCoordinator {
-
     // MARK: - Destroy
 
     static func destroyStore(at storeURL: URL) throws {
@@ -157,6 +157,5 @@ extension NSPersistentStoreCoordinator {
             Logger.error("failed to add persistent store to coordinator, error: \(error)")
             throw error
         }
-
     }
 }

@@ -2,7 +2,7 @@
 
 import Foundation
 
-internal class PendingNotificationHelper {
+enum PendingNotificationHelper {
     static func remove(id: Int) {
         var pendingNotifications = readAll()
 
@@ -26,7 +26,8 @@ internal class PendingNotificationHelper {
     static func readAll() -> [PendingNotification] {
         var pendingNotifications = [PendingNotification]()
         if let data = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.PENDING_NOTIFICATIONS.rawValue),
-           let decoded = try? JSONDecoder().decode([PendingNotification].self, from: data as! Data) {
+           let decoded = try? JSONDecoder().decode([PendingNotification].self, from: data as! Data)
+        {
             pendingNotifications = decoded
         }
 

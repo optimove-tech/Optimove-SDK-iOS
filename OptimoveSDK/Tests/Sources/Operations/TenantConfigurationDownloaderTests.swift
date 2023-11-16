@@ -1,12 +1,11 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
+import Mocker
 import OptimoveCore
 @testable import OptimoveSDK
-import Mocker
+import XCTest
 
 class TenantConfigurationDownloaderTests: XCTestCase {
-
     var repository = MockConfigurationRepository()
     var downloader: TenantConfigurationDownloader!
     var storage = MockOptimoveStorage()
@@ -38,12 +37,12 @@ class TenantConfigurationDownloaderTests: XCTestCase {
             .appendingPathExtension("json")
 
         let expectedConfig = TenantConfigFixture().build()
-        Mocker.register(
+        try Mocker.register(
             Mock(
                 url: expectedURL,
                 dataType: .json,
                 statusCode: 200,
-                data: [.get: try JSONEncoder().encode(expectedConfig)]
+                data: [.get: JSONEncoder().encode(expectedConfig)]
             )
         )
 
@@ -51,5 +50,4 @@ class TenantConfigurationDownloaderTests: XCTestCase {
 
         XCTAssertEqual(repository.tenant, expectedConfig)
     }
-
 }

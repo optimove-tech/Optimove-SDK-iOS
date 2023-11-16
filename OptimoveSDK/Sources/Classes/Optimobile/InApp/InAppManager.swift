@@ -27,7 +27,7 @@ class InAppManager {
 
     private var syncQueue: DispatchQueue
     private let STORED_IN_APP_LIMIT = 50
-    private let SYNC_DEBOUNCE_SECONDS = 3_600 as TimeInterval
+    private let SYNC_DEBOUNCE_SECONDS = 3600 as TimeInterval
 
     // MARK: Initialization
 
@@ -59,7 +59,7 @@ class InAppManager {
 
         let options = [
             NSMigratePersistentStoresAutomaticallyOption: NSNumber(value: true),
-            NSInferMappingModelAutomaticallyOption: NSNumber(value: true)
+            NSInferMappingModelAutomaticallyOption: NSNumber(value: true),
         ]
 
         do {
@@ -90,9 +90,9 @@ class InAppManager {
         }
 
         #if DEBUG
-        sync(onComplete)
+            sync(onComplete)
         #else
-        syncDebounced(onComplete)
+            syncDebounced(onComplete)
         #endif
     }
 
@@ -479,7 +479,7 @@ class InAppManager {
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: "sentAt", ascending: false),
             NSSortDescriptor(key: "updatedAt", ascending: false),
-            NSSortDescriptor(key: "id", ascending: false)
+            NSSortDescriptor(key: "id", ascending: false),
         ]
         fetchRequest.fetchOffset = STORED_IN_APP_LIMIT
 
@@ -525,7 +525,7 @@ class InAppManager {
             fetchRequest.sortDescriptors = [
                 NSSortDescriptor(key: "sentAt", ascending: true),
                 NSSortDescriptor(key: "updatedAt", ascending: true),
-                NSSortDescriptor(key: "id", ascending: true)
+                NSSortDescriptor(key: "id", ascending: true),
             ]
 
             var entities: [Any] = []

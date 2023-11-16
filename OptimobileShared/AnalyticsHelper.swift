@@ -1,7 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
-import Foundation
 import CoreData
+import Foundation
 
 class KSEventModel: NSManagedObject {
     @NSManaged var uuid: String
@@ -13,8 +13,7 @@ class KSEventModel: NSManagedObject {
 
 typealias SyncCompletedBlock = (Error?) -> Void
 
-internal class AnalyticsHelper {
-
+class AnalyticsHelper {
     private var analyticsContext: NSManagedObjectContext?
     private var migrationAnalyticsContext: NSManagedObjectContext?
     private var eventsHttpClient: KSHttpClient
@@ -44,7 +43,7 @@ internal class AnalyticsHelper {
 
     private func getMainStoreUrl(appGroupExists: Bool) -> URL? {
         if !appGroupExists {
-           return getAppDbUrl()
+            return getAppDbUrl()
         }
 
         return getSharedDbUrl()
@@ -73,7 +72,7 @@ internal class AnalyticsHelper {
 
         let storeUrl = getMainStoreUrl(appGroupExists: appGroupExists)
 
-        if appGroupExists && appDbExists {
+        if appGroupExists, appDbExists {
             migrationAnalyticsContext = getManagedObjectContext(storeUrl: appDbUrl)
         }
 
@@ -101,6 +100,7 @@ internal class AnalyticsHelper {
     }
 
     // MARK: Event Tracking
+
     func trackEvent(eventType: String, properties: [String: Any]?, immediateFlush: Bool) {
         trackEvent(eventType: eventType, atTime: Date(), properties: properties, immediateFlush: immediateFlush)
     }
@@ -125,7 +125,7 @@ internal class AnalyticsHelper {
             let event = KSEventModel(entity: entity, insertInto: nil)
 
             event.uuid = UUID().uuidString.lowercased()
-            event.happenedAt = NSNumber(value: Int64(atTime.timeIntervalSince1970 * 1_000))
+            event.happenedAt = NSNumber(value: Int64(atTime.timeIntervalSince1970 * 1000))
             event.eventType = eventType
             event.userIdentifier = OptimobileHelper.currentUserIdentifier
 
@@ -210,21 +210,21 @@ internal class AnalyticsHelper {
                 "uuid": event.uuid,
                 "timestamp": event.happenedAt,
                 "data": jsonProps,
-                "userId": event.userIdentifier
+                "userId": event.userIdentifier,
             ])
             eventIds.append(event.objectID)
         }
 
         let path = "/v1/app-installs/\(OptimobileHelper.installId)/events"
 
-        self.eventsHttpClient.sendRequest(.POST, toPath: path, data: data, onSuccess: { (response, data) in
+        eventsHttpClient.sendRequest(.POST, toPath: path, data: data, onSuccess: { _, _ in
             if let err = self.pruneEventsBatch(context, eventIds) {
                 print("Failed to prune events batch: " + err.localizedDescription)
                 onSyncComplete?(err)
                 return
             }
             self.syncEvents(context: context, onSyncComplete)
-        }) { (response, error, data) in
+        }) { _, error, _ in
             print("Failed to send events")
             onSyncComplete?(error)
         }
@@ -253,7 +253,7 @@ internal class AnalyticsHelper {
 
         let request = NSFetchRequest<KSEventModel>(entityName: "Event")
         request.returnsObjectsAsFaults = false
-        request.sortDescriptors = [ NSSortDescriptor(key: "happenedAt", ascending: true) ]
+        request.sortDescriptors = [NSSortDescriptor(key: "happenedAt", ascending: true)]
         request.fetchLimit = 100
         request.includesPendingChanges = false
 
@@ -267,6 +267,7 @@ internal class AnalyticsHelper {
     }
 
     // MARK: CoreData model definition
+
     fileprivate func getCoreDataModel() -> NSManagedObjectModel {
         let model = NSManagedObjectModel()
 

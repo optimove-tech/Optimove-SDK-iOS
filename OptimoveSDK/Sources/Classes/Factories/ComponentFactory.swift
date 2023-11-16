@@ -4,40 +4,40 @@ import OptimoveCore
 import UIKit
 
 final class ComponentFactory {
-
     private let serviceLocator: ServiceLocator
     private let coreEventFactory: CoreEventFactory
     private let persistentContainer: PersistentContainer
 
     init(serviceLocator: ServiceLocator,
-         coreEventFactory: CoreEventFactory) {
+         coreEventFactory: CoreEventFactory)
+    {
         self.serviceLocator = serviceLocator
         self.coreEventFactory = coreEventFactory
-        self.persistentContainer = PersistentContainer()
+        persistentContainer = PersistentContainer()
     }
 
     func createRealtimeComponent(configuration: Configuration) throws -> RealTime {
         let storage = serviceLocator.storage()
-        return RealTime(
+        return try RealTime(
             configuration: configuration.realtime,
             storage: storage,
             networking: OptistreamNetworkingImpl(
                 networkClient: serviceLocator.networkClient(),
                 endpoint: configuration.realtime.realtimeGateway
             ),
-            queue: try OptistreamQueueImpl(
+            queue: OptistreamQueueImpl(
                 queueType: .realtime,
-                container: self.persistentContainer,
+                container: persistentContainer,
                 tenant: configuration.tenantID
             )
         )
     }
 
     func createOptitrackComponent(configuration: Configuration) throws -> OptiTrack {
-        return OptiTrack(
-            queue: try OptistreamQueueImpl(
+        return try OptiTrack(
+            queue: OptistreamQueueImpl(
                 queueType: .track,
-                container: self.persistentContainer,
+                container: persistentContainer,
                 tenant: configuration.tenantID
             ),
             networking: OptistreamNetworkingImpl(
@@ -54,5 +54,4 @@ final class ComponentFactory {
             storage: serviceLocator.storage()
         )
     }
-
 }

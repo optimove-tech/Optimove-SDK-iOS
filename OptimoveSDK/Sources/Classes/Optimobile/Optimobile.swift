@@ -16,11 +16,12 @@ public enum InAppConsentStrategy: String {
 }
 
 public enum InAppDisplayMode: String {
-    case automatic = "automatic"
-    case paused = "paused"
+    case automatic
+    case paused
 }
 
 // MARK: class
+
 class Optimobile {
     let urlBuilder: UrlBuilder
 
@@ -37,13 +38,11 @@ class Optimobile {
     var notificationCenter: Any?
 
     static var sharedInstance: Optimobile {
-        get {
-            if false == isInitialized() {
-                assertionFailure("The OptimobileSDK has not been initialized")
-            }
-
-            return instance!
+        if isInitialized() == false {
+            assertionFailure("The OptimobileSDK has not been initialized")
         }
+
+        return instance!
     }
 
     static func getInstance() -> Optimobile {
@@ -56,9 +55,7 @@ class Optimobile {
     fileprivate(set) var inAppConsentStrategy = InAppConsentStrategy.notEnabled
 
     static var inAppConsentStrategy: InAppConsentStrategy {
-        get {
-            return sharedInstance.inAppConsentStrategy
-        }
+        return sharedInstance.inAppConsentStrategy
     }
 
     fileprivate(set) var inAppManager: InAppManager
@@ -72,26 +69,20 @@ class Optimobile {
     fileprivate(set) var deepLinkHelper: DeepLinkHelper?
 
     static var apiKey: String {
-        get {
-            return sharedInstance.apiKey
-        }
+        return sharedInstance.apiKey
     }
 
     static var secretKey: String {
-        get {
-            return sharedInstance.secretKey
-        }
+        return sharedInstance.secretKey
     }
 
     /**
-        The unique installation Id of the current app
+         The unique installation Id of the current app
 
-        - Returns: String - UUID
-    */
+         - Returns: String - UUID
+     */
     static var installId: String {
-        get {
-            return OptimobileHelper.installId
-        }
+        return OptimobileHelper.installId
     }
 
     static func isInitialized() -> Bool {
@@ -99,8 +90,8 @@ class Optimobile {
     }
 
     /**
-        Initialize the Optimobile SDK.
-    */
+         Initialize the Optimobile SDK.
+     */
     static func initialize(config: OptimobileConfig, initialVisitorId: String, initialUserId: String?) {
         if instance !== nil {
             assertionFailure("The OptimobileSDK has already been initialized")
@@ -137,7 +128,8 @@ class Optimobile {
         // we're a new install. Note comparing to `nil` isn't enough because we may have a value depending if previous storage used
         // app groups or not.
         if existingInstallId != initialVisitorId,
-           let _ = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue) {
+           let _ = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
+        {
             UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
         }
 
@@ -178,8 +170,8 @@ class Optimobile {
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
         inAppManager = InAppManager(config)
         pushHelper = PushHelper()
-        badgeObserver = OptimobileBadgeObserver(callback: { (newBadgeCount) in
-           KeyValPersistenceHelper.set(newBadgeCount, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
+        badgeObserver = OptimobileBadgeObserver(callback: { newBadgeCount in
+            KeyValPersistenceHelper.set(newBadgeCount, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
         })
 
         if config.deepLinkHandler != nil {
@@ -198,5 +190,4 @@ class Optimobile {
         pushHttpClient.invalidateSessionCancellingTasks(true)
         coreHttpClient.invalidateSessionCancellingTasks(true)
     }
-
 }

@@ -1,11 +1,10 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
+import XCTest
 
 class NewUserIDHandlerTests: XCTestCase {
-
     var storage = MockOptimoveStorage()
 
     func test_first_login() {
@@ -14,7 +13,7 @@ class NewUserIDHandlerTests: XCTestCase {
 
         let visitorIDExpectation = expectation(description: "visitorID was not generated")
         let customerIDExpectation = expectation(description: "customerID was not generated")
-        storage.assertFunction = { (value, key) in
+        storage.assertFunction = { value, key in
             if key == .visitorID {
                 XCTAssertEqual(value as? String, user.visitorID)
                 visitorIDExpectation.fulfill()
@@ -30,7 +29,7 @@ class NewUserIDHandlerTests: XCTestCase {
         wait(
             for: [
                 visitorIDExpectation,
-                customerIDExpectation
+                customerIDExpectation,
             ],
             timeout: defaultTimeout
         )
@@ -44,7 +43,7 @@ class NewUserIDHandlerTests: XCTestCase {
 
         let visitorIDExpectation = expectation(description: "visitorID was not generated")
         let customerIDExpectation = expectation(description: "customerID was not generated")
-        storage.assertFunction = { (value, key) in
+        storage.assertFunction = { value, key in
             if key == .visitorID {
                 XCTAssertEqual(value as? String, user.visitorID)
                 visitorIDExpectation.fulfill()
@@ -60,7 +59,7 @@ class NewUserIDHandlerTests: XCTestCase {
         wait(
             for: [
                 visitorIDExpectation,
-                customerIDExpectation
+                customerIDExpectation,
             ],
             timeout: defaultTimeout
         )
@@ -74,7 +73,7 @@ class NewUserIDHandlerTests: XCTestCase {
 
         let visitorIDExpectation = expectation(description: "visitorID was not generated")
         let customerIDExpectation = expectation(description: "customerID was not generated")
-        storage.assertFunction = { (value, key) in
+        storage.assertFunction = { value, key in
             if key == .visitorID {
                 XCTAssertEqual(value as? String, user.visitorID)
                 visitorIDExpectation.fulfill()
@@ -90,10 +89,9 @@ class NewUserIDHandlerTests: XCTestCase {
         wait(
             for: [
                 visitorIDExpectation,
-                customerIDExpectation
+                customerIDExpectation,
             ],
             timeout: defaultTimeout
         )
     }
-
 }

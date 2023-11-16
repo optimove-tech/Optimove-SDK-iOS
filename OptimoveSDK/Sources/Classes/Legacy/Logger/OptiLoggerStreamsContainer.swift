@@ -5,7 +5,6 @@ import OptimoveCore
 
 /// Contains an array of a log receivers.
 @objc public final class OptiLoggerStreamsContainer: NSObject {
-
     /// The method transmit a log event to a set of receivers.
     ///
     /// - Parameters:
@@ -43,14 +42,13 @@ import OptimoveCore
     /// - Warning: Current version does not maintains deletion from receivers.
     ///
     /// - Parameter stream: The stream for deletion.
-    @objc public static func remove(stream: OptiLoggerOutputStream) {
+    @objc public static func remove(stream _: OptiLoggerOutputStream) {
         // TODO: Solve a deletion inside MultiplexLoggerStream, without breaking a public API.
         // MultiplexLoggerStream.remove(stream: stream)
     }
 }
 
 final class OptiLoggerOutputStreamAdapter: LoggerStream {
-
     private let adaptee: OptiLoggerOutputStream
 
     init(adaptee: OptiLoggerOutputStream) {
@@ -58,19 +56,16 @@ final class OptiLoggerOutputStreamAdapter: LoggerStream {
     }
 
     var policy: LoggerStreamFilter {
-        return adaptee.isVisibleToClient ? .all : .custom(filter: { _, _  in return false })
+        return adaptee.isVisibleToClient ? .all : .custom(filter: { _, _ in false })
     }
 
     func log(level: LogLevelCore, fileName: String, methodName: String, logModule: String?, message: String) {
         adaptee.log(level: LogLevel(rawValue: level.rawValue)!, fileName: fileName, methodName: methodName, logModule: logModule, message: message)
     }
-
 }
 
 extension LogLevel {
-
     func convert() -> LogLevelCore {
-        return LogLevelCore(rawValue: self.rawValue)!
+        return LogLevelCore(rawValue: rawValue)!
     }
-
 }

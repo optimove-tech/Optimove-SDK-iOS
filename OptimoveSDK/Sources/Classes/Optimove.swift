@@ -1,9 +1,9 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
+import CoreLocation
+import OptimoveCore
 import UIKit.UIApplication
 import UserNotifications
-import OptimoveCore
-import CoreLocation
 
 public typealias Event = OptimoveCore.Event
 typealias Logger = OptimoveCore.Logger
@@ -13,20 +13,17 @@ typealias Logger = OptimoveCore.Logger
 /// - WARNING:
 ///  To initialize and configure SDK using `Optimove.configure(for:)` first.
 @objc public final class Optimove: NSObject {
-
     /// The current OptimoveSDK version string value.
     public static let version = OptimoveCore.SDKVersion
 
     /// The shared instance of Optimove SDK.
-    @objc public static let shared: Optimove = {
-        return Optimove()
-    }()
+    @objc public static let shared: Optimove = .init()
 
     private let container: Container
     private var config: OptimoveConfig!
 
-    private override init() {
-        self.container = Assembly().makeContainer()
+    override private init() {
+        container = Assembly().makeContainer()
         container.resolve { serviceLocator in
             serviceLocator.loggerInitializator().initialize()
             serviceLocator.newVisitorIdGenerator().generate()
@@ -65,19 +62,17 @@ typealias Logger = OptimoveCore.Logger
             }
         }
     }
-
 }
 
 // MARK: - Event API call
 
-extension Optimove {
-
+public extension Optimove {
     /// Report the event to Optimove SDK.
     ///
     /// - Parameters:
     ///   - name: Name of the event.
     ///   - parameters: The dictionary of attributes.
-    @objc public func reportEvent(name: String, parameters: [String: Any] = [:]) {
+    @objc func reportEvent(name: String, parameters: [String: Any] = [:]) {
         container.resolve { serviceLocator in
             let tenantEvent = TenantEvent(name: name, context: parameters)
             serviceLocator.pipeline().deliver(.report(events: [tenantEvent]))
@@ -89,7 +84,7 @@ extension Optimove {
     /// - Parameters:
     ///   - name: Name of the event.
     ///   - parameters: The dictionary of attributes.
-    @objc public static func reportEvent(name: String, parameters: [String: Any] = [:]) {
+    @objc static func reportEvent(name: String, parameters: [String: Any] = [:]) {
         shared.reportEvent(name: name, parameters: parameters)
     }
 
@@ -97,7 +92,7 @@ extension Optimove {
     ///
     /// - Parameters:
     ///   - event: Instance of OptimoveEvent type.
-    @objc public func reportEvent(_ event: OptimoveEvent) {
+    @objc func reportEvent(_ event: OptimoveEvent) {
         container.resolve { serviceLocator in
             let tenantEvent = TenantEvent(name: event.name, context: event.parameters)
             serviceLocator.pipeline().deliver(.report(events: [tenantEvent]))
@@ -108,21 +103,19 @@ extension Optimove {
     ///
     /// - Parameters:
     ///   - event: Instance of OptimoveEvent type.
-    @objc public static func reportEvent(_ event: OptimoveEvent) {
+    @objc static func reportEvent(_ event: OptimoveEvent) {
         shared.reportEvent(event)
     }
-
 }
 
 // MARK: - ScreenVisit API call
 
-extension Optimove {
-
+public extension Optimove {
     /// Report the screen visit event.
     /// - Parameters:
     ///   - screenTitle: The screen title.
     ///   - screenCategory: The screen category.
-    @objc public func reportScreenVisit(screenTitle title: String, screenCategory category: String? = nil) {
+    @objc func reportScreenVisit(screenTitle title: String, screenCategory category: String? = nil) {
         let title = title.trimmingCharacters(in: .whitespaces)
         let validationResult = ScreenVisitValidator.validate(screenTitle: title)
         guard validationResult == .valid else { return }
@@ -139,21 +132,20 @@ extension Optimove {
     /// - Parameters:
     ///   - screenTitle: The screen title.
     ///   - screenCategory: The screen category.
-    @objc public static func reportScreenVisit(screenTitle title: String, screenCategory category: String? = nil) {
+    @objc static func reportScreenVisit(screenTitle title: String, screenCategory category: String? = nil) {
         shared.reportScreenVisit(screenTitle: title, screenCategory: category)
     }
 }
 
 // MARK: - SetUserID API call
 
-extension Optimove {
-
+public extension Optimove {
     /// Set a user ID and a user email.
     ///
     /// - Parameters:
     ///   - sdkId: The user unique identifier.
     ///   - email: The user email.
-    @objc public func registerUser(sdkId userID: String, email: String) {
+    @objc func registerUser(sdkId userID: String, email: String) {
         if config.isOptimoveConfigured() {
             let function: (ServiceLocator) -> Void = { serviceLocator in
                 tryCatch {
@@ -179,14 +171,14 @@ extension Optimove {
     /// - Parameters:
     ///   - sdkId: The user unique identifier.
     ///   - email: The user email.
-    @objc public static func registerUser(sdkId userID: String, email: String) {
+    @objc static func registerUser(sdkId userID: String, email: String) {
         shared.registerUser(sdkId: userID, email: email)
     }
 
     /// Set a user ID to the Optimove SDK.
     ///
     /// - Parameter userID: The user unique identifier.
-    @objc public func setUserId(_ userID: String) {
+    @objc func setUserId(_ userID: String) {
         if config.isOptimoveConfigured() {
             let function: (ServiceLocator) -> Void = { serviceLocator in
                 tryCatch {
@@ -208,27 +200,27 @@ extension Optimove {
 
     /// get visitor id of optimove SDK.
     /// call this function if you need the internal visitor Id of Optimove
-    @objc public static func getVisitorID() -> String? {
+    @objc static func getVisitorID() -> String? {
         return shared.getVisitorID()
     }
 
     private func getVisitorID() -> String? {
         let function: (ServiceLocator) -> String? = { serviceLocator in
-            return try? serviceLocator.storage().getVisitorID()
+            try? serviceLocator.storage().getVisitorID()
         }
         guard let id = container.resolve(function) else { return nil }
         return id
     }
 
     /// Get the initial visitor identifier of Optimove SDK.
-    @objc public static func getInitialVisitorID() -> String? {
+    @objc static func getInitialVisitorID() -> String? {
         return shared.getInitialVisitorID()
     }
 
     /// Get the initial visitor identifier of Optimove SDK.
-    @objc public func getInitialVisitorID() -> String? {
+    @objc func getInitialVisitorID() -> String? {
         let function: (ServiceLocator) -> String? = { serviceLocator in
-            return try? serviceLocator.storage().getInitialVisitorId()
+            try? serviceLocator.storage().getInitialVisitorId()
         }
         guard let id = container.resolve(function) else { return nil }
         return id
@@ -237,7 +229,7 @@ extension Optimove {
     /// Set a user ID to the Optimove SDK.
     ///
     /// - Parameter userID: The user unique identifier.
-    @objc public static func setUserId(_ userID: String) {
+    @objc static func setUserId(_ userID: String) {
         shared.setUserId(userID)
     }
 
@@ -248,7 +240,7 @@ extension Optimove {
     /// Set a user email to the Optimove SDK.
     ///
     /// - Parameter email: The user email.
-    @objc public func setUserEmail(email: String) {
+    @objc func setUserEmail(email: String) {
         let function: (ServiceLocator) -> Void = { serviceLocator in
             tryCatch {
                 let event: Event = try self._setUserEmail(email, serviceLocator)
@@ -261,7 +253,7 @@ extension Optimove {
     /// Set a user email to the Optimove SDK.
     ///
     /// - Parameter email: The user email.
-    @objc public static func setUserEmail(email: String) {
+    @objc static func setUserEmail(email: String) {
         shared.setUserEmail(email: email)
     }
 
@@ -271,13 +263,13 @@ extension Optimove {
 
     /// Signout the user from the app
     ///  Call this function to unset the customerID and revert to an anonymous visitor
-    @objc public static func signOutUser() {
+    @objc static func signOutUser() {
         shared.signOutUser()
     }
 
     /// Signout the user from the app
     /// Call this function to unset the customerID and revert to an anonymous visitor
-    public func signOutUser() {
+    func signOutUser() {
         if config.isOptimoveConfigured() {
             let function: (ServiceLocator) -> Void = { serviceLocator in
                 tryCatch {
@@ -296,52 +288,51 @@ extension Optimove {
 
 // MARK: - Optimobile APIs
 
-extension Optimove {
-
+public extension Optimove {
     /**
-        Helper method for requesting the device token with alert, badge and sound permissions.
+         Helper method for requesting the device token with alert, badge and sound permissions.
 
-        On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
-    */
-    @objc public func pushRequestDeviceToken() {
+         On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+     */
+    @objc func pushRequestDeviceToken() {
         Optimobile.pushRequestDeviceToken()
     }
 
     /**
-        Helper method for requesting the device token with alert, badge and sound permissions.
+         Helper method for requesting the device token with alert, badge and sound permissions.
 
-        On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
-    */
+         On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+     */
     @available(iOS 10.0, *)
-    @objc public func pushRequestDeviceToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
+    @objc func pushRequestDeviceToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
         Optimobile.pushRequestDeviceToken(onAuthorizationStatus)
     }
 
     /**
-        Register a device token with the Optimove Push service.
+         Register a device token with the Optimove Push service.
 
-        Note you shouldn't normally need to call this method, registration is handled by the SDK.
+         Note you shouldn't normally need to call this method, registration is handled by the SDK.
 
-        Parameters:
-            - deviceToken: The push token returned by the device
-    */
-    @objc public func pushRegister(_ deviceToken: Data) {
+         Parameters:
+             - deviceToken: The push token returned by the device
+     */
+    @objc func pushRegister(_ deviceToken: Data) {
         Optimobile.pushRegister(deviceToken)
     }
 
     /**
         Unregister the device token with the Optimove Push service.
-     
+
         Notifications will no longer be received until pushRequestDeviceToken is called again
      */
-    @objc public func pushUnregister() {
+    @objc func pushUnregister() {
         Optimobile.pushUnregister()
     }
 
     /**
         Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed.
      */
-    @objc public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    @objc func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return Optimobile.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
 
@@ -349,21 +340,21 @@ extension Optimove {
         Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed in scene-based apps.
      */
     @available(iOS 13.0, *)
-    @objc public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+    @objc func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         Optimobile.scene(scene, continue: userActivity)
     }
 
     /**
-        Updates the location of the current installation in Optimove. Accurate locaiton information is used for geofencing.
-    */
-    @objc public func sendLocationUpdate(location: CLLocation) {
+         Updates the location of the current installation in Optimove. Accurate locaiton information is used for geofencing.
+     */
+    @objc func sendLocationUpdate(location: CLLocation) {
         Optimobile.sendLocationUpdate(location: location)
     }
 
     /**
-        Records a proximity event for an iBeacon.
-    */
-    @objc public func trackIBeaconProximity(beacon: CLBeacon) {
+         Records a proximity event for an iBeacon.
+     */
+    @objc func trackIBeaconProximity(beacon: CLBeacon) {
         Optimobile.trackIBeaconProximity(beacon: beacon)
     }
     
@@ -374,18 +365,16 @@ extension Optimove {
     }
     
     /**
-        Records a proximity event for an Eddystone beacon.
-    */
-    @objc public func trackEddystoneBeaconProximity(hexNamespace: String, hexInstance: String, distanceMeters: NSNumber? = nil) {
+         Records a proximity event for an Eddystone beacon.
+     */
+    @objc func trackEddystoneBeaconProximity(hexNamespace: String, hexInstance: String, distanceMeters: NSNumber? = nil) {
         Optimobile.trackEddystoneBeaconProximity(hexNamespace: hexNamespace, hexInstance: hexInstance, distanceMeters: distanceMeters?.doubleValue)
     }
-
 }
 
 // MARK: - Private
 
 private extension Optimove {
-
     // MARK: Initialization
 
     /// The method use to fetch tenant config, initialize Optimove SDK and control this process.
@@ -436,5 +425,4 @@ private extension Optimove {
         }
         container.resolve(function)
     }
-
 }

@@ -3,7 +3,7 @@
 import Foundation
 
 /// Combined protocol for a convenince access to stored values and files.
-public typealias OptimoveStorage = KeyValueStorage & FileStorage & StorageValue
+public typealias OptimoveStorage = FileStorage & KeyValueStorage & StorageValue
 
 // MARK: - StorageCase
 
@@ -77,17 +77,16 @@ public protocol StorageValue {
 public protocol KeyValueStorage {
     func set(value: Any?, key: StorageKey)
     func value(for: StorageKey) -> Any?
-    subscript<T>(key: StorageKey) -> T? { get set }
+    subscript<T>(_: StorageKey) -> T? { get set }
 }
 
 extension UserDefaults: KeyValueStorage {
-
     public func set(value: Any?, key: StorageKey) {
-        self.set(value, forKey: key.rawValue)
+        set(value, forKey: key.rawValue)
     }
 
     public func value(for key: StorageKey) -> Any? {
-        return self.value(forKey: key.rawValue)
+        return value(forKey: key.rawValue)
     }
 
     public subscript<T>(key: StorageKey) -> T? {
@@ -98,7 +97,6 @@ extension UserDefaults: KeyValueStorage {
             set(value: newValue, key: key)
         }
     }
-
 }
 
 public enum StorageError: LocalizedError {
@@ -114,34 +112,32 @@ public enum StorageError: LocalizedError {
 
 /// Class implements the Façade pattern for hiding complexity of the OptimoveStorage protocol.
 public final class StorageFacade: OptimoveStorage {
-
     private let keyValureStorage: KeyValueStorage
     private let fileStorage: FileStorage
 
     public init(
         keyValureStorage: KeyValueStorage,
-        fileStorage: FileStorage) {
+        fileStorage: FileStorage
+    ) {
         self.keyValureStorage = keyValureStorage
         self.fileStorage = fileStorage
     }
-
 }
 
 // MARK: - KeyValueStorage
 
-extension StorageFacade {
-
+public extension StorageFacade {
     /// Use `storage.key` instead.
     /// Some variable have formatters, implemented in own setters. Set unformatted value could cause an issue.
-    public func set(value: Any?, key: StorageKey) {
+    func set(value: Any?, key: StorageKey) {
         keyValureStorage.set(value: value, key: key)
     }
 
-    public func value(for key: StorageKey) -> Any? {
+    func value(for key: StorageKey) -> Any? {
         return keyValureStorage.value(for: key)
     }
 
-    public subscript<T>(key: StorageKey) -> T? {
+    subscript<T>(key: StorageKey) -> T? {
         get {
             return keyValureStorage.value(for: key) as? T
         }
@@ -150,7 +146,7 @@ extension StorageFacade {
         }
     }
 
-/// Should be supported in the future version of Swift. https://bugs.swift.org/browse/SR-238
+    /// Should be supported in the future version of Swift. https://bugs.swift.org/browse/SR-238
 //    subscript<T>(key: StorageKey) -> () throws -> T {
 //        get {
 //            return { try cast(self.storage(for: key).value(forKey: key.rawValue)) }
@@ -159,43 +155,39 @@ extension StorageFacade {
 //            storage(for: key).set(newValue, forKey: key.rawValue)
 //        }
 //    }
-
 }
 
 // MARK: - FileStorage
 
-extension StorageFacade {
-
-    public func isExist(fileName: String) -> Bool {
+public extension StorageFacade {
+    func isExist(fileName: String) -> Bool {
         return fileStorage.isExist(fileName: fileName)
     }
 
-    public func save<T: Codable>(data: T, toFileName: String) throws {
+    func save<T: Codable>(data: T, toFileName: String) throws {
         try fileStorage.save(data: data, toFileName: toFileName)
     }
 
-    public func saveData(data: Data, toFileName: String) throws {
+    func saveData(data: Data, toFileName: String) throws {
         try fileStorage.saveData(data: data, toFileName: toFileName)
     }
 
-    public func load<T: Codable>(fileName: String) throws -> T {
+    func load<T: Codable>(fileName: String) throws -> T {
         return try unwrap(fileStorage.load(fileName: fileName))
     }
 
-    public func loadData(fileName: String) throws -> Data {
+    func loadData(fileName: String) throws -> Data {
         return try unwrap(fileStorage.loadData(fileName: fileName))
     }
 
-    public func delete(fileName: String) throws {
+    func delete(fileName: String) throws {
         try fileStorage.delete(fileName: fileName)
     }
-
 }
 
 // MARK: - StorageValue
 
 public extension KeyValueStorage where Self: StorageValue {
-
     var installationID: String? {
         get {
             return self[.installationID]
@@ -235,7 +227,7 @@ public extension KeyValueStorage where Self: StorageValue {
     var configurationEndPoint: URL? {
         get {
             do {
-                return URL(string: try unwrap(self[.configurationEndPoint]))
+                return try URL(string: unwrap(self[.configurationEndPoint]))
             } catch {
                 return nil
             }
@@ -329,7 +321,7 @@ public extension KeyValueStorage where Self: StorageValue {
     var optitrackEndpoint: URL? {
         get {
             do {
-                return URL(string: try unwrap(self[.optitrackEndpoint]))
+                return try URL(string: unwrap(self[.optitrackEndpoint]))
             } catch {
                 return nil
             }
@@ -491,5 +483,4 @@ public extension KeyValueStorage where Self: StorageValue {
         }
         return value
     }
-
 }

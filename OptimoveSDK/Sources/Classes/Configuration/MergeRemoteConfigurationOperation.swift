@@ -3,8 +3,7 @@
 import Foundation
 import OptimoveCore
 
-internal final class MergeRemoteConfigurationOperation: AsyncOperation {
-
+final class MergeRemoteConfigurationOperation: AsyncOperation {
     private let repository: ConfigurationRepository
 
     init(repository: ConfigurationRepository) {
@@ -12,7 +11,7 @@ internal final class MergeRemoteConfigurationOperation: AsyncOperation {
     }
 
     override func main() {
-        guard !self.isCancelled else { return }
+        guard !isCancelled else { return }
         state = .executing
         do {
             let globalConfig = try repository.getGlobal()
@@ -27,7 +26,6 @@ internal final class MergeRemoteConfigurationOperation: AsyncOperation {
         } catch {
             Logger.error(error.localizedDescription)
         }
-        self.state = .finished
+        state = .finished
     }
-
 }

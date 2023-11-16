@@ -4,7 +4,6 @@ import CoreData
 import OptimoveCore
 
 extension NSManagedObjectContext {
-
     /**
      Safe is determined by checking if the context has any persistent stores.
      - Returns: `False` if no persistent stores found.

@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class FirstRunTimestampGenerator {
-
     private var storage: OptimoveStorage
 
     init(storage: OptimoveStorage) {

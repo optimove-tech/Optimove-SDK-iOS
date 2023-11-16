@@ -2,8 +2,7 @@
 
 import Foundation
 
-internal class KeyValPersistenceHelper {
-
+enum KeyValPersistenceHelper {
     static func set(_ value: Any?, forKey: String) {
         getUserDefaults().set(value, forKey: forKey)
     }
@@ -16,7 +15,7 @@ internal class KeyValPersistenceHelper {
         getUserDefaults().removeObject(forKey: forKey)
     }
 
-    internal static func maybeMigrateUserDefaultsToAppGroups() {
+    static func maybeMigrateUserDefaultsToAppGroups() {
         let standardDefaults = UserDefaults.standard
         let haveMigratedKey: String = OptimobileUserDefaultsKey.MIGRATED_TO_GROUPS.rawValue
         if !AppGroupsHelper.isKumulosAppGroupDefined() {
@@ -25,7 +24,7 @@ internal class KeyValPersistenceHelper {
         }
 
         guard let groupDefaults = UserDefaults(suiteName: AppGroupsHelper.getKumulosGroupName()) else { return }
-        if groupDefaults.bool(forKey: haveMigratedKey) && standardDefaults.bool(forKey: haveMigratedKey) {
+        if groupDefaults.bool(forKey: haveMigratedKey), standardDefaults.bool(forKey: haveMigratedKey) {
             return
         }
 

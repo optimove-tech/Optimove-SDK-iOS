@@ -9,8 +9,7 @@ typealias OptistreamEventBuilder = OptimoveCore.OptistreamEventBuilder
 typealias OptistreamNetworking = OptimoveCore.OptistreamNetworking
 
 final class OptiTrack {
-
-    struct Constants {
+    enum Constants {
         static let eventBatchLimit = 50
     }
 
@@ -52,14 +51,13 @@ final class OptiTrack {
     }
 
     private func stopBackgroundTask() {
-        guard self.backgroundTaskId != .invalid else { return }
-        UIApplication.shared.endBackgroundTask(self.backgroundTaskId)
-        self.backgroundTaskId = .invalid
+        guard backgroundTaskId != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(backgroundTaskId)
+        backgroundTaskId = .invalid
     }
 }
 
 extension OptiTrack: OptistreamComponent {
-
     func serve(_ operation: OptistreamOperation) throws {
         dispatchQueue.async { [weak self] in
             guard let self = self else { return }
@@ -76,11 +74,9 @@ extension OptiTrack: OptistreamComponent {
             }
         }
     }
-
 }
 
 private extension OptiTrack {
-
     func startDispatchTimer() {
         guard Thread.isMainThread else {
             DispatchQueue.main.sync {
@@ -88,7 +84,7 @@ private extension OptiTrack {
             }
             return
         }
-        guard dispatchInterval > 0  else { return }
+        guard dispatchInterval > 0 else { return }
         stopDispatchTimer()
         /// Dispatching asynchronous to break the retain cycle
         DispatchQueue.main.async { [weak self] in
@@ -137,13 +133,13 @@ private extension OptiTrack {
             return
         }
         guard !isDispatching else {
-           Logger.debug("Tracker is already dispatching.")
-           return
+            Logger.debug("Tracker is already dispatching.")
+            return
         }
         guard !queue.isEmpty else {
-           Logger.debug("No need to dispatch. Dispatch queue is empty.")
-           stopDispatching()
-           return
+            Logger.debug("No need to dispatch. Dispatch queue is empty.")
+            stopDispatching()
+            return
         }
         Logger.info("Start dispatching events")
         isDispatching = true
@@ -157,14 +153,14 @@ private extension OptiTrack {
             Logger.info("Finished dispatching events")
             return
         }
-        networking.send(events: events) { [weak self] (result) in
+        networking.send(events: events) { [weak self] result in
             guard let self = self else { return }
             self.dispatchQueue.async {
                 switch result {
                 case .success:
                     self.queue.remove(events: events)
                     self.dispatchBatch()
-                case .failure(let error):
+                case let .failure(error):
                     Logger.error(error.localizedDescription)
                     switch error {
                     case .requestInvalid:
@@ -183,5 +179,4 @@ private extension OptiTrack {
         stopBackgroundTask()
         startDispatchTimer()
     }
-
 }

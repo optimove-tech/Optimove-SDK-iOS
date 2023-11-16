@@ -1,13 +1,12 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(EventCD)
 /// The Event – Core Data managed object
 final class EventCD: NSManagedObject {
-
     static func insert(
         into context: NSManagedObjectContext,
         event: OptistreamEvent,
@@ -23,16 +22,13 @@ final class EventCD: NSManagedObject {
 }
 
 extension EventCD {
-
     @NSManaged fileprivate(set) var uuid: String
     @NSManaged fileprivate(set) var date: String
     @NSManaged fileprivate(set) var data: Data
     @NSManaged fileprivate(set) var type: String
-
 }
 
 extension EventCD: Managed {
-
     static var entityName: String {
         return "EventCD"
     }
@@ -40,11 +36,9 @@ extension EventCD: Managed {
     static var defaultSortDescriptors: [NSSortDescriptor] {
         return [NSSortDescriptor(keyPath: \EventCD.date, ascending: true)]
     }
-
 }
 
 extension EventCD {
-
     static func queueTypePredicate(queueType: OptistreamQueueType) -> NSPredicate {
         return NSPredicate(format: "%K == %@", #keyPath(EventCD.type), queueType.rawValue)
     }

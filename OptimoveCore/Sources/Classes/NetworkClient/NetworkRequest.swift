@@ -3,8 +3,7 @@
 import Foundation
 
 public final class NetworkRequest {
-
-    public struct DefaultValue {
+    public enum DefaultValue {
         public static let path: String? = nil
         public static let headers: [HTTPHeader] = []
         public static let queryItems: [URLQueryItem]? = nil
@@ -30,7 +29,8 @@ public final class NetworkRequest {
         queryItems: [URLQueryItem]? = DefaultValue.queryItems,
         httpBody: Data? = DefaultValue.httpBody,
         timeoutInterval: TimeInterval = DefaultValue.timeoutInterval,
-        keyEncodingStrategy: KeyEncodingStrategy = DefaultValue.keyEncodingStrategy) {
+        keyEncodingStrategy: KeyEncodingStrategy = DefaultValue.keyEncodingStrategy
+    ) {
         self.method = method
         self.baseURL = baseURL
         self.path = path
@@ -49,17 +49,18 @@ public final class NetworkRequest {
         queryItems: [URLQueryItem]? = DefaultValue.queryItems,
         body: Body,
         timeoutInterval: TimeInterval = DefaultValue.timeoutInterval,
-        keyEncodingStrategy: KeyEncodingStrategy = DefaultValue.keyEncodingStrategy) throws {
+        keyEncodingStrategy: KeyEncodingStrategy = DefaultValue.keyEncodingStrategy
+    ) throws {
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = keyEncodingStrategy.toJSONEncoderStrategy()
         encoder.dateEncodingStrategy = .formatted(Formatter.iso8601withFractionalSeconds)
-        self.init(
+        try self.init(
             method: method,
             baseURL: baseURL,
             path: path,
             headers: headers + [HTTPHeader(field: .contentType, value: .json)],
             queryItems: queryItems,
-            httpBody: try encoder.encode(body),
+            httpBody: encoder.encode(body),
             timeoutInterval: timeoutInterval
         )
     }
@@ -83,7 +84,6 @@ public struct HTTPHeader {
 }
 
 public extension HTTPHeader {
-
     enum Fields: String {
         case contentType = "Content-Type"
         case userAgent = "User-Agent"
@@ -92,27 +92,22 @@ public extension HTTPHeader {
     enum Values: String {
         case json = "application/json"
     }
-
 }
 
-extension HTTPHeader {
-
-    public init(field: Fields, value: Values) {
+public extension HTTPHeader {
+    init(field: Fields, value: Values) {
         self.field = field.rawValue
         self.value = value.rawValue
     }
-
 }
 
 extension HTTPHeader: CustomStringConvertible {
-
     public var description: String {
         return "key: \(field), value: \(value)"
     }
 }
 
 extension NetworkRequest: CustomStringConvertible {
-
     public var description: String {
         return """
         [Method]: \(method.rawValue)
@@ -137,7 +132,7 @@ public enum KeyEncodingStrategy {
             return .convertToSnakeCase
         case .useDefaultKeys:
             return .useDefaultKeys
-        case .custom(let function):
+        case let .custom(function):
             return .custom(function)
         }
     }

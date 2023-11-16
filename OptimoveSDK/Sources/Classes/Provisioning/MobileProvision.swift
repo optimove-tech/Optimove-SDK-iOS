@@ -13,7 +13,6 @@ struct MobileProvision: Decodable {
     }
 
     struct Entitlements: Decodable {
-
         let apsEnvironment: Environment
 
         private enum CodingKeys: String, CodingKey {
@@ -37,18 +36,17 @@ struct MobileProvision: Decodable {
 }
 
 extension MobileProvision {
-
     enum UIApplicationReleaseMode: Int {
-        case  unknown,
-              releaseDev,
-              releaseAdHoc,
-              releaseWildcard,
-              releaseAppStore,
-              releaseSim,
-              releaseEnterprise
+        case unknown,
+             releaseDev,
+             releaseAdHoc,
+             releaseWildcard,
+             releaseAppStore,
+             releaseSim,
+             releaseEnterprise
     }
 
-    private struct PlistTags {
+    private enum PlistTags {
         static let start = "<plist"
         static let end = "</plist>"
     }
@@ -75,7 +73,7 @@ extension MobileProvision {
         guard scanner.scanUpTo(PlistTags.end, into: &extractedPlist) != false else {
             throw endError
         }
-        return String(try unwrap(extractedPlist))
+        return try String(unwrap(extractedPlist))
     }
 
     static func releaseMode() -> UIApplicationReleaseMode {

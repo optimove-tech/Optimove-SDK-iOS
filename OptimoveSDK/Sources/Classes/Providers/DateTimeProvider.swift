@@ -7,12 +7,10 @@ protocol DateTimeProvider {
     var now: Date { get }
 }
 
-final class DateTimeProviderImpl { }
+final class DateTimeProviderImpl {}
 
 extension DateTimeProviderImpl: DateTimeProvider {
-
     var now: Date {
         return Date()
     }
-
 }

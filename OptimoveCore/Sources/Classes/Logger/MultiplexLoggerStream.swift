@@ -2,9 +2,8 @@
 
 import Foundation
 
-public final class MultiplexLoggerStream {
-
-    private struct Constants {
+public enum MultiplexLoggerStream {
+    private enum Constants {
         static let delimiter = "/"
         static let placeholder = ""
     }
@@ -22,15 +21,13 @@ public final class MultiplexLoggerStream {
         isRemote: Bool
     ) {
         queue.async {
-
             let file = fileName?.components(separatedBy: Constants.delimiter).last ?? Constants.placeholder
             let function = methodName ?? Constants.placeholder
 
             streams.forEach { stream in
 
                 switch stream.policy {
-
-                case .custom(let filterFunction):
+                case let .custom(filterFunction):
                     if filterFunction(level, isRemote) {
                         fallthrough
                     }
