@@ -26,13 +26,17 @@ public struct OptimoveConfig {
 }
 
 struct OptimobileConfig {
+    struct Credentials {
+        let apiKey: String
+        let secretKey: String
+    }
+
     enum Region: String {
         case EU = "eu"
         case US = "us"
     }
 
-    let apiKey: String
-    let secretKey: String
+    let credentials: Credentials
     let region: Region
 
     let sessionIdleTimeout: UInt
@@ -59,11 +63,10 @@ struct OptimobileConfig {
 }
 
 open class OptimoveConfigBuilder: NSObject {
+    private var credentials: OptimobileConfig.Credentials?
+    private var region: OptimobileConfig.Region?
     private var _tenantToken: String?
     private var _configName: String?
-    private var _region: OptimobileConfig.Region?
-    private var _apiKey: String?
-    private var _secretKey: String?
     private var _sessionIdleTimeout: UInt
     private var _inAppConsentStrategy = InAppConsentStrategy.notEnabled
     private var _inAppDisplayMode = InAppDisplayMode.automatic
@@ -92,13 +95,15 @@ open class OptimoveConfigBuilder: NSObject {
         }
 
         if let optimobileCredentialsTuple = optimobileCredentialsTuple {
-            _apiKey = optimobileCredentialsTuple.apiKey
-            _secretKey = optimobileCredentialsTuple.secretKey
-            _region = optimobileCredentialsTuple.region
+            credentials = optimobileCredentialsTuple.credentials
+            region = optimobileCredentialsTuple.region
+
             _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentialsTuple.region.rawValue)
         }
 
         _sessionIdleTimeout = 23
+
+        super.init()
     }
 
     @discardableResult public func setSessionIdleTimeout(seconds: UInt) -> OptimoveConfigBuilder {
@@ -183,15 +188,13 @@ open class OptimoveConfigBuilder: NSObject {
             tenantInfo = OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
         }
 
-        if let _apiKey = _apiKey,
-           let _secretKey = _secretKey,
-           let _baseUrlMap = _baseUrlMap,
-           let _region = _region
+        if let credentials = credentials,
+           let region = region,
+           let _baseUrlMap = _baseUrlMap
         {
             optimobileConfig = OptimobileConfig(
-                apiKey: _apiKey,
-                secretKey: _secretKey,
-                region: _region,
+                credentials: credentials,
+                region: region,
                 sessionIdleTimeout: _sessionIdleTimeout,
                 inAppConsentStrategy: _inAppConsentStrategy,
                 inAppDefaultDisplayMode: _inAppDisplayMode,
@@ -215,7 +218,7 @@ open class OptimoveConfigBuilder: NSObject {
 
     private static func parseOptimoveCredentials(creds: String?) -> (tenantToken: String, configName: String)? {
         guard let creds = creds,
-              let tuple = parseTuple(creds: creds),
+              let tuple = try? parseTuple(base64: creds),
               let ver = tuple[0] as? Int
         else {
             return nil
@@ -234,9 +237,9 @@ open class OptimoveConfigBuilder: NSObject {
         return (tenantToken, configName)
     }
 
-    private static func parseOptimobileCredentials(creds: String?) -> (region: OptimobileConfig.Region, apiKey: String, secretKey: String)? {
+    private static func parseOptimobileCredentials(creds: String?) -> (region: OptimobileConfig.Region, credentials: OptimobileConfig.Credentials)? {
         guard let creds = creds,
-              let tuple = parseTuple(creds: creds),
+              let tuple = try? parseTuple(base64: creds),
               let ver = tuple[0] as? Int
         else {
             return nil
@@ -249,19 +252,36 @@ open class OptimoveConfigBuilder: NSObject {
         guard
             let regionRaw = tuple[1] as? String,
             let region = OptimobileConfig.Region(rawValue: regionRaw),
-            let apiKey = tuple[2] as? String,
-            let secretKey = tuple[3] as? String
+            let apiKeyRaw = tuple[2] as? String,
+            let secretKeyRaw = tuple[3] as? String
         else {
             return nil
         }
 
-        return (region, apiKey, secretKey)
+        return (region, OptimobileConfig.Credentials(apiKey: apiKeyRaw, secretKey: secretKeyRaw))
     }
 
-    private static func parseTuple(creds: String) -> [Any]? {
-        let json = Data(base64Encoded: creds)!
-        let tuple = try? JSONSerialization.jsonObject(with: json)
+    enum Error: Foundation.LocalizedError {
+        case failedDecodingBase64(String)
+        case failedSerialize(data: Data, to: Any.Type)
 
-        return tuple as? [Any]
+        var errorDescription: String? {
+            switch self {
+            case let .failedDecodingBase64(string):
+                "Failed on decoding base64 value \(string)"
+            case let .failedSerialize(data: data, to: type):
+                "Failed to serialize data length \(data.count) to type \(type.self)"
+            }
+        }
+    }
+
+    private static func parseTuple(base64: String) throws -> [Any] {
+        guard let data = Data(base64Encoded: base64) else {
+            throw Error.failedDecodingBase64(base64)
+        }
+        guard let result = try JSONSerialization.jsonObject(with: data) as? [Any] else {
+            throw Error.failedSerialize(data: data, to: [Any].self)
+        }
+        return result
     }
 }

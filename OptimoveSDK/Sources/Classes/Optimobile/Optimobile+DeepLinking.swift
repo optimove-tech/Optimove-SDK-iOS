@@ -55,7 +55,7 @@ class DeepLinkHelper {
                 "Accept": "appliction/json",
             ]
         )
-        httpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
+        httpClient.setBasicAuth(user: config.credentials.apiKey, password: config.credentials.secretKey)
         anyContinuationHandled = false
     }
 
