@@ -239,9 +239,16 @@ public class OptimoveNotificationService {
             return
         }
 
-        let eventsBaseUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.EVENTS_BASE_URL.rawValue) as? String ?? "https://events.kumulos.com"
+        // TODO: Pass credentials. Store COnfig?
 
-        analyticsHelper = AnalyticsHelper(apiKey: apiKey, secretKey: secretKey, baseEventsUrl: eventsBaseUrl)
+        let region = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.REGION.rawValue) as? String ?? "uk-1"
+
+        let httpClientFactory = NetworkFactory(
+            urlBuilder: UrlBuilder(region: region)
+        )
+        analyticsHelper = AnalyticsHelper(
+            httpClient: httpClientFactory.build(for: .events)
+        )
     }
 
     fileprivate class func isBackgroundPush(userInfo: [AnyHashable: Any]) -> Bool {

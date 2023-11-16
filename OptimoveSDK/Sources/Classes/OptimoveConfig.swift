@@ -36,7 +36,6 @@ public struct OptimobileConfig {
         case US = "us"
     }
 
-    let credentials: Credentials
     let region: Region
 
     let sessionIdleTimeout: UInt
@@ -55,7 +54,7 @@ public struct OptimobileConfig {
     let deepLinkCname: URL?
     let deepLinkHandler: DeepLinkHandler?
 
-    let baseUrlMap: ServiceUrlMap
+    let baseUrlMap: UrlBuilder.ServiceUrlMap
 
     let runtimeInfo: [String: AnyObject]?
     let sdkInfo: [String: AnyObject]?
@@ -75,18 +74,27 @@ open class OptimoveConfigBuilder: NSObject {
     private var _pushReceivedInForegroundHandlerBlock: Any?
     private var _deepLinkCname: URL?
     private var _deepLinkHandler: DeepLinkHandler?
-    private var _baseUrlMap: ServiceUrlMap?
+    private var _baseUrlMap: UrlBuilder.ServiceUrlMap?
 
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
 
-    public init(optimoveCredentials: String?, optimobileCredentials: String?) {
+    public convenience init(optimoveCredentials: String?, optimobileCredentials: String?) {
+        self.init()
+
         let optimoveCredentialsTuple = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials)
         let optimobileCredentialsTuple = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials)
 
         if optimoveCredentialsTuple == nil && optimobileCredentialsTuple == nil {
-            assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
+            Logger.warn(
+                """
+                Invalid credentials provided to OptimoveConfigBuilder.
+                At least one of optimoveCredentials or optimobileCredentials are required.
+
+                For postponed initialization use `Optimove.setCredentials` method.
+                """
+            )
         }
 
         if let optimoveCredentialsTuple = optimoveCredentialsTuple {
@@ -100,9 +108,10 @@ open class OptimoveConfigBuilder: NSObject {
 
             _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentialsTuple.region.rawValue)
         }
+    }
 
+    override public required init() {
         _sessionIdleTimeout = 23
-
         super.init()
     }
 
@@ -178,15 +187,6 @@ open class OptimoveConfigBuilder: NSObject {
         return self
     }
 
-    /**
-     Internal SDK embedding API, do not call or depend on this method in your app
-     */
-    @discardableResult public func setBaseUrlMapping(baseUrlMap: ServiceUrlMap) -> OptimoveConfigBuilder {
-        _baseUrlMap = baseUrlMap
-
-        return self
-    }
-
     @discardableResult public func build() -> OptimoveConfig {
         var tenantInfo: OptimoveTenantInfo?
         var optimobileConfig: OptimobileConfig?
@@ -195,12 +195,10 @@ open class OptimoveConfigBuilder: NSObject {
             tenantInfo = OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
         }
 
-        if let credentials = credentials,
-           let region = region,
+        if let region = region,
            let _baseUrlMap = _baseUrlMap
         {
             optimobileConfig = OptimobileConfig(
-                credentials: credentials,
                 region: region,
                 sessionIdleTimeout: _sessionIdleTimeout,
                 inAppConsentStrategy: _inAppConsentStrategy,

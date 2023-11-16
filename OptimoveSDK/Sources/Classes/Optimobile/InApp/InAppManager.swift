@@ -18,6 +18,7 @@ private var ks_existingBackgroundFetchDelegate: IMP?
 typealias InAppSyncCompletionHandler = (_ result: Int) -> Void
 
 class InAppManager {
+    private let httpClient: KSHttpClient
     private(set) var presenter: InAppPresenter
     private var pendingTickleIds = NSMutableOrderedSet(capacity: 1)
 
@@ -31,7 +32,8 @@ class InAppManager {
 
     // MARK: Initialization
 
-    init(_ config: OptimobileConfig) {
+    init(_ config: OptimobileConfig, httpClient: KSHttpClient) {
+        self.httpClient = httpClient
         presenter = InAppPresenter(displayMode: config.inAppDefaultDisplayMode)
         syncQueue = DispatchQueue(label: "kumulos.in-app.sync")
     }
@@ -269,7 +271,7 @@ class InAppManager {
             let encodedIdentifier = KSHttpUtil.urlEncode(OptimobileHelper.currentUserIdentifier)
             let path = "/v1/users/\(encodedIdentifier!)/messages\(after)"
 
-            Optimobile.sharedInstance.pushHttpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { _, decodedBody in
+            self.httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { _, decodedBody in
                 defer {
                     UserDefaults.standard.set(Date(), forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue)
                     syncBarrier.signal()

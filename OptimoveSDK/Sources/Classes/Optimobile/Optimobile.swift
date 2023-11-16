@@ -23,11 +23,6 @@ public enum InAppDisplayMode: String {
 // MARK: class
 
 class Optimobile {
-    let urlBuilder: UrlBuilder
-
-    let pushHttpClient: KSHttpClient
-    let coreHttpClient: KSHttpClient
-
     let pushNotificationDeviceType = 1
     let pushNotificationProductionTokenType: Int = 1
 
@@ -65,6 +60,8 @@ class Optimobile {
     fileprivate var pushHelper: PushHelper
 
     fileprivate(set) var deepLinkHelper: DeepLinkHelper?
+
+    private let networkFactory: NetworkFactory
 
     /**
          The unique installation Id of the current app
@@ -123,10 +120,10 @@ class Optimobile {
             UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
         }
 
-        KeyValPersistenceHelper.set(config.credentials.apiKey, forKey: OptimobileUserDefaultsKey.API_KEY.rawValue)
-        KeyValPersistenceHelper.set(config.credentials.secretKey, forKey: OptimobileUserDefaultsKey.SECRET_KEY.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.events], forKey: OptimobileUserDefaultsKey.EVENTS_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap, forKey: OptimobileUserDefaultsKey.BASE_URLS.rawValue)
+        KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
         KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.iar], forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
     }
 
@@ -145,25 +142,22 @@ class Optimobile {
 
     fileprivate init(config: OptimobileConfig) {
         self.config = config
+        networkFactory = NetworkFactory(
+            urlBuilder: UrlBuilder(baseUrlMap: config.baseUrlMap)
+        )
         inAppConsentStrategy = config.inAppConsentStrategy
 
-        urlBuilder = UrlBuilder(baseUrlMap: config.baseUrlMap)
+        analyticsHelper = AnalyticsHelper(httpClient: networkFactory.build(for: .events))
 
-        pushHttpClient = KSHttpClient(baseUrl: URL(string: urlBuilder.urlForService(.push))!, requestFormat: .json, responseFormat: .json)
-        pushHttpClient.setBasicAuth(user: config.credentials.apiKey, password: config.credentials.secretKey)
-        coreHttpClient = KSHttpClient(baseUrl: URL(string: urlBuilder.urlForService(.crm))!, requestFormat: .json, responseFormat: .json)
-        coreHttpClient.setBasicAuth(user: config.credentials.apiKey, password: config.credentials.secretKey)
-
-        analyticsHelper = AnalyticsHelper(apiKey: config.credentials.apiKey, secretKey: config.credentials.secretKey, baseEventsUrl: urlBuilder.urlForService(.events))
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
-        inAppManager = InAppManager(config)
+        inAppManager = InAppManager(config, httpClient: networkFactory.build(for: .push))
         pushHelper = PushHelper()
         badgeObserver = OptimobileBadgeObserver(callback: { newBadgeCount in
             KeyValPersistenceHelper.set(newBadgeCount, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
         })
 
         if config.deepLinkHandler != nil {
-            deepLinkHelper = DeepLinkHelper(config, urlBuilder: urlBuilder)
+            deepLinkHelper = DeepLinkHelper(config, httpClient: networkFactory.build(for: .ddl))
         }
     }
 
@@ -172,10 +166,5 @@ class Optimobile {
         inAppManager.initialize()
         _ = pushHelper.pushInit
         deepLinkHelper?.checkForNonContinuationLinkMatch()
-    }
-
-    deinit {
-        pushHttpClient.invalidateSessionCancellingTasks(true)
-        coreHttpClient.invalidateSessionCancellingTasks(true)
     }
 }

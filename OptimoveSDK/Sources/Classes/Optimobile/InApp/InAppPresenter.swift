@@ -278,8 +278,8 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         #else
             let cachePolicy = URLRequest.CachePolicy.reloadIgnoringCacheData
         #endif
-        let url = Optimobile.getInstance().urlBuilder.urlForService(.iar)
-        let request = URLRequest(url: URL(string: url)!, cachePolicy: cachePolicy, timeoutInterval: 8)
+        let url = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue) as! URL
+        let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
         webView.load(request)
 
         // Spinner
@@ -390,8 +390,8 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         if let httpResponse = navigationResponse.response as? HTTPURLResponse,
            let url = httpResponse.url
         {
-            let baseUrl = Optimobile.getInstance().urlBuilder.urlForService(.iar)
-            if url.absoluteString.starts(with: baseUrl) && httpResponse.statusCode >= 400 {
+            let baseUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue) as! URL
+            if url.absoluteString.starts(with: baseUrl.absoluteString) && httpResponse.statusCode >= 400 {
                 decisionHandler(.cancel)
                 cancelCurrentPresentationQueue(waitForViewCleanup: false)
                 return

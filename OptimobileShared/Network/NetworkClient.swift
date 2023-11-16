@@ -23,7 +23,7 @@ enum KSHttpMethod: String {
     case DELETE
 }
 
-class KSHttpClient {
+final class KSHttpClient {
     private let baseUrl: URL
     private let baseUrlComponents: URLComponents?
     private let urlSession: URLSession
@@ -51,6 +51,10 @@ class KSHttpClient {
 
         urlSession = URLSession(configuration: config)
         authHeader = nil
+    }
+
+    deinit {
+        invalidateSessionCancellingTasks(true)
     }
 
     func setBasicAuth(user: String, password: String) {
@@ -150,6 +154,8 @@ class KSHttpClient {
     }
 
     fileprivate func sendRequest(request: URLRequest, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) -> URLSessionDataTask {
+//        onFailure(nil, Error, nil)
+
         let task = urlSession.dataTask(with: request) { data, response, error in
             guard let httpResponse = response as? HTTPURLResponse else {
                 onFailure(nil, KSHttpError.responseCastingError, nil)

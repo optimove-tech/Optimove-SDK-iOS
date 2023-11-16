@@ -20,12 +20,11 @@ class AnalyticsHelper {
 
     // MARK: Initialization
 
-    init(apiKey: String, secretKey: String, baseEventsUrl: String) {
+    init(httpClient: KSHttpClient) {
         analyticsContext = nil
         migrationAnalyticsContext = nil
 
-        eventsHttpClient = KSHttpClient(baseUrl: URL(string: baseEventsUrl)!, requestFormat: .json, responseFormat: .json)
-        eventsHttpClient.setBasicAuth(user: apiKey, password: secretKey)
+        eventsHttpClient = httpClient
 
         initContext()
 

@@ -44,18 +44,9 @@ class DeepLinkHelper {
     let httpClient: KSHttpClient
     var anyContinuationHandled: Bool
 
-    init(_ config: OptimobileConfig, urlBuilder: UrlBuilder) {
+    init(_ config: OptimobileConfig, httpClient: KSHttpClient) {
         self.config = config
-        httpClient = KSHttpClient(
-            baseUrl: URL(string: urlBuilder.urlForService(.ddl))!,
-            requestFormat: .rawData,
-            responseFormat: .rawData,
-            additionalHeaders: [
-                "Content-Type": "application/json",
-                "Accept": "appliction/json",
-            ]
-        )
-        httpClient.setBasicAuth(user: config.credentials.apiKey, password: config.credentials.secretKey)
+        self.httpClient = httpClient
         anyContinuationHandled = false
     }
 
