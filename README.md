@@ -3,7 +3,9 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/optimove-tech/Optimove-SDK-iOS?style=flat-square)](https://github.com/optimove-tech/Optimove-SDK-iOS/releases/latest)
 [![CI](https://github.com/optimove-tech/Optimove-SDK-iOS/actions/workflows/main.yml/badge.svg)](https://github.com/optimove-tech/Optimove-SDK-iOS/actions/workflows/main.yml)
 ![Cocoapods platforms](https://img.shields.io/cocoapods/p/OptimoveSDK?color=brightgreen&label=CocoaPods&style=flat-square)
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage)
+
+<!-- [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat-square)](https://github.com/Carthage/Carthage) -->
+
 ![SwiftPM comppatible](https://img.shields.io/badge/SwiftPM-compatible-success?style=flat-square)
 ![GitHub](https://img.shields.io/github/license/optimove-tech/Optimove-SDK-iOS?style=flat-square)
 
@@ -41,7 +43,7 @@ In this guide we will go through the following steps necessary to have the basic
 4. [Deferred Deep Linking](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/deferred-deep-linking)
 
 > **NOTE**:
-To unlock these capabilities, you will need to have added the relevant OptiMobile channels to your Optimove package. If you can’t see this feature in your Optimove instance, contact your CSM to find out more.
+> To unlock these capabilities, you will need to have added the relevant OptiMobile channels to your Optimove package. If you can’t see this feature in your Optimove instance, contact your CSM to find out more.
 
 ## Migrations
 
