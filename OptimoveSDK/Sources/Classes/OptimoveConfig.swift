@@ -26,9 +26,14 @@ public struct OptimoveConfig {
 }
 
 public struct OptimobileConfig {
+    public enum Region: String {
+        case EU = "eu"
+        case US = "us"
+    }
+
     let apiKey: String
     let secretKey: String
-    let region: String
+    let region: Region
 
     let sessionIdleTimeout: UInt
 
@@ -56,7 +61,7 @@ public struct OptimobileConfig {
 open class OptimoveConfigBuilder: NSObject {
     private var _tenantToken: String?
     private var _configName: String?
-    private var _region: String?
+    private var _region: OptimobileConfig.Region?
     private var _apiKey: String?
     private var _secretKey: String?
     private var _sessionIdleTimeout: UInt
@@ -90,7 +95,7 @@ open class OptimoveConfigBuilder: NSObject {
             _apiKey = optimobileCredentialsTuple.apiKey
             _secretKey = optimobileCredentialsTuple.secretKey
             _region = optimobileCredentialsTuple.region
-            _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentialsTuple.region)
+            _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentialsTuple.region.rawValue)
         }
 
         _sessionIdleTimeout = 23
@@ -229,7 +234,7 @@ open class OptimoveConfigBuilder: NSObject {
         return (tenantToken, configName)
     }
 
-    private static func parseOptimobileCredentials(creds: String?) -> (region: String, apiKey: String, secretKey: String)? {
+    private static func parseOptimobileCredentials(creds: String?) -> (region: OptimobileConfig.Region, apiKey: String, secretKey: String)? {
         guard let creds = creds,
               let tuple = parseTuple(creds: creds),
               let ver = tuple[0] as? Int
@@ -241,9 +246,11 @@ open class OptimoveConfigBuilder: NSObject {
             assertionFailure("Incompatible credentials version given, please update the SDK version or check credentials")
         }
 
-        guard let region = tuple[1] as? String,
-              let apiKey = tuple[2] as? String,
-              let secretKey = tuple[3] as? String
+        guard
+            let regionRaw = tuple[1] as? String,
+            let region = OptimobileConfig.Region(rawValue: regionRaw),
+            let apiKey = tuple[2] as? String,
+            let secretKey = tuple[3] as? String
         else {
             return nil
         }
