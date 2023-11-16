@@ -25,13 +25,13 @@ public struct OptimoveConfig {
     }
 }
 
-struct OptimobileConfig {
+public struct OptimobileConfig {
     struct Credentials {
         let apiKey: String
         let secretKey: String
     }
 
-    enum Region: String {
+    public enum Region: String {
         case EU = "eu"
         case US = "us"
     }
@@ -104,6 +104,13 @@ open class OptimoveConfigBuilder: NSObject {
         _sessionIdleTimeout = 23
 
         super.init()
+    }
+
+    public typealias Region = OptimobileConfig.Region
+
+    @discardableResult public func bootOptiMobile(_ region: Region) -> OptimoveConfigBuilder {
+        self.region = region
+        return self
     }
 
     @discardableResult public func setSessionIdleTimeout(seconds: UInt) -> OptimoveConfigBuilder {
