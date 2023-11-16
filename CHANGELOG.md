@@ -1,5 +1,7 @@
 # Changelog
 
+## 5.5.0
+
 ## 5.4.0
 
 - Add the initial visitor identifier getter to public API. The new API is public available via the following methods:
