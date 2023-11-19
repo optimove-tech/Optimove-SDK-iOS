@@ -39,8 +39,9 @@ public struct OptimoveConfig {
 
 public struct OptimobileConfig {
     public enum Region: String {
-        case EU = "eu"
-        case US = "us"
+        case EU2 = "eu-central-2"
+        case UK1 = "uk-1"
+        case US1 = "us-east-1"
     }
 
     let credentials: Credentials?
