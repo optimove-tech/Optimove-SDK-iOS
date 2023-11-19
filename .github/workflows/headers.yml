@@ -1,0 +1,12 @@
+name: Headers
+on: [push]
+jobs:
+  run_tests:
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check headers
+        run: |
+          chmod +x ./check_headers.sh
+          ./check_headers.sh
+        shell: bash
