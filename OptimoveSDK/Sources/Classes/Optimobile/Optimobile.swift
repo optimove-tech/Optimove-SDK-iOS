@@ -102,6 +102,10 @@ class Optimobile {
 
         maybeAlignUserAssociation(initialUserId: initialUserId)
     }
+    
+    static func setCredentials(_ credentials: Credentials) {
+        KeyValPersistenceHelper.set(try? JSONEncoder().encode(credentials), forKey: OptimobileUserDefaultsKey.CREDENTIALS_JSON.rawValue)
+    }
 
     fileprivate static func writeDefaultsKeys(config: OptimobileConfig, initialVisitorId: String) {
         KeyValPersistenceHelper.maybeMigrateUserDefaultsToAppGroups()
@@ -120,6 +124,9 @@ class Optimobile {
             UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
         }
 
+        if let credentials = config.credentials {
+            setCredentials(credentials)
+        }
         KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
         KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(config.baseUrlMap[.iar], forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
