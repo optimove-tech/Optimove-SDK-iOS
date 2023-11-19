@@ -30,10 +30,18 @@ final class KSHttpClient {
     private var authHeader: String?
     private let requestFormat: KSHttpDataFormat
     private let responseFormat: KSHttpDataFormat
+    private let authorization: HttpAuthorizationProtocol
 
     // MARK: Initializers & Configs
 
-    init(baseUrl: URL, requestFormat: KSHttpDataFormat, responseFormat: KSHttpDataFormat, additionalHeaders: [AnyHashable: Any]? = nil) {
+    init(
+        baseUrl: URL,
+        requestFormat: KSHttpDataFormat,
+        responseFormat: KSHttpDataFormat,
+        authorization: HttpAuthorizationProtocol,
+        additionalHeaders: [AnyHashable: Any]? = nil
+    ) {
+        self.authorization = authorization
         self.baseUrl = baseUrl
         baseUrlComponents = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false)
         self.requestFormat = requestFormat
@@ -57,16 +65,6 @@ final class KSHttpClient {
         invalidateSessionCancellingTasks(true)
     }
 
-    func setBasicAuth(user: String, password: String) {
-        let creds = "\(user):\(password)"
-        let data = creds.data(using: .utf8)
-        let base64Creds = data?.base64EncodedString()
-
-        if let encoded = base64Creds {
-            authHeader = "Basic \(encoded)"
-        }
-    }
-
     func invalidateSessionCancellingTasks(_ cancel: Bool) {
         if cancel {
             urlSession.invalidateAndCancel()
@@ -77,10 +75,17 @@ final class KSHttpClient {
 
     // MARK: HTTP Methods
 
-    @discardableResult func sendRequest(_ method: KSHttpMethod, toPath: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) -> URLSessionDataTask {
-        let request = newRequestToPath(toPath, method: method, body: data)
+    func sendRequest(_ method: KSHttpMethod, toPath: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
+        var request = newRequestToPath(toPath, method: method, body: data)
 
-        return sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
+        do {
+            try authorization.authorizeRequest(&request)
+        } catch {
+            onFailure(nil, error, nil)
+            return
+        }
+        
+        sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
     }
 
     // MARK: Helpers
@@ -91,10 +96,6 @@ final class KSHttpClient {
 
         var urlRequest = URLRequest(url: url!)
         urlRequest.httpMethod = method.rawValue
-
-        if let auth = authHeader {
-            urlRequest.addValue(auth, forHTTPHeaderField: "Authorization")
-        }
 
         switch requestFormat {
         case .json:
@@ -153,7 +154,7 @@ final class KSHttpClient {
         return decodedData
     }
 
-    fileprivate func sendRequest(request: URLRequest, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) -> URLSessionDataTask {
+    fileprivate func sendRequest(request: URLRequest, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
         let task = urlSession.dataTask(with: request) { data, response, error in
             guard let httpResponse = response as? HTTPURLResponse else {
                 onFailure(nil, KSHttpError.responseCastingError, nil)
@@ -180,8 +181,6 @@ final class KSHttpClient {
         }
 
         task.resume()
-
-        return task
     }
 }
 

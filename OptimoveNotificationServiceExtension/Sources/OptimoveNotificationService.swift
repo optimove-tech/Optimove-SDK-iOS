@@ -231,20 +231,11 @@ public class OptimoveNotificationService {
     }
 
     fileprivate class func initializeAnalyticsHelper() {
-        let apiKey = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.API_KEY.rawValue)
-        let secretKey = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.SECRET_KEY.rawValue)
-
-        guard let apiKey = apiKey as? String, let secretKey = secretKey as? String else {
-            print("Extension: authorization credentials not present")
-            return
-        }
-
-        // TODO: Pass credentials. Store COnfig?
-
         let region = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.REGION.rawValue) as? String ?? "uk-1"
 
         let httpClientFactory = NetworkFactory(
-            urlBuilder: UrlBuilder(region: region)
+            urlBuilder: UrlBuilder(region: region),
+            authorization: AuthorizationMediator(storage: KeyValPersistenceHelper.self)
         )
         analyticsHelper = AnalyticsHelper(
             httpClient: httpClientFactory.build(for: .events)

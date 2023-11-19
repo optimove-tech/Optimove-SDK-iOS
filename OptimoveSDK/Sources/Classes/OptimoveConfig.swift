@@ -26,16 +26,13 @@ public struct OptimoveConfig {
 }
 
 public struct OptimobileConfig {
-    struct Credentials {
-        let apiKey: String
-        let secretKey: String
-    }
     /// Optimove initialization strategy.
     public enum InitializationStrategy: UInt8 {
         case none = 0
         case optimobileOnly = 1
         case optimoveOnly = 2
         case all = 3
+
         /// Union of two initialization strategies.
         /// - Parameters:
         ///   - lhs: ``InitializationStrategy`` instance.
@@ -81,7 +78,7 @@ public struct OptimobileConfig {
 public typealias Region = OptimobileConfig.Region
 
 open class OptimoveConfigBuilder: NSObject {
-    private var credentials: OptimobileConfig.Credentials?
+    private var credentials: Credentials?
     private var region: OptimobileConfig.Region?
     private var initializationStrategy: OptimobileConfig.InitializationStrategy
     private var _tenantToken: String?
@@ -261,7 +258,7 @@ open class OptimoveConfigBuilder: NSObject {
         return (tenantToken, configName)
     }
 
-    private static func parseOptimobileCredentials(creds: String?) -> (region: OptimobileConfig.Region, credentials: OptimobileConfig.Credentials)? {
+    private static func parseOptimobileCredentials(creds: String?) -> (region: OptimobileConfig.Region, credentials: Credentials)? {
         guard let creds = creds,
               let tuple = try? parseTuple(base64: creds),
               let ver = tuple[0] as? Int
@@ -282,7 +279,7 @@ open class OptimoveConfigBuilder: NSObject {
             return nil
         }
 
-        return (region, OptimobileConfig.Credentials(apiKey: apiKeyRaw, secretKey: secretKeyRaw))
+        return (region, Credentials(apiKey: apiKeyRaw, secretKey: secretKeyRaw))
     }
 
     enum Error: Foundation.LocalizedError {

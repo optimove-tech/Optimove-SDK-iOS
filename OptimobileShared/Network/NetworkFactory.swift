@@ -3,10 +3,12 @@
 import Foundation
 
 final class NetworkFactory {
-    private var urlBuilder: UrlBuilder
+    var urlBuilder: UrlBuilder
+    var authorization: HttpAuthorizationProtocol
 
-    init(urlBuilder: UrlBuilder) {
+    init(urlBuilder: UrlBuilder, authorization: HttpAuthorizationProtocol) {
         self.urlBuilder = urlBuilder
+        self.authorization = authorization
     }
 
     func updateRegion(_ region: String) {
@@ -17,7 +19,8 @@ final class NetworkFactory {
         return KSHttpClient(
             baseUrl: urlBuilder.urlForService(service),
             requestFormat: .json,
-            responseFormat: .json
+            responseFormat: .json,
+            authorization: authorization
         )
     }
 }

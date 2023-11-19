@@ -143,7 +143,8 @@ class Optimobile {
     fileprivate init(config: OptimobileConfig) {
         self.config = config
         networkFactory = NetworkFactory(
-            urlBuilder: UrlBuilder(baseUrlMap: config.baseUrlMap)
+            urlBuilder: UrlBuilder(baseUrlMap: config.baseUrlMap),
+            authorization: AuthorizationMediator(storage: KeyValPersistenceHelper.self)
         )
         inAppConsentStrategy = config.inAppConsentStrategy
 

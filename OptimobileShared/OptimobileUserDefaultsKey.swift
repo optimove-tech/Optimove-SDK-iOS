@@ -3,8 +3,7 @@
 import Foundation
 
 enum OptimobileUserDefaultsKey: String {
-    case API_KEY = "KumulosApiKey"
-    case SECRET_KEY = "KumulosSecretKey"
+    case CREDENTIALS_JSON = "KumulosCredentialsJson"
     case BASE_URLS = "KumulosEventsBaseUrls"
     case REGION = "KumulosEventsRegion"
     case MEDIA_BASE_URL = "KumulosMediaBaseUrl"
@@ -24,8 +23,6 @@ enum OptimobileUserDefaultsKey: String {
     case DYNAMIC_CATEGORY = "__kumulos__dynamic__categories__"
 
     static let sharedKeys = [
-        API_KEY,
-        SECRET_KEY,
         MEDIA_BASE_URL,
         INSTALL_UUID,
         USER_ID,
