@@ -2,9 +2,13 @@
 
 import Foundation
 
+enum AuthorizationStrategy {
+    case basic
+    // case bearer
+}
+
 protocol AuthorizationMediatorProtocol {
-    func getAuthHeader() -> String?
-    func setBasicAuth(user: String, password: String)
+    func getAuthorization(_: AuthorizationStrategy) throws -> String
 }
 
 enum HttpAuthorizationError: Error {
@@ -30,17 +34,30 @@ final class AuthorizationMediator {
         }
         return try? JSONDecoder().decode(Credentials.self, from: data)
     }
+    
+    func getBasicAuthorization() throws -> String {
+        if basicAuthorization == nil, let credentials = readCredentialsFromStorage() {
+            setBasicAuth(user: credentials.apiKey, password: credentials.secretKey)
+        }
+        guard let basicAuthorization else {
+            throw HttpAuthorizationError.missingAuthHeader
+        }
+        return basicAuthorization
+    }
+    
+    func setBasicAuth(user: String, password: String) {
+        let basic = "\(user):\(password)"
+        if let token = basic.data(using: .utf8)?.base64EncodedString() {
+            basicAuthorization = "Basic \(token)"
+        }
+    }
 }
 
 extension AuthorizationMediator: AuthorizationMediatorProtocol {
-    func getAuthHeader() -> String? {
-        return basicAuthorization
-    }
-
-    func setBasicAuth(user: String, password: String) {
-        let creds = "\(user):\(password)"
-        if let token = creds.data(using: .utf8)?.base64EncodedString() {
-            basicAuthorization = "Basic \(token)"
+    func getAuthorization(_ strategy: AuthorizationStrategy) throws -> String {
+        switch strategy {
+        case .basic:
+            return try getBasicAuthorization()
         }
     }
 }
@@ -49,12 +66,7 @@ extension AuthorizationMediator: HttpAuthorizationProtocol {
     static let field = "Authorization"
 
     func authorizeRequest(_ urlRequest: inout URLRequest) throws {
-        if basicAuthorization == nil, let credentials = readCredentialsFromStorage() {
-            setBasicAuth(user: credentials.apiKey, password: credentials.secretKey)
-        }
-        guard let basicAuthorization else {
-            throw HttpAuthorizationError.missingAuthHeader
-        }
+        let basicAuthorization = try getAuthorization(.basic)
         urlRequest.addValue(basicAuthorization, forHTTPHeaderField: AuthorizationMediator.field)
     }
 }
