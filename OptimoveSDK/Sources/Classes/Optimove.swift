@@ -52,10 +52,14 @@ typealias Logger = OptimoveCore.Logger
 
         if config.isOptimobileConfigured(), let optimobileConfig = config.optimobileConfig {
             shared.container.resolve { serviceLocator in
-                let visitorId = try serviceLocator.storage().getInitialVisitorId()
-                let userId = try serviceLocator.storage().getCustomerID()
-
-                Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId, initialUserId: userId)
+                do {
+                    let visitorId = try serviceLocator.storage().getInitialVisitorId()
+                    let userId = try? serviceLocator.storage().getCustomerID()
+                    
+                    Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId, initialUserId: userId)
+                } catch {
+                    throw GuardError.custom("Failed on OptimobileSDK initialization. Reason: \(error.localizedDescription)")
+                }
             }
         }
     }
