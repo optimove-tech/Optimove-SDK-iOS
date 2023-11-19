@@ -120,7 +120,6 @@ class Optimobile {
             UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
         }
 
-        KeyValPersistenceHelper.set(config.baseUrlMap, forKey: OptimobileUserDefaultsKey.BASE_URLS.rawValue)
         KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
         KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(config.baseUrlMap[.iar], forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)

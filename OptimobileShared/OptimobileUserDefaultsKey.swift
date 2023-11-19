@@ -4,7 +4,6 @@ import Foundation
 
 enum OptimobileUserDefaultsKey: String {
     case CREDENTIALS_JSON = "KumulosCredentialsJson"
-    case BASE_URLS = "KumulosEventsBaseUrls"
     case REGION = "KumulosEventsRegion"
     case MEDIA_BASE_URL = "KumulosMediaBaseUrl"
     case IAR_BASE_URL = "KumulosIARBaseUrl"
