@@ -27,20 +27,15 @@ public struct OptimoveConfig {
 
 public struct OptimobileConfig {
     /// Optimove initialization strategy.
-    public enum InitializationStrategy: UInt8 {
-        case none = 0
-        case optimobileOnly = 1
-        case optimoveOnly = 2
-        case all = 3
+    struct InitializationStrategy: OptionSet {
+        let rawValue: Int
 
-        /// Union of two initialization strategies.
-        /// - Parameters:
-        ///   - lhs: ``InitializationStrategy`` instance.
-        ///   - rhs: ``InitializationStrategy`` instance.
-        /// - Returns: Union of two initialization strategies.
-        static func | (lhs: InitializationStrategy, rhs: InitializationStrategy) -> InitializationStrategy {
-            return InitializationStrategy(rawValue: lhs.rawValue | rhs.rawValue)!
-        }
+        static let none = InitializationStrategy(rawValue: 1 << 0)
+        static let delayed = InitializationStrategy(rawValue: 1 << 1)
+        static let optimobileOnly = InitializationStrategy(rawValue: 1 << 2)
+        static let optimoveOnly = InitializationStrategy(rawValue: 1 << 3)
+
+        static let all: InitializationStrategy = [.optimobileOnly, .optimoveOnly]
     }
 
     public enum Region: String {
@@ -107,6 +102,7 @@ open class OptimoveConfigBuilder: NSObject {
     public convenience init(region: Region) {
         self.init()
         self.region = region
+        initializationStrategy = .delayed
     }
 
     override public required init() {
@@ -116,19 +112,17 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
-        var initilazationStrategise: Set<OptimobileConfig.InitializationStrategy> = []
         if let optimoveCredentials = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials) {
             _tenantToken = optimoveCredentials.tenantToken
             _configName = optimoveCredentials.configName
-            initilazationStrategise.insert(.optimoveOnly)
+            initializationStrategy.insert(.optimoveOnly)
         }
         if let optimobileCredentials = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials) {
             credentials = optimobileCredentials.credentials
             region = optimobileCredentials.region
             _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentials.region.rawValue)
-            initilazationStrategise.insert(.optimobileOnly)
+            initializationStrategy.insert(.optimobileOnly)
         }
-        initializationStrategy = initilazationStrategise.reduce(.none, |)
         return self
     }
 
