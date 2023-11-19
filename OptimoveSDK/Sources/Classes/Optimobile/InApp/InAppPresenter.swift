@@ -278,9 +278,11 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         #else
             let cachePolicy = URLRequest.CachePolicy.reloadIgnoringCacheData
         #endif
-        let url = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue) as! URL
-        let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
-        webView.load(request)
+        if let urlString = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue) as? String,
+           let url = URL(string: urlString) {
+            let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
+            webView.load(request)
+        }
 
         // Spinner
         let loadingSpinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
@@ -388,9 +390,11 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
     func webView(_: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         // Handles HTTP responses for all status codes
         if let httpResponse = navigationResponse.response as? HTTPURLResponse,
-           let url = httpResponse.url
+           let url = httpResponse.url,
+           let baseUrlString = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue) as? String,
+           let baseUrl = URL(string: baseUrlString)
         {
-            let baseUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue) as! URL
+            
             if url.absoluteString.starts(with: baseUrl.absoluteString) && httpResponse.statusCode >= 400 {
                 decisionHandler(.cancel)
                 cancelCurrentPresentationQueue(waitForViewCleanup: false)

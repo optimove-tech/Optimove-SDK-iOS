@@ -128,8 +128,8 @@ class Optimobile {
             setCredentials(credentials)
         }
         KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.iar], forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.media]?.absoluteString, forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.iar]?.absoluteString, forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
     }
 
@@ -166,6 +166,8 @@ class Optimobile {
         if config.deepLinkHandler != nil {
             deepLinkHelper = DeepLinkHelper(config, httpClient: networkFactory.build(for: .ddl))
         }
+        
+        Logger.debug("Optimobile SDK was initialized with \(config)")
     }
 
     private func initializeHelpers() {
