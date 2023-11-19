@@ -282,9 +282,9 @@ open class OptimoveConfigBuilder: NSObject {
         var errorDescription: String? {
             switch self {
             case let .failedDecodingBase64(string):
-                "Failed on decoding base64 value \(string)"
+                return "Failed on decoding base64 value \(string)"
             case let .failedSerialize(data: data, to: type):
-                "Failed to serialize data length \(data.count) to type \(type.self)"
+                return "Failed to serialize data length \(data.count) to type \(type.self)"
             }
         }
     }
