@@ -1,11 +1,8 @@
-name: Unit Tests
-
+name: CI
 on: [push]
-
 jobs:
-  build:
+  unit-tests:
     runs-on: macOS-latest
-
     steps:
       - uses: actions/checkout@v1
       - run: brew install xcbeautify
