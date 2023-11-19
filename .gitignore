@@ -75,7 +75,3 @@ fastlane/test_output
 # Visual studio code
 .vscode
 Example/Podfile.lock
-
-# XcodeGen
-Optimove.xcodeproj/
-Optimove.xcodeproj
