@@ -52,11 +52,8 @@ typealias Logger = OptimoveCore.Logger
 
         if config.isOptimobileConfigured(), let optimobileConfig = config.optimobileConfig {
             shared.container.resolve { serviceLocator in
-                guard let visitorId = try? serviceLocator.storage().getInitialVisitorId() else {
-                    return
-                }
-
-                let userId = try? serviceLocator.storage().getCustomerID()
+                let visitorId = try serviceLocator.storage().getInitialVisitorId()
+                let userId = try serviceLocator.storage().getCustomerID()
 
                 Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId, initialUserId: userId)
             }
