@@ -39,6 +39,7 @@ public struct OptimoveConfig {
 
 public struct OptimobileConfig {
     public enum Region: String {
+        case EU1 = "eu-central-1"
         case EU2 = "eu-central-2"
         case UK1 = "uk-1"
         case US1 = "us-east-1"
