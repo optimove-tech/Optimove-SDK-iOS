@@ -1,4 +1,4 @@
-
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
 import CoreLocation

@@ -1,9 +1,4 @@
-//
-//  OptimoveNotificationExtensionTests.swift
-//  OptimoveNotificationExtensionTests
-//
-//  Created by Christopher Wyllie on 21/04/2022.
-//
+//  Copyright © 2022 Optimove. All rights reserved.
 
 import XCTest
 @testable import OptimoveNotificationServiceExtension
