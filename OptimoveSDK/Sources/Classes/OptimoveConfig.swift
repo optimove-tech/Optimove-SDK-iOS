@@ -30,12 +30,28 @@ public struct OptimobileConfig {
         let apiKey: String
         let secretKey: String
     }
+    /// Optimove initialization strategy.
+    public enum InitializationStrategy: UInt8 {
+        case none = 0
+        case optimobileOnly = 1
+        case optimoveOnly = 2
+        case all = 3
+        /// Union of two initialization strategies.
+        /// - Parameters:
+        ///   - lhs: ``InitializationStrategy`` instance.
+        ///   - rhs: ``InitializationStrategy`` instance.
+        /// - Returns: Union of two initialization strategies.
+        static func | (lhs: InitializationStrategy, rhs: InitializationStrategy) -> InitializationStrategy {
+            return InitializationStrategy(rawValue: lhs.rawValue | rhs.rawValue)!
+        }
+    }
 
     public enum Region: String {
         case EU = "eu"
         case US = "us"
     }
 
+    let initializationStrategy: InitializationStrategy
     let region: Region
 
     let sessionIdleTimeout: UInt
@@ -64,6 +80,7 @@ public struct OptimobileConfig {
 open class OptimoveConfigBuilder: NSObject {
     private var credentials: OptimobileConfig.Credentials?
     private var region: OptimobileConfig.Region?
+    private var initializationStrategy: OptimobileConfig.InitializationStrategy
     private var _tenantToken: String?
     private var _configName: String?
     private var _sessionIdleTimeout: UInt
@@ -82,36 +99,35 @@ open class OptimoveConfigBuilder: NSObject {
 
     public convenience init(optimoveCredentials: String?, optimobileCredentials: String?) {
         self.init()
-
-        let optimoveCredentialsTuple = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials)
-        let optimobileCredentialsTuple = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials)
-
-        if optimoveCredentialsTuple == nil && optimobileCredentialsTuple == nil {
-            Logger.warn(
-                """
-                Invalid credentials provided to OptimoveConfigBuilder.
-                At least one of optimoveCredentials or optimobileCredentials are required.
-
-                For postponed initialization use `Optimove.setCredentials` method.
-                """
-            )
+        var initilazationStrategise: Set<OptimobileConfig.InitializationStrategy> = []
+        
+        if let optimoveCredentials = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials) {
+            _tenantToken = optimoveCredentials.tenantToken
+            _configName = optimoveCredentials.configName
+            initilazationStrategise.insert(.optimoveOnly)
         }
 
-        if let optimoveCredentialsTuple = optimoveCredentialsTuple {
-            _tenantToken = optimoveCredentialsTuple.tenantToken
-            _configName = optimoveCredentialsTuple.configName
+        if let optimobileCredentials = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials) {
+            credentials = optimobileCredentials.credentials
+            region = optimobileCredentials.region
+
+            _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentials.region.rawValue)
+            
+            initilazationStrategise.insert(.optimobileOnly)
         }
-
-        if let optimobileCredentialsTuple = optimobileCredentialsTuple {
-            credentials = optimobileCredentialsTuple.credentials
-            region = optimobileCredentialsTuple.region
-
-            _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentialsTuple.region.rawValue)
+        
+        initializationStrategy = initilazationStrategise.reduce(.none, |)
+        
+        if initializationStrategy == .none {
+            assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
         }
     }
 
+    // TODO: Add new initialition method that support the postponed init feature.
+
     override public required init() {
         _sessionIdleTimeout = 23
+        initializationStrategy = .none
         super.init()
     }
 
@@ -199,6 +215,8 @@ open class OptimoveConfigBuilder: NSObject {
            let _baseUrlMap = _baseUrlMap
         {
             optimobileConfig = OptimobileConfig(
+                credentials: credentials,
+                initializationStrategy: initializationStrategy,
                 region: region,
                 sessionIdleTimeout: _sessionIdleTimeout,
                 inAppConsentStrategy: _inAppConsentStrategy,
