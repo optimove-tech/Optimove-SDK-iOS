@@ -367,6 +367,17 @@ extension Optimove {
         Optimobile.trackIBeaconProximity(beacon: beacon)
     }
     
+    @objc public func trackOpenMetric(notificationId: Int) {
+        Optimobile.trackEvent(
+            eventType: OptimobileEvent.MESSAGE_OPENED,
+            properties: [
+                "type" : KS_MESSAGE_TYPE_PUSH,
+                "id": notificationId
+            ],
+            immediateFlush: true
+        )
+    }
+    
     /**
         Records a proximity event for an Eddystone beacon.
     */
