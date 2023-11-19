@@ -485,6 +485,6 @@ class PushHelper {
         }
 
         let props: [String:Any] = ["type" : KS_MESSAGE_TYPE_PUSH, "id": notification.id]
-        Optimobile.trackEvent(eventType: KumulosSharedEvent.MESSAGE_DELIVERED, properties:props, immediateFlush: true)
+        Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED, properties:props, immediateFlush: true)
     }
 }
