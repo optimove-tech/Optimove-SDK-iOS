@@ -100,10 +100,6 @@ open class OptimoveConfigBuilder: NSObject {
     public convenience init(optimoveCredentials: String?, optimobileCredentials: String?) {
         self.init()
         self.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
-
-        if initializationStrategy == .none {
-            assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
-        }
     }
 
     /// Initialization without credentials.
@@ -202,6 +198,9 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func build() -> OptimoveConfig {
+        if initializationStrategy == .none {
+            assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
+        }
         var tenantInfo: OptimoveTenantInfo?
         var optimobileConfig: OptimobileConfig?
 
