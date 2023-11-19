@@ -367,6 +367,9 @@ extension Optimove {
         Optimobile.trackIBeaconProximity(beacon: beacon)
     }
     
+    
+    /// Records a notification open event
+    /// - Parameter notificationId: the notification ID
     @objc public func trackOpenMetric(notificationId: Int) {
         Optimobile.trackEvent(
             eventType: OptimobileEvent.MESSAGE_OPENED,
