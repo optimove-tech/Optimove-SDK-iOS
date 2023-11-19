@@ -8,10 +8,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - run: brew install xcbeautify xcodegen
+      - run: brew install xcbeautify
         name: Install dependencies
-      - run: xcodegen generate
-        name: Generate Xcode project
       - run: set -o pipefail && xcodebuild build-for-testing -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 14" | xcbeautify
         name: Build
       - run: set -o pipefail && xcodebuild test-without-building -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 14" | xcbeautify
