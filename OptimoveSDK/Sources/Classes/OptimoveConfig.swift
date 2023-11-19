@@ -77,6 +77,8 @@ public struct OptimobileConfig {
     let isRelease: Bool?
 }
 
+public typealias Region = OptimobileConfig.Region
+
 open class OptimoveConfigBuilder: NSObject {
     private var credentials: OptimobileConfig.Credentials?
     private var region: OptimobileConfig.Region?
@@ -123,15 +125,18 @@ open class OptimoveConfigBuilder: NSObject {
         }
     }
 
-    // TODO: Add new initialition method that support the postponed init feature.
+    /// Initialization without credentials.
+    /// - Parameter region: ``Region``
+    public convenience init(region: Region) {
+        self.init()
+        self.region = region
+    }
 
     override public required init() {
         _sessionIdleTimeout = 23
         initializationStrategy = .none
         super.init()
     }
-
-    public typealias Region = OptimobileConfig.Region
 
     @discardableResult public func bootOptiMobile(_ region: Region) -> OptimoveConfigBuilder {
         self.region = region
