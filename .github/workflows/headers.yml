@@ -1,7 +1,7 @@
 name: Headers
 on: [push]
 jobs:
-  run_tests:
+  check-headers:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
