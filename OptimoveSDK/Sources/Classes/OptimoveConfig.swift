@@ -51,6 +51,7 @@ public struct OptimobileConfig {
         case US = "us"
     }
 
+    let credentials: Credentials?
     let initializationStrategy: InitializationStrategy
     let region: Region
 
@@ -138,8 +139,16 @@ open class OptimoveConfigBuilder: NSObject {
         super.init()
     }
 
-    @discardableResult public func bootOptiMobile(_ region: Region) -> OptimoveConfigBuilder {
-        self.region = region
+    @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
+        if let optimoveCredentials = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials) {
+            _tenantToken = optimoveCredentials.tenantToken
+            _configName = optimoveCredentials.configName
+        }
+        if let optimobileCredentials = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials) {
+            credentials = optimobileCredentials.credentials
+            region = optimobileCredentials.region
+            _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentials.region.rawValue)
+        }
         return self
     }
 
