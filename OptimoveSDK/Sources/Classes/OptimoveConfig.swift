@@ -102,25 +102,8 @@ open class OptimoveConfigBuilder: NSObject {
 
     public convenience init(optimoveCredentials: String?, optimobileCredentials: String?) {
         self.init()
-        var initilazationStrategise: Set<OptimobileConfig.InitializationStrategy> = []
-        
-        if let optimoveCredentials = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials) {
-            _tenantToken = optimoveCredentials.tenantToken
-            _configName = optimoveCredentials.configName
-            initilazationStrategise.insert(.optimoveOnly)
-        }
+        self.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
 
-        if let optimobileCredentials = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials) {
-            credentials = optimobileCredentials.credentials
-            region = optimobileCredentials.region
-
-            _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentials.region.rawValue)
-            
-            initilazationStrategise.insert(.optimobileOnly)
-        }
-        
-        initializationStrategy = initilazationStrategise.reduce(.none, |)
-        
         if initializationStrategy == .none {
             assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
         }
@@ -140,15 +123,19 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
+        var initilazationStrategise: Set<OptimobileConfig.InitializationStrategy> = []
         if let optimoveCredentials = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials) {
             _tenantToken = optimoveCredentials.tenantToken
             _configName = optimoveCredentials.configName
+            initilazationStrategise.insert(.optimoveOnly)
         }
         if let optimobileCredentials = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials) {
             credentials = optimobileCredentials.credentials
             region = optimobileCredentials.region
             _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentials.region.rawValue)
+            initilazationStrategise.insert(.optimobileOnly)
         }
+        initializationStrategy = initilazationStrategise.reduce(.none, |)
         return self
     }
 
