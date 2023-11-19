@@ -154,8 +154,6 @@ final class KSHttpClient {
     }
 
     fileprivate func sendRequest(request: URLRequest, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) -> URLSessionDataTask {
-//        onFailure(nil, Error, nil)
-
         let task = urlSession.dataTask(with: request) { data, response, error in
             guard let httpResponse = response as? HTTPURLResponse else {
                 onFailure(nil, KSHttpError.responseCastingError, nil)
