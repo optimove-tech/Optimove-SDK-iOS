@@ -11,7 +11,8 @@ options=(
 
 git grep "${options[@]}" -- \
     '*.'{h,m,mm,swift} \
-    ':(exclude)**/third_party/**'
+    ':(exclude)**/third_party/**' \
+    ':(exclude)Package.swift'
 if [[ $? == 0 ]]; then
   echo "ERROR: Missing copyright notices in the files above. Please fix."
   exit 1
