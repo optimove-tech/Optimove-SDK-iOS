@@ -3,6 +3,18 @@
 import Foundation
 
 public struct OptimoveConfig {
+    /// Optimove initialization strategy.
+    struct InitializationStrategy: OptionSet {
+        let rawValue: Int
+
+        static let none = InitializationStrategy(rawValue: 1 << 0)
+        static let delayed = InitializationStrategy(rawValue: 1 << 1)
+        static let optimobileOnly = InitializationStrategy(rawValue: 1 << 2)
+        static let optimoveOnly = InitializationStrategy(rawValue: 1 << 3)
+
+        static let all: InitializationStrategy = [.optimobileOnly, .optimoveOnly]
+    }
+    
     let tenantInfo: OptimoveTenantInfo?
     let optimobileConfig: OptimobileConfig?
 
@@ -26,17 +38,7 @@ public struct OptimoveConfig {
 }
 
 public struct OptimobileConfig {
-    /// Optimove initialization strategy.
-    struct InitializationStrategy: OptionSet {
-        let rawValue: Int
 
-        static let none = InitializationStrategy(rawValue: 1 << 0)
-        static let delayed = InitializationStrategy(rawValue: 1 << 1)
-        static let optimobileOnly = InitializationStrategy(rawValue: 1 << 2)
-        static let optimoveOnly = InitializationStrategy(rawValue: 1 << 3)
-
-        static let all: InitializationStrategy = [.optimobileOnly, .optimoveOnly]
-    }
 
     public enum Region: String {
         case EU = "eu"
@@ -44,7 +46,6 @@ public struct OptimobileConfig {
     }
 
     let credentials: Credentials?
-    let initializationStrategy: InitializationStrategy
     let region: Region
 
     let sessionIdleTimeout: UInt
@@ -75,7 +76,7 @@ public typealias Region = OptimobileConfig.Region
 open class OptimoveConfigBuilder: NSObject {
     private var credentials: Credentials?
     private var region: OptimobileConfig.Region?
-    private var initializationStrategy: OptimobileConfig.InitializationStrategy
+    private var initializationStrategy: OptimoveConfig.InitializationStrategy
     private var _tenantToken: String?
     private var _configName: String?
     private var _sessionIdleTimeout: UInt
@@ -207,7 +208,6 @@ open class OptimoveConfigBuilder: NSObject {
         {
             optimobileConfig = OptimobileConfig(
                 credentials: credentials,
-                initializationStrategy: initializationStrategy,
                 region: region,
                 sessionIdleTimeout: _sessionIdleTimeout,
                 inAppConsentStrategy: _inAppConsentStrategy,
