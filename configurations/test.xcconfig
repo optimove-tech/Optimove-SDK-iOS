@@ -1,0 +1,5 @@
+SCHEME="UnitTests"
+PROJECT="Optimove.xcodeproj"
+SDK="iphonesimulator"
+DESTANATION="platform=iOS Simulator,name=iPhone 14"
+CONFIGURATION="Debug"
