@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Stop the script if any command fails
-set -o pipefail
+set -e -o pipefail
 
 echo "Checking dependencies..."
 
@@ -31,13 +31,9 @@ if ! command -v xcbeautify &>/dev/null; then
     brew install xcbeautify
 fi
 
-# Define your scheme and workspace/project name
-source test.xcconfig
-
-# TODO: Move lines above to xconfig file
+echo "Dependencies are installed."
 
 # Print the info
-echo "Starting process..."
 echo "----------------------------------------------------------------------------------------------------"
 echo "Project: $PROJECT"
 echo "Scheme: $SCHEME"
@@ -45,25 +41,3 @@ echo "Configuration: $CONFIGURATION"
 echo "SDK: $SDK"
 echo "Destination: $DESTANATION"
 echo "----------------------------------------------------------------------------------------------------"
-
-# Run XcodeGen to regenerate the project
-echo "Removing existing Xcode project..."
-rm -rf "$PROJECT"
-echo "Generating new Xcode project with XcodeGen..."
-xcodegen
-
-echo "----------------------------------------------------------------------------------------------------"
-
-# Function to run xcodebuild and xcbeautify
-run_xcodebuild() {
-    echo "Running xcodebuild command: $*"
-    xcodebuild "$@" | xcbeautify
-    echo "----------------------------------------------------------------------------------------------------"
-}
-
-# Build the project
-echo "Building the iOS project..."
-run_xcodebuild build-for-testing -scheme "$SCHEME" -project "$PROJECT" \
-    -destination "$DESTANATION" -sdk "$SDK" -configuration "$CONFIGURATION"
-
-echo "Process completed successfully."

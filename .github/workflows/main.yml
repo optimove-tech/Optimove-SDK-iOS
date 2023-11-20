@@ -5,7 +5,7 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v1
-      - run: ./build-for-testing.sh
+      - run: ./scripts/build-for-testing.sh
         name: Build for testing
-      - run: ./test-without-building.sh
+      - run: ./scripts/test-without-building.sh
         name: Test
