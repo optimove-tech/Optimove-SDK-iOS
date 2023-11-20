@@ -211,8 +211,8 @@ extension Optimobile {
     */
     static func pushTrackOpen(notification: PushNotification) {
         if notification.id == 0 {
-            Logger.error("""
-            Failed to track the push open event.
+            Logger.warn("""
+            Ignoring push notification open.
             Reason: Invalid notification id (== 0).
             Payload: \(notification).
             """)
