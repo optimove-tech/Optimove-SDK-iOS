@@ -3,7 +3,7 @@
 # Stop the script if any command fails
 set -e -o pipefail
 
-# Print the info
+# Print the environment variables
 echo "----------------------------------------------------------------------------------------------------"
 echo "Root: $ROOT"
 echo "Project: $PROJECT"
@@ -40,3 +40,5 @@ if ! command -v xcbeautify &>/dev/null; then
 fi
 
 echo "Dependencies are installed."
+
+echo "----------------------------------------------------------------------------------------------------"
