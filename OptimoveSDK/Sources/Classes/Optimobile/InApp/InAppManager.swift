@@ -618,7 +618,7 @@ internal class InAppManager {
     private func trackMessageDelivery(messages: [[AnyHashable : Any]]) -> Void {
         for message in messages {
             let props: [String:Any] = ["type" : MESSAGE_TYPE_IN_APP, "id":message["id"] as! Int]
-            Optimobile.trackEvent(eventType: KumulosSharedEvent.MESSAGE_DELIVERED.rawValue, properties: props)
+            Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED, properties: props)
         }
     }
     

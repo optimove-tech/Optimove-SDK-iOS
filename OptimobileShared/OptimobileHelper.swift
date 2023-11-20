@@ -4,10 +4,6 @@ import Foundation
 
 internal let KS_MESSAGE_TYPE_PUSH = 1
 
-internal enum KumulosSharedEvent : String {
-    case MESSAGE_DELIVERED = "k.message.delivered"
-}
-
 internal class OptimobileHelper {
     
     private static let installIdLock = DispatchSemaphore(value: 1)

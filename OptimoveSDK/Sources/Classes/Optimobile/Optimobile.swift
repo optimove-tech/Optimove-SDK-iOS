@@ -3,24 +3,6 @@
 import Foundation
 import UserNotifications
 
-internal enum OptimobileEvent : String {
-    case STATS_FOREGROUND = "k.fg"
-    case STATS_BACKGROUND = "k.bg"
-    case STATS_CALL_HOME = "k.stats.installTracked"
-    case STATS_ASSOCIATE_USER = "k.stats.userAssociated"
-    case STATS_USER_ASSOCIATION_CLEARED = "k.stats.userAssociationCleared"
-    case PUSH_DEVICE_REGISTER = "k.push.deviceRegistered"
-    case ENGAGE_BEACON_ENTERED_PROXIMITY = "k.engage.beaconEnteredProximity"
-    case ENGAGE_LOCATION_UPDATED = "k.engage.locationUpdated"
-    case DEVICE_UNSUBSCRIBED = "k.push.deviceUnsubscribed"
-    case IN_APP_CONSENT_CHANGED = "k.inApp.statusUpdated"
-    case MESSAGE_OPENED = "k.message.opened"
-    case MESSAGE_DISMISSED = "k.message.dismissed"
-    case MESSAGE_DELETED_FROM_INBOX = "k.message.inbox.deleted"
-    case DEEP_LINK_MATCHED = "k.deepLink.matched"
-    case MESSAGE_READ = "k.message.read"
-}
-
 public typealias InAppDeepLinkHandlerBlock = (InAppButtonPress) -> Void
 public typealias PushOpenedHandlerBlock = (PushNotification) -> Void
 

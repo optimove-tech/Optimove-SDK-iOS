@@ -225,7 +225,7 @@ public class OptimoveNotificationService {
 
         dispatchGroup.enter()
 
-        analyticsHelper.trackEvent(eventType: KumulosSharedEvent.MESSAGE_DELIVERED.rawValue, atTime: Date(), properties: props, immediateFlush: true, onSyncComplete: {err in
+        analyticsHelper.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED.rawValue, atTime: Date(), properties: props, immediateFlush: true, onSyncComplete: {err in
             self.syncBarrier.signal()
         })
 
