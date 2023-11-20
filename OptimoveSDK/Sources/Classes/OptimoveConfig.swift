@@ -14,7 +14,7 @@ public struct OptimoveConfig {
 
         static let all: InitializationStrategy = [.optimobileOnly, .optimoveOnly]
     }
-    
+
     let tenantInfo: OptimoveTenantInfo?
     let optimobileConfig: OptimobileConfig?
 
@@ -38,13 +38,6 @@ public struct OptimoveConfig {
 }
 
 public struct OptimobileConfig {
-    public enum Region: String {
-        case EU1 = "eu-central-1"
-        case EU2 = "eu-central-2"
-        case UK1 = "uk-1"
-        case US1 = "us-east-1"
-    }
-
     let credentials: Credentials?
     let region: Region
 
@@ -95,7 +88,7 @@ open class OptimoveConfigBuilder: NSObject {
 
     public convenience init(optimoveCredentials: String?, optimobileCredentials: String?) {
         self.init()
-        self.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+        setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
     }
 
     /// Initialization without credentials.
@@ -113,15 +106,19 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
-        if let optimoveCredentials = OptimoveConfigBuilder.parseOptimoveCredentials(creds: optimoveCredentials) {
-            _tenantToken = optimoveCredentials.tenantToken
-            _configName = optimoveCredentials.configName
+        if let optimoveCredentials = optimoveCredentials,
+           let args = try? OptimoveArguments(base64: optimoveCredentials)
+        {
+            _tenantToken = args.tenantToken
+            _configName = args.configName
             initializationStrategy.insert(.optimoveOnly)
         }
-        if let optimobileCredentials = OptimoveConfigBuilder.parseOptimobileCredentials(creds: optimobileCredentials) {
-            credentials = optimobileCredentials.credentials
-            region = optimobileCredentials.region
-            _baseUrlMap = UrlBuilder.defaultMapping(for: optimobileCredentials.region.rawValue)
+        if let optimobileCredentials = optimobileCredentials,
+           let args = try? OptimobileArguments(base64: optimobileCredentials)
+        {
+            credentials = args.credentials
+            region = args.region
+            _baseUrlMap = UrlBuilder.defaultMapping(for: args.region.rawValue)
             initializationStrategy.insert(.optimobileOnly)
         }
         return self
@@ -196,106 +193,151 @@ open class OptimoveConfigBuilder: NSObject {
         if initializationStrategy == .none {
             assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
         }
-        var tenantInfo: OptimoveTenantInfo?
-        var optimobileConfig: OptimobileConfig?
 
-        if let _tenantToken = _tenantToken, let _configName = _configName {
-            tenantInfo = OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
-        }
+        let tenantInfo: OptimoveTenantInfo? = {
+            if let _tenantToken = _tenantToken,
+               let _configName = _configName
+            {
+                return OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
+            }
+            return nil
+        }()
 
-        if let region = region,
-           let _baseUrlMap = _baseUrlMap
-        {
-            optimobileConfig = OptimobileConfig(
-                credentials: credentials,
-                region: region,
-                sessionIdleTimeout: _sessionIdleTimeout,
-                inAppConsentStrategy: _inAppConsentStrategy,
-                inAppDefaultDisplayMode: _inAppDisplayMode,
-                inAppDeepLinkHandlerBlock: _inAppDeepLinkHandlerBlock,
-                pushOpenedHandlerBlock: _pushOpenedHandlerBlock,
-                _pushReceivedInForegroundHandlerBlock: _pushReceivedInForegroundHandlerBlock,
-                deepLinkCname: _deepLinkCname,
-                deepLinkHandler: _deepLinkHandler,
-                baseUrlMap: _baseUrlMap,
-                runtimeInfo: _runtimeInfo,
-                sdkInfo: _sdkInfo,
-                isRelease: _isRelease
-            )
-        }
+        var optimobileConfig: OptimobileConfig? = {
+            if let region = region,
+               let _baseUrlMap = _baseUrlMap
+            {
+                return OptimobileConfig(
+                    credentials: credentials,
+                    region: region,
+                    sessionIdleTimeout: _sessionIdleTimeout,
+                    inAppConsentStrategy: _inAppConsentStrategy,
+                    inAppDefaultDisplayMode: _inAppDisplayMode,
+                    inAppDeepLinkHandlerBlock: _inAppDeepLinkHandlerBlock,
+                    pushOpenedHandlerBlock: _pushOpenedHandlerBlock,
+                    _pushReceivedInForegroundHandlerBlock: _pushReceivedInForegroundHandlerBlock,
+                    deepLinkCname: _deepLinkCname,
+                    deepLinkHandler: _deepLinkHandler,
+                    baseUrlMap: _baseUrlMap,
+                    runtimeInfo: _runtimeInfo,
+                    sdkInfo: _sdkInfo,
+                    isRelease: _isRelease
+                )
+            }
+            return nil
+        }()
 
         return OptimoveConfig(
             tenantInfo: tenantInfo,
             optimobileConfig: optimobileConfig
         )
     }
+}
 
-    private static func parseOptimoveCredentials(creds: String?) -> (tenantToken: String, configName: String)? {
-        guard let creds = creds,
-              let tuple = try? parseTuple(base64: creds),
-              let ver = tuple[0] as? Int
-        else {
-            return nil
+public extension OptimobileConfig {
+    enum Region: String, CaseIterable {
+        case EU1 = "eu-central-1"
+        case EU2 = "eu-central-2"
+        case UK1 = "uk-1"
+        case US1 = "us-east-1"
+
+        init(string: String) throws {
+            enum Error: Foundation.LocalizedError {
+                case failedRepresents(String)
+
+                var errorDescription: String? {
+                    switch self {
+                    case let .failedRepresents(string):
+                        return "Failed on represent the value \(string). Avaliable values are \(Region.allCases.description)"
+                    }
+                }
+            }
+            guard let value = OptimobileConfig.Region(rawValue: string) else {
+                throw Error.failedRepresents(string)
+            }
+            self = value
         }
-
-        if ver != 1 {
-            assertionFailure("Incompatible credentials version given, please update the SDK version or check credentials")
-        }
-
-        guard let tenantToken = tuple[1] as? String,
-              let configName = tuple[2] as? String
-        else {
-            return nil
-        }
-
-        return (tenantToken, configName)
     }
+}
 
-    private static func parseOptimobileCredentials(creds: String?) -> (region: OptimobileConfig.Region, credentials: Credentials)? {
-        guard let creds = creds,
-              let tuple = try? parseTuple(base64: creds),
-              let ver = tuple[0] as? Int
-        else {
-            return nil
-        }
-
-        if ver != 1 {
-            assertionFailure("Incompatible credentials version given, please update the SDK version or check credentials")
-        }
-
-        guard
-            let regionRaw = tuple[1] as? String,
-            let region = OptimobileConfig.Region(rawValue: regionRaw),
-            let apiKeyRaw = tuple[2] as? String,
-            let secretKeyRaw = tuple[3] as? String
-        else {
-            return nil
-        }
-
-        return (region, Credentials(apiKey: apiKeyRaw, secretKey: secretKeyRaw))
-    }
-
+struct OptimoveArguments: Decodable {
     enum Error: Foundation.LocalizedError {
         case failedDecodingBase64(String)
-        case failedSerialize(data: Data, to: Any.Type)
 
         var errorDescription: String? {
             switch self {
             case let .failedDecodingBase64(string):
-                return "Failed on decoding base64 value \(string)"
-            case let .failedSerialize(data: data, to: type):
-                return "Failed to serialize data length \(data.count) to type \(type.self)"
+                return "Failed on decoding base64 the value \(string)"
             }
         }
     }
 
-    private static func parseTuple(base64: String) throws -> [Any] {
+    let version: Int
+    let tenantToken: String
+    let configName: String
+
+    enum CodingKeys: String, CodingKey {
+        case version
+        case tenantToken
+        case configName
+    }
+
+    init(base64: String) throws {
         guard let data = Data(base64Encoded: base64) else {
             throw Error.failedDecodingBase64(base64)
         }
-        guard let result = try JSONSerialization.jsonObject(with: data) as? [Any] else {
-            throw Error.failedSerialize(data: data, to: [Any].self)
+        self = try JSONDecoder().decode(OptimoveArguments.self, from: data)
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+
+        // Assuming the order and type of elements is known and fixed
+        version = try container.decode(Int.self)
+        tenantToken = try container.decode(String.self)
+        configName = try container.decode(String.self)
+    }
+}
+
+struct OptimobileArguments: Decodable {
+    enum Error: Foundation.LocalizedError {
+        case failedDecodingBase64(String)
+
+        var errorDescription: String? {
+            switch self {
+            case let .failedDecodingBase64(string):
+                return "Failed on decoding base64 the value \(string)"
+            }
         }
-        return result
+    }
+
+    let version: Int
+    let region: OptimobileConfig.Region
+    var credentials: Credentials
+
+    enum CodingKeys: String, CodingKey {
+        case version
+        case region
+        case credentials
+    }
+
+    init(base64: String) throws {
+        guard let data = Data(base64Encoded: base64) else {
+            throw Error.failedDecodingBase64(base64)
+        }
+        self = try JSONDecoder().decode(OptimobileArguments.self, from: data)
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+
+        // Assuming the order and type of elements is known and fixed
+        version = try container.decode(Int.self)
+        let regionString = try container.decode(String.self)
+        let apiKey = try container.decode(String.self)
+        let secretKey = try container.decode(String.self)
+
+        region = try OptimobileConfig.Region(string: regionString)
+        credentials = Credentials(apiKey: apiKey, secretKey: secretKey)
     }
 }
