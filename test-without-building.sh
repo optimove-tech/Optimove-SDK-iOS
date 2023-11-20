@@ -32,11 +32,7 @@ if ! command -v xcbeautify &>/dev/null; then
 fi
 
 # Define your scheme and workspace/project name
-SCHEME="UnitTests"
-PROJECT="Optimove.xcodeproj"
-SDK="iphonesimulator"
-DESTANATION="platform=iOS Simulator,name=iPhone 14"
-CONFIGURATION="Debug"
+source test.xcconfig
 
 # TODO: Move lines above to xconfig file
 
