@@ -23,7 +23,7 @@ fi
 
 # Check if Homebrew is installed
 if ! command -v brew &>/dev/null; then
-    echo "Error: Homebrew is not installed. Cannot install XcodeGen."
+    echo "Error: Homebrew is not installed. Please install Homebrew from https://brew.sh/"
     exit 1
 fi
 
