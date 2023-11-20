@@ -2,6 +2,8 @@
 
 ## 5.5.0
 
+- Increased the minimum supported iOS version to 12.0 for Carthage builds.
+
 ## 5.4.0
 
 - Add the initial visitor identifier getter to public API. The new API is public available via the following methods:
