@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Stop the script if any command fails
-set -e pipefail
+set -o pipefail
 
 echo "Checking dependencies..."
 

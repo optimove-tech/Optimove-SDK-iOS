@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Stop the script if any command fails
-set -e pipefail
+set -o pipefail
 
 echo "Checking dependencies..."
 
@@ -35,7 +35,7 @@ fi
 SCHEME="UnitTests"
 PROJECT="Optimove.xcodeproj"
 SDK="iphonesimulator"
-DESTANATION="platform=iOS Simulator,name=iPhone 15"
+DESTANATION="platform=iOS Simulator,name=iPhone 14"
 CONFIGURATION="Debug"
 
 # TODO: Move lines above to xconfig file
