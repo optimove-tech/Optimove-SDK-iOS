@@ -14,10 +14,6 @@ class MergeRemoteConfigurationOperationTests: XCTestCase {
         )
     }
 
-    func test_should_fail() {
-        XCTFail()
-    }
-    
     func test_merge_config() {
         let globalConfig = GlobalConfigFixture().build()
         try! repository.saveGlobal(globalConfig)
