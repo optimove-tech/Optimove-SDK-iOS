@@ -369,7 +369,7 @@ extension Optimove {
     
     /// Records a notification open event
     /// - Parameter userInfo - The userInfo dictionary you received in the push notification payload
-    @objc public func trackOpenMetric(userInfo:  [AnyHashable: Any]) {
+    @objc public func trackOpenMetric(userInfo: [AnyHashable: Any]) {
         Optimobile.pushTrackOpen(userInfo: userInfo)
     }
     
