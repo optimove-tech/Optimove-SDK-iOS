@@ -5,8 +5,6 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v1
-      - run: brew install xcbeautify
-        name: Install dependencies
       - run: ./build-for-testing.sh
         name: Build for testing
       - run: ./test-without-building.sh
