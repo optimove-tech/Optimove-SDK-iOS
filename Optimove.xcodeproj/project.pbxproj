@@ -165,6 +165,7 @@
 		929E35FD131B942202950B5B /* OptimoveNotificationExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F60CE8D6E405DAC4EBCEE3C /* OptimoveNotificationExtensionTests.swift */; };
 		957510FD9374B0360E0B2495 /* NewTenantInfoHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B7CAD06AF20B0ACA56C962 /* NewTenantInfoHandlerTests.swift */; };
 		95D574CDBD1AD0C0416C0CA2 /* ParametersNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFA35DE83F5306D2EB306C1 /* ParametersNormalizer.swift */; };
+		975697C5309B40D22C37B171 /* OptimobileEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D30D3726F5ED92D84512FB /* OptimobileEvent.swift */; };
 		98C5A68EE8133BD14877F57B /* Dictionary+CompactMapKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CA140085BC23AFEE47F451 /* Dictionary+CompactMapKeys.swift */; };
 		9CB2C5384B4414B52C02DBBD /* OptistreamQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E365016FD32E91448DAD12 /* OptistreamQueue.swift */; };
 		9CF7237135A4CC033D355E3F /* TenantConfigFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197CDA59D9D767513A115BDF /* TenantConfigFixture.swift */; };
@@ -250,6 +251,7 @@
 		E147D2E305837E0D739D1C05 /* KVOExpectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E56A6CE9F936B2F897953F /* KVOExpectation.swift */; };
 		E1B7BB8C96DEC557EDFA7F6D /* EventCDv1ToEventCDv2MappingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6766A447E9CDA51F2CE3D91B /* EventCDv1ToEventCDv2MappingModel.swift */; };
 		E1E7F62209130B79A66B39EC /* MigrationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CAFA8674D956078D45613FD /* MigrationObserver.swift */; };
+		E25DA148253CD764023C91BD /* OptimobileEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6218043D6E4B30B504B25EAC /* OptimobileEvent.swift */; };
 		E362BF6DD8888742811D98A0 /* StubEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432D5D39398212165A5C8188 /* StubEvent.swift */; };
 		E454A59BDF3B9A9F68DB6139 /* MainFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A5795C174DB5BE5833F0373 /* MainFactory.swift */; };
 		E55BD25E76886EA7EFA887F2 /* EventConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = C95FC1B779C18A7446E2845C /* EventConfig.swift */; };
@@ -442,6 +444,7 @@
 		5FC57145A54E5033A5CECAF0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		5FE216E57E65CEC3F6D9F4CE /* String+isBlank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+isBlank.swift"; sourceTree = "<group>"; };
 		615F8FAE93C5D0A6AC301070 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		6218043D6E4B30B504B25EAC /* OptimobileEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimobileEvent.swift; sourceTree = "<group>"; };
 		63C7EC2263685823B37EC99A /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		6424915844F66E0315561874 /* RealTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTime.swift; sourceTree = "<group>"; };
 		64AAD2B0BFFF64DCB3907ECE /* OptimoveCore-Unit.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "OptimoveCore-Unit.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -572,6 +575,7 @@
 		E36EE80C309330F735D037E2 /* SdkPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SdkPlatform.swift; sourceTree = "<group>"; };
 		E5F014AB9AE645C920DD038B /* NetworkRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequest.swift; sourceTree = "<group>"; };
 		E6C2AA83233AE32D981F3555 /* GlobalConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConfig.swift; sourceTree = "<group>"; };
+		E6D30D3726F5ED92D84512FB /* OptimobileEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimobileEvent.swift; sourceTree = "<group>"; };
 		E6E56A6CE9F936B2F897953F /* KVOExpectation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KVOExpectation.swift; sourceTree = "<group>"; };
 		E81A4955301970EC4DFBDA13 /* KeyValueStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueStorageTests.swift; sourceTree = "<group>"; };
 		EA2B4035AC1EEB59B3534409 /* InAppManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppManager.swift; sourceTree = "<group>"; };
@@ -1606,6 +1610,7 @@
 				7E4B3747D4FE3D271EBADC2C /* KeyValPersistenceHelper.swift */,
 				99EF83EFAF52070E59C5A389 /* KSHttp.swift */,
 				07BBE644C3487EC57B169E6B /* MediaHelper.swift */,
+				E6D30D3726F5ED92D84512FB /* OptimobileEvent.swift */,
 				ED41094AA6F15AAEC368096A /* OptimobileHelper.swift */,
 				66905FCA4315A6615953B49B /* OptimobileUserDefaultsKey.swift */,
 				499FB65BC432D40BBB409525 /* PendingNotification.swift */,
@@ -1622,6 +1627,7 @@
 				F251A2E671B4575611FC81D5 /* KeyValPersistenceHelper.swift */,
 				427D452311AC9642F4EAD787 /* KSHttp.swift */,
 				A26871854B50CF09EED86457 /* MediaHelper.swift */,
+				6218043D6E4B30B504B25EAC /* OptimobileEvent.swift */,
 				C1F3F81B42DD7AA8AB1BEE7A /* OptimobileHelper.swift */,
 				C7AFA2A8587C5DCA93A30108 /* OptimobileUserDefaultsKey.swift */,
 				D7F841AF4345B15514C71B49 /* PendingNotification.swift */,
@@ -1977,6 +1983,7 @@
 				503930654F8FCECBDE14DA5B /* Optimobile+Stats.swift in Sources */,
 				7AEB43BFC0E814FEBEE5BC1F /* Optimobile.swift in Sources */,
 				2E41CAC99770B430CCA80976 /* OptimobileBadgeObserver.swift in Sources */,
+				E25DA148253CD764023C91BD /* OptimobileEvent.swift in Sources */,
 				72D7D833022337E4C0CF9A11 /* OptimobileHelper.swift in Sources */,
 				40F8D5713430223076ED4DA8 /* OptimobileUserDefaultsKey.swift in Sources */,
 				499D5BF06BBCC8EBB94263E4 /* Optimove.swift in Sources */,
@@ -2059,6 +2066,7 @@
 				AA64749A1A517EC2636A22B4 /* KSHttp.swift in Sources */,
 				FBEDA772B460CEDF5A9CD453 /* KeyValPersistenceHelper.swift in Sources */,
 				B90744D2826B1CC61479CB09 /* MediaHelper.swift in Sources */,
+				975697C5309B40D22C37B171 /* OptimobileEvent.swift in Sources */,
 				C6D90CD8E2120D32C952FFF5 /* OptimobileHelper.swift in Sources */,
 				718D7492799EC4068EF80F67 /* OptimobileUserDefaultsKey.swift in Sources */,
 				72AE4BC46B4A6A97E92622C3 /* OptimoveNotificationService.swift in Sources */,
