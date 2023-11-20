@@ -209,27 +209,22 @@ extension Optimobile {
         Parameters:
             - notification: The notification which triggered the action
     */
-    static func pushTrackOpen(notification: PushNotification?) {
-        guard let notification = notification else {
+    static func pushTrackOpen(notification: PushNotification) {
+        if notification.id == 0 {
+            Logger.error("""
+            Failed to track the push open event.
+            Reason: Invalid notification id (== 0).
+            Payload: \(notification).
+            """)
             return
         }
-
         let params = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_OPENED, properties:params)
     }
 
-    @available(iOS 9.0, *)
-    internal func pushHandleOpen(withUserInfo: [AnyHashable: Any]?) {
-        guard let userInfo = withUserInfo else {
-            return
-        }
-
+    static func pushTrackOpen(userInfo: [AnyHashable: Any]) {
         let notification = PushNotification(userInfo: userInfo)
-        if notification.id == 0 {
-            return
-        }
-
-        self.pushHandleOpen(notification: notification)
+        Optimobile.pushTrackOpen(notification: notification)
     }
 
     @available(iOS 10.0, *)

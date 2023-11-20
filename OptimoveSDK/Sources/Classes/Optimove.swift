@@ -367,18 +367,10 @@ extension Optimove {
         Optimobile.trackIBeaconProximity(beacon: beacon)
     }
     
-    
     /// Records a notification open event
-    /// - Parameter notificationId: the notification ID
-    @objc public func trackOpenMetric(notificationId: Int) {
-        Optimobile.trackEvent(
-            eventType: OptimobileEvent.MESSAGE_OPENED,
-            properties: [
-                "type" : KS_MESSAGE_TYPE_PUSH,
-                "id": notificationId
-            ],
-            immediateFlush: true
-        )
+    /// - Parameter userInfo - The userInfo dictionary you received in the push notification payload
+    @objc public func trackOpenMetric(userInfo:  [AnyHashable: Any]) {
+        Optimobile.pushTrackOpen(userInfo: userInfo)
     }
     
     /**
