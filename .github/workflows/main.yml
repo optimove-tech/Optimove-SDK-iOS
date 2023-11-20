@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v1
       - run: brew install xcbeautify
         name: Install dependencies
-      - run: set -o pipefail && xcodebuild build-for-testing -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 14" | xcbeautify
-        name: Build
-      - run: set -o pipefail && xcodebuild test-without-building -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 14" | xcbeautify
+      - run: ./build-for-testing.sh
+        name: Build for testing
+      - run: ./test-without-building.sh
         name: Test
