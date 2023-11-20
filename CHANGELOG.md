@@ -2,7 +2,7 @@
 
 ## 5.5.0
 
-- Add a new public API `Optimove.trackOpenMetric(notificationId: Int)` - to track the open metric of a push notification, when UserNotificationCenter delegate is not available.
+- Add a new public API `Optimove.trackOpenMetric(userInfo: [AnyHashable: Any])` - to track the open metric of a push notification, when UserNotificationCenter delegate is not available.
 
 ## 5.4.0
 
