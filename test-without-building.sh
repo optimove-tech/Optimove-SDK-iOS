@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Stop the script if any command fails
-set -e
+set -e pipefail
+
+echo "Checking dependencies..."
 
 # Check if xcodebuild is installed
 if ! command -v xcodebuild &>/dev/null; then
