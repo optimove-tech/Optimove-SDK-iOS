@@ -2,19 +2,20 @@
 
 import Foundation
 
-public struct OptimoveConfig {
-    /// Optimove initialization strategy.
-    struct InitializationStrategy: OptionSet {
-        let rawValue: Int
+/// A set of options for configuring the SDK.
+public struct FeatureSet: OptionSet, @unchecked Sendable {
+    public let rawValue: Int
+    
+    static let none = FeatureSet(rawValue: 1 << 0)
+    public static private(set) var optimobile = FeatureSet(rawValue: 1 << 1)
+    public static private(set) var optimove = FeatureSet(rawValue: 1 << 2)
 
-        static let none = InitializationStrategy(rawValue: 1 << 0)
-        static let delayed = InitializationStrategy(rawValue: 1 << 1)
-        static let optimobileOnly = InitializationStrategy(rawValue: 1 << 2)
-        static let optimoveOnly = InitializationStrategy(rawValue: 1 << 3)
-
-        static let all: InitializationStrategy = [.optimobileOnly, .optimoveOnly]
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
     }
+}
 
+public struct OptimoveConfig {
     let tenantInfo: OptimoveTenantInfo?
     let optimobileConfig: OptimobileConfig?
 
@@ -69,7 +70,7 @@ public typealias Region = OptimobileConfig.Region
 open class OptimoveConfigBuilder: NSObject {
     private var credentials: Credentials?
     private var region: OptimobileConfig.Region?
-    private var initializationStrategy: OptimoveConfig.InitializationStrategy
+    private var featureSet: FeatureSet
     private var _tenantToken: String?
     private var _configName: String?
     private var _sessionIdleTimeout: UInt
@@ -93,15 +94,15 @@ open class OptimoveConfigBuilder: NSObject {
 
     /// Initialization without credentials.
     /// - Parameter region: ``Region``
-    public convenience init(region: Region) {
+    public convenience init(region: Region, featureSet: FeatureSet) {
         self.init()
         self.region = region
-        initializationStrategy = .delayed
+        self.featureSet = featureSet
     }
 
     override public required init() {
         _sessionIdleTimeout = 23
-        initializationStrategy = .none
+        featureSet = .none
         super.init()
     }
 
@@ -111,7 +112,7 @@ open class OptimoveConfigBuilder: NSObject {
         {
             _tenantToken = args.tenantToken
             _configName = args.configName
-            initializationStrategy.insert(.optimoveOnly)
+            featureSet.insert(.optimove)
         }
         if let optimobileCredentials = optimobileCredentials,
            let args = try? OptimobileArguments(base64: optimobileCredentials)
@@ -119,7 +120,7 @@ open class OptimoveConfigBuilder: NSObject {
             credentials = args.credentials
             region = args.region
             _baseUrlMap = UrlBuilder.defaultMapping(for: args.region.rawValue)
-            initializationStrategy.insert(.optimobileOnly)
+            featureSet.insert(.optimobile)
         }
         return self
     }
@@ -199,7 +200,7 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func build() -> OptimoveConfig {
-        if initializationStrategy == .none {
+        if featureSet == .none {
             assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
         }
 
