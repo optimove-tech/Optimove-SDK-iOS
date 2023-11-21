@@ -2,7 +2,7 @@
 
 import Foundation
 
-class UrlBuilder {
+public class UrlBuilder {
     public enum Service: CaseIterable {
         case crm
         case ddl
@@ -12,7 +12,7 @@ class UrlBuilder {
         case push
     }
 
-    public typealias ServiceUrlMap = [Service: URL]
+    public typealias ServiceUrlMap = [Service: String]
 
     let baseUrlMap: ServiceUrlMap
 
@@ -32,17 +32,17 @@ class UrlBuilder {
 
     func urlForService(_ service: Service) -> URL {
         let baseUrl = baseUrlMap[service]!
-        return baseUrl
+        return URL(string: baseUrl)!
     }
 
     static func defaultMapping(for region: String) -> ServiceUrlMap {
         return [
-            .crm: URL(string: "https://crm-\(region).kumulos.com")!,
-            .ddl: URL(string: "https://links-\(region).kumulos.com")!,
-            .events: URL(string: "https://events-\(region).kumulos.com")!,
-            .iar: URL(string: "https://iar.app.delivery")!,
-            .media: URL(string: "https://i-\(region).app.delivery")!,
-            .push: URL(string: "https://push-\(region).kumulos.com")!,
+            .crm: "https://crm-\(region).kumulos.com",
+            .ddl: "https://links-\(region).kumulos.com",
+            .events: "https://events-\(region).kumulos.com",
+            .iar: "https://iar.app.delivery",
+            .media: "https://i-\(region).app.delivery",
+            .push: "https://push-\(region).kumulos.com",
         ]
     }
 }

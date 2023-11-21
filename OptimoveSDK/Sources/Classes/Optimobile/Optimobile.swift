@@ -128,8 +128,8 @@ class Optimobile {
             setCredentials(credentials)
         }
         KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.media]?.absoluteString, forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.iar]?.absoluteString, forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.iar], forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
     }
 

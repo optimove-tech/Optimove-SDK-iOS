@@ -161,6 +161,15 @@ open class OptimoveConfigBuilder: NSObject {
 
         return self
     }
+    
+    /**
+     Internal SDK embedding API, do not call or depend on this method in your app
+     */
+    @discardableResult public func setBaseUrlMapping(baseUrlMap: UrlBuilder.ServiceUrlMap) -> OptimoveConfigBuilder {
+        _baseUrlMap = baseUrlMap
+
+        return self
+    }
 
     /**
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
