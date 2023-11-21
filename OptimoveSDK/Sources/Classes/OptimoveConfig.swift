@@ -203,7 +203,7 @@ open class OptimoveConfigBuilder: NSObject {
             return nil
         }()
 
-        var optimobileConfig: OptimobileConfig? = {
+        let optimobileConfig: OptimobileConfig? = {
             if let region = region,
                let _baseUrlMap = _baseUrlMap
             {
