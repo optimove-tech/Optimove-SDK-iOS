@@ -163,15 +163,6 @@ open class OptimoveConfigBuilder: NSObject {
     }
     
     /**
-     Internal SDK embedding API, do not call or depend on this method in your app
-     */
-    @discardableResult public func setBaseUrlMapping(baseUrlMap: UrlBuilder.ServiceUrlMap) -> OptimoveConfigBuilder {
-        _baseUrlMap = baseUrlMap
-
-        return self
-    }
-
-    /**
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
      */
     @discardableResult public func setRuntimeInfo(runtimeInfo: [String: AnyObject]) -> OptimoveConfigBuilder {
@@ -194,6 +185,15 @@ open class OptimoveConfigBuilder: NSObject {
      */
     @discardableResult public func setTargetType(isRelease: Bool) -> OptimoveConfigBuilder {
         _isRelease = isRelease
+
+        return self
+    }
+    
+    /**
+     Internal SDK embedding API, do not call or depend on this method in your app
+     */
+    @discardableResult public func setBaseUrlMapping(baseUrlMap: UrlBuilder.ServiceUrlMap) -> OptimoveConfigBuilder {
+        _baseUrlMap = baseUrlMap
 
         return self
     }
