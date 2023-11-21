@@ -61,10 +61,6 @@ final class KSHttpClient {
         authHeader = nil
     }
 
-    deinit {
-        invalidateSessionCancellingTasks(true)
-    }
-
     func invalidateSessionCancellingTasks(_ cancel: Bool) {
         if cancel {
             urlSession.invalidateAndCancel()
