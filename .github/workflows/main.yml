@@ -1,22 +1,11 @@
 name: CI
-
 on: [push]
-
 jobs:
-  build:
-
+  unit-tests:
     runs-on: macOS-latest
-
-    env:
-        DEVELOPER_DIR: /Applications/Xcode_13.2.1.app/Contents/Developer
-
     steps:
-    - uses: actions/checkout@v1
-    - run: carthage update --use-xcframeworks --cache-builds
-      name: Carthage
-    - name: Install xcbeautify
-      run: brew install xcbeautify
-    - run: set -o pipefail && xcodebuild build-for-testing -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11" | xcbeautify
-      name: Build
-    - run: set -o pipefail && xcodebuild test-without-building -project Optimove.xcodeproj -scheme UnitTests -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 11" | xcbeautify
-      name: Test
+      - uses: actions/checkout@v1
+      - run: ./scripts/build-for-testing.sh
+        name: Build for testing
+      - run: ./scripts/test-without-building.sh
+        name: Test
