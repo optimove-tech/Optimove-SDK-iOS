@@ -80,7 +80,7 @@ final class Optimobile {
          Initialize the Optimobile SDK.
      */
     static func initialize(config optimoveConfig: OptimoveConfig, initialVisitorId: String, initialUserId: String?) {
-        if instance !== nil, optimoveConfig.featureSet.contains(.delayedConfiguration) {
+        if instance !== nil, optimoveConfig.features.contains(.delayedConfiguration) {
             completeDelayedConfiguration(config: optimoveConfig.optimobileConfig!)
             return
         }
