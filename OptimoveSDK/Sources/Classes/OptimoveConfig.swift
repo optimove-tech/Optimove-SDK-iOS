@@ -207,9 +207,8 @@ open class OptimoveConfigBuilder: NSObject {
     @discardableResult public func build() -> OptimoveConfig {
         if featureSet == .none {
             // FIXME: - Remove this assertionFailure and throw an error instead
-            assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
+            Logger.error("Invalid credentials provided to \(OptimoveConfigBuilder.self). At least one of optimoveCredentials or optimobileCredentials are required.")
         }
-        
 
         let tenantInfo: OptimoveTenantInfo? = {
             if let _tenantToken = _tenantToken,
@@ -217,6 +216,7 @@ open class OptimoveConfigBuilder: NSObject {
             {
                 return OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
             }
+            Logger.info("Tenant info is not set. The Optimove SDK initialization will be skipped.")
             return nil
         }()
 
@@ -239,6 +239,7 @@ open class OptimoveConfigBuilder: NSObject {
                     isRelease: _isRelease
                 )
             }
+            Logger.info("Optimobile config is not set. The Optimobile SDK initialization will be skipped.")
             return nil
         }()
 
