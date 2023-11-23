@@ -6,10 +6,9 @@ import Foundation
 public struct FeatureSet: OptionSet, @unchecked Sendable, CustomStringConvertible {
     public let rawValue: Int
 
-    static let none = FeatureSet(rawValue: 1 << 0)
-    static let delayedConfiguration = FeatureSet(rawValue: 1 << 1)
-    public static let optimobile = FeatureSet(rawValue: 1 << 2)
-    public static let optimove = FeatureSet(rawValue: 1 << 3)
+    public static let optimobile = FeatureSet(rawValue: 1 << 1)
+    public static let optimove = FeatureSet(rawValue: 1 << 2)
+    static let delayedConfiguration = FeatureSet(rawValue: 1 << 3)
 
     public init(rawValue: Int) {
         self.rawValue = rawValue
@@ -116,7 +115,7 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     override public required init() {
-        featureSet = .none
+        featureSet = []
         super.init()
     }
 
@@ -134,6 +133,10 @@ open class OptimoveConfigBuilder: NSObject {
             credentials = args.credentials
             region = args.region
             featureSet.insert(.optimobile)
+        }
+        if featureSet.intersection([.optimove, .optimobile]).isEmpty {
+            // TODO: - Throw an error
+            Logger.error("Invalid credentials provided to \(OptimoveConfigBuilder.self). At least one of optimoveCredentials or optimobileCredentials are required.")
         }
         return self
     }
@@ -209,18 +212,13 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func build() -> OptimoveConfig {
-        if featureSet == .none {
-            // FIXME: - Remove this assertionFailure and throw an error instead
-            Logger.error("Invalid credentials provided to \(OptimoveConfigBuilder.self). At least one of optimoveCredentials or optimobileCredentials are required.")
-        }
-
         let tenantInfo: OptimoveTenantInfo? = {
             if let _tenantToken = _tenantToken,
                let _configName = _configName
             {
                 return OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
             }
-            Logger.info("Tenant info is not set. The Optimove SDK initialization will be skipped.")
+            Logger.info("\(OptimoveTenantInfo.self) building failed.")
             return nil
         }()
 
@@ -243,7 +241,7 @@ open class OptimoveConfigBuilder: NSObject {
                     isRelease: _isRelease
                 )
             }
-            Logger.info("Optimobile config is not set. The Optimobile SDK initialization will be skipped.")
+            Logger.info("\(OptimobileConfig.self) building failed.")
             return nil
         }()
 
