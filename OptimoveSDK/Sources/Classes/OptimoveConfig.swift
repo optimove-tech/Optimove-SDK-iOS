@@ -3,15 +3,31 @@
 import Foundation
 
 /// A set of options for configuring the SDK.
-public struct FeatureSet: OptionSet, @unchecked Sendable {
+public struct FeatureSet: OptionSet, @unchecked Sendable, CustomStringConvertible {
     public let rawValue: Int
-    
+
     static let none = FeatureSet(rawValue: 1 << 0)
-    public static private(set) var optimobile = FeatureSet(rawValue: 1 << 1)
-    public static private(set) var optimove = FeatureSet(rawValue: 1 << 2)
+    static let delayedConfiguration = FeatureSet(rawValue: 1 << 1)
+    public static let optimobile = FeatureSet(rawValue: 1 << 2)
+    public static let optimove = FeatureSet(rawValue: 1 << 3)
 
     public init(rawValue: Int) {
         self.rawValue = rawValue
+    }
+
+    public var description: String {
+        var descriptions: [String] = []
+        if contains(.optimobile) {
+            descriptions.append("Optimobile")
+        }
+        if contains(.optimove) {
+            descriptions.append("Optimove")
+        }
+        if contains(.delayedConfiguration) {
+            descriptions.append("Delayed Configuration")
+        }
+
+        return descriptions.isEmpty ? "No Features" : descriptions.joined(separator: ", ")
     }
 }
 
@@ -21,11 +37,11 @@ public struct OptimoveConfig {
     let optimobileConfig: OptimobileConfig?
 
     func isOptimoveConfigured() -> Bool {
-        return tenantInfo != nil
+        return featureSet.contains(.optimove)
     }
 
     func isOptimobileConfigured() -> Bool {
-        return optimobileConfig != nil
+        return featureSet.contains(.optimobile) || featureSet.contains(.delayedConfiguration)
     }
 }
 
@@ -96,7 +112,7 @@ open class OptimoveConfigBuilder: NSObject {
     public convenience init(region: Region, featureSet: FeatureSet) {
         self.init()
         self.region = region
-        self.featureSet = featureSet
+        self.featureSet = [featureSet, .delayedConfiguration]
     }
 
     override public required init() {
@@ -160,7 +176,7 @@ open class OptimoveConfigBuilder: NSObject {
 
         return self
     }
-    
+
     /**
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
      */
@@ -193,9 +209,10 @@ open class OptimoveConfigBuilder: NSObject {
             // FIXME: - Remove this assertionFailure and throw an error instead
             assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
         }
+        
+
         let tenantInfo: OptimoveTenantInfo? = {
-            if featureSet.contains(.optimobile),
-               let _tenantToken = _tenantToken,
+            if let _tenantToken = _tenantToken,
                let _configName = _configName
             {
                 return OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
@@ -204,9 +221,7 @@ open class OptimoveConfigBuilder: NSObject {
         }()
 
         let optimobileConfig: OptimobileConfig? = {
-            if featureSet.contains(.optimobile),
-               let region = region
-            {
+            if let region = region {
                 return OptimobileConfig(
                     credentials: credentials,
                     region: region,
