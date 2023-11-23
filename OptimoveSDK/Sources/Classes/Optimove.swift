@@ -409,6 +409,7 @@ private extension Optimove {
                     completion(.success(()))
                 case let .failure(error):
                     Logger.fatal("Initialization failed. 🛑\nReason: \(error.localizedDescription)")
+                    RunningFlagsIndication.isInitializerRunning.toggle()
                     completion(.failure(error))
                 }
             }
