@@ -79,9 +79,20 @@ class Optimobile {
     /**
          Initialize the Optimobile SDK.
      */
-    static func initialize(config: OptimobileConfig, initialVisitorId: String, initialUserId: String?) {
-        if instance !== nil {
-            assertionFailure("The OptimobileSDK has already been initialized")
+    static func initialize(config optimoveConfig: OptimoveConfig, initialVisitorId: String, initialUserId: String?) {
+        if instance !== nil, optimoveConfig.featureSet.contains(.delayedConfiguration) {
+            completeDelayedConfiguration(config: optimoveConfig.optimobileConfig!)
+            return
+        }
+
+        guard instance == nil else {
+            Logger.error("The OptimobileSDK has already been initialized")
+            return
+        }
+
+        guard let config = optimoveConfig.optimobileConfig else {
+            Logger.error("The OptimobileSDK has not been initialized. OptimoveConfig is missing.")
+            return
         }
 
         writeDefaultsKeys(config: config, initialVisitorId: initialVisitorId)
@@ -102,7 +113,16 @@ class Optimobile {
 
         maybeAlignUserAssociation(initialUserId: initialUserId)
     }
-    
+
+    static func completeDelayedConfiguration(config: OptimobileConfig) {
+        guard let credentials = config.credentials else {
+            Logger.warn("No credentials provided for delayed configuration completion.")
+            return
+        }
+        Logger.info("Completing delayed configuration with credentials: \(credentials)")
+        setCredentials(credentials)
+    }
+
     static func setCredentials(_ credentials: Credentials) {
         KeyValPersistenceHelper.set(try? JSONEncoder().encode(credentials), forKey: OptimobileUserDefaultsKey.CREDENTIALS_JSON.rawValue)
     }
@@ -166,7 +186,7 @@ class Optimobile {
         if config.deepLinkHandler != nil {
             deepLinkHelper = DeepLinkHelper(config, httpClient: networkFactory.build(for: .ddl))
         }
-        
+
         Logger.debug("Optimobile SDK was initialized with \(config)")
     }
 

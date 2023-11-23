@@ -50,13 +50,13 @@ typealias Logger = OptimoveCore.Logger
             Optimove.configure(for: tenantInfo)
         }
 
-        if config.isOptimobileConfigured(), let optimobileConfig = config.optimobileConfig {
+        if config.isOptimobileConfigured() {
             shared.container.resolve { serviceLocator in
                 do {
                     let visitorId = try serviceLocator.storage().getInitialVisitorId()
                     let userId = try? serviceLocator.storage().getCustomerID()
-                    
-                    Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId, initialUserId: userId)
+
+                    Optimobile.initialize(config: config, initialVisitorId: visitorId, initialUserId: userId)
                 } catch {
                     throw GuardError.custom("Failed on OptimobileSDK initialization. Reason: \(error.localizedDescription)")
                 }
@@ -67,6 +67,7 @@ typealias Logger = OptimoveCore.Logger
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
     public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
         let builder = OptimoveConfigBuilder(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+        builder.setFeatureSet([builder.featureSet, .delayedConfiguration])
         let config = builder.build()
         initialize(with: config)
     }

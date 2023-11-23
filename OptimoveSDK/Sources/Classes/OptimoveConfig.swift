@@ -41,7 +41,7 @@ public struct OptimoveConfig {
     }
 
     func isOptimobileConfigured() -> Bool {
-        return featureSet.contains(.optimobile) || featureSet.contains(.delayedConfiguration)
+        return featureSet.contains(.optimobile)
     }
 }
 
@@ -86,7 +86,7 @@ public typealias Region = OptimobileConfig.Region
 
 open class OptimoveConfigBuilder: NSObject {
     private var credentials: Credentials?
-    private var featureSet: FeatureSet
+    public private(set) var featureSet: FeatureSet
     private var region: OptimobileConfig.Region?
     private var _tenantToken: String?
     private var _configName: String?
@@ -136,6 +136,11 @@ open class OptimoveConfigBuilder: NSObject {
             region = args.region
             featureSet.insert(.optimobile)
         }
+        return self
+    }
+
+    @discardableResult public func setFeatureSet(_ featureSet: FeatureSet) -> OptimoveConfigBuilder {
+        self.featureSet = featureSet
         return self
     }
 
