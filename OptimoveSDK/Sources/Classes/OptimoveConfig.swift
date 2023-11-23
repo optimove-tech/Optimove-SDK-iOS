@@ -81,8 +81,6 @@ open class OptimoveConfigBuilder: NSObject {
     private var _pushReceivedInForegroundHandlerBlock: Any?
     private var _deepLinkCname: URL?
     private var _deepLinkHandler: DeepLinkHandler?
-    private var _baseUrlMap: UrlBuilder.ServiceUrlMap?
-
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
@@ -119,7 +117,6 @@ open class OptimoveConfigBuilder: NSObject {
         {
             credentials = args.credentials
             region = args.region
-            _baseUrlMap = UrlBuilder.defaultMapping(for: args.region.rawValue)
             featureSet.insert(.optimobile)
         }
         return self
@@ -189,21 +186,11 @@ open class OptimoveConfigBuilder: NSObject {
 
         return self
     }
-    
-    /**
-     Internal SDK embedding API, do not call or depend on this method in your app
-     */
-    @discardableResult public func setBaseUrlMapping(baseUrlMap: UrlBuilder.ServiceUrlMap) -> OptimoveConfigBuilder {
-        _baseUrlMap = baseUrlMap
-
-        return self
-    }
 
     @discardableResult public func build() -> OptimoveConfig {
         if featureSet == .none {
             assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
         }
-
         let tenantInfo: OptimoveTenantInfo? = {
             if let _tenantToken = _tenantToken,
                let _configName = _configName
@@ -215,7 +202,6 @@ open class OptimoveConfigBuilder: NSObject {
 
         let optimobileConfig: OptimobileConfig? = {
             if let region = region,
-               let _baseUrlMap = _baseUrlMap
             {
                 return OptimobileConfig(
                     credentials: credentials,
@@ -228,7 +214,7 @@ open class OptimoveConfigBuilder: NSObject {
                     _pushReceivedInForegroundHandlerBlock: _pushReceivedInForegroundHandlerBlock,
                     deepLinkCname: _deepLinkCname,
                     deepLinkHandler: _deepLinkHandler,
-                    baseUrlMap: _baseUrlMap,
+                    baseUrlMap: UrlBuilder.defaultMapping(for: region.rawValue),
                     runtimeInfo: _runtimeInfo,
                     sdkInfo: _sdkInfo,
                     isRelease: _isRelease
