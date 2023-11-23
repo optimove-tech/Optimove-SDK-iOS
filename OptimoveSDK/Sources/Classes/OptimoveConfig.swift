@@ -90,7 +90,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var region: OptimobileConfig.Region?
     private var _tenantToken: String?
     private var _configName: String?
-    private var _sessionIdleTimeout: UInt
+    private var _sessionIdleTimeout: UInt = 23
     private var _inAppConsentStrategy = InAppConsentStrategy.notEnabled
     private var _inAppDisplayMode = InAppDisplayMode.automatic
     private var _inAppDeepLinkHandlerBlock: InAppDeepLinkHandlerBlock?
@@ -116,7 +116,6 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     override public required init() {
-        _sessionIdleTimeout = 23
         featureSet = .none
         super.init()
     }
