@@ -3,10 +3,15 @@
 import Foundation
 
 /// A set of options for configuring the SDK.
+/// - Note: The SDK can be configured to support multiple features.
+/// - Tag: Feature
+/// - SeeAlso: ``OptimoveConfigBuilder``
 public struct Feature: OptionSet, @unchecked Sendable, CustomStringConvertible {
     public let rawValue: Int
 
+    /// Optimobile feature.
     public static let optimobile = Feature(rawValue: 1 << 1)
+    /// Optimove feature.
     public static let optimove = Feature(rawValue: 1 << 2)
     static let delayedConfiguration = Feature(rawValue: 1 << 3)
 
@@ -106,8 +111,11 @@ open class OptimoveConfigBuilder: NSObject {
         setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
     }
 
-    /// Initialization without credentials.
-    /// - Parameter region: ``Region``
+    /// Intent to use for intialization for delayed configuration.
+    /// - Parameter region: ``Region`` - region to be configured.
+    /// - Parameter features: ``Feature`` - single or multiple features to be configured.
+    ///
+    /// - Multiple feature usage example: `OptimoveConfigBuilder(region: .US, features: [.optimove, .optimobile])`
     public convenience init(region: Region, features: Feature) {
         self.init()
         self.region = region
