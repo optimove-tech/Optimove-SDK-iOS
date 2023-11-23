@@ -120,12 +120,19 @@ final class Optimobile {
             return
         }
         Logger.info("Completing delayed configuration with credentials: \(credentials)")
+        updateStorageValues(config)
         setCredentials(credentials)
         NotificationCenter.default.post(name: .optimobileInializationFinished, object: nil)
     }
 
     static func setCredentials(_ credentials: Credentials) {
         KeyValPersistenceHelper.set(try? JSONEncoder().encode(credentials), forKey: OptimobileUserDefaultsKey.CREDENTIALS_JSON.rawValue)
+    }
+
+    static func updateStorageValues(_ config: OptimobileConfig) {
+        KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(config.baseUrlMap[.iar], forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
     }
 
     fileprivate static func writeDefaultsKeys(config: OptimobileConfig, initialVisitorId: String) {
@@ -144,14 +151,12 @@ final class Optimobile {
         {
             UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
         }
+        KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
 
         if let credentials = config.credentials {
             setCredentials(credentials)
         }
-        KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.iar], forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
+        updateStorageValues(config)
     }
 
     fileprivate static func maybeAlignUserAssociation(initialUserId: String?) {
