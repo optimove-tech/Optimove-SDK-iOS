@@ -32,12 +32,12 @@ typealias Logger = OptimoveCore.Logger
     }
 
     /// The starting point of the Optimove SDK.
-    ///
-    /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
-    @objc static func configure(for tenantInfo: OptimoveTenantInfo) {
+    static func configure(for config: OptimoveConfig) {
         /// FUTURE: To merge configure call with init.
         shared.container.resolve { serviceLocator in
-            serviceLocator.newTenantInfoHandler().handle(tenantInfo)
+            if let tenantInfo = config.tenantInfo {
+                serviceLocator.newTenantInfoHandler().handle(tenantInfo)
+            }
             serviceLocator.deviceStateObserver().start()
             shared.startSDK { _ in }
         }
@@ -46,8 +46,8 @@ typealias Logger = OptimoveCore.Logger
     public static func initialize(with config: OptimoveConfig) {
         shared.config = config
 
-        if config.isOptimoveConfigured(), let tenantInfo = config.tenantInfo {
-            Optimove.configure(for: tenantInfo)
+        if config.isOptimoveConfigured() {
+            Optimove.configure(for: config)
         }
 
         if config.isOptimobileConfigured() {
