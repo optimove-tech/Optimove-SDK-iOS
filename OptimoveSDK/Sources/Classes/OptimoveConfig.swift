@@ -16,6 +16,7 @@ public struct FeatureSet: OptionSet, @unchecked Sendable {
 }
 
 public struct OptimoveConfig {
+    let featureSet: FeatureSet
     let tenantInfo: OptimoveTenantInfo?
     let optimobileConfig: OptimobileConfig?
 
@@ -69,8 +70,8 @@ public typealias Region = OptimobileConfig.Region
 
 open class OptimoveConfigBuilder: NSObject {
     private var credentials: Credentials?
-    private var region: OptimobileConfig.Region?
     private var featureSet: FeatureSet
+    private var region: OptimobileConfig.Region?
     private var _tenantToken: String?
     private var _configName: String?
     private var _sessionIdleTimeout: UInt
@@ -189,10 +190,12 @@ open class OptimoveConfigBuilder: NSObject {
 
     @discardableResult public func build() -> OptimoveConfig {
         if featureSet == .none {
+            // FIXME: - Remove this assertionFailure and throw an error instead
             assertionFailure("Invalid credentials provided to OptimoveConfigBuilder. At least one of optimoveCredentials or optimobileCredentials are required.")
         }
         let tenantInfo: OptimoveTenantInfo? = {
-            if let _tenantToken = _tenantToken,
+            if featureSet.contains(.optimobile),
+               let _tenantToken = _tenantToken,
                let _configName = _configName
             {
                 return OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
@@ -201,7 +204,8 @@ open class OptimoveConfigBuilder: NSObject {
         }()
 
         let optimobileConfig: OptimobileConfig? = {
-            if let region = region,
+            if featureSet.contains(.optimobile),
+               let region = region
             {
                 return OptimobileConfig(
                     credentials: credentials,
@@ -224,6 +228,7 @@ open class OptimoveConfigBuilder: NSObject {
         }()
 
         return OptimoveConfig(
+            featureSet: featureSet,
             tenantInfo: tenantInfo,
             optimobileConfig: optimobileConfig
         )
