@@ -37,17 +37,36 @@ public enum DeepLinkResolution {
 
 public typealias DeepLinkHandler = (DeepLinkResolution) -> Void
 
-class DeepLinkHelper {
+final class DeepLinkHelper {
+    struct CachedLink {
+        let url: URL
+        let wasDeferred: Bool
+    }
+
     fileprivate static let deferredLinkCheckedKey = "KUMULOS_DDL_CHECKED"
 
     let config: OptimobileConfig
     let httpClient: KSHttpClient
     var anyContinuationHandled: Bool
+    var cachedLink: CachedLink?
+    var cachedFingerprintComponents: [String: String]?
 
     init(_ config: OptimobileConfig, httpClient: KSHttpClient) {
         self.config = config
         self.httpClient = httpClient
         anyContinuationHandled = false
+
+    }
+
+    func maybeProcessCache() {
+        if let cachedLink = cachedLink {
+            handleDeepLinkUrl(cachedLink.url, wasDeferred: cachedLink.wasDeferred)
+            self.cachedLink = nil
+        }
+        if let cachedFingerprintComponents = cachedFingerprintComponents {
+            handleFingerprintComponents(components: cachedFingerprintComponents)
+            self.cachedFingerprintComponents = nil
+        }
     }
 
     func checkForNonContinuationLinkMatch() {
@@ -136,7 +155,13 @@ class DeepLinkHelper {
             default:
                 self.invokeDeepLinkHandler(.lookupFailed(url))
             }
-        }, onFailure: { res, _, _ in
+        }, onFailure: { res, error, _ in
+            if let error = error {
+                if case HttpAuthorizationError.missingAuthHeader = error {
+                    self.cachedLink = CachedLink(url: url, wasDeferred: wasDeferred)
+                    return
+                }
+            }
             switch res?.statusCode {
             case 404:
                 self.invokeDeepLinkHandler(.linkNotFound(url))
@@ -181,7 +206,13 @@ class DeepLinkHelper {
                 // Noop
                 break
             }
-        }, onFailure: { res, _, data in
+        }, onFailure: { res, error, data in
+            if let error = error {
+                if case HttpAuthorizationError.missingAuthHeader = error {
+                    self.cachedFingerprintComponents = components
+                    return
+                }
+            }
             guard let jsonData = data as? Data,
                   let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable: Any],
                   let urlString = response["linkUrl"] as? String,
