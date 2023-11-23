@@ -50,12 +50,18 @@ final class DeepLinkHelper {
     var anyContinuationHandled: Bool
     var cachedLink: CachedLink?
     var cachedFingerprintComponents: [String: String]?
+    var finishedInitializationToken: NSObjectProtocol?
 
     init(_ config: OptimobileConfig, httpClient: KSHttpClient) {
         self.config = config
         self.httpClient = httpClient
         anyContinuationHandled = false
 
+        finishedInitializationToken = NotificationCenter.default
+            .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
+                self?.maybeProcessCache()
+                Logger.debug("Notification \(notification.name.rawValue) was processed")
+            }
     }
 
     func maybeProcessCache() {

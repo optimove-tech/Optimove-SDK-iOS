@@ -22,7 +22,7 @@ public enum InAppDisplayMode: String {
 
 // MARK: class
 
-class Optimobile {
+final class Optimobile {
     let pushNotificationDeviceType = 1
     let pushNotificationProductionTokenType: Int = 1
 
@@ -121,6 +121,7 @@ class Optimobile {
         }
         Logger.info("Completing delayed configuration with credentials: \(credentials)")
         setCredentials(credentials)
+        NotificationCenter.default.post(name: .optimobileInializationFinished, object: nil)
     }
 
     static func setCredentials(_ credentials: Credentials) {

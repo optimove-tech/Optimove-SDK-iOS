@@ -13,10 +13,11 @@ class KSEventModel: NSManagedObject {
 
 typealias SyncCompletedBlock = (Error?) -> Void
 
-class AnalyticsHelper {
+final class AnalyticsHelper {
     private var analyticsContext: NSManagedObjectContext?
     private var migrationAnalyticsContext: NSManagedObjectContext?
     private var eventsHttpClient: KSHttpClient
+    private var finishedInitializationToken: NSObjectProtocol?
 
     // MARK: Initialization
 
@@ -34,6 +35,14 @@ class AnalyticsHelper {
             }
             self.syncEvents(context: self.analyticsContext)
         }
+
+        finishedInitializationToken = NotificationCenter.default
+            .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
+                print("Notification \(notification.name.rawValue) was processed")
+                if let analyticsContext = self?.analyticsContext {
+                    self?.syncEvents(context: analyticsContext)
+                }
+            }
     }
 
     deinit {
