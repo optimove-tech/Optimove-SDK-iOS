@@ -3,6 +3,20 @@
 import Foundation
 
 public class UrlBuilder {
+    enum Error: LocalizedError {
+        case regionNotSet
+        case failedToBuildUrl(String?)
+
+        var errorDescription: String? {
+            switch self {
+            case .regionNotSet:
+                return "Region not set"
+            case let .failedToBuildUrl(string):
+                return "Failed to build URL: \(string ?? "nil")"
+            }
+        }
+    }
+
     public enum Service: CaseIterable {
         case crm
         case ddl
@@ -14,25 +28,26 @@ public class UrlBuilder {
 
     public typealias ServiceUrlMap = [Service: String]
 
-    let baseUrlMap: ServiceUrlMap
-
-    convenience init(region: String) {
-        self.init(baseUrlMap: UrlBuilder.defaultMapping(for: region))
-    }
-
-    required init(baseUrlMap: ServiceUrlMap) {
-        for s in Service.allCases {
-            if baseUrlMap[s] == nil {
-                fatalError("baseUrlMap must contain an entry for all Service cases")
+    let storage: KeyValPersistenceHelper.Type
+    var region: String {
+        get throws {
+            if let regionString = storage.object(forKey: OptimobileUserDefaultsKey.REGION.rawValue) as? String {
+                return regionString
             }
+            throw Error.regionNotSet
         }
-
-        self.baseUrlMap = baseUrlMap
     }
 
-    func urlForService(_ service: Service) -> URL {
-        let baseUrl = baseUrlMap[service]!
-        return URL(string: baseUrl)!
+    required init(storage: KeyValPersistenceHelper.Type) {
+        self.storage = storage
+    }
+
+    func urlForService(_ service: Service) throws -> URL {
+        let baseUrlMap = try UrlBuilder.defaultMapping(for: region)
+        guard let baseUrl = baseUrlMap[service], let url = URL(string: baseUrl) else {
+            throw Error.failedToBuildUrl(baseUrlMap[service])
+        }
+        return url
     }
 
     static func defaultMapping(for region: String) -> ServiceUrlMap {

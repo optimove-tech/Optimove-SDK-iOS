@@ -11,13 +11,10 @@ final class NetworkFactory {
         self.authorization = authorization
     }
 
-    func updateRegion(_ region: String) {
-        urlBuilder = UrlBuilder(region: region)
-    }
-
     func build(for service: UrlBuilder.Service) -> KSHttpClient {
         return KSHttpClient(
-            baseUrl: urlBuilder.urlForService(service),
+            serviceType: service,
+            urlBuilder: urlBuilder,
             requestFormat: .json,
             responseFormat: .json,
             authorization: authorization

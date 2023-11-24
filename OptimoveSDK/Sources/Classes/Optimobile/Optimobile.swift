@@ -131,8 +131,9 @@ final class Optimobile {
 
     static func updateStorageValues(_ config: OptimobileConfig) {
         KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.iar], forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
+        let baseUrlMap = UrlBuilder.defaultMapping(for: config.region.rawValue)
+        KeyValPersistenceHelper.set(baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
+        KeyValPersistenceHelper.set(baseUrlMap[.iar], forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
     }
 
     fileprivate static func writeDefaultsKeys(config: OptimobileConfig, initialVisitorId: String) {
@@ -172,10 +173,10 @@ final class Optimobile {
         Optimobile.associateUserWithInstall(userIdentifier: initialUserId!)
     }
 
-    fileprivate init(config: OptimobileConfig) {
+    private init(config: OptimobileConfig) {
         self.config = config
         networkFactory = NetworkFactory(
-            urlBuilder: UrlBuilder(baseUrlMap: config.baseUrlMap),
+            urlBuilder: UrlBuilder(storage: KeyValPersistenceHelper.self),
             authorization: AuthorizationMediator(storage: KeyValPersistenceHelper.self)
         )
         inAppConsentStrategy = config.inAppConsentStrategy

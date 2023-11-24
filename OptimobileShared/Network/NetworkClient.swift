@@ -24,8 +24,8 @@ enum KSHttpMethod: String {
 }
 
 final class KSHttpClient {
-    private let baseUrl: URL
-    private let baseUrlComponents: URLComponents?
+    private let serviceType: UrlBuilder.Service
+    private let urlBuilder: UrlBuilder
     private let urlSession: URLSession
     private var authHeader: String?
     private let requestFormat: KSHttpDataFormat
@@ -35,15 +35,16 @@ final class KSHttpClient {
     // MARK: Initializers & Configs
 
     init(
-        baseUrl: URL,
+        serviceType: UrlBuilder.Service,
+        urlBuilder: UrlBuilder,
         requestFormat: KSHttpDataFormat,
         responseFormat: KSHttpDataFormat,
         authorization: HttpAuthorizationProtocol,
         additionalHeaders: [AnyHashable: Any]? = nil
     ) {
         self.authorization = authorization
-        self.baseUrl = baseUrl
-        baseUrlComponents = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false)
+        self.serviceType = serviceType
+        self.urlBuilder = urlBuilder
         self.requestFormat = requestFormat
         self.responseFormat = responseFormat
 
@@ -71,26 +72,26 @@ final class KSHttpClient {
 
     // MARK: HTTP Methods
 
-    func sendRequest(_ method: KSHttpMethod, toPath: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
-        var request = newRequestToPath(toPath, method: method, body: data)
-
+    func sendRequest(_ method: KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
         do {
+            var request = try buildRequest(for: path, method: method, body: data)
             try authorization.authorizeRequest(&request)
+            sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
         } catch {
             onFailure(nil, error, nil)
-            return
         }
-        
-        sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
     }
 
     // MARK: Helpers
 
-    fileprivate func newRequestToPath(_ path: String, method: KSHttpMethod, body: Any?) -> URLRequest {
-        let fullPath = "\(baseUrlComponents?.path ?? "")\(path)"
-        let url = URL(string: fullPath, relativeTo: baseUrl)
-
-        var urlRequest = URLRequest(url: url!)
+    fileprivate func buildRequest(for path: String, method: KSHttpMethod, body: Any?) throws -> URLRequest {
+        var url = try urlBuilder.urlForService(serviceType)
+        if #available(iOS 16.0, *) {
+            url = url.appending(path: path)
+        } else {
+            url = url.appendingPathComponent(path)
+        }
+        var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
 
         switch requestFormat {

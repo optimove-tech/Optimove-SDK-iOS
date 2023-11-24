@@ -79,8 +79,6 @@ public struct OptimobileConfig {
     let deepLinkCname: URL?
     let deepLinkHandler: DeepLinkHandler?
 
-    let baseUrlMap: UrlBuilder.ServiceUrlMap
-
     let runtimeInfo: [String: AnyObject]?
     let sdkInfo: [String: AnyObject]?
     let isRelease: Bool?
@@ -243,7 +241,6 @@ open class OptimoveConfigBuilder: NSObject {
                     _pushReceivedInForegroundHandlerBlock: _pushReceivedInForegroundHandlerBlock,
                     deepLinkCname: _deepLinkCname,
                     deepLinkHandler: _deepLinkHandler,
-                    baseUrlMap: UrlBuilder.defaultMapping(for: region.rawValue),
                     runtimeInfo: _runtimeInfo,
                     sdkInfo: _sdkInfo,
                     isRelease: _isRelease

@@ -231,10 +231,8 @@ public class OptimoveNotificationService {
     }
 
     fileprivate class func initializeAnalyticsHelper() {
-        let region = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.REGION.rawValue) as? String ?? "uk-1"
-
         let httpClientFactory = NetworkFactory(
-            urlBuilder: UrlBuilder(region: region),
+            urlBuilder: UrlBuilder(storage: KeyValPersistenceHelper.self),
             authorization: AuthorizationMediator(storage: KeyValPersistenceHelper.self)
         )
         analyticsHelper = AnalyticsHelper(
