@@ -1,43 +1,36 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import Foundation
 import OptimoveCore
-import WebKit
+import UIKit
 
 final class UserAgentGenerator {
-
     private var storage: OptimoveStorage
     private let synchronizer: Pipeline
     private let coreEventFactory: CoreEventFactory
-    private var webView: WKWebView?
 
     init(storage: OptimoveStorage,
          synchronizer: Pipeline,
-         coreEventFactory: CoreEventFactory) {
+         coreEventFactory: CoreEventFactory)
+    {
         self.storage = storage
         self.synchronizer = synchronizer
         self.coreEventFactory = coreEventFactory
     }
 
     func generate() {
-        guard Thread.isMainThread else {
-            DispatchQueue.main.async {
-                self.generate()
-            }
-            return
+        func generateUserAgent() -> String {
+            let deviceName = UIDevice.current.model
+            let osName = UIDevice.current.systemName
+            let osVersion = UIDevice.current.systemVersion
+            let locale = Locale.current.identifier
+            let timeZone = TimeZone.current.identifier
+
+            return "\(deviceName); \(osName) \(osVersion); \(locale); \(timeZone)"
         }
-        webView = WKWebView(frame: .zero)
-        webView?.evaluateJavaScript("navigator.userAgent") { (result, error) in
-            if let error = error {
-                Logger.error(error.localizedDescription)
-            }
-            self.storage.userAgent = (result as? String) ?? "user_agent_undefined"
-            tryCatch {
-                let event = try self.coreEventFactory.createEvent(.setUserAgent)
-                self.synchronizer.deliver(.report(events: [event]))
-            }
-            self.webView = nil
+        self.storage.userAgent = generateUserAgent()
+        tryCatch {
+            let event = try self.coreEventFactory.createEvent(.setUserAgent)
+            self.synchronizer.deliver(.report(events: [event]))
         }
     }
-
 }
