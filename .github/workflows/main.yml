@@ -9,3 +9,13 @@ jobs:
         name: Build for testing
       - run: ./scripts/test-without-building.sh
         name: Test
+
+  check-headers:
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Check headers
+        run: |
+          chmod +x ./check_headers.sh
+          ./check_headers.sh
+        shell: bash
