@@ -366,13 +366,12 @@ public extension Optimove {
     @objc func trackIBeaconProximity(beacon: CLBeacon) {
         Optimobile.trackIBeaconProximity(beacon: beacon)
     }
-    
+
     /// Records a notification open event
     /// - Parameter userInfo - The userInfo dictionary you received in the push notification payload
-    @objc public func trackOpenMetric(userInfo: [AnyHashable: Any]) {
+    @objc func trackOpenMetric(userInfo: [AnyHashable: Any]) {
         Optimobile.pushTrackOpen(userInfo: userInfo)
     }
-    
 
     /**
          Records a proximity event for an Eddystone beacon.

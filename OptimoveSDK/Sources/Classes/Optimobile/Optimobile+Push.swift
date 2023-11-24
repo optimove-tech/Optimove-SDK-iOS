@@ -202,11 +202,11 @@ extension Optimobile {
     // MARK: Open handling
 
     /**
-         Track a user action triggered by a push notification
+          Track a user action triggered by a push notification
 
-        Parameters:
-            - notification: The notification which triggered the action
-    */
+         Parameters:
+             - notification: The notification which triggered the action
+     */
     static func pushTrackOpen(notification: PushNotification) {
         if notification.id == 0 {
             Logger.warn("""
@@ -359,9 +359,6 @@ class PushHelper {
     typealias kumulos_applicationDidRegisterForRemoteNotifications = @convention(c) (_ obj: UIApplicationDelegate, _ _cmd: Selector, _ application: UIApplication, _ deviceToken: Data) -> Void
     typealias didRegBlock = @convention(block) (_ obj: UIApplicationDelegate, _ application: UIApplication, _ deviceToken: Data) -> Void
 
-    typealias kumulos_applicationDidRegisterForRemoteNotifications = @convention(c) (_ obj: UIApplicationDelegate, _ _cmd: Selector, _ application: UIApplication, _ deviceToken: Data) -> Void
-    typealias didRegBlock = @convention(block) (_ obj: UIApplicationDelegate, _ application: UIApplication, _ deviceToken: Data) -> Void
-
     typealias kumulos_applicationDidFailToRegisterForRemoteNotificaitons = @convention(c) (_ obj: Any, _ _cmd: Selector, _ application: UIApplication, _ error: Error) -> Void
     typealias didFailToRegBlock = @convention(block) (_ obj: Any, _ application: UIApplication, _ error: Error) -> Void
 
@@ -478,7 +475,7 @@ class PushHelper {
             return
         }
 
-        let props: [String:Any] = ["type" : KS_MESSAGE_TYPE_PUSH, "id": notification.id]
-        Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED, properties:props, immediateFlush: true)
+        let props: [String: Any] = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.id]
+        Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED, properties: props, immediateFlush: true)
     }
 }
