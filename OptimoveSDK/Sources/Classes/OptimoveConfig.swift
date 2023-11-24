@@ -260,10 +260,9 @@ open class OptimoveConfigBuilder: NSObject {
 
 public extension OptimobileConfig {
     enum Region: String, CaseIterable {
-        case EU1 = "eu-central-1"
-        case EU2 = "eu-central-2"
-        case UK1 = "uk-1"
-        case US1 = "us-east-1"
+        case DEV = "uk-1"
+        case EU = "eu-central-2"
+        case US = "us-east-1"
 
         init(string: String) throws {
             enum Error: Foundation.LocalizedError {
