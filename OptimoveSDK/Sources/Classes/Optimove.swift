@@ -71,6 +71,17 @@ typealias Logger = OptimoveCore.Logger
         let config = builder.build()
         initialize(with: config)
     }
+
+    public static func isFeatureRunning(_ feature: Feature) -> Bool {
+        switch feature {
+        case .optimobile:
+            return Optimobile.isSdkRunning
+        case .optimove:
+            return RunningFlagsIndication.isSdkRunning
+        default:
+            return false
+        }
+    }
 }
 
 // MARK: - Event API call

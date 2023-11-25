@@ -76,6 +76,11 @@ final class Optimobile {
         return instance != nil
     }
 
+    static var isSdkRunning: Bool {
+        let object = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.CREDENTIALS_JSON.rawValue)
+        return object != nil
+    }
+
     /**
          Initialize the Optimobile SDK.
      */
