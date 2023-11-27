@@ -189,7 +189,10 @@ final class Optimobile {
         )
         inAppConsentStrategy = config.inAppConsentStrategy
 
-        analyticsHelper = AnalyticsHelper(httpClient: networkFactory.build(for: .events))
+        analyticsHelper = AnalyticsHelper(
+            httpClient: networkFactory.build(for: .events),
+            pendingAnalytics: PendingAnalyticsImpl(storage: KeyValPersistenceHelper.self)
+        )
 
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
         inAppManager = InAppManager(config, httpClient: networkFactory.build(for: .push))
