@@ -2,19 +2,13 @@
 
 import Foundation
 
+protocol KeyValPersistent {
+    static func set(_ value: Any?, forKey: String)
+    static func object(forKey: String) -> Any?
+    static func removeObject(forKey: String)
+}
+
 enum KeyValPersistenceHelper {
-    static func set(_ value: Any?, forKey: String) {
-        getUserDefaults().set(value, forKey: forKey)
-    }
-
-    static func object(forKey: String) -> Any? {
-        return getUserDefaults().object(forKey: forKey)
-    }
-
-    static func removeObject(forKey: String) {
-        getUserDefaults().removeObject(forKey: forKey)
-    }
-
     static func maybeMigrateUserDefaultsToAppGroups() {
         let standardDefaults = UserDefaults.standard
         let haveMigratedKey: String = OptimobileUserDefaultsKey.MIGRATED_TO_GROUPS.rawValue
@@ -47,5 +41,19 @@ enum KeyValPersistenceHelper {
         }
 
         return UserDefaults.standard
+    }
+}
+
+extension KeyValPersistenceHelper: KeyValPersistent {
+    static func set(_ value: Any?, forKey: String) {
+        getUserDefaults().set(value, forKey: forKey)
+    }
+
+    static func object(forKey: String) -> Any? {
+        return getUserDefaults().object(forKey: forKey)
+    }
+
+    static func removeObject(forKey: String) {
+        getUserDefaults().removeObject(forKey: forKey)
     }
 }
