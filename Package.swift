@@ -39,6 +39,21 @@ let package = Package(
             name: "OptimoveNotificationServiceExtension",
             path: "OptimoveNotificationServiceExtension/Sources"
         ),
+        .testTarget(
+            name: "OptimoveSDKTests",
+            dependencies: ["OptimoveSDK"],
+            path: "OptimoveSDK/Tests"
+        ),
+        .testTarget(
+            name: "OptimoveCoreTests",
+            dependencies: ["OptimoveCore"],
+            path: "OptimoveCore/Tests"
+        ),
+        .testTarget(
+            name: "OptimoveNotificationServiceExtensionTests",
+            dependencies: ["OptimoveNotificationServiceExtension"],
+            path: "OptimoveNotificationServiceExtension/Tests"
+        ),
     ],
     swiftLanguageVersions: [.v5]
 )
