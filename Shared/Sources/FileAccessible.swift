@@ -3,16 +3,16 @@
 import Foundation
 
 /// Helps to fetch JSON files.
-protocol FileAccessible: AnyObject {
+public protocol FileAccessible: AnyObject {
     /// The name of the json name.
     var fileName: String { get }
     /// Returns Data from JSON file if exists.
     var data: Data { get }
 }
 
-extension FileAccessible {
+public extension FileAccessible {
     var data: Data {
-        let bundle = Bundle(for: type(of: self))
+        let bundle = Bundle.mypackageResources
         guard let url = bundle.url(forResource: fileName, withExtension: "") else {
             fatalError("File name: \(fileName) does not exist.")
         }

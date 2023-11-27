@@ -3,15 +3,15 @@
 import Foundation
 @testable import OptimoveCore
 
-final class GlobalConfigFixture: FileAccessible {
-    let fileName: String = "core_events.json"
+public final class GlobalConfigFixture: FileAccessible {
+    public let fileName: String = "core_events.json"
     private var events: [String: EventsConfig] = [:]
 
-    init() {
+    public init() {
         events = try! JSONDecoder().decode([String: EventsConfig].self, from: data)
     }
 
-    func build() -> GlobalConfig {
+    public func build() -> GlobalConfig {
         return GlobalConfig(
             general: generalConfigFuxture(),
             optitrack: optitrackConfigFixture(),
@@ -19,19 +19,19 @@ final class GlobalConfigFixture: FileAccessible {
         )
     }
 
-    func generalConfigFuxture() -> GlobalGeneralConfig {
+    public func generalConfigFuxture() -> GlobalGeneralConfig {
         return GlobalGeneralConfig(
             logsServiceEndpoint: StubVariables.url
         )
     }
 
-    func optitrackConfigFixture() -> GlobalOptitrackConfig {
+    public func optitrackConfigFixture() -> GlobalOptitrackConfig {
         return GlobalOptitrackConfig(
             eventCategoryName: "event_category_name"
         )
     }
 
-    func coreEventFixture() -> [String: EventsConfig] {
+    public func coreEventFixture() -> [String: EventsConfig] {
         return events
     }
 }

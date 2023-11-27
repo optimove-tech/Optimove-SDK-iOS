@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 @testable import OptimoveSDK
+import OptimoveTest
 import XCTest
 
 class MergeRemoteConfigurationOperationTests: XCTestCase {

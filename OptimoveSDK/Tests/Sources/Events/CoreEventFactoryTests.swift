@@ -2,6 +2,7 @@
 
 import OptimoveCore
 @testable import OptimoveSDK
+@testable import OptimoveTest
 import XCTest
 
 class CoreEventFactoryTests: OptimoveTestCase {

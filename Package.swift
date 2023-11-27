@@ -23,6 +23,9 @@ let package = Package(
             targets: ["OptimoveNotificationServiceExtension"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/WeTransfer/Mocker", from: "3.0.1"),
+    ],
     targets: [
         .target(
             name: "OptimoveSDK",
@@ -39,15 +42,39 @@ let package = Package(
             name: "OptimoveNotificationServiceExtension",
             path: "OptimoveNotificationServiceExtension/Sources"
         ),
+        .target(
+            name: "OptimoveTest",
+            dependencies: [
+                "OptimoveCore",
+            ],
+            path: "Shared",
+            resources: [
+                .process("Resources"),
+            ]
+        ),
         .testTarget(
             name: "OptimoveSDKTests",
-            dependencies: ["OptimoveSDK"],
-            path: "OptimoveSDK/Tests"
+            dependencies: [
+                "Mocker",
+                "OptimoveSDK",
+                "OptimoveTest",
+            ],
+            path: "OptimoveSDK/Tests",
+            resources: [
+                .process("Resources"),
+            ]
         ),
         .testTarget(
             name: "OptimoveCoreTests",
-            dependencies: ["OptimoveCore"],
-            path: "OptimoveCore/Tests"
+            dependencies: [
+                "Mocker",
+                "OptimoveCore",
+                "OptimoveTest",
+            ],
+            path: "OptimoveCore/Tests",
+            resources: [
+                .process("Resources"),
+            ]
         ),
         .testTarget(
             name: "OptimoveNotificationServiceExtensionTests",

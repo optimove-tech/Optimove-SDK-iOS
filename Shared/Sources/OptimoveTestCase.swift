@@ -3,41 +3,41 @@
 import OptimoveCore
 import XCTest
 
-let defaultTimeout: TimeInterval = 0.8
+public let defaultTimeout: TimeInterval = 0.8
 
-class OptimoveTestCase: XCTestCase {
-    var storage = MockOptimoveStorage()
+open class OptimoveTestCase: XCTestCase {
+    public var storage = MockOptimoveStorage()
 
-    enum StubConstants {
-        static let fcmToken = "fcmToken"
-        static let isMbaasOptIn = false
-        static let tenantID = 100
-        static let visitorID = StubVariables.visitorID
-        static let customerID = StubVariables.customerID
-        static let initialVisitorId = StubVariables.initialVisitorId
-        static let apnsToken = Data()
+    public enum StubConstants {
+        public static let fcmToken = "fcmToken"
+        public static let isMbaasOptIn = false
+        public static let tenantID = 100
+        public static let visitorID = StubVariables.visitorID
+        public static let customerID = StubVariables.customerID
+        public static let initialVisitorId = StubVariables.initialVisitorId
+        public static let apnsToken = Data()
     }
 
-    func prefillStorageWithConfiguration() {
+    public func prefillStorageWithConfiguration() {
         storage.siteID = StubConstants.tenantID
         storage.tenantID = StubConstants.tenantID
         storage.optitrackEndpoint = URL(string: "https://optimove.net")!
     }
 
-    func prefillStorageWithTheFirstLaunch() {
+    public func prefillStorageWithTheFirstLaunch() {
         prefillStorageWithConfiguration()
         storage.installationID = UUID().uuidString
         storage.userAgent = "user-agent"
         storage.firstRunTimestamp = Date().timeIntervalSince1970.seconds
     }
 
-    func prefillStorageAsVisitor() {
+    public func prefillStorageAsVisitor() {
         prefillStorageWithTheFirstLaunch()
         storage.initialVisitorId = StubConstants.initialVisitorId
         storage.visitorID = StubConstants.visitorID
     }
 
-    func prefillStorageAsCustomer() {
+    public func prefillStorageAsCustomer() {
         prefillStorageAsVisitor()
         storage.customerID = StubConstants.customerID
         storage.initialVisitorId = StubConstants.initialVisitorId

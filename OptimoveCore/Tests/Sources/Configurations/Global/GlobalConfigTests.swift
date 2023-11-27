@@ -2,6 +2,7 @@
 
 @testable import OptimoveCore
 import XCTest
+import OptimoveTest
 
 class GlobalConfigTests: XCTestCase, FileAccessible {
     let fileName = "configs.json"
