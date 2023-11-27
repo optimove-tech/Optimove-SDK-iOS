@@ -62,6 +62,7 @@ final class Optimobile {
     fileprivate(set) var deepLinkHelper: DeepLinkHelper?
 
     private let networkFactory: NetworkFactory
+    private var credentials: Credentials?
 
     /**
          The unique installation Id of the current app
@@ -77,8 +78,8 @@ final class Optimobile {
     }
 
     static var isSdkRunning: Bool {
-        let object = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.CREDENTIALS_JSON.rawValue)
-        return object != nil
+        // FIXME: Return true if the SDK is configured and running
+        return false
     }
 
     /**
@@ -131,7 +132,7 @@ final class Optimobile {
     }
 
     static func setCredentials(_ credentials: Credentials) {
-        KeyValPersistenceHelper.set(try? JSONEncoder().encode(credentials), forKey: OptimobileUserDefaultsKey.CREDENTIALS_JSON.rawValue)
+        Optimobile.instance?.credentials = credentials
     }
 
     static func updateStorageValues(_ config: OptimobileConfig) {
@@ -182,7 +183,9 @@ final class Optimobile {
         self.config = config
         networkFactory = NetworkFactory(
             urlBuilder: UrlBuilder(storage: KeyValPersistenceHelper.self),
-            authorization: AuthorizationMediator(storage: KeyValPersistenceHelper.self)
+            authorization: AuthorizationMediator(provider: {
+                Optimobile.instance?.credentials
+            })
         )
         inAppConsentStrategy = config.inAppConsentStrategy
 

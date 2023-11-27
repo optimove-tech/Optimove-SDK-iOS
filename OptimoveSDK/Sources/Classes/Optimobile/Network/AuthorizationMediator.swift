@@ -19,24 +19,19 @@ protocol HttpAuthorizationProtocol {
     func authorizeRequest(_: inout URLRequest) throws
 }
 
+typealias CredentialsProvider = () -> Credentials?
+
 final class AuthorizationMediator {
     var basicAuthorization: String?
-    let storage: KeyValPersistenceHelper.Type
-    
-    init(basicAuthorization: String? = nil, storage: KeyValPersistenceHelper.Type) {
+    let provider: CredentialsProvider
+
+    init(basicAuthorization: String? = nil, provider: @escaping CredentialsProvider) {
         self.basicAuthorization = basicAuthorization
-        self.storage = storage
+        self.provider = provider
     }
-    
-    func readCredentialsFromStorage() -> Credentials? {
-        guard let data = storage.object(forKey: OptimobileUserDefaultsKey.CREDENTIALS_JSON.rawValue) as? Data else {
-            return nil
-        }
-        return try? JSONDecoder().decode(Credentials.self, from: data)
-    }
-    
+
     func getBasicAuthorization() throws -> String {
-        if basicAuthorization == nil, let credentials = readCredentialsFromStorage() {
+        if basicAuthorization == nil, let credentials = provider() {
             setBasicAuth(user: credentials.apiKey, password: credentials.secretKey)
         }
         guard let basicAuthorization else {
@@ -44,7 +39,7 @@ final class AuthorizationMediator {
         }
         return basicAuthorization
     }
-    
+
     func setBasicAuth(user: String, password: String) {
         let basic = "\(user):\(password)"
         if let token = basic.data(using: .utf8)?.base64EncodedString() {
