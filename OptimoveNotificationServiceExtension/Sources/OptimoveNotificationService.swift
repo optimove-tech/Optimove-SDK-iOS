@@ -207,12 +207,23 @@ public class OptimoveNotificationService {
         KeyValPersistenceHelper.set(newBadge, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
     }
 
-    fileprivate class func trackDeliveredEvent(dispatchGroup _: DispatchGroup, userInfo: [AnyHashable: Any], notificationId _: Int) {
+    fileprivate class func trackDeliveredEvent(dispatchGroup _: DispatchGroup, userInfo: [AnyHashable: Any], notificationId: Int) {
         if isBackgroundPush(userInfo: userInfo) {
             return
         }
 
-        // TODO: Save DELIVERED event to storage
+        do {
+            let pendingAnalytics = PendingAnalyticsImpl(storage: KeyValPersistenceHelper.self)
+            try pendingAnalytics.add(
+                metric: PendingAnalyticMetric(
+                    id: String(notificationId),
+                    eventType: .MESSAGE_DELIVERED,
+                    properties: ["type": KS_MESSAGE_TYPE_PUSH, "id": notificationId]
+                )
+            )
+        } catch {
+            print("NotificationServiceExtension: Failed to track delivered event: \(error)")
+        }
     }
 
     fileprivate class func isBackgroundPush(userInfo: [AnyHashable: Any]) -> Bool {
