@@ -146,15 +146,14 @@ public extension StorageFacade {
         }
     }
 
-    /// Should be supported in the future version of Swift. https://bugs.swift.org/browse/SR-238
-//    subscript<T>(key: StorageKey) -> () throws -> T {
-//        get {
-//            return { try cast(self.storage(for: key).value(forKey: key.rawValue)) }
-//        }
-//        set {
-//            storage(for: key).set(newValue, forKey: key.rawValue)
-//        }
-//    }
+    subscript<T>(key: StorageKey) -> () throws -> T {
+        get {
+            { try cast(self.keyValureStorage.value(for: key)) }
+        }
+        set {
+            keyValureStorage.set(value: newValue, key: key)
+        }
+    }
 }
 
 // MARK: - FileStorage

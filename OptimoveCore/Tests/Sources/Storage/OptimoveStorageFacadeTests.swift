@@ -37,4 +37,25 @@ class OptimoveStorageFacadeTests: XCTestCase {
         let value: String? = storage[key]
         XCTAssert(value == stub_string)
     }
+
+    func test_try_get_subscript() throws {
+        // given
+        let stub_string = "stub_string"
+        let key: StorageKey = .tenantToken
+
+        // when
+        storage[key] = stub_string
+
+        // then
+        let value: String = try storage[key]()
+        XCTAssert(value == stub_string)
+    }
+
+    func test_try_get_subscript_fails() {
+        // given
+        let key: StorageKey = .tenantToken
+
+        // then
+        try XCTAssertThrowsError(storage[key]() as String)
+    }
 }
