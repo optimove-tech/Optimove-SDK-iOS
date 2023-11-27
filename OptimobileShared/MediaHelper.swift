@@ -2,17 +2,18 @@
 
 import Foundation
 
-public enum MediaHelper {
-    private static let mediaResizerBaseUrl: String = "https://i.app.delivery"
+enum MediaHelper {
+    /// Use ``Region.US`` as fallback region.
+    static let mediaResizerBaseUrl: String = "https://i-us-east-1.app.delivery"
 
     static func getCompletePictureUrl(pictureUrl: String, width: UInt) -> URL? {
-        if (((pictureUrl as NSString).substring(with: NSRange(location: 0, length: 8))) == "https://") || (((pictureUrl as NSString).substring(with: NSRange(location: 0, length: 7))) == "http://") {
+        if pictureUrl.hasPrefix("https://") || pictureUrl.hasPrefix("http://") {
             return URL(string: pictureUrl)
         }
 
         let baseUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue) as? String ?? mediaResizerBaseUrl
 
-        let completeString = String(format: "%@%@%ld%@%@", baseUrl, "/", width, "x/", pictureUrl)
+        let completeString = "\(baseUrl)/\(width)x/\(pictureUrl)"
         return URL(string: completeString)
     }
 }
