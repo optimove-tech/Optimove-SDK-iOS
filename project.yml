@@ -1,147 +1,147 @@
-name: Optimove
-options:
-  deploymentTarget:
-    iOS: "12"
+# name: Optimove
+# options:
+#   deploymentTarget:
+#     iOS: "12"
 
-packages:
-  Mocker:
-    url: https://github.com/WeTransfer/Mocker
-    from: 3.0.0
+# packages:
+#   Mocker:
+#     url: https://github.com/WeTransfer/Mocker
+#     from: 3.0.0
 
-schemes:
-  UnitTests:
-    build:
-      targets:
-        OptimoveCore-Unit: [test]
-        OptimoveSDK-Unit: [test]
-        OptimoveNotificationServiceExtension-Unit: [test]
-    test:
-      targets:
-        - OptimoveCore-Unit
-        - OptimoveSDK-Unit
-        - OptimoveNotificationServiceExtension-Unit
-      parallelizeBuild: true
+# schemes:
+#   UnitTests:
+#     build:
+#       targets:
+#         OptimoveCore-Unit: [test]
+#         OptimoveSDK-Unit: [test]
+#         OptimoveNotificationServiceExtension-Unit: [test]
+#     test:
+#       targets:
+#         - OptimoveCore-Unit
+#         - OptimoveSDK-Unit
+#         - OptimoveNotificationServiceExtension-Unit
+#       parallelizeBuild: true
 
-targets:
-  OptimoveCore:
-    type: framework
-    platform: iOS
-    sources:
-      - path: OptimoveCore
-        excludes:
-          - "Tests/**/*"
-          - ".gitkeep"
-    info:
-      path: OptimoveCore/Info.plist
-      properties:
-        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
-    scheme:
-      testTargets:
-        - OptimoveCore-Unit
-    settings:
-      APPLICATION_EXTENSION_API_ONLY: YES
-      PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.core
-    dependencies:
-      - sdk: Foundation.framework
+# targets:
+#   OptimoveCore:
+#     type: framework
+#     platform: iOS
+#     sources:
+#       - path: OptimoveCore
+#         excludes:
+#           - "Tests/**/*"
+#           - ".gitkeep"
+#     info:
+#       path: OptimoveCore/Info.plist
+#       properties:
+#         CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+#     scheme:
+#       testTargets:
+#         - OptimoveCore-Unit
+#     settings:
+#       APPLICATION_EXTENSION_API_ONLY: YES
+#       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.core
+#     dependencies:
+#       - sdk: Foundation.framework
 
-  OptimoveSDK:
-    type: framework
-    platform: iOS
-    sources:
-      - path: OptimoveSDK
-        excludes:
-          - "Tests/**/*"
-          - ".gitkeep"
-    info:
-      path: OptimoveSDK/Info.plist
-      properties:
-        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
-    scheme:
-      testTargets:
-        - OptimoveSDK-Unit
-    settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk
-    dependencies:
-      - target: OptimoveCore
-      - sdk: UIKit.framework
-      - sdk: UserNotifications.framework
-      - sdk: Foundation.framework
-      - sdk: CoreData.framework
+#   OptimoveSDK:
+#     type: framework
+#     platform: iOS
+#     sources:
+#       - path: OptimoveSDK
+#         excludes:
+#           - "Tests/**/*"
+#           - ".gitkeep"
+#     info:
+#       path: OptimoveSDK/Info.plist
+#       properties:
+#         CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+#     scheme:
+#       testTargets:
+#         - OptimoveSDK-Unit
+#     settings:
+#       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk
+#     dependencies:
+#       - target: OptimoveCore
+#       - sdk: UIKit.framework
+#       - sdk: UserNotifications.framework
+#       - sdk: Foundation.framework
+#       - sdk: CoreData.framework
 
-  OptimoveNotificationServiceExtension:
-    type: framework
-    platform: iOS
-    sources:
-      - path: OptimoveNotificationServiceExtension
-        excludes:
-          - "Tests/**/*"
-          - ".gitkeep"
-    info:
-      path: OptimoveNotificationServiceExtension/Info.plist
-      properties:
-        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
-    scheme:
-      testTargets:
-        - OptimoveNotificationServiceExtension-Unit
-    settings:
-      APPLICATION_EXTENSION_API_ONLY: YES
-      PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.extension.notificationservice
-    dependencies:
-      - target: OptimoveCore
-      - sdk: UserNotifications.framework
-      - sdk: Foundation.framework
+#   OptimoveNotificationServiceExtension:
+#     type: framework
+#     platform: iOS
+#     sources:
+#       - path: OptimoveNotificationServiceExtension
+#         excludes:
+#           - "Tests/**/*"
+#           - ".gitkeep"
+#     info:
+#       path: OptimoveNotificationServiceExtension/Info.plist
+#       properties:
+#         CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+#     scheme:
+#       testTargets:
+#         - OptimoveNotificationServiceExtension-Unit
+#     settings:
+#       APPLICATION_EXTENSION_API_ONLY: YES
+#       PRODUCT_BUNDLE_IDENTIFIER: com.optimove.sdk.extension.notificationservice
+#     dependencies:
+#       - target: OptimoveCore
+#       - sdk: UserNotifications.framework
+#       - sdk: Foundation.framework
 
-  # unit-test
+#   # unit-test
 
-  OptimoveCore-Unit:
-    type: bundle.unit-test
-    platform: iOS
-    sources:
-      - path: OptimoveCore
-        excludes:
-          - "Sources/**/*"
-          - "Info.plist"
-          - ".gitkeep"
-      - path: Shared
-        name: Shared-Unit
-    settings:
-      GENERATE_INFOPLIST_FILE: YES
-    dependencies:
-      - target: OptimoveCore
-      - package: Mocker
+#   OptimoveCore-Unit:
+#     type: bundle.unit-test
+#     platform: iOS
+#     sources:
+#       - path: OptimoveCore
+#         excludes:
+#           - "Sources/**/*"
+#           - "Info.plist"
+#           - ".gitkeep"
+#       - path: Shared
+#         name: Shared-Unit
+#     settings:
+#       GENERATE_INFOPLIST_FILE: YES
+#     dependencies:
+#       - target: OptimoveCore
+#       - package: Mocker
 
-  OptimoveSDK-Unit:
-    type: bundle.unit-test
-    platform: iOS
-    # scheme:
-    #   commandLineArguments:
-    #     "-com.optimove.track.test": true
-    sources:
-      - path: OptimoveSDK
-        excludes:
-          - "Sources/**/*"
-          - "Info.plist"
-          - ".gitkeep"
-      - path: Shared
-        name: Shared-Unit
-    settings:
-      GENERATE_INFOPLIST_FILE: YES
-    dependencies:
-      - target: OptimoveSDK
-      - package: Mocker
+#   OptimoveSDK-Unit:
+#     type: bundle.unit-test
+#     platform: iOS
+#     # scheme:
+#     #   commandLineArguments:
+#     #     "-com.optimove.track.test": true
+#     sources:
+#       - path: OptimoveSDK
+#         excludes:
+#           - "Sources/**/*"
+#           - "Info.plist"
+#           - ".gitkeep"
+#       - path: Shared
+#         name: Shared-Unit
+#     settings:
+#       GENERATE_INFOPLIST_FILE: YES
+#     dependencies:
+#       - target: OptimoveSDK
+#       - package: Mocker
 
-  OptimoveNotificationServiceExtension-Unit:
-    type: bundle.unit-test
-    platform: iOS
-    sources:
-      - path: OptimoveNotificationServiceExtension
-        excludes:
-          - "Sources/**/*"
-          - "Info.plist"
-          - ".gitkeep"
-      - path: Shared
-        name: Shared-Unit
-    settings:
-      GENERATE_INFOPLIST_FILE: YES
-    dependencies:
-      - target: OptimoveNotificationServiceExtension
+#   OptimoveNotificationServiceExtension-Unit:
+#     type: bundle.unit-test
+#     platform: iOS
+#     sources:
+#       - path: OptimoveNotificationServiceExtension
+#         excludes:
+#           - "Sources/**/*"
+#           - "Info.plist"
+#           - ".gitkeep"
+#       - path: Shared
+#         name: Shared-Unit
+#     settings:
+#       GENERATE_INFOPLIST_FILE: YES
+#     dependencies:
+#       - target: OptimoveNotificationServiceExtension
