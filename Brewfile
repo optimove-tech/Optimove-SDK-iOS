@@ -1,0 +1,2 @@
+# Brewfile
+brew "xcbeautify"

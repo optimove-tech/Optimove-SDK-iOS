@@ -1,31 +1,20 @@
 #!/bin/bash
 
-# Set the root directory
-export ROOT=$PWD
+set -o pipefail
+set -e
+set -x
 
 # Set the project variables
-source $ROOT/configurations/test.xcconfig
-
-# Bootstrap the project
-source $ROOT/scripts/bootstrap.sh
-
-# # Run XcodeGen to regenerate the project
-# echo "Removing existing Xcode project..."
-# rm -rf "$PROJECT"
-
-# echo "Generating new Xcode project with XcodeGen..."
-# xcodegen
-
-# echo "----------------------------------------------------------------------------------------------------"
+source $PWD/configurations/test.xcconfig
 
 # Build the project
-echo "Building the iOS project..."
 xcodebuild build-for-testing \
     -scheme "$SCHEME" \
     -project "$PROJECT" \
     -destination "$DESTANATION" \
     -sdk "$SDK" \
-    -configuration "$CONFIGURATION" |
+    -configuration "$CONFIGURATION" \
+    -derivedDataPath $1 |
     xcbeautify
 
 echo "Process completed successfully."
