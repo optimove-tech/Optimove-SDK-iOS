@@ -47,11 +47,11 @@ extension ConfigurationRepositoryImpl: ConfigurationRepository {
     }
 
     public func getGlobal() throws -> GlobalConfig {
-        return try storage.load(fileName: Constants.Global.fileName, isTemporary: true)
+        return try storage.load(fileName: Constants.Global.fileName)
     }
 
     public func saveGlobal(_ config: GlobalConfig) throws {
-        try storage.save(data: config, toFileName: Constants.Global.fileName, isTemporary: true)
+        try storage.save(data: config, toFileName: Constants.Global.fileName)
     }
 
     public func getTenant() throws -> TenantConfig {
