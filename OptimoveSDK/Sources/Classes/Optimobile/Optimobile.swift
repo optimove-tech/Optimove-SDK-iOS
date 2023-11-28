@@ -78,8 +78,7 @@ final class Optimobile {
     }
 
     static var isSdkRunning: Bool {
-        // FIXME: Return true if the SDK is configured and running
-        return false
+        return Optimobile.instance?.credentials != nil
     }
 
     /**
