@@ -26,7 +26,8 @@ class OptimoveFileManagerTests: XCTestCase {
 
     override func setUp() {
         fileStorage = try! FileStorageImpl(
-            url: try! FileManager.optimoveURL()
+            persistentStorageURL: try! FileManager.optimoveURL(),
+            temporaryStorageURL: try! FileManager.temporaryURL()
         )
     }
 

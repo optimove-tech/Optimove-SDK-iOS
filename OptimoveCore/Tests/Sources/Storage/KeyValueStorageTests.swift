@@ -14,7 +14,7 @@ class MockKeyValueStorage: KeyValueStorage {
     }
 
     func value(for key: StorageKey) -> Any? {
-        return state[key]
+        return state[key] ?? nil
     }
 
     subscript<T>(key: StorageKey) -> T? {
@@ -30,27 +30,27 @@ class MockKeyValueStorage: KeyValueStorage {
 class MockFileStorage: FileStorage {
     var storage: [String: Data] = [:]
 
-    func isExist(fileName: String) -> Bool {
+    func isExist(fileName: String, isTemporary: Bool) -> Bool {
         return storage[fileName] != nil
     }
 
-    func save<T: Codable>(data: T, toFileName: String) throws {
+    public func save<T: Codable>(data: T, toFileName: String, isTemporary: Bool) throws {
         storage[toFileName] = try JSONEncoder().encode(data)
     }
 
-    func saveData(data: Data, toFileName: String) throws {
+    public func saveData(data: Data, toFileName: String, isTemporary: Bool) throws {
         storage[toFileName] = data
     }
 
-    func load<T: Codable>(fileName: String) throws -> T {
+    func load<T: Codable>(fileName: String, isTemporary: Bool) throws -> T {
         return try JSONDecoder().decode(T.self, from: unwrap(storage[fileName]))
     }
 
-    func loadData(fileName: String) throws -> Data {
+    func loadData(fileName: String, isTemporary: Bool) throws -> Data {
         return try unwrap(storage[fileName])
     }
 
-    func delete(fileName: String) throws {
+    func delete(fileName: String, isTemporary: Bool) throws {
         return storage[fileName] = nil
     }
 }
@@ -61,7 +61,8 @@ class KeyValueStorageTests: XCTestCase {
 
     override func setUp() {
         storage = StorageFacade(
-            keyValureStorage: MockKeyValueStorage(),
+            persistantStorage: MockKeyValueStorage(),
+            inMemoryStorage: MockKeyValueStorage(),
             fileStorage: MockFileStorage()
         )
     }

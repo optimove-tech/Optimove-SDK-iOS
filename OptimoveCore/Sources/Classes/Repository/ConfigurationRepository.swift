@@ -39,30 +39,30 @@ public final class ConfigurationRepositoryImpl {
 
 extension ConfigurationRepositoryImpl: ConfigurationRepository {
     public func getConfiguration() throws -> Configuration {
-        return try storage.load(fileName: Constants.Configuration.fileName)
+        return try storage.load(fileName: Constants.Configuration.fileName, isTemporary: true)
     }
 
     public func setConfiguration(_ config: Configuration) throws {
-        try storage.save(data: config, toFileName: Constants.Configuration.fileName)
+        try storage.save(data: config, toFileName: Constants.Configuration.fileName, isTemporary: true)
     }
 
     public func getGlobal() throws -> GlobalConfig {
-        return try storage.load(fileName: Constants.Global.fileName)
+        return try storage.load(fileName: Constants.Global.fileName, isTemporary: true)
     }
 
     public func saveGlobal(_ config: GlobalConfig) throws {
-        try storage.save(data: config, toFileName: Constants.Global.fileName)
+        try storage.save(data: config, toFileName: Constants.Global.fileName, isTemporary: true)
     }
 
     public func getTenant() throws -> TenantConfig {
         let version = try storage.getVersion()
         let fileName = version + Constants.fileExtension
-        return try storage.load(fileName: fileName)
+        return try storage.load(fileName: fileName, isTemporary: true)
     }
 
     public func saveTenant(_ config: TenantConfig) throws {
         let version = try storage.getVersion()
         let fileName = version + Constants.fileExtension
-        try storage.save(data: config, toFileName: fileName)
+        try storage.save(data: config, toFileName: fileName, isTemporary: true)
     }
 }

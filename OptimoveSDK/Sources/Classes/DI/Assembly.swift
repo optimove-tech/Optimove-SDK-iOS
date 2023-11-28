@@ -13,11 +13,14 @@ final class Assembly {
         migrate()
         do {
             let keyValureStorage = try UserDefaults.optimove()
-            let optimoveURL = try FileManager.optimoveURL()
-            let fileStorage = try FileStorageImpl(url: optimoveURL)
+            let fileStorage = try FileStorageImpl(
+                persistentStorageURL: FileManager.optimoveURL(),
+                temporaryStorageURL: FileManager.temporaryURL()
+            )
             return ServiceLocator(
                 storageFacade: StorageFacade(
-                    keyValureStorage: keyValureStorage,
+                    persistantStorage: keyValureStorage,
+                    inMemoryStorage: InMemoryStorage(),
                     fileStorage: fileStorage
                 )
             )
