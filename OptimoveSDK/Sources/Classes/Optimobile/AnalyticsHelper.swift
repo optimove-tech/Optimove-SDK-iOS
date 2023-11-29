@@ -54,13 +54,14 @@ final class AnalyticsHelper {
     }
 
     private func maybeSendPendingMetrics() {
-        let removeAllPendingMetrics = {
+        func removePendingMetric(id: String) {
             do {
-                try self.pendingAnalytics.removeAll()
+                try pendingAnalytics.remove(id: id)
             } catch {
                 Logger.error("Failed to remove all pending metrics: " + error.localizedDescription)
             }
         }
+
         do {
             let metrics = try pendingAnalytics.readAll()
             Logger.debug("Found \(metrics.count) pending metrics")
@@ -71,7 +72,7 @@ final class AnalyticsHelper {
                     properties: metric.properties,
                     immediateFlush: true,
                     onSyncComplete: { _ in
-                        removeAllPendingMetrics()
+                        removePendingMetric(id: metric.id)
                     }
                 )
             }
