@@ -117,8 +117,6 @@ final class Optimobile {
         }
 
         maybeAlignUserAssociation(initialUserId: initialUserId)
-
-        NotificationCenter.default.post(name: .optimobileInializationFinished, object: nil)
     }
 
     static func completeDelayedConfiguration(config: OptimobileConfig) {
