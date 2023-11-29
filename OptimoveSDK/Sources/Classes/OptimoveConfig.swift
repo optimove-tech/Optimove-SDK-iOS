@@ -126,19 +126,25 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
-        if let optimoveCredentials = optimoveCredentials,
-           let args = try? OptimoveArguments(base64: optimoveCredentials)
-        {
-            _tenantToken = args.tenantToken
-            _configName = args.configName
-            features.insert(.optimove)
+        do {
+            if let optimoveCredentials = optimoveCredentials {
+                let args = try OptimoveArguments(base64: optimoveCredentials)
+                _tenantToken = args.tenantToken
+                _configName = args.configName
+                features.insert(.optimove)
+            }
+        } catch {
+            Logger.error(error.localizedDescription)
         }
-        if let optimobileCredentials = optimobileCredentials,
-           let args = try? OptimobileArguments(base64: optimobileCredentials)
-        {
-            credentials = args.credentials
-            region = args.region
-            features.insert(.optimobile)
+        do {
+            if let optimobileCredentials = optimobileCredentials {
+                let args = try OptimobileArguments(base64: optimobileCredentials)
+                credentials = args.credentials
+                region = args.region
+                features.insert(.optimobile)
+            }
+        } catch {
+            Logger.error(error.localizedDescription)
         }
         if features.intersection([.optimove, .optimobile]).isEmpty {
             // TODO: - Throw an error
