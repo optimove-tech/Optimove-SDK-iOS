@@ -45,7 +45,7 @@ final class AnalyticsHelper {
                     self.syncEvents(context: analyticsContext)
                 }
                 self.maybeSendPendingMetrics()
-                Logger.error("Notification \(notification.name.rawValue) was processed")
+                Logger.debug("Notification \(notification.name.rawValue) was processed")
             }
     }
 
