@@ -91,7 +91,9 @@ final class Optimobile {
         }
 
         guard instance == nil else {
-            Logger.error("The OptimobileSDK has already been initialized")
+            let message = "The OptimobileSDK has already been initialized"
+            assertionFailure(message)
+            Logger.error(message)
             return
         }
 
