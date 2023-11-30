@@ -62,6 +62,7 @@ public struct OptimoveConfig {
 public struct OptimobileConfig {
     let credentials: Credentials?
     let region: Region
+    let urlBuilder: UrlBuilder
 
     let sessionIdleTimeout: UInt
 
@@ -89,7 +90,8 @@ public typealias Region = OptimobileConfig.Region
 open class OptimoveConfigBuilder: NSObject {
     private var credentials: Credentials?
     public private(set) var features: Feature
-    private var region: OptimobileConfig.Region?
+    var region: OptimobileConfig.Region?
+    var urlBuilder: UrlBuilder
     private var _tenantToken: String?
     private var _configName: String?
     private var _sessionIdleTimeout: UInt = 23
@@ -100,7 +102,6 @@ open class OptimoveConfigBuilder: NSObject {
     private var _pushReceivedInForegroundHandlerBlock: Any?
     private var _deepLinkCname: URL?
     private var _deepLinkHandler: DeepLinkHandler?
-    private var _baseUrlMap: UrlBuilder.ServiceUrlMap?
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
@@ -123,6 +124,7 @@ open class OptimoveConfigBuilder: NSObject {
 
     override public required init() {
         features = []
+        urlBuilder = UrlBuilder(storage: KeyValPersistenceHelper.self)
         super.init()
     }
 
@@ -228,7 +230,7 @@ open class OptimoveConfigBuilder: NSObject {
      Internal SDK embedding API, do not call or depend on this method in your app
      */
     @discardableResult public func setBaseUrlMapping(baseUrlMap: UrlBuilder.ServiceUrlMap) -> OptimoveConfigBuilder {
-        _baseUrlMap = baseUrlMap
+        urlBuilder.runtimeUrlsMap = baseUrlMap
 
         return self
     }
@@ -249,6 +251,7 @@ open class OptimoveConfigBuilder: NSObject {
                 return OptimobileConfig(
                     credentials: credentials,
                     region: region,
+                    urlBuilder: urlBuilder,
                     sessionIdleTimeout: _sessionIdleTimeout,
                     inAppConsentStrategy: _inAppConsentStrategy,
                     inAppDefaultDisplayMode: _inAppDisplayMode,

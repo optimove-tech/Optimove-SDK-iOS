@@ -29,6 +29,20 @@ public class UrlBuilder {
     public typealias ServiceUrlMap = [Service: String]
 
     let storage: KeyValPersistenceHelper.Type
+
+    // Overrided urls
+    var runtimeUrlsMap: ServiceUrlMap?
+
+    // Computed property to allow overriding the default URL map
+    var urlMap: ServiceUrlMap {
+        get throws {
+            if let runtimeUrlsMap = runtimeUrlsMap {
+                return runtimeUrlsMap
+            }
+            return try UrlBuilder.defaultMapping(for: region)
+        }
+    }
+
     var region: String {
         get throws {
             if let regionString = storage.object(forKey: OptimobileUserDefaultsKey.REGION.rawValue) as? String {
@@ -38,12 +52,16 @@ public class UrlBuilder {
         }
     }
 
-    required init(storage: KeyValPersistenceHelper.Type) {
+    required init(storage: KeyValPersistenceHelper.Type, runtimeUrlsMap: ServiceUrlMap? = nil) {
         self.storage = storage
+        self.runtimeUrlsMap = runtimeUrlsMap
+        if let runtimeUrlsMap = runtimeUrlsMap {
+            validateUrl(urlsMap: runtimeUrlsMap)
+        }
     }
 
     func urlForService(_ service: Service) throws -> URL {
-        let baseUrlMap = try UrlBuilder.defaultMapping(for: region)
+        let baseUrlMap = try urlMap
         guard let baseUrl = baseUrlMap[service], let url = URL(string: baseUrl) else {
             throw Error.failedToBuildUrl(baseUrlMap[service])
         }
@@ -59,5 +77,13 @@ public class UrlBuilder {
             .media: "https://i-\(region).app.delivery",
             .push: "https://push-\(region).kumulos.com",
         ]
+    }
+
+    func validateUrl(urlsMap: ServiceUrlMap) {
+        for s in Service.allCases {
+            if urlsMap[s] == nil {
+                fatalError("UrlMap must contain an entry for all Service case. Missing key: \(s)")
+            }
+        }
     }
 }

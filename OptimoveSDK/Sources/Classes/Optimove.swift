@@ -66,7 +66,10 @@ typealias Logger = OptimoveCore.Logger
 
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
     public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
-        let builder = OptimoveConfigBuilder(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+        let builder = OptimoveConfigBuilder(
+            optimoveCredentials: optimoveCredentials,
+            optimobileCredentials: optimobileCredentials
+        )
         builder.setFeatures([builder.features, .delayedConfiguration])
         let config = builder.build()
         initialize(with: config)
