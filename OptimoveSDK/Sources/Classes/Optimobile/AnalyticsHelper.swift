@@ -15,19 +15,17 @@ typealias SyncCompletedBlock = (Error?) -> Void
 
 final class AnalyticsHelper {
     let eventsHttpClient: KSHttpClient
-    let pendingAnalytics: PendingAnalytics
     private var analyticsContext: NSManagedObjectContext?
     private var migrationAnalyticsContext: NSManagedObjectContext?
     private var finishedInitializationToken: NSObjectProtocol?
 
     // MARK: Initialization
 
-    init(httpClient: KSHttpClient, pendingAnalytics: PendingAnalytics) {
+    init(httpClient: KSHttpClient) {
         analyticsContext = nil
         migrationAnalyticsContext = nil
 
         eventsHttpClient = httpClient
-        self.pendingAnalytics = pendingAnalytics
 
         initContext()
 
@@ -44,41 +42,12 @@ final class AnalyticsHelper {
                 if let analyticsContext = self.analyticsContext {
                     self.syncEvents(context: analyticsContext)
                 }
-                self.maybeSendPendingMetrics()
                 Logger.debug("Notification \(notification.name.rawValue) was processed")
             }
     }
 
     deinit {
         eventsHttpClient.invalidateSessionCancellingTasks(false)
-    }
-
-    private func maybeSendPendingMetrics() {
-        func removePendingMetric(id: String) {
-            do {
-                try pendingAnalytics.remove(id: id)
-            } catch {
-                Logger.error("Failed to remove all pending metrics: " + error.localizedDescription)
-            }
-        }
-
-        do {
-            let metrics = try pendingAnalytics.readAll()
-            Logger.debug("Found \(metrics.count) pending metrics")
-            metrics.forEach { metric in
-                self.trackEvent(
-                    eventType: metric.eventType.rawValue,
-                    atTime: Date(timeIntervalSince1970: Double(metric.timestamp)),
-                    properties: metric.properties,
-                    immediateFlush: true,
-                    onSyncComplete: { _ in
-                        removePendingMetric(id: metric.id)
-                    }
-                )
-            }
-        } catch {
-            Logger.error("Failed to read pending metrics: " + error.localizedDescription)
-        }
     }
 
     private func getMainStoreUrl(appGroupExists: Bool) -> URL? {

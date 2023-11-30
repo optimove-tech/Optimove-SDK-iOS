@@ -34,7 +34,6 @@ public class OptimoveNotificationService {
 
         if AppGroupsHelper.isKumulosAppGroupDefined() {
             maybeSetBadge(bestAttemptContent: bestAttemptContent, userInfo: userInfo)
-            trackDeliveredEvent(dispatchGroup: dispatchGroup, userInfo: userInfo, notificationId: id)
             PendingNotificationHelper.add(notification: PendingNotification(id: id, deliveredAt: Date(), identifier: request.identifier))
         }
 
@@ -205,25 +204,6 @@ public class OptimoveNotificationService {
 
         bestAttemptContent.badge = newBadge
         KeyValPersistenceHelper.set(newBadge, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
-    }
-
-    fileprivate class func trackDeliveredEvent(dispatchGroup _: DispatchGroup, userInfo: [AnyHashable: Any], notificationId: Int) {
-        if isBackgroundPush(userInfo: userInfo) {
-            return
-        }
-
-        do {
-            let pendingAnalytics = PendingAnalyticsImpl(storage: KeyValPersistenceHelper.self)
-            try pendingAnalytics.add(
-                metric: PendingAnalyticMetric(
-                    id: String(notificationId),
-                    eventType: .MESSAGE_DELIVERED,
-                    properties: ["type": KS_MESSAGE_TYPE_PUSH, "id": notificationId]
-                )
-            )
-        } catch {
-            print("NotificationServiceExtension: Failed to track delivered event: \(error)")
-        }
     }
 
     fileprivate class func isBackgroundPush(userInfo: [AnyHashable: Any]) -> Bool {
