@@ -122,6 +122,31 @@ open class OptimoveConfigBuilder: NSObject {
         self.features = [features, .delayedConfiguration]
     }
 
+    convenience init(from config: OptimoveConfig) {
+        self.init()
+        if let tenantInfo = config.tenantInfo {
+            _tenantToken = tenantInfo.tenantToken
+            _configName = tenantInfo.configName
+        }
+        if let optimobileConfig = config.optimobileConfig {
+            credentials = optimobileConfig.credentials
+            region = optimobileConfig.region
+            urlBuilder = optimobileConfig.urlBuilder
+            _sessionIdleTimeout = optimobileConfig.sessionIdleTimeout
+            _inAppConsentStrategy = optimobileConfig.inAppConsentStrategy
+            _inAppDisplayMode = optimobileConfig.inAppDefaultDisplayMode
+            _inAppDeepLinkHandlerBlock = optimobileConfig.inAppDeepLinkHandlerBlock
+            _pushOpenedHandlerBlock = optimobileConfig.pushOpenedHandlerBlock
+            _pushReceivedInForegroundHandlerBlock = optimobileConfig._pushReceivedInForegroundHandlerBlock
+            _deepLinkCname = optimobileConfig.deepLinkCname
+            _deepLinkHandler = optimobileConfig.deepLinkHandler
+            _runtimeInfo = optimobileConfig.runtimeInfo
+            _sdkInfo = optimobileConfig.sdkInfo
+            _isRelease = optimobileConfig.isRelease
+        }
+        features = config.features
+    }
+
     override public required init() {
         features = []
         urlBuilder = UrlBuilder(storage: KeyValPersistenceHelper.self)
@@ -129,12 +154,14 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
+        if optimoveCredentials == nil && optimoveCredentials == nil {
+            assertionFailure("Invalid credentials provided to \(OptimoveConfigBuilder.self). At least one of optimoveCredentials or optimobileCredentials are required.")
+        }
         do {
             if let optimoveCredentials = optimoveCredentials {
                 let args = try OptimoveArguments(base64: optimoveCredentials)
                 _tenantToken = args.tenantToken
                 _configName = args.configName
-                features.insert(.optimove)
             }
         } catch {
             Logger.error(error.localizedDescription)
@@ -144,15 +171,11 @@ open class OptimoveConfigBuilder: NSObject {
                 let args = try OptimobileArguments(base64: optimobileCredentials)
                 credentials = args.credentials
                 region = args.region
-                features.insert(.optimobile)
             }
         } catch {
             Logger.error(error.localizedDescription)
         }
-        if features.intersection([.optimove, .optimobile]).isEmpty {
-            // TODO: - Throw an error
-            Logger.error("Invalid credentials provided to \(OptimoveConfigBuilder.self). At least one of optimoveCredentials or optimobileCredentials are required.")
-        }
+
         return self
     }
 
@@ -236,8 +259,13 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func build() -> OptimoveConfig {
+        if features.intersection([.optimove, .optimobile]).isEmpty {
+            Logger.error("No features enabled. Please enable at least one feature.")
+        }
+
         let tenantInfo: OptimoveTenantInfo? = {
-            if let _tenantToken = _tenantToken,
+            if features.contains(.optimove),
+               let _tenantToken = _tenantToken,
                let _configName = _configName
             {
                 return OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
@@ -247,7 +275,9 @@ open class OptimoveConfigBuilder: NSObject {
         }()
 
         let optimobileConfig: OptimobileConfig? = {
-            if let region = region {
+            if features.contains(.optimobile),
+               let region = region
+            {
                 return OptimobileConfig(
                     credentials: credentials,
                     region: region,

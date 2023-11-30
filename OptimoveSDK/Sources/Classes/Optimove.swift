@@ -66,11 +66,12 @@ typealias Logger = OptimoveCore.Logger
 
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
     public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
-        let builder = OptimoveConfigBuilder(
-            optimoveCredentials: optimoveCredentials,
-            optimobileCredentials: optimobileCredentials
-        )
-        builder.setFeatures([builder.features, .delayedConfiguration])
+        guard let currentConfig = shared.config else {
+            Logger.error("Optimove SDK is not configured yet. Please call Optimove.initialize(with:) first.")
+            return
+        }
+        let builder = OptimoveConfigBuilder(from: currentConfig)
+        builder.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
         let config = builder.build()
         initialize(with: config)
     }
