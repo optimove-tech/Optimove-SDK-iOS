@@ -100,6 +100,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var _pushReceivedInForegroundHandlerBlock: Any?
     private var _deepLinkCname: URL?
     private var _deepLinkHandler: DeepLinkHandler?
+    private var _baseUrlMap: UrlBuilder.ServiceUrlMap?
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
@@ -226,7 +227,7 @@ open class OptimoveConfigBuilder: NSObject {
     /**
      Internal SDK embedding API, do not call or depend on this method in your app
      */
-    @discardableResult public func setBaseUrlMapping(baseUrlMap: ServiceUrlMap) -> OptimoveConfigBuilder {
+    @discardableResult public func setBaseUrlMapping(baseUrlMap: UrlBuilder.ServiceUrlMap) -> OptimoveConfigBuilder {
         _baseUrlMap = baseUrlMap
 
         return self
