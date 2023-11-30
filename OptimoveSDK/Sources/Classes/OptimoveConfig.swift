@@ -223,6 +223,15 @@ open class OptimoveConfigBuilder: NSObject {
         return self
     }
 
+    /**
+     Internal SDK embedding API, do not call or depend on this method in your app
+     */
+    @discardableResult public func setBaseUrlMapping(baseUrlMap: ServiceUrlMap) -> OptimoveConfigBuilder {
+        _baseUrlMap = baseUrlMap
+
+        return self
+    }
+
     @discardableResult public func build() -> OptimoveConfig {
         let tenantInfo: OptimoveTenantInfo? = {
             if let _tenantToken = _tenantToken,
