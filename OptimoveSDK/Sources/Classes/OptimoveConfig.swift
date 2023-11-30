@@ -270,7 +270,13 @@ open class OptimoveConfigBuilder: NSObject {
             {
                 return OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
             }
-            Logger.info("\(OptimoveTenantInfo.self) building skipped.")
+            if features.contains(.optimove) {
+                let message = "Missing required optimove config. Please set optimove config."
+                assertionFailure(message)
+                Logger.error(message)
+            } else {
+                Logger.info("\(OptimoveTenantInfo.self) building skipped.")
+            }
             return nil
         }()
 
@@ -295,7 +301,13 @@ open class OptimoveConfigBuilder: NSObject {
                     isRelease: _isRelease
                 )
             }
-            Logger.info("\(OptimobileConfig.self) building skipped.")
+            if features.contains(.optimobile) {
+                let message = "Missing required optimobile config. Please set optimobile config."
+                assertionFailure(message)
+                Logger.error(message)
+            } else {
+                Logger.info("\(OptimobileConfig.self) building skipped.")
+            }
             return nil
         }()
 
