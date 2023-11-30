@@ -155,7 +155,7 @@ open class OptimoveConfigBuilder: NSObject {
 
     @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
         if optimoveCredentials == nil && optimoveCredentials == nil {
-            assertionFailure("Invalid credentials provided to \(OptimoveConfigBuilder.self). At least one of optimoveCredentials or optimobileCredentials are required.")
+            assertionFailure("Should provide at least optimove or optimobile credentials")
         }
         do {
             if let optimoveCredentials = optimoveCredentials {
@@ -270,13 +270,7 @@ open class OptimoveConfigBuilder: NSObject {
             {
                 return OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
             }
-            if features.contains(.optimove) {
-                let message = "Missing required optimove config. Please set optimove config."
-                assertionFailure(message)
-                Logger.error(message)
-            } else {
-                Logger.info("\(OptimoveTenantInfo.self) building skipped.")
-            }
+            Logger.info("\(OptimoveTenantInfo.self) building skipped.")
             return nil
         }()
 
@@ -301,13 +295,7 @@ open class OptimoveConfigBuilder: NSObject {
                     isRelease: _isRelease
                 )
             }
-            if features.contains(.optimobile) {
-                let message = "Missing required optimobile config. Please set optimobile config."
-                assertionFailure(message)
-                Logger.error(message)
-            } else {
-                Logger.info("\(OptimobileConfig.self) building skipped.")
-            }
+            Logger.info("\(OptimobileConfig.self) building skipped.")
             return nil
         }()
 
