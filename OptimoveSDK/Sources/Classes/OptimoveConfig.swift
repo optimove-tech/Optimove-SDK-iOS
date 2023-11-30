@@ -239,7 +239,7 @@ open class OptimoveConfigBuilder: NSObject {
             {
                 return OptimoveTenantInfo(tenantToken: _tenantToken, configName: _configName)
             }
-            Logger.info("\(OptimoveTenantInfo.self) building failed.")
+            Logger.info("\(OptimoveTenantInfo.self) building skipped.")
             return nil
         }()
 
@@ -261,7 +261,7 @@ open class OptimoveConfigBuilder: NSObject {
                     isRelease: _isRelease
                 )
             }
-            Logger.info("\(OptimobileConfig.self) building failed.")
+            Logger.info("\(OptimobileConfig.self) building skipped.")
             return nil
         }()
 
