@@ -30,12 +30,21 @@ class InAppManager {
     private let STORED_IN_APP_LIMIT = 50
     private let SYNC_DEBOUNCE_SECONDS = 3600 as TimeInterval
 
+    var finishedInitializationToken: NSObjectProtocol?
+
     // MARK: Initialization
 
     init(_ config: OptimobileConfig, httpClient: KSHttpClient) {
         self.httpClient = httpClient
         presenter = InAppPresenter(displayMode: config.inAppDefaultDisplayMode)
         syncQueue = DispatchQueue(label: "kumulos.in-app.sync")
+
+        finishedInitializationToken = NotificationCenter.default
+            .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
+                guard let self = self else { return }
+                self.sync()
+                Logger.debug("Notification \(notification.name.rawValue) was processed")
+            }
     }
 
     func initialize() {
