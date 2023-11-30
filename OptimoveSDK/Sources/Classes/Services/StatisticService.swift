@@ -7,13 +7,10 @@ protocol StatisticService {
 }
 
 final class StatisticServiceImpl {
-
     private var _applicationOpenTime: TimeInterval = Date().timeIntervalSince1970
-
 }
 
 extension StatisticServiceImpl: StatisticService {
-
     var applicationOpenTime: TimeInterval {
         get {
             return _applicationOpenTime
@@ -22,5 +19,4 @@ extension StatisticServiceImpl: StatisticService {
             _applicationOpenTime = newValue
         }
     }
-
 }

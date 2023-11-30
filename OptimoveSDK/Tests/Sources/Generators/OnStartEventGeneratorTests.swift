@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveSDK
+import XCTest
 
 final class OnStartEventGeneratorTests: OptimoveTestCase {
-
     var generator: OnStartEventGenerator!
     var dataProvider: MockDateTimeProvider!
     var synchronizer: MockSynchronizer!
@@ -61,11 +60,10 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
             for: [
                 metaDataEventExpectation,
                 userAgentEventExpectation,
-                appOpenEventExpectation
+                appOpenEventExpectation,
             ],
             // Additional second to complete the async operation and prevent a flickering.
             timeout: defaultTimeout + 3
         )
     }
-
 }

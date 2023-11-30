@@ -4,40 +4,31 @@ import Foundation
 import OptimoveCore
 
 final class ServiceLocator {
-
     // MARK: - Singletons
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
     private let _storage: StorageFacade
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _statisticService: StatisticService = {
-        return StatisticServiceImpl()
-    }()
+    private lazy var _statisticService: StatisticService = StatisticServiceImpl()
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _pipelineSinglton: PipelineMutator = {
-        return PipelineImpl(
-            pipe: InMemoryBuffer()
-        )
-    }()
+    private lazy var _pipelineSinglton: PipelineMutator = PipelineImpl(
+        pipe: InMemoryBuffer()
+    )
 
     /// Keeps as singleton in reason to share a session state between a service consumers.
-    private lazy var _locationManager: LocationService = {
-        return LocationServiceImpl()
-    }()
+    private lazy var _locationManager: LocationService = LocationServiceImpl()
 
-    private lazy var _deviceStateObserver: DeviceStateObserver = {
-        return DeviceStateObserverFactory(
-            statisticService: statisticService(),
-            synchronizer: pipeline(),
-            dateTimeProvider: dateTimeProvider(),
-            coreEventFactory: coreEventFactory(),
-            storage: storage()
-        ).build()
-    }()
+    private lazy var _deviceStateObserver: DeviceStateObserver = DeviceStateObserverFactory(
+        statisticService: statisticService(),
+        synchronizer: pipeline(),
+        dateTimeProvider: dateTimeProvider(),
+        coreEventFactory: coreEventFactory(),
+        storage: storage()
+    ).build()
 
-    /// MARK: - Initializer
+    // MARK: - Initializer
 
     init(storageFacade: StorageFacade) {
         _storage = storageFacade
@@ -86,7 +77,7 @@ final class ServiceLocator {
             pipeline: _pipelineSinglton,
             dependencies: [
                 OptimoveStrorageSDKInitializerDependency(storage: storage()),
-                MultiplexLoggerStreamSDKInitializerDependency()
+                MultiplexLoggerStreamSDKInitializerDependency(),
             ],
             storage: storage()
         )
@@ -111,12 +102,12 @@ final class ServiceLocator {
     func installationIdGenerator() -> InstallationIdGenerator {
         return InstallationIdGenerator(storage: storage())
     }
-    
+
     func deviceStateObserver() -> DeviceStateObserver {
         return _deviceStateObserver
     }
 
-    /// MARK: - Factories
+    // MARK: - Factories
 
     func componentFactory() -> ComponentFactory {
         return ComponentFactory(
@@ -148,5 +139,4 @@ final class ServiceLocator {
             networking: networkingFactory().createRemoteConfigurationNetworking()
         )
     }
-
 }

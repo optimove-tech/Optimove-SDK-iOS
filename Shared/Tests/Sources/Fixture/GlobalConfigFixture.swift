@@ -4,7 +4,6 @@ import Foundation
 @testable import OptimoveCore
 
 final class GlobalConfigFixture: FileAccessible {
-
     let fileName: String = "core_events.json"
     private var events: [String: EventsConfig] = [:]
 

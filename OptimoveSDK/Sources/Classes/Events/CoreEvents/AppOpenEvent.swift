@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 final class AppOpenEvent: Event {
-
-    struct Constants {
+    enum Constants {
         static let name = "app_open"
-        struct Key {
+        enum Key {
             static let appNS = OptimoveKeys.Configuration.appNs.rawValue
             static let deviceID = OptimoveKeys.Configuration.deviceId.rawValue
             static let visitorID = OptimoveKeys.Configuration.visitorId.rawValue
@@ -15,7 +14,7 @@ final class AppOpenEvent: Event {
     init(bundleIdentifier: String, deviceID: String, visitorID: String?, customerID: String?) {
         var parameters = [
             Constants.Key.appNS: bundleIdentifier,
-            Constants.Key.deviceID: deviceID
+            Constants.Key.deviceID: deviceID,
         ]
         if let customerID = customerID {
             parameters[Constants.Key.userID] = customerID

@@ -3,7 +3,6 @@
 import OptimoveCore
 
 final class DeviceStateObserverFactory {
-
     private let statisticService: StatisticService
     private let synchronizer: Pipeline
     private let dateTimeProvider: DateTimeProvider
@@ -14,7 +13,8 @@ final class DeviceStateObserverFactory {
          synchronizer: Pipeline,
          dateTimeProvider: DateTimeProvider,
          coreEventFactory: CoreEventFactory,
-         storage: OptimoveStorage) {
+         storage: OptimoveStorage)
+    {
         self.statisticService = statisticService
         self.synchronizer = synchronizer
         self.dateTimeProvider = dateTimeProvider
@@ -28,7 +28,7 @@ final class DeviceStateObserverFactory {
                 MigrationObserver(
                     migrationWorks: [
                         MigrationWork_2_10_0(synchronizer: synchronizer, storage: storage),
-                        MigrationWork_3_0_0(storage: storage)
+                        MigrationWork_3_0_0(storage: storage),
                     ]
                 ),
                 ResignActiveObserver(
@@ -39,9 +39,8 @@ final class DeviceStateObserverFactory {
                     statisticService: statisticService,
                     dateTimeProvider: dateTimeProvider,
                     coreEventFactory: coreEventFactory
-                )
+                ),
             ]
         )
     }
-
 }

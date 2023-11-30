@@ -3,20 +3,20 @@
 import Foundation
 import WebKit
 
-fileprivate enum PrintDustMessage : String {
-    case clientReady =  "READY"
+private enum PrintDustMessage: String {
+    case clientReady = "READY"
     case clientFingerprintGeneraged = "FINGERPRINT_GENERATED"
     case requestFingerprint = "REQUEST_FINGERPRINT"
 }
 
-fileprivate enum DeferredState<R> {
+private enum DeferredState<R> {
     case pending
     case resolved(R)
 }
 
-fileprivate class Deferred<R> {
-    var state : DeferredState<R>
-    var pendingWatchers : [(R) -> Void]
+private class Deferred<R> {
+    var state: DeferredState<R>
+    var pendingWatchers: [(R) -> Void]
 
     init() {
         state = .pending
@@ -25,8 +25,8 @@ fileprivate class Deferred<R> {
 
     func resolve(result: R) {
         DispatchQueue.main.async {
-            switch (self.state) {
-            case .resolved(_): return
+            switch self.state {
+            case .resolved: return
             default: break
             }
 
@@ -42,24 +42,22 @@ fileprivate class Deferred<R> {
 
     func then(onResult: @escaping (R) -> Void) {
         DispatchQueue.main.async {
-            switch (self.state) {
+            switch self.state {
             case .pending:
                 self.pendingWatchers.append(onResult)
-                break
-            case .resolved(let result):
+            case let .resolved(result):
                 onResult(result)
-                break
             }
         }
     }
 }
 
-class DeepLinkFingerprinter : NSObject, WKScriptMessageHandler, WKNavigationDelegate {
+class DeepLinkFingerprinter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
     fileprivate static let printDustRuntimeUrl = "https://pd.app.delivery"
     fileprivate static let printDustHandlerName = "printHandler"
 
-    fileprivate var webView : WKWebView?
-    fileprivate let fingerprint : Deferred<[String:String]>
+    fileprivate var webView: WKWebView?
+    fileprivate let fingerprint: Deferred<[String: String]>
 
     override init() {
         let controller = WKUserContentController()
@@ -77,44 +75,42 @@ class DeepLinkFingerprinter : NSObject, WKScriptMessageHandler, WKNavigationDele
         webView?.load(request)
     }
 
-    func getFingerprintComponents(_ onGenerated: @escaping ([String:String]) -> Void) {
+    func getFingerprintComponents(_ onGenerated: @escaping ([String: String]) -> Void) {
         fingerprint.then(onResult: onGenerated)
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.name != DeepLinkFingerprinter.printDustHandlerName {
-            return;
+            return
         }
 
         let body = message.body as! NSDictionary
         let type = body["type"] as! String
 
-        switch (type) {
+        switch type {
         case PrintDustMessage.clientReady.rawValue:
             postClientMessage(type: PrintDustMessage.requestFingerprint.rawValue, data: nil)
-            break;
         case PrintDustMessage.clientFingerprintGeneraged.rawValue:
-            guard let data = body["data"] as? [String:AnyObject],
-                  let components = data["components"] as? [String:String] else {
+            guard let data = body["data"] as? [String: AnyObject],
+                  let components = data["components"] as? [String: String]
+            else {
                 return
             }
             fingerprint.resolve(result: components)
             DispatchQueue.main.async { self.cleanUpWebView() }
-            break;
         default:
             print("Unhandled message: \(type)")
         }
     }
 
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    func webView(_: WKWebView, didFail _: WKNavigation!, withError _: Error) {
         DispatchQueue.main.async { self.cleanUpWebView() }
     }
 
     fileprivate func postClientMessage(type: String, data: Any?) {
         do {
-            let msg: [String: Any] = ["type" : type, "data" : data != nil ? data! : NSNull()]
-            let json : Data = try JSONSerialization.data(withJSONObject: msg, options: JSONSerialization.WritingOptions(rawValue: 0))
-
+            let msg: [String: Any] = ["type": type, "data": data != nil ? data! : NSNull()]
+            let json: Data = try JSONSerialization.data(withJSONObject: msg, options: JSONSerialization.WritingOptions(rawValue: 0))
 
             let jsonMsg = String(data: json, encoding: .utf8)
             let evalString = String(format: "postHostMessage(%@);", jsonMsg!)
@@ -123,7 +119,7 @@ class DeepLinkFingerprinter : NSObject, WKScriptMessageHandler, WKNavigationDele
         } catch {
             // Noop
         }
-      }
+    }
 
     fileprivate func cleanUpWebView() {
         webView?.stopLoading()

@@ -2,8 +2,7 @@
 
 import Foundation
 
-struct StubVariables {
-
+enum StubVariables {
     static let int = 42
     static let string = "string"
     static let bool = true
@@ -13,6 +12,5 @@ struct StubVariables {
     static let customerID = "customerID".lowercased()
     static let userEmail = "userEmail".lowercased()
     static let initialVisitorId = "initialVisitorId".lowercased()
-    static let tenantID = 9_999
-
+    static let tenantID = 9999
 }

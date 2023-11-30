@@ -13,7 +13,6 @@ protocol PipelineMutator: Pipeline {
 }
 
 final class PipelineImpl {
-
     private let queue: DispatchQueue
     private let pipe: Pipe
 
@@ -21,11 +20,9 @@ final class PipelineImpl {
         queue = DispatchQueue(label: "com.optimove.pipeline", qos: .userInitiated)
         self.pipe = pipe
     }
-
 }
 
 extension PipelineImpl: Pipeline {
-
     func deliver(_ operation: CommonOperation) {
         queue.async { [pipe] in
             tryCatch {
@@ -33,24 +30,19 @@ extension PipelineImpl: Pipeline {
             }
         }
     }
-
 }
 
 extension PipelineImpl: PipelineMutator {
-
     func addNextPipe(_ nextPipe: Pipe) {
         queue.async { [pipe] in
             // The first pipe should be a InMemortyBuffer.
             pipe.next = nextPipe
         }
     }
-
 }
 
 extension PipelineImpl: ResignActiveSubscriber {
-
     func onResignActive() {
         deliver(.dispatchNow)
     }
-
 }

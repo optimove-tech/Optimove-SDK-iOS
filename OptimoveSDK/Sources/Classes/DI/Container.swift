@@ -2,7 +2,6 @@
 
 /// The container is using for prevent an unexpected internal crash to affect on a tenant app.
 final class Container {
-
     private var serviceLocator: ServiceLocator?
 
     init(serviceLocator: ServiceLocator?) {
@@ -16,5 +15,4 @@ final class Container {
         }
         return nil
     }
-
 }

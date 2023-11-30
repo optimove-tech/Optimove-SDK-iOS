@@ -4,8 +4,7 @@ import Foundation
 import OptimoveCore
 
 public final class RemoteConfigurationRequestBuilder {
-
-    private struct Constants {
+    private enum Constants {
         static let timeout: TimeInterval = 30
     }
 
@@ -32,5 +31,4 @@ public final class RemoteConfigurationRequestBuilder {
         Logger.debug("Connect to \(url.absoluteString) to retreive global file.")
         return NetworkRequest(method: .get, baseURL: url, timeoutInterval: Constants.timeout)
     }
-
 }

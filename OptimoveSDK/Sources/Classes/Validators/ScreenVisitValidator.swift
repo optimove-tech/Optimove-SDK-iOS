@@ -2,8 +2,7 @@
 
 import OptimoveCore
 
-struct ScreenVisitValidator {
-
+enum ScreenVisitValidator {
     enum Result {
         case valid
         case emptyTitle
@@ -16,5 +15,4 @@ struct ScreenVisitValidator {
         }
         return .valid
     }
-
 }

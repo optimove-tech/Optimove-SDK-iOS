@@ -1,26 +1,25 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveCore
+import XCTest
 
 final class MockedFileManager: FileManager {
-
     private let groupedURL = URL(fileURLWithPath: "grouped")
     private let sharedURL = URL(fileURLWithPath: "shared")
     private var state: [String: Data] = [:]
 
-    override func containerURL(forSecurityApplicationGroupIdentifier groupIdentifier: String) -> URL? {
+    override func containerURL(forSecurityApplicationGroupIdentifier _: String) -> URL? {
         return groupedURL
     }
 
-    override func urls(for directory: FileManager.SearchPathDirectory,
-                       in domainMask: FileManager.SearchPathDomainMask) -> [URL] {
+    override func urls(for _: FileManager.SearchPathDirectory,
+                       in _: FileManager.SearchPathDomainMask) -> [URL]
+    {
         return [sharedURL]
     }
 }
 
 class OptimoveFileManagerTests: XCTestCase {
-
     let fileName = "StubCodable"
     var fileStorage: FileStorage!
     let fileManager = MockedFileManager()
@@ -58,7 +57,7 @@ class OptimoveFileManagerTests: XCTestCase {
         try load_data(isGroupContainer: false)
     }
 
-    func load_data(isGroupContainer: Bool) throws {
+    func load_data(isGroupContainer _: Bool) throws {
         // given
         save_encodable()
 
@@ -76,7 +75,7 @@ class OptimoveFileManagerTests: XCTestCase {
         delete_file(isGroupContainer: false)
     }
 
-    func delete_file(isGroupContainer: Bool) {
+    func delete_file(isGroupContainer _: Bool) {
         // given
         save_encodable()
 
@@ -104,13 +103,12 @@ class OptimoveFileManagerTests: XCTestCase {
         // then
         XCTAssertThrowsError(try fileStorage.delete(fileName: fileName))
     }
-
 }
 
 private struct StubCodable: Codable {
     var name = "name"
     var value = "value"
     var parameters: [String: String] = [
-        "key": "value"
+        "key": "value",
     ]
 }

@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveSDK
+import XCTest
 
 class SetUserIdEventTests: XCTestCase {
-
     func test_event_name() {
         // given
         let originalVistorId = "originalVistorId"
@@ -32,5 +31,4 @@ class SetUserIdEventTests: XCTestCase {
         XCTAssert(event.context[SetUserIdEvent.Constants.Key.userId] as? String == userId)
         XCTAssert(event.context[SetUserIdEvent.Constants.Key.updatedVisitorId] as? String == updateVisitorId)
     }
-
 }

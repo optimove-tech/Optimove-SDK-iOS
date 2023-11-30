@@ -3,10 +3,8 @@
 import Foundation
 
 extension String {
-
     /// Returns timmed string without whitespaces and new lines.
     var isBlank: Bool {
-        return self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        return trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
-
 }

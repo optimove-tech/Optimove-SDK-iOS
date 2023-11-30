@@ -1,11 +1,10 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
+import XCTest
 
 final class OptiTrackMockQueueTests: OptimoveTestCase {
-
     var optitrack: OptiTrack!
     var dateProvider = MockDateTimeProvider()
     var statisticService = MockStatisticService()
@@ -39,7 +38,7 @@ final class OptiTrackMockQueueTests: OptimoveTestCase {
 
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
-        networking.assetEventsFunction = { (events, completion) -> Void in
+        networking.assetEventsFunction = { events, _ in
             XCTAssertEqual(events.count, 1)
             networkExpectation.fulfill()
         }
@@ -53,11 +52,11 @@ final class OptiTrackMockQueueTests: OptimoveTestCase {
         // given
         prefillStorageAsVisitor()
         let stubEvents = [StubEvent(), StubEvent()]
-        queue.events = stubEvents.map({ try! self.builder.build(event: $0) })
+        queue.events = stubEvents.map { try! self.builder.build(event: $0) }
 
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
-        networking.assetEventsFunction = { (events, completion) -> Void in
+        networking.assetEventsFunction = { events, _ in
             XCTAssertEqual(stubEvents.count, events.count)
             networkExpectation.fulfill()
         }

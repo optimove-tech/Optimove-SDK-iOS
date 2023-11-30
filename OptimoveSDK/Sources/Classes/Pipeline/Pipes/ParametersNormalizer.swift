@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class ParametersNormalizer: Pipe {
-
     private let configuration: Configuration
 
     init(configuration: Configuration) {
@@ -17,8 +16,8 @@ final class ParametersNormalizer: Pipe {
         let normilizeFunction = { () -> CommonOperation in
             switch operation {
             case let .report(events: events):
-                return CommonOperation.report(
-                    events: try self.normilize(events)
+                return try CommonOperation.report(
+                    events: self.normilize(events)
                 )
             default:
                 return operation
@@ -35,12 +34,10 @@ final class ParametersNormalizer: Pipe {
             return event
         }
     }
-
 }
 
 extension Event {
-
-    private struct Constants {
+    private enum Constants {
         static let boolean = "Boolean"
     }
 
@@ -53,11 +50,11 @@ extension Event {
     /// - Returns: Normilized event
     /// - Throws: Throw an error if an event configuration are missing.
     func normilize(_ events: [String: EventsConfig]) throws -> Event {
-        let normilizeName = self.name.normilizeKey()
+        let normilizeName = name.normilizeKey()
         guard let eventConfig = events[normilizeName] else {
             return self
         }
-        let normalizedParameters = self.context.reduce(into: [String: Any]()) { (result, next) in
+        let normalizedParameters = context.reduce(into: [String: Any]()) { result, next in
             // Replacing all spaces in a key with underscore character.
             let normalizedKey = next.key.normilizeKey()
 
@@ -76,12 +73,11 @@ extension Event {
             }
         }
         return Event(
-            eventId: self.eventId,
+            eventId: eventId,
             name: normilizeName,
-            category: self.category,
+            category: category,
             context: normalizedParameters,
-            timestamp: self.timestamp
+            timestamp: timestamp
         )
     }
-
 }

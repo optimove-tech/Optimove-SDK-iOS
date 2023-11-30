@@ -1,11 +1,10 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
+import XCTest
 
 class NewTenantInfoHandlerTests: XCTestCase {
-
     var storage = MockOptimoveStorage()
 
     func test_tenant_info_save_correctly() {
@@ -15,7 +14,7 @@ class NewTenantInfoHandlerTests: XCTestCase {
 
         let handler = NewTenantInfoHandler(storage: storage)
 
-        storage.assertFunction = { (value, key) in
+        storage.assertFunction = { value, key in
             if key == .tenantToken {
                 XCTAssertEqual(value as? String, tenantToken)
             }
@@ -29,5 +28,4 @@ class NewTenantInfoHandlerTests: XCTestCase {
 
         handler.handle(tenantInfo)
     }
-
 }

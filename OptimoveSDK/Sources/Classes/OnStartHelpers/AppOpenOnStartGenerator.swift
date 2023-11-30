@@ -5,12 +5,12 @@ import OptimoveCore
 import UIKit.UIApplication
 
 final class AppOpenOnStartGenerator {
-
     private let synchronizer: Pipeline
     private let coreEventFactory: CoreEventFactory
 
     init(synchronizer: Pipeline,
-         coreEventFactory: CoreEventFactory) {
+         coreEventFactory: CoreEventFactory)
+    {
         self.synchronizer = synchronizer
         self.coreEventFactory = coreEventFactory
     }
@@ -28,5 +28,4 @@ final class AppOpenOnStartGenerator {
             self.synchronizer.deliver(.report(events: [event]))
         }
     }
-
 }

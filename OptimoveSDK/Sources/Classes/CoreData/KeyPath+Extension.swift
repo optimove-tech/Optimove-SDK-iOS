@@ -3,7 +3,6 @@
 import Foundation
 
 extension KeyPath {
-
     /// returns the Root object type
     var rootType: Any.Type {
         return Root.self

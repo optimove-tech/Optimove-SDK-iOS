@@ -1,11 +1,10 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import XCTest
 import CoreData
 @testable import OptimoveSDK
+import XCTest
 
 class CoreDataMigratorTests: XCTestCase {
-
     var migrator: CoreDataMigrator!
 
     override func setUpWithError() throws {
@@ -16,7 +15,7 @@ class CoreDataMigratorTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-         migrator = nil
+        migrator = nil
     }
 
     func tearDownCoreDataStack(context: NSManagedObjectContext) {
@@ -46,11 +45,9 @@ class CoreDataMigratorTests: XCTestCase {
         XCTAssertNoThrow(try JSONDecoder().decode(OptistreamEvent.self, from: migratedPost.data))
         tearDownCoreDataStack(context: context)
     }
-
 }
 
 extension FileManager {
-
     // MARK: - Temp
 
     static func clearTempDirectoryContents() {
@@ -72,7 +69,6 @@ extension FileManager {
 }
 
 extension NSManagedObjectContext {
-
     // MARK: Model
 
     convenience init(model: NSManagedObjectModel, storeURL: URL) {

@@ -13,7 +13,6 @@ struct MobileProvision: Decodable {
     }
 
     struct Entitlements: Decodable {
-
         let apsEnvironment: Environment
 
         private enum CodingKeys: String, CodingKey {
@@ -37,35 +36,34 @@ struct MobileProvision: Decodable {
 }
 
 extension MobileProvision {
-    
     enum UIApplicationReleaseMode: Int {
-        case  unknown,
-              releaseDev,
-              releaseAdHoc,
-              releaseWildcard,
-              releaseAppStore,
-              releaseSim,
-              releaseEnterprise
+        case unknown,
+             releaseDev,
+             releaseAdHoc,
+             releaseWildcard,
+             releaseAppStore,
+             releaseSim,
+             releaseEnterprise
     }
-    
-    private struct PlistTags {
+
+    private enum PlistTags {
         static let start = "<plist"
         static let end = "</plist>"
     }
-    
+
     static func read() throws -> MobileProvision {
         let profilePath: String = try unwrap(Bundle.main.path(forResource: "embedded", ofType: "mobileprovision"))
         return try read(from: profilePath)
     }
-    
-    static func read(from profilePath: String) throws ->  MobileProvision {
+
+    static func read(from profilePath: String) throws -> MobileProvision {
         let profile = try String(contentsOfFile: profilePath, encoding: String.Encoding.isoLatin1)
         let plistString: String = try unwrap(convertPlistDataToString(profile))
         let plistData: Data = try unwrap(plistString.appending(PlistTags.end).data(using: .isoLatin1))
         let decoder = PropertyListDecoder()
         return try decoder.decode(MobileProvision.self, from: plistData)
     }
-    
+
     private static func convertPlistDataToString(_ string: String) throws -> String {
         let scanner = Scanner(string: string)
         let startError = GuardError.custom("Not found plist tag \(PlistTags.start), in '\(string)'")
@@ -75,9 +73,9 @@ extension MobileProvision {
         guard scanner.scanUpTo(PlistTags.end, into: &extractedPlist) != false else {
             throw endError
         }
-        return String(try unwrap(extractedPlist))
+        return try String(unwrap(extractedPlist))
     }
-    
+
     static func releaseMode() -> UIApplicationReleaseMode {
         guard let mobileProvision = try? MobileProvision.read() else { return .unknown }
 

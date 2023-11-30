@@ -5,9 +5,8 @@ import Foundation
 /// Builds an Optistream event from internal event type.
 /// The `delivery_event` do not use this class in reason of memory consuption under Notification Service Extention.
 public final class OptistreamEventBuilder {
-
-    struct Constants {
-        struct Values {
+    enum Constants {
+        enum Values {
             static let origin = "sdk"
         }
     }
@@ -24,22 +23,21 @@ public final class OptistreamEventBuilder {
     }
 
     public func build(event: Event) throws -> OptistreamEvent {
-        return OptistreamEvent(
+        return try OptistreamEvent(
             tenant: tenantID,
             category: event.category,
             event: event.name,
             origin: Constants.Values.origin,
             customer: storage.customerID,
-            visitor: try storage.getVisitorID(),
+            visitor: storage.getVisitorID(),
             timestamp: Formatter.iso8601withFractionalSeconds.string(from: event.timestamp),
-            context: try JSON(event.context),
+            context: JSON(event.context),
             metadata: OptistreamEvent.Metadata(
                 realtime: event.isRealtime,
-                firstVisitorDate: try storage.getFirstRunTimestamp(),
+                firstVisitorDate: storage.getFirstRunTimestamp(),
                 eventId: event.eventId.uuidString,
                 requestId: event.requestId
             )
         )
     }
-
 }

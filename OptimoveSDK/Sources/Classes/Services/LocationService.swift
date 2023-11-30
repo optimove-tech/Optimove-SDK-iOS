@@ -1,8 +1,8 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
+import CoreLocation
 import Foundation
 import OptimoveCore
-import CoreLocation
 
 enum Location: String {
     case latitude
@@ -21,7 +21,6 @@ protocol LocationService {
 }
 
 extension LocationServiceImpl: LocationService {
-
     func getLocation(onComplete: @escaping (Result<[Location: String], LocationError>) -> Void) {
         DispatchQueue.main.async {
             if self.isAuthorized(), self.hasDescriptions {
@@ -30,26 +29,24 @@ extension LocationServiceImpl: LocationService {
             onComplete(.failure(.notAuthorized))
         }
     }
-
 }
 
 final class LocationServiceImpl {
-
     private let locationManager = CLLocationManager()
     private let preferredLocale = Locale(identifier: "en_US_POSIX")
     private let descriptionKeys: [String] = [
         "NSLocationAlwaysUsageDescription",
-        "NSLocationWhenInUseUsageDescription"
+        "NSLocationWhenInUseUsageDescription",
     ]
     private let authorizedStatuses: [CLAuthorizationStatus] = [
         .authorizedAlways,
-        .authorizedWhenInUse
+        .authorizedWhenInUse,
     ]
     private let desiredAccuracy: CLLocationAccuracy = kCLLocationAccuracyKilometer
-    private var hasDescriptions: Bool = false
+    private var hasDescriptions = false
 
     init() {
-        hasDescriptions = self.hasDescriptionForMainApp()
+        hasDescriptions = hasDescriptionForMainApp()
     }
 
     private func hasDescriptionForMainApp() -> Bool {
@@ -69,9 +66,9 @@ final class LocationServiceImpl {
         }
         var locations: [Location: String] = [
             .latitude: String(location.coordinate.latitude),
-            .longitude: String(location.coordinate.longitude)
+            .longitude: String(location.coordinate.longitude),
         ]
-        getLocality(location: location) { (result) in
+        getLocality(location: location) { result in
             switch result {
             case let .success(locality):
                 locations[.locality] = locality
@@ -83,8 +80,9 @@ final class LocationServiceImpl {
     }
 
     private func getLocality(location: CLLocation,
-                             onComplete: @escaping (Result<String, LocationError>) -> Void) {
-        let completionHandler: CLGeocodeCompletionHandler = { (placemarks, error) in
+                             onComplete: @escaping (Result<String, LocationError>) -> Void)
+    {
+        let completionHandler: CLGeocodeCompletionHandler = { placemarks, error in
             if let error = error {
                 Logger.error(error.localizedDescription)
                 onComplete(.failure(.noLocality))
@@ -96,7 +94,7 @@ final class LocationServiceImpl {
             switch findLocality() {
             case Optional.none:
                 onComplete(.failure(.noLocality))
-            case Optional.some(let locality):
+            case let Optional.some(locality):
                 onComplete(.success(locality))
             }
         }
@@ -113,5 +111,4 @@ final class LocationServiceImpl {
             )
         }
     }
-
 }

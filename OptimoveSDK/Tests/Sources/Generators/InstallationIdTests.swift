@@ -1,10 +1,9 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveSDK
+import XCTest
 
 final class InstallationIdTests: OptimoveTestCase {
-
     var generator: InstallationIdGenerator!
 
     override func setUp() {
@@ -17,7 +16,7 @@ final class InstallationIdTests: OptimoveTestCase {
 
         // then
         let installationIdExpectation = expectation(description: "SetInstallationId was not generated.")
-        storage.assertFunction = { (value, key) in
+        storage.assertFunction = { _, key in
             if key == .installationID {
                 installationIdExpectation.fulfill()
             }
@@ -28,7 +27,7 @@ final class InstallationIdTests: OptimoveTestCase {
 
         wait(
             for: [
-                installationIdExpectation
+                installationIdExpectation,
             ],
             timeout: defaultTimeout
         )
@@ -41,7 +40,7 @@ final class InstallationIdTests: OptimoveTestCase {
 
         // then
         let installationIdExpectation = expectation(description: "SetInstallationId was not generated.")
-        storage.assertFunction = { (value, key) in
+        storage.assertFunction = { _, key in
             if key == .installationID {
                 installationIdExpectation.fulfill()
             }
@@ -52,7 +51,7 @@ final class InstallationIdTests: OptimoveTestCase {
 
         wait(
             for: [
-                installationIdExpectation
+                installationIdExpectation,
             ],
             timeout: defaultTimeout
         )
@@ -65,7 +64,7 @@ final class InstallationIdTests: OptimoveTestCase {
         // then
         let installationIdExpectation = expectation(description: "SetInstallationId was not generated.")
         installationIdExpectation.isInverted.toggle()
-        storage.assertFunction = { (value, key) in
+        storage.assertFunction = { _, key in
             if key == .installationID {
                 installationIdExpectation.fulfill()
             }
@@ -76,10 +75,9 @@ final class InstallationIdTests: OptimoveTestCase {
 
         wait(
             for: [
-                installationIdExpectation
+                installationIdExpectation,
             ],
             timeout: defaultTimeout
         )
     }
-
 }

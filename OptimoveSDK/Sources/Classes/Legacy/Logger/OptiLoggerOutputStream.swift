@@ -4,7 +4,6 @@ import Foundation
 
 /// Receiver of logs of OptimoveSDK.
 @objc public protocol OptiLoggerOutputStream {
-
     /// Describe if the stream could receive logs independently from project settings.
     /// If `true` all logs will be received, despite on a project settings.
     var isVisibleToClient: Bool { get }

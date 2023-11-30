@@ -1,11 +1,10 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 import Mocker
 @testable import OptimoveCore
+import XCTest
 
 class NetworkClientTests: XCTestCase {
-
     func test_get_request() {
         // given
         Mocker.register(
@@ -27,7 +26,7 @@ class NetworkClientTests: XCTestCase {
 
         // when
         let success = expectation(description: "Result with success was not generated")
-        client.perform(request) { (result) in
+        client.perform(request) { result in
             switch result {
             case .success:
                 success.fulfill()
@@ -62,7 +61,7 @@ class NetworkClientTests: XCTestCase {
 
         // when
         let success = expectation(description: "Result with success was not generated")
-        client.perform(request) { (result) in
+        client.perform(request) { result in
             switch result {
             case .success:
                 success.fulfill()

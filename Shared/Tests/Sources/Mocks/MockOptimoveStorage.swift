@@ -4,17 +4,16 @@ import Foundation
 import OptimoveCore
 
 final class MockOptimoveStorage: OptimoveStorage {
-
     var assertFunction: ((_ value: Any?, _ key: StorageKey) -> Void)?
     var state: [StorageKey: Any?] = [:]
 
     func set(value: Any?, key: StorageKey) {
         state[key] = value
-        self.assertFunction?(value, key)
+        assertFunction?(value, key)
     }
 
     func value(for key: StorageKey) -> Any? {
-        return state[key] ?? nil
+        return state[key]
     }
 
     subscript<T>(key: StorageKey) -> T? {
@@ -33,7 +32,7 @@ final class MockOptimoveStorage: OptimoveStorage {
     }
 
     func save<T: Codable>(data: T, toFileName: String) throws {
-         storage[toFileName] = try JSONEncoder().encode(data)
+        storage[toFileName] = try JSONEncoder().encode(data)
     }
 
     func saveData(data: Data, toFileName: String) throws {
@@ -41,7 +40,7 @@ final class MockOptimoveStorage: OptimoveStorage {
     }
 
     func load<T: Codable>(fileName: String) throws -> T {
-        return try JSONDecoder().decode(T.self, from: try unwrap(storage[fileName]))
+        return try JSONDecoder().decode(T.self, from: unwrap(storage[fileName]))
     }
 
     func loadData(fileName: String) throws -> Data {

@@ -3,7 +3,6 @@
 import Foundation
 
 @objc public enum LogLevelCore: Int {
-
     case debug = 0
     case info = 1
     case warn = 2
@@ -26,18 +25,15 @@ import Foundation
             return nil
         }
     }
-
 }
 
 extension LogLevelCore: Comparable {
-
     public static func < (lhs: LogLevelCore, rhs: LogLevelCore) -> Bool {
         return lhs.rawValue < rhs.rawValue
     }
 }
 
 extension LogLevelCore: Codable {
-
     enum CodingKeys: String, CodingKey {
         case debug
         case info

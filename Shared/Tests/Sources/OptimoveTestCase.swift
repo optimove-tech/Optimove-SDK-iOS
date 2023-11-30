@@ -1,15 +1,14 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 import OptimoveCore
+import XCTest
 
 let defaultTimeout: TimeInterval = 0.8
 
 class OptimoveTestCase: XCTestCase {
-
     var storage = MockOptimoveStorage()
 
-    struct StubConstants {
+    enum StubConstants {
         static let fcmToken = "fcmToken"
         static let isMbaasOptIn = false
         static let tenantID = 100
@@ -43,16 +42,13 @@ class OptimoveTestCase: XCTestCase {
         storage.customerID = StubConstants.customerID
         storage.initialVisitorId = StubConstants.initialVisitorId
     }
-
 }
 
 extension String {
-
     static func randomString(length: Int) -> String {
         let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return String((0..<length).map { _ in letters.randomElement()! })
+        return String((0 ..< length).map { _ in letters.randomElement()! })
     }
-
 }
 
 enum StubError: Error {

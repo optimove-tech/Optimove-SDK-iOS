@@ -7,7 +7,7 @@ let package = Package(
     name: "Optimove",
     platforms: [
         .iOS(.v10),
-        .macOS(.v10_14)
+        .macOS(.v10_14),
     ],
     products: [
         .library(
@@ -21,13 +21,13 @@ let package = Package(
         .library(
             name: "OptimoveNotificationServiceExtension",
             targets: ["OptimoveNotificationServiceExtension"]
-        )
+        ),
     ],
     targets: [
         .target(
             name: "OptimoveSDK",
             dependencies: [
-                "OptimoveCore"
+                "OptimoveCore",
             ],
             path: "OptimoveSDK/Sources"
         ),
@@ -38,7 +38,7 @@ let package = Package(
         .target(
             name: "OptimoveNotificationServiceExtension",
             path: "OptimoveNotificationServiceExtension/Sources"
-        )
+        ),
     ],
     swiftLanguageVersions: [.v5]
 )

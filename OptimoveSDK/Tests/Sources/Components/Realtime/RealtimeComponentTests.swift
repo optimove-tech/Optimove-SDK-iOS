@@ -1,11 +1,10 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
+import XCTest
 
 class RealtimeComponentTests: OptimoveTestCase {
-
     var realtime: RealTime!
     var networking = OptistreamNetworkingMock()
     var queue = MockOptistreamQueue()
@@ -23,8 +22,8 @@ class RealtimeComponentTests: OptimoveTestCase {
         let event2 = FixtureOptistreamEvent.generateEvent(event: "event2")
         let event1Expectation = expectation(description: "\(event1.event) was not generated")
         let event2Expectation = expectation(description: "\(event2.event) was not generated")
-        networking.assetEventsFunction = { events, completion in
-            events.forEach { (event) in
+        networking.assetEventsFunction = { events, _ in
+            events.forEach { event in
                 switch event.event {
                 case event1.event:
                     event1Expectation.fulfill()
@@ -59,8 +58,8 @@ class RealtimeComponentTests: OptimoveTestCase {
         let event1 = FixtureOptistreamEvent.generateEvent(event: "event1")
         let event1Expectation = expectation(description: "\(event1.event) was not generated")
         event1Expectation.isInverted.toggle()
-        networking.assetEventsFunction = { events, completion in
-            events.forEach { (event) in
+        networking.assetEventsFunction = { events, _ in
+            events.forEach { event in
                 switch event.event {
                 case event1.event:
                     event1Expectation.fulfill()
@@ -75,11 +74,9 @@ class RealtimeComponentTests: OptimoveTestCase {
             timeout: defaultTimeout
         )
     }
-
 }
 
-final class FixtureOptistreamEvent {
-
+enum FixtureOptistreamEvent {
     static func generateEvent(event: String) -> OptistreamEvent {
         return OptistreamEvent(
             tenant: StubVariables.tenantID,
@@ -98,5 +95,4 @@ final class FixtureOptistreamEvent {
             )
         )
     }
-
 }

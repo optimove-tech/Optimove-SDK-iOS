@@ -1,10 +1,9 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import UIKit
 import OptimoveCore
+import UIKit
 
 final class InstallationIdGenerator {
-
     private var storage: OptimoveStorage
 
     init(storage: OptimoveStorage) {
@@ -21,5 +20,4 @@ final class InstallationIdGenerator {
         }
         storage.installationID = installationID
     }
-
 }

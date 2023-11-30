@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveSDK
+import XCTest
 
 class MergeRemoteConfigurationOperationTests: XCTestCase {
-
     var repository = MockConfigurationRepository()
     var merger: MergeRemoteConfigurationOperation!
 
@@ -30,5 +29,4 @@ class MergeRemoteConfigurationOperationTests: XCTestCase {
         OperationQueue().addOperations([merger], waitUntilFinished: true)
         XCTAssertNil(repository.global)
     }
-
 }

@@ -1,11 +1,10 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
+import XCTest
 
 class OptitrackTests: OptimoveTestCase {
-
     var optitrack: OptiTrack!
     var networking: OptistreamNetworkingMock!
     var builder: OptistreamEventBuilder!
@@ -34,9 +33,9 @@ class OptitrackTests: OptimoveTestCase {
     }
 
     override func tearDownWithError() throws {
-        self.optitrack = nil
-        self.networking = nil
-        self.builder = nil
+        optitrack = nil
+        networking = nil
+        builder = nil
     }
 
     func disabled_test_load_realtime() throws {
@@ -68,7 +67,7 @@ class OptitrackTests: OptimoveTestCase {
         )
         batchExpectation.expectedFulfillmentCount = batchTimes
         var eventIds: [String] = []
-        networking.assetEventsFunction = { (events, completion) -> Void in
+        networking.assetEventsFunction = { events, completion in
             events.enumerated().forEach { event in
                 let eventId = event.element.metadata.eventId
                 if eventIds.contains(eventId) {
@@ -82,9 +81,8 @@ class OptitrackTests: OptimoveTestCase {
         }
 
         try optitrack?.serve(.report(events: events))
-        waitForExpectations(timeout: 10, handler: { (error) -> Void in
+        waitForExpectations(timeout: 10, handler: { error in
             print("Number of procceded events \(eventIds.count), with error: \(error.debugDescription)")
         })
     }
-
 }
