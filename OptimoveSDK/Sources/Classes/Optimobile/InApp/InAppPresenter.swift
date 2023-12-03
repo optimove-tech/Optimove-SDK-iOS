@@ -158,7 +158,7 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         }
 
         let content = NSMutableDictionary(dictionary: currentMessage!.content)
-        content["region"] = Optimobile.sharedInstance.config.region
+        content["region"] = Optimobile.sharedInstance.config.region.rawValue
 
         postClientMessage(type: "PRESENT_MESSAGE", data: content)
     }
@@ -279,7 +279,8 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
             let cachePolicy = URLRequest.CachePolicy.reloadIgnoringCacheData
         #endif
         if let urlString = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue) as? String,
-           let url = URL(string: urlString) {
+           let url = URL(string: urlString)
+        {
             let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
             webView.load(request)
         }
@@ -330,7 +331,7 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
 
         do {
             let msg: [String: Any] = ["type": type, "data": data != nil ? data! : NSNull()]
-            let json: Data = try JSONSerialization.data(withJSONObject: msg, options: JSONSerialization.WritingOptions(rawValue: 0))
+            let json: Data = try JSONSerialization.data(withJSONObject: msg, options: [])
 
             let jsonMsg = String(data: json, encoding: .utf8)
             let evalString = String(format: "postHostMessage(%@);", jsonMsg!)
@@ -394,7 +395,6 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
            let baseUrlString = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue) as? String,
            let baseUrl = URL(string: baseUrlString)
         {
-            
             if url.absoluteString.starts(with: baseUrl.absoluteString) && httpResponse.statusCode >= 400 {
                 decisionHandler(.cancel)
                 cancelCurrentPresentationQueue(waitForViewCleanup: false)
