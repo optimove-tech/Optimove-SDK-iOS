@@ -56,7 +56,7 @@ typealias Logger = OptimoveCore.Logger
                     let visitorId = try serviceLocator.storage().getInitialVisitorId()
                     let userId = try? serviceLocator.storage().getCustomerID()
 
-                    Optimobile.initialize(config: config, initialVisitorId: visitorId, initialUserId: userId)
+                    try Optimobile.initialize(config: config, initialVisitorId: visitorId, initialUserId: userId)
                 } catch {
                     throw GuardError.custom("Failed on OptimobileSDK initialization. Reason: \(error.localizedDescription)")
                 }

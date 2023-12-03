@@ -23,6 +23,23 @@ public enum InAppDisplayMode: String {
 // MARK: class
 
 final class Optimobile {
+    enum Error: LocalizedError {
+        case alreadyInitialized
+        case configurationIsMissing
+        case noCredentialsProvidedForDelayedConfigurationCompletion
+
+        var errorDescription: String? {
+            switch self {
+            case .alreadyInitialized:
+                return "The OptimobileSDK has already been initialized."
+            case .configurationIsMissing:
+                return "OptimoveConfig is missing."
+            case .noCredentialsProvidedForDelayedConfigurationCompletion:
+                return "No credentials provided for delayed configuration completion."
+            }
+        }
+    }
+
     let pushNotificationDeviceType = 1
     let pushNotificationProductionTokenType: Int = 1
 
@@ -84,22 +101,19 @@ final class Optimobile {
     /**
          Initialize the Optimobile SDK.
      */
-    static func initialize(config optimoveConfig: OptimoveConfig, initialVisitorId: String, initialUserId: String?) {
+    static func initialize(config optimoveConfig: OptimoveConfig, initialVisitorId: String, initialUserId: String?) throws {
         if instance !== nil, optimoveConfig.features.contains(.delayedConfiguration) {
-            completeDelayedConfiguration(config: optimoveConfig.optimobileConfig!)
+            try completeDelayedConfiguration(config: optimoveConfig.optimobileConfig!)
             return
         }
 
         guard instance == nil else {
-            let message = "The OptimobileSDK has already been initialized"
-            assertionFailure(message)
-            Logger.error(message)
-            return
+            assertionFailure(Error.alreadyInitialized.localizedDescription)
+            throw Error.alreadyInitialized
         }
 
         guard let config = optimoveConfig.optimobileConfig else {
-            Logger.error("The OptimobileSDK has not been initialized. OptimoveConfig is missing.")
-            return
+            throw Error.configurationIsMissing
         }
 
         writeDefaultsKeys(config: config, initialVisitorId: initialVisitorId)
@@ -125,10 +139,9 @@ final class Optimobile {
         }
     }
 
-    static func completeDelayedConfiguration(config: OptimobileConfig) {
+    static func completeDelayedConfiguration(config: OptimobileConfig) throws {
         guard let credentials = config.credentials else {
-            Logger.warn("No credentials provided for delayed configuration completion.")
-            return
+            throw Error.noCredentialsProvidedForDelayedConfigurationCompletion
         }
         Logger.info("Completing delayed configuration with credentials: \(credentials)")
         updateStorageValues(config)

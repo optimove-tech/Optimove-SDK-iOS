@@ -121,7 +121,7 @@ extension Optimobile {
             DispatchQueue.main.async {
                 if UIApplication.shared.applicationState == .background {
                     onAuthorizationStatus?(.notDetermined,
-                                           NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Application not active, aborting push permission request"]) as Error)
+                                           NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Application not active, aborting push permission request"]) as Swift.Error)
                     return
                 }
 
