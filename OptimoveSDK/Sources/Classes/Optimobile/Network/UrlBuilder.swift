@@ -21,7 +21,6 @@ public class UrlBuilder {
         case crm
         case ddl
         case events
-        case iar
         case media
         case push
     }
@@ -73,7 +72,6 @@ public class UrlBuilder {
             .crm: "https://crm-\(region).kumulos.com",
             .ddl: "https://links-\(region).kumulos.com",
             .events: "https://events-\(region).kumulos.com",
-            .iar: "https://iar.app.delivery",
             .media: "https://i-\(region).app.delivery",
             .push: "https://push-\(region).kumulos.com",
         ]

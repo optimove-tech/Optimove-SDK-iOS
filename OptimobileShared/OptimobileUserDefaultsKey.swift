@@ -5,7 +5,6 @@ import Foundation
 enum OptimobileUserDefaultsKey: String {
     case REGION = "KumulosEventsRegion"
     case MEDIA_BASE_URL = "KumulosMediaBaseUrl"
-    case IAR_BASE_URL = "KumulosIARBaseUrl"
     case INSTALL_UUID = "KumulosUUID"
     case USER_ID = "KumulosCurrentUserID"
     case BADGE_COUNT = "KumulosBadgeCount"

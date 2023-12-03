@@ -14,7 +14,11 @@ enum InAppAction: String {
     case REQUEST_RATING = "requestAppStoreRating"
 }
 
-class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
+final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
+    enum Constants {
+        static let baseUrl = "https://iar.app.delivery"
+    }
+
     private let messageQueueLock = DispatchSemaphore(value: 1)
 
     private var webView: WKWebView?
@@ -278,9 +282,7 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         #else
             let cachePolicy = URLRequest.CachePolicy.reloadIgnoringCacheData
         #endif
-        if let urlString = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue) as? String,
-           let url = URL(string: urlString)
-        {
+        if let url = URL(string: Constants.baseUrl) {
             let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
             webView.load(request)
         }
@@ -392,8 +394,7 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         // Handles HTTP responses for all status codes
         if let httpResponse = navigationResponse.response as? HTTPURLResponse,
            let url = httpResponse.url,
-           let baseUrlString = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue) as? String,
-           let baseUrl = URL(string: baseUrlString)
+           let baseUrl = URL(string: Constants.baseUrl)
         {
             if url.absoluteString.starts(with: baseUrl.absoluteString) && httpResponse.statusCode >= 400 {
                 decisionHandler(.cancel)

@@ -144,7 +144,6 @@ final class Optimobile {
         KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
         let baseUrlMap = UrlBuilder.defaultMapping(for: config.region.rawValue)
         KeyValPersistenceHelper.set(baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(baseUrlMap[.iar], forKey: OptimobileUserDefaultsKey.IAR_BASE_URL.rawValue)
     }
 
     fileprivate static func writeDefaultsKeys(config: OptimobileConfig, initialVisitorId: String) {
