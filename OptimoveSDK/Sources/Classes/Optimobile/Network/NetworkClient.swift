@@ -86,11 +86,10 @@ final class KSHttpClient {
 
     fileprivate func buildRequest(for path: String, method: KSHttpMethod, body: Any?) throws -> URLRequest {
         var url = try urlBuilder.urlForService(serviceType)
-        if #available(iOS 16.0, *) {
-            url = url.appending(path: path)
-        } else {
-            url = url.appendingPathComponent(path)
-        }
+
+        // FIXME: The incoming path value contains not only path but also query parameters. This why we cannot append path component to the url. It will cause wrong encoding of the path component. The solution is to operate with URLComponents instead of path.
+        url = URL(string: url.absoluteString.appending(path))!
+
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
 
