@@ -1,5 +1,5 @@
 #!/bin/bash
-# get_xcode_path.sh ARG
+# get-xcode-path.sh ARG
 #  - ARG: The version number or path
 
 set -o pipefail
