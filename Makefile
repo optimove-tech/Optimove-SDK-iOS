@@ -3,7 +3,7 @@ XCODE ?= 15.0.1
 export TEST_DESTINATION ?= platform=iOS Simulator,OS=17.0,name=iPhone 15
 export DEVELOPER_DIR = $(shell bash ./scripts/get-xcode-path.sh ${XCODE} $(XCODE_PATH))
 
-build_path = build
+build_path = .build
 derived_data_path = ${build_path}/derived_data
 
 .PHONY: setup
