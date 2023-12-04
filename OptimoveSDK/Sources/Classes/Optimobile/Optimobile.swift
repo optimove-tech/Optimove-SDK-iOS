@@ -35,7 +35,7 @@ final class Optimobile {
             case .configurationIsMissing:
                 return "OptimoveConfig is missing."
             case .noCredentialsProvidedForDelayedConfigurationCompletion:
-                return "No credentials provided for delayed configuration completion."
+                return "No OptimobileCredentials provided for delayed configuration completion."
             }
         }
     }
@@ -79,7 +79,7 @@ final class Optimobile {
     fileprivate(set) var deepLinkHelper: DeepLinkHelper?
 
     private let networkFactory: NetworkFactory
-    private var credentials: Credentials?
+    private var credentials: OptimobileCredentials?
 
     /**
          The unique installation Id of the current app
@@ -149,7 +149,7 @@ final class Optimobile {
         NotificationCenter.default.post(name: .optimobileInializationFinished, object: nil)
     }
 
-    static func setCredentials(_ credentials: Credentials) {
+    static func setCredentials(_ credentials: OptimobileCredentials) {
         Optimobile.instance?.credentials = credentials
     }
 

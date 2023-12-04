@@ -2,7 +2,7 @@
 
 import Foundation
 
-struct Credentials: Codable {
+struct OptimobileCredentials: Codable {
     let apiKey: String
     let secretKey: String
 }

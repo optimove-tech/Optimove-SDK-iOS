@@ -19,7 +19,7 @@ protocol HttpAuthorizationProtocol {
     func authorizeRequest(_: inout URLRequest) throws
 }
 
-typealias CredentialsProvider = () -> Credentials?
+typealias CredentialsProvider = () -> OptimobileCredentials?
 
 final class AuthorizationMediator {
     var basicAuthorization: String?

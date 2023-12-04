@@ -60,7 +60,7 @@ public struct OptimoveConfig {
 }
 
 public struct OptimobileConfig {
-    let credentials: Credentials?
+    let credentials: OptimobileCredentials?
     let region: Region
     let urlBuilder: UrlBuilder
 
@@ -88,7 +88,7 @@ public struct OptimobileConfig {
 public typealias Region = OptimobileConfig.Region
 
 open class OptimoveConfigBuilder: NSObject {
-    private var credentials: Credentials?
+    private var credentials: OptimobileCredentials?
     public private(set) var features: Feature
     var region: OptimobileConfig.Region?
     var urlBuilder: UrlBuilder
@@ -385,7 +385,7 @@ struct OptimobileArguments: Decodable {
 
     let version: Int
     let region: OptimobileConfig.Region
-    var credentials: Credentials
+    var credentials: OptimobileCredentials
 
     enum CodingKeys: String, CodingKey {
         case version
@@ -410,6 +410,6 @@ struct OptimobileArguments: Decodable {
         let secretKey = try container.decode(String.self)
 
         region = try OptimobileConfig.Region(string: regionString)
-        credentials = Credentials(apiKey: apiKey, secretKey: secretKey)
+        credentials = OptimobileCredentials(apiKey: apiKey, secretKey: secretKey)
     }
 }
