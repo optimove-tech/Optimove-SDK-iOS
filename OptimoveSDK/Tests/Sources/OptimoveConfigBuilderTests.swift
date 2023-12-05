@@ -29,6 +29,7 @@ final class OptimoveConfigBuilderTests: XCTestCase {
             UrlBuilder.Service.crm: "https://www.optimove.com",
             UrlBuilder.Service.ddl: "https://www.optimove.com",
             UrlBuilder.Service.events: "https://www.optimove.com",
+            UrlBuilder.Service.iar: "https://www.optimove.com",
             UrlBuilder.Service.media: "https://www.optimove.com",
             UrlBuilder.Service.push: "https://www.optimove.com",
         ]
