@@ -15,10 +15,6 @@ enum InAppAction: String {
 }
 
 final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
-    enum Constants {
-        static let baseUrl = "https://iar.app.delivery"
-    }
-
     private let messageQueueLock = DispatchSemaphore(value: 1)
 
     private var webView: WKWebView?
@@ -35,12 +31,15 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     private var displayMode: InAppDisplayMode
     private var currentMessage: InAppMessage?
 
-    init(displayMode: InAppDisplayMode) {
+    let urlBuilder: UrlBuilder
+
+    init(displayMode: InAppDisplayMode, urlBuilder: UrlBuilder) {
         messageQueue = NSMutableOrderedSet(capacity: 5)
         pendingTickleIds = NSMutableOrderedSet(capacity: 2)
         currentMessage = nil
 
         self.displayMode = displayMode
+        self.urlBuilder = urlBuilder
 
         super.init()
     }
@@ -282,7 +281,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         #else
             let cachePolicy = URLRequest.CachePolicy.reloadIgnoringCacheData
         #endif
-        if let url = URL(string: Constants.baseUrl) {
+        if let url = try? urlBuilder.urlForService(.iar) {
             let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
             webView.load(request)
         }
@@ -394,7 +393,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         // Handles HTTP responses for all status codes
         if let httpResponse = navigationResponse.response as? HTTPURLResponse,
            let url = httpResponse.url,
-           let baseUrl = URL(string: Constants.baseUrl)
+           let baseUrl = try? urlBuilder.urlForService(.iar)
         {
             if url.absoluteString.starts(with: baseUrl.absoluteString) && httpResponse.statusCode >= 400 {
                 decisionHandler(.cancel)

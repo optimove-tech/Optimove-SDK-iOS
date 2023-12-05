@@ -34,10 +34,10 @@ class InAppManager {
 
     // MARK: Initialization
 
-    init(_ config: OptimobileConfig, httpClient: KSHttpClient) {
+    init(_ config: OptimobileConfig, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
         self.httpClient = httpClient
-        presenter = InAppPresenter(displayMode: config.inAppDefaultDisplayMode)
-        syncQueue = DispatchQueue(label: "kumulos.in-app.sync")
+        presenter = InAppPresenter(displayMode: config.inAppDefaultDisplayMode, urlBuilder: urlBuilder)
+        syncQueue = DispatchQueue(label: "com.optimove.inapp.sync")
 
         finishedInitializationToken = NotificationCenter.default
             .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in

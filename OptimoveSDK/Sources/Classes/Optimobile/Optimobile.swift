@@ -198,8 +198,9 @@ final class Optimobile {
 
     private init(config: OptimobileConfig) {
         self.config = config
+        let urlBuilder = UrlBuilder(storage: KeyValPersistenceHelper.self)
         networkFactory = NetworkFactory(
-            urlBuilder: UrlBuilder(storage: KeyValPersistenceHelper.self),
+            urlBuilder: urlBuilder,
             authorization: AuthorizationMediator(provider: {
                 Optimobile.instance?.credentials
             })
@@ -211,7 +212,7 @@ final class Optimobile {
         )
 
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
-        inAppManager = InAppManager(config, httpClient: networkFactory.build(for: .push))
+        inAppManager = InAppManager(config, httpClient: networkFactory.build(for: .push), urlBuilder: urlBuilder)
         pushHelper = PushHelper()
         badgeObserver = OptimobileBadgeObserver(callback: { newBadgeCount in
             KeyValPersistenceHelper.set(newBadgeCount, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)

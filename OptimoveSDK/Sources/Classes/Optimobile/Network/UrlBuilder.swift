@@ -21,6 +21,7 @@ public class UrlBuilder {
         case crm
         case ddl
         case events
+        case iar
         case media
         case push
     }
@@ -53,9 +54,8 @@ public class UrlBuilder {
 
     required init(storage: KeyValPersistenceHelper.Type, runtimeUrlsMap: ServiceUrlMap? = nil) {
         self.storage = storage
-        self.runtimeUrlsMap = runtimeUrlsMap
-        if let runtimeUrlsMap = runtimeUrlsMap {
-            validateUrl(urlsMap: runtimeUrlsMap)
+        if let runtimeUrlsMap = runtimeUrlsMap, isValidateUrlMap(urlsMap: runtimeUrlsMap) {
+            self.runtimeUrlsMap = runtimeUrlsMap
         }
     }
 
@@ -72,16 +72,19 @@ public class UrlBuilder {
             .crm: "https://crm-\(region).kumulos.com",
             .ddl: "https://links-\(region).kumulos.com",
             .events: "https://events-\(region).kumulos.com",
+            .iar: "https://iar.app.delivery",
             .media: "https://i-\(region).app.delivery",
             .push: "https://push-\(region).kumulos.com",
         ]
     }
 
-    func validateUrl(urlsMap: ServiceUrlMap) {
+    func isValidateUrlMap(urlsMap: ServiceUrlMap) -> Bool {
         for s in Service.allCases {
             if urlsMap[s] == nil {
                 fatalError("UrlMap must contain an entry for all Service case. Missing key: \(s)")
+                return false
             }
         }
+        return true
     }
 }
