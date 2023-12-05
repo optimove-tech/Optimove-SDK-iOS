@@ -42,14 +42,13 @@ class InAppManager {
         finishedInitializationToken = NotificationCenter.default
             .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
                 guard let self = self else { return }
-                self.sync()
+                handleEnrollmentAndSyncSetup()
                 Logger.debug("Notification \(notification.name.rawValue) was processed")
             }
     }
 
     func initialize() {
         initContext()
-        handleEnrollmentAndSyncSetup()
     }
 
     func initContext() {
