@@ -16,7 +16,7 @@ enum HttpAuthorizationError: Error {
 }
 
 protocol HttpAuthorizationProtocol {
-    func authorizeRequest(_: inout URLRequest) throws
+    func authorizeRequest(_: inout URLRequest, strategy: AuthorizationStrategy) throws
 }
 
 typealias CredentialsProvider = () -> OptimobileCredentials?
@@ -25,8 +25,7 @@ final class AuthorizationMediator {
     var basicAuthorization: String?
     let provider: CredentialsProvider
 
-    init(basicAuthorization: String? = nil, provider: @escaping CredentialsProvider) {
-        self.basicAuthorization = basicAuthorization
+    init(provider: @escaping CredentialsProvider) {
         self.provider = provider
     }
 
@@ -60,8 +59,8 @@ extension AuthorizationMediator: AuthorizationMediatorProtocol {
 extension AuthorizationMediator: HttpAuthorizationProtocol {
     static let field = "Authorization"
 
-    func authorizeRequest(_ urlRequest: inout URLRequest) throws {
-        let basicAuthorization = try getAuthorization(.basic)
+    func authorizeRequest(_ urlRequest: inout URLRequest, strategy: AuthorizationStrategy) throws {
+        let basicAuthorization = try getAuthorization(strategy)
         urlRequest.addValue(basicAuthorization, forHTTPHeaderField: AuthorizationMediator.field)
     }
 }

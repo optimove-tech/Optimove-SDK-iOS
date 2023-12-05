@@ -75,7 +75,7 @@ final class KSHttpClient {
     func sendRequest(_ method: KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
         do {
             var request = try buildRequest(for: path, method: method, body: data)
-            try authorization.authorizeRequest(&request)
+            try authorization.authorizeRequest(&request, strategy: .basic)
             sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
         } catch {
             onFailure(nil, error, nil)
