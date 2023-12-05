@@ -103,24 +103,37 @@ extension UserDefaults: KeyValueStorage {
 
 public final class InMemoryStorage: KeyValueStorage {
     private var storage = [StorageKey: Any]()
+    private let queue = DispatchQueue(label: "com.optimove.sdk.inmemorystorage", attributes: .concurrent)
 
     public init() {}
 
     public func set(value: Any?, key: StorageKey) {
-        storage[key] = value
+        queue.async(flags: .barrier) { [self] in
+            storage[key] = value
+        }
     }
 
     public subscript<T>(key: StorageKey) -> T? {
         get {
-            return value(for: key) as? T
+            var result: T?
+            queue.sync {
+                result = storage[key] as? T
+            }
+            return result
         }
         set {
-            set(value: newValue, key: key)
+            queue.async(flags: .barrier) { [self] in
+                storage[key] = newValue
+            }
         }
     }
 
     public func value(for key: StorageKey) -> Any? {
-        return storage[key]
+        var result: Any?
+        queue.sync {
+            result = storage[key]
+        }
+        return result
     }
 }
 
