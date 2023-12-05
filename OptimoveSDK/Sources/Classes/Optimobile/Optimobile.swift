@@ -33,7 +33,7 @@ final class Optimobile {
             case .alreadyInitialized:
                 return "The OptimobileSDK has already been initialized."
             case .configurationIsMissing:
-                return "OptimoveConfig is missing."
+                return "OptimobileConfig is missing."
             case .noCredentialsProvidedForDelayedConfigurationCompletion:
                 return "No OptimobileCredentials provided for delayed configuration completion."
             }
