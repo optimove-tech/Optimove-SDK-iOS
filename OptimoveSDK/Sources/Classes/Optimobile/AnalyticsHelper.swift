@@ -29,25 +29,23 @@ final class AnalyticsHelper {
 
         initContext()
 
-        DispatchQueue.global().async {
-            if self.migrationAnalyticsContext != nil {
-                self.syncEvents(context: self.migrationAnalyticsContext)
-            }
-            self.syncEvents(context: self.analyticsContext)
-        }
-
         finishedInitializationToken = NotificationCenter.default
             .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
                 guard let self = self else { return }
-                if let analyticsContext = self.analyticsContext {
-                    self.syncEvents(context: analyticsContext)
-                }
+                self.flushEvents()
                 Logger.debug("Notification \(notification.name.rawValue) was processed")
             }
     }
 
     deinit {
         eventsHttpClient.invalidateSessionCancellingTasks(false)
+    }
+
+    func flushEvents() {
+        if migrationAnalyticsContext != nil {
+            syncEvents(context: migrationAnalyticsContext)
+        }
+        syncEvents(context: analyticsContext)
     }
 
     private func getMainStoreUrl(appGroupExists: Bool) -> URL? {
