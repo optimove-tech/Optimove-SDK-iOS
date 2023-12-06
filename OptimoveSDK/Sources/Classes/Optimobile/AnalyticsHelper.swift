@@ -31,8 +31,10 @@ final class AnalyticsHelper {
 
         finishedInitializationToken = NotificationCenter.default
             .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
-                guard let self = self else { return }
-                self.flushEvents()
+                DispatchQueue.global().async {
+                    guard let self = self else { return }
+                    self.flushEvents()
+                }
                 Logger.debug("Notification \(notification.name.rawValue) was processed")
             }
     }
