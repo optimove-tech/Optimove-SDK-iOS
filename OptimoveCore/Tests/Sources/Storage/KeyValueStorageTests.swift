@@ -30,27 +30,27 @@ class MockKeyValueStorage: KeyValueStorage {
 class MockFileStorage: FileStorage {
     var storage: [String: Data] = [:]
 
-    func isExist(fileName: String, isTemporary: Bool) -> Bool {
+    func isExist(fileName: String, isTemporary _: Bool) -> Bool {
         return storage[fileName] != nil
     }
 
-    public func save<T: Codable>(data: T, toFileName: String, isTemporary: Bool) throws {
+    public func save<T: Codable>(data: T, toFileName: String, isTemporary _: Bool) throws {
         storage[toFileName] = try JSONEncoder().encode(data)
     }
 
-    public func saveData(data: Data, toFileName: String, isTemporary: Bool) throws {
+    public func saveData(data: Data, toFileName: String, isTemporary _: Bool) throws {
         storage[toFileName] = data
     }
 
-    func load<T: Codable>(fileName: String, isTemporary: Bool) throws -> T {
+    func load<T: Codable>(fileName: String, isTemporary _: Bool) throws -> T {
         return try JSONDecoder().decode(T.self, from: unwrap(storage[fileName]))
     }
 
-    func loadData(fileName: String, isTemporary: Bool) throws -> Data {
+    func loadData(fileName: String, isTemporary _: Bool) throws -> Data {
         return try unwrap(storage[fileName])
     }
 
-    func delete(fileName: String, isTemporary: Bool) throws {
+    func delete(fileName: String, isTemporary _: Bool) throws {
         return storage[fileName] = nil
     }
 }

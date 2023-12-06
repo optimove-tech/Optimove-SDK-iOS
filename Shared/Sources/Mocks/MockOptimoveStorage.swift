@@ -29,27 +29,27 @@ public final class MockOptimoveStorage: OptimoveStorage {
 
     var storage: [String: Data] = [:]
 
-    public func isExist(fileName: String, isTemporary: Bool) -> Bool {
+    public func isExist(fileName: String, isTemporary _: Bool) -> Bool {
         return storage[fileName] != nil
     }
 
-    public func save<T: Codable>(data: T, toFileName: String, isTemporary: Bool) throws {
+    public func save<T: Codable>(data: T, toFileName: String, isTemporary _: Bool) throws {
         storage[toFileName] = try JSONEncoder().encode(data)
     }
 
-    public func saveData(data: Data, toFileName: String, isTemporary: Bool) throws {
+    public func saveData(data: Data, toFileName: String, isTemporary _: Bool) throws {
         storage[toFileName] = data
     }
 
-    public func load<T: Codable>(fileName: String, isTemporary: Bool) throws -> T {
+    public func load<T: Codable>(fileName: String, isTemporary _: Bool) throws -> T {
         return try JSONDecoder().decode(T.self, from: unwrap(storage[fileName]))
     }
 
-    public func loadData(fileName: String, isTemporary: Bool) throws -> Data {
+    public func loadData(fileName: String, isTemporary _: Bool) throws -> Data {
         return try unwrap(storage[fileName])
     }
 
-    public func delete(fileName: String, isTemporary: Bool) throws {
+    public func delete(fileName: String, isTemporary _: Bool) throws {
         return storage[fileName] = nil
     }
 }

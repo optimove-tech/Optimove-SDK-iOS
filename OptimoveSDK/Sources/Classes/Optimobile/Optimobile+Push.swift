@@ -463,14 +463,14 @@ class PushHelper {
         }
     }()
 
-    fileprivate func setBadge(userInfo: [AnyHashable: Any]) {
+    private func setBadge(userInfo: [AnyHashable: Any]) {
         let badge: NSNumber? = OptimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
         if let newBadge = badge {
             UIApplication.shared.applicationIconBadgeNumber = newBadge.intValue
         }
     }
 
-    fileprivate func trackPushDelivery(notification: PushNotification) {
+    private func trackPushDelivery(notification: PushNotification) {
         if notification.id == 0 {
             return
         }

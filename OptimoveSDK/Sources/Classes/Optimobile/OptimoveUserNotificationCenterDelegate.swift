@@ -57,7 +57,7 @@ class OptimoveUserNotificationCenterDelegate: NSObject, UNUserNotificationCenter
     }
 
     fileprivate func chainCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, with completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        if existingDelegate != nil && existingDelegate?.responds(to: #selector(userNotificationCenter(_:willPresent:withCompletionHandler:))) == true {
+        if existingDelegate != nil, existingDelegate?.responds(to: #selector(userNotificationCenter(_:willPresent:withCompletionHandler:))) == true {
             self.existingDelegate?.userNotificationCenter?(center, willPresent: notification, withCompletionHandler: completionHandler)
             return
         }
@@ -66,7 +66,7 @@ class OptimoveUserNotificationCenterDelegate: NSObject, UNUserNotificationCenter
     }
 
     fileprivate func chainCenter(_ center: UNUserNotificationCenter, didReceive notificationResponse: UNNotificationResponse, with completionHandler: @escaping () -> Void) {
-        if existingDelegate != nil && existingDelegate?.responds(to: #selector(userNotificationCenter(_:didReceive:withCompletionHandler:))) == true {
+        if existingDelegate != nil, existingDelegate?.responds(to: #selector(userNotificationCenter(_:didReceive:withCompletionHandler:))) == true {
             self.existingDelegate?.userNotificationCenter?(center, didReceive: notificationResponse, withCompletionHandler: completionHandler)
             return
         }

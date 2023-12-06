@@ -22,10 +22,10 @@ final class EventCDv2: NSManagedObject {
 }
 
 extension EventCDv2 {
-    @NSManaged fileprivate(set) var eventId: String
-    @NSManaged fileprivate(set) var creationDate: Date
-    @NSManaged fileprivate(set) var data: Data
-    @NSManaged fileprivate(set) var type: String
+    @NSManaged private(set) var eventId: String
+    @NSManaged private(set) var creationDate: Date
+    @NSManaged private(set) var data: Data
+    @NSManaged private(set) var type: String
 }
 
 extension EventCDv2: Managed {

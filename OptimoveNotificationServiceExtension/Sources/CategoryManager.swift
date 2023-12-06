@@ -38,7 +38,7 @@ class CategoryManager {
         _ = sharedInstance.getExistingCategories()
     }
 
-    fileprivate func getExistingCategories() -> Set<UNNotificationCategory> {
+    private func getExistingCategories() -> Set<UNNotificationCategory> {
         var returnedCategories = Set<UNNotificationCategory>()
 
         UNUserNotificationCenter.current().getNotificationCategories { (categories: Set<UNNotificationCategory>) in
@@ -52,7 +52,7 @@ class CategoryManager {
         return returnedCategories
     }
 
-    fileprivate func getExistingDynamicCategoriesList() -> [String] {
+    private func getExistingDynamicCategoriesList() -> [String] {
         dynamicCategoryLock.wait()
         defer {
             dynamicCategoryLock.signal()
@@ -69,7 +69,7 @@ class CategoryManager {
         return newArray
     }
 
-    fileprivate func pruneCategoriesAndSave(categories: Set<UNNotificationCategory>, dynamicCategories: [String]) {
+    private func pruneCategoriesAndSave(categories: Set<UNNotificationCategory>, dynamicCategories: [String]) {
         if dynamicCategories.count <= MAX_DYNAMIC_CATEGORIES {
             UNUserNotificationCenter.current().setNotificationCategories(categories)
             UserDefaults.standard.set(dynamicCategories, forKey: OptimobileUserDefaultsKey.DYNAMIC_CATEGORY.rawValue)

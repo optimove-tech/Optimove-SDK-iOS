@@ -41,9 +41,9 @@ public class InAppInboxItem {
     }
 
     public func isAvailable() -> Bool {
-        if availableFrom != nil && availableFrom!.timeIntervalSinceNow > 0 {
+        if availableFrom != nil, availableFrom!.timeIntervalSinceNow > 0 {
             return false
-        } else if availableTo != nil && availableTo!.timeIntervalSinceNow < 0 {
+        } else if availableTo != nil, availableTo!.timeIntervalSinceNow < 0 {
             return false
         }
 

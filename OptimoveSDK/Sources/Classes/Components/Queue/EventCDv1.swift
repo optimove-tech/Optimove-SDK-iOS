@@ -22,10 +22,10 @@ final class EventCD: NSManagedObject {
 }
 
 extension EventCD {
-    @NSManaged fileprivate(set) var uuid: String
-    @NSManaged fileprivate(set) var date: String
-    @NSManaged fileprivate(set) var data: Data
-    @NSManaged fileprivate(set) var type: String
+    @NSManaged private(set) var uuid: String
+    @NSManaged private(set) var date: String
+    @NSManaged private(set) var data: Data
+    @NSManaged private(set) var type: String
 }
 
 extension EventCD: Managed {

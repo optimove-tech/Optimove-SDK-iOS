@@ -93,7 +93,7 @@ final class DeepLinkHelper {
         checkForWebToAppBannerTap()
     }
 
-    fileprivate func checkForDeferredLinkOnClipboard() -> Bool {
+    private func checkForDeferredLinkOnClipboard() -> Bool {
         var handled = false
 
         if let checked = KeyValPersistenceHelper.object(forKey: DeepLinkHelper.deferredLinkCheckedKey) as? Bool, checked == true {
@@ -118,7 +118,7 @@ final class DeepLinkHelper {
         return handled
     }
 
-    fileprivate func checkForWebToAppBannerTap() {
+    private func checkForWebToAppBannerTap() {
         let fp = DeepLinkFingerprinter()
 
         fp.getFingerprintComponents { components in
@@ -128,7 +128,7 @@ final class DeepLinkHelper {
         }
     }
 
-    fileprivate func urlShouldBeHandled(_ url: URL) -> Bool {
+    private func urlShouldBeHandled(_ url: URL) -> Bool {
         guard let host = url.host else {
             return false
         }
@@ -136,7 +136,7 @@ final class DeepLinkHelper {
         return host.hasSuffix("lnk.click") || host == config.deepLinkCname?.host
     }
 
-    fileprivate func handleDeepLinkUrl(_ url: URL, wasDeferred: Bool = false) {
+    private func handleDeepLinkUrl(_ url: URL, wasDeferred: Bool = false) {
         let slug = KSHttpUtil.urlEncode(url.path.trimmingCharacters(in: ["/"]))
 
         var path = "/v1/deeplinks/\(slug ?? "")?wasDeferred=\(wasDeferred ? 1 : 0)"
@@ -181,7 +181,7 @@ final class DeepLinkHelper {
         })
     }
 
-    fileprivate func handleFingerprintComponents(components: [String: String]) {
+    private func handleFingerprintComponents(components: [String: String]) {
         guard let componentJson = try? JSONSerialization.data(withJSONObject: components, options: JSONSerialization.WritingOptions(rawValue: 0)),
               let encodedComponents = KSHttpUtil.urlEncode(componentJson.base64EncodedString())
         else {
@@ -239,7 +239,7 @@ final class DeepLinkHelper {
         })
     }
 
-    fileprivate func invokeDeepLinkHandler(_ resolution: DeepLinkResolution) {
+    private func invokeDeepLinkHandler(_ resolution: DeepLinkResolution) {
         DispatchQueue.main.async {
             self.config.deepLinkHandler?(resolution)
         }

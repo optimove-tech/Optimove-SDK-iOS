@@ -61,22 +61,22 @@ final class Optimobile {
         return sharedInstance
     }
 
-    fileprivate(set) var config: OptimobileConfig
-    fileprivate(set) var inAppConsentStrategy = InAppConsentStrategy.notEnabled
+    private(set) var config: OptimobileConfig
+    private(set) var inAppConsentStrategy = InAppConsentStrategy.notEnabled
 
     static var inAppConsentStrategy: InAppConsentStrategy {
         return sharedInstance.inAppConsentStrategy
     }
 
-    fileprivate(set) var inAppManager: InAppManager
+    private(set) var inAppManager: InAppManager
 
-    fileprivate(set) var analyticsHelper: AnalyticsHelper
-    fileprivate(set) var sessionHelper: SessionHelper
-    fileprivate(set) var badgeObserver: OptimobileBadgeObserver
+    private(set) var analyticsHelper: AnalyticsHelper
+    private(set) var sessionHelper: SessionHelper
+    private(set) var badgeObserver: OptimobileBadgeObserver
 
-    fileprivate var pushHelper: PushHelper
+    private var pushHelper: PushHelper
 
-    fileprivate(set) var deepLinkHelper: DeepLinkHelper?
+    private(set) var deepLinkHelper: DeepLinkHelper?
 
     private let networkFactory: NetworkFactory
     private var credentials: OptimobileCredentials?

@@ -154,7 +154,7 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
-        if optimoveCredentials == nil && optimoveCredentials == nil {
+        if optimoveCredentials == nil, optimoveCredentials == nil {
             assertionFailure("Should provide at least optimove or optimobile credentials")
         }
         do {

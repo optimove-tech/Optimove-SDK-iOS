@@ -96,11 +96,11 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
                 let aIsTickle = self.pendingTickleIds.contains(a.id)
                 let bIsTickle = self.pendingTickleIds.contains(b.id)
 
-                if aIsTickle && !bIsTickle {
+                if aIsTickle, !bIsTickle {
                     return .orderedAscending
-                } else if !aIsTickle && bIsTickle {
+                } else if !aIsTickle, bIsTickle {
                     return .orderedDescending
-                } else if aIsTickle && bIsTickle {
+                } else if aIsTickle, bIsTickle {
                     let aIdx = self.pendingTickleIds.index(of: a.id)
                     let bIdx = self.pendingTickleIds.index(of: b.id)
 
@@ -395,7 +395,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
            let url = httpResponse.url,
            let baseUrl = try? urlBuilder.urlForService(.iar)
         {
-            if url.absoluteString.starts(with: baseUrl.absoluteString) && httpResponse.statusCode >= 400 {
+            if url.absoluteString.starts(with: baseUrl.absoluteString), httpResponse.statusCode >= 400 {
                 decisionHandler(.cancel)
                 cancelCurrentPresentationQueue(waitForViewCleanup: false)
                 return

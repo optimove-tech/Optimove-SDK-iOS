@@ -106,7 +106,7 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func remove(events: [OptistreamEvent]) {
-        let eventIds = events.map { $0.metadata.eventId }
+        let eventIds = events.map(\.metadata.eventId)
         let predicate = EventCDv2.queueTypeAndEventIdsPredicate(eventIds: eventIds, queueType: queueType)
         context.safePerformAndWait { isSafe in
             if !isSafe {

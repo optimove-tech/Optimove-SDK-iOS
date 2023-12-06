@@ -161,7 +161,7 @@ extension MigrationWork_3_3_0 {
             let fileManager = FileManager.default
             var isDirectory: ObjCBool = false
             let exists = FileManager.default.fileExists(atPath: oldURL.absoluteString, isDirectory: &isDirectory)
-            guard exists && isDirectory.boolValue else {
+            guard exists, isDirectory.boolValue else {
                 return
             }
             let files = try FileManager.default.contentsOfDirectory(atPath: oldURL.absoluteString)

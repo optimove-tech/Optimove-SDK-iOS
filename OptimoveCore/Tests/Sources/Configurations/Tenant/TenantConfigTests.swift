@@ -1,8 +1,8 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 @testable import OptimoveCore
-import XCTest
 import OptimoveTest
+import XCTest
 
 class TenantConfigTests: XCTestCase, FileAccessible {
     // Use `com.apple.dt.xctest.tool` bundle identifier in the config file, just for this test case.

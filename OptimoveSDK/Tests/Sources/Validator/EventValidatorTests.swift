@@ -1,8 +1,8 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
 import OptimoveCore
-import OptimoveTest
 @testable import OptimoveSDK
+import OptimoveTest
 import XCTest
 
 class EventValidatorTests: OptimoveTestCase {

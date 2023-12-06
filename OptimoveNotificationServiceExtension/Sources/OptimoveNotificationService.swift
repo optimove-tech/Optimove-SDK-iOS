@@ -42,7 +42,7 @@ public class OptimoveNotificationService {
         }
     }
 
-    fileprivate class func validateUserInfo(userInfo: [AnyHashable: Any]) -> Bool {
+    private class func validateUserInfo(userInfo: [AnyHashable: Any]) -> Bool {
         var dict: [AnyHashable: Any] = userInfo
         let keysInOrder = ["custom", "a", "k.message", "data"]
 
@@ -61,7 +61,7 @@ public class OptimoveNotificationService {
         return true
     }
 
-    fileprivate class func getButtons(userInfo: [AnyHashable: Any], bestAttemptContent _: UNMutableNotificationContent) -> NSMutableArray {
+    private class func getButtons(userInfo: [AnyHashable: Any], bestAttemptContent _: UNMutableNotificationContent) -> NSMutableArray {
         let actionArray = NSMutableArray()
 
         let custom = userInfo["custom"] as! [AnyHashable: Any]
@@ -93,7 +93,7 @@ public class OptimoveNotificationService {
     }
 
     @available(iOS 15.0, *)
-    fileprivate class func getButtonIcon(button: [AnyHashable: Any]) -> UNNotificationActionIcon? {
+    private class func getButtonIcon(button: [AnyHashable: Any]) -> UNNotificationActionIcon? {
         guard let icon = button["icon"] as? [String: String], let iconType = icon["type"], let iconId = icon["id"] else {
             return nil
         }
@@ -106,7 +106,7 @@ public class OptimoveNotificationService {
         return UNNotificationActionIcon(systemImageName: iconId)
     }
 
-    fileprivate class func addCategory(bestAttemptContent: UNMutableNotificationContent, actionArray: NSMutableArray, id: Int) {
+    private class func addCategory(bestAttemptContent: UNMutableNotificationContent, actionArray: NSMutableArray, id: Int) {
         let categoryIdentifier = CategoryManager.getCategoryIdForMessageId(messageId: id)
 
         let category = UNNotificationCategory(identifier: categoryIdentifier, actions: actionArray as! [UNNotificationAction], intentIdentifiers: [], options: .customDismissAction)
@@ -116,7 +116,7 @@ public class OptimoveNotificationService {
         bestAttemptContent.categoryIdentifier = categoryIdentifier
     }
 
-    fileprivate class func maybeAddImageAttachment(dispatchGroup: DispatchGroup, userInfo: [AnyHashable: Any], bestAttemptContent: UNMutableNotificationContent) {
+    private class func maybeAddImageAttachment(dispatchGroup: DispatchGroup, userInfo: [AnyHashable: Any], bestAttemptContent: UNMutableNotificationContent) {
         let attachments = userInfo["attachments"] as? [AnyHashable: Any]
         let pictureUrl = attachments?["pictureUrl"] as? String
 
@@ -135,7 +135,7 @@ public class OptimoveNotificationService {
         })
     }
 
-    fileprivate class func getPictureExtension(_ pictureUrl: String?) -> String? {
+    private class func getPictureExtension(_ pictureUrl: String?) -> String? {
         if pictureUrl == nil {
             return nil
         }
@@ -147,7 +147,7 @@ public class OptimoveNotificationService {
         return "." + pictureExtension
     }
 
-    fileprivate class func loadAttachment(_ url: URL, withExtension pictureExtension: String?, completionHandler: @escaping (UNNotificationAttachment?) -> Void) {
+    private class func loadAttachment(_ url: URL, withExtension pictureExtension: String?, completionHandler: @escaping (UNNotificationAttachment?) -> Void) {
         let session = URLSession(configuration: URLSessionConfiguration.default)
 
         (session.downloadTask(with: url, completionHandler: { temporaryFileLocation, response, error in
@@ -191,7 +191,7 @@ public class OptimoveNotificationService {
         })).resume()
     }
 
-    fileprivate class func maybeSetBadge(bestAttemptContent: UNMutableNotificationContent, userInfo: [AnyHashable: Any]) {
+    private class func maybeSetBadge(bestAttemptContent: UNMutableNotificationContent, userInfo: [AnyHashable: Any]) {
         let aps = userInfo["aps"] as! [AnyHashable: Any]
         if let contentAvailable = aps["content-available"] as? Int, contentAvailable == 1 {
             return
@@ -206,7 +206,7 @@ public class OptimoveNotificationService {
         KeyValPersistenceHelper.set(newBadge, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
     }
 
-    fileprivate class func isBackgroundPush(userInfo: [AnyHashable: Any]) -> Bool {
+    private class func isBackgroundPush(userInfo: [AnyHashable: Any]) -> Bool {
         let aps = userInfo["aps"] as! [AnyHashable: Any]
         if let contentAvailable = aps["content-available"] as? Int, contentAvailable == 1 {
             return true

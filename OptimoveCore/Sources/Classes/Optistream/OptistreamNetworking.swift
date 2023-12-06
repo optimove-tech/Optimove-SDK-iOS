@@ -76,7 +76,7 @@ private extension OptistreamNetworkingImpl {
                 """
                 Optistream succeed:
                 request:
-                    \(events.map { $0.event }.joined(separator: "\n\t"))
+                    \(events.map(\.event).joined(separator: "\n\t"))
                 response:
                     status code: \(response.statusCode)
                     body: \(response.description)
@@ -92,7 +92,7 @@ private extension OptistreamNetworkingImpl {
                 """
                 Optistream request invalid:
                     request:
-                    \(events.map { $0.event }.joined(separator: "\n"))
+                    \(events.map(\.event).joined(separator: "\n"))
                     reason:
                     \(response())
                 """
@@ -103,7 +103,7 @@ private extension OptistreamNetworkingImpl {
                 """
                 Optistream failed:
                     request:
-                    \(events.map { $0.event }.joined(separator: "\n"))
+                    \(events.map(\.event).joined(separator: "\n"))
                     reason:
                     \(error.localizedDescription)
                 """

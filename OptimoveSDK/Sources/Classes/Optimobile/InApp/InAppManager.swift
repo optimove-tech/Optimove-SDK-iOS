@@ -819,7 +819,7 @@ class InAppManager {
             }
 
             let success = markInboxItemRead(withId: item.id, shouldWait: true)
-            if success && !inboxNeedsUpdate {
+            if success, !inboxNeedsUpdate {
                 inboxNeedsUpdate = true
             }
 

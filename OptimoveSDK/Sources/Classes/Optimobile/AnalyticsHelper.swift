@@ -277,7 +277,7 @@ final class AnalyticsHelper {
 
     // MARK: CoreData model definition
 
-    fileprivate func getCoreDataModel() -> NSManagedObjectModel {
+    private func getCoreDataModel() -> NSManagedObjectModel {
         let model = NSManagedObjectModel()
 
         let eventEntity = NSEntityDescription()

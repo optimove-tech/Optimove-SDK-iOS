@@ -84,7 +84,7 @@ final class KSHttpClient {
 
     // MARK: Helpers
 
-    fileprivate func buildRequest(for path: String, method: KSHttpMethod, body: Any?) throws -> URLRequest {
+    private func buildRequest(for path: String, method: KSHttpMethod, body: Any?) throws -> URLRequest {
         var url = try urlBuilder.urlForService(serviceType)
 
         // FIXME: The incoming path value contains not only path but also query parameters. This why we cannot append path component to the url. It will cause wrong encoding of the path component. The solution is to operate with URLComponents instead of path.
@@ -110,7 +110,7 @@ final class KSHttpClient {
         return urlRequest
     }
 
-    fileprivate func encodeBody(_ body: Any) -> Data? {
+    private func encodeBody(_ body: Any) -> Data? {
         switch requestFormat {
         case .json:
             guard JSONSerialization.isValidJSONObject(body) else {
@@ -131,7 +131,7 @@ final class KSHttpClient {
         }
     }
 
-    fileprivate func decodeBody(_ data: Data) -> Any? {
+    private func decodeBody(_ data: Data) -> Any? {
         if data.isEmpty {
             return nil
         }
@@ -150,7 +150,7 @@ final class KSHttpClient {
         return decodedData
     }
 
-    fileprivate func sendRequest(request: URLRequest, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
+    private func sendRequest(request: URLRequest, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
         let task = urlSession.dataTask(with: request) { data, response, error in
             guard let httpResponse = response as? HTTPURLResponse else {
                 onFailure(nil, KSHttpError.responseCastingError, nil)

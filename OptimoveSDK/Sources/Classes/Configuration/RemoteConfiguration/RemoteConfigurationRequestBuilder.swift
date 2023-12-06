@@ -9,7 +9,7 @@ public final class RemoteConfigurationRequestBuilder {
 
         var errorDescription: String? {
             switch self {
-            case .failedToCreateTenantConfigurationRequest(let error):
+            case let .failedToCreateTenantConfigurationRequest(error):
                 return "Failed to create tenant configuration request: \(error.localizedDescription)"
             }
         }

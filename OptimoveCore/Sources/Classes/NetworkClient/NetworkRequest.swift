@@ -113,8 +113,8 @@ extension NetworkRequest: CustomStringConvertible {
         [Method]: \(method.rawValue)
         [URL]: \(baseURL.absoluteString)
         [Path]: \(String(describing: path))
-        [Headers]: \(String(describing: headers.map { $0.description }))
-        [QueryItems]: \(String(describing: queryItems.map { $0.description }))
+        [Headers]: \(String(describing: headers.map(\.description)))
+        [QueryItems]: \(String(describing: queryItems.map(\.description)))
         [Body]: \(String(describing: httpBody == nil ? nil : String(data: httpBody!, encoding: .utf8)))
         [TimeoutInterval]: \(timeoutInterval)
         """

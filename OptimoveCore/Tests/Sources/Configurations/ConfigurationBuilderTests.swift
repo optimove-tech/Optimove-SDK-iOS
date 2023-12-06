@@ -1,8 +1,8 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 @testable import OptimoveCore
-import XCTest
 import OptimoveTest
+import XCTest
 
 class ConfigurationBuilderTests: XCTestCase {
     func test_build_configuration() {
