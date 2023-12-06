@@ -30,6 +30,8 @@ public enum StorageKey: String, CaseIterable {
     case siteID /// Legacy: See tenantID
     case settingUserSuccess
     case firstVisitTimestamp /// Legacy
+
+    static let inMemoryValues: Set<StorageKey> = [.tenantToken, .version]
 }
 
 // MARK: - StorageValue
@@ -99,6 +101,42 @@ extension UserDefaults: KeyValueStorage {
     }
 }
 
+public final class InMemoryStorage: KeyValueStorage {
+    private var storage = [StorageKey: Any]()
+    private let queue = DispatchQueue(label: "com.optimove.sdk.inmemorystorage", attributes: .concurrent)
+
+    public init() {}
+
+    public func set(value: Any?, key: StorageKey) {
+        queue.async(flags: .barrier) { [self] in
+            storage[key] = value
+        }
+    }
+
+    public subscript<T>(key: StorageKey) -> T? {
+        get {
+            var result: T?
+            queue.sync {
+                result = storage[key] as? T
+            }
+            return result
+        }
+        set {
+            queue.async(flags: .barrier) { [self] in
+                storage[key] = newValue
+            }
+        }
+    }
+
+    public func value(for key: StorageKey) -> Any? {
+        var result: Any?
+        queue.sync {
+            result = storage[key]
+        }
+        return result
+    }
+}
+
 public enum StorageError: LocalizedError {
     case noValue(StorageKey)
 
@@ -112,15 +150,25 @@ public enum StorageError: LocalizedError {
 
 /// Class implements the Façade pattern for hiding complexity of the OptimoveStorage protocol.
 public final class StorageFacade: OptimoveStorage {
-    private let keyValureStorage: KeyValueStorage
+    private let persistantStorage: KeyValueStorage
+    private let inMemoryStorage: KeyValueStorage
     private let fileStorage: FileStorage
 
     public init(
-        keyValureStorage: KeyValueStorage,
+        persistantStorage: KeyValueStorage,
+        inMemoryStorage: KeyValueStorage,
         fileStorage: FileStorage
     ) {
-        self.keyValureStorage = keyValureStorage
         self.fileStorage = fileStorage
+        self.inMemoryStorage = inMemoryStorage
+        self.persistantStorage = persistantStorage
+    }
+
+    func getStorage(for key: StorageKey) -> KeyValueStorage {
+        if StorageKey.inMemoryValues.contains(key) {
+            return inMemoryStorage
+        }
+        return persistantStorage
     }
 }
 
@@ -130,58 +178,57 @@ public extension StorageFacade {
     /// Use `storage.key` instead.
     /// Some variable have formatters, implemented in own setters. Set unformatted value could cause an issue.
     func set(value: Any?, key: StorageKey) {
-        keyValureStorage.set(value: value, key: key)
+        getStorage(for: key).set(value: value, key: key)
     }
 
     func value(for key: StorageKey) -> Any? {
-        return keyValureStorage.value(for: key)
+        return getStorage(for: key).value(for: key)
     }
 
     subscript<T>(key: StorageKey) -> T? {
         get {
-            return keyValureStorage.value(for: key) as? T
+            return getStorage(for: key).value(for: key) as? T
         }
         set {
-            keyValureStorage.set(value: newValue, key: key)
+            getStorage(for: key).set(value: newValue, key: key)
         }
     }
 
-    /// Should be supported in the future version of Swift. https://bugs.swift.org/browse/SR-238
-//    subscript<T>(key: StorageKey) -> () throws -> T {
-//        get {
-//            return { try cast(self.storage(for: key).value(forKey: key.rawValue)) }
-//        }
-//        set {
-//            storage(for: key).set(newValue, forKey: key.rawValue)
-//        }
-//    }
+    subscript<T>(key: StorageKey) -> () throws -> T {
+        get {
+            { try cast(self.getStorage(for: key).value(for: key)) }
+        }
+        set {
+            getStorage(for: key).set(value: newValue, key: key)
+        }
+    }
 }
 
 // MARK: - FileStorage
 
 public extension StorageFacade {
-    func isExist(fileName: String) -> Bool {
-        return fileStorage.isExist(fileName: fileName)
+    func isExist(fileName: String, isTemporary: Bool) -> Bool {
+        return fileStorage.isExist(fileName: fileName, isTemporary: isTemporary)
     }
 
-    func save<T: Codable>(data: T, toFileName: String) throws {
-        try fileStorage.save(data: data, toFileName: toFileName)
+    func save<T: Codable>(data: T, toFileName: String, isTemporary: Bool) throws {
+        try fileStorage.save(data: data, toFileName: toFileName, isTemporary: isTemporary)
     }
 
-    func saveData(data: Data, toFileName: String) throws {
-        try fileStorage.saveData(data: data, toFileName: toFileName)
+    func saveData(data: Data, toFileName: String, isTemporary: Bool) throws {
+        try fileStorage.saveData(data: data, toFileName: toFileName, isTemporary: isTemporary)
     }
 
-    func load<T: Codable>(fileName: String) throws -> T {
-        return try unwrap(fileStorage.load(fileName: fileName))
+    func load<T: Codable>(fileName: String, isTemporary: Bool) throws -> T {
+        return try unwrap(fileStorage.load(fileName: fileName, isTemporary: isTemporary))
     }
 
-    func loadData(fileName: String) throws -> Data {
-        return try unwrap(fileStorage.loadData(fileName: fileName))
+    func loadData(fileName: String, isTemporary: Bool) throws -> Data {
+        return try unwrap(fileStorage.loadData(fileName: fileName, isTemporary: isTemporary))
     }
 
-    func delete(fileName: String) throws {
-        try fileStorage.delete(fileName: fileName)
+    func delete(fileName: String, isTemporary: Bool) throws {
+        try fileStorage.delete(fileName: fileName, isTemporary: isTemporary)
     }
 }
 

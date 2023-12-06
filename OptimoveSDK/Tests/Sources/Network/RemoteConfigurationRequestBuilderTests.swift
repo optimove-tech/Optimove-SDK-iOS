@@ -3,6 +3,7 @@
 import OptimoveCore
 @testable import OptimoveSDK
 import XCTest
+import OptimoveTest
 
 final class RemoteConfigurationRequestBuilderTests: XCTestCase {
     var requestBuilder: RemoteConfigurationRequestBuilder!

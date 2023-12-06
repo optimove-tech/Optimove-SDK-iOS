@@ -2,6 +2,7 @@
 
 @testable import OptimoveCore
 import XCTest
+import OptimoveTest
 
 class ConfigurationBuilderTests: XCTestCase {
     func test_build_configuration() {

@@ -5,7 +5,6 @@ import UIKit
 import UserNotifications
 
 public class OptimoveNotificationService {
-    fileprivate static var analyticsHelper: AnalyticsHelper?
     private static let syncBarrier = DispatchSemaphore(value: 0)
 
     public class func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
@@ -35,7 +34,6 @@ public class OptimoveNotificationService {
 
         if AppGroupsHelper.isKumulosAppGroupDefined() {
             maybeSetBadge(bestAttemptContent: bestAttemptContent, userInfo: userInfo)
-            trackDeliveredEvent(dispatchGroup: dispatchGroup, userInfo: userInfo, notificationId: id)
             PendingNotificationHelper.add(notification: PendingNotification(id: id, deliveredAt: Date(), identifier: request.identifier))
         }
 
@@ -206,42 +204,6 @@ public class OptimoveNotificationService {
 
         bestAttemptContent.badge = newBadge
         KeyValPersistenceHelper.set(newBadge, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
-    }
-
-    fileprivate class func trackDeliveredEvent(dispatchGroup: DispatchGroup, userInfo: [AnyHashable: Any], notificationId: Int) {
-        if isBackgroundPush(userInfo: userInfo) {
-            return
-        }
-
-        initializeAnalyticsHelper()
-        guard let analyticsHelper = analyticsHelper else {
-            return
-        }
-
-        let props: [String: Any] = ["type": KS_MESSAGE_TYPE_PUSH, "id": notificationId]
-
-        dispatchGroup.enter()
-
-        analyticsHelper.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED.rawValue, atTime: Date(), properties: props, immediateFlush: true, onSyncComplete: { _ in
-            self.syncBarrier.signal()
-        })
-
-        _ = syncBarrier.wait(timeout: .now() + .seconds(10))
-        dispatchGroup.leave()
-    }
-
-    fileprivate class func initializeAnalyticsHelper() {
-        let apiKey = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.API_KEY.rawValue)
-        let secretKey = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.SECRET_KEY.rawValue)
-
-        guard let apiKey = apiKey as? String, let secretKey = secretKey as? String else {
-            print("Extension: authorization credentials not present")
-            return
-        }
-
-        let eventsBaseUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.EVENTS_BASE_URL.rawValue) as? String ?? "https://events.kumulos.com"
-
-        analyticsHelper = AnalyticsHelper(apiKey: apiKey, secretKey: secretKey, baseEventsUrl: eventsBaseUrl)
     }
 
     fileprivate class func isBackgroundPush(userInfo: [AnyHashable: Any]) -> Bool {

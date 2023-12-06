@@ -13,32 +13,41 @@ class KSEventModel: NSManagedObject {
 
 typealias SyncCompletedBlock = (Error?) -> Void
 
-class AnalyticsHelper {
+final class AnalyticsHelper {
+    let eventsHttpClient: KSHttpClient
     private var analyticsContext: NSManagedObjectContext?
     private var migrationAnalyticsContext: NSManagedObjectContext?
-    private var eventsHttpClient: KSHttpClient
+    private var finishedInitializationToken: NSObjectProtocol?
 
     // MARK: Initialization
 
-    init(apiKey: String, secretKey: String, baseEventsUrl: String) {
+    init(httpClient: KSHttpClient) {
         analyticsContext = nil
         migrationAnalyticsContext = nil
 
-        eventsHttpClient = KSHttpClient(baseUrl: URL(string: baseEventsUrl)!, requestFormat: .json, responseFormat: .json)
-        eventsHttpClient.setBasicAuth(user: apiKey, password: secretKey)
+        eventsHttpClient = httpClient
 
         initContext()
 
-        DispatchQueue.global().async {
-            if self.migrationAnalyticsContext != nil {
-                self.syncEvents(context: self.migrationAnalyticsContext)
+        finishedInitializationToken = NotificationCenter.default
+            .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
+                DispatchQueue.global().async {
+                    guard let self = self else { return }
+                    self.flushEvents()
+                }
+                Logger.debug("Notification \(notification.name.rawValue) was processed")
             }
-            self.syncEvents(context: self.analyticsContext)
-        }
     }
 
     deinit {
         eventsHttpClient.invalidateSessionCancellingTasks(false)
+    }
+
+    func flushEvents() {
+        if migrationAnalyticsContext != nil {
+            syncEvents(context: migrationAnalyticsContext)
+        }
+        syncEvents(context: analyticsContext)
     }
 
     private func getMainStoreUrl(appGroupExists: Bool) -> URL? {

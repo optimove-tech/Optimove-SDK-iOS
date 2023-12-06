@@ -22,11 +22,23 @@ public enum InAppDisplayMode: String {
 
 // MARK: class
 
-class Optimobile {
-    let urlBuilder: UrlBuilder
+final class Optimobile {
+    enum Error: LocalizedError {
+        case alreadyInitialized
+        case configurationIsMissing
+        case noCredentialsProvidedForDelayedConfigurationCompletion
 
-    let pushHttpClient: KSHttpClient
-    let coreHttpClient: KSHttpClient
+        var errorDescription: String? {
+            switch self {
+            case .alreadyInitialized:
+                return "The OptimobileSDK has already been initialized."
+            case .configurationIsMissing:
+                return "OptimobileConfig is missing."
+            case .noCredentialsProvidedForDelayedConfigurationCompletion:
+                return "No OptimobileCredentials provided for delayed configuration completion."
+            }
+        }
+    }
 
     let pushNotificationDeviceType = 1
     let pushNotificationProductionTokenType: Int = 1
@@ -50,8 +62,6 @@ class Optimobile {
     }
 
     fileprivate(set) var config: OptimobileConfig
-    fileprivate(set) var apiKey: String
-    fileprivate(set) var secretKey: String
     fileprivate(set) var inAppConsentStrategy = InAppConsentStrategy.notEnabled
 
     static var inAppConsentStrategy: InAppConsentStrategy {
@@ -68,13 +78,8 @@ class Optimobile {
 
     fileprivate(set) var deepLinkHelper: DeepLinkHelper?
 
-    static var apiKey: String {
-        return sharedInstance.apiKey
-    }
-
-    static var secretKey: String {
-        return sharedInstance.secretKey
-    }
+    private let networkFactory: NetworkFactory
+    private var credentials: OptimobileCredentials?
 
     /**
          The unique installation Id of the current app
@@ -89,12 +94,26 @@ class Optimobile {
         return instance != nil
     }
 
+    static var isSdkRunning: Bool {
+        return Optimobile.instance?.credentials != nil
+    }
+
     /**
          Initialize the Optimobile SDK.
      */
-    static func initialize(config: OptimobileConfig, initialVisitorId: String, initialUserId: String?) {
-        if instance !== nil {
-            assertionFailure("The OptimobileSDK has already been initialized")
+    static func initialize(config optimoveConfig: OptimoveConfig, initialVisitorId: String, initialUserId: String?) throws {
+        if instance !== nil, optimoveConfig.features.contains(.delayedConfiguration) {
+            try completeDelayedConfiguration(config: optimoveConfig.optimobileConfig!)
+            return
+        }
+
+        guard instance == nil else {
+            assertionFailure(Error.alreadyInitialized.localizedDescription)
+            throw Error.alreadyInitialized
+        }
+
+        guard let config = optimoveConfig.optimobileConfig else {
+            throw Error.configurationIsMissing
         }
 
         writeDefaultsKeys(config: config, initialVisitorId: initialVisitorId)
@@ -114,6 +133,30 @@ class Optimobile {
         }
 
         maybeAlignUserAssociation(initialUserId: initialUserId)
+
+        if !optimoveConfig.features.contains(.delayedConfiguration) {
+            NotificationCenter.default.post(name: .optimobileInializationFinished, object: nil)
+        }
+    }
+
+    static func completeDelayedConfiguration(config: OptimobileConfig) throws {
+        guard let credentials = config.credentials else {
+            throw Error.noCredentialsProvidedForDelayedConfigurationCompletion
+        }
+        Logger.info("Completing delayed configuration with credentials: \(credentials)")
+        updateStorageValues(config)
+        setCredentials(credentials)
+        NotificationCenter.default.post(name: .optimobileInializationFinished, object: nil)
+    }
+
+    static func setCredentials(_ credentials: OptimobileCredentials) {
+        Optimobile.instance?.credentials = credentials
+    }
+
+    static func updateStorageValues(_ config: OptimobileConfig) {
+        KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
+        let baseUrlMap = UrlBuilder.defaultMapping(for: config.region.rawValue)
+        KeyValPersistenceHelper.set(baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
     }
 
     fileprivate static func writeDefaultsKeys(config: OptimobileConfig, initialVisitorId: String) {
@@ -132,12 +175,12 @@ class Optimobile {
         {
             UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
         }
-
-        KeyValPersistenceHelper.set(config.apiKey, forKey: OptimobileUserDefaultsKey.API_KEY.rawValue)
-        KeyValPersistenceHelper.set(config.secretKey, forKey: OptimobileUserDefaultsKey.SECRET_KEY.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.events], forKey: OptimobileUserDefaultsKey.EVENTS_BASE_URL.rawValue)
-        KeyValPersistenceHelper.set(config.baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
         KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
+
+        if let credentials = config.credentials {
+            setCredentials(credentials)
+        }
+        updateStorageValues(config)
     }
 
     fileprivate static func maybeAlignUserAssociation(initialUserId: String?) {
@@ -153,30 +196,33 @@ class Optimobile {
         Optimobile.associateUserWithInstall(userIdentifier: initialUserId!)
     }
 
-    fileprivate init(config: OptimobileConfig) {
+    private init(config: OptimobileConfig) {
         self.config = config
-        apiKey = config.apiKey
-        secretKey = config.secretKey
+        let urlBuilder = UrlBuilder(storage: KeyValPersistenceHelper.self)
+        networkFactory = NetworkFactory(
+            urlBuilder: urlBuilder,
+            authorization: AuthorizationMediator(provider: {
+                Optimobile.instance?.credentials
+            })
+        )
         inAppConsentStrategy = config.inAppConsentStrategy
 
-        urlBuilder = UrlBuilder(baseUrlMap: config.baseUrlMap)
+        analyticsHelper = AnalyticsHelper(
+            httpClient: networkFactory.build(for: .events)
+        )
 
-        pushHttpClient = KSHttpClient(baseUrl: URL(string: urlBuilder.urlForService(.push))!, requestFormat: .json, responseFormat: .json)
-        pushHttpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
-        coreHttpClient = KSHttpClient(baseUrl: URL(string: urlBuilder.urlForService(.crm))!, requestFormat: .json, responseFormat: .json)
-        coreHttpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
-
-        analyticsHelper = AnalyticsHelper(apiKey: apiKey, secretKey: secretKey, baseEventsUrl: urlBuilder.urlForService(.events))
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
-        inAppManager = InAppManager(config)
+        inAppManager = InAppManager(config, httpClient: networkFactory.build(for: .push), urlBuilder: urlBuilder)
         pushHelper = PushHelper()
         badgeObserver = OptimobileBadgeObserver(callback: { newBadgeCount in
             KeyValPersistenceHelper.set(newBadgeCount, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
         })
 
         if config.deepLinkHandler != nil {
-            deepLinkHelper = DeepLinkHelper(config, urlBuilder: urlBuilder)
+            deepLinkHelper = DeepLinkHelper(config, httpClient: networkFactory.build(for: .ddl))
         }
+
+        Logger.debug("Optimobile SDK was initialized with \(config)")
     }
 
     private func initializeHelpers() {
@@ -184,10 +230,5 @@ class Optimobile {
         inAppManager.initialize()
         _ = pushHelper.pushInit
         deepLinkHelper?.checkForNonContinuationLinkMatch()
-    }
-
-    deinit {
-        pushHttpClient.invalidateSessionCancellingTasks(true)
-        coreHttpClient.invalidateSessionCancellingTasks(true)
     }
 }

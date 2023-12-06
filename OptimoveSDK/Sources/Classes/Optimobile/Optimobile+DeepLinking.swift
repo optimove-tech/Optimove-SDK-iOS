@@ -37,26 +37,42 @@ public enum DeepLinkResolution {
 
 public typealias DeepLinkHandler = (DeepLinkResolution) -> Void
 
-class DeepLinkHelper {
+final class DeepLinkHelper {
+    struct CachedLink {
+        let url: URL
+        let wasDeferred: Bool
+    }
+
     fileprivate static let deferredLinkCheckedKey = "KUMULOS_DDL_CHECKED"
 
     let config: OptimobileConfig
     let httpClient: KSHttpClient
     var anyContinuationHandled: Bool
+    var cachedLink: CachedLink?
+    var cachedFingerprintComponents: [String: String]?
+    var finishedInitializationToken: NSObjectProtocol?
 
-    init(_ config: OptimobileConfig, urlBuilder: UrlBuilder) {
+    init(_ config: OptimobileConfig, httpClient: KSHttpClient) {
         self.config = config
-        httpClient = KSHttpClient(
-            baseUrl: URL(string: urlBuilder.urlForService(.ddl))!,
-            requestFormat: .rawData,
-            responseFormat: .rawData,
-            additionalHeaders: [
-                "Content-Type": "application/json",
-                "Accept": "appliction/json",
-            ]
-        )
-        httpClient.setBasicAuth(user: config.apiKey, password: config.secretKey)
+        self.httpClient = httpClient
         anyContinuationHandled = false
+
+        finishedInitializationToken = NotificationCenter.default
+            .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
+                self?.maybeProcessCache()
+                Logger.debug("Notification \(notification.name.rawValue) was processed")
+            }
+    }
+
+    func maybeProcessCache() {
+        if let cachedLink = cachedLink {
+            handleDeepLinkUrl(cachedLink.url, wasDeferred: cachedLink.wasDeferred)
+            self.cachedLink = nil
+        }
+        if let cachedFingerprintComponents = cachedFingerprintComponents {
+            handleFingerprintComponents(components: cachedFingerprintComponents)
+            self.cachedFingerprintComponents = nil
+        }
     }
 
     func checkForNonContinuationLinkMatch() {
@@ -145,7 +161,13 @@ class DeepLinkHelper {
             default:
                 self.invokeDeepLinkHandler(.lookupFailed(url))
             }
-        }, onFailure: { res, _, _ in
+        }, onFailure: { res, error, _ in
+            if let error = error {
+                if case HttpAuthorizationError.missingAuthHeader = error {
+                    self.cachedLink = CachedLink(url: url, wasDeferred: wasDeferred)
+                    return
+                }
+            }
             switch res?.statusCode {
             case 404:
                 self.invokeDeepLinkHandler(.linkNotFound(url))
@@ -190,7 +212,13 @@ class DeepLinkHelper {
                 // Noop
                 break
             }
-        }, onFailure: { res, _, data in
+        }, onFailure: { res, error, data in
+            if let error = error {
+                if case HttpAuthorizationError.missingAuthHeader = error {
+                    self.cachedFingerprintComponents = components
+                    return
+                }
+            }
             guard let jsonData = data as? Data,
                   let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable: Any],
                   let urlString = response["linkUrl"] as? String,

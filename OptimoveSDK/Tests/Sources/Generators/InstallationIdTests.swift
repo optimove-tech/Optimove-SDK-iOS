@@ -1,6 +1,7 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
 @testable import OptimoveSDK
+import OptimoveTest
 import XCTest
 
 final class InstallationIdTests: OptimoveTestCase {

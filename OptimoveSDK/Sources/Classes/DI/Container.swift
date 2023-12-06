@@ -9,9 +9,13 @@ final class Container {
     }
 
     @discardableResult
-    func resolve<ReturnType>(_ invoker: @escaping (ServiceLocator) -> (ReturnType)) -> ReturnType? {
+    func resolve<ReturnType>(_ invoker: @escaping (ServiceLocator) throws -> (ReturnType)) -> ReturnType? {
         if let serviceLocator = serviceLocator {
-            return invoker(serviceLocator)
+            do {
+                return try invoker(serviceLocator)
+            } catch {
+                Logger.error(error.localizedDescription)
+            }
         }
         return nil
     }

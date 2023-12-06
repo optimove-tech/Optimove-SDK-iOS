@@ -2,6 +2,7 @@
 
 import OptimoveCore
 @testable import OptimoveSDK
+import OptimoveTest
 import XCTest
 
 class NewUserIDHandlerTests: XCTestCase {

@@ -3,14 +3,13 @@
 import Foundation
 
 enum OptimobileUserDefaultsKey: String {
-    case API_KEY = "KumulosApiKey"
-    case SECRET_KEY = "KumulosSecretKey"
-    case EVENTS_BASE_URL = "KumulosEventsBaseUrl"
+    case REGION = "KumulosEventsRegion"
     case MEDIA_BASE_URL = "KumulosMediaBaseUrl"
     case INSTALL_UUID = "KumulosUUID"
     case USER_ID = "KumulosCurrentUserID"
     case BADGE_COUNT = "KumulosBadgeCount"
     case PENDING_NOTIFICATIONS = "KumulosPendingNotifications"
+    case PENDING_ANALYTICS = "KumulosPendingAnalytics"
 
     // exist only in standard defaults for app
     case MIGRATED_TO_GROUPS = "KumulosDidMigrateToAppGroups"
@@ -22,9 +21,6 @@ enum OptimobileUserDefaultsKey: String {
     case DYNAMIC_CATEGORY = "__kumulos__dynamic__categories__"
 
     static let sharedKeys = [
-        API_KEY,
-        SECRET_KEY,
-        EVENTS_BASE_URL,
         MEDIA_BASE_URL,
         INSTALL_UUID,
         USER_ID,

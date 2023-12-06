@@ -18,6 +18,7 @@ private var ks_existingBackgroundFetchDelegate: IMP?
 typealias InAppSyncCompletionHandler = (_ result: Int) -> Void
 
 class InAppManager {
+    private let httpClient: KSHttpClient
     private(set) var presenter: InAppPresenter
     private var pendingTickleIds = NSMutableOrderedSet(capacity: 1)
 
@@ -29,16 +30,25 @@ class InAppManager {
     private let STORED_IN_APP_LIMIT = 50
     private let SYNC_DEBOUNCE_SECONDS = 3600 as TimeInterval
 
+    var finishedInitializationToken: NSObjectProtocol?
+
     // MARK: Initialization
 
-    init(_ config: OptimobileConfig) {
-        presenter = InAppPresenter(displayMode: config.inAppDefaultDisplayMode)
-        syncQueue = DispatchQueue(label: "kumulos.in-app.sync")
+    init(_ config: OptimobileConfig, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
+        self.httpClient = httpClient
+        presenter = InAppPresenter(displayMode: config.inAppDefaultDisplayMode, urlBuilder: urlBuilder)
+        syncQueue = DispatchQueue(label: "com.optimove.inapp.sync")
+
+        finishedInitializationToken = NotificationCenter.default
+            .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
+                guard let self = self else { return }
+                handleEnrollmentAndSyncSetup()
+                Logger.debug("Notification \(notification.name.rawValue) was processed")
+            }
     }
 
     func initialize() {
         initContext()
-        handleEnrollmentAndSyncSetup()
     }
 
     func initContext() {
@@ -269,7 +279,7 @@ class InAppManager {
             let encodedIdentifier = KSHttpUtil.urlEncode(OptimobileHelper.currentUserIdentifier)
             let path = "/v1/users/\(encodedIdentifier!)/messages\(after)"
 
-            Optimobile.sharedInstance.pushHttpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { _, decodedBody in
+            self.httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { _, decodedBody in
                 defer {
                     UserDefaults.standard.set(Date(), forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue)
                     syncBarrier.signal()

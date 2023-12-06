@@ -121,7 +121,7 @@ extension Optimobile {
             DispatchQueue.main.async {
                 if UIApplication.shared.applicationState == .background {
                     onAuthorizationStatus?(.notDetermined,
-                                           NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Application not active, aborting push permission request"]) as Error)
+                                           NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Application not active, aborting push permission request"]) as Swift.Error)
                     return
                 }
 
@@ -202,11 +202,11 @@ extension Optimobile {
     // MARK: Open handling
 
     /**
-         Track a user action triggered by a push notification
+          Track a user action triggered by a push notification
 
-        Parameters:
-            - notification: The notification which triggered the action
-    */
+         Parameters:
+             - notification: The notification which triggered the action
+     */
     static func pushTrackOpen(notification: PushNotification) {
         if notification.id == 0 {
             Logger.warn("""
@@ -475,7 +475,7 @@ class PushHelper {
             return
         }
 
-        let props: [String:Any] = ["type" : KS_MESSAGE_TYPE_PUSH, "id": notification.id]
-        Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED, properties:props, immediateFlush: true)
+        let props: [String: Any] = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.id]
+        Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED, properties: props, immediateFlush: true)
     }
 }

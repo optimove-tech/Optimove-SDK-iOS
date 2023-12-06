@@ -1,14 +1,9 @@
-//
-//  OptimoveNotificationExtensionTests.swift
-//  OptimoveNotificationExtensionTests
-//
-//  Created by Christopher Wyllie on 21/04/2022.
-//
+//  Copyright © 2023 Optimove. All rights reserved.
 
-@testable import OptimoveNotificationServiceExtension
 import XCTest
 
-class OptimoveNotificationExtensionTests: XCTestCase {
+final class OptimoveNotificationServiceExtensionTests: XCTestCase {
+
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -27,8 +22,9 @@ class OptimoveNotificationExtensionTests: XCTestCase {
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
-        measure {
+        self.measure {
             // Put the code you want to measure the time of here.
         }
     }
+
 }

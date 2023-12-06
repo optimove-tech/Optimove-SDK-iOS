@@ -32,12 +32,12 @@ typealias Logger = OptimoveCore.Logger
     }
 
     /// The starting point of the Optimove SDK.
-    ///
-    /// - Parameter tenantInfo: Basic client information received on the onboarding process with Optimove.
-    @objc static func configure(for tenantInfo: OptimoveTenantInfo) {
+    static func configure(for config: OptimoveConfig) {
         /// FUTURE: To merge configure call with init.
         shared.container.resolve { serviceLocator in
-            serviceLocator.newTenantInfoHandler().handle(tenantInfo)
+            if let tenantInfo = config.tenantInfo {
+                serviceLocator.newTenantInfoHandler().handle(tenantInfo)
+            }
             serviceLocator.deviceStateObserver().start()
             shared.startSDK { _ in }
         }
@@ -46,20 +46,44 @@ typealias Logger = OptimoveCore.Logger
     public static func initialize(with config: OptimoveConfig) {
         shared.config = config
 
-        if config.isOptimoveConfigured(), let tenantInfo = config.tenantInfo {
-            Optimove.configure(for: tenantInfo)
+        if config.isOptimoveConfigured() {
+            Optimove.configure(for: config)
         }
 
-        if config.isOptimobileConfigured(), let optimobileConfig = config.optimobileConfig {
+        if config.isOptimobileConfigured() {
             shared.container.resolve { serviceLocator in
-                guard let visitorId = try? serviceLocator.storage().getInitialVisitorId() else {
-                    return
+                do {
+                    let visitorId = try serviceLocator.storage().getInitialVisitorId()
+                    let userId = try? serviceLocator.storage().getCustomerID()
+
+                    try Optimobile.initialize(config: config, initialVisitorId: visitorId, initialUserId: userId)
+                } catch {
+                    throw GuardError.custom("Failed on OptimobileSDK initialization. Reason: \(error.localizedDescription)")
                 }
-
-                let userId = try? serviceLocator.storage().getCustomerID()
-
-                Optimobile.initialize(config: optimobileConfig, initialVisitorId: visitorId, initialUserId: userId)
             }
+        }
+    }
+
+    /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
+    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
+        guard let currentConfig = shared.config else {
+            Logger.error("Optimove SDK is not configured yet. Please call Optimove.initialize(with:) first.")
+            return
+        }
+        let builder = OptimoveConfigBuilder(from: currentConfig)
+        builder.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+        let config = builder.build()
+        initialize(with: config)
+    }
+
+    public static func isFeatureRunning(_ feature: Feature) -> Bool {
+        switch feature {
+        case .optimobile:
+            return Optimobile.isSdkRunning
+        case .optimove:
+            return RunningFlagsIndication.isSdkRunning
+        default:
+            return false
         }
     }
 }
@@ -357,13 +381,13 @@ public extension Optimove {
     @objc func trackIBeaconProximity(beacon: CLBeacon) {
         Optimobile.trackIBeaconProximity(beacon: beacon)
     }
-    
+
     /// Records a notification open event
     /// - Parameter userInfo - The userInfo dictionary you received in the push notification payload
-    @objc public func trackOpenMetric(userInfo: [AnyHashable: Any]) {
+    @objc func trackOpenMetric(userInfo: [AnyHashable: Any]) {
         Optimobile.pushTrackOpen(userInfo: userInfo)
     }
-    
+
     /**
          Records a proximity event for an Eddystone beacon.
      */
@@ -399,6 +423,7 @@ private extension Optimove {
                     completion(.success(()))
                 case let .failure(error):
                     Logger.fatal("Initialization failed. 🛑\nReason: \(error.localizedDescription)")
+                    RunningFlagsIndication.isInitializerRunning.toggle()
                     completion(.failure(error))
                 }
             }

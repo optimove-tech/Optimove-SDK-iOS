@@ -14,7 +14,7 @@ enum InAppAction: String {
     case REQUEST_RATING = "requestAppStoreRating"
 }
 
-class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
+final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
     private let messageQueueLock = DispatchSemaphore(value: 1)
 
     private var webView: WKWebView?
@@ -31,12 +31,15 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
     private var displayMode: InAppDisplayMode
     private var currentMessage: InAppMessage?
 
-    init(displayMode: InAppDisplayMode) {
+    let urlBuilder: UrlBuilder
+
+    init(displayMode: InAppDisplayMode, urlBuilder: UrlBuilder) {
         messageQueue = NSMutableOrderedSet(capacity: 5)
         pendingTickleIds = NSMutableOrderedSet(capacity: 2)
         currentMessage = nil
 
         self.displayMode = displayMode
+        self.urlBuilder = urlBuilder
 
         super.init()
     }
@@ -158,7 +161,7 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         }
 
         let content = NSMutableDictionary(dictionary: currentMessage!.content)
-        content["region"] = Optimobile.sharedInstance.config.region
+        content["region"] = Optimobile.sharedInstance.config.region.rawValue
 
         postClientMessage(type: "PRESENT_MESSAGE", data: content)
     }
@@ -278,9 +281,10 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         #else
             let cachePolicy = URLRequest.CachePolicy.reloadIgnoringCacheData
         #endif
-        let url = Optimobile.getInstance().urlBuilder.urlForService(.iar)
-        let request = URLRequest(url: URL(string: url)!, cachePolicy: cachePolicy, timeoutInterval: 8)
-        webView.load(request)
+        if let url = try? urlBuilder.urlForService(.iar) {
+            let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
+            webView.load(request)
+        }
 
         // Spinner
         let loadingSpinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
@@ -328,7 +332,7 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
 
         do {
             let msg: [String: Any] = ["type": type, "data": data != nil ? data! : NSNull()]
-            let json: Data = try JSONSerialization.data(withJSONObject: msg, options: JSONSerialization.WritingOptions(rawValue: 0))
+            let json: Data = try JSONSerialization.data(withJSONObject: msg, options: [])
 
             let jsonMsg = String(data: json, encoding: .utf8)
             let evalString = String(format: "postHostMessage(%@);", jsonMsg!)
@@ -388,10 +392,10 @@ class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
     func webView(_: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         // Handles HTTP responses for all status codes
         if let httpResponse = navigationResponse.response as? HTTPURLResponse,
-           let url = httpResponse.url
+           let url = httpResponse.url,
+           let baseUrl = try? urlBuilder.urlForService(.iar)
         {
-            let baseUrl = Optimobile.getInstance().urlBuilder.urlForService(.iar)
-            if url.absoluteString.starts(with: baseUrl) && httpResponse.statusCode >= 400 {
+            if url.absoluteString.starts(with: baseUrl.absoluteString) && httpResponse.statusCode >= 400 {
                 decisionHandler(.cancel)
                 cancelCurrentPresentationQueue(waitForViewCleanup: false)
                 return

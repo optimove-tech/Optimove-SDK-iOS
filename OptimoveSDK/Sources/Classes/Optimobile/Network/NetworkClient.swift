@@ -23,19 +23,28 @@ enum KSHttpMethod: String {
     case DELETE
 }
 
-class KSHttpClient {
-    private let baseUrl: URL
-    private let baseUrlComponents: URLComponents?
+final class KSHttpClient {
+    private let serviceType: UrlBuilder.Service
+    private let urlBuilder: UrlBuilder
     private let urlSession: URLSession
     private var authHeader: String?
     private let requestFormat: KSHttpDataFormat
     private let responseFormat: KSHttpDataFormat
+    private let authorization: HttpAuthorizationProtocol
 
     // MARK: Initializers & Configs
 
-    init(baseUrl: URL, requestFormat: KSHttpDataFormat, responseFormat: KSHttpDataFormat, additionalHeaders: [AnyHashable: Any]? = nil) {
-        self.baseUrl = baseUrl
-        baseUrlComponents = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false)
+    init(
+        serviceType: UrlBuilder.Service,
+        urlBuilder: UrlBuilder,
+        requestFormat: KSHttpDataFormat,
+        responseFormat: KSHttpDataFormat,
+        authorization: HttpAuthorizationProtocol,
+        additionalHeaders: [AnyHashable: Any]? = nil
+    ) {
+        self.authorization = authorization
+        self.serviceType = serviceType
+        self.urlBuilder = urlBuilder
         self.requestFormat = requestFormat
         self.responseFormat = responseFormat
 
@@ -53,16 +62,6 @@ class KSHttpClient {
         authHeader = nil
     }
 
-    func setBasicAuth(user: String, password: String) {
-        let creds = "\(user):\(password)"
-        let data = creds.data(using: .utf8)
-        let base64Creds = data?.base64EncodedString()
-
-        if let encoded = base64Creds {
-            authHeader = "Basic \(encoded)"
-        }
-    }
-
     func invalidateSessionCancellingTasks(_ cancel: Bool) {
         if cancel {
             urlSession.invalidateAndCancel()
@@ -73,24 +72,26 @@ class KSHttpClient {
 
     // MARK: HTTP Methods
 
-    @discardableResult func sendRequest(_ method: KSHttpMethod, toPath: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) -> URLSessionDataTask {
-        let request = newRequestToPath(toPath, method: method, body: data)
-
-        return sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
+    func sendRequest(_ method: KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
+        do {
+            var request = try buildRequest(for: path, method: method, body: data)
+            try authorization.authorizeRequest(&request, strategy: .basic)
+            sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
+        } catch {
+            onFailure(nil, error, nil)
+        }
     }
 
     // MARK: Helpers
 
-    fileprivate func newRequestToPath(_ path: String, method: KSHttpMethod, body: Any?) -> URLRequest {
-        let fullPath = "\(baseUrlComponents?.path ?? "")\(path)"
-        let url = URL(string: fullPath, relativeTo: baseUrl)
+    fileprivate func buildRequest(for path: String, method: KSHttpMethod, body: Any?) throws -> URLRequest {
+        var url = try urlBuilder.urlForService(serviceType)
 
-        var urlRequest = URLRequest(url: url!)
+        // FIXME: The incoming path value contains not only path but also query parameters. This why we cannot append path component to the url. It will cause wrong encoding of the path component. The solution is to operate with URLComponents instead of path.
+        url = URL(string: url.absoluteString.appending(path))!
+
+        var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
-
-        if let auth = authHeader {
-            urlRequest.addValue(auth, forHTTPHeaderField: "Authorization")
-        }
 
         switch requestFormat {
         case .json:
@@ -149,7 +150,7 @@ class KSHttpClient {
         return decodedData
     }
 
-    fileprivate func sendRequest(request: URLRequest, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) -> URLSessionDataTask {
+    fileprivate func sendRequest(request: URLRequest, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
         let task = urlSession.dataTask(with: request) { data, response, error in
             guard let httpResponse = response as? HTTPURLResponse else {
                 onFailure(nil, KSHttpError.responseCastingError, nil)
@@ -176,8 +177,6 @@ class KSHttpClient {
         }
 
         task.resume()
-
-        return task
     }
 }
 

@@ -3,6 +3,7 @@
 import Mocker
 @testable import OptimoveCore
 import XCTest
+import OptimoveTest
 
 class NetworkClientTests: XCTestCase {
     func test_get_request() {
