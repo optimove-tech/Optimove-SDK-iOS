@@ -15,8 +15,10 @@ enum HttpAuthorizationError: Error {
     case missingAuthHeader
 }
 
+typealias HttpHeader = [String: String]
+
 protocol HttpAuthorizationProtocol {
-    func authorizeRequest(_: inout URLRequest, strategy: AuthorizationStrategy) throws
+    func getAuthorizationHeader(strategy: AuthorizationStrategy) throws -> HttpHeader
 }
 
 typealias CredentialsProvider = () -> OptimobileCredentials?
@@ -57,10 +59,11 @@ extension AuthorizationMediator: AuthorizationMediatorProtocol {
 }
 
 extension AuthorizationMediator: HttpAuthorizationProtocol {
-    static let field = "Authorization"
+    static let HTTPHeaderField = "Authorization"
 
-    func authorizeRequest(_ urlRequest: inout URLRequest, strategy: AuthorizationStrategy) throws {
-        let basicAuthorization = try getAuthorization(strategy)
-        urlRequest.addValue(basicAuthorization, forHTTPHeaderField: AuthorizationMediator.field)
+    func getAuthorizationHeader(strategy: AuthorizationStrategy) throws -> HttpHeader {
+        return try [
+            AuthorizationMediator.HTTPHeaderField: getAuthorization(strategy)
+        ]
     }
 }

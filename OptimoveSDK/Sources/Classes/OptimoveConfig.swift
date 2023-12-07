@@ -158,7 +158,7 @@ open class OptimoveConfigBuilder: NSObject {
             assertionFailure("Should provide at least optimove or optimobile credentials")
         }
         do {
-            if let optimoveCredentials = optimoveCredentials {
+            if let optimoveCredentials = optimoveCredentials, !optimoveCredentials.isEmpty {
                 let args = try OptimoveArguments(base64: optimoveCredentials)
                 _tenantToken = args.tenantToken
                 _configName = args.configName
@@ -167,7 +167,7 @@ open class OptimoveConfigBuilder: NSObject {
             Logger.error(error.localizedDescription)
         }
         do {
-            if let optimobileCredentials = optimobileCredentials {
+            if let optimobileCredentials = optimobileCredentials, !optimobileCredentials.isEmpty {
                 let args = try OptimobileArguments(base64: optimobileCredentials)
                 credentials = args.credentials
                 region = args.region
@@ -334,10 +334,13 @@ public extension OptimobileConfig {
 
 struct OptimoveArguments: Decodable {
     enum Error: Foundation.LocalizedError {
+        case emptyBase64
         case failedDecodingBase64(String)
 
         var errorDescription: String? {
             switch self {
+            case .emptyBase64:
+                return "The base64 string is empty"
             case let .failedDecodingBase64(string):
                 return "Failed on decoding base64 the value \(string)"
             }
@@ -355,6 +358,9 @@ struct OptimoveArguments: Decodable {
     }
 
     init(base64: String) throws {
+        guard !base64.isEmpty else {
+            throw Error.emptyBase64
+        }
         guard let data = Data(base64Encoded: base64) else {
             throw Error.failedDecodingBase64(base64)
         }
@@ -373,10 +379,13 @@ struct OptimoveArguments: Decodable {
 
 struct OptimobileArguments: Decodable {
     enum Error: Foundation.LocalizedError {
+        case emptyBase64
         case failedDecodingBase64(String)
 
         var errorDescription: String? {
             switch self {
+            case .emptyBase64:
+                return "The base64 string is empty"
             case let .failedDecodingBase64(string):
                 return "Failed on decoding base64 the value \(string)"
             }
@@ -394,6 +403,9 @@ struct OptimobileArguments: Decodable {
     }
 
     init(base64: String) throws {
+        guard !base64.isEmpty else {
+            throw Error.emptyBase64
+        }
         guard let data = Data(base64Encoded: base64) else {
             throw Error.failedDecodingBase64(base64)
         }
