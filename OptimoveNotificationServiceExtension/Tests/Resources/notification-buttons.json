@@ -3,7 +3,8 @@
     "alert": {
       "title": "title",
       "body": "body"
-    }
+    },
+    "mutable-content": 1
   },
   "custom": {
     "a": {

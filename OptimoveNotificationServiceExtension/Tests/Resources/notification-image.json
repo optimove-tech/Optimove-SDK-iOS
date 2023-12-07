@@ -3,7 +3,8 @@
     "alert": {
       "title": "title",
       "body": "body"
-    }
+    },
+    "mutable-content": 1
   },
   "attachments": {
     "pictureUrl": "B04wM4Y7/b2f69e254879d69b58c7418468213762.jpeg"
