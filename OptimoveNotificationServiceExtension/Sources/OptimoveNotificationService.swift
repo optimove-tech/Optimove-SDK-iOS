@@ -4,13 +4,13 @@ import Foundation
 import UIKit
 import UserNotifications
 
-public class OptimoveNotificationService {
+public enum OptimoveNotificationService {
     enum Error: String, LocalizedError {
         case noBestAttemptContent
         case userInfoNotValid
     }
 
-    public class func didReceive(
+    public static func didReceive(
         _ request: UNNotificationRequest,
         withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void
     ) {
@@ -25,7 +25,7 @@ public class OptimoveNotificationService {
         }
     }
 
-    class func didReceive(_ request: UNNotificationRequest) async throws -> UNNotificationContent {
+    static func didReceive(_ request: UNNotificationRequest) async throws -> UNNotificationContent {
         guard let bestAttemptContent = request.content.mutableCopy() as? UNMutableNotificationContent else {
             throw Error.noBestAttemptContent
         }
@@ -58,7 +58,7 @@ public class OptimoveNotificationService {
         return bestAttemptContent
     }
 
-    class func buildActions(notification: PushNotification) -> [UNNotificationAction] {
+    static func buildActions(notification: PushNotification) -> [UNNotificationAction] {
         return notification.buttons?.map { button in
             if #available(iOS 15.0, *) {
                 return UNNotificationAction(
@@ -78,7 +78,7 @@ public class OptimoveNotificationService {
     }
 
     @available(iOS 15.0, *)
-    class func buildIcon(button: PushNotification.Button) -> UNNotificationActionIcon? {
+    static func buildIcon(button: PushNotification.Button) -> UNNotificationActionIcon? {
         guard let icon = button.icon else { return nil }
         switch icon.type {
         case .custom:
@@ -88,7 +88,7 @@ public class OptimoveNotificationService {
         }
     }
 
-    class func buildCategorIdentifier(notification: PushNotification) -> String {
+    static func buildCategorIdentifier(notification: PushNotification) -> String {
         let categoryIdentifier = CategoryManager.getCategoryIdForMessageId(messageId: notification.id)
 
         let category = UNNotificationCategory(
@@ -103,7 +103,7 @@ public class OptimoveNotificationService {
         return categoryIdentifier
     }
 
-    class func maybeGetAttachment(notification: PushNotification) async throws -> UNNotificationAttachment? {
+    static func maybeGetAttachment(notification: PushNotification) async throws -> UNNotificationAttachment? {
         guard let picturePath = notification.picturePath else { return nil }
 
         let url = try await MediaHelper.getCompletePictureUrl(
@@ -114,11 +114,11 @@ public class OptimoveNotificationService {
         return try await downloadAttachment(url: url)
     }
 
-    class func downloadAttachment(url: URL) async throws -> UNNotificationAttachment {
+    static func downloadAttachment(url: URL) async throws -> UNNotificationAttachment {
         let (data, response) = try await URLSession.shared.data(from: url)
         let tempURL = URL(fileURLWithPath: NSTemporaryDirectory())
-        .appendingPathComponent(UUID().uuidString)
-        .appendingPathExtension((response.url ?? url).pathExtension)
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension((response.url ?? url).pathExtension)
         try data.write(to: tempURL)
         return try UNNotificationAttachment(
             identifier: "",
@@ -126,7 +126,7 @@ public class OptimoveNotificationService {
         )
     }
 
-    class func maybeSetBadge(bestAttemptContent: UNMutableNotificationContent, userInfo: [AnyHashable: Any]) {
+    static func maybeSetBadge(bestAttemptContent: UNMutableNotificationContent, userInfo: [AnyHashable: Any]) {
         let aps = userInfo["aps"] as! [AnyHashable: Any]
         if let contentAvailable = aps["content-available"] as? Int, contentAvailable == 1 {
             return
