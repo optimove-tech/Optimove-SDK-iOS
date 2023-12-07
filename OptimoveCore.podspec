@@ -13,9 +13,4 @@ Pod::Spec.new do |s|
   base_dir = "OptimoveCore/"
   s.source_files = base_dir + 'Sources/Classes/**/*'
   s.frameworks = 'Foundation'
-  s.test_spec 'unit' do |unit_tests|
-    unit_tests.source_files = base_dir + 'Tests/Sources/**/*', 'Shared/Tests/Sources/**/*'
-    unit_tests.resources = base_dir + 'Tests/Resources/**/*', 'Shared/Tests/Resources/**/*'
-    unit_tests.dependency 'Mocker', '~> 1.0'
-  end
 end

@@ -16,9 +16,4 @@ Pod::Spec.new do |s|
   s.source_files = base_dir + 'Sources/Classes/**/*', 'OptimobileShared/**/*'
   s.dependency 'OptimoveCore', s.version.to_s
   s.frameworks = 'Foundation', 'UIKit', 'SystemConfiguration', 'UserNotifications', 'CoreData'
-  s.test_spec 'unit' do |unit_tests|
-    unit_tests.source_files = base_dir + 'Tests/Sources/**/*',  'Shared/Tests/Sources/**/*'
-    unit_tests.resources = base_dir + 'Tests/Resources/**/*', 'Shared/Tests/Resources/**/*'
-    unit_tests.dependency 'Mocker', '~> 1.0'
-  end
 end
