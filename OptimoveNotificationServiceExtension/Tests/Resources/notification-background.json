@@ -4,8 +4,7 @@
       "title": "title",
       "body": "body"
     },
-    "content-available": 1,
-    "mutable-content": 1
+    "content-available": 1
   },
   "custom": {
     "a": {

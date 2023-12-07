@@ -4,7 +4,8 @@
       "title": "title",
       "body": "body"
     },
-    "badge": 42
+    "badge": 42,
+    "mutable-content": 1
   },
   "custom": {
     "badge_inc": 42,
