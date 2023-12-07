@@ -81,7 +81,7 @@ public class UrlBuilder {
     func isValidateUrlMap(urlsMap: ServiceUrlMap) -> Bool {
         for s in Service.allCases {
             if urlsMap[s] == nil {
-                fatalError("UrlMap must contain an entry for all Service case. Missing key: \(s)")
+                assertionFailure("UrlMap must contain an entry for all Service case. Missing key: \(s)")
                 return false
             }
         }
