@@ -1,0 +1,20 @@
+{
+  "aps": {
+    "alert": {
+      "title": "title",
+      "body": "body"
+    },
+    "content-available": 1,
+    "mutable-content": 1
+  },
+  "custom": {
+    "a": {
+      "k.message": {
+        "type": 1,
+        "data": {
+          "id": 1
+        }
+      }
+    }
+  }
+}

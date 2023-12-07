@@ -78,8 +78,14 @@ let package = Package(
         ),
         .testTarget(
             name: "OptimoveNotificationServiceExtensionTests",
-            dependencies: ["OptimoveNotificationServiceExtension"],
-            path: "OptimoveNotificationServiceExtension/Tests"
+            dependencies: [
+                "OptimoveNotificationServiceExtension",
+                "OptimoveTest",
+            ],
+            path: "OptimoveNotificationServiceExtension/Tests",
+            resources: [
+                .process("Resources"),
+            ]
         ),
     ],
     swiftLanguageVersions: [.v5]
