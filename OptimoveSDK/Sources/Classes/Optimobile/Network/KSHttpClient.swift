@@ -75,7 +75,10 @@ final class KSHttpClient {
     func sendRequest(_ method: KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
         do {
             var request = try buildRequest(for: path, method: method, body: data)
-            try authorization.authorizeRequest(&request, strategy: .basic)
+
+            let headers = try authorization.getAuthorizationHeader(strategy: .basic)
+            request.allHTTPHeaderFields = request.allHTTPHeaderFields?.merging(headers) { _, new in new } ?? headers
+
             sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
         } catch {
             onFailure(nil, error, nil)
