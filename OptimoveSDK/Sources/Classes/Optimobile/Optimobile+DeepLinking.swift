@@ -2,6 +2,7 @@
 
 import Foundation
 import UIKit
+import OptimobileCore
 
 public struct DeepLinkContent {
     public let title: String?

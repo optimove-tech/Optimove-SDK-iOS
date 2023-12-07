@@ -1,5 +1,6 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
+import OptimobileCore
 import StoreKit
 import UIKit
 import UserNotifications

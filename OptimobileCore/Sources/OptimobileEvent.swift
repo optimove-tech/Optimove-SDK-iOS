@@ -1,6 +1,6 @@
 //  Copyright © 2023 Optimove. All rights reserved.
 
-enum OptimobileEvent: String, Codable {
+public enum OptimobileEvent: String, Codable {
     case DEEP_LINK_MATCHED = "k.deepLink.matched"
     case DEVICE_UNSUBSCRIBED = "k.push.deviceUnsubscribed"
     case ENGAGE_BEACON_ENTERED_PROXIMITY = "k.engage.beaconEnteredProximity"

@@ -29,6 +29,7 @@ let package = Package(
         .target(
             name: "OptimoveSDK",
             dependencies: [
+                "OptimobileCore",
                 "OptimoveCore",
             ],
             path: "OptimoveSDK/Sources"
@@ -38,7 +39,14 @@ let package = Package(
             path: "OptimoveCore/Sources"
         ),
         .target(
+            name: "OptimobileCore",
+            path: "OptimobileCore/Sources"
+        ),
+        .target(
             name: "OptimoveNotificationServiceExtension",
+            dependencies: [
+                "OptimobileCore",
+            ],
             path: "OptimoveNotificationServiceExtension/Sources"
         ),
         .target(
@@ -74,6 +82,13 @@ let package = Package(
             resources: [
                 .process("Resources"),
             ]
+        ),
+        .testTarget(
+            name: "OptimobileCoreTests",
+            dependencies: [
+                "OptimobileCore",
+            ],
+            path: "OptimobileCore/Tests"
         ),
         .testTarget(
             name: "OptimoveNotificationServiceExtensionTests",

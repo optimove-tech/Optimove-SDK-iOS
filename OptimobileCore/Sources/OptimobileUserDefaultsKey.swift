@@ -2,7 +2,7 @@
 
 import Foundation
 
-enum OptimobileUserDefaultsKey: String {
+public enum OptimobileUserDefaultsKey: String {
     case REGION = "KumulosEventsRegion"
     case MEDIA_BASE_URL = "KumulosMediaBaseUrl"
     case INSTALL_UUID = "KumulosUUID"
