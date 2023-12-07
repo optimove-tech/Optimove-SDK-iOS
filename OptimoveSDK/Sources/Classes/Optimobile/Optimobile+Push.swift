@@ -6,79 +6,6 @@ import OptimobileCore
 import UIKit
 import UserNotifications
 
-public class PushNotification: NSObject {
-    static let DeepLinkTypeInApp: Int = 1
-
-    public internal(set) var id: Int
-    public internal(set) var aps: [AnyHashable: Any]
-    public internal(set) var data: [AnyHashable: Any]
-    public internal(set) var url: URL?
-    public internal(set) var actionIdentifier: String?
-
-    init(userInfo: [AnyHashable: Any]?) {
-        id = 0
-        self.aps = [:]
-        self.data = [:]
-
-        guard let userInfo = userInfo else {
-            return
-        }
-
-        guard let aps = userInfo["aps"] as? [AnyHashable: Any] else {
-            return
-        }
-
-        self.aps = aps
-
-        guard let custom = userInfo["custom"] as? [AnyHashable: Any] else {
-            return
-        }
-
-        guard let data = custom["a"] as? [AnyHashable: Any] else {
-            return
-        }
-
-        self.data = data
-
-        guard let msg = data["k.message"] as? [AnyHashable: Any] else {
-            return
-        }
-
-        let msgData = msg["data"] as! [AnyHashable: Any]
-
-        id = msgData["id"] as! Int
-
-        if let urlStr = custom["u"] as? String {
-            url = URL(string: urlStr)
-        } else {
-            url = nil
-        }
-    }
-
-    @available(iOS 10.0, *)
-    convenience init(userInfo: [AnyHashable: Any]?, response: UNNotificationResponse?) {
-        self.init(userInfo: userInfo)
-
-        if let notificationResponse = response {
-            if notificationResponse.actionIdentifier != UNNotificationDefaultActionIdentifier {
-                actionIdentifier = notificationResponse.actionIdentifier
-            }
-        }
-    }
-
-    public func inAppDeepLink() -> [AnyHashable: Any]? {
-        guard let deepLink = data["k.deepLink"] as? [AnyHashable: Any] else {
-            return nil
-        }
-
-        if deepLink["type"] as? Int != PushNotification.DeepLinkTypeInApp {
-            return nil
-        }
-
-        return deepLink
-    }
-}
-
 @available(iOS 10.0, *)
 public typealias OptimoveUNAuthorizationCheckedHandler = (UNAuthorizationStatus, Error?) -> Void
 
@@ -209,35 +136,44 @@ extension Optimobile {
              - notification: The notification which triggered the action
      */
     static func pushTrackOpen(notification: PushNotification) {
-        if notification.id == 0 {
-            Logger.warn("""
-            Ignoring push notification open.
-            Reason: Invalid notification id (== 0).
-            Payload: \(notification).
-            """)
-        }
         let params = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_OPENED, properties: params)
     }
 
     static func pushTrackOpen(userInfo: [AnyHashable: Any]) {
-        let notification = PushNotification(userInfo: userInfo)
-        Optimobile.pushTrackOpen(notification: notification)
+        do {
+            let notification = try PushNotification(userInfo: userInfo)
+            Optimobile.pushTrackOpen(notification: notification)
+        } catch {
+            Logger.error(
+                """
+                Ignoring push notification open.
+                Reason: Invalid notification payload.
+                Payload: \(userInfo).
+                Error: \(error.localizedDescription).
+                """
+            )
+        }
     }
 
     @available(iOS 10.0, *)
-    func pushHandleOpen(withUserInfo: [AnyHashable: Any]?, response: UNNotificationResponse?) -> Bool {
-        let notification = PushNotification(userInfo: withUserInfo, response: response)
-
-        if notification.id == 0 {
+    func pushHandleOpen(withUserInfo userInfo: [AnyHashable: Any]) -> Bool {
+        do {
+            let notification = try PushNotification(userInfo: userInfo)
+            pushHandleOpen(notification: notification)
+            PendingNotificationHelper.remove(id: notification.id)
+            return true
+        } catch {
+            Logger.error(
+                """
+                Ignoring push notification open.
+                Reason: Invalid notification payload.
+                Payload: \(userInfo).
+                Error: \(error.localizedDescription).
+                """
+            )
             return false
         }
-
-        pushHandleOpen(notification: notification)
-
-        PendingNotificationHelper.remove(id: notification.id)
-
-        return true
     }
 
     private func pushHandleOpen(notification: PushNotification) {
@@ -269,16 +205,24 @@ extension Optimobile {
     // MARK: Dismissed handling
 
     @available(iOS 10.0, *)
-    func pushHandleDismissed(withUserInfo: [AnyHashable: Any]?, response: UNNotificationResponse?) -> Bool {
-        let notification = PushNotification(userInfo: withUserInfo, response: response)
-
-        if notification.id == 0 {
+    func pushHandleDismissed(withUserInfo userInfo: [AnyHashable: Any]) -> Bool {
+        do {
+            let data = try JSONSerialization.data(withJSONObject: userInfo)
+            let notification = try JSONDecoder().decode(PushNotification.self, from: data)
+            pushHandleDismissed(notificationId: notification.id)
+            PendingNotificationHelper.remove(id: notification.id)
+            return true
+        } catch {
+            Logger.error(
+                """
+                Ignoring push notification dismissed.
+                Reason: Invalid notification payload.
+                Payload: \(userInfo).
+                Error: \(error.localizedDescription).
+                """
+            )
             return false
         }
-
-        pushHandleDismissed(notificationId: notification.id)
-
-        return true
     }
 
     @available(iOS 10.0, *)
@@ -303,23 +247,24 @@ extension Optimobile {
         if !AppGroupsHelper.isKumulosAppGroupDefined() {
             return
         }
+        Task {
+            do {
+                let notifications = await UNUserNotificationCenter.current().deliveredNotifications()
+                var actualPendingNotificationIds: [Int] = []
+                for notification in notifications {
+                    let notification = try PushNotification(userInfo: notification.request.content.userInfo)
 
-        UNUserNotificationCenter.current().getDeliveredNotifications { (notifications: [UNNotification]) in
-            var actualPendingNotificationIds: [Int] = []
-            for notification in notifications {
-                let notification = PushNotification(userInfo: notification.request.content.userInfo)
-                if notification.id == 0 {
-                    continue
+                    actualPendingNotificationIds.append(notification.id)
                 }
 
-                actualPendingNotificationIds.append(notification.id)
-            }
+                let recordedPendingNotifications = PendingNotificationHelper.readAll()
 
-            let recordedPendingNotifications = PendingNotificationHelper.readAll()
-
-            let deletions = recordedPendingNotifications.filter { !actualPendingNotificationIds.contains($0.id) }
-            for deletion in deletions {
-                self.pushHandleDismissed(notificationId: deletion.id, dismissedAt: deletion.deliveredAt)
+                let deletions = recordedPendingNotifications.filter { !actualPendingNotificationIds.contains($0.id) }
+                for deletion in deletions {
+                    pushHandleDismissed(notificationId: deletion.id, dismissedAt: deletion.deliveredAt)
+                }
+            } catch {
+                Logger.error("Failed to track push dismissed events: \(error.localizedDescription)")
             }
         }
     }
@@ -400,58 +345,63 @@ class PushHelper {
         let didReceiveSelector = #selector(UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:))
         let receiveType = NSString(string: "v@:@@@?").utf8String
         let didReceive: didReceiveBlock = { (obj: Any, _ application: UIApplication, userInfo: [AnyHashable: Any], completionHandler: @escaping (UIBackgroundFetchResult) -> Void) in
-            let notification = PushNotification(userInfo: userInfo)
-            let hasInApp = notification.inAppDeepLink() != nil
+            do {
+                let notification = try PushNotification(userInfo: userInfo)
+                let hasInApp = notification.deeplink != nil
 
-            self.setBadge(userInfo: userInfo)
-            self.trackPushDelivery(notification: notification)
+                self.setBadge(userInfo: userInfo)
+                self.trackPushDelivery(notification: notification)
 
-            if existingDidReceive == nil, !hasInApp {
-                // Nothing to do
-                completionHandler(.noData)
-                return
-            } else if existingDidReceive != nil, !hasInApp {
-                // Only existing delegate work to do
-                unsafeBitCast(existingDidReceive, to: kumulos_applicationDidReceiveRemoteNotificationFetchCompletionHandler.self)(obj, didReceiveSelector, application, userInfo, completionHandler)
-                return
-            }
+                if existingDidReceive == nil, !hasInApp {
+                    // Nothing to do
+                    completionHandler(.noData)
+                    return
+                } else if existingDidReceive != nil, !hasInApp {
+                    // Only existing delegate work to do
+                    unsafeBitCast(existingDidReceive, to: kumulos_applicationDidReceiveRemoteNotificationFetchCompletionHandler.self)(obj, didReceiveSelector, application, userInfo, completionHandler)
+                    return
+                }
 
-            var fetchResult: UIBackgroundFetchResult = .noData
-            let group = DispatchGroup()
+                var fetchResult: UIBackgroundFetchResult = .noData
+                let group = DispatchGroup()
 
-            if existingDidReceive != nil {
-                group.enter()
-                DispatchQueue.main.async {
-                    unsafeBitCast(existingDidReceive, to: kumulos_applicationDidReceiveRemoteNotificationFetchCompletionHandler.self)(obj, didReceiveSelector, application, userInfo, { (result: UIBackgroundFetchResult) in
-                        DispatchQueue.main.async {
-                            if fetchResult == .noData {
-                                fetchResult = result
+                if existingDidReceive != nil {
+                    group.enter()
+                    DispatchQueue.main.async {
+                        unsafeBitCast(existingDidReceive, to: kumulos_applicationDidReceiveRemoteNotificationFetchCompletionHandler.self)(obj, didReceiveSelector, application, userInfo, { (result: UIBackgroundFetchResult) in
+                            DispatchQueue.main.async {
+                                if fetchResult == .noData {
+                                    fetchResult = result
+                                }
+
+                                group.leave()
                             }
+                        })
+                    }
+                }
+
+                if hasInApp {
+                    group.enter()
+                    Optimobile.sharedInstance.inAppManager.sync { (result: Int) in
+                        DispatchQueue.main.async {
+                            if result < 0 {
+                                fetchResult = .failed
+                            } else if result > 0 {
+                                fetchResult = .newData
+                            }
+                            // No data case is default, allow override from other handler
 
                             group.leave()
                         }
-                    })
-                }
-            }
-
-            if hasInApp {
-                group.enter()
-                Optimobile.sharedInstance.inAppManager.sync { (result: Int) in
-                    DispatchQueue.main.async {
-                        if result < 0 {
-                            fetchResult = .failed
-                        } else if result > 0 {
-                            fetchResult = .newData
-                        }
-                        // No data case is default, allow override from other handler
-
-                        group.leave()
                     }
                 }
-            }
 
-            group.notify(queue: .main) {
-                completionHandler(fetchResult)
+                group.notify(queue: .main) {
+                    completionHandler(fetchResult)
+                }
+            } catch {
+                Logger.error("Failed to parse push notification: \(error.localizedDescription)")
+                completionHandler(.failed)
             }
         }
         let kumulosDidReceive = imp_implementationWithBlock(unsafeBitCast(didReceive, to: AnyObject.self))

@@ -1,6 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
+import OptimobileCore
 import UserNotifications
 
 @available(iOS 10.0, *)
@@ -12,19 +13,23 @@ class OptimoveUserNotificationCenterDelegate: NSObject, UNUserNotificationCenter
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        let push = PushNotification(userInfo: notification.request.content.userInfo, response: nil)
+        do {
+            let push = try PushNotification(userInfo: notification.request.content.userInfo)
 
-        if push.id == 0 {
+            if push.id == 0 {
+                chainCenter(center, willPresent: notification, with: completionHandler)
+                return
+            }
+
+            if Optimobile.sharedInstance.config.pushReceivedInForegroundHandlerBlock == nil {
+                completionHandler(.alert)
+                return
+            }
+
+            Optimobile.sharedInstance.config.pushReceivedInForegroundHandlerBlock?(push, completionHandler)
+        } catch {
             chainCenter(center, willPresent: notification, with: completionHandler)
-            return
         }
-
-        if Optimobile.sharedInstance.config.pushReceivedInForegroundHandlerBlock == nil {
-            completionHandler(.alert)
-            return
-        }
-
-        Optimobile.sharedInstance.config.pushReceivedInForegroundHandlerBlock?(push, completionHandler)
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -36,7 +41,7 @@ class OptimoveUserNotificationCenterDelegate: NSObject, UNUserNotificationCenter
         }
 
         if response.actionIdentifier == UNNotificationDismissActionIdentifier {
-            let handled = Optimobile.sharedInstance.pushHandleDismissed(withUserInfo: userInfo, response: response)
+            let handled = Optimobile.sharedInstance.pushHandleDismissed(withUserInfo: userInfo)
             if !handled {
                 chainCenter(center, didReceive: response, with: completionHandler)
                 return
@@ -46,7 +51,7 @@ class OptimoveUserNotificationCenterDelegate: NSObject, UNUserNotificationCenter
             return
         }
 
-        let handled = Optimobile.sharedInstance.pushHandleOpen(withUserInfo: userInfo, response: response)
+        let handled = Optimobile.sharedInstance.pushHandleOpen(withUserInfo: userInfo)
 
         if !handled {
             chainCenter(center, didReceive: response, with: completionHandler)

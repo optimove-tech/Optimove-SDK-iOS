@@ -1,6 +1,6 @@
 //  Copyright © 2023 Optimove. All rights reserved.
 
-@testable import OptimoveNotificationServiceExtension
+import OptimobileCore
 import OptimoveTest
 import XCTest
 
@@ -55,5 +55,21 @@ final class PushNotificationTests: XCTestCase, FileAccessible {
         let notification = try decoder.decode(PushNotification.self, from: data)
 
         XCTAssertEqual(notification.isBackground, true)
+    }
+
+    func test_decode_url() throws {
+        fileName = "notification-url.json"
+        let decoder = JSONDecoder()
+        let notification = try decoder.decode(PushNotification.self, from: data)
+
+        XCTAssertEqual(notification.url?.absoluteString, "https://www.optimove.com")
+    }
+
+    func test_decode_deeplink() throws {
+        fileName = "notification-deeplink.json"
+        let decoder = JSONDecoder()
+        let notification = try decoder.decode(PushNotification.self, from: data)
+
+        XCTAssertEqual(notification.deeplink?.id, 1)
     }
 }
