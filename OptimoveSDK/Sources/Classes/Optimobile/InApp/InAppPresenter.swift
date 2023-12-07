@@ -339,7 +339,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
             webView.evaluateJavaScript(evalString, completionHandler: nil)
         } catch {
-            // Noop?
+            Logger.error(error.localizedDescription)
         }
     }
 
