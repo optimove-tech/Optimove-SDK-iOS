@@ -29,19 +29,15 @@ public enum OptimoveNotificationService {
         guard let bestAttemptContent = request.content.mutableCopy() as? UNMutableNotificationContent else {
             throw Error.noBestAttemptContent
         }
-
         let userInfo = request.content.userInfo
         guard JSONSerialization.isValidJSONObject(userInfo) else {
             throw Error.userInfoNotValid
         }
-
         let data = try JSONSerialization.data(withJSONObject: userInfo)
         let notification = try JSONDecoder().decode(PushNotification.self, from: data)
-
-        if bestAttemptContent.categoryIdentifier == "" {
-            bestAttemptContent.categoryIdentifier = buildCategorIdentifier(notification: notification)
+        if bestAttemptContent.categoryIdentifier.isEmpty {
+            bestAttemptContent.categoryIdentifier = await buildCategory(notification: notification)
         }
-
         if AppGroupsHelper.isKumulosAppGroupDefined() {
             if let attachment = try await maybeGetAttachment(notification: notification) {
                 bestAttemptContent.attachments = [attachment]
@@ -88,17 +84,15 @@ public enum OptimoveNotificationService {
         }
     }
 
-    static func buildCategorIdentifier(notification: PushNotification) -> String {
-        let categoryIdentifier = CategoryManager.getCategoryIdForMessageId(messageId: notification.id)
-
+    static func buildCategory(notification: PushNotification) async -> String {
+        let categoryIdentifier = CategoryManager.getCategoryId(messageId: notification.id)
         let category = UNNotificationCategory(
             identifier: categoryIdentifier,
             actions: buildActions(notification: notification),
             intentIdentifiers: [],
             options: .customDismissAction
         )
-
-        CategoryManager.registerCategory(category: category)
+        await CategoryManager.registerCategory(category)
 
         return categoryIdentifier
     }
@@ -120,6 +114,7 @@ public enum OptimoveNotificationService {
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension((response.url ?? url).pathExtension)
         try data.write(to: tempURL)
+
         return try UNNotificationAttachment(
             identifier: "",
             url: tempURL
