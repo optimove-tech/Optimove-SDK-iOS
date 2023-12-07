@@ -2,6 +2,6 @@
 
 import Foundation
 
-extension Notification.Name {
+public extension Notification.Name {
     static let optimobileInializationFinished = Notification.Name("optimobileInializationFinished")
 }

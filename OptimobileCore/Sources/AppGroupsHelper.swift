@@ -6,14 +6,14 @@ public enum AppGroupConfig {
     public static var suffix: String = ".optimove"
 }
 
-enum AppGroupsHelper {
-    static func isKumulosAppGroupDefined() -> Bool {
+public enum AppGroupsHelper {
+    public static func isKumulosAppGroupDefined() -> Bool {
         let containerUrl = getSharedContainerPath()
 
         return containerUrl != nil
     }
 
-    static func getSharedContainerPath() -> URL? {
+    public static func getSharedContainerPath() -> URL? {
         return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: getKumulosGroupName())
     }
 

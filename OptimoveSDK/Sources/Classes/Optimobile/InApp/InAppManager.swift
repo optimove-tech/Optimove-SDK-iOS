@@ -2,6 +2,7 @@
 
 import CoreData
 import Foundation
+import OptimobileCore
 import UIKit
 
 public enum InAppMessagePresentationResult: String {

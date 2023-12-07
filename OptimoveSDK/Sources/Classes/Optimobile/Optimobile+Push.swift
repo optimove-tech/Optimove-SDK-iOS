@@ -2,6 +2,7 @@
 
 import Foundation
 import ObjectiveC.runtime
+import OptimobileCore
 import UIKit
 import UserNotifications
 

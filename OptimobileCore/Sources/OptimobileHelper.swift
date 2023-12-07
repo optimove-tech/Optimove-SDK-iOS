@@ -2,13 +2,13 @@
 
 import Foundation
 
-let KS_MESSAGE_TYPE_PUSH = 1
+public let KS_MESSAGE_TYPE_PUSH = 1
 
-enum OptimobileHelper {
+public enum OptimobileHelper {
     private static let installIdLock = DispatchSemaphore(value: 1)
-    static let userIdLock = DispatchSemaphore(value: 1)
+    public static let userIdLock = DispatchSemaphore(value: 1)
 
-    static var installId: String {
+    public static var installId: String {
         installIdLock.wait()
         defer {
             installIdLock.signal()
@@ -29,7 +29,7 @@ enum OptimobileHelper {
 
       If no user is associated, it returns the Kumulos installation ID
      */
-    static var currentUserIdentifier: String {
+    public static var currentUserIdentifier: String {
         userIdLock.wait()
         defer { userIdLock.signal() }
         if let userId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue) as! String? {
@@ -39,7 +39,7 @@ enum OptimobileHelper {
         return OptimobileHelper.installId
     }
 
-    static func getBadgeFromUserInfo(userInfo: [AnyHashable: Any]) -> NSNumber? {
+    public static func getBadgeFromUserInfo(userInfo: [AnyHashable: Any]) -> NSNumber? {
         let custom = userInfo["custom"] as? [AnyHashable: Any]
         let aps = userInfo["aps"] as? [AnyHashable: Any]
 
