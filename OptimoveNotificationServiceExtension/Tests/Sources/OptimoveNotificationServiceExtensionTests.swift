@@ -1,28 +1,52 @@
 //  Copyright © 2023 Optimove. All rights reserved.
 
+@testable import OptimoveNotificationServiceExtension
 import XCTest
 
 final class OptimoveNotificationServiceExtensionTests: XCTestCase {
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    func test_download_attachment() async throws {
+        let url = URL(string: "https://picsum.photos/200")!
+        let attachment = try await OptimoveNotificationService.downloadAttachment(url: url)
+        XCTAssertNotNil(attachment)
+        XCTAssertTrue(
+            FileManager.default.fileExists(atPath: attachment.url.path),
+            "File should exist at path: \(attachment.url.path)"
+        )
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func test_download_attachment_in_the_process() async throws {
+        let url = URL(string: "https://picsum.photos/200")!
+        for _ in 0 ... 10 {
+            let attachment = try await OptimoveNotificationService.downloadAttachment(url: url)
+            XCTAssertNotNil(attachment)
+            XCTAssertTrue(
+                FileManager.default.fileExists(atPath: attachment.url.path),
+                "File should exist at path: \(attachment.url.path)"
+            )
         }
+    }
+
+    func test_download_attachment_withInvalidUrl() async throws {
+        let url = URL(string: "https://picsum.photos/invalid")!
+        do {
+            _ = try await OptimoveNotificationService.downloadAttachment(url: url)
+            XCTFail("Should throw an error")
+        } catch {
+            XCTAssertNotNil(error)
+        }
+    }
+
+    func test_getCompletePictureUrl() throws {
+        let pictureUrlString = "https://www.optimove.com/wp-content/uploads/2018/12/optimove-logo.png"
+        let url = try MediaHelper.getCompletePictureUrl(pictureUrlString: pictureUrlString, width: 100)
+        XCTAssertEqual(url.absoluteString, pictureUrlString)
+    }
+
+    func test_getCompletePictureUrl_withMediaUrl() throws {
+        let pictureUrlString = "B04wM4Y7/b2f69e254879d69b58c7418468213762.jpeg"
+        let mediaUrl = "https://www.optimove.com"
+        KeyValPersistenceHelper.set(mediaUrl, forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
+        let url = try MediaHelper.getCompletePictureUrl(pictureUrlString: pictureUrlString, width: 100)
+        XCTAssertEqual(url.absoluteString, "\(mediaUrl)/100x/\(pictureUrlString)")
     }
 }
