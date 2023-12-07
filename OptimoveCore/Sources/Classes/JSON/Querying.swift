@@ -25,10 +25,9 @@
 import Foundation
 
 public extension JSON {
-
     /// Return the string value if this is a `.string`, otherwise `nil`
     var stringValue: String? {
-        if case .string(let value) = self {
+        if case let .string(value) = self {
             return value
         }
         return nil
@@ -36,7 +35,7 @@ public extension JSON {
 
     /// Return the double value if this is a `.number`, otherwise `nil`
     var doubleValue: Double? {
-        if case .number(let value) = self {
+        if case let .number(value) = self {
             return value
         }
         return nil
@@ -44,7 +43,7 @@ public extension JSON {
 
     /// Return the bool value if this is a `.bool`, otherwise `nil`
     var boolValue: Bool? {
-        if case .bool(let value) = self {
+        if case let .bool(value) = self {
             return value
         }
         return nil
@@ -52,7 +51,7 @@ public extension JSON {
 
     /// Return the object value if this is an `.object`, otherwise `nil`
     var objectValue: [String: JSON]? {
-        if case .object(let value) = self {
+        if case let .object(value) = self {
             return value
         }
         return nil
@@ -60,7 +59,7 @@ public extension JSON {
 
     /// Return the array value if this is an `.array`, otherwise `nil`
     var arrayValue: [JSON]? {
-        if case .array(let value) = self {
+        if case let .array(value) = self {
             return value
         }
         return nil
@@ -78,7 +77,7 @@ public extension JSON {
     ///
     /// If this is not an `.array` or the index is out of bounds, returns `nil`.
     subscript(index: Int) -> JSON? {
-        if case .array(let arr) = self, arr.indices.contains(index) {
+        if case let .array(arr) = self, arr.indices.contains(index) {
             return arr[index]
         }
         return nil
@@ -86,7 +85,7 @@ public extension JSON {
 
     /// If this is an `.object`, return item at key
     subscript(key: String) -> JSON? {
-        if case .object(let dict) = self {
+        if case let .object(dict) = self {
             return dict[key]
         }
         return nil
@@ -107,9 +106,8 @@ public extension JSON {
     }
 
     func queryKeyPath<T>(_ path: T) -> JSON? where T: Collection, T.Element == String {
-
         // Only object values may be subscripted
-        guard case .object(let object) = self else {
+        guard case let .object(object) = self else {
             return nil
         }
 
@@ -127,5 +125,4 @@ public extension JSON {
 
         return tail.isEmpty ? value : value.queryKeyPath(tail)
     }
-
 }

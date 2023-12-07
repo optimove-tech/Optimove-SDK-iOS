@@ -3,7 +3,6 @@
 import Foundation
 
 open class AsyncOperation: Operation {
-
     public enum State: String {
         case waiting = "isWaiting"
         case ready = "isReady"
@@ -43,7 +42,7 @@ open class AsyncOperation: Operation {
         }
     }
 
-    open override var isReady: Bool {
+    override open var isReady: Bool {
         if self.state == .waiting {
             return super.isReady
         } else {
@@ -51,7 +50,7 @@ open class AsyncOperation: Operation {
         }
     }
 
-    open override var isExecuting: Bool {
+    override open var isExecuting: Bool {
         if self.state == .waiting {
             return super.isExecuting
         } else {
@@ -59,7 +58,7 @@ open class AsyncOperation: Operation {
         }
     }
 
-    open override var isFinished: Bool {
+    override open var isFinished: Bool {
         if self.state == .waiting {
             return super.isFinished
         } else {
@@ -67,7 +66,7 @@ open class AsyncOperation: Operation {
         }
     }
 
-    open override var isCancelled: Bool {
+    override open var isCancelled: Bool {
         if self.state == .waiting {
             return super.isCancelled
         } else {
@@ -75,13 +74,12 @@ open class AsyncOperation: Operation {
         }
     }
 
-    open override var isAsynchronous: Bool {
+    override open var isAsynchronous: Bool {
         return true
     }
 }
 
 open class AsyncBlockOperation: AsyncOperation {
-
     public typealias Closure = (AsyncBlockOperation) -> Void
 
     public let closure: Closure
@@ -90,9 +88,9 @@ open class AsyncBlockOperation: AsyncOperation {
         self.closure = closure
     }
 
-    open override func main() {
-        guard !self.isCancelled else { return }
+    override open func main() {
+        guard !isCancelled else { return }
 
-        self.closure(self)
+        closure(self)
     }
 }

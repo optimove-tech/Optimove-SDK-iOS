@@ -4,24 +4,24 @@ import Foundation
 import OptimoveCore
 
 final class ConfigurationFetcher {
-
     private let operationQueue: OperationQueue
     private let operationFactory: OperationFactory
     private let configurationRepository: ConfigurationRepository
 
     init(operationFactory: OperationFactory,
-         configurationRepository: ConfigurationRepository) {
+         configurationRepository: ConfigurationRepository)
+    {
         self.operationFactory = operationFactory
         self.configurationRepository = configurationRepository
-        self.operationQueue = OperationQueue()
-        self.operationQueue.qualityOfService = .utility
+        operationQueue = OperationQueue()
+        operationQueue.qualityOfService = .utility
     }
 
     func fetch(completion: @escaping (Result<Configuration, Error>) -> Void) {
         // Operations that execute asynchronously to fetch remote configs.
         let downloadOperations: [Foundation.Operation] = [
             operationFactory.globalConfigurationDownloader(),
-            operationFactory.tenantConfigurationDownloader()
+            operationFactory.tenantConfigurationDownloader(),
         ]
 
         // Operation merge all remote configs to a invariant.
@@ -37,7 +37,7 @@ final class ConfigurationFetcher {
             // If there no configuration file either downloaded or stored, the SDK cannot be initialized.
             completion(
                 Result(catching: {
-                    return try self.configurationRepository.getConfiguration()
+                    try self.configurationRepository.getConfiguration()
                 })
             )
         }
@@ -52,5 +52,4 @@ final class ConfigurationFetcher {
         // The completion operation is performing on the current queue.
         operationQueue.addOperation(completionOperation)
     }
-
 }

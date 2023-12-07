@@ -1,11 +1,11 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
+@testable import OptimoveTest
+import XCTest
 
 class CoreEventFactoryTests: OptimoveTestCase {
-
     var factory: CoreEventFactory!
     var dateProvider: MockDateTimeProvider!
 
@@ -21,7 +21,7 @@ class CoreEventFactoryTests: OptimoveTestCase {
     func test_create_AppOpenEvent() throws {
         prefillStorageAsVisitor()
         let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
-        let event = try self.factory.createEvent(.appOpen)
+        let event = try factory.createEvent(.appOpen)
         XCTAssert(event.name == AppOpenEvent.Constants.name)
         expectation.fulfill()
         wait(for: [expectation], timeout: defaultTimeout)
@@ -31,7 +31,7 @@ class CoreEventFactoryTests: OptimoveTestCase {
         prefillStorageAsVisitor()
         let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
         let user = User(userID: StubConstants.customerID)
-        let event = try self.factory.createEvent(.setUser(user: user))
+        let event = try factory.createEvent(.setUser(user: user))
         XCTAssert(event.name == SetUserIdEvent.Constants.name)
         expectation.fulfill()
         wait(for: [expectation], timeout: defaultTimeout)
@@ -43,7 +43,7 @@ class CoreEventFactoryTests: OptimoveTestCase {
         storage.tenantToken = "1234"
         storage.version = "1"
         let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
-        let event = try self.factory.createEvent(.metaData)
+        let event = try factory.createEvent(.metaData)
         XCTAssert(event.name == MetaDataEvent.Constants.name)
         expectation.fulfill()
         wait(for: [expectation], timeout: defaultTimeout)
@@ -52,7 +52,7 @@ class CoreEventFactoryTests: OptimoveTestCase {
     func test_create_setUserAgent() throws {
         prefillStorageAsVisitor()
         let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
-        let event = try self.factory.createEvent(.setUserAgent)
+        let event = try factory.createEvent(.setUserAgent)
         XCTAssert(event.name == SetUserAgent.Constants.name)
         expectation.fulfill()
         wait(for: [expectation], timeout: defaultTimeout)
@@ -60,10 +60,9 @@ class CoreEventFactoryTests: OptimoveTestCase {
 
     func test_create_pageVisit() throws {
         let expectation = XCTestExpectation(description: "Event creation failed for \(#function)")
-        let event = try self.factory.createEvent(.pageVisit(title: "", category: ""))
+        let event = try factory.createEvent(.pageVisit(title: "", category: ""))
         XCTAssert(event.name == PageVisitEvent.Constants.name)
         expectation.fulfill()
         wait(for: [expectation], timeout: defaultTimeout)
     }
-
 }

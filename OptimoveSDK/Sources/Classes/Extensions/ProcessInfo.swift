@@ -7,7 +7,7 @@ extension ProcessInfo {
         return [
             operatingSystemVersion.majorVersion,
             operatingSystemVersion.minorVersion,
-            operatingSystemVersion.patchVersion
+            operatingSystemVersion.patchVersion,
         ].map { String($0) }.joined(separator: ".")
     }
 }

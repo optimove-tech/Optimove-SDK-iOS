@@ -4,12 +4,12 @@ import Foundation
 import OptimoveCore
 
 final class RemoteConfigurationNetworking {
-
     private let networkClient: NetworkClient
     private let requestBuilder: RemoteConfigurationRequestBuilder
 
     init(networkClient: NetworkClient,
-         requestBuilder: RemoteConfigurationRequestBuilder) {
+         requestBuilder: RemoteConfigurationRequestBuilder)
+    {
         self.networkClient = networkClient
         self.requestBuilder = requestBuilder
     }
@@ -17,7 +17,7 @@ final class RemoteConfigurationNetworking {
     func getTenantConfiguration(_ completion: @escaping (Result<TenantConfig, Error>) -> Void) {
         do {
             let request = try requestBuilder.createTenantConfigurationsRequest()
-            networkClient.perform(request) { (result) in
+            networkClient.perform(request) { result in
                 completion(
                     Result {
                         let data = try result.get()
@@ -32,7 +32,7 @@ final class RemoteConfigurationNetworking {
 
     func getGlobalConfiguration(_ completion: @escaping (Result<GlobalConfig, Error>) -> Void) {
         let request = requestBuilder.createGlobalConfigurationsRequest()
-        networkClient.perform(request) { (result) in
+        networkClient.perform(request) { result in
             completion(
                 Result {
                     let data = try result.get()
@@ -41,5 +41,4 @@ final class RemoteConfigurationNetworking {
             )
         }
     }
-
 }

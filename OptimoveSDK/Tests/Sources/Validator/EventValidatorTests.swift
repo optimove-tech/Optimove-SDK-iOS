@@ -1,11 +1,11 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import XCTest
 import OptimoveCore
 @testable import OptimoveSDK
+import OptimoveTest
+import XCTest
 
 class EventValidatorTests: OptimoveTestCase {
-
     var validator: EventValidator!
     var configuration: Configuration!
 
@@ -17,8 +17,9 @@ class EventValidatorTests: OptimoveTestCase {
         configuration = builder.build()
         validator = EventValidator(configuration: configuration, storage: storage)
     }
-    
+
     // MARK: - verifySetUserIdEvent
+
     func test_verifySetUserIdEvent_alreadySetInUserId_error() throws {
         let userId = "abc"
         storage.customerID = userId
@@ -27,7 +28,7 @@ class EventValidatorTests: OptimoveTestCase {
             userId: userId,
             updateVisitorId: ""
         )
-        
+
         let errors = validator.verifySetUserIdEvent(event)
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(
@@ -37,6 +38,7 @@ class EventValidatorTests: OptimoveTestCase {
     }
 
     // MARK: - verifySetEmailEvent
+
     func test_verifySetEmailEvent_emailAlreadySet_error() throws {
         let email = "abcABC%-90@abcABC-.abcABC"
         storage.userEmail = email
@@ -48,5 +50,4 @@ class EventValidatorTests: OptimoveTestCase {
             ValidationError.alreadySetInUserEmail(email: email)
         )
     }
-
 }

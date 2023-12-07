@@ -4,16 +4,15 @@ import Foundation
 import os.log
 
 public final class ConsoleLoggerStream: LoggerStream {
-
     public var policy: LoggerStreamFilter {
-        return LoggerStreamFilter.custom { [unowned self] (level, _) -> Bool in
-            return self.isAllowedByFiltring(level: level)
+        return LoggerStreamFilter.custom { [unowned self] level, _ -> Bool in
+            self.isAllowedByFiltring(level: level)
         }
     }
 
     public init() {}
 
-    public func log(level: LogLevelCore, fileName: String, methodName: String, logModule: String?, message: String) {
+    public func log(level: LogLevelCore, fileName _: String, methodName _: String, logModule _: String?, message: String) {
         os_log(
             "%{public}@",
             log: OSLog.consoleStream,
@@ -37,7 +36,6 @@ extension OSLog {
 }
 
 extension OSLogType {
-
     init(logLevel: LogLevelCore) {
         switch logLevel {
         case .fatal:

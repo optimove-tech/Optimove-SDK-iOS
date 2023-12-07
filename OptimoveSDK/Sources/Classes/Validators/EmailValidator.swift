@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 struct EmailValidator {
-
     enum Result: String {
         case valid
         case alreadySetIn

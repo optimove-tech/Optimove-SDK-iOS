@@ -3,9 +3,7 @@
 import Foundation
 
 public extension Bundle {
-
     var appVersion: String {
         return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "undefined"
     }
-
 }

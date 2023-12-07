@@ -19,9 +19,10 @@ final class KVOExpectation: XCTestExpectation {
     /// observed key path will be checked immediately after initialization.
     convenience init<Object: NSObject, Value: Equatable>(
         object objectToObserve: Object, keyPath: KeyPath<Object, Value>,
-        expectedValue: Value, file: StaticString = #file, line: Int = #line) {
-        self.init(object: objectToObserve, keyPath: keyPath, options: .initial) { (obj, change) -> Bool in
-            return obj[keyPath: keyPath] == expectedValue
+        expectedValue: Value, file _: StaticString = #file, line _: Int = #line
+    ) {
+        self.init(object: objectToObserve, keyPath: keyPath, options: .initial) { obj, _ -> Bool in
+            obj[keyPath: keyPath] == expectedValue
         }
     }
 
@@ -45,9 +46,10 @@ final class KVOExpectation: XCTestExpectation {
         object objectToObserve: Object, keyPath: KeyPath<Object, Value>,
         options: NSKeyValueObservingOptions = [],
         file: StaticString = #file, line: Int = #line,
-        handler: ((Object, NSKeyValueObservedChange<Value>) -> Bool)? = nil) {
+        handler: ((Object, NSKeyValueObservedChange<Value>) -> Bool)? = nil
+    ) {
         super.init(description: KVOExpectation.description(forObject: objectToObserve, keyPath: keyPath, file: file, line: line))
-        kvoToken = objectToObserve.observe(keyPath, options: options) { (object, change) in
+        kvoToken = objectToObserve.observe(keyPath, options: options) { object, change in
             let isFulfilled = handler == nil || handler?(object, change) == true
             if isFulfilled {
                 self.kvoToken = nil
@@ -75,10 +77,12 @@ extension XCTestCase {
     @discardableResult
     func keyValueObservingExpectation<Object: NSObject, Value: Equatable>(
         for objectToObserve: Object, keyPath: KeyPath<Object, Value>,
-        expectedValue: Value, file: StaticString = #file, line: Int = #line)
-        -> XCTestExpectation {
-        return keyValueObservingExpectation(for: objectToObserve, keyPath: keyPath, options: [.initial]) { (obj, change) -> Bool in
-            return obj[keyPath: keyPath] == expectedValue
+        expectedValue: Value, file _: StaticString = #file, line _: Int = #line
+    )
+        -> XCTestExpectation
+    {
+        return keyValueObservingExpectation(for: objectToObserve, keyPath: keyPath, options: [.initial]) { obj, _ -> Bool in
+            obj[keyPath: keyPath] == expectedValue
         }
     }
 
@@ -103,15 +107,17 @@ extension XCTestCase {
         for objectToObserve: Object, keyPath: KeyPath<Object, Value>,
         options: NSKeyValueObservingOptions = [],
         file: StaticString = #file, line: Int = #line,
-        handler: ((Object, NSKeyValueObservedChange<Value>) -> Bool)? = nil)
-        -> XCTestExpectation {
+        handler: ((Object, NSKeyValueObservedChange<Value>) -> Bool)? = nil
+    )
+        -> XCTestExpectation
+    {
         let wrapper = expectation(description: KVOExpectation.description(forObject: objectToObserve, keyPath: keyPath, file: file, line: line))
         // Following XCTest precedent, which sets `assertForOverFulfill` to true by default
         // for expectations created with `XCTestCase` convenience methods.
         wrapper.assertForOverFulfill = true
         // The KVO handler inside KVOExpectation retains its parent object while the observation is active.
         // That's why we can get away with not retaining the KVOExpectation here.
-        _ = KVOExpectation(object: objectToObserve, keyPath: keyPath, options: options) { (object, change) in
+        _ = KVOExpectation(object: objectToObserve, keyPath: keyPath, options: options) { object, change in
             let isFulfilled = handler == nil || handler?(object, change) == true
             if isFulfilled {
                 wrapper.fulfill()

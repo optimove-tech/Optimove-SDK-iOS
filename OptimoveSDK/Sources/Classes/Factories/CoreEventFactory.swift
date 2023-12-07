@@ -17,7 +17,6 @@ protocol CoreEventFactory {
 }
 
 final class CoreEventFactoryImpl {
-
     private var storage: OptimoveStorage
     private let dateTimeProvider: DateTimeProvider
     private let locationService: LocationService
@@ -27,16 +26,15 @@ final class CoreEventFactoryImpl {
 
     init(storage: OptimoveStorage,
          dateTimeProvider: DateTimeProvider,
-         locationService: LocationService) {
+         locationService: LocationService)
+    {
         self.storage = storage
         self.dateTimeProvider = dateTimeProvider
         self.locationService = locationService
     }
-
 }
 
 extension CoreEventFactoryImpl: CoreEventFactory {
-
     func createEvent(_ type: CoreEventType) throws -> Event {
         switch type {
         case .appOpen:
@@ -46,7 +44,7 @@ extension CoreEventFactoryImpl: CoreEventFactory {
         case .metaData:
             return try createMetaDataEvent()
         case let .pageVisit(title: t, category: c):
-            return self.createPageVisitEvent(title: t, category: c)
+            return createPageVisitEvent(title: t, category: c)
         case .setUserAgent:
             return try createSetUserAgentEvent()
         case let .setUserEmail(email):
@@ -56,11 +54,10 @@ extension CoreEventFactoryImpl: CoreEventFactory {
 }
 
 private extension CoreEventFactoryImpl {
-
     func createAppOpenEvent() throws -> AppOpenEvent {
-        return AppOpenEvent(
-            bundleIdentifier: try getApplicationNamespace(),
-            deviceID: try storage.getInstallationID(),
+        return try AppOpenEvent(
+            bundleIdentifier: getApplicationNamespace(),
+            deviceID: storage.getInstallationID(),
             visitorID: storage.visitorID,
             customerID: storage.customerID
         )
@@ -82,7 +79,7 @@ private extension CoreEventFactoryImpl {
         let sdkVersion = getSdkVersion()
         var event: MetaDataEvent?
         let semaphore = DispatchSemaphore(value: 0)
-        locationService.getLocation(onComplete: { (result) in
+        locationService.getLocation(onComplete: { result in
             let location = try? result.get()
             event = MetaDataEvent(
                 configUrl: configUrl,
@@ -100,8 +97,8 @@ private extension CoreEventFactoryImpl {
     }
 
     func createSetUserAgentEvent() throws -> SetUserAgent {
-        return SetUserAgent(
-            userAgent: try storage.getUserAgent()
+        return try SetUserAgent(
+            userAgent: storage.getUserAgent()
         )
     }
 
@@ -113,8 +110,8 @@ private extension CoreEventFactoryImpl {
     }
 
     func createSetUserEvent(user: User) throws -> SetUserIdEvent {
-        return SetUserIdEvent(
-            originalVistorId: try storage.getInitialVisitorId(),
+        return try SetUserIdEvent(
+            originalVistorId: storage.getInitialVisitorId(),
             userId: user.userID,
             updateVisitorId: user.visitorID
         )
@@ -125,11 +122,9 @@ private extension CoreEventFactoryImpl {
             email: email
         )
     }
-
 }
 
 private extension CoreEventFactoryImpl {
-
     func getApplicationNamespace() throws -> String {
         return try Bundle.getApplicationNameSpace()
     }
@@ -137,7 +132,6 @@ private extension CoreEventFactoryImpl {
     func getSdkVersion() -> String {
         return SDKVersion
     }
-
 }
 
 enum CoreEventFactoryError: LocalizedError {

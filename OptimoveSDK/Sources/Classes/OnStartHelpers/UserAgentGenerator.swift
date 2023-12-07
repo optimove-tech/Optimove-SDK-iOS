@@ -5,7 +5,6 @@ import OptimoveCore
 import WebKit
 
 final class UserAgentGenerator {
-
     private var storage: OptimoveStorage
     private let synchronizer: Pipeline
     private let coreEventFactory: CoreEventFactory
@@ -13,7 +12,8 @@ final class UserAgentGenerator {
 
     init(storage: OptimoveStorage,
          synchronizer: Pipeline,
-         coreEventFactory: CoreEventFactory) {
+         coreEventFactory: CoreEventFactory)
+    {
         self.storage = storage
         self.synchronizer = synchronizer
         self.coreEventFactory = coreEventFactory
@@ -27,7 +27,7 @@ final class UserAgentGenerator {
             return
         }
         webView = WKWebView(frame: .zero)
-        webView?.evaluateJavaScript("navigator.userAgent") { (result, error) in
+        webView?.evaluateJavaScript("navigator.userAgent") { result, error in
             if let error = error {
                 Logger.error(error.localizedDescription)
             }
@@ -39,5 +39,4 @@ final class UserAgentGenerator {
             self.webView = nil
         }
     }
-
 }

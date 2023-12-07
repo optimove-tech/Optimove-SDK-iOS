@@ -38,7 +38,8 @@ public struct LoggerConfig: Codable, TenantInfo {
     public init(
         tenantID: Int,
         logServiceEndpoint: URL,
-        isProductionLogsEnabled: Bool) {
+        isProductionLogsEnabled: Bool
+    ) {
         self.tenantID = tenantID
         self.logServiceEndpoint = logServiceEndpoint
         self.isProductionLogsEnabled = isProductionLogsEnabled

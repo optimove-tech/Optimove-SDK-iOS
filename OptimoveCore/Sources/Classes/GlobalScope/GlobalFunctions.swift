@@ -58,9 +58,8 @@ public enum CastError: LocalizedError {
             to type: \(expectedType)
             at function: \(function):\(line)
             """
-}
+        }
     }
-
 }
 
 public enum GuardError: LocalizedError {
@@ -75,7 +74,7 @@ public enum GuardError: LocalizedError {
 }
 
 public let tryCatch: (() throws -> Void) -> Void = { function in
-    return {
+    {
         do {
             try function()
         } catch {

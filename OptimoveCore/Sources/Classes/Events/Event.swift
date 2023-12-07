@@ -3,7 +3,6 @@
 import Foundation
 
 open class Event {
-
     public static let category = "track"
 
     public let eventId: UUID
@@ -32,5 +31,4 @@ open class Event {
         self.timestamp = timestamp
         self.isRealtime = isRealtime
     }
-
 }

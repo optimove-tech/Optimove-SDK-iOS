@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class InMemoryBuffer: Pipe {
-
     private var buffer = RingBuffer<CommonOperation>(count: 100)
 
     override var next: Pipe? {
@@ -30,5 +29,4 @@ final class InMemoryBuffer: Pipe {
             }
         }
     }
-
 }

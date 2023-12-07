@@ -4,7 +4,6 @@ import CoreData
 
 /// Describes and creates`NSFetchedPropertyDescription`
 struct CoreDataFetchedPropertyDescription {
-
     static func fetchedProperty(
         name: String,
         fetchRequest: NSFetchRequest<NSFetchRequestResult>,
@@ -28,5 +27,4 @@ struct CoreDataFetchedPropertyDescription {
         fetchedProperty.isOptional = isOptional
         return fetchedProperty
     }
-
 }

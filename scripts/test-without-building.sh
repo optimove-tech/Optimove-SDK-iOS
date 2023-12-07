@@ -1,21 +1,20 @@
 #!/bin/bash
 
-# Set the root directory
-export ROOT=$PWD
+set -o pipefail
+set -e
+set -x
 
 # Set the project variables
-source $ROOT/configurations/test.xcconfig
+source $PWD/configurations/test.xcconfig
 
-# Bootstrap the project
-source $ROOT/scripts/bootstrap.sh
-
-# Run the tests
+# Test the project
 xcodebuild test-without-building \
     -scheme "$SCHEME" \
     -project "$PROJECT" \
     -destination "$DESTANATION" \
     -sdk "$SDK" \
-    -configuration "$CONFIGURATION" |
+    -configuration "$CONFIGURATION" \
+    -derivedDataPath $1 |
     xcbeautify
 
 echo "Process completed successfully."

@@ -1,7 +1,8 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveCore
+import OptimoveTest
+import XCTest
 
 class MockKeyValueStorage: KeyValueStorage {
     var assertFunction: ((_ value: Any?, _ key: StorageKey) -> Void)?
@@ -9,7 +10,7 @@ class MockKeyValueStorage: KeyValueStorage {
 
     func set(value: Any?, key: StorageKey) {
         state[key] = value
-        self.assertFunction?(value, key)
+        assertFunction?(value, key)
     }
 
     func value(for key: StorageKey) -> Any? {
@@ -27,44 +28,41 @@ class MockKeyValueStorage: KeyValueStorage {
 }
 
 class MockFileStorage: FileStorage {
-
     var storage: [String: Data] = [:]
 
-    func isExist(fileName: String) -> Bool {
+    func isExist(fileName: String, isTemporary _: Bool) -> Bool {
         return storage[fileName] != nil
     }
 
-    func save<T: Codable>(data: T, toFileName: String) throws {
+    public func save<T: Codable>(data: T, toFileName: String, isTemporary _: Bool) throws {
         storage[toFileName] = try JSONEncoder().encode(data)
     }
 
-    func saveData(data: Data, toFileName: String) throws {
+    public func saveData(data: Data, toFileName: String, isTemporary _: Bool) throws {
         storage[toFileName] = data
     }
 
-    func load<T: Codable>(fileName: String) throws -> T {
-        return try JSONDecoder().decode(T.self, from: try unwrap(storage[fileName]))
+    func load<T: Codable>(fileName: String, isTemporary _: Bool) throws -> T {
+        return try JSONDecoder().decode(T.self, from: unwrap(storage[fileName]))
     }
 
-    func loadData(fileName: String) throws -> Data {
+    func loadData(fileName: String, isTemporary _: Bool) throws -> Data {
         return try unwrap(storage[fileName])
     }
 
-    func delete(fileName: String) throws {
+    func delete(fileName: String, isTemporary _: Bool) throws {
         return storage[fileName] = nil
     }
-
 }
 
 class KeyValueStorageTests: XCTestCase {
-
     var storage: OptimoveStorage!
     let stub_data = Data(capacity: 42)
 
     override func setUp() {
-
         storage = StorageFacade(
-            keyValureStorage: MockKeyValueStorage(),
+            persistantStorage: MockKeyValueStorage(),
+            inMemoryStorage: MockKeyValueStorage(),
             fileStorage: MockFileStorage()
         )
     }
@@ -243,5 +241,4 @@ class KeyValueStorageTests: XCTestCase {
         // then
         XCTAssertNil(storage.isSettingUserSuccess)
     }
-
 }

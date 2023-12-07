@@ -8,8 +8,7 @@ public struct NetworkResponse<Body> {
 }
 
 public extension NetworkResponse where Body == Data? {
-
-    func decode<BodyType: Decodable>(to type: BodyType.Type) throws -> BodyType {
+    func decode<BodyType: Decodable>(to _: BodyType.Type) throws -> BodyType {
         let data = try unwrap()
         return try JSONDecoder().decode(BodyType.self, from: data)
     }
@@ -32,5 +31,4 @@ public extension NetworkResponse where Body == Data? {
             return error.localizedDescription
         }
     }
-
 }

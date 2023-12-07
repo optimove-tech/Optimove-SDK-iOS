@@ -4,7 +4,6 @@ import OptimoveCore
 @testable import OptimoveSDK
 
 final class MockOptistreamQueue: OptistreamQueue {
-
     var events: [OptistreamEvent] = []
 
     var isEmpty: Bool {
@@ -18,7 +17,7 @@ final class MockOptistreamQueue: OptistreamQueue {
     func first(limit: Int) -> [OptistreamEvent] {
         let amount = limit <= events.count
             ? limit : events.count
-        return Array(self.events[0..<amount])
+        return Array(events[0 ..< amount])
     }
 
     func remove(events: [OptistreamEvent]) {
@@ -26,5 +25,4 @@ final class MockOptistreamQueue: OptistreamQueue {
             !events.contains(cachedEvent) // O(n*n)
         }
     }
-
 }

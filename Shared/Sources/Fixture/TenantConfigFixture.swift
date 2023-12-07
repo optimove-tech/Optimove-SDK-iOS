@@ -3,9 +3,10 @@
 import Foundation
 import OptimoveCore
 
-final class TenantConfigFixture {
+public final class TenantConfigFixture {
+    public init() {}
 
-    func build(_ options: Options = Options.default) -> TenantConfig {
+    public func build(_ options: Options = Options.default) -> TenantConfig {
         return TenantConfig(
             realtime: tenantRealtimeConfigFixture(),
             optitrack: tenantOptitrackConfigFixture(),
@@ -17,20 +18,20 @@ final class TenantConfigFixture {
         )
     }
 
-    func tenantRealtimeConfigFixture() -> TenantRealtimeConfig {
+    public func tenantRealtimeConfigFixture() -> TenantRealtimeConfig {
         return TenantRealtimeConfig(
             realtimeGateway: StubVariables.url
         )
     }
 
-    func tenantOptitrackConfigFixture() -> TenantOptitrackConfig {
+    public func tenantOptitrackConfigFixture() -> TenantOptitrackConfig {
         return TenantOptitrackConfig(
             optitrackEndpoint: StubVariables.url,
             siteId: StubVariables.int
         )
     }
 
-    func createTenantEventFixture() -> [String: EventsConfig] {
+    public func createTenantEventFixture() -> [String: EventsConfig] {
         return [
             StubEvent.Constnats.name: EventsConfig(
                 id: StubEvent.Constnats.id,
@@ -56,10 +57,9 @@ final class TenantConfigFixture {
                     "event_native_mobile": Parameter(
                         type: "Boolean",
                         optional: true
-                    )
+                    ),
                 ]
-            )
+            ),
         ]
     }
-
 }

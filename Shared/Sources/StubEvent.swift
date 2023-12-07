@@ -3,23 +3,21 @@
 import Foundation
 @testable import OptimoveCore
 
-final class StubEvent: Event {
-
-    struct Constnats {
-        static let id = 2_000
+public final class StubEvent: Event {
+    public enum Constnats {
+        static let id = 2000
         static let name = "stub_name"
         static let key = "stub_key"
         static let value = "stub_value"
     }
 
-    init() {
+    public init() {
         super.init(name: Constnats.name, context: [:])
     }
 
-    init(context: [String: Any]) {
+    public init(context: [String: Any]) {
         super.init(name: Constnats.name, context: context)
     }
-
 }
 
 public let StubOptistreamEvent = OptistreamEvent(

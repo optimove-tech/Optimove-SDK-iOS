@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class NewEmailHandler {
-
     private var storage: OptimoveStorage
 
     init(storage: OptimoveStorage) {
@@ -14,5 +13,4 @@ final class NewEmailHandler {
     func handle(email: String) {
         storage.userEmail = email
     }
-
 }

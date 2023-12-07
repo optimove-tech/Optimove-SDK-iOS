@@ -10,16 +10,17 @@ public struct GlobalConfig: Codable, Equatable {
     public let coreEvents: [String: EventsConfig]
 
     public init(general: GlobalGeneralConfig,
-         optitrack: GlobalOptitrackConfig,
-         coreEvents: [String: EventsConfig]) {
+                optitrack: GlobalOptitrackConfig,
+                coreEvents: [String: EventsConfig])
+    {
         self.general = general
         self.optitrack = optitrack
         self.coreEvents = coreEvents
     }
 
     enum CodingKeys: String, CodingKey {
-        case general = "general"
-        case optitrack = "optitrack"
+        case general
+        case optitrack
         case coreEvents = "core_events"
     }
 
@@ -39,6 +40,7 @@ public struct GlobalConfig: Codable, Equatable {
 }
 
 // MARK: - General
+
 public struct GlobalGeneralConfig: Codable, Equatable {
     public let logsServiceEndpoint: URL
 
@@ -51,8 +53,8 @@ public struct GlobalGeneralConfig: Codable, Equatable {
     }
 }
 
-
 // MARK: - Optitrack
+
 public struct GlobalOptitrackConfig: Codable, Equatable {
     public let eventCategoryName: String
 

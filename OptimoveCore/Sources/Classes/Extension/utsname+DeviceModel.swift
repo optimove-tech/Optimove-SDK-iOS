@@ -3,7 +3,6 @@
 import Foundation
 
 public extension utsname {
-
     var deviceModel: String {
         var systemInfo = self
         uname(&systemInfo)
@@ -13,5 +12,4 @@ public extension utsname {
             return identifier + String(UnicodeScalar(UInt8(value)))
         }
     }
-
 }

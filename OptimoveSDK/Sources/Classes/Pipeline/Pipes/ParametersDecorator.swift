@@ -4,21 +4,20 @@ import Foundation
 import OptimoveCore
 
 final class ParametersDecorator: Pipe {
-
-    private struct Constants {
-        struct Key {
+    private enum Constants {
+        enum Key {
             static let eventDeviceType = "event_device_type"
             static let eventPlatform = "event_platform"
             static let eventOs = "event_os"
             static let eventNativeMobile = "event_native_mobile"
         }
-        struct Value {
+
+        enum Value {
             static let eventDeviceType = "Mobile"
             static let eventPlatform = "iOS"
             static let eventOs = "iOS \(operatingSystemVersionOnlyString)"
             static let eventNativeMobile = true
             private static let operatingSystemVersionOnlyString = ProcessInfo().operatingSystemVersionOnlyString
-
         }
     }
 
@@ -65,15 +64,14 @@ final class ParametersDecorator: Pipe {
             Constants.Key.eventNativeMobile: Constants.Value.eventNativeMobile,
             Constants.Key.eventOs: Constants.Value.eventOs,
             Constants.Key.eventDeviceType: Constants.Value.eventDeviceType,
-            Constants.Key.eventPlatform: Constants.Value.eventPlatform
+            Constants.Key.eventPlatform: Constants.Value.eventPlatform,
         ]
         defaultParameters
             .filter { defaultParameter -> Bool in
-                return eventConfig.parameters[defaultParameter.key] != nil
+                eventConfig.parameters[defaultParameter.key] != nil
             }.forEach { defaultParameter in
                 event.context[defaultParameter.key] = defaultParameter.value
             }
         return event
     }
-
 }

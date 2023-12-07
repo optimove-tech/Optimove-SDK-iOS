@@ -4,10 +4,8 @@ import CoreData
 
 /// Describes `NSFetchIndexDescription`
 struct CoreDataFetchIndexDescription {
-
     /// Describes `NSFetchIndexElementDescription`
     struct Element {
-
         enum Property {
             case property(name: String)
             case expression(type: String)
@@ -27,5 +25,4 @@ struct CoreDataFetchIndexDescription {
     static func index(name: String, elements: [Element]) -> CoreDataFetchIndexDescription {
         CoreDataFetchIndexDescription(name: name, elements: elements)
     }
-
 }

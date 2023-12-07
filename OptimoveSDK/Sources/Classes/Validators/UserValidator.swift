@@ -3,7 +3,6 @@
 import OptimoveCore
 
 struct UserValidator {
-
     enum Result: String {
         case valid
         case alreadySetIn
@@ -22,5 +21,4 @@ struct UserValidator {
         }
         return .valid
     }
-
 }

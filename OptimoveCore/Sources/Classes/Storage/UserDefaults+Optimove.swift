@@ -3,8 +3,7 @@
 import Foundation
 
 public extension UserDefaults {
-
-    struct Constants {
+    enum Constants {
         static let suiteName: String = "com.optimove.sdk"
     }
 
@@ -15,5 +14,4 @@ public extension UserDefaults {
         }
         return userDefaults
     }
-
 }

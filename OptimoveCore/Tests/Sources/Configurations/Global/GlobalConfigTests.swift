@@ -1,10 +1,10 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveCore
+import OptimoveTest
+import XCTest
 
 class GlobalConfigTests: XCTestCase, FileAccessible {
-
     let fileName = "configs.json"
 
     // Check data sample by test decoder
@@ -39,5 +39,4 @@ class GlobalConfigTests: XCTestCase, FileAccessible {
         // then
         XCTAssertNoThrow(try decoder.decode(GlobalConfig.self, from: data))
     }
-
 }

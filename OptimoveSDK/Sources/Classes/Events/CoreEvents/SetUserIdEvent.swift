@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 final class SetUserIdEvent: Event {
-
-    struct Constants {
+    enum Constants {
         static let name = OptimoveKeys.Configuration.setUserId.rawValue
-        struct Key {
+        enum Key {
             static let originalVistorId = OptimoveKeys.Configuration.originalVisitorId.rawValue
             static let userId = OptimoveKeys.Configuration.realtimeUserId.rawValue
             static let updatedVisitorId = OptimoveKeys.Configuration.realtimeupdatedVisitorId.rawValue
@@ -17,7 +16,7 @@ final class SetUserIdEvent: Event {
             context: [
                 Constants.Key.originalVistorId: originalVistorId,
                 Constants.Key.userId: userId,
-                Constants.Key.updatedVisitorId: updateVisitorId
+                Constants.Key.updatedVisitorId: updateVisitorId,
             ]
         )
     }

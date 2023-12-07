@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveSDK
+import XCTest
 
 class SetUserEmailEventTests: XCTestCase {
-
     func test_event_name() {
         // given
         let email = ""

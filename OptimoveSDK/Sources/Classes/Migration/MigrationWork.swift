@@ -9,13 +9,12 @@ protocol MigrationWork {
 }
 
 class MigrationWorker: MigrationWork {
-
     let version: Version
 
     init(
         newVersion: Version
     ) {
-        self.version = newVersion
+        version = newVersion
     }
 
     func isAllowToMiragte(_ currentVersion: String) -> Bool {
@@ -32,7 +31,6 @@ class MigrationWorker: MigrationWork {
 }
 
 class MigrationWorkerWithStorage: MigrationWorker {
-
     fileprivate var storage: OptimoveStorage
 
     init(
@@ -54,15 +52,14 @@ class MigrationWorkerWithStorage: MigrationWorker {
         storage.finishedMigration(to: version.rawValue)
         super.runMigration()
     }
-
 }
 
 final class MigrationWork_2_10_0: MigrationWorkerWithStorage {
-
     private let synchronizer: Pipeline
 
     init(synchronizer: Pipeline,
-         storage: OptimoveStorage) {
+         storage: OptimoveStorage)
+    {
         self.synchronizer = synchronizer
         super.init(storage: storage, newVersion: .v_2_10_0)
     }
@@ -71,11 +68,9 @@ final class MigrationWork_2_10_0: MigrationWorkerWithStorage {
         synchronizer.deliver(.setInstallation)
         super.runMigration()
     }
-
 }
 
 final class MigrationWork_3_0_0: MigrationWorkerWithStorage {
-
     init(storage: OptimoveStorage) {
         super.init(storage: storage, newVersion: .v_3_0_0)
     }
@@ -86,34 +81,31 @@ final class MigrationWork_3_0_0: MigrationWorkerWithStorage {
         }
         super.runMigration()
     }
-
 }
 
 /// Migation from AppGroup to the main container.
 final class MigrationWork_3_3_0: MigrationWorker {
-
     init() {
         super.init(newVersion: .v_3_3_0)
     }
 
-    override func isAllowToMiragte(_ currentVersion: String) -> Bool {
+    override func isAllowToMiragte(_: String) -> Bool {
         guard let storage = try? UserDefaults.optimove() else {
             return true
         }
         let key = StorageKey.migrationVersions
         let versions = storage.object(forKey: key.rawValue) as? [String] ?? []
-        return !versions.contains(self.version.rawValue)
+        return !versions.contains(version.rawValue)
     }
 
     override func runMigration() {
         let replacers: [Replacer] = [
             UserDefaultsReplacer(),
-            AppGroupReplacer()
+            AppGroupReplacer(),
         ]
         replacers.forEach { $0.replace() }
         super.runMigration()
     }
-
 }
 
 private protocol Replacer {
@@ -121,9 +113,7 @@ private protocol Replacer {
 }
 
 extension MigrationWork_3_3_0 {
-
     final class AppGroupReplacer: Replacer {
-
         func replace() {
             do {
                 try moveDefautlsFromAppGroup()
@@ -136,7 +126,7 @@ extension MigrationWork_3_3_0 {
         }
 
         func moveDefautlsFromAppGroup() throws {
-            let bundleID =  try Bundle.getApplicationNameSpace()
+            let bundleID = try Bundle.getApplicationNameSpace()
             let oldDefaults = try getDeprecatedUserDefaultsGrouped(tenantBundleIdentifier: bundleID)
             let newDefaults = try UserDefaults.optimove()
             let groupKeys: Set<StorageKey> = [
@@ -154,32 +144,32 @@ extension MigrationWork_3_3_0 {
                 .deviceResolutionHeight,
                 .advertisingIdentifier,
                 .migrationVersions,
-                .firstRunTimestamp
+                .firstRunTimestamp,
             ]
-            groupKeys.forEach({ key in
+            groupKeys.forEach { key in
                 if let value = oldDefaults.value(for: key) {
                     newDefaults.set(value: value, key: key)
                     oldDefaults.removeObject(forKey: key.rawValue)
                 }
-            })
+            }
         }
 
         func moveFilesFromAppGroup() throws {
-            let bundleID =  try Bundle.getApplicationNameSpace()
+            let bundleID = try Bundle.getApplicationNameSpace()
             let oldURL = try getDeprecatedFileManagerGroupContainerURL(tenantBundleIdentifier: bundleID).appendingPathComponent("OptimoveSDK")
             let newURL = try FileManager.optimoveURL()
             let fileManager = FileManager.default
             var isDirectory: ObjCBool = false
             let exists = FileManager.default.fileExists(atPath: oldURL.absoluteString, isDirectory: &isDirectory)
-            guard exists && isDirectory.boolValue else {
+            guard exists, isDirectory.boolValue else {
                 return
             }
             let files = try FileManager.default.contentsOfDirectory(atPath: oldURL.absoluteString)
-            try files.forEach({ file in
+            try files.forEach { file in
                 let oldPath = oldURL.appendingPathComponent(file)
                 try fileManager.moveItem(at: oldPath, to: newURL.appendingPathComponent(file))
                 try fileManager.removeItem(at: oldPath)
-            })
+            }
         }
 
         func markMigrationAsCompleted() throws {
@@ -194,10 +184,10 @@ extension MigrationWork_3_3_0 {
             let suiteName = "group.\(tenantBundleIdentifier).optimove"
             guard let userDefaults = UserDefaults(suiteName: suiteName) else {
                 throw GuardError.custom(
-                """
-                Unable to initialize UserDefault with suit name "\(suiteName)".
-                Highly possible that the client forgot to add the app group as described in the documentation.
-                """
+                    """
+                    Unable to initialize UserDefault with suit name "\(suiteName)".
+                    Highly possible that the client forgot to add the app group as described in the documentation.
+                    """
                 )
             }
             return userDefaults
@@ -228,15 +218,14 @@ extension MigrationWork_3_3_0 {
                     .settingUserSuccess,
                     .firstVisitTimestamp,
                 ]
-                sharedKeys.forEach({ key in
+                sharedKeys.forEach { key in
                     let value = oldDefaults.value(for: key)
                     newDefaults.set(value: value, key: key)
                     oldDefaults.removeObject(forKey: key.rawValue)
-                })
+                }
             } catch {
                 Logger.error(error.localizedDescription)
             }
         }
     }
-
 }
