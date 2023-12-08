@@ -260,30 +260,39 @@ final class MigrationWork_5_7_0: MigrationWorker {
             .IN_APP_MOST_RECENT_UPDATED_AT: .inAppMostRecentUpdateAt,
             .IN_APP_CONSENTED: .inAppConsented,
             .DYNAMIC_CATEGORY: .dynamicCategory,
+            .KUMULOS_DDL_CHECKED: .deferredLinkChecked,
         ]
         /// Move values from Kumulos UserDefaults to Optimove UserDefaults.
-        let kumulosStorage = UserDefaults.standard
-        let optimoveStorage = try! UserDefaults.optimove()
+        let kumulosStandardStorage = UserDefaults.standard
+        let optimoveStandardStorage = try! UserDefaults.optimove()
+        let optimoveAppGroupStorage = try! UserDefaults.optimoveAppGroup()
         OptimobileUserDefaultsKey.allCases.forEach { key in
-            if let value = kumulosStorage.object(forKey: key.rawValue),
+            if let value = kumulosStandardStorage.object(forKey: key.rawValue),
                let storageKey = keyMapping[key]
             {
-                optimoveStorage.set(value: value, key: storageKey)
-                kumulosStorage.removeObject(forKey: key.rawValue)
+                optimoveStandardStorage.set(value: value, key: storageKey)
+                kumulosStandardStorage.removeObject(forKey: key.rawValue)
             }
         }
         /// Rename Kumulos keys to Optimove keys.
         OptimobileUserDefaultsKey.allCases.forEach { key in
-            if let value = optimoveStorage.object(forKey: key.rawValue),
+            if let value = optimoveStandardStorage.object(forKey: key.rawValue),
                let storageKey = keyMapping[key]
             {
-                optimoveStorage.removeObject(forKey: key.rawValue)
-                optimoveStorage.set(value: value, key: storageKey)
+                optimoveStandardStorage.removeObject(forKey: key.rawValue)
+                optimoveStandardStorage.set(value: value, key: storageKey)
+            }
+            if let value = optimoveAppGroupStorage.object(forKey: key.rawValue),
+               let storageKey = keyMapping[key]
+            {
+                optimoveAppGroupStorage.removeObject(forKey: key.rawValue)
+                optimoveAppGroupStorage.set(value: value, key: storageKey)
             }
         }
         /// Remove Kumulos UserDefaults keys.
         ["KumulosDidMigrateToAppGroups"].forEach { key in
-            kumulosStorage.removeObject(forKey: key)
+            kumulosStandardStorage.removeObject(forKey: key)
+            optimoveAppGroupStorage.removeObject(forKey: key)
         }
         Logger.info("Migration from Kumulos UserDefaults to Optimove UserDefaults completed")
         super.runMigration()

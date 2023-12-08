@@ -13,6 +13,7 @@ public enum OptimobileUserDefaultsKey: String, CaseIterable {
     case IN_APP_LAST_SYNCED_AT = "KumulosMessagesLastSyncedAt"
     case IN_APP_MOST_RECENT_UPDATED_AT = "KumulosInAppMostRecentUpdatedAt"
     case IN_APP_CONSENTED = "KumulosInAppConsented"
+    case KUMULOS_DDL_CHECKED
 
     // exist only in standard defaults for extension
     case DYNAMIC_CATEGORY = "__kumulos__dynamic__categories__"

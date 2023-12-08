@@ -36,7 +36,7 @@ public enum StorageKey: String, CaseIterable {
     case inAppMostRecentUpdateAt
     case inAppConsented
     case dynamicCategory
-    case deferredLinkChecked = "KUMULOS_DDL_CHECKED"
+    case deferredLinkChecked
 
     public static let inMemoryValues: Set<StorageKey> = [.tenantToken, .version]
     public static let appGroupValues: Set<StorageKey> = [
