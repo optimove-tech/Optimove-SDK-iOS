@@ -3,17 +3,23 @@
 import OptimoveCore
 import UserNotifications
 
-enum CategoryManager {
+struct CategoryManager {
     enum Constants {
         static let MAX_DYNAMIC_CATEGORIES = 128
         static let DYNAMIC_CATEGORY = OptimobileUserDefaultsKey.DYNAMIC_CATEGORY.rawValue
+    }
+
+    let storage: KeyValueStorage
+
+    init(storage: KeyValueStorage) {
+        self.storage = storage
     }
 
     static func getCategoryId(messageId: Int) -> String {
         return "__kumulos_category_\(messageId)__"
     }
 
-    static func registerCategory(_ category: UNNotificationCategory) async {
+    func registerCategory(_ category: UNNotificationCategory) async {
         var systemCategories = await UNUserNotificationCenter.current().notificationCategories()
         var storedCategoryIds = readCategoryIds()
 
@@ -29,16 +35,16 @@ enum CategoryManager {
         await UNUserNotificationCenter.current().notificationCategories()
     }
 
-    static func readCategoryIds() -> Set<String> {
-        let array = UserDefaults.standard.object(forKey: Constants.DYNAMIC_CATEGORY) as? [String] ?? []
+    func readCategoryIds() -> Set<String> {
+        let array: [String] = storage[.dynamicCategory] ?? []
         return Set(array)
     }
 
-    static func writeCategoryIds(_ ids: Set<String>) {
-        UserDefaults.standard.set(Array(ids), forKey: Constants.DYNAMIC_CATEGORY)
+    func writeCategoryIds(_ ids: Set<String>) {
+        storage.set(value: Array(ids), key: .dynamicCategory)
     }
 
-    static func maybePruneCategories(
+    func maybePruneCategories(
         categories: Set<UNNotificationCategory>,
         categoryIds: Set<String>,
         limit: Int = Constants.MAX_DYNAMIC_CATEGORIES

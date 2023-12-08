@@ -36,10 +36,14 @@ public enum OptimoveNotificationService {
         }
         let data = try JSONSerialization.data(withJSONObject: userInfo)
         let notification = try JSONDecoder().decode(PushNotification.self, from: data)
-        if bestAttemptContent.categoryIdentifier.isEmpty {
-            bestAttemptContent.categoryIdentifier = await buildCategory(notification: notification)
-        }
         if let storage = try? UserDefaults.optimoveAppGroup() {
+            if bestAttemptContent.categoryIdentifier.isEmpty {
+                let categoryManager = CategoryManager(storage: storage)
+                bestAttemptContent.categoryIdentifier = await buildCategory(
+                    notification: notification,
+                    categoryManager: categoryManager
+                )
+            }
             let mediaHelper = MediaHelper(storage: storage)
             if let attachment = try await maybeGetAttachment(
                 notification: notification,
@@ -94,7 +98,7 @@ public enum OptimoveNotificationService {
         }
     }
 
-    static func buildCategory(notification: PushNotification) async -> String {
+    static func buildCategory(notification: PushNotification, categoryManager: CategoryManager) async -> String {
         let categoryIdentifier = CategoryManager.getCategoryId(messageId: notification.message.id)
         let category = UNNotificationCategory(
             identifier: categoryIdentifier,
@@ -102,7 +106,7 @@ public enum OptimoveNotificationService {
             intentIdentifiers: [],
             options: .customDismissAction
         )
-        await CategoryManager.registerCategory(category)
+        await categoryManager.registerCategory(category)
 
         return categoryIdentifier
     }

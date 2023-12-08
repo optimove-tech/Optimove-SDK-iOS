@@ -283,7 +283,7 @@ class InAppManager {
         syncQueue.async {
             let syncBarrier = DispatchSemaphore(value: 0)
 
-            let mostRecentUpdate: Date = storage[.inAppMostRecentUpdateAt]
+            let mostRecentUpdate: Date? = self.storage[.inAppMostRecentUpdateAt]
             var after = ""
 
             if let mostRecentUpdate = mostRecentUpdate {
@@ -300,7 +300,7 @@ class InAppManager {
 
             self.httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { _, decodedBody in
                 defer {
-                    storage.set(value: Date(), key: .inAppMostRecentUpdateAt)
+                    self.storage.set(value: Date(), key: .inAppMostRecentUpdateAt)
                     syncBarrier.signal()
                 }
 
