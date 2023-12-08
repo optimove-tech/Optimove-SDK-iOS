@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-@testable import OptimoveCore
+import OptimoveSDK
 import XCTest
 
 final class MockedFileManager: FileManager {

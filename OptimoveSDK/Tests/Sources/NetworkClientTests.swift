@@ -1,7 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Mocker
-@testable import OptimoveCore
+import OptimoveSDK
 import OptimoveTest
 import XCTest
 

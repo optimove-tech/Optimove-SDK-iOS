@@ -1,6 +1,7 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 public struct OptistreamEvent: Codable {
     public let tenant: Int
