@@ -99,7 +99,7 @@ public enum OptimoveNotificationService {
     }
 
     static func maybeGetAttachment(notification: PushNotification) async throws -> UNNotificationAttachment? {
-        guard let picturePath = notification.picturePath else { return nil }
+        guard let picturePath = notification.attachment?.pictureUrl else { return nil }
 
         let url = try await MediaHelper.getCompletePictureUrl(
             pictureUrlString: picturePath,

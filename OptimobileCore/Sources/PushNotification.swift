@@ -19,6 +19,10 @@ public struct PushNotification: Decodable {
         }
     }
 
+    public struct Attachment: Decodable {
+        public let pictureUrl: String?
+    }
+
     public struct Button: Decodable {
         public struct Icon: Decodable {
             public enum IconType: String, Decodable {
@@ -35,12 +39,12 @@ public struct PushNotification: Decodable {
         public let text: String
     }
 
+    public let attachment: PushNotification.Attachment?
+    public let badge: Int?
+    public let buttons: [PushNotification.Button]?
     public let deeplink: PushNotification.Data?
     public let message: PushNotification.Data
-    public let badge: Int?
-    public let buttons: [Button]?
     public let isBackground: Bool
-    public let picturePath: String?
     public let url: URL?
 
     private enum CodingKeys: String, CodingKey {
@@ -50,12 +54,9 @@ public struct PushNotification: Decodable {
         case badge = "badge_inc"
         case buttons = "k.buttons"
         case custom
-        case data
         case deeplink = "k.deepLink"
-        case id
         case isBackground = "content-available"
         case message = "k.message"
-        case pictureUrl
         case u
     }
 
@@ -69,6 +70,7 @@ public struct PushNotification: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let custom = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .custom)
+        self.attachment = try container.decodeIfPresent(Attachment.self, forKey: .attachments)
         self.badge = try custom.decodeIfPresent(Int.self, forKey: .badge)
 
         let a = try custom.nestedContainer(keyedBy: CodingKeys.self, forKey: .a)
@@ -79,9 +81,6 @@ public struct PushNotification: Decodable {
         let aps = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .aps)
         let isBackground = try aps.decodeIfPresent(Int.self, forKey: .isBackground)
         self.isBackground = isBackground == 1 ? true : false
-
-        let attachments = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .attachments)
-        self.picturePath = try attachments?.decodeIfPresent(String.self, forKey: .pictureUrl)
 
         self.url = try custom.decodeIfPresent(URL.self, forKey: .u)
     }
