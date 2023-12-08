@@ -8,8 +8,8 @@ protocol KeyValPersistent {
     static func removeObject(forKey: String)
 }
 
-enum KeyValPersistenceHelper {
-    static func maybeMigrateUserDefaultsToAppGroups() {
+public enum KeyValPersistenceHelper {
+    public static func maybeMigrateUserDefaultsToAppGroups() {
         let standardDefaults = UserDefaults.standard
         let haveMigratedKey: String = OptimobileUserDefaultsKey.MIGRATED_TO_GROUPS.rawValue
         if !AppGroupsHelper.isKumulosAppGroupDefined() {
@@ -45,15 +45,15 @@ enum KeyValPersistenceHelper {
 }
 
 extension KeyValPersistenceHelper: KeyValPersistent {
-    static func set(_ value: Any?, forKey: String) {
+    public static func set(_ value: Any?, forKey: String) {
         getUserDefaults().set(value, forKey: forKey)
     }
 
-    static func object(forKey: String) -> Any? {
+    public static func object(forKey: String) -> Any? {
         return getUserDefaults().object(forKey: forKey)
     }
 
-    static func removeObject(forKey: String) {
+    public static func removeObject(forKey: String) {
         getUserDefaults().removeObject(forKey: forKey)
     }
 }

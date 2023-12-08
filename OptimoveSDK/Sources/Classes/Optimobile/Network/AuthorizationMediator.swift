@@ -1,6 +1,7 @@
 //  Copyright © 2023 Optimove. All rights reserved.
 
 import Foundation
+import OptimobileCore
 
 enum AuthorizationStrategy {
     case basic

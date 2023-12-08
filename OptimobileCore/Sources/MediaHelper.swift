@@ -2,13 +2,13 @@
 
 import Foundation
 
-enum MediaHelper {
+public enum MediaHelper {
     enum Error: LocalizedError {
         case noMediaUrlFound
         case invalidPictureUrl(String)
     }
 
-    static func getCompletePictureUrl(pictureUrlString: String, width: UInt) throws -> URL {
+    public static func getCompletePictureUrl(pictureUrlString: String, width: UInt) throws -> URL {
         if pictureUrlString.hasPrefix("https://") || pictureUrlString.hasPrefix("http://") {
             guard let url = URL(string: pictureUrlString) else {
                 throw Error.invalidPictureUrl(pictureUrlString)

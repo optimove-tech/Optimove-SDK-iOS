@@ -2,6 +2,7 @@
 
 import CoreData
 import Foundation
+import OptimobileCore
 import UIKit
 
 public enum InAppMessagePresentationResult: String {
@@ -670,24 +671,20 @@ class InAppManager {
     }
 
     func handlePushOpen(notification: PushNotification) {
-        let deepLink: [AnyHashable: Any]? = notification.inAppDeepLink()
-        if !inAppEnabled() || deepLink == nil {
+        guard let deepLink = notification.deeplink, !inAppEnabled() else {
             return
         }
 
         DispatchQueue.global(qos: .default).async {
-            let data = deepLink!["data"] as! [AnyHashable: Any]
-            let inAppPartId: Int = data["id"] as! Int
-
             objc_sync_enter(self.pendingTickleIds)
             defer { objc_sync_exit(self.pendingTickleIds) }
 
-            self.pendingTickleIds.add(inAppPartId)
+            self.pendingTickleIds.add(deepLink.id)
 
             let messagesToPresent = self.getMessagesToPresent([])
 
             let tickleMessageFound = messagesToPresent.contains(where: { message -> Bool in
-                message.id == inAppPartId
+                message.id == deepLink.id
             })
 
             if !tickleMessageFound {
