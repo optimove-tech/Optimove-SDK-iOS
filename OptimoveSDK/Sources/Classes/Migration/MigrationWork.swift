@@ -260,7 +260,6 @@ final class MigrationWork_5_7_0: MigrationWorker {
             .IN_APP_MOST_RECENT_UPDATED_AT: .inAppMostRecentUpdateAt,
             .IN_APP_CONSENTED: .inAppConsented,
             .DYNAMIC_CATEGORY: .dynamicCategory,
-            // TODO: MIGRATED_TO_GROUPS
         ]
         /// Move values from Kumulos UserDefaults to Optimove UserDefaults.
         let kumulosStorage = UserDefaults.standard

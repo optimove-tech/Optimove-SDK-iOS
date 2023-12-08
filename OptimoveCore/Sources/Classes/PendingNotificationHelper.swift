@@ -2,8 +2,14 @@
 
 import Foundation
 
-public enum PendingNotificationHelper {
-    public static func remove(id: Int) {
+public struct PendingNotificationHelper {
+    let storage: KeyValueStorage
+
+    public init(storage: KeyValueStorage) {
+        self.storage = storage
+    }
+
+    public func remove(id: Int) {
         var pendingNotifications = readAll()
 
         if let i = pendingNotifications.firstIndex(where: { $0.id == id }) {
@@ -13,7 +19,7 @@ public enum PendingNotificationHelper {
         }
     }
 
-    public static func remove(identifier: String) {
+    public func remove(identifier: String) {
         var pendingNotifications = readAll()
 
         if let i = pendingNotifications.firstIndex(where: { $0.identifier == identifier }) {
@@ -23,10 +29,10 @@ public enum PendingNotificationHelper {
         }
     }
 
-    public static func readAll() -> [PendingNotification] {
+    public func readAll() -> [PendingNotification] {
         var pendingNotifications = [PendingNotification]()
-        if let data = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.PENDING_NOTIFICATIONS.rawValue),
-           let decoded = try? JSONDecoder().decode([PendingNotification].self, from: data as! Data)
+        if let data: Data = storage[.pendingNotifications],
+           let decoded = try? JSONDecoder().decode([PendingNotification].self, from: data)
         {
             pendingNotifications = decoded
         }
@@ -34,7 +40,7 @@ public enum PendingNotificationHelper {
         return pendingNotifications
     }
 
-    public static func add(notification: PendingNotification) {
+    public func add(notification: PendingNotification) {
         var pendingNotifications = readAll()
 
         if let _ = pendingNotifications.firstIndex(where: { $0.id == notification.id }) {
@@ -46,9 +52,9 @@ public enum PendingNotificationHelper {
         save(pendingNotifications: pendingNotifications)
     }
 
-    static func save(pendingNotifications: [PendingNotification]) {
+    func save(pendingNotifications: [PendingNotification]) {
         if let data = try? JSONEncoder().encode(pendingNotifications) {
-            KeyValPersistenceHelper.set(data, forKey: OptimobileUserDefaultsKey.PENDING_NOTIFICATIONS.rawValue)
+            storage.set(value: data, key: .pendingNotifications)
         }
     }
 }

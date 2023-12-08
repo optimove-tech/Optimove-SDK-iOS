@@ -10,9 +10,6 @@ public enum OptimobileUserDefaultsKey: String, CaseIterable {
     case BADGE_COUNT = "KumulosBadgeCount"
     case PENDING_NOTIFICATIONS = "KumulosPendingNotifications"
     case PENDING_ANALYTICS = "KumulosPendingAnalytics"
-
-    // exist only in standard defaults for app
-    case MIGRATED_TO_GROUPS = "KumulosDidMigrateToAppGroups"
     case IN_APP_LAST_SYNCED_AT = "KumulosMessagesLastSyncedAt"
     case IN_APP_MOST_RECENT_UPDATED_AT = "KumulosInAppMostRecentUpdatedAt"
     case IN_APP_CONSENTED = "KumulosInAppConsented"

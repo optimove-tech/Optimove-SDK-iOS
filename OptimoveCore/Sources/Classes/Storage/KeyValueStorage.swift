@@ -3,7 +3,7 @@
 import Foundation
 
 /// The enum used as keys for storage values.
-enum StorageKey: String, CaseIterable {
+public enum StorageKey: String, CaseIterable {
     case installationID
     case customerID
     case configurationEndPoint
@@ -36,13 +36,21 @@ enum StorageKey: String, CaseIterable {
     case inAppMostRecentUpdateAt
     case inAppConsented
     case dynamicCategory
+    case deferredLinkChecked = "KUMULOS_DDL_CHECKED"
 
-    static let inMemoryValues: Set<StorageKey> = [.tenantToken, .version]
-    static let appGroup: Set<StorageKey> = [.mediaURL, .dynamicCategory]
+    public static let inMemoryValues: Set<StorageKey> = [.tenantToken, .version]
+    public static let appGroup: Set<StorageKey> = [
+        .badgeCount,
+        .dynamicCategory,
+        .installUUID,
+        .mediaURL,
+        .pendingNotifications,
+        .userID,
+    ]
 }
 
 /// The protocol used as convenience accessor to storage values.
-protocol StorageValue {
+public protocol StorageValue {
     var installationID: String? { get set }
     var customerID: String? { get set }
     var configurationEndPoint: URL? { get set }
@@ -81,7 +89,7 @@ protocol StorageValue {
 }
 
 /// The protocol used for convenience implementation of any storage technology below this protocol.
-protocol KeyValueStorage {
+public protocol KeyValueStorage {
     func set(value: Any?, key: StorageKey)
     func value(for: StorageKey) -> Any?
     subscript<T>(_: StorageKey) -> T? { get set }
@@ -89,15 +97,15 @@ protocol KeyValueStorage {
 
 /// ``UserDefaults`` uses as persistent ``KeyValueStorage``.
 extension UserDefaults: KeyValueStorage {
-    func set(value: Any?, key: StorageKey) {
+    public func set(value: Any?, key: StorageKey) {
         set(value, forKey: key.rawValue)
     }
 
-    func value(for key: StorageKey) -> Any? {
+    public func value(for key: StorageKey) -> Any? {
         return value(forKey: key.rawValue)
     }
 
-    subscript<T>(key: StorageKey) -> T? {
+    public subscript<T>(key: StorageKey) -> T? {
         get {
             return value(for: key) as? T
         }
@@ -108,19 +116,19 @@ extension UserDefaults: KeyValueStorage {
 }
 
 /// ``InMemoryStorage`` uses as in-memory ``KeyValueStorage``.
-final class InMemoryStorage: KeyValueStorage {
+public final class InMemoryStorage: KeyValueStorage {
     private var storage = [StorageKey: Any]()
     private let queue = DispatchQueue(label: "com.optimove.sdk.inmemorystorage", attributes: .concurrent)
 
-    init() {}
+    public init() {}
 
-    func set(value: Any?, key: StorageKey) {
+    public func set(value: Any?, key: StorageKey) {
         queue.async(flags: .barrier) { [self] in
             storage[key] = value
         }
     }
 
-    subscript<T>(key: StorageKey) -> T? {
+    public subscript<T>(key: StorageKey) -> T? {
         get {
             var result: T?
             queue.sync {
@@ -135,7 +143,7 @@ final class InMemoryStorage: KeyValueStorage {
         }
     }
 
-    func value(for key: StorageKey) -> Any? {
+    public func value(for key: StorageKey) -> Any? {
         var result: Any?
         queue.sync {
             result = storage[key]
