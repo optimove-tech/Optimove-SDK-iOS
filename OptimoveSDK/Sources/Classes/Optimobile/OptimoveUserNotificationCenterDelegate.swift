@@ -16,11 +16,6 @@ class OptimoveUserNotificationCenterDelegate: NSObject, UNUserNotificationCenter
         do {
             let push = try PushNotification(userInfo: notification.request.content.userInfo)
 
-            if push.id == 0 {
-                chainCenter(center, willPresent: notification, with: completionHandler)
-                return
-            }
-
             if Optimobile.sharedInstance.config.pushReceivedInForegroundHandlerBlock == nil {
                 completionHandler(.alert)
                 return

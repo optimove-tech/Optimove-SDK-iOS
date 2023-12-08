@@ -35,8 +35,8 @@ public struct PushNotification: Decodable {
         public let text: String
     }
 
-    public let id: Int
     public let deeplink: PushNotification.Data?
+    public let message: PushNotification.Data
     public let badge: Int?
     public let buttons: [Button]?
     public let isBackground: Bool
@@ -73,10 +73,8 @@ public struct PushNotification: Decodable {
 
         let a = try custom.nestedContainer(keyedBy: CodingKeys.self, forKey: .a)
         self.buttons = try a.decodeIfPresent([Button].self, forKey: .buttons)
-
-        let message = try a.nestedContainer(keyedBy: CodingKeys.self, forKey: .message)
-        let messageData = try message.nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
-        self.id = try messageData.decode(Int.self, forKey: .id)
+        self.deeplink = try a.decodeIfPresent(PushNotification.Data.self, forKey: .deeplink)
+        self.message = try a.decode(PushNotification.Data.self, forKey: .message)
 
         let aps = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .aps)
         let isBackground = try aps.decodeIfPresent(Int.self, forKey: .isBackground)
@@ -86,7 +84,5 @@ public struct PushNotification: Decodable {
         self.picturePath = try attachments?.decodeIfPresent(String.self, forKey: .pictureUrl)
 
         self.url = try custom.decodeIfPresent(URL.self, forKey: .u)
-
-        self.deeplink = try a.decodeIfPresent(PushNotification.Data.self, forKey: .deeplink)
     }
 }
