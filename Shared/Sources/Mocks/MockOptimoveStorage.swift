@@ -2,6 +2,7 @@
 
 import Foundation
 import OptimoveCore
+@testable import OptimoveSDK
 
 public final class MockOptimoveStorage: OptimoveStorage {
     public init() {}

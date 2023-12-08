@@ -1,7 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
-@testable import OptimoveCore
+@testable import OptimoveSDK
 
 public final class GlobalConfigFixture: FileAccessible {
     public let fileName: String = "core_events.json"

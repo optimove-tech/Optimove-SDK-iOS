@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-public final class RemoteConfigurationRequestBuilder {
+final class RemoteConfigurationRequestBuilder {
     enum Error: LocalizedError {
         case failedToCreateTenantConfigurationRequest(Swift.Error)
 
@@ -21,11 +21,11 @@ public final class RemoteConfigurationRequestBuilder {
 
     private let storage: OptimoveStorage
 
-    public init(storage: OptimoveStorage) {
+    init(storage: OptimoveStorage) {
         self.storage = storage
     }
 
-    public func createTenantConfigurationsRequest() throws -> NetworkRequest {
+    func createTenantConfigurationsRequest() throws -> NetworkRequest {
         do {
             let tenantToken = try storage.getTenantToken()
             let version = try storage.getVersion()
@@ -41,7 +41,7 @@ public final class RemoteConfigurationRequestBuilder {
         }
     }
 
-    public func createGlobalConfigurationsRequest() -> NetworkRequest {
+    func createGlobalConfigurationsRequest() -> NetworkRequest {
         let url = Endpoints.Remote.GlobalConfig.url
         Logger.debug("Connect to \(url.absoluteString) to retreive global file.")
         return NetworkRequest(method: .get, baseURL: url, timeoutInterval: Constants.timeout)

@@ -2,17 +2,17 @@
 
 import CoreData
 import Foundation
-import OptimobileCore
+import OptimoveCore
 
-public class InAppInboxItem {
-    public internal(set) var id: Int64
-    public internal(set) var title: String
-    public internal(set) var subtitle: String
-    public internal(set) var availableFrom: Date?
-    public internal(set) var availableTo: Date?
-    public internal(set) var dismissedAt: Date?
-    public internal(set) var sentAt: Date
-    public internal(set) var data: NSDictionary?
+class InAppInboxItem {
+    private(set) var id: Int64
+    private(set) var title: String
+    private(set) var subtitle: String
+    private(set) var availableFrom: Date?
+    private(set) var availableTo: Date?
+    private(set) var dismissedAt: Date?
+    private(set) var sentAt: Date
+    private(set) var data: NSDictionary?
     private var readAt: Date?
     private var imagePath: String?
 
@@ -41,7 +41,7 @@ public class InAppInboxItem {
         imagePath = inboxConfig["imagePath"] as? String
     }
 
-    public func isAvailable() -> Bool {
+    func isAvailable() -> Bool {
         if availableFrom != nil, availableFrom!.timeIntervalSinceNow > 0 {
             return false
         } else if availableTo != nil, availableTo!.timeIntervalSinceNow < 0 {
@@ -51,15 +51,15 @@ public class InAppInboxItem {
         return true
     }
 
-    public func isRead() -> Bool {
+    func isRead() -> Bool {
         return readAt != nil
     }
 
-    public func getImageUrl() -> URL? {
+    func getImageUrl() -> URL? {
         return getImageUrl(width: InAppInboxItem.defaultImageWidth)
     }
 
-    public func getImageUrl(width: UInt) -> URL? {
+    func getImageUrl(width: UInt) -> URL? {
         if let imagePathNotNil = imagePath {
             return try? MediaHelper.getCompletePictureUrl(
                 pictureUrlString: imagePathNotNil,
@@ -71,18 +71,18 @@ public class InAppInboxItem {
     }
 }
 
-public struct InAppInboxSummary {
-    public let totalCount: Int64
-    public let unreadCount: Int64
+struct InAppInboxSummary {
+    let totalCount: Int64
+    let unreadCount: Int64
 }
 
-public typealias InboxUpdatedHandlerBlock = () -> Void
-public typealias InboxSummaryBlock = (InAppInboxSummary?) -> Void
+typealias InboxUpdatedHandlerBlock = () -> Void
+typealias InboxSummaryBlock = (InAppInboxSummary?) -> Void
 
-public enum OptimoveInApp {
+enum OptimoveInApp {
     private static var _inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?
 
-    public static func updateConsent(forUser consentGiven: Bool) {
+    static func updateConsent(forUser consentGiven: Bool) {
         if Optimobile.inAppConsentStrategy != InAppConsentStrategy.explicitByUser {
             NSException(name: NSExceptionName(rawValue: "Optimobile: Invalid In-app consent strategy"), reason: "You can only manage in-app messaging consent when the feature is enabled and strategy is set to InAppConsentStrategyExplicitByUser", userInfo: nil).raise()
 
@@ -92,15 +92,15 @@ public enum OptimoveInApp {
         Optimobile.sharedInstance.inAppManager.updateUserConsent(consentGiven: consentGiven)
     }
 
-    public static func setDisplayMode(mode: InAppDisplayMode) {
+    static func setDisplayMode(mode: InAppDisplayMode) {
         Optimobile.sharedInstance.inAppManager.presenter.setDisplayMode(mode)
     }
 
-    public static func getDisplayMode() -> InAppDisplayMode {
+    static func getDisplayMode() -> InAppDisplayMode {
         return Optimobile.sharedInstance.inAppManager.presenter.getDisplayMode()
     }
 
-    public static func getInboxItems() -> [InAppInboxItem] {
+    static func getInboxItems() -> [InAppInboxItem] {
         guard let context = Optimobile.sharedInstance.inAppManager.messagesContext else {
             return []
         }
@@ -140,7 +140,7 @@ public enum OptimoveInApp {
         return results
     }
 
-    public static func presentInboxMessage(item: InAppInboxItem) -> InAppMessagePresentationResult {
+    static func presentInboxMessage(item: InAppInboxItem) -> InAppMessagePresentationResult {
         if getDisplayMode() == .paused {
             return .PAUSED
         }
@@ -154,11 +154,11 @@ public enum OptimoveInApp {
         return result ? InAppMessagePresentationResult.PRESENTED : InAppMessagePresentationResult.FAILED
     }
 
-    public static func deleteMessageFromInbox(item: InAppInboxItem) -> Bool {
+    static func deleteMessageFromInbox(item: InAppInboxItem) -> Bool {
         return Optimobile.sharedInstance.inAppManager.deleteMessageFromInbox(withId: item.id)
     }
 
-    public static func markAsRead(item: InAppInboxItem) -> Bool {
+    static func markAsRead(item: InAppInboxItem) -> Bool {
         if item.isRead() {
             return false
         }
@@ -168,15 +168,15 @@ public enum OptimoveInApp {
         return res
     }
 
-    public static func markAllInboxItemsAsRead() -> Bool {
+    static func markAllInboxItemsAsRead() -> Bool {
         return Optimobile.sharedInstance.inAppManager.markAllInboxItemsAsRead()
     }
 
-    public static func setOnInboxUpdated(inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?) {
+    static func setOnInboxUpdated(inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?) {
         _inboxUpdatedHandlerBlock = inboxUpdatedHandlerBlock
     }
 
-    public static func getInboxSummaryAsync(inboxSummaryBlock: @escaping InboxSummaryBlock) {
+    static func getInboxSummaryAsync(inboxSummaryBlock: @escaping InboxSummaryBlock) {
         Optimobile.sharedInstance.inAppManager.readInboxSummary(inboxSummaryBlock: inboxSummaryBlock)
     }
 

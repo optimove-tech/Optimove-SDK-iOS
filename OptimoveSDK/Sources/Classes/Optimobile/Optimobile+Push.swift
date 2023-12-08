@@ -2,12 +2,14 @@
 
 import Foundation
 import ObjectiveC.runtime
-import OptimobileCore
+import OptimoveCore
 import UIKit
 import UserNotifications
 
 @available(iOS 10.0, *)
 public typealias OptimoveUNAuthorizationCheckedHandler = (UNAuthorizationStatus, Error?) -> Void
+
+let KS_MESSAGE_TYPE_PUSH = 1
 
 extension Optimobile {
     /**

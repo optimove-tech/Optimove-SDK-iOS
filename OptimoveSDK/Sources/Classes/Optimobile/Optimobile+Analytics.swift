@@ -1,7 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
-import OptimobileCore
+import OptimoveCore
 
 extension Optimobile {
     static func trackEvent(eventType: OptimobileEvent, properties: [String: Any]?, immediateFlush: Bool = false) {

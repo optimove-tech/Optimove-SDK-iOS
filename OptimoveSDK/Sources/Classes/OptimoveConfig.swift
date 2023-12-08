@@ -1,7 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
-import OptimobileCore
+import OptimoveCore
 
 /// A set of options for configuring the SDK.
 /// - Note: The SDK can be configured to support multiple features.
@@ -50,11 +50,11 @@ public struct OptimoveConfig {
     }
 }
 
-@objc public class OptimoveTenantInfo: NSObject {
-    @objc public var tenantToken: String
-    @objc public var configName: String
+class OptimoveTenantInfo: NSObject {
+    var tenantToken: String
+    var configName: String
 
-    @objc public init(tenantToken: String, configName: String) {
+    init(tenantToken: String, configName: String) {
         self.tenantToken = tenantToken
         self.configName = configName
     }

@@ -3,9 +3,6 @@
 import Foundation
 import OptimoveCore
 
-typealias NetworkClient = OptimoveCore.NetworkClient
-typealias NetworkClientImpl = OptimoveCore.NetworkClientImpl
-
 final class MainFactory {
     private let serviceLocator: ServiceLocator
 

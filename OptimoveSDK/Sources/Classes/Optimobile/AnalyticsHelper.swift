@@ -2,7 +2,7 @@
 
 import CoreData
 import Foundation
-import OptimobileCore
+import OptimoveCore
 
 class KSEventModel: NSManagedObject {
     @NSManaged var uuid: String
