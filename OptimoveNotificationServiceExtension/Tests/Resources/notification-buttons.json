@@ -1,0 +1,41 @@
+{
+  "aps": {
+    "alert": {
+      "title": "title",
+      "body": "body"
+    },
+    "mutable-content": 1
+  },
+  "custom": {
+    "a": {
+      "k.message": {
+        "type": 1,
+        "data": {
+          "id": 1
+        }
+      },
+      "k.buttons": [
+        {
+          "id": "1",
+          "text": "action_1"
+        },
+        {
+          "id": "2",
+          "text": "action_2",
+          "icon": {
+            "type": "system",
+            "id": "sys_icon_id"
+          }
+        },
+        {
+          "id": "3",
+          "text": "action_3",
+          "icon": {
+            "type": "custom",
+            "id": "custom_icon_id"
+          }
+        }
+      ]
+    }
+  }
+}

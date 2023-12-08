@@ -3,17 +3,28 @@
 import Foundation
 
 enum MediaHelper {
-    /// Use ``Region.US`` as fallback region.
-    static let mediaResizerBaseUrl: String = "https://i-us-east-1.app.delivery"
+    enum Error: LocalizedError {
+        case noMediaUrlFound
+        case invalidPictureUrl(String)
+    }
 
-    static func getCompletePictureUrl(pictureUrl: String, width: UInt) -> URL? {
-        if pictureUrl.hasPrefix("https://") || pictureUrl.hasPrefix("http://") {
-            return URL(string: pictureUrl)
+    static func getCompletePictureUrl(pictureUrlString: String, width: UInt) throws -> URL {
+        if pictureUrlString.hasPrefix("https://") || pictureUrlString.hasPrefix("http://") {
+            guard let url = URL(string: pictureUrlString) else {
+                throw Error.invalidPictureUrl(pictureUrlString)
+            }
+            return url
         }
 
-        let baseUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue) as? String ?? mediaResizerBaseUrl
+        guard let mediaUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue) as? String else {
+            throw Error.noMediaUrlFound
+        }
 
-        let completeString = "\(baseUrl)/\(width)x/\(pictureUrl)"
-        return URL(string: completeString)
+        let urlString = "\(mediaUrl)/\(width)x/\(pictureUrlString)"
+        guard let url = URL(string: urlString) else {
+            throw Error.invalidPictureUrl(urlString)
+        }
+
+        return url
     }
 }

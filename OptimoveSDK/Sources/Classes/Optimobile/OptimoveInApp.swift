@@ -60,7 +60,10 @@ public class InAppInboxItem {
 
     public func getImageUrl(width: UInt) -> URL? {
         if let imagePathNotNil = imagePath {
-            return MediaHelper.getCompletePictureUrl(pictureUrl: imagePathNotNil, width: width)
+            return try? MediaHelper.getCompletePictureUrl(
+                pictureUrlString: imagePathNotNil,
+                width: width
+            )
         }
 
         return nil
