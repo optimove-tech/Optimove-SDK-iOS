@@ -136,7 +136,7 @@ extension Optimobile {
              - notification: The notification which triggered the action
      */
     static func pushTrackOpen(notification: PushNotification) {
-        let params = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.id]
+        let params = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.message.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_OPENED, properties: params)
     }
 
@@ -161,7 +161,7 @@ extension Optimobile {
         do {
             let notification = try PushNotification(userInfo: userInfo)
             pushHandleOpen(notification: notification)
-            PendingNotificationHelper.remove(id: notification.id)
+            PendingNotificationHelper.remove(id: notification.message.id)
             return true
         } catch {
             Logger.error(
@@ -209,8 +209,8 @@ extension Optimobile {
         do {
             let data = try JSONSerialization.data(withJSONObject: userInfo)
             let notification = try JSONDecoder().decode(PushNotification.self, from: data)
-            pushHandleDismissed(notificationId: notification.id)
-            PendingNotificationHelper.remove(id: notification.id)
+            pushHandleDismissed(notificationId: notification.message.id)
+            PendingNotificationHelper.remove(id: notification.message.id)
             return true
         } catch {
             Logger.error(
@@ -254,7 +254,7 @@ extension Optimobile {
                 for notification in notifications {
                     let notification = try PushNotification(userInfo: notification.request.content.userInfo)
 
-                    actualPendingNotificationIds.append(notification.id)
+                    actualPendingNotificationIds.append(notification.message.id)
                 }
 
                 let recordedPendingNotifications = PendingNotificationHelper.readAll()
@@ -422,11 +422,7 @@ class PushHelper {
     }
 
     private func trackPushDelivery(notification: PushNotification) {
-        if notification.id == 0 {
-            return
-        }
-
-        let props: [String: Any] = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.id]
+        let props: [String: Any] = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.message.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED, properties: props, immediateFlush: true)
     }
 }

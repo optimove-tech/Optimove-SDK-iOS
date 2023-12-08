@@ -46,7 +46,7 @@ public enum OptimoveNotificationService {
             maybeSetBadge(bestAttemptContent: bestAttemptContent, userInfo: userInfo)
             PendingNotificationHelper.add(
                 notification: PendingNotification(
-                    id: notification.id,
+                    id: notification.message.id,
                     identifier: request.identifier
                 )
             )
@@ -86,7 +86,7 @@ public enum OptimoveNotificationService {
     }
 
     static func buildCategory(notification: PushNotification) async -> String {
-        let categoryIdentifier = CategoryManager.getCategoryId(messageId: notification.id)
+        let categoryIdentifier = CategoryManager.getCategoryId(messageId: notification.message.id)
         let category = UNNotificationCategory(
             identifier: categoryIdentifier,
             actions: buildActions(notification: notification),

@@ -7,11 +7,11 @@ import XCTest
 final class PushNotificationTests: XCTestCase, FileAccessible {
     var fileName: String = ""
 
-    func test_decode_id() throws {
+    func test_decode_message() throws {
         fileName = "notification-message.json"
         let decoder = JSONDecoder()
         let notification = try decoder.decode(PushNotification.self, from: data)
-        XCTAssertEqual(notification.id, 1)
+        XCTAssertEqual(notification.message.id, 1)
     }
 
     func test_decode_badge() throws {
