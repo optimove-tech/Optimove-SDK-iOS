@@ -1,7 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
-import OptimobileCore
+import OptimoveCore
 import UserNotifications
 
 public typealias InAppDeepLinkHandlerBlock = (InAppButtonPress) -> Void

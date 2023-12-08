@@ -1,7 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
-import OptimobileCore
+import OptimoveCore
 
 /// A set of options for configuring the SDK.
 /// - Note: The SDK can be configured to support multiple features.

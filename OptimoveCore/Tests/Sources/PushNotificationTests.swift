@@ -1,6 +1,6 @@
 //  Copyright © 2023 Optimove. All rights reserved.
 
-import OptimobileCore
+import OptimoveCore
 import OptimoveTest
 import XCTest
 
