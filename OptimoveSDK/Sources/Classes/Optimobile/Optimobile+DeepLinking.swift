@@ -5,8 +5,8 @@ import OptimoveCore
 import UIKit
 
 public struct DeepLinkContent {
-    public let title: String?
-    public let description: String?
+    let title: String?
+    let description: String?
 }
 
 public struct DeepLink {

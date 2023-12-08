@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-public extension UserDefaults {
+extension UserDefaults {
     enum Constants {
         static let suiteName: String = "com.optimove.sdk"
     }

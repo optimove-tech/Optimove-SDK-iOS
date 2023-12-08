@@ -26,7 +26,7 @@ import Foundation
 
 private struct InitializationError: Error {}
 
-public extension JSON {
+extension JSON {
     /// Create a JSON value from anything.
     ///
     /// Argument has to be a valid JSON structure: A `Double`, `Int`, `String`,
@@ -59,7 +59,7 @@ public extension JSON {
     }
 }
 
-public extension JSON {
+extension JSON {
     /// Create a JSON value from an `Encodable`. This will give you access to the “raw”
     /// encoded JSON value the `Encodable` is serialized into.
     init<T: Encodable>(encodable: T) throws {
@@ -69,25 +69,25 @@ public extension JSON {
 }
 
 extension JSON: ExpressibleByBooleanLiteral {
-    public init(booleanLiteral value: Bool) {
+    init(booleanLiteral value: Bool) {
         self = .bool(value)
     }
 }
 
 extension JSON: ExpressibleByNilLiteral {
-    public init(nilLiteral _: ()) {
+    init(nilLiteral _: ()) {
         self = .null
     }
 }
 
 extension JSON: ExpressibleByArrayLiteral {
-    public init(arrayLiteral elements: JSON...) {
+    init(arrayLiteral elements: JSON...) {
         self = .array(elements)
     }
 }
 
 extension JSON: ExpressibleByDictionaryLiteral {
-    public init(dictionaryLiteral elements: (String, JSON)...) {
+    init(dictionaryLiteral elements: (String, JSON)...) {
         var object: [String: JSON] = [:]
         for (k, v) in elements {
             object[k] = v
@@ -97,19 +97,19 @@ extension JSON: ExpressibleByDictionaryLiteral {
 }
 
 extension JSON: ExpressibleByFloatLiteral {
-    public init(floatLiteral value: Double) {
+    init(floatLiteral value: Double) {
         self = .number(value)
     }
 }
 
 extension JSON: ExpressibleByIntegerLiteral {
-    public init(integerLiteral value: Int) {
+    init(integerLiteral value: Int) {
         self = .number(Double(value))
     }
 }
 
 extension JSON: ExpressibleByStringLiteral {
-    public init(stringLiteral value: String) {
+    init(stringLiteral value: String) {
         self = .string(value)
     }
 }

@@ -2,8 +2,8 @@
 
 import Foundation
 
-public enum AppGroupConfig {
-    public static var suffix: String = ".optimove"
+enum AppGroupConfig {
+    static var suffix: String = ".optimove"
 }
 
 public enum AppGroupsHelper {

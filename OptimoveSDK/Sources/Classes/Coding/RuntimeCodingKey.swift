@@ -2,16 +2,16 @@
 
 import Foundation
 
-public final class RuntimeCodingKey: CodingKey {
-    public var stringValue: String
+final class RuntimeCodingKey: CodingKey {
+    var stringValue: String
 
-    public init?(stringValue: String) {
+    init?(stringValue: String) {
         self.stringValue = stringValue
     }
 
-    public var intValue: Int?
+    var intValue: Int?
 
-    public init?(intValue: Int) {
+    init?(intValue: Int) {
         self.intValue = intValue
         stringValue = String(intValue)
     }

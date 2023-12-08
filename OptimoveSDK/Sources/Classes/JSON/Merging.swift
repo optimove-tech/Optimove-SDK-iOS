@@ -24,7 +24,7 @@
 
 import Foundation
 
-public extension JSON {
+extension JSON {
     /// Return a new JSON value by merging two other ones
     ///
     /// If we call the current JSON value `old` and the incoming JSON value

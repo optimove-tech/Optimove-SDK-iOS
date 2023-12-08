@@ -50,11 +50,11 @@ public struct OptimoveConfig {
     }
 }
 
-@objc public class OptimoveTenantInfo: NSObject {
-    @objc public var tenantToken: String
-    @objc public var configName: String
+class OptimoveTenantInfo: NSObject {
+    var tenantToken: String
+    var configName: String
 
-    @objc public init(tenantToken: String, configName: String) {
+    init(tenantToken: String, configName: String) {
         self.tenantToken = tenantToken
         self.configName = configName
     }

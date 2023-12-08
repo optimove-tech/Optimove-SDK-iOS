@@ -1,15 +1,15 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
-public struct TenantConfig: Codable, Equatable {
-    public let isSupportedAirship: Bool
-    public let isEnableRealtime: Bool
-    public let isEnableRealtimeThroughOptistream: Bool
-    public let isProductionLogsEnabled: Bool
-    public let realtime: TenantRealtimeConfig
-    public var optitrack: TenantOptitrackConfig
-    public let events: [String: EventsConfig]
+struct TenantConfig: Codable, Equatable {
+    let isSupportedAirship: Bool
+    let isEnableRealtime: Bool
+    let isEnableRealtimeThroughOptistream: Bool
+    let isProductionLogsEnabled: Bool
+    let realtime: TenantRealtimeConfig
+    var optitrack: TenantOptitrackConfig
+    let events: [String: EventsConfig]
 
-    public init(
+    init(
         realtime: TenantRealtimeConfig,
         optitrack: TenantOptitrackConfig,
         events: [String: EventsConfig],
@@ -27,7 +27,7 @@ public struct TenantConfig: Codable, Equatable {
         self.isProductionLogsEnabled = isProductionLogsEnabled
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         isSupportedAirship = try container.decodeIfPresent(Bool.self, forKey: .supportAirship) ?? false
         isEnableRealtime = try container.decode(Bool.self, forKey: .enableRealtime)
@@ -38,7 +38,7 @@ public struct TenantConfig: Codable, Equatable {
         events = try container.decode([String: EventsConfig].self, forKey: .events)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(isSupportedAirship, forKey: .supportAirship)
         try container.encodeIfPresent(isProductionLogsEnabled, forKey: .prodLogsEnabled)

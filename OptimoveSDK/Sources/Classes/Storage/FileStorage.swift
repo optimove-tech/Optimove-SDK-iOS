@@ -3,7 +3,7 @@
 import Foundation
 import OptimoveCore
 
-public protocol FileStorage {
+protocol FileStorage {
     /// Check file if exist.
     ///
     /// - Parameters:
@@ -61,7 +61,7 @@ public protocol FileStorage {
     func delete(fileName: String, isTemporary: Bool) throws
 }
 
-public extension FileStorage {
+extension FileStorage {
     func isExist(fileName: String) -> Bool {
         return isExist(fileName: fileName, isTemporary: false)
     }
@@ -87,7 +87,7 @@ public extension FileStorage {
     }
 }
 
-public final class FileStorageImpl {
+final class FileStorageImpl {
     enum FileStorageError: Error {
         case unableToCreateDirectory
         case unableToSaveFile
@@ -103,7 +103,7 @@ public final class FileStorageImpl {
     let persistentStorageURL: URL
     let temporaryStorageURL: URL
 
-    public init(persistentStorageURL: URL, temporaryStorageURL: URL) throws {
+    init(persistentStorageURL: URL, temporaryStorageURL: URL) throws {
         fileManager = FileManager.default
         self.persistentStorageURL = persistentStorageURL
         self.temporaryStorageURL = temporaryStorageURL
@@ -125,13 +125,13 @@ public final class FileStorageImpl {
 }
 
 extension FileStorageImpl: FileStorage {
-    public func isExist(fileName: String, isTemporary: Bool) -> Bool {
+    func isExist(fileName: String, isTemporary: Bool) -> Bool {
         let url = getDirectory(isTemporary: isTemporary)
         let fileUrl = url.appendingPathComponent(fileName)
         return fileManager.fileExists(atPath: fileUrl.path)
     }
 
-    public func loadData(fileName: String, isTemporary: Bool) throws -> Data {
+    func loadData(fileName: String, isTemporary: Bool) throws -> Data {
         let fileUrl = getDirectory(isTemporary: isTemporary).appendingPathComponent(fileName)
         do {
             let contents = try unwrap(fileManager.contents(atPath: fileUrl.path))
@@ -143,17 +143,17 @@ extension FileStorageImpl: FileStorage {
         }
     }
 
-    public func load<T>(fileName: String, isTemporary: Bool) throws -> T where T: Decodable, T: Encodable {
+    func load<T>(fileName: String, isTemporary: Bool) throws -> T where T: Decodable, T: Encodable {
         let data = try loadData(fileName: fileName, isTemporary: isTemporary)
         return try JSONDecoder().decode(T.self, from: data)
     }
 
-    public func save<T: Encodable>(data: T, toFileName fileName: String, isTemporary: Bool) throws {
+    func save<T: Encodable>(data: T, toFileName fileName: String, isTemporary: Bool) throws {
         let data = try JSONEncoder().encode(data)
         try saveData(data: data, toFileName: fileName, isTemporary: isTemporary)
     }
 
-    public func saveData(data: Data, toFileName fileName: String, isTemporary: Bool) throws {
+    func saveData(data: Data, toFileName fileName: String, isTemporary: Bool) throws {
         do {
             let url = getDirectory(isTemporary: isTemporary)
             try fileManager.createDirectory(at: url, withIntermediateDirectories: true)
@@ -169,7 +169,7 @@ extension FileStorageImpl: FileStorage {
         }
     }
 
-    public func delete(fileName: String, isTemporary: Bool) throws {
+    func delete(fileName: String, isTemporary: Bool) throws {
         do {
             let fileUrl = getDirectory(isTemporary: isTemporary).appendingPathComponent(fileName)
             try fileManager.removeItem(at: fileUrl)

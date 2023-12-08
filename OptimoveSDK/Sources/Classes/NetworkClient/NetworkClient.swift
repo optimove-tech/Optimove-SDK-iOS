@@ -2,22 +2,22 @@
 
 import Foundation
 
-public typealias NetworkServiceCompletion = (Result<NetworkResponse<Data?>, NetworkError>) -> Void
+typealias NetworkServiceCompletion = (Result<NetworkResponse<Data?>, NetworkError>) -> Void
 
-public protocol NetworkClient {
+protocol NetworkClient {
     func perform(_ request: NetworkRequest, _ completion: @escaping NetworkServiceCompletion)
 }
 
-public struct NetworkClientImpl {
+struct NetworkClientImpl {
     let session: URLSession
 
-    public init(configuration: URLSessionConfiguration = URLSessionConfiguration.default) {
+    init(configuration: URLSessionConfiguration = URLSessionConfiguration.default) {
         session = URLSession(configuration: configuration)
     }
 }
 
 extension NetworkClientImpl: NetworkClient {
-    public func perform(_ request: NetworkRequest, _ completion: @escaping NetworkServiceCompletion) {
+    func perform(_ request: NetworkRequest, _ completion: @escaping NetworkServiceCompletion) {
         let baseURL: URL = request.baseURL
 
         var urlComponents = URLComponents()

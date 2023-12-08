@@ -24,7 +24,7 @@
 
 import Foundation
 
-public extension JSON {
+extension JSON {
     /// Return the string value if this is a `.string`, otherwise `nil`
     var stringValue: String? {
         if case let .string(value) = self {

@@ -3,24 +3,24 @@
 import Foundation
 import OptimoveCore
 
-public struct OptistreamEvent: Codable {
-    public let tenant: Int
-    public let category: String
-    public let event: String
-    public let origin: String
-    public let customer: String?
-    public let visitor: String
-    public let timestamp: String
-    public let context: JSON
-    public var metadata: Metadata
+struct OptistreamEvent: Codable {
+    let tenant: Int
+    let category: String
+    let event: String
+    let origin: String
+    let customer: String?
+    let visitor: String
+    let timestamp: String
+    let context: JSON
+    var metadata: Metadata
 
-    public struct Metadata: Codable, Hashable {
-        public var realtime: Bool
-        public var firstVisitorDate: Int64?
-        public let eventId: String
-        public let requestId: String
-        public let platform: String = "ios"
-        public let version: String = SDKVersion
+    struct Metadata: Codable, Hashable {
+        var realtime: Bool
+        var firstVisitorDate: Int64?
+        let eventId: String
+        let requestId: String
+        let platform: String = "ios"
+        let version: String = SDKVersion
 
         enum CodingKeys: String, CodingKey {
             case realtime
@@ -31,7 +31,7 @@ public struct OptistreamEvent: Codable {
             case version = "sdk_version"
         }
 
-        public init(
+        init(
             realtime: Bool,
             firstVisitorDate: Int64?,
             eventId: String,
@@ -44,7 +44,7 @@ public struct OptistreamEvent: Codable {
         }
     }
 
-    public init(
+    init(
         tenant: Int,
         category: String,
         event: String,
@@ -68,7 +68,7 @@ public struct OptistreamEvent: Codable {
 }
 
 extension OptistreamEvent: Equatable {
-    public static func == (lhs: OptistreamEvent, rhs: OptistreamEvent) -> Bool {
+    static func == (lhs: OptistreamEvent, rhs: OptistreamEvent) -> Bool {
         return lhs.metadata.eventId == rhs.metadata.eventId
     }
 }

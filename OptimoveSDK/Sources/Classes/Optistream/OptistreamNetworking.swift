@@ -2,7 +2,7 @@
 
 import Foundation
 
-public protocol OptistreamNetworking {
+protocol OptistreamNetworking {
     func send(
         events: [OptistreamEvent],
         path: String,
@@ -15,11 +15,11 @@ public protocol OptistreamNetworking {
     )
 }
 
-public final class OptistreamNetworkingImpl {
+final class OptistreamNetworkingImpl {
     private let networkClient: NetworkClient
     private let endpoint: URL
 
-    public init(
+    init(
         networkClient: NetworkClient,
         endpoint: URL
     ) {
@@ -49,7 +49,7 @@ public final class OptistreamNetworkingImpl {
 }
 
 extension OptistreamNetworkingImpl: OptistreamNetworking {
-    public func send(
+    func send(
         events: [OptistreamEvent],
         path: String,
         completion: @escaping (Result<Void, NetworkError>) -> Void
@@ -57,7 +57,7 @@ extension OptistreamNetworkingImpl: OptistreamNetworking {
         _send(events: events, path: path, completion: completion)
     }
 
-    public func send(
+    func send(
         events: [OptistreamEvent],
         completion: @escaping (Result<Void, NetworkError>) -> Void
     ) {

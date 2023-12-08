@@ -2,26 +2,26 @@
 
 import Foundation
 
-public final class NetworkRequest {
-    public enum DefaultValue {
-        public static let path: String? = nil
-        public static let headers: [HTTPHeader] = []
-        public static let queryItems: [URLQueryItem]? = nil
-        public static let httpBody: Data? = nil
-        public static let timeoutInterval: TimeInterval = 60
-        public static let keyEncodingStrategy: KeyEncodingStrategy = .useDefaultKeys
+final class NetworkRequest {
+    enum DefaultValue {
+        static let path: String? = nil
+        static let headers: [HTTPHeader] = []
+        static let queryItems: [URLQueryItem]? = nil
+        static let httpBody: Data? = nil
+        static let timeoutInterval: TimeInterval = 60
+        static let keyEncodingStrategy: KeyEncodingStrategy = .useDefaultKeys
     }
 
-    public let method: HTTPMethod
-    public let baseURL: URL
-    public let path: String?
-    public let headers: [HTTPHeader]?
-    public let queryItems: [URLQueryItem]?
-    public let httpBody: Data?
-    public let timeoutInterval: TimeInterval
-    public let keyEncodingStrategy: KeyEncodingStrategy
+    let method: HTTPMethod
+    let baseURL: URL
+    let path: String?
+    let headers: [HTTPHeader]?
+    let queryItems: [URLQueryItem]?
+    let httpBody: Data?
+    let timeoutInterval: TimeInterval
+    let keyEncodingStrategy: KeyEncodingStrategy
 
-    public required init(
+    required init(
         method: HTTPMethod,
         baseURL: URL,
         path: String? = DefaultValue.path,
@@ -41,7 +41,7 @@ public final class NetworkRequest {
         self.keyEncodingStrategy = keyEncodingStrategy
     }
 
-    public convenience init<Body: Encodable>(
+    convenience init<Body: Encodable>(
         method: HTTPMethod,
         baseURL: URL,
         path: String? = DefaultValue.path,
@@ -66,7 +66,7 @@ public final class NetworkRequest {
     }
 }
 
-public enum HTTPMethod: String {
+enum HTTPMethod: String {
     case get = "GET"
     case put = "PUT"
     case post = "POST"
@@ -78,12 +78,12 @@ public enum HTTPMethod: String {
     case patch = "PATCH"
 }
 
-public struct HTTPHeader {
-    public let field: String
-    public let value: String
+struct HTTPHeader {
+    let field: String
+    let value: String
 }
 
-public extension HTTPHeader {
+extension HTTPHeader {
     enum Fields: String {
         case contentType = "Content-Type"
         case userAgent = "User-Agent"
@@ -94,7 +94,7 @@ public extension HTTPHeader {
     }
 }
 
-public extension HTTPHeader {
+extension HTTPHeader {
     init(field: Fields, value: Values) {
         self.field = field.rawValue
         self.value = value.rawValue
@@ -102,13 +102,13 @@ public extension HTTPHeader {
 }
 
 extension HTTPHeader: CustomStringConvertible {
-    public var description: String {
+    var description: String {
         return "key: \(field), value: \(value)"
     }
 }
 
 extension NetworkRequest: CustomStringConvertible {
-    public var description: String {
+    var description: String {
         return """
         [Method]: \(method.rawValue)
         [URL]: \(baseURL.absoluteString)
@@ -121,7 +121,7 @@ extension NetworkRequest: CustomStringConvertible {
     }
 }
 
-public enum KeyEncodingStrategy {
+enum KeyEncodingStrategy {
     case useDefaultKeys
     case convertToSnakeCase
     case custom(([CodingKey]) -> CodingKey)

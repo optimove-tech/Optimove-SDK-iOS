@@ -20,7 +20,7 @@
 
 import Foundation
 
-public enum SysctlError: Error {
+enum SysctlError: Error {
     case unknown
     case malformedUTF8
     case invalidSize
@@ -28,7 +28,7 @@ public enum SysctlError: Error {
 }
 
 /// Wrapper around `sysctl` that preflights and allocates an [Int8] for the result and throws a Swift error if anything goes wrong.
-public func sysctl(levels: [Int32]) throws -> [Int8] {
+func sysctl(levels: [Int32]) throws -> [Int8] {
     return try levels.withUnsafeBufferPointer { levelsPointer throws -> [Int8] in
         // Preflight the request to get the required data size
         var requiredSize = 0
@@ -51,7 +51,7 @@ public func sysctl(levels: [Int32]) throws -> [Int8] {
 }
 
 /// Generate an array of name levels (as can be used with the previous sysctl function) from a sysctl name string.
-public func sysctlLevels(fromName: String) throws -> [Int32] {
+func sysctlLevels(fromName: String) throws -> [Int32] {
     var levelsBufferSize = Int(CTL_MAXNAME)
     var levelsBuffer = [Int32](repeating: 0, count: levelsBufferSize)
     try levelsBuffer.withUnsafeMutableBufferPointer { (lbp: inout UnsafeMutableBufferPointer<Int32>) throws in
@@ -89,33 +89,33 @@ private func stringFromSysctl(levels: [Int32]) throws -> String {
 }
 
 /// Get an arbitrary sysctl value and interpret the bytes as a UTF8 string
-public func sysctlString(levels: Int32...) throws -> String {
+func sysctlString(levels: Int32...) throws -> String {
     return try stringFromSysctl(levels: levels)
 }
 
 /// Get an arbitrary sysctl value and interpret the bytes as a UTF8 string
-public func sysctlString(name: String) throws -> String {
+func sysctlString(name: String) throws -> String {
     return try stringFromSysctl(levels: sysctlLevels(fromName: name))
 }
 
 /// Get an arbitrary sysctl value and cast it to an Int64
-public func sysctlInt(levels: Int32...) throws -> Int64 {
+func sysctlInt(levels: Int32...) throws -> Int64 {
     return try intFromSysctl(levels: levels)
 }
 
 /// Get an arbitrary sysctl value and cast it to an Int64
-public func sysctlInt(name: String) throws -> Int64 {
+func sysctlInt(name: String) throws -> Int64 {
     return try intFromSysctl(levels: sysctlLevels(fromName: name))
 }
 
-public enum Sysctl {
+enum Sysctl {
     /// e.g. "MyComputer.local" (from System Preferences -> Sharing -> Computer Name) or
     /// "My-Name-iPhone" (from Settings -> General -> About -> Name)
-    public static var hostName: String { return try! sysctlString(levels: CTL_KERN, KERN_HOSTNAME) }
+    static var hostName: String { return try! sysctlString(levels: CTL_KERN, KERN_HOSTNAME) }
 
     /// e.g. "x86_64" or "N71mAP"
     /// NOTE: this is *corrected* on iOS devices to fetch hw.model
-    public static var machine: String {
+    static var machine: String {
         #if os(iOS) && !arch(x86_64) && !arch(i386)
             return try! sysctlString(levels: CTL_HW, HW_MODEL)
         #else
@@ -125,7 +125,7 @@ public enum Sysctl {
 
     /// e.g. "MacPro4,1" or "iPhone8,1"
     /// NOTE: this is *corrected* on iOS devices to fetch hw.machine
-    public static var model: String {
+    static var model: String {
         #if os(iOS) && !arch(x86_64) && !arch(i386)
             return try! sysctlString(levels: CTL_HW, HW_MACHINE)
         #else
@@ -134,29 +134,29 @@ public enum Sysctl {
     }
 
     /// e.g. "8" or "2"
-    public static var activeCPUs: Int64 { return try! sysctlInt(levels: CTL_HW, HW_AVAILCPU) }
+    static var activeCPUs: Int64 { return try! sysctlInt(levels: CTL_HW, HW_AVAILCPU) }
 
     /// e.g. "15.3.0" or "15.0.0"
-    public static var osRelease: String { return try! sysctlString(levels: CTL_KERN, KERN_OSRELEASE) }
+    static var osRelease: String { return try! sysctlString(levels: CTL_KERN, KERN_OSRELEASE) }
 
     /// e.g. 199506 or 199506
-    public static var osRev: Int64 { return try! sysctlInt(levels: CTL_KERN, KERN_OSREV) }
+    static var osRev: Int64 { return try! sysctlInt(levels: CTL_KERN, KERN_OSREV) }
 
     /// e.g. "Darwin" or "Darwin"
-    public static var osType: String { return try! sysctlString(levels: CTL_KERN, KERN_OSTYPE) }
+    static var osType: String { return try! sysctlString(levels: CTL_KERN, KERN_OSTYPE) }
 
     /// e.g. "15D21" or "13D20"
-    public static var osVersion: String { return try! sysctlString(levels: CTL_KERN, KERN_OSVERSION) }
+    static var osVersion: String { return try! sysctlString(levels: CTL_KERN, KERN_OSVERSION) }
 
     /// e.g. "Darwin Kernel Version 15.3.0: Thu Dec 10 18:40:58 PST 2015; root:xnu-3248.30.4~1/RELEASE_X86_64" or
     /// "Darwin Kernel Version 15.0.0: Wed Dec  9 22:19:38 PST 2015; root:xnu-3248.31.3~2/RELEASE_ARM64_S8000"
-    public static var version: String { return try! sysctlString(levels: CTL_KERN, KERN_VERSION) }
+    static var version: String { return try! sysctlString(levels: CTL_KERN, KERN_VERSION) }
 
     #if os(OSX)
         /// e.g. 2659000000 (not available on iOS)
-        public static var cpuFreq: Int64 { return try! sysctlInt(name: "hw.cpufrequency") }
+        static var cpuFreq: Int64 { return try! sysctlInt(name: "hw.cpufrequency") }
 
         /// e.g. 25769803776 (not available on iOS)
-        public static var memSize: Int64 { return try! sysctlInt(levels: CTL_HW, HW_MEMSIZE) }
+        static var memSize: Int64 { return try! sysctlInt(levels: CTL_HW, HW_MEMSIZE) }
     #endif
 }

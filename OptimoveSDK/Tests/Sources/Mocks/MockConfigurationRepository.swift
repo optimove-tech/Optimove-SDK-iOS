@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import OptimoveSDK
+@testable import OptimoveSDK
 import OptimoveCore
 
 final class MockConfigurationRepository: ConfigurationRepository {
