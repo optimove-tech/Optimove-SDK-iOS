@@ -3,7 +3,7 @@
 import Foundation
 
 public extension FileManager {
-    static func optimoveAppGroupURL() -> URL {
+    static func optimoveAppGroupURL() throws -> URL {
         let suiteName = Bundle.optimoveAppGroupIdentifier
         guard let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: suiteName) else {
             let message = """
@@ -11,7 +11,8 @@ public extension FileManager {
             Highly possible that the client forgot to add the app group as described in the documentation.
             Link: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/SDK-Setup-Capabilities
             """
-            fatalError(message)
+            assertionFailure(message)
+            throw GuardError.custom(message)
         }
         return url
     }

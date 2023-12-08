@@ -3,7 +3,7 @@
 import Foundation
 
 public extension UserDefaults {
-    static func optimoveAppGroup() -> UserDefaults {
+    static func optimoveAppGroup() throws -> UserDefaults {
         let suiteName = Bundle.optimoveAppGroupIdentifier
         guard let userDefaults = UserDefaults(suiteName: suiteName) else {
             let message = """
@@ -11,7 +11,8 @@ public extension UserDefaults {
             Highly possible that the client forgot to add the app group as described in the documentation.
             Link: https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/SDK-Setup-Capabilities
             """
-            fatalError(message)
+            assertionFailure(message)
+            throw GuardError.custom(message)
         }
         return userDefaults
     }

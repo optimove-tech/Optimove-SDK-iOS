@@ -42,7 +42,7 @@ final class OptimoveConfigBuilderTests: XCTestCase {
     }
 
     func testBaseUrlMapping() throws {
-        UserDefaults.optimoveAppGroup().set(value: Region.DEV.rawValue, key: .region)
+        try UserDefaults.optimoveAppGroup().set(value: Region.DEV.rawValue, key: .region)
         let urlsMap = UrlBuilder.defaultMapping(for: Region.DEV.rawValue)
         let config = optimoveConfigBuilder.build()
         try UrlBuilder.Service.allCases.forEach { service in

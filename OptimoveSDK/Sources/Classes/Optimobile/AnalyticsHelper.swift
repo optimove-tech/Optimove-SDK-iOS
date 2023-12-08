@@ -80,7 +80,7 @@ final class AnalyticsHelper {
     private func initContext() {
         let appDbUrl = getAppDbUrl()
         let appDbExists = appDbUrl == nil ? false : FileManager.default.fileExists(atPath: appDbUrl!.path)
-        let appGroupExists = AppGroupsHelper.isAppGroupDefined()
+        let appGroupExists = true
 
         let storeUrl = getMainStoreUrl(appGroupExists: appGroupExists)
 
