@@ -48,9 +48,9 @@ public enum OptimoveNotificationService {
                 bestAttemptContent.attachments = [attachment]
             }
             let optimobileHelper = OptimobileHelper(storage: storage)
-            if let badge = maybeSetBadge(userInfo: userInfo, optimobileHelper: optimobileHelper) {
+            if let badge = optimobileHelper.getBadge(notification: notification) {
                 storage.set(value: badge, key: .badgeCount)
-                bestAttemptContent.badge = badge
+                bestAttemptContent.badge = NSNumber(integerLiteral: badge)
             }
             let pendingNoticationHelper = PendingNotificationHelper(storage: storage)
             pendingNoticationHelper.add(
@@ -129,21 +129,5 @@ public enum OptimoveNotificationService {
             identifier: "",
             url: tempURL
         )
-    }
-
-    static func maybeSetBadge(
-        userInfo: [AnyHashable: Any],
-        optimobileHelper: OptimobileHelper
-    ) -> NSNumber? {
-        let aps = userInfo["aps"] as! [AnyHashable: Any]
-        if let contentAvailable = aps["content-available"] as? Int, contentAvailable == 1 {
-            return nil
-        }
-
-        let newBadge: NSNumber? = optimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
-        if newBadge == nil {
-            return nil
-        }
-        return newBadge
     }
 }

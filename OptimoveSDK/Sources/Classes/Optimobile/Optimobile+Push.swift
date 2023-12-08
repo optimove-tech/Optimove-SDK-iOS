@@ -348,7 +348,7 @@ class PushHelper {
                 let notification = try PushNotification(userInfo: userInfo)
                 let hasInApp = notification.deeplink != nil
 
-                self.setBadge(userInfo: userInfo)
+                self.setBadge(notification: notification)
                 self.trackPushDelivery(notification: notification)
 
                 if existingDidReceive == nil, !hasInApp {
@@ -419,10 +419,9 @@ class PushHelper {
         self.optimobileHelper = optimobileHelper
     }
 
-    private func setBadge(userInfo: [AnyHashable: Any]) {
-        let badge: NSNumber? = optimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
-        if let newBadge = badge {
-            UIApplication.shared.applicationIconBadgeNumber = newBadge.intValue
+    private func setBadge(notification: PushNotification) {
+        if let badge = optimobileHelper.getBadge(notification: notification) {
+            UIApplication.shared.applicationIconBadgeNumber = badge
         }
     }
 
