@@ -1,6 +1,6 @@
 //  Copyright © 2023 Optimove. All rights reserved.
 
-@testable import OptimobileCore
+import OptimoveCore
 import XCTest
 
 final class MediaHelperTests: XCTestCase {

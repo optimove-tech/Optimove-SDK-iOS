@@ -1,6 +1,6 @@
 import CoreLocation
 import Foundation
-import OptimobileCore
+import OptimoveCore
 
 extension Optimobile {
     static func sendLocationUpdate(location: CLLocation) {

@@ -2,7 +2,7 @@
 
 import CoreData
 import Foundation
-import OptimobileCore
+import OptimoveCore
 
 public class InAppInboxItem {
     public internal(set) var id: Int64

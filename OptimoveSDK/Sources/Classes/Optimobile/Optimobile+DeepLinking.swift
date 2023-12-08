@@ -1,8 +1,8 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 import UIKit
-import OptimobileCore
 
 public struct DeepLinkContent {
     public let title: String?
