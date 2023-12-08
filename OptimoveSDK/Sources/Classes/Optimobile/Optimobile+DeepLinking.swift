@@ -44,18 +44,18 @@ final class DeepLinkHelper {
         let wasDeferred: Bool
     }
 
-    fileprivate static let deferredLinkCheckedKey = "KUMULOS_DDL_CHECKED"
-
     let config: OptimobileConfig
     let httpClient: KSHttpClient
+    let storage: OptimoveStorage
     var anyContinuationHandled: Bool
     var cachedLink: CachedLink?
     var cachedFingerprintComponents: [String: String]?
     var finishedInitializationToken: NSObjectProtocol?
 
-    init(_ config: OptimobileConfig, httpClient: KSHttpClient) {
+    init(_ config: OptimobileConfig, httpClient: KSHttpClient, storage: OptimoveStorage) {
         self.config = config
         self.httpClient = httpClient
+        self.storage = storage
         anyContinuationHandled = false
 
         finishedInitializationToken = NotificationCenter.default
@@ -97,7 +97,7 @@ final class DeepLinkHelper {
     private func checkForDeferredLinkOnClipboard() -> Bool {
         var handled = false
 
-        if let checked = KeyValPersistenceHelper.object(forKey: DeepLinkHelper.deferredLinkCheckedKey) as? Bool, checked == true {
+        if let checked: Bool? = storage[.deferredLinkChecked], checked == true {
             return handled
         }
 
@@ -114,7 +114,7 @@ final class DeepLinkHelper {
             handled = true
         }
 
-        KeyValPersistenceHelper.set(true, forKey: DeepLinkHelper.deferredLinkCheckedKey)
+        storage.set(value: true, key: .deferredLinkChecked)
 
         return handled
     }

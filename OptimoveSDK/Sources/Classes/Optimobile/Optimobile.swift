@@ -21,8 +21,6 @@ public enum InAppDisplayMode: String {
     case paused
 }
 
-// MARK: class
-
 final class Optimobile {
     enum Error: LocalizedError {
         case alreadyInitialized
@@ -43,12 +41,21 @@ final class Optimobile {
 
     let pushNotificationDeviceType = 1
     let pushNotificationProductionTokenType: Int = 1
-
     let sdkType: Int = 101
-
     fileprivate static var instance: Optimobile?
-
     var notificationCenter: Any?
+    private(set) var config: OptimobileConfig
+    private(set) var inAppConsentStrategy = InAppConsentStrategy.notEnabled
+    private(set) var inAppManager: InAppManager
+    private(set) var analyticsHelper: AnalyticsHelper
+    private(set) var sessionHelper: SessionHelper
+    private(set) var badgeObserver: OptimobileBadgeObserver
+    private var pushHelper: PushHelper
+    private(set) var deepLinkHelper: DeepLinkHelper?
+    private let networkFactory: NetworkFactory
+    private var credentials: OptimobileCredentials?
+    let pendingNoticationHelper: PendingNotificationHelper
+    let optimobileHelper: OptimobileHelper
 
     static var sharedInstance: Optimobile {
         if isInitialized() == false {
@@ -62,33 +69,17 @@ final class Optimobile {
         return sharedInstance
     }
 
-    private(set) var config: OptimobileConfig
-    private(set) var inAppConsentStrategy = InAppConsentStrategy.notEnabled
-
     static var inAppConsentStrategy: InAppConsentStrategy {
         return sharedInstance.inAppConsentStrategy
     }
-
-    private(set) var inAppManager: InAppManager
-
-    private(set) var analyticsHelper: AnalyticsHelper
-    private(set) var sessionHelper: SessionHelper
-    private(set) var badgeObserver: OptimobileBadgeObserver
-
-    private var pushHelper: PushHelper
-
-    private(set) var deepLinkHelper: DeepLinkHelper?
-
-    private let networkFactory: NetworkFactory
-    private var credentials: OptimobileCredentials?
 
     /**
          The unique installation Id of the current app
 
          - Returns: String - UUID
      */
-    static var installId: String {
-        return OptimobileHelper.installId
+    func installId() -> String {
+        return optimobileHelper.installId()
     }
 
     static func isInitialized() -> Bool {
@@ -102,9 +93,12 @@ final class Optimobile {
     /**
          Initialize the Optimobile SDK.
      */
-    static func initialize(config optimoveConfig: OptimoveConfig, initialVisitorId: String, initialUserId: String?) throws {
+    static func initialize(
+        optimoveConfig: OptimoveConfig,
+        storage: OptimoveStorage
+    ) throws {
         if instance !== nil, optimoveConfig.features.contains(.delayedConfiguration) {
-            try completeDelayedConfiguration(config: optimoveConfig.optimobileConfig!)
+            try completeDelayedConfiguration(config: optimoveConfig.optimobileConfig!, storage: storage)
             return
         }
 
@@ -117,9 +111,9 @@ final class Optimobile {
             throw Error.configurationIsMissing
         }
 
-        writeDefaultsKeys(config: config, initialVisitorId: initialVisitorId)
+        try writeDefaultsKeys(config: config, storage: storage)
 
-        instance = Optimobile(config: config)
+        instance = Optimobile(config: config, storage: storage)
 
         instance!.initializeHelpers()
 
@@ -133,19 +127,19 @@ final class Optimobile {
             instance!.sendDeviceInformation(config: config)
         }
 
-        maybeAlignUserAssociation(initialUserId: initialUserId)
+        instance!.maybeAlignUserAssociation(storage: storage)
 
         if !optimoveConfig.features.contains(.delayedConfiguration) {
             NotificationCenter.default.post(name: .optimobileInializationFinished, object: nil)
         }
     }
 
-    static func completeDelayedConfiguration(config: OptimobileConfig) throws {
+    static func completeDelayedConfiguration(config: OptimobileConfig, storage: OptimoveStorage) throws {
         guard let credentials = config.credentials else {
             throw Error.noCredentialsProvidedForDelayedConfigurationCompletion
         }
         Logger.info("Completing delayed configuration with credentials: \(credentials)")
-        updateStorageValues(config)
+        updateStorageValues(config, storage: storage)
         setCredentials(credentials)
         NotificationCenter.default.post(name: .optimobileInializationFinished, object: nil)
     }
@@ -154,16 +148,18 @@ final class Optimobile {
         Optimobile.instance?.credentials = credentials
     }
 
-    static func updateStorageValues(_ config: OptimobileConfig) {
-        KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
+    static func updateStorageValues(_ config: OptimobileConfig, storage: OptimoveStorage) {
+        storage.set(value: config.region.rawValue, key: .region)
         let baseUrlMap = UrlBuilder.defaultMapping(for: config.region.rawValue)
-        KeyValPersistenceHelper.set(baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
+        storage.set(value: baseUrlMap[.media], key: .mediaURL)
     }
 
-    fileprivate static func writeDefaultsKeys(config: OptimobileConfig, initialVisitorId: String) {
-        KeyValPersistenceHelper.maybeMigrateUserDefaultsToAppGroups()
-
-        let existingInstallId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue) as? String
+    fileprivate static func writeDefaultsKeys(
+        config: OptimobileConfig,
+        storage: OptimoveStorage
+    ) throws {
+        let existingInstallId: String? = storage[.installUUID]
+        let initialVisitorId = try storage.getInitialVisitorId()
         // This block handles upgrades from Kumulos SDK users to Optimove SDK users
         // In the case where a user was auto-enrolled into in-app messaging on the K SDK, they would not become auto-enrolled
         // on the new Optimove SDK installation.
@@ -172,34 +168,34 @@ final class Optimobile {
         // we're a new install. Note comparing to `nil` isn't enough because we may have a value depending if previous storage used
         // app groups or not.
         if existingInstallId != initialVisitorId,
-           let _ = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
+           storage[.inAppConsented] != nil
         {
-            UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
+            storage.set(value: nil, key: .inAppConsented)
         }
-        KeyValPersistenceHelper.set(initialVisitorId, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
+        storage.set(value: initialVisitorId, key: .installUUID)
 
         if let credentials = config.credentials {
             setCredentials(credentials)
         }
-        updateStorageValues(config)
+        updateStorageValues(config, storage: storage)
     }
 
-    fileprivate static func maybeAlignUserAssociation(initialUserId: String?) {
-        if initialUserId == nil {
+    fileprivate func maybeAlignUserAssociation(storage: OptimoveStorage) {
+        guard let initialUserId: String = storage[.customerID] else {
             return
         }
 
-        let optimobileUserId = OptimobileHelper.currentUserIdentifier
+        let optimobileUserId = optimobileHelper.currentUserIdentifier()
         if optimobileUserId == initialUserId {
             return
         }
 
-        Optimobile.associateUserWithInstall(userIdentifier: initialUserId!)
+        Optimobile.associateUserWithInstall(userIdentifier: initialUserId, storage: storage)
     }
 
-    private init(config: OptimobileConfig) {
+    private init(config: OptimobileConfig, storage: OptimoveStorage) {
         self.config = config
-        let urlBuilder = UrlBuilder(storage: KeyValPersistenceHelper.self)
+        let urlBuilder = UrlBuilder(storage: storage)
         networkFactory = NetworkFactory(
             urlBuilder: urlBuilder,
             authorization: AuthorizationMediator(provider: {
@@ -207,20 +203,39 @@ final class Optimobile {
             })
         )
         inAppConsentStrategy = config.inAppConsentStrategy
-
+        optimobileHelper = OptimobileHelper(
+            storage: storage
+        )
         analyticsHelper = AnalyticsHelper(
-            httpClient: networkFactory.build(for: .events)
+            httpClient: networkFactory.build(for: .events),
+            optimobileHelper: optimobileHelper
         )
 
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)
-        inAppManager = InAppManager(config, httpClient: networkFactory.build(for: .push), urlBuilder: urlBuilder)
-        pushHelper = PushHelper()
+        pendingNoticationHelper = PendingNotificationHelper(
+            storage: storage
+        )
+        inAppManager = InAppManager(
+            config,
+            httpClient: networkFactory.build(for: .push),
+            urlBuilder: urlBuilder,
+            storage: storage,
+            pendingNoticationHelper: pendingNoticationHelper,
+            optimobileHelper: optimobileHelper
+        )
+        pushHelper = PushHelper(
+            optimobileHelper: optimobileHelper
+        )
         badgeObserver = OptimobileBadgeObserver(callback: { newBadgeCount in
-            KeyValPersistenceHelper.set(newBadgeCount, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
+            storage.set(value: newBadgeCount, key: .badgeCount)
         })
 
         if config.deepLinkHandler != nil {
-            deepLinkHelper = DeepLinkHelper(config, httpClient: networkFactory.build(for: .ddl))
+            deepLinkHelper = DeepLinkHelper(
+                config,
+                httpClient: networkFactory.build(for: .ddl),
+                storage: storage
+            )
         }
 
         Logger.debug("Optimobile SDK was initialized with \(config)")

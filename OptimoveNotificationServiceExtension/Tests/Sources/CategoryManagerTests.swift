@@ -2,10 +2,13 @@
 
 @testable import OptimoveNotificationServiceExtension
 import XCTest
+import OptimoveTest
 
 final class CategoryManagerTests: XCTestCase {
-    override func tearDown() async throws {
-        UserDefaults.standard.removeObject(forKey: CategoryManager.Constants.DYNAMIC_CATEGORY)
+    var categoryManager: CategoryManager!
+
+    override func setUpWithError() throws {
+        categoryManager = CategoryManager(storage: MockOptimoveStorage())
     }
 
     func test_category_id() {
@@ -14,17 +17,17 @@ final class CategoryManagerTests: XCTestCase {
     }
 
     func test_read_dynamic_categories() async throws {
-        let categories = CategoryManager.readCategoryIds()
+        let categories = categoryManager.readCategoryIds()
         XCTAssertEqual(categories.count, 0)
     }
 
     func test_write_dynamic_categories() async throws {
-        let categories = CategoryManager.readCategoryIds()
+        let categories = categoryManager.readCategoryIds()
         XCTAssertEqual(categories.count, 0)
 
-        CategoryManager.writeCategoryIds(["category1", "category2"])
+        categoryManager.writeCategoryIds(["category1", "category2"])
 
-        let newCategories = CategoryManager.readCategoryIds()
+        let newCategories = categoryManager.readCategoryIds()
         XCTAssertEqual(newCategories.count, 2)
     }
 
@@ -36,7 +39,7 @@ final class CategoryManagerTests: XCTestCase {
         ]
         let categoryIds = Set(["category1", "category2", "category3"])
 
-        let (prunedCategories, prunedCategoryIds) = CategoryManager.maybePruneCategories(
+        let (prunedCategories, prunedCategoryIds) = categoryManager.maybePruneCategories(
             categories: categories,
             categoryIds: categoryIds
         )
@@ -53,7 +56,7 @@ final class CategoryManagerTests: XCTestCase {
         ]
         let categoryIds = Set(["category1", "category2", "category3"])
 
-        let (prunedCategories, prunedCategoryIds) = CategoryManager.maybePruneCategories(
+        let (prunedCategories, prunedCategoryIds) = categoryManager.maybePruneCategories(
             categories: categories,
             categoryIds: categoryIds,
             limit: 2
