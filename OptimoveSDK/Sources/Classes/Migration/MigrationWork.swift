@@ -272,6 +272,19 @@ final class MigrationWork_5_7_0: MigrationWorker {
                 kumulosStorage.removeObject(forKey: key.rawValue)
             }
         }
+        /// Rename Kumulos keys to Optimove keys.
+        OptimobileUserDefaultsKey.allCases.forEach { key in
+            if let value = optimoveStorage.object(forKey: key.rawValue),
+               let storageKey = keyMapping[key]
+            {
+                optimoveStorage.removeObject(forKey: key.rawValue)
+                optimoveStorage.set(value: value, key: storageKey)
+            }
+        }
+        /// Remove Kumulos UserDefaults keys.
+        ["KumulosDidMigrateToAppGroups"].forEach { key in
+            kumulosStorage.removeObject(forKey: key)
+        }
         Logger.info("Migration from Kumulos UserDefaults to Optimove UserDefaults completed")
         super.runMigration()
     }
