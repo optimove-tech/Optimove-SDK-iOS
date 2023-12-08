@@ -149,9 +149,14 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     override public required init() {
-        features = []
-        urlBuilder = UrlBuilder(storage: UserDefaults.optimoveAppGroup())
-        super.init()
+        do {
+            features = []
+            // FIXME: Move UrlBuilder out of OptimoveConfigBuilder
+            urlBuilder = try UrlBuilder(storage: UserDefaults.optimoveAppGroup())
+            super.init()
+        } catch {
+            fatalError(error.localizedDescription)
+        }
     }
 
     @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {

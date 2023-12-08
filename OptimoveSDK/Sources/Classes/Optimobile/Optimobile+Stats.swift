@@ -159,7 +159,7 @@ extension Optimobile {
         }
 
         return [
-            "hasGroup": AppGroupsHelper.isAppGroupDefined(),
+            "hasGroup": true,
             "push": push,
         ]
     }

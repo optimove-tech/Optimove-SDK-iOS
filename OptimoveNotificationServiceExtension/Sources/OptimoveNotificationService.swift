@@ -39,8 +39,7 @@ public enum OptimoveNotificationService {
         if bestAttemptContent.categoryIdentifier.isEmpty {
             bestAttemptContent.categoryIdentifier = await buildCategory(notification: notification)
         }
-        if AppGroupsHelper.isAppGroupDefined() {
-            let storage = UserDefaults.optimoveAppGroup()
+        if let storage = try? UserDefaults.optimoveAppGroup() {
             let mediaHelper = MediaHelper(storage: storage)
             if let attachment = try await maybeGetAttachment(
                 notification: notification,

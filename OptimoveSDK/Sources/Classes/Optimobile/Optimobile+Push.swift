@@ -246,9 +246,6 @@ extension Optimobile {
 
     @available(iOS 10.0, *)
     func maybeTrackPushDismissedEvents() {
-        if !AppGroupsHelper.isAppGroupDefined() {
-            return
-        }
         Task {
             do {
                 let notifications = await UNUserNotificationCenter.current().deliveredNotifications()
