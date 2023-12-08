@@ -18,7 +18,7 @@ final class PushNotificationTests: XCTestCase, FileAccessible {
         fileName = "notification-badge.json"
         let decoder = JSONDecoder()
         let notification = try decoder.decode(PushNotification.self, from: data)
-        XCTAssertEqual(notification.badge, 42)
+        XCTAssertEqual(notification.badgeIncrement, 42)
     }
 
     func test_decode_buttons() throws {
