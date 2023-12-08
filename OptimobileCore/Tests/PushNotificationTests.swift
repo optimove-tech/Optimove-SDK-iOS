@@ -54,7 +54,7 @@ final class PushNotificationTests: XCTestCase, FileAccessible {
         let decoder = JSONDecoder()
         let notification = try decoder.decode(PushNotification.self, from: data)
 
-        XCTAssertEqual(notification.isBackground, true)
+        XCTAssertEqual(notification.aps.isBackground, true)
     }
 
     func test_decode_url() throws {

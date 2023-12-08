@@ -4,18 +4,37 @@ import Foundation
 
 /// Represents a push notification received from the server.
 public struct PushNotification: Decodable {
-    public struct Data: Decodable {
-        public let id: Int
+    public struct Aps: Decodable {
+        public struct Alert: Decodable {
+            public let title: String?
+            public let body: String?
+        }
+
+        public let alert: Alert?
+        public let badge: Int?
+        public let sound: String?
+        /// The background notification flag. To perform a silent background update, specify the value 1 and don’t include the alert, badge, or sound keys in your payload. If this key is present with a value of 1, the system attempts to initialize your app in the background so that it can make updates to its user interface. If the app is already running in the foreground, this key has no effect.
+        public let isBackground: Bool
+        /// The notification service app extension flag. If the value is 1, the system passes the notification to your notification service app extension before delivery. Use your extension to modify the notification’s content.
+        public let isExtension: Bool
 
         private enum CodingKeys: String, CodingKey {
-            case id
-            case data
+            case alert
+            case badge
+            case sound
+            case isBackground = "content-available"
+            case isExtension = "mutable-content"
         }
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            let data = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
-            self.id = try data.decode(Int.self, forKey: CodingKeys.id)
+            self.alert = try container.decodeIfPresent(Alert.self, forKey: .alert)
+            self.badge = try container.decodeIfPresent(Int.self, forKey: .badge)
+            self.sound = try container.decodeIfPresent(String.self, forKey: .sound)
+            let isBackground = try container.decodeIfPresent(Int.self, forKey: .isBackground)
+            self.isBackground = isBackground == 1
+            let isExtension = try container.decodeIfPresent(Int.self, forKey: .isExtension)
+            self.isExtension = isExtension == 1
         }
     }
 
@@ -39,12 +58,28 @@ public struct PushNotification: Decodable {
         public let text: String
     }
 
+    public struct Data: Decodable {
+        public let id: Int
+
+        private enum CodingKeys: String, CodingKey {
+            case id
+            case data
+        }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let data = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
+            self.id = try data.decode(Int.self, forKey: CodingKeys.id)
+        }
+    }
+
+    public let aps: Aps
     public let attachment: PushNotification.Attachment?
+    /// Optimove badge
     public let badge: Int?
     public let buttons: [PushNotification.Button]?
     public let deeplink: PushNotification.Data?
     public let message: PushNotification.Data
-    public let isBackground: Bool
     public let url: URL?
 
     private enum CodingKeys: String, CodingKey {
@@ -55,7 +90,6 @@ public struct PushNotification: Decodable {
         case buttons = "k.buttons"
         case custom
         case deeplink = "k.deepLink"
-        case isBackground = "content-available"
         case message = "k.message"
         case u
     }
@@ -68,20 +102,16 @@ public struct PushNotification: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.aps = try container.decode(Aps.self, forKey: .aps)
+        self.attachment = try container.decodeIfPresent(Attachment.self, forKey: .attachments)
 
         let custom = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .custom)
-        self.attachment = try container.decodeIfPresent(Attachment.self, forKey: .attachments)
         self.badge = try custom.decodeIfPresent(Int.self, forKey: .badge)
+        self.url = try custom.decodeIfPresent(URL.self, forKey: .u)
 
         let a = try custom.nestedContainer(keyedBy: CodingKeys.self, forKey: .a)
         self.buttons = try a.decodeIfPresent([Button].self, forKey: .buttons)
         self.deeplink = try a.decodeIfPresent(PushNotification.Data.self, forKey: .deeplink)
         self.message = try a.decode(PushNotification.Data.self, forKey: .message)
-
-        let aps = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .aps)
-        let isBackground = try aps.decodeIfPresent(Int.self, forKey: .isBackground)
-        self.isBackground = isBackground == 1 ? true : false
-
-        self.url = try custom.decodeIfPresent(URL.self, forKey: .u)
     }
 }
