@@ -1,8 +1,8 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
+import CoreData
 import Foundation
 import OptimoveCore
-import CoreData
 
 enum OptistreamQueueType: String {
     case realtime

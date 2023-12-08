@@ -4,12 +4,11 @@ import Foundation
 import OptimoveCore
 
 final class RealTime {
-
-    private struct Constants {
+    private enum Constants {
         static let eventBatchLimit = 50
         static let failProtectedEvents = [
             OptimoveKeys.Configuration.setUserId.rawValue,
-            OptimoveKeys.Configuration.setEmail.rawValue
+            OptimoveKeys.Configuration.setEmail.rawValue,
         ]
         static let path = "reportEvent"
     }
@@ -26,18 +25,18 @@ final class RealTime {
         configuration: RealtimeConfig,
         storage: OptimoveStorage,
         networking: OptistreamNetworking,
-        queue: OptistreamQueue) {
+        queue: OptistreamQueue
+    ) {
         self.configuration = configuration
         self.storage = storage
         self.networking = networking
         self.queue = queue
     }
-
 }
 
 extension RealTime: OptistreamComponent {
-
     func serve(_ operation: OptistreamOperation) throws {
+        Logger.debug("\(self) serve \(operation)")
         let handleOperationOnQueue: () -> Void = { [weak self] in
             guard let self = self else { return }
             switch operation {
@@ -54,7 +53,6 @@ extension RealTime: OptistreamComponent {
 }
 
 private extension RealTime {
-
     func isAllowedToReport(_ event: OptistreamEvent) -> Bool {
         return event.metadata.realtime &&
             !configuration.isEnableRealtimeThroughOptistream
@@ -73,8 +71,8 @@ private extension RealTime {
             } else {
                 /// If intersection found, we have to separate the outdated `failProtectedEvents` from the up-to-dated `failProtectedEvents`,
                 /// and keep only up-to-dated, if they're left.
-                let toSend = failProtectedEvents.filter { (event) -> Bool in
-                    return events.filter { $0.event == event.event }.isEmpty
+                let toSend = failProtectedEvents.filter { event -> Bool in
+                    events.filter { $0.event == event.event }.isEmpty
                 }
                 /// Remove the outdated `failProtectedEvents` from a queue.
                 let toRemove = failProtectedEvents.filter { !toSend.contains($0) }
@@ -84,17 +82,15 @@ private extension RealTime {
             }
         }
     }
-
 }
 
 // MARK: - Private
 
 private extension RealTime {
-
     // MARK: Send report
 
     func sentReportEvent(_ events: [OptistreamEvent]) {
-        networking.send(events: events, path: Constants.path) { [weak self] (result) in
+        networking.send(events: events, path: Constants.path) { [weak self] result in
             guard let self = self else { return }
             self.realTimeQueue.async { [weak self] in
                 guard let self = self else { return }
@@ -120,5 +116,4 @@ private extension RealTime {
     func isFailProtectedEvent(_ event: OptistreamEvent) -> Bool {
         return Constants.failProtectedEvents.contains(event.event)
     }
-
 }

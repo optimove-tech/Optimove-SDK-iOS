@@ -7,7 +7,6 @@ typealias NetworkClient = OptimoveCore.NetworkClient
 typealias NetworkClientImpl = OptimoveCore.NetworkClientImpl
 
 final class MainFactory {
-
     private let serviceLocator: ServiceLocator
 
     init(serviceLocator: ServiceLocator) {
@@ -40,5 +39,4 @@ final class MainFactory {
             networking: networkingFactory().createRemoteConfigurationNetworking()
         )
     }
-
 }

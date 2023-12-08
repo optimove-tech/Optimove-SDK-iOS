@@ -2,6 +2,6 @@
 
 import Foundation
 
-extension Notification.Name {
-    public static let internetStatusChanged = Notification.Name("internetStatusChanged")
+public extension Notification.Name {
+    static let internetStatusChanged = Notification.Name("internetStatusChanged")
 }

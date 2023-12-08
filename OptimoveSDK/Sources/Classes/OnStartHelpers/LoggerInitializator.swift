@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class LoggerInitializator {
-
     private var storage: OptimoveStorage
 
     init(storage: OptimoveStorage) {
@@ -15,5 +14,4 @@ final class LoggerInitializator {
         MultiplexLoggerStream.add(stream: ConsoleLoggerStream())
         MultiplexLoggerStream.add(stream: RemoteLoggerStream(tenantId: storage.tenantID ?? -1))
     }
-
 }

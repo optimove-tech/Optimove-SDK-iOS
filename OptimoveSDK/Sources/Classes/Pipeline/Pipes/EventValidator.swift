@@ -4,16 +4,16 @@ import Foundation
 import OptimoveCore
 
 final class EventValidator: Pipe {
-    
     private let configuration: Configuration
     private let storage: OptimoveStorage
-    
+
     init(configuration: Configuration,
-         storage: OptimoveStorage) {
+         storage: OptimoveStorage)
+    {
         self.configuration = configuration
         self.storage = storage
     }
-    
+
     override func deliver(_ operation: CommonOperation) throws {
         let validationFunction = { [configuration] () throws -> CommonOperation in
             switch operation {
@@ -27,10 +27,9 @@ final class EventValidator: Pipe {
                             switch error {
                             case .alreadySetInUserEmail, .alreadySetInUserId:
                                 include = false
-                                break
                             }
                         }
-                        
+
                         return include
                     }
                     return CommonOperation.report(events: validatedEvents)
@@ -47,12 +46,12 @@ final class EventValidator: Pipe {
         }
         try next?.deliver(validationFunction())
     }
-    
+
     func verifySetUserIdEvent(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserIdEvent.Constants.name,
-           let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String {
-            
+           let userID = event.context[SetUserIdEvent.Constants.Key.userId] as? String
+        {
             let user = User(userID: userID)
             let userID = user.userID.trimmingCharacters(in: .whitespaces)
             let validationResult = UserValidator(storage: storage).validateNewUser(user)
@@ -65,7 +64,7 @@ final class EventValidator: Pipe {
         }
         return errors
     }
-    
+
     func verifySetEmailEvent(_ event: Event) -> [ValidationError] {
         var errors: [ValidationError] = []
         if event.name == SetUserEmailEvent.Constants.name, let email = event.context[SetUserEmailEvent.Constants.Key.email] as? String {
@@ -80,13 +79,12 @@ final class EventValidator: Pipe {
         return errors
     }
 
-    func validate(event: Event, withConfigs configs: [String: EventsConfig]) throws -> [ValidationError] {
+    func validate(event: Event, withConfigs _: [String: EventsConfig]) throws -> [ValidationError] {
         return [
             verifySetUserIdEvent(event),
-            verifySetEmailEvent(event)
-            ].flatMap { $0 }
+            verifySetEmailEvent(event),
+        ].flatMap { $0 }
     }
-
 }
 
 enum ValidationError: LocalizedError, Equatable {
@@ -105,22 +103,20 @@ enum ValidationError: LocalizedError, Equatable {
 
     var status: Int {
         switch self {
-        case .alreadySetInUserId: return 1_072
-        case .alreadySetInUserEmail: return 1_081
+        case .alreadySetInUserId: return 1072
+        case .alreadySetInUserEmail: return 1081
         }
     }
-
 }
 
 extension String {
-
-    private struct Constants {
+    private enum Constants {
         static let spaceCharacter = " "
         static let underscoreCharacter = "_"
     }
 
     func normilizeKey(with replacement: String = Constants.underscoreCharacter) -> String {
-        return self.trimmingCharacters(in: .whitespaces)
+        return trimmingCharacters(in: .whitespaces)
             .replacingOccurrences(of: Constants.spaceCharacter, with: replacement)
     }
 }

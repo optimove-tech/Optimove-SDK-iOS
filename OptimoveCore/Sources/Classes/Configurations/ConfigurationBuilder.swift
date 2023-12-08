@@ -3,18 +3,18 @@
 import Foundation
 
 public final class ConfigurationBuilder {
-
     private let globalConfig: GlobalConfig
     private let tenantConfig: TenantConfig
     private let events: [String: EventsConfig]
 
     public init(globalConfig: GlobalConfig,
-         tenantConfig: TenantConfig) {
+                tenantConfig: TenantConfig)
+    {
         self.globalConfig = globalConfig
         self.tenantConfig = tenantConfig
         events = globalConfig.coreEvents.merging(
             tenantConfig.events,
-            uniquingKeysWith: { globalEvent, tenantEvent in globalEvent }
+            uniquingKeysWith: { globalEvent, _ in globalEvent }
         )
     }
 
@@ -29,11 +29,9 @@ public final class ConfigurationBuilder {
             isSupportedAirship: tenantConfig.isSupportedAirship
         )
     }
-
 }
 
 private extension ConfigurationBuilder {
-
     func buildLoggerConfig() -> LoggerConfig {
         return LoggerConfig(
             tenantID: tenantConfig.optitrack.siteId,
@@ -62,5 +60,4 @@ private extension ConfigurationBuilder {
             isEnableRealtime: tenantConfig.isEnableRealtime && tenantConfig.isEnableRealtimeThroughOptistream
         )
     }
-
 }

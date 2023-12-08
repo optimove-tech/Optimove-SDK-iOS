@@ -3,15 +3,14 @@
 import CoreData
 
 struct CoreDataRelationshipDescription {
-
     static func relationship(
-               name: String,
+        name: String,
         destination: String,
-           optional: Bool = true,
-             toMany: Bool = false,
-         deleteRule: NSDeleteRule = .nullifyDeleteRule,
-            inverse: String? = nil) -> CoreDataRelationshipDescription {
-
+        optional: Bool = true,
+        toMany: Bool = false,
+        deleteRule: NSDeleteRule = .nullifyDeleteRule,
+        inverse: String? = nil
+    ) -> CoreDataRelationshipDescription {
         let maxCount = toMany ? 0 : 1
 
         return CoreDataRelationshipDescription(name: name, destination: destination, optional: optional, maxCount: maxCount, minCount: 0, deleteRule: deleteRule, inverse: inverse)
@@ -33,7 +32,6 @@ struct CoreDataRelationshipDescription {
 }
 
 extension CoreDataRelationshipDescription {
-
     /// create a relationship from an NSManagedObject KeyPath, the inverse relationship another NSManagedObject KeyPath, and given delete rule
     static func relationship<Root, Value, InverseRoot, InverseValue>(_ keyPath: KeyPath<Root, Value>, inverse: KeyPath<InverseRoot, InverseValue>, deleteRule: NSDeleteRule = .nullifyDeleteRule) -> CoreDataRelationshipDescription where Root: NSManagedObject, InverseRoot: NSManagedObject {
         assert(keyPath.destinationType is NSManagedObject.Type)

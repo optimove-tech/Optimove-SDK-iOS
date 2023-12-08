@@ -1,8 +1,14 @@
 # Changelog
 
+## 5.6.0
+
+- Support the delayed configuration for SDK. Add new public APIs:
+    - `OptimoveConfigBuilder(region: Region, features: [Feature])` - call for creating delayed configuration builder.
+    - `Optimove.setCredentials(optimoveCredentials: String?, optimobileCredentials: String?)` - call for setting credentials for delayed configuration.
+
 ## 5.5.0
 
-- Add a new public API `Optimove.trackOpenMetric(userInfo: [AnyHashable: Any])` - to track the open metric of a push notification, when UserNotificationCenter delegate is not available.
+- Add a new public API `Optimove.shared.trackOpenMetric(userInfo: [AnyHashable: Any])` - to track the open metric of a push notification, when UserNotificationCenter delegate is not available.
 - Increased the minimum supported iOS version to 12.0 for Carthage builds.
 
 ## 5.4.0

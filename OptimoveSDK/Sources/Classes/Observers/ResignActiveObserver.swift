@@ -8,7 +8,6 @@ protocol ResignActiveSubscriber {
 }
 
 final class ResignActiveObserver: DeviceStateObservable {
-
     private let subscriber: ResignActiveSubscriber
     private var willResignActiveToken: NSObjectProtocol?
 
@@ -21,9 +20,8 @@ final class ResignActiveObserver: DeviceStateObservable {
             forName: UIApplication.willResignActiveNotification,
             object: nil,
             queue: .main
-        ) { [subscriber] (_) in
+        ) { [subscriber] _ in
             subscriber.onResignActive()
         }
     }
-
 }

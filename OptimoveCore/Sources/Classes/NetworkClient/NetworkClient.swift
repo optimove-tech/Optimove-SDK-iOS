@@ -9,19 +9,15 @@ public protocol NetworkClient {
 }
 
 public struct NetworkClientImpl {
-
     let session: URLSession
 
     public init(configuration: URLSessionConfiguration = URLSessionConfiguration.default) {
         session = URLSession(configuration: configuration)
     }
-
 }
 
 extension NetworkClientImpl: NetworkClient {
-
     public func perform(_ request: NetworkRequest, _ completion: @escaping NetworkServiceCompletion) {
-
         let baseURL: URL = request.baseURL
 
         var urlComponents = URLComponents()
@@ -53,7 +49,7 @@ extension NetworkClientImpl: NetworkClient {
 
         request.headers?.forEach { urlRequest.addValue($0.value, forHTTPHeaderField: $0.field) }
 
-        let task = session.dataTask(with: urlRequest) { (data, response, error) in
+        let task = session.dataTask(with: urlRequest) { data, response, error in
             if let error = error {
                 completion(.failure(NetworkError.error(error)))
                 return
@@ -63,11 +59,11 @@ extension NetworkClientImpl: NetworkClient {
                 return
             }
             switch httpResponse.statusCode {
-            case 200...299:
+            case 200 ... 299:
                 completion(.success(NetworkResponse<Data?>(statusCode: httpResponse.statusCode, body: data)))
-            case 400...499:
+            case 400 ... 499:
                 completion(.failure(NetworkError.requestInvalid(data)))
-            case 500...599:
+            case 500 ... 599:
                 completion(.failure(NetworkError.requestFailed))
             default:
                 completion(.success(NetworkResponse<Data?>(statusCode: httpResponse.statusCode, body: data)))
@@ -75,5 +71,4 @@ extension NetworkClientImpl: NetworkClient {
         }
         task.resume()
     }
-
 }

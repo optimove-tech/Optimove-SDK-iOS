@@ -6,7 +6,8 @@ public struct Parameter: Codable, Equatable {
 
     public init(
         type: String,
-        optional: Bool) {
+        optional: Bool
+    ) {
         self.type = type
         self.optional = optional
     }
@@ -19,5 +20,4 @@ public struct Parameter: Codable, Equatable {
         case type
         case optional
     }
-
 }

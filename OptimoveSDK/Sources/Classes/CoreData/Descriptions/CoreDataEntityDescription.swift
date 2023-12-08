@@ -4,7 +4,6 @@ import CoreData
 
 /// Describes and creates `NSEntityDescription`
 struct CoreDataEntityDescription {
-
     static func entity(
         name: String,
         managedObjectClass: NSManagedObject.Type = NSManagedObject.self,

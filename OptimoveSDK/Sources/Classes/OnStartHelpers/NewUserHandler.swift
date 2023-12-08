@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class NewUserHandler {
-
     private var storage: OptimoveStorage
 
     init(storage: OptimoveStorage) {
@@ -15,5 +14,4 @@ final class NewUserHandler {
         storage.customerID = user.userID
         storage.visitorID = user.visitorID
     }
-
 }

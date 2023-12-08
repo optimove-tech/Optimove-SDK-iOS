@@ -14,7 +14,6 @@ public struct OptistreamEvent: Codable {
     public var metadata: Metadata
 
     public struct Metadata: Codable, Hashable {
-
         public var realtime: Bool
         public var firstVisitorDate: Int64?
         public let eventId: String
@@ -42,7 +41,6 @@ public struct OptistreamEvent: Codable {
             self.eventId = eventId
             self.requestId = requestId
         }
-
     }
 
     public init(
@@ -69,11 +67,9 @@ public struct OptistreamEvent: Codable {
 }
 
 extension OptistreamEvent: Equatable {
-
     public static func == (lhs: OptistreamEvent, rhs: OptistreamEvent) -> Bool {
         return lhs.metadata.eventId == rhs.metadata.eventId
     }
-
 }
 
-extension OptistreamEvent: Hashable { }
+extension OptistreamEvent: Hashable {}

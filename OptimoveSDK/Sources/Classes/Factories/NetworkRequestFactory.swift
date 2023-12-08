@@ -5,12 +5,12 @@ import OptimoveCore
 
 // For creating concrete networking.
 final class NetworkingFactory {
-
     private let networkClient: NetworkClient
     private let requestBuilderFactory: NetworkRequestBuilderFactory
 
     init(networkClient: NetworkClient,
-         requestBuilderFactory: NetworkRequestBuilderFactory) {
+         requestBuilderFactory: NetworkRequestBuilderFactory)
+    {
         self.networkClient = networkClient
         self.requestBuilderFactory = requestBuilderFactory
     }

@@ -16,7 +16,6 @@ public protocol OptistreamNetworking {
 }
 
 public final class OptistreamNetworkingImpl {
-
     private let networkClient: NetworkClient
     private let endpoint: URL
 
@@ -50,7 +49,6 @@ public final class OptistreamNetworkingImpl {
 }
 
 extension OptistreamNetworkingImpl: OptistreamNetworking {
-
     public func send(
         events: [OptistreamEvent],
         path: String,
@@ -65,28 +63,27 @@ extension OptistreamNetworkingImpl: OptistreamNetworking {
     ) {
         _send(events: events, path: nil, completion: completion)
     }
-
 }
 
 private extension OptistreamNetworkingImpl {
-
     static func handleResult(result: Result<NetworkResponse<Data?>, NetworkError>,
                              for events: [OptistreamEvent],
-                             completion: @escaping (Result<Void, NetworkError>) -> Void) {
+                             completion: @escaping (Result<Void, NetworkError>) -> Void)
+    {
         do {
             let response = try result.get()
             Logger.debug(
                 """
                 Optistream succeed:
                 request:
-                    \(events.map { $0.event }.joined(separator: "\n\t"))
+                    \(events.map(\.event).joined(separator: "\n\t"))
                 response:
                     status code: \(response.statusCode)
                     body: \(response.description)
                 """
             )
             completion(.success(()))
-        } catch NetworkError.requestInvalid(let data) {
+        } catch let NetworkError.requestInvalid(data) {
             let response: () -> String = {
                 guard let data = data else { return "no data" }
                 return String(decoding: data, as: UTF8.self)
@@ -95,7 +92,7 @@ private extension OptistreamNetworkingImpl {
                 """
                 Optistream request invalid:
                     request:
-                    \(events.map { $0.event }.joined(separator: "\n"))
+                    \(events.map(\.event).joined(separator: "\n"))
                     reason:
                     \(response())
                 """
@@ -106,7 +103,7 @@ private extension OptistreamNetworkingImpl {
                 """
                 Optistream failed:
                     request:
-                    \(events.map { $0.event }.joined(separator: "\n"))
+                    \(events.map(\.event).joined(separator: "\n"))
                     reason:
                     \(error.localizedDescription)
                 """
@@ -114,5 +111,4 @@ private extension OptistreamNetworkingImpl {
             completion(.failure(NetworkError.error(error)))
         }
     }
-
 }

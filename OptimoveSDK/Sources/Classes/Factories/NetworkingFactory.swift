@@ -5,7 +5,6 @@ import OptimoveCore
 
 /// Create network request builders.
 final class NetworkRequestBuilderFactory {
-
     private let serviceLocator: ServiceLocator
 
     init(serviceLocator: ServiceLocator) {
@@ -15,5 +14,4 @@ final class NetworkRequestBuilderFactory {
     func createRemoteConfigurationRequestBuiler() -> RemoteConfigurationRequestBuilder {
         return RemoteConfigurationRequestBuilder(storage: serviceLocator.storage())
     }
-
 }

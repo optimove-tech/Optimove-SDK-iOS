@@ -4,7 +4,6 @@ import CoreData
 
 /// Describes and creates`NSAttributeDescription`
 struct CoreDataAttributeDescription {
-
     static func attribute(
         name: String,
         type: NSAttributeType,

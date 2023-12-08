@@ -2,8 +2,9 @@
 
 import Foundation
 
-public extension FileManager {
+private var temporaryDirectoryURL: URL?
 
+public extension FileManager {
     static func optimoveURL() throws -> URL {
         return try FileManager.default.url(
             for: .applicationSupportDirectory,
@@ -12,5 +13,20 @@ public extension FileManager {
             create: true
         )
     }
-    
+
+    static func temporaryURL() throws -> URL {
+        if let temporaryDirectoryURL = temporaryDirectoryURL {
+            return temporaryDirectoryURL
+        }
+        temporaryDirectoryURL = try FileManager.default.url(
+            for: .itemReplacementDirectory,
+            in: .userDomainMask,
+            appropriateFor: URL(
+                fileURLWithPath: NSTemporaryDirectory(),
+                isDirectory: true
+            ),
+            create: true
+        )
+        return try temporaryURL()
+    }
 }

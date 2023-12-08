@@ -1,14 +1,13 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import Foundation
 import CoreData
+import Foundation
 import OptimoveCore
 import UIKit
 
 final class OptistreamQueueImpl {
-
-    struct Constants {
-        struct Store {
+    enum Constants {
+        enum Store {
             static let name = "Events"
         }
     }
@@ -45,11 +44,9 @@ final class OptistreamQueueImpl {
     @objc func save() {
         context.safeSaveOrRollback()
     }
-
 }
 
 extension OptistreamQueueImpl: OptistreamQueue {
-
     var isEmpty: Bool {
         do {
             return try context.safeTryPerformAndWait { isSafe in
@@ -106,11 +103,10 @@ extension OptistreamQueueImpl: OptistreamQueue {
             Logger.error(error.localizedDescription)
             return []
         }
-
     }
 
     func remove(events: [OptistreamEvent]) {
-        let eventIds = events.map { $0.metadata.eventId }
+        let eventIds = events.map(\.metadata.eventId)
         let predicate = EventCDv2.queueTypeAndEventIdsPredicate(eventIds: eventIds, queueType: queueType)
         context.safePerformAndWait { isSafe in
             if !isSafe {
@@ -120,12 +116,11 @@ extension OptistreamQueueImpl: OptistreamQueue {
             let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: EventCDv2.entityName)
             fetch.predicate = predicate
             tryCatch {
-                let results: [NSManagedObject] = try cast(try context.fetch(fetch))
-                results.forEach({ (object) in
+                let results: [NSManagedObject] = try cast(context.fetch(fetch))
+                results.forEach { object in
                     context.delete(object)
-                })
+                }
             }
-
         }
     }
 }

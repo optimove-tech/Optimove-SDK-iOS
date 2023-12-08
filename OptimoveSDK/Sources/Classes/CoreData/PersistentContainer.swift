@@ -1,11 +1,10 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import Foundation
 import CoreData
+import Foundation
 import OptimoveCore
 
 final class PersistentContainer: NSPersistentContainer {
-
     enum PersistentStoreType {
         case sql
         case inMemory
@@ -20,7 +19,7 @@ final class PersistentContainer: NSPersistentContainer {
         }
     }
 
-    private struct Constants {
+    private enum Constants {
         static let modelName = "OptistreamQueue"
         static let folderName = "com.optimove.sdk.no-backup"
     }
@@ -50,9 +49,9 @@ final class PersistentContainer: NSPersistentContainer {
         )
         persistentStoreDescription.shouldMigrateStoreAutomatically = false
         persistentStoreDescription.shouldInferMappingModelAutomatically = false
-        self.persistentStoreDescriptions = [persistentStoreDescription]
+        persistentStoreDescriptions = [persistentStoreDescription]
         migrateStoreIfNeeded {
-            self.loadPersistentStores { description, error in
+            self.loadPersistentStores { _, error in
                 if let error = error {
                     Logger.error("Unable to load persistent stores: \(error)")
                 }
@@ -85,27 +84,25 @@ final class PersistentContainer: NSPersistentContainer {
 
     private func isThisStoreAlreadyLoaded(storeName: String) -> Bool {
         return !persistentStoreDescriptions.compactMap { psd in
-            return psd.url?.deletingPathExtension().lastPathComponent
+            psd.url?.deletingPathExtension().lastPathComponent
         }.filter { $0 == storeName }.isEmpty
     }
-
 }
 
 extension FileManager {
-
     func defineStoreURL(folderName: String, storeName: String) throws -> URL {
-        let libraryDirectory = try unwrap(self.urls(for: .libraryDirectory, in: .userDomainMask).first)
+        let libraryDirectory = try unwrap(urls(for: .libraryDirectory, in: .userDomainMask).first)
         let libraryStoreDirectoryURL = try unwrap(libraryDirectory.appendingPathComponent(folderName))
         let storeURL = try unwrap(libraryStoreDirectoryURL.appendingPathComponent("\(storeName).sqlite"))
-        guard !self.directoryExists(atUrl: libraryStoreDirectoryURL, isDirectory: true) else {
-            return try self.addSkipBackupAttributeToItemAtURL(url: storeURL)
+        guard !directoryExists(atUrl: libraryStoreDirectoryURL, isDirectory: true) else {
+            return try addSkipBackupAttributeToItemAtURL(url: storeURL)
         }
-        try self.createDirectory(at: libraryStoreDirectoryURL, withIntermediateDirectories: true)
-        return try self.addSkipBackupAttributeToItemAtURL(url: storeURL)
+        try createDirectory(at: libraryStoreDirectoryURL, withIntermediateDirectories: true)
+        return try addSkipBackupAttributeToItemAtURL(url: storeURL)
     }
 
     func addSkipBackupAttributeToItemAtURL(url: URL) throws -> URL {
-        guard self.directoryExists(atUrl: url, isDirectory: false) else {
+        guard directoryExists(atUrl: url, isDirectory: false) else {
             return url
         }
         var url = url
@@ -117,13 +114,12 @@ extension FileManager {
 
     func directoryExists(atUrl url: URL, isDirectory: Bool) -> Bool {
         var isDirectory = ObjCBool(isDirectory)
-        let exists = self.fileExists(atPath: url.path, isDirectory: &isDirectory)
+        let exists = fileExists(atPath: url.path, isDirectory: &isDirectory)
         return exists && isDirectory.boolValue
     }
 }
 
 extension CoreDataModelDescription {
-
     static func makeOptistreamEventModel(version: CoreDataMigrationVersion) -> NSManagedObjectModel {
         switch version {
         case .version1:
@@ -143,10 +139,10 @@ extension CoreDataModelDescription {
                         .attribute(name: #keyPath(EventCD.data), type: .binaryDataAttributeType),
                         .attribute(name: #keyPath(EventCD.type), type: .stringAttributeType),
                         .attribute(name: #keyPath(EventCD.uuid), type: .stringAttributeType),
-                        .attribute(name: #keyPath(EventCD.date), type: .stringAttributeType)
+                        .attribute(name: #keyPath(EventCD.date), type: .stringAttributeType),
                     ],
                     constraints: [#keyPath(EventCD.uuid), #keyPath(EventCD.type)]
-                )
+                ),
             ]
         )
         return modelDescription.makeModel()
@@ -166,10 +162,10 @@ extension CoreDataModelDescription {
                             name: #keyPath(EventCDv2.creationDate),
                             type: .dateAttributeType,
                             defaultValue: Date()
-                        )
+                        ),
                     ],
                     constraints: [#keyPath(EventCDv2.eventId), #keyPath(EventCDv2.type)]
-                )
+                ),
             ]
         )
         return modelDescription.makeModel()

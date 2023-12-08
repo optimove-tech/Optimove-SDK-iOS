@@ -1,10 +1,9 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
 @testable import OptimoveSDK
+import XCTest
 
 class SetUserAgentEventTests: XCTestCase {
-
     func test_event_name() {
         // given
         let userAgent = ""
@@ -54,5 +53,4 @@ class SetUserAgentEventTests: XCTestCase {
         let first = event.context.first
         XCTAssert(first?.key == SetUserAgent.Constants.userAgentHeaderBase + String(1))
     }
-
 }

@@ -4,12 +4,12 @@ import Foundation
 import OptimoveCore
 
 final class OperationFactory {
-
     private let configurationRepository: ConfigurationRepository
     private let networking: RemoteConfigurationNetworking
 
     init(configurationRepository: ConfigurationRepository,
-         networking: RemoteConfigurationNetworking) {
+         networking: RemoteConfigurationNetworking)
+    {
         self.configurationRepository = configurationRepository
         self.networking = networking
     }
@@ -33,5 +33,4 @@ final class OperationFactory {
             repository: configurationRepository
         )
     }
-
 }

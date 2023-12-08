@@ -3,7 +3,6 @@
 import Foundation
 
 public extension Bundle {
-
     /// https://stackoverflow.com/a/27849695
     static func hostAppBundle() -> Bundle? {
         let mainBundle = Bundle.main
@@ -16,5 +15,4 @@ public extension Bundle {
         }
         return mainBundle
     }
-
 }

@@ -5,11 +5,10 @@ import OptimoveCore
 import UIKit.UIApplication
 
 final class AppOpenObserver {
-
-    struct Constants {
-        struct AppOpen {
+    enum Constants {
+        enum AppOpen {
             // The threshold used for throttling emits an AppOpen event.
-            static let throttlingThreshold: TimeInterval = 1_800 // 30 minutes.
+            static let throttlingThreshold: TimeInterval = 1800 // 30 minutes.
         }
     }
 
@@ -21,7 +20,8 @@ final class AppOpenObserver {
     init(synchronizer: Pipeline,
          statisticService: StatisticService,
          dateTimeProvider: DateTimeProvider,
-         coreEventFactory: CoreEventFactory) {
+         coreEventFactory: CoreEventFactory)
+    {
         self.synchronizer = synchronizer
         self.statisticService = statisticService
         self.dateTimeProvider = dateTimeProvider
@@ -34,21 +34,19 @@ final class AppOpenObserver {
         let appOpenTime = statisticService.applicationOpenTime
         if (now - appOpenTime) > threshold {
             let event = try coreEventFactory.createEvent(.appOpen)
-            self.synchronizer.deliver(.report(events: [event]))
-            self.statisticService.applicationOpenTime = self.dateTimeProvider.now.timeIntervalSince1970
+            synchronizer.deliver(.report(events: [event]))
+            statisticService.applicationOpenTime = dateTimeProvider.now.timeIntervalSince1970
         }
     }
-
 }
 
 extension AppOpenObserver: DeviceStateObservable {
-
     func observe() {
         NotificationCenter.default.addObserver(
             forName: UIApplication.willEnterForegroundNotification,
             object: nil,
             queue: .main
-        ) { [weak self] (_) in
+        ) { [weak self] _ in
             do {
                 try self?.handleWillEnterForegroundNotification()
             } catch {
@@ -56,5 +54,4 @@ extension AppOpenObserver: DeviceStateObservable {
             }
         }
     }
-
 }

@@ -38,9 +38,7 @@ import Foundation
 }
 
 extension JSON: Codable {
-
     public func encode(to encoder: Encoder) throws {
-
         var container = encoder.singleValueContainer()
 
         switch self {
@@ -60,7 +58,6 @@ extension JSON: Codable {
     }
 
     public init(from decoder: Decoder) throws {
-
         let container = try decoder.singleValueContainer()
 
         if let object = try? container.decode([String: JSON].self) {
@@ -84,14 +81,13 @@ extension JSON: Codable {
 }
 
 extension JSON: CustomDebugStringConvertible {
-
     public var debugDescription: String {
         switch self {
-        case .string(let str):
+        case let .string(str):
             return str.debugDescription
-        case .number(let num):
+        case let .number(num):
             return num.debugDescription
-        case .bool(let bool):
+        case let .bool(bool):
             return bool.description
         case .null:
             return "null"

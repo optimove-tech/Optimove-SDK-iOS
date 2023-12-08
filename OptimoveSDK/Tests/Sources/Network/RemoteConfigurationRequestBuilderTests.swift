@@ -1,11 +1,11 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-import XCTest
-@testable import OptimoveSDK
 import OptimoveCore
+@testable import OptimoveSDK
+import OptimoveTest
+import XCTest
 
 final class RemoteConfigurationRequestBuilderTests: XCTestCase {
-
     var requestBuilder: RemoteConfigurationRequestBuilder!
     var storage: MockOptimoveStorage!
 

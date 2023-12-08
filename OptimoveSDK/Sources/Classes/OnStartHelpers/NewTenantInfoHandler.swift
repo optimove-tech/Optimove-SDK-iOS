@@ -4,7 +4,6 @@ import Foundation
 import OptimoveCore
 
 final class NewTenantInfoHandler {
-
     private var storage: OptimoveStorage
 
     init(storage: OptimoveStorage) {
@@ -28,5 +27,4 @@ final class NewTenantInfoHandler {
             """
         )
     }
-
 }

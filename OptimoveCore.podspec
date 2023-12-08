@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveCore'
-  s.version          = '5.5.0'
+  s.version          = '5.7.0'
   s.summary          = 'Official Optimove SDK for iOS. Core framework.'
   s.description      = 'The core framework is used to share code-base between other Optimove frameworks.'
   s.homepage         = 'https://github.com/optimove-tech/Optimove-SDK-iOS'
@@ -13,9 +13,4 @@ Pod::Spec.new do |s|
   base_dir = "OptimoveCore/"
   s.source_files = base_dir + 'Sources/Classes/**/*'
   s.frameworks = 'Foundation'
-  s.test_spec 'unit' do |unit_tests|
-    unit_tests.source_files = base_dir + 'Tests/Sources/**/*', 'Shared/Tests/Sources/**/*'
-    unit_tests.resources = base_dir + 'Tests/Resources/**/*', 'Shared/Tests/Resources/**/*'
-    unit_tests.dependency 'Mocker', '~> 1.0'
-  end
 end
