@@ -2,13 +2,19 @@
 
 import Foundation
 
-public enum MediaHelper {
+public struct MediaHelper {
     enum Error: LocalizedError {
         case noMediaUrlFound
         case invalidPictureUrl(String)
     }
 
-    public static func getCompletePictureUrl(pictureUrlString: String, width: UInt) throws -> URL {
+    let storage: KeyValueStorage
+
+    public init(storage: KeyValueStorage) {
+        self.storage = storage
+    }
+
+    public func getCompletePictureUrl(pictureUrlString: String, width: UInt) throws -> URL {
         if pictureUrlString.hasPrefix("https://") || pictureUrlString.hasPrefix("http://") {
             guard let url = URL(string: pictureUrlString) else {
                 throw Error.invalidPictureUrl(pictureUrlString)
@@ -16,7 +22,7 @@ public enum MediaHelper {
             return url
         }
 
-        guard let mediaUrl = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue) as? String else {
+        guard let mediaUrl: String = storage[.mediaURL] else {
             throw Error.noMediaUrlFound
         }
 

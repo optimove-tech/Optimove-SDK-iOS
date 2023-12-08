@@ -32,9 +32,16 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     private var displayMode: InAppDisplayMode
     private var currentMessage: InAppMessage?
 
+    let pendingNoticationHelper: PendingNotificationHelper
+
     let urlBuilder: UrlBuilder
 
-    init(displayMode: InAppDisplayMode, urlBuilder: UrlBuilder) {
+    init(
+        displayMode: InAppDisplayMode,
+        urlBuilder: UrlBuilder,
+        pendingNoticationHelper: PendingNotificationHelper
+    ) {
+        self.pendingNoticationHelper = pendingNoticationHelper
         messageQueue = NSMutableOrderedSet(capacity: 5)
         pendingTickleIds = NSMutableOrderedSet(capacity: 2)
         currentMessage = nil
@@ -176,7 +183,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             let tickleNotificationId = "k-in-app-message:\(message.id)"
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [tickleNotificationId])
 
-            PendingNotificationHelper.remove(identifier: tickleNotificationId)
+            pendingNoticationHelper.remove(identifier: tickleNotificationId)
         }
 
         messageQueueLock.wait()

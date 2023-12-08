@@ -13,7 +13,7 @@ public struct DeepLink {
     public let url: URL
     public let content: DeepLinkContent
     public let data: [AnyHashable: Any?]
-    
+
     init?(for url: URL, from jsonData: [AnyHashable: Any]) {
         guard let linkData = jsonData["linkData"] as? [AnyHashable: Any?],
               let content = jsonData["content"] as? [AnyHashable: Any?]
@@ -104,7 +104,7 @@ final class DeepLinkHelper {
 
         return handled
     }
-    
+
     private func urlShouldBeHandled(_ url: URL) -> Bool {
         guard let host = url.host else {
             return false
@@ -179,7 +179,7 @@ final class DeepLinkHelper {
 
         return handleContinuation(for: url)
     }
-    
+
     @discardableResult
     fileprivate func handleContinuation(for url: URL) -> Bool {
         if config.deepLinkHandler == nil {
@@ -189,12 +189,12 @@ final class DeepLinkHelper {
 
         return handleUrl(url: url)
     }
-    
+
     fileprivate func handleUrl(url: URL) -> Bool {
         if !urlShouldBeHandled(url) {
             return false
         }
-        
+
         handleDeepLinkUrl(url)
         return true
     }
@@ -204,7 +204,7 @@ extension Optimobile {
     static func urlOpened(url: URL) -> Bool {
         return getInstance().deepLinkHelper?.handleContinuation(for: url) ?? false
     }
-    
+
     static func application(_: UIApplication, continue userActivity: NSUserActivity, restorationHandler _: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return getInstance().deepLinkHelper?.handleContinuation(for: userActivity) ?? false
     }

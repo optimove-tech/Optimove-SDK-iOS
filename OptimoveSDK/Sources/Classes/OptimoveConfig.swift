@@ -150,7 +150,7 @@ open class OptimoveConfigBuilder: NSObject {
 
     override public required init() {
         features = []
-        urlBuilder = UrlBuilder(storage: KeyValPersistenceHelper.self)
+        urlBuilder = UrlBuilder(storage: UserDefaults.optimoveAppGroup())
         super.init()
     }
 

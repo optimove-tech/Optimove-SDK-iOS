@@ -19,7 +19,10 @@ private var ks_existingBackgroundFetchDelegate: IMP?
 typealias InAppSyncCompletionHandler = (_ result: Int) -> Void
 
 class InAppManager {
-    private let httpClient: KSHttpClient
+    let httpClient: KSHttpClient
+    let storage: OptimoveStorage
+    let pendingNoticationHelper: PendingNotificationHelper
+    let optimobileHelper: OptimobileHelper
     private(set) var presenter: InAppPresenter
     private var pendingTickleIds = NSMutableOrderedSet(capacity: 1)
 
@@ -35,9 +38,23 @@ class InAppManager {
 
     // MARK: Initialization
 
-    init(_ config: OptimobileConfig, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
+    init(
+        _ config: OptimobileConfig,
+        httpClient: KSHttpClient,
+        urlBuilder: UrlBuilder,
+        storage: OptimoveStorage,
+        pendingNoticationHelper: PendingNotificationHelper,
+        optimobileHelper: OptimobileHelper
+    ) {
         self.httpClient = httpClient
-        presenter = InAppPresenter(displayMode: config.inAppDefaultDisplayMode, urlBuilder: urlBuilder)
+        self.storage = storage
+        self.pendingNoticationHelper = pendingNoticationHelper
+        self.optimobileHelper = optimobileHelper
+        presenter = InAppPresenter(
+            displayMode: config.inAppDefaultDisplayMode,
+            urlBuilder: urlBuilder,
+            pendingNoticationHelper: pendingNoticationHelper
+        )
         syncQueue = DispatchQueue(label: "com.optimove.inapp.sync")
 
         finishedInitializationToken = NotificationCenter.default
@@ -262,6 +279,7 @@ class InAppManager {
     }
 
     func sync(_ onComplete: InAppSyncCompletionHandler? = nil) {
+        let currentUserIdentifier = optimobileHelper.currentUserIdentifier()
         syncQueue.async {
             let syncBarrier = DispatchSemaphore(value: 0)
 
@@ -277,7 +295,7 @@ class InAppManager {
                 after = "?after=\(KSHttpUtil.urlEncode(formatter.string(from: mostRecentUpdate as Date))!)"
             }
 
-            let encodedIdentifier = KSHttpUtil.urlEncode(OptimobileHelper.currentUserIdentifier)
+            let encodedIdentifier = KSHttpUtil.urlEncode(currentUserIdentifier)
             let path = "/v1/users/\(encodedIdentifier!)/messages\(after)"
 
             self.httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { _, decodedBody in
@@ -446,7 +464,7 @@ class InAppManager {
         if #available(iOS 10, *) {
             let tickleNotificationId = "k-in-app-message:\(id)"
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [tickleNotificationId])
-            PendingNotificationHelper.remove(identifier: tickleNotificationId)
+            pendingNoticationHelper.remove(identifier: tickleNotificationId)
         }
     }
 
@@ -808,7 +826,7 @@ class InAppManager {
 
     func markAllInboxItemsAsRead() -> Bool {
         var result = true
-        let inboxItems = OptimoveInApp.getInboxItems()
+        let inboxItems = OptimoveInApp.getInboxItems(storage: storage)
         var inboxNeedsUpdate = false
         for item in inboxItems {
             if item.isRead() {

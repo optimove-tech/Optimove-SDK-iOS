@@ -39,12 +39,22 @@ public enum OptimoveNotificationService {
         if bestAttemptContent.categoryIdentifier.isEmpty {
             bestAttemptContent.categoryIdentifier = await buildCategory(notification: notification)
         }
-        if AppGroupsHelper.isKumulosAppGroupDefined() {
-            if let attachment = try await maybeGetAttachment(notification: notification) {
+        if AppGroupsHelper.isAppGroupDefined() {
+            let storage = UserDefaults.optimoveAppGroup()
+            let mediaHelper = MediaHelper(storage: storage)
+            if let attachment = try await maybeGetAttachment(
+                notification: notification,
+                mediaHelper: mediaHelper
+            ) {
                 bestAttemptContent.attachments = [attachment]
             }
-            maybeSetBadge(bestAttemptContent: bestAttemptContent, userInfo: userInfo)
-            PendingNotificationHelper.add(
+            let optimobileHelper = OptimobileHelper(storage: storage)
+            if let badge = maybeSetBadge(userInfo: userInfo, optimobileHelper: optimobileHelper) {
+                storage.set(value: badge, key: .badgeCount)
+                bestAttemptContent.badge = badge
+            }
+            let pendingNoticationHelper = PendingNotificationHelper(storage: storage)
+            pendingNoticationHelper.add(
                 notification: PendingNotification(
                     id: notification.message.id,
                     identifier: request.identifier
@@ -98,10 +108,10 @@ public enum OptimoveNotificationService {
         return categoryIdentifier
     }
 
-    static func maybeGetAttachment(notification: PushNotification) async throws -> UNNotificationAttachment? {
+    static func maybeGetAttachment(notification: PushNotification, mediaHelper: MediaHelper) async throws -> UNNotificationAttachment? {
         guard let picturePath = notification.attachment?.pictureUrl else { return nil }
 
-        let url = try await MediaHelper.getCompletePictureUrl(
+        let url = try await mediaHelper.getCompletePictureUrl(
             pictureUrlString: picturePath,
             width: UInt(floor(UIScreen.main.bounds.size.width))
         )
@@ -122,18 +132,19 @@ public enum OptimoveNotificationService {
         )
     }
 
-    static func maybeSetBadge(bestAttemptContent: UNMutableNotificationContent, userInfo: [AnyHashable: Any]) {
+    static func maybeSetBadge(
+        userInfo: [AnyHashable: Any],
+        optimobileHelper: OptimobileHelper
+    ) -> NSNumber? {
         let aps = userInfo["aps"] as! [AnyHashable: Any]
         if let contentAvailable = aps["content-available"] as? Int, contentAvailable == 1 {
-            return
+            return nil
         }
 
-        let newBadge: NSNumber? = OptimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
+        let newBadge: NSNumber? = optimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
         if newBadge == nil {
-            return
+            return nil
         }
-
-        bestAttemptContent.badge = newBadge
-        KeyValPersistenceHelper.set(newBadge, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
+        return newBadge
     }
 }
