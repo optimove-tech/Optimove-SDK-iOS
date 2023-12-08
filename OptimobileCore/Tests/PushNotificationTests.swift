@@ -46,7 +46,7 @@ final class PushNotificationTests: XCTestCase, FileAccessible {
         let decoder = JSONDecoder()
         let notification = try decoder.decode(PushNotification.self, from: data)
 
-        XCTAssertEqual(notification.picturePath, "B04wM4Y7/b2f69e254879d69b58c7418468213762.jpeg")
+        XCTAssertEqual(notification.attachment?.pictureUrl, "B04wM4Y7/b2f69e254879d69b58c7418468213762.jpeg")
     }
 
     func test_decode_background() throws {
