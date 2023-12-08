@@ -1,10 +1,10 @@
 //  Copyright © 2017 Optimove. All rights reserved.
 
-public struct Parameter: Codable, Equatable {
-    public let type: String
-    public let optional: Bool
+struct Parameter: Codable, Equatable {
+    let type: String
+    let optional: Bool
 
-    public init(
+    init(
         type: String,
         optional: Bool
     ) {
@@ -12,7 +12,7 @@ public struct Parameter: Codable, Equatable {
         self.optional = optional
     }
 
-    public var mandatory: Bool {
+    var mandatory: Bool {
         return !optional
     }
 

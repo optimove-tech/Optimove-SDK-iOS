@@ -2,10 +2,10 @@
 
 import Foundation
 
-public struct TenantRealtimeConfig: Codable, Equatable {
-    public var realtimeGateway: URL
+struct TenantRealtimeConfig: Codable, Equatable {
+    var realtimeGateway: URL
 
-    public init(realtimeGateway: URL) {
+    init(realtimeGateway: URL) {
         self.realtimeGateway = realtimeGateway
     }
 }

@@ -4,14 +4,14 @@ import Foundation
 
 // MARK: - GlobalConfig
 
-public struct GlobalConfig: Codable, Equatable {
-    public let general: GlobalGeneralConfig
-    public let optitrack: GlobalOptitrackConfig
-    public let coreEvents: [String: EventsConfig]
+struct GlobalConfig: Codable, Equatable {
+    let general: GlobalGeneralConfig
+    let optitrack: GlobalOptitrackConfig
+    let coreEvents: [String: EventsConfig]
 
-    public init(general: GlobalGeneralConfig,
-                optitrack: GlobalOptitrackConfig,
-                coreEvents: [String: EventsConfig])
+    init(general: GlobalGeneralConfig,
+         optitrack: GlobalOptitrackConfig,
+         coreEvents: [String: EventsConfig])
     {
         self.general = general
         self.optitrack = optitrack
@@ -24,14 +24,14 @@ public struct GlobalConfig: Codable, Equatable {
         case coreEvents = "core_events"
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         general = try container.decode(GlobalGeneralConfig.self, forKey: .general)
         optitrack = try container.decode(GlobalOptitrackConfig.self, forKey: .optitrack)
         coreEvents = try container.decode([String: EventsConfig].self, forKey: .coreEvents)
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(general, forKey: .general)
         try container.encode(optitrack, forKey: .optitrack)
@@ -41,10 +41,10 @@ public struct GlobalConfig: Codable, Equatable {
 
 // MARK: - General
 
-public struct GlobalGeneralConfig: Codable, Equatable {
-    public let logsServiceEndpoint: URL
+struct GlobalGeneralConfig: Codable, Equatable {
+    let logsServiceEndpoint: URL
 
-    public init(logsServiceEndpoint: URL) {
+    init(logsServiceEndpoint: URL) {
         self.logsServiceEndpoint = logsServiceEndpoint
     }
 
@@ -55,10 +55,10 @@ public struct GlobalGeneralConfig: Codable, Equatable {
 
 // MARK: - Optitrack
 
-public struct GlobalOptitrackConfig: Codable, Equatable {
-    public let eventCategoryName: String
+struct GlobalOptitrackConfig: Codable, Equatable {
+    let eventCategoryName: String
 
-    public init(eventCategoryName: String) {
+    init(eventCategoryName: String) {
         self.eventCategoryName = eventCategoryName
     }
 

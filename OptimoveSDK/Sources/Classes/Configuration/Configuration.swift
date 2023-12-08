@@ -2,16 +2,16 @@
 
 import Foundation
 
-public struct Configuration: Codable, TenantInfo, EventInfo {
-    public let tenantID: Int
-    public let logger: LoggerConfig
-    public let realtime: RealtimeConfig
-    public let optitrack: OptitrackConfig
-    public let events: [String: EventsConfig]
-    public let isEnableRealtime: Bool
-    public let isSupportedAirship: Bool
+struct Configuration: Codable, TenantInfo, EventInfo {
+    let tenantID: Int
+    let logger: LoggerConfig
+    let realtime: RealtimeConfig
+    let optitrack: OptitrackConfig
+    let events: [String: EventsConfig]
+    let isEnableRealtime: Bool
+    let isSupportedAirship: Bool
 
-    public init(
+    init(
         tenantID: Int,
         logger: LoggerConfig,
         realtime: RealtimeConfig,
@@ -30,12 +30,12 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
     }
 }
 
-public struct LoggerConfig: Codable, TenantInfo {
-    public let tenantID: Int
-    public let logServiceEndpoint: URL
-    public let isProductionLogsEnabled: Bool
+struct LoggerConfig: Codable, TenantInfo {
+    let tenantID: Int
+    let logServiceEndpoint: URL
+    let isProductionLogsEnabled: Bool
 
-    public init(
+    init(
         tenantID: Int,
         logServiceEndpoint: URL,
         isProductionLogsEnabled: Bool
@@ -46,13 +46,13 @@ public struct LoggerConfig: Codable, TenantInfo {
     }
 }
 
-public struct RealtimeConfig: Codable, TenantInfo, EventInfo {
-    public let tenantID: Int
-    public let realtimeGateway: URL
-    public let events: [String: EventsConfig]
-    public let isEnableRealtimeThroughOptistream: Bool
+struct RealtimeConfig: Codable, TenantInfo, EventInfo {
+    let tenantID: Int
+    let realtimeGateway: URL
+    let events: [String: EventsConfig]
+    let isEnableRealtimeThroughOptistream: Bool
 
-    public init(
+    init(
         tenantID: Int,
         realtimeGateway: URL,
         events: [String: EventsConfig],
@@ -65,15 +65,15 @@ public struct RealtimeConfig: Codable, TenantInfo, EventInfo {
     }
 }
 
-public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
-    public let tenantID: Int
-    public let optitrackEndpoint: URL
-    public let enableAdvertisingIdReport: Bool
-    public let eventCategoryName: String
-    public let events: [String: EventsConfig]
-    public let isEnableRealtime: Bool
+struct OptitrackConfig: Codable, TenantInfo, EventInfo {
+    let tenantID: Int
+    let optitrackEndpoint: URL
+    let enableAdvertisingIdReport: Bool
+    let eventCategoryName: String
+    let events: [String: EventsConfig]
+    let isEnableRealtime: Bool
 
-    public init(
+    init(
         tenantID: Int,
         optitrackEndpoint: URL,
         enableAdvertisingIdReport: Bool,
@@ -90,10 +90,10 @@ public struct OptitrackConfig: Codable, TenantInfo, EventInfo {
     }
 }
 
-public protocol TenantInfo {
+protocol TenantInfo {
     var tenantID: Int { get }
 }
 
-public protocol EventInfo {
+protocol EventInfo {
     var events: [String: EventsConfig] { get }
 }

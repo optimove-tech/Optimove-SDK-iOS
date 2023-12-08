@@ -1,6 +1,6 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
-import OptimoveSDK
+@testable import OptimoveSDK
 
 public final class OptistreamNetworkingMock: OptistreamNetworking {
     public init() {}

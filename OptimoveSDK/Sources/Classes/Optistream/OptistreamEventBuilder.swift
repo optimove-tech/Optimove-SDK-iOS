@@ -4,7 +4,7 @@ import Foundation
 
 /// Builds an Optistream event from internal event type.
 /// The `delivery_event` do not use this class in reason of memory consuption under Notification Service Extention.
-public final class OptistreamEventBuilder {
+final class OptistreamEventBuilder {
     enum Constants {
         enum Values {
             static let origin = "sdk"
@@ -14,7 +14,7 @@ public final class OptistreamEventBuilder {
     private let tenantID: Int
     private let storage: OptimoveStorage
 
-    public init(
+    init(
         tenantID: Int,
         storage: OptimoveStorage
     ) {
@@ -22,7 +22,7 @@ public final class OptistreamEventBuilder {
         self.storage = storage
     }
 
-    public func build(event: Event) throws -> OptistreamEvent {
+    func build(event: Event) throws -> OptistreamEvent {
         return try OptistreamEvent(
             tenant: tenantID,
             category: event.category,

@@ -9,6 +9,8 @@ import UserNotifications
 @available(iOS 10.0, *)
 public typealias OptimoveUNAuthorizationCheckedHandler = (UNAuthorizationStatus, Error?) -> Void
 
+let KS_MESSAGE_TYPE_PUSH = 1
+
 extension Optimobile {
     /**
          Helper method for requesting the device token with alert, badge and sound permissions.

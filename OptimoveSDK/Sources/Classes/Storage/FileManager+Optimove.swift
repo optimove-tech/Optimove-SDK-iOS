@@ -4,7 +4,7 @@ import Foundation
 
 private var temporaryDirectoryURL: URL?
 
-public extension FileManager {
+extension FileManager {
     static func optimoveURL() throws -> URL {
         return try FileManager.default.url(
             for: .applicationSupportDirectory,

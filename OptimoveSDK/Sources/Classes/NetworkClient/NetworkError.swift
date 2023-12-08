@@ -2,14 +2,14 @@
 
 import Foundation
 
-public enum NetworkError: LocalizedError {
+enum NetworkError: LocalizedError {
     case error(Error)
     case noData
     case invalidURL
     case requestInvalid(Data?)
     case requestFailed
 
-    public var errorDescription: String? {
+    var errorDescription: String? {
         return "NetworkError: " + {
             switch self {
             case let .error(error):

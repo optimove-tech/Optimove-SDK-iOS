@@ -2,18 +2,18 @@
 
 import Foundation
 
-open class Event {
-    public static let category = "track"
+class Event {
+    static let category = "track"
 
-    public let eventId: UUID
-    public let requestId: String
-    public let name: String
-    public let timestamp: Date
-    public let category: String
-    public var context: [String: Any]
-    public var isRealtime: Bool
+    let eventId: UUID
+    let requestId: String
+    let name: String
+    let timestamp: Date
+    let category: String
+    var context: [String: Any]
+    var isRealtime: Bool
 
-    public init(
+    init(
         eventId: UUID? = nil,
         requestId: String? = nil,
         name: String,

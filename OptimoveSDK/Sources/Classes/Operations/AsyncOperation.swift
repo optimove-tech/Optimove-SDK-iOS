@@ -2,8 +2,8 @@
 
 import Foundation
 
-open class AsyncOperation: Operation {
-    public enum State: String {
+class AsyncOperation: Operation {
+    enum State: String {
         case waiting = "isWaiting"
         case ready = "isReady"
         case executing = "isExecuting"
@@ -11,7 +11,7 @@ open class AsyncOperation: Operation {
         case cancelled = "isCancelled"
     }
 
-    public var state = State.waiting {
+    var state = State.waiting {
         willSet {
             willChangeValue(forKey: State.ready.rawValue)
             willChangeValue(forKey: State.executing.rawValue)
@@ -79,12 +79,12 @@ open class AsyncOperation: Operation {
     }
 }
 
-open class AsyncBlockOperation: AsyncOperation {
-    public typealias Closure = (AsyncBlockOperation) -> Void
+class AsyncBlockOperation: AsyncOperation {
+    typealias Closure = (AsyncBlockOperation) -> Void
 
-    public let closure: Closure
+    let closure: Closure
 
-    public init(closure: @escaping Closure) {
+    init(closure: @escaping Closure) {
         self.closure = closure
     }
 

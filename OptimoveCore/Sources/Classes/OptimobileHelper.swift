@@ -2,8 +2,6 @@
 
 import Foundation
 
-public let KS_MESSAGE_TYPE_PUSH = 1
-
 public enum OptimobileHelper {
     private static let installIdLock = DispatchSemaphore(value: 1)
     public static let userIdLock = DispatchSemaphore(value: 1)

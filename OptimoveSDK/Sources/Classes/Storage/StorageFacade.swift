@@ -4,13 +4,13 @@ import Foundation
 import OptimoveCore
 
 /// Combined protocol for a convenince access to stored values and files.
-public typealias OptimoveStorage = FileStorage & KeyValueStorage & StorageValue
+typealias OptimoveStorage = FileStorage & KeyValueStorage & StorageValue
 
 // MARK: - StorageCase
 
 // MARK: - StorageKey
 
-public enum StorageKey: String, CaseIterable {
+enum StorageKey: String, CaseIterable {
     case installationID
     case customerID
     case configurationEndPoint
@@ -38,7 +38,7 @@ public enum StorageKey: String, CaseIterable {
 // MARK: - StorageValue
 
 /// The protocol used as convenience accessor to storage values.
-public protocol StorageValue {
+protocol StorageValue {
     var installationID: String? { get set }
     var customerID: String? { get set }
     var configurationEndPoint: URL? { get set }
@@ -77,22 +77,22 @@ public protocol StorageValue {
 }
 
 /// The protocol used for convenience implementation of any storage technology below this protocol.
-public protocol KeyValueStorage {
+protocol KeyValueStorage {
     func set(value: Any?, key: StorageKey)
     func value(for: StorageKey) -> Any?
     subscript<T>(_: StorageKey) -> T? { get set }
 }
 
 extension UserDefaults: KeyValueStorage {
-    public func set(value: Any?, key: StorageKey) {
+    func set(value: Any?, key: StorageKey) {
         set(value, forKey: key.rawValue)
     }
 
-    public func value(for key: StorageKey) -> Any? {
+    func value(for key: StorageKey) -> Any? {
         return value(forKey: key.rawValue)
     }
 
-    public subscript<T>(key: StorageKey) -> T? {
+    subscript<T>(key: StorageKey) -> T? {
         get {
             return value(for: key) as? T
         }
@@ -102,19 +102,19 @@ extension UserDefaults: KeyValueStorage {
     }
 }
 
-public final class InMemoryStorage: KeyValueStorage {
+final class InMemoryStorage: KeyValueStorage {
     private var storage = [StorageKey: Any]()
     private let queue = DispatchQueue(label: "com.optimove.sdk.inmemorystorage", attributes: .concurrent)
 
-    public init() {}
+    init() {}
 
-    public func set(value: Any?, key: StorageKey) {
+    func set(value: Any?, key: StorageKey) {
         queue.async(flags: .barrier) { [self] in
             storage[key] = value
         }
     }
 
-    public subscript<T>(key: StorageKey) -> T? {
+    subscript<T>(key: StorageKey) -> T? {
         get {
             var result: T?
             queue.sync {
@@ -129,7 +129,7 @@ public final class InMemoryStorage: KeyValueStorage {
         }
     }
 
-    public func value(for key: StorageKey) -> Any? {
+    func value(for key: StorageKey) -> Any? {
         var result: Any?
         queue.sync {
             result = storage[key]
@@ -138,10 +138,10 @@ public final class InMemoryStorage: KeyValueStorage {
     }
 }
 
-public enum StorageError: LocalizedError {
+enum StorageError: LocalizedError {
     case noValue(StorageKey)
 
-    public var errorDescription: String? {
+    var errorDescription: String? {
         switch self {
         case let .noValue(key):
             return "StorageError: No value for key \(key.rawValue)"
@@ -150,12 +150,12 @@ public enum StorageError: LocalizedError {
 }
 
 /// Class implements the Façade pattern for hiding complexity of the OptimoveStorage protocol.
-public final class StorageFacade: OptimoveStorage {
+final class StorageFacade: OptimoveStorage {
     private let persistantStorage: KeyValueStorage
     private let inMemoryStorage: KeyValueStorage
     private let fileStorage: FileStorage
 
-    public init(
+    init(
         persistantStorage: KeyValueStorage,
         inMemoryStorage: KeyValueStorage,
         fileStorage: FileStorage
@@ -175,7 +175,7 @@ public final class StorageFacade: OptimoveStorage {
 
 // MARK: - KeyValueStorage
 
-public extension StorageFacade {
+extension StorageFacade {
     /// Use `storage.key` instead.
     /// Some variable have formatters, implemented in own setters. Set unformatted value could cause an issue.
     func set(value: Any?, key: StorageKey) {
@@ -207,7 +207,7 @@ public extension StorageFacade {
 
 // MARK: - FileStorage
 
-public extension StorageFacade {
+extension StorageFacade {
     func isExist(fileName: String, isTemporary: Bool) -> Bool {
         return fileStorage.isExist(fileName: fileName, isTemporary: isTemporary)
     }
@@ -235,7 +235,7 @@ public extension StorageFacade {
 
 // MARK: - StorageValue
 
-public extension KeyValueStorage where Self: StorageValue {
+extension KeyValueStorage where Self: StorageValue {
     var installationID: String? {
         get {
             return self[.installationID]

@@ -2,11 +2,11 @@
 
 import Foundation
 
-public struct TenantOptitrackConfig: Codable, Equatable {
-    public var optitrackEndpoint: URL
-    public var siteId: Int
+struct TenantOptitrackConfig: Codable, Equatable {
+    var optitrackEndpoint: URL
+    var siteId: Int
 
-    public init(
+    init(
         optitrackEndpoint: URL,
         siteId: Int
     ) {
