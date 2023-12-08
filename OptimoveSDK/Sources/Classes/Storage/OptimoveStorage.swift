@@ -19,25 +19,32 @@ enum StorageError: LocalizedError {
 
 /// Class implements the Façade pattern for hiding complexity of the OptimoveStorage protocol.
 final class StorageFacade: OptimoveStorage {
-    private let persistantStorage: KeyValueStorage
+    // FIXME: - Split persistance storage to AppGroup and Standart
+    private let standardStorage: KeyValueStorage
+    private let appGroupStorage: KeyValueStorage
     private let inMemoryStorage: KeyValueStorage
     private let fileStorage: FileStorage
 
     init(
-        persistantStorage: KeyValueStorage,
+        standardStorage: KeyValueStorage,
+        appGroupStorage: KeyValueStorage,
         inMemoryStorage: KeyValueStorage,
         fileStorage: FileStorage
     ) {
         self.fileStorage = fileStorage
         self.inMemoryStorage = inMemoryStorage
-        self.persistantStorage = persistantStorage
+        self.appGroupStorage = appGroupStorage
+        self.standardStorage = standardStorage
     }
 
     func getStorage(for key: StorageKey) -> KeyValueStorage {
         if StorageKey.inMemoryValues.contains(key) {
             return inMemoryStorage
         }
-        return persistantStorage
+        if StorageKey.appGroupValues.contains(key) {
+            return appGroupStorage
+        }
+        return standardStorage
     }
 }
 
