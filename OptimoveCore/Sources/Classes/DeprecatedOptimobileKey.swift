@@ -2,7 +2,7 @@
 
 import Foundation
 
-public enum OptimobileUserDefaultsKey: String, CaseIterable {
+public enum DeprecatedOptimobileKey: String, CaseIterable {
     case REGION = "KumulosEventsRegion"
     case MEDIA_BASE_URL = "KumulosMediaBaseUrl"
     case INSTALL_UUID = "KumulosUUID"

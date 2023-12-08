@@ -248,7 +248,7 @@ final class MigrationWork_5_7_0: MigrationWorker {
 
     override func runMigration() {
         Logger.info("Migration from Kumulos UserDefaults to Optimove UserDefaults started")
-        let keyMapping: [OptimobileUserDefaultsKey: StorageKey] = [
+        let keyMapping: [DeprecatedOptimobileKey: StorageKey] = [
             .REGION: .region,
             .MEDIA_BASE_URL: .mediaURL,
             .INSTALL_UUID: .installUUID,
@@ -266,7 +266,7 @@ final class MigrationWork_5_7_0: MigrationWorker {
         let kumulosStandardStorage = UserDefaults.standard
         let optimoveStandardStorage = try! UserDefaults.optimove()
         let optimoveAppGroupStorage = try! UserDefaults.optimoveAppGroup()
-        OptimobileUserDefaultsKey.allCases.forEach { key in
+        DeprecatedOptimobileKey.allCases.forEach { key in
             if let value = kumulosStandardStorage.object(forKey: key.rawValue),
                let storageKey = keyMapping[key]
             {
@@ -275,7 +275,7 @@ final class MigrationWork_5_7_0: MigrationWorker {
             }
         }
         /// Rename Kumulos keys to Optimove keys.
-        OptimobileUserDefaultsKey.allCases.forEach { key in
+        DeprecatedOptimobileKey.allCases.forEach { key in
             if let value = optimoveStandardStorage.object(forKey: key.rawValue),
                let storageKey = keyMapping[key]
             {

@@ -6,7 +6,6 @@ import UserNotifications
 struct CategoryManager {
     enum Constants {
         static let MAX_DYNAMIC_CATEGORIES = 128
-        static let DYNAMIC_CATEGORY = OptimobileUserDefaultsKey.DYNAMIC_CATEGORY.rawValue
     }
 
     let storage: KeyValueStorage
