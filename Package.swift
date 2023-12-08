@@ -56,6 +56,7 @@ let package = Package(
             name: "OptimoveTest",
             dependencies: [
                 "OptimoveCore",
+                "OptimoveSDK",
             ],
             path: "Shared",
             resources: [

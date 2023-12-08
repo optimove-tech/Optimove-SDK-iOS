@@ -1,6 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-@testable import OptimoveCore
+@testable import OptimoveSDK
 import XCTest
 
 class OptimoveStorageFacadeTests: XCTestCase {

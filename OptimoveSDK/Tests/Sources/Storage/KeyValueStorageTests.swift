@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
-@testable import OptimoveCore
+import OptimoveCore
+import OptimoveSDK
 import OptimoveTest
 import XCTest
 

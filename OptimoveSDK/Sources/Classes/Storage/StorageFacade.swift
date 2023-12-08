@@ -1,6 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 /// Combined protocol for a convenince access to stored values and files.
 public typealias OptimoveStorage = FileStorage & KeyValueStorage & StorageValue
