@@ -39,7 +39,7 @@ public enum StorageKey: String, CaseIterable {
     case deferredLinkChecked = "KUMULOS_DDL_CHECKED"
 
     public static let inMemoryValues: Set<StorageKey> = [.tenantToken, .version]
-    public static let appGroup: Set<StorageKey> = [
+    public static let appGroupValues: Set<StorageKey> = [
         .badgeCount,
         .dynamicCategory,
         .installUUID,
