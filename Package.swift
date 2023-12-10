@@ -24,12 +24,14 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/WeTransfer/Mocker", from: "3.0.1"),
+        .package(url: "https://github.com/iwill/generic-json-swift", from: "2.0.2"),
     ],
     targets: [
         .target(
             name: "OptimoveSDK",
             dependencies: [
                 "OptimoveCore",
+                .product(name: "GenericJSON", package: "generic-json-swift"),
             ],
             path: "OptimoveSDK/Sources"
         ),

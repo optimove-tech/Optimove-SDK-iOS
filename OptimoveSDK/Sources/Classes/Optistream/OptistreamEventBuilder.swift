@@ -1,6 +1,7 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
 import Foundation
+import GenericJSON
 
 /// Builds an Optistream event from internal event type.
 /// The `delivery_event` do not use this class in reason of memory consuption under Notification Service Extention.

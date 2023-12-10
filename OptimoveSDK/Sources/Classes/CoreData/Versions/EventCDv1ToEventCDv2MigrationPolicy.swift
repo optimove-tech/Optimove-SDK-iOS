@@ -2,6 +2,7 @@
 
 import CoreData
 import Foundation
+import GenericJSON
 import OptimoveCore
 
 final class EventCDv1ToEventCDv2MigrationPolicy: NSEntityMigrationPolicy {
