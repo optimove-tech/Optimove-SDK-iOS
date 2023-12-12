@@ -17,14 +17,18 @@
       "k.buttons": [
         {
           "id": "1",
-          "text": "action_1"
+          "text": "action_1",
+          "icon": {
+            "type": "system",
+            "id": "figure.walk"
+          }
         },
         {
           "id": "2",
           "text": "action_2",
           "icon": {
             "type": "system",
-            "id": "sys_icon_id"
+            "id": "sun.max.fill"
           }
         },
         {
