@@ -113,7 +113,7 @@ final class Optimobile {
 
         try writeDefaultsKeys(config: config, storage: storage)
 
-        instance = Optimobile(config: config, storage: storage)
+        instance = try Optimobile(config: config, storage: storage)
 
         instance!.initializeHelpers()
 
@@ -193,7 +193,7 @@ final class Optimobile {
         Optimobile.associateUserWithInstall(userIdentifier: initialUserId, storage: storage)
     }
 
-    private init(config: OptimobileConfig, storage: OptimoveStorage) {
+    private init(config: OptimobileConfig, storage: OptimoveStorage) throws {
         self.config = config
         let urlBuilder = UrlBuilder(storage: storage)
         networkFactory = NetworkFactory(
@@ -206,9 +206,12 @@ final class Optimobile {
         optimobileHelper = OptimobileHelper(
             storage: storage
         )
-        analyticsHelper = AnalyticsHelper(
+        analyticsHelper = try AnalyticsHelper(
             httpClient: networkFactory.build(for: .events),
-            optimobileHelper: optimobileHelper
+            optimobileHelper: optimobileHelper,
+            container: PersistentContainer(
+                persistentContainerConfigurator: AnalyticsPersistentContainerConfigurator()
+            )
         )
 
         sessionHelper = SessionHelper(sessionIdleTimeout: config.sessionIdleTimeout)

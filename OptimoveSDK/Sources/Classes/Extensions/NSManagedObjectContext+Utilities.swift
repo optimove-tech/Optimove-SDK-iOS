@@ -4,6 +4,17 @@ import CoreData
 import OptimoveCore
 
 extension NSManagedObjectContext {
+    enum Error: LocalizedError {
+        case unableToSaveEvent
+
+        var errorDescription: String? {
+            switch self {
+            case .unableToSaveEvent:
+                return "Unable to save event"
+            }
+        }
+    }
+
     /**
      Safe is determined by checking if the context has any persistent stores.
      - Returns: `False` if no persistent stores found.
@@ -20,11 +31,42 @@ extension NSManagedObjectContext {
      - Returns: A value with generic type.
      */
     func safeTryPerformAndWait<T>(_ block: (Bool) throws -> T) throws -> T {
-        var result: Result<T, Error>?
+        var result: Result<T, Swift.Error>?
         performAndWait {
             result = Result { try block(isSafe) }
         }
         return try result!.get()
+    }
+
+    // Async perform with throws error
+    func safeTryPerform<T>(_ block: @escaping (NSManagedObjectContext) throws -> T, completion: @escaping (Result<T, Swift.Error>) -> Void) {
+        perform {
+            guard self.isSafe else {
+                completion(.failure(NSManagedObjectContext.Error.unableToSaveEvent))
+                return
+            }
+            let result = Result { try block(self) }
+            completion(result)
+        }
+    }
+
+    // Async/await perform with throws error
+    func safeTryPerform<T>(
+        _ block: @escaping (NSManagedObjectContext) throws -> T) async throws -> T
+    {
+        guard isSafe else {
+            throw NSManagedObjectContext.Error.unableToSaveEvent
+        }
+        return try await withCheckedThrowingContinuation { continuation in
+            self.perform {
+                do {
+                    let result = try block(self)
+                    continuation.resume(returning: result)
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
 
     /**
@@ -34,7 +76,7 @@ extension NSManagedObjectContext {
         - block: A block to perform.
      */
     func safeTryPerformAndWait(_ block: (Bool) throws -> Void) throws {
-        var result: Result<Void, Error>?
+        var result: Result<Void, Swift.Error>?
         performAndWait {
             result = Result { try block(isSafe) }
         }
