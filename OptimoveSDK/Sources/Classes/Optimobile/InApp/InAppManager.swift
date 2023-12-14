@@ -13,6 +13,12 @@ public enum InAppMessagePresentationResult: String {
     case PAUSED = "paused"
 }
 
+enum InAppPresented: String {
+    case IMMEDIATELY = "immediately"
+    case NEXT_OPEN = "next-open"
+    case NEVER = "never"
+}
+
 typealias kumulos_applicationPerformFetchWithCompletionHandler = @convention(c) (_ obj: Any, _ _cmd: Selector, _ application: UIApplication, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void
 typealias fetchBlock = @convention(block) (_ obj: Any, _ application: UIApplication, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void
 private var ks_existingBackgroundFetchDelegate: IMP?
