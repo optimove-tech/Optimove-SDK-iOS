@@ -19,24 +19,22 @@ final class PersistentContainer: NSPersistentContainer {
         }
     }
 
-    private enum Constants {
-        static let modelName = "OptistreamQueue"
-        static let folderName = "com.optimove.sdk.no-backup"
-    }
-
     private let migrator: CoreDataMigratorProtocol
+    private let persistentContainerConfigurator: PersistentContainerConfigurator
     private let storeType: PersistentStoreType
 
     init(
-        modelName: String = Constants.modelName,
-        version: CoreDataMigrationVersion = .current,
+        persistentContainerConfigurator: PersistentContainerConfigurator,
         migrator: CoreDataMigratorProtocol = CoreDataMigrator(),
         storeType: PersistentStoreType = .sql
     ) {
-        let mom = CoreDataModelDescription.makeOptistreamEventModel(version: version)
         self.migrator = migrator
         self.storeType = storeType
-        super.init(name: modelName, managedObjectModel: mom)
+        self.persistentContainerConfigurator = persistentContainerConfigurator
+        super.init(
+            name: persistentContainerConfigurator.modelName,
+            managedObjectModel: persistentContainerConfigurator.managedObjectModel
+        )
     }
 
     func loadPersistentStores(storeName: String) throws {
@@ -44,7 +42,8 @@ final class PersistentContainer: NSPersistentContainer {
         let persistentStoreDescription = NSPersistentStoreDescription()
         persistentStoreDescription.type = storeType.coreDataValue
         persistentStoreDescription.url = try FileManager.default.defineStoreURL(
-            folderName: Constants.folderName,
+            location: persistentContainerConfigurator.location,
+            folderName: persistentContainerConfigurator.folderName,
             storeName: storeName
         )
         persistentStoreDescription.shouldMigrateStoreAutomatically = false
@@ -90,14 +89,32 @@ final class PersistentContainer: NSPersistentContainer {
 }
 
 extension FileManager {
-    func defineStoreURL(folderName: String, storeName: String) throws -> URL {
-        let libraryDirectory = try unwrap(urls(for: .libraryDirectory, in: .userDomainMask).first)
-        let libraryStoreDirectoryURL = try unwrap(libraryDirectory.appendingPathComponent(folderName))
-        let storeURL = try unwrap(libraryStoreDirectoryURL.appendingPathComponent("\(storeName).sqlite"))
-        guard !directoryExists(atUrl: libraryStoreDirectoryURL, isDirectory: true) else {
+    func defineLocation(_ location: FileManagerLocation) throws -> URL {
+        switch location {
+        case let .appGroupDirectory(url):
+            return url
+        case .libraryDirectory:
+            return try unwrap(urls(for: .libraryDirectory, in: .userDomainMask).first)
+        }
+    }
+
+    func defineStoreURL(
+        location: FileManagerLocation,
+        folderName: String?,
+        storeName: String
+    ) throws -> URL {
+        let storeFolderURL = try {
+            let locationURL = try defineLocation(location)
+            if let folderName = folderName {
+                return try unwrap(locationURL.appendingPathComponent(folderName))
+            }
+            return locationURL
+        }()
+        let storeURL = try unwrap(storeFolderURL.appendingPathComponent("\(storeName).sqlite"))
+        guard !directoryExists(atUrl: storeFolderURL, isDirectory: true) else {
             return try addSkipBackupAttributeToItemAtURL(url: storeURL)
         }
-        try createDirectory(at: libraryStoreDirectoryURL, withIntermediateDirectories: true)
+        try createDirectory(at: storeFolderURL, withIntermediateDirectories: true)
         return try addSkipBackupAttributeToItemAtURL(url: storeURL)
     }
 
@@ -127,6 +144,10 @@ extension CoreDataModelDescription {
         case .version2:
             return makeOptistreamEventModelv2()
         }
+    }
+
+    static func makeAnalyticsEventModel() -> NSManagedObjectModel {
+        return makeAnalyticsEventModelv1()
     }
 
     private static func makeOptistreamEventModelv1() -> NSManagedObjectModel {
@@ -165,6 +186,43 @@ extension CoreDataModelDescription {
                         ),
                     ],
                     constraints: [#keyPath(EventCDv2.eventId), #keyPath(EventCDv2.type)]
+                ),
+            ]
+        )
+        return modelDescription.makeModel()
+    }
+
+    private static func makeAnalyticsEventModelv1() -> NSManagedObjectModel {
+        let modelDescription = CoreDataModelDescription(
+            entities: [
+                .entity(
+                    name: KSEventModel.entityName,
+                    managedObjectClass: KSEventModel.self,
+                    attributes: [
+                        .attribute(
+                            name: #keyPath(KSEventModel.eventType),
+                            type: .stringAttributeType
+                        ),
+                        .attribute(
+                            name: #keyPath(KSEventModel.happenedAt),
+                            type: .integer64AttributeType,
+                            defaultValue: 0
+                        ),
+                        .attribute(
+                            name: #keyPath(KSEventModel.properties),
+                            type: .binaryDataAttributeType,
+                            isOptional: true
+                        ),
+                        .attribute(
+                            name: #keyPath(KSEventModel.uuid),
+                            type: .stringAttributeType
+                        ),
+                        .attribute(
+                            name: #keyPath(KSEventModel.userIdentifier),
+                            type: .stringAttributeType,
+                            isOptional: true
+                        ),
+                    ]
                 ),
             ]
         )

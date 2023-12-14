@@ -13,7 +13,9 @@ final class ComponentFactory {
     {
         self.serviceLocator = serviceLocator
         self.coreEventFactory = coreEventFactory
-        persistentContainer = PersistentContainer()
+        persistentContainer = PersistentContainer(
+            persistentContainerConfigurator: OptistreamPersistentContainerConfigurator()
+        )
     }
 
     func createRealtimeComponent(configuration: Configuration) throws -> RealTime {
