@@ -18,7 +18,9 @@ class OptitrackTests: OptimoveTestCase {
         networking = OptistreamNetworkingMock()
         let queue = try OptistreamQueueImpl(
             queueType: .track,
-            container: PersistentContainer(),
+            container: PersistentContainer(
+                persistentContainerConfigurator: OptistreamPersistentContainerConfigurator()
+            ),
             tenant: configuration.tenantID
         )
         builder = OptistreamEventBuilder(

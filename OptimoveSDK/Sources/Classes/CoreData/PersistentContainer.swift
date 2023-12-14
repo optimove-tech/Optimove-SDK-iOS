@@ -19,24 +19,22 @@ final class PersistentContainer: NSPersistentContainer {
         }
     }
 
-    private enum Constants {
-        static let modelName = "OptistreamQueue"
-        static let folderName = "com.optimove.sdk.no-backup"
-    }
-
     private let migrator: CoreDataMigratorProtocol
+    private let persistentContainerConfigurator: PersistentContainerConfigurator
     private let storeType: PersistentStoreType
 
     init(
-        modelName: String = Constants.modelName,
-        version: CoreDataMigrationVersion = .current,
+        persistentContainerConfigurator: PersistentContainerConfigurator,
         migrator: CoreDataMigratorProtocol = CoreDataMigrator(),
         storeType: PersistentStoreType = .sql
     ) {
-        let mom = CoreDataModelDescription.makeOptistreamEventModel(version: version)
         self.migrator = migrator
         self.storeType = storeType
-        super.init(name: modelName, managedObjectModel: mom)
+        self.persistentContainerConfigurator = persistentContainerConfigurator
+        super.init(
+            name: persistentContainerConfigurator.modelName,
+            managedObjectModel: persistentContainerConfigurator.managedObjectModel
+        )
     }
 
     func loadPersistentStores(storeName: String) throws {
@@ -44,7 +42,7 @@ final class PersistentContainer: NSPersistentContainer {
         let persistentStoreDescription = NSPersistentStoreDescription()
         persistentStoreDescription.type = storeType.coreDataValue
         persistentStoreDescription.url = try FileManager.default.defineStoreURL(
-            folderName: Constants.folderName,
+            folderName: persistentContainerConfigurator.folderName,
             storeName: storeName
         )
         persistentStoreDescription.shouldMigrateStoreAutomatically = false
@@ -129,6 +127,10 @@ extension CoreDataModelDescription {
         }
     }
 
+    static func makeAnalyticsEventModel() -> NSManagedObjectModel {
+        return makeAnalyticsEventModelv1()
+    }
+
     private static func makeOptistreamEventModelv1() -> NSManagedObjectModel {
         let modelDescription = CoreDataModelDescription(
             entities: [
@@ -165,6 +167,43 @@ extension CoreDataModelDescription {
                         ),
                     ],
                     constraints: [#keyPath(EventCDv2.eventId), #keyPath(EventCDv2.type)]
+                ),
+            ]
+        )
+        return modelDescription.makeModel()
+    }
+
+    private static func makeAnalyticsEventModelv1() -> NSManagedObjectModel {
+        let modelDescription = CoreDataModelDescription(
+            entities: [
+                .entity(
+                    name: KSEventModel.entityName,
+                    managedObjectClass: KSEventModel.self,
+                    attributes: [
+                        .attribute(
+                            name: #keyPath(KSEventModel.eventType),
+                            type: .stringAttributeType
+                        ),
+                        .attribute(
+                            name: #keyPath(KSEventModel.happenedAt),
+                            type: .integer64AttributeType,
+                            defaultValue: 0
+                        ),
+                        .attribute(
+                            name: #keyPath(KSEventModel.properties),
+                            type: .binaryDataAttributeType,
+                            isOptional: true
+                        ),
+                        .attribute(
+                            name: #keyPath(KSEventModel.uuid),
+                            type: .stringAttributeType
+                        ),
+                        .attribute(
+                            name: #keyPath(KSEventModel.userIdentifier),
+                            type: .stringAttributeType,
+                            isOptional: true
+                        ),
+                    ]
                 ),
             ]
         )
