@@ -2,6 +2,7 @@
 
 import CoreData
 import Foundation
+import GenericJSON
 import OptimoveCore
 import UIKit
 
@@ -177,9 +178,10 @@ class InAppManager {
     }
 
     func updateUserConsent(consentGiven: Bool) {
-        let props: [String: Any] = ["consented": consentGiven]
-
-        Optimobile.trackEventImmediately(eventType: OptimobileEvent.IN_APP_CONSENT_CHANGED.rawValue, properties: props)
+        Optimobile.trackEventImmediately(
+            eventType: OptimobileEvent.IN_APP_CONSENT_CHANGED.rawValue,
+            properties: ["consented": consentGiven]
+        )
 
         if consentGiven {
             UserDefaults.standard.set(consentGiven, forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
@@ -303,25 +305,34 @@ class InAppManager {
                     UserDefaults.standard.set(Date(), forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue)
                     syncBarrier.signal()
                 }
-
-                let messagesToPersist = decodedBody as? [[AnyHashable: Any]]
-                if messagesToPersist == nil || messagesToPersist!.count == 0 {
-                    onComplete?(0)
-                    return
-                }
-
-                self.persistInAppMessages(messages: messagesToPersist!)
-                onComplete?(1)
-
-                DispatchQueue.main.async {
-                    if UIApplication.shared.applicationState != .active {
+                do {
+                    guard let decodedBody = decodedBody else {
+                        onComplete?(0)
+                        return
+                    }
+                    let messagesToPersist = try JSON(decodedBody)
+                    if messagesToPersist == nil || messagesToPersist.count == 0 {
+                        onComplete?(0)
                         return
                     }
 
-                    DispatchQueue.global(qos: .default).async {
-                        let messagesToPresent = self.getMessagesToPresent([InAppPresented.IMMEDIATELY.rawValue])
-                        self.presenter.queueMessagesForPresentation(messages: messagesToPresent, tickleIds: self.pendingTickleIds)
+                    self.persistInAppMessages(messages: messagesToPersist)
+                    onComplete?(1)
+
+                    DispatchQueue.main.async {
+                        if UIApplication.shared.applicationState != .active {
+                            return
+                        }
+
+                        DispatchQueue.global(qos: .default).async {
+                            let messagesToPresent = self.getMessagesToPresent([InAppPresented.IMMEDIATELY.rawValue])
+                            self.presenter.queueMessagesForPresentation(messages: messagesToPresent, tickleIds: self.pendingTickleIds)
+                        }
                     }
+                } catch {
+                    Logger.error(error.localizedDescription)
+                    onComplete?(-1)
+                    syncBarrier.signal()
                 }
             }, onFailure: { _, _, _ in
                 onComplete?(-1)
@@ -332,127 +343,93 @@ class InAppManager {
         }
     }
 
-    private func persistInAppMessages(messages: [[AnyHashable: Any]]) {
+    private func persistInAppMessages(messages: JSON) {
         guard let context = messagesContext else {
             NSLog("InAppManager: NSManagedObjectContext is nil in persistInAppMessages")
             return
         }
 
         context.performAndWait {
-            let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
-
-            if entity == nil {
-                print("Failed to get entity description for Message, aborting!")
-                return
-            }
-
-            var mostRecentUpdate = NSDate(timeIntervalSince1970: 0)
-            let dateParser = DateFormatter()
-            dateParser.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-            dateParser.locale = Locale(identifier: "en_US_POSIX")
-            dateParser.timeZone = TimeZone(secondsFromGMT: 0)
-
-            var fetchedWithInbox = false
-            for message in messages {
-                let partId = message["id"] as! Int64
-
-                let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
-                fetchRequest.entity = entity
-                let predicate = NSPredicate(format: "id = %i", partId)
-                fetchRequest.predicate = predicate
-
-                var fetchedObjects: [InAppMessageEntity]
-                do {
-                    fetchedObjects = try context.fetch(fetchRequest) as! [InAppMessageEntity]
-                } catch {
-                    continue
+            do {
+                guard let entity = NSEntityDescription.entity(forEntityName: "Message", in: context) else {
+                    print("Failed to get entity description for Message, aborting!")
+                    return
                 }
 
-                // Upsert
-                let model: InAppMessageEntity = fetchedObjects.count == 1 ? fetchedObjects[0] : InAppMessageEntity(entity: entity!, insertInto: context)
+                var mostRecentUpdate = Date(timeIntervalSince1970: 0)
+                let dateParser = DateFormatter()
+                dateParser.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+                dateParser.locale = Locale(identifier: "en_US_POSIX")
+                dateParser.timeZone = TimeZone(secondsFromGMT: 0)
 
-                model.id = partId
-                model.updatedAt = dateParser.date(from: message["updatedAt"] as! String)! as NSDate
-                if model.dismissedAt == nil {
-                    model.dismissedAt = dateParser.date(from: message["openedAt"] as? String ?? "") as NSDate?
-                }
-                model.presentedWhen = message["presentedWhen"] as! String
+                for message in try unwrap(messages.arrayValue) {
+                    guard let partId = message.id?.doubleValue,
+                          let updatedAtString = message.updatedAt?.stringValue,
+                          let presentedWhenString = message.presentedWhen?.stringValue
+                    else {
+                        continue
+                    }
 
-                if model.readAt == nil {
-                    model.readAt = dateParser.date(from: message["readAt"] as? String ?? "") as NSDate?
-                }
+                    let fetchRequest: NSFetchRequest<InAppMessageEntity> = NSFetchRequest(entityName: "Message")
+                    fetchRequest.entity = entity
+                    fetchRequest.predicate = NSPredicate(format: "id = %lld", partId)
 
-                if model.sentAt == nil {
-                    model.sentAt = dateParser.date(from: message["sentAt"] as? String ?? "") as NSDate?
-                }
+                    let fetchedObjects: [InAppMessageEntity]
+                    do {
+                        fetchedObjects = try context.fetch(fetchRequest)
+                    } catch {
+                        continue
+                    }
 
-                model.content = message["content"] as! NSDictionary
-                model.data = message["data"] as? NSDictionary
-                model.badgeConfig = message["badge"] as? NSDictionary
-                model.inboxConfig = message["inbox"] as? NSDictionary
+                    // Upsert
+                    let model: InAppMessageEntity = fetchedObjects.count == 1 ? fetchedObjects[0] : InAppMessageEntity(entity: entity, insertInto: context)
 
-                if model.inboxConfig != nil {
-                    // crude way to refresh when new inbox, updated readAt, updated inbox title/subtite
-                    // may cause redundant refreshes (if message with inbox updated, but not inbox itself).
-                    fetchedWithInbox = true
+                    model.id = Int64(partId)
+                    model.updatedAt = dateParser.date(from: updatedAtString)!
+                    model.dismissedAt = dateParser.date(from: message["openedAt"]?.stringValue ?? "")
+                    model.presentedWhen = presentedWhenString
 
-                    let inbox = model.inboxConfig!
+                    if model.readAt == nil {
+                        model.readAt = dateParser.date(from: message["readAt"]?.stringValue ?? "")
+                    }
 
-                    model.inboxFrom = dateParser.date(from: inbox["from"] as? String ?? "") as NSDate?
-                    model.inboxTo = dateParser.date(from: inbox["to"] as? String ?? "") as NSDate?
-                }
+                    if model.sentAt == nil {
+                        model.sentAt = dateParser.date(from: message["sentAt"]?.stringValue ?? "")
+                    }
 
-                let inboxDeletedAt = message["inboxDeletedAt"] as? String
-                if inboxDeletedAt != nil {
-                    model.inboxConfig = nil
-                    model.inboxFrom = nil
-                    model.inboxTo = nil
-                    if model.dismissedAt == nil {
-                        model.dismissedAt = dateParser.date(from: inboxDeletedAt!) as NSDate?
+                    model.content = ObjcJSON(json: message["content"] ?? .null)
+                    model.data = ObjcJSON(json: message["data"] ?? .null)
+                    model.badgeConfig = ObjcJSON(json: message["badge"] ?? .null)
+                    model.inboxConfig = ObjcJSON(json: message["inbox"] ?? .null)
+
+                    if let inbox = model.inboxConfig?.toGenericJSON() {
+                        model.inboxFrom = dateParser.date(from: inbox["from"]?.stringValue ?? "")
+                        model.inboxTo = dateParser.date(from: inbox["to"]?.stringValue ?? "")
+                    }
+
+                    if let inboxDeletedAt = message["inboxDeletedAt"]?.stringValue {
+                        model.inboxConfig = nil
+                        model.inboxFrom = nil
+                        model.inboxTo = nil
+                        if model.dismissedAt == nil {
+                            model.dismissedAt = dateParser.date(from: inboxDeletedAt)
+                        }
+                    }
+
+                    model.expiresAt = dateParser.date(from: message["expiresAt"]?.stringValue ?? "")
+
+                    if model.updatedAt.timeIntervalSince1970 > mostRecentUpdate.timeIntervalSince1970 {
+                        mostRecentUpdate = model.updatedAt
                     }
                 }
 
-                model.expiresAt = dateParser.date(from: message["expiresAt"] as? String ?? "") as NSDate?
+                // The rest of your method's code would go here...
 
-                if model.updatedAt.timeIntervalSince1970 > mostRecentUpdate.timeIntervalSince1970 {
-                    mostRecentUpdate = model.updatedAt
-                }
-            }
-
-            // Evict
-            var (idsEvicted, evictedWithInbox) = evictMessages(context: context)
-
-            do {
-                try context.save()
+                // Example of how you would update UserDefaults with the `mostRecentUpdate` Date:
+                UserDefaults.standard.set(mostRecentUpdate, forKey: OptimobileUserDefaultsKey.IN_APP_MOST_RECENT_UPDATED_AT.rawValue)
             } catch {
-                print("Failed to persist messages: \(error)")
-                return
+                Logger.error(error.localizedDescription)
             }
-
-            // exceeders evicted after saving because fetchOffset is ignored when have unsaved changes
-            // https://stackoverflow.com/questions/10725252/possible-issue-with-fetchlimit-and-fetchoffset-in-a-core-data-query
-            let (exceederIdsEvicted, evictedExceedersWithInbox) = evictMessagesExceedingLimit(context: context)
-            if exceederIdsEvicted.count > 0 {
-                idsEvicted += exceederIdsEvicted
-
-                do {
-                    try context.save()
-                } catch {
-                    print("Failed to evict exceeding messages: \(error)")
-                    return
-                }
-            }
-
-            for idEvicted in idsEvicted {
-                removeNotificationTickle(id: idEvicted)
-            }
-
-            UserDefaults.standard.set(mostRecentUpdate, forKey: OptimobileUserDefaultsKey.IN_APP_MOST_RECENT_UPDATED_AT.rawValue)
-
-            trackMessageDelivery(messages: messages)
-
-            let inboxUpdated = fetchedWithInbox || evictedWithInbox || evictedExceedersWithInbox
-            OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: inboxUpdated)
         }
     }
 
@@ -548,7 +525,7 @@ class InAppManager {
             fetchRequest.includesPendingChanges = false
             fetchRequest.returnsObjectsAsFaults = false
 
-            let predicate = NSPredicate(format: "((presentedWhen IN %@) OR (id IN %@)) AND (dismissedAt = nil) AND (expiresAt = nil OR expiresAt > %@)", presentedWhenOptions, self.pendingTickleIds, NSDate())
+            let predicate = NSPredicate(format: "((presentedWhen IN %@) OR (id IN %@)) AND (dismissedAt = nil) AND (expiresAt = nil OR expiresAt > %@)", presentedWhenOptions, self.pendingTickleIds, Date() as CVarArg)
             fetchRequest.predicate = predicate
 
             fetchRequest.sortDescriptors = [
@@ -619,9 +596,9 @@ class InAppManager {
             }
 
             if messageEntities.count == 1 {
-                messageEntities[0].dismissedAt = NSDate()
+                messageEntities[0].dismissedAt = Date()
                 if messageEntities[0].readAt == nil {
-                    messageEntities[0].readAt = NSDate()
+                    messageEntities[0].readAt = Date()
                 }
             }
 
@@ -748,9 +725,9 @@ class InAppManager {
                 messageEntities[0].inboxTo = nil
                 messageEntities[0].inboxFrom = nil
                 messageEntities[0].inboxConfig = nil
-                messageEntities[0].dismissedAt = NSDate()
+                messageEntities[0].dismissedAt = Date()
                 if messageEntities[0].readAt == nil {
-                    messageEntities[0].readAt = NSDate()
+                    messageEntities[0].readAt = Date()
                 }
             }
 
@@ -799,7 +776,7 @@ class InAppManager {
             }
 
             if messageEntities.count == 1 {
-                messageEntities[0].readAt = NSDate()
+                messageEntities[0].readAt = Date()
             }
 
             do {

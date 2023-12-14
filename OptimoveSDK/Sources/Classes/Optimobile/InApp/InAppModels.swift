@@ -2,6 +2,7 @@
 
 import CoreData
 import Foundation
+import GenericJSON
 
 enum InAppPresented: String {
     case IMMEDIATELY = "immediately"
@@ -11,71 +12,66 @@ enum InAppPresented: String {
 
 final class InAppMessageEntity: NSManagedObject {
     @NSManaged var id: Int64
-    @NSManaged var updatedAt: NSDate
+    @NSManaged var updatedAt: Date
     @NSManaged var presentedWhen: String
-    @NSManaged var content: NSDictionary
-    @NSManaged var data: NSDictionary?
-    @NSManaged var badgeConfig: NSDictionary?
-    @NSManaged var inboxConfig: NSDictionary?
-    @NSManaged var dismissedAt: NSDate?
-    @NSManaged var inboxFrom: NSDate?
-    @NSManaged var inboxTo: NSDate?
-    @NSManaged var expiresAt: NSDate?
-    @NSManaged var readAt: NSDate?
-    @NSManaged var sentAt: NSDate?
+    @NSManaged var content: ObjcJSON
+    @NSManaged var data: ObjcJSON?
+    @NSManaged var badgeConfig: ObjcJSON?
+    @NSManaged var inboxConfig: ObjcJSON?
+    @NSManaged var dismissedAt: Date?
+    @NSManaged var inboxFrom: Date?
+    @NSManaged var inboxTo: Date?
+    @NSManaged var expiresAt: Date?
+    @NSManaged var readAt: Date?
+    @NSManaged var sentAt: Date?
 
     func isAvailable() -> Bool {
-        let availableFrom = inboxFrom as Date?
-        let availableTo = inboxTo as Date?
-
-        if availableFrom != nil, availableFrom!.timeIntervalSinceNow > 0 {
+        if let availableFrom = inboxFrom, availableFrom.timeIntervalSinceNow > 0 {
             return false
-        } else if availableTo != nil, availableTo!.timeIntervalSinceNow < 0 {
+        } else if let availableTo = inboxTo, availableTo.timeIntervalSinceNow < 0 {
             return false
         }
-
         return true
     }
 }
 
-final class InAppMessage: NSObject {
+final class InAppMessage {
     private(set) var id: Int64
-    private(set) var updatedAt: NSDate
-    private(set) var content: NSDictionary
-    private(set) var data: NSDictionary?
-    private(set) var badgeConfig: NSDictionary?
-    private(set) var inboxConfig: NSDictionary?
-    private(set) var dismissedAt: NSDate?
-    private(set) var readAt: NSDate?
-    private(set) var sentAt: NSDate?
+    private(set) var updatedAt: Date
+    private(set) var content: ObjcJSON
+    private(set) var data: ObjcJSON?
+    private(set) var badgeConfig: ObjcJSON?
+    private(set) var inboxConfig: ObjcJSON?
+    private(set) var dismissedAt: Date?
+    private(set) var readAt: Date?
+    private(set) var sentAt: Date?
 
     init(entity: InAppMessageEntity) {
         id = Int64(entity.id)
-        updatedAt = entity.updatedAt.copy() as! NSDate
-        content = entity.content.copy() as! NSDictionary
-        data = entity.data?.copy() as? NSDictionary
-        badgeConfig = entity.badgeConfig?.copy() as? NSDictionary
-        inboxConfig = entity.inboxConfig?.copy() as? NSDictionary
-        dismissedAt = entity.dismissedAt?.copy() as? NSDate
-        readAt = entity.readAt?.copy() as? NSDate
-        sentAt = entity.sentAt?.copy() as? NSDate
+        updatedAt = entity.updatedAt
+        content = entity.content
+        data = entity.data
+        badgeConfig = entity.badgeConfig
+        inboxConfig = entity.inboxConfig
+        dismissedAt = entity.dismissedAt
+        readAt = entity.readAt
+        sentAt = entity.sentAt
     }
 
-    override func isEqual(_ object: Any?) -> Bool {
-        if let other = object as? InAppMessage {
-            return id == other.id
-        }
-
-        return super.isEqual(object)
+    static func == (lhs: InAppMessage, rhs: InAppMessage) -> Bool {
+        return lhs.id == rhs.id
     }
 
-    override var hash: Int {
-        id.hashValue
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 
+// Ensure that the InAppMessage conforms to Equatable and Hashable to provide the isEqual and hash functionality.
+extension InAppMessage: Equatable, Hashable {}
+
 public struct InAppButtonPress {
-    public let deepLinkData: [AnyHashable: Any]
+    public let deepLinkData: JSON
     public let messageId: Int64
-    public let messageData: NSDictionary?
+    public let messageData: JSON?
 }

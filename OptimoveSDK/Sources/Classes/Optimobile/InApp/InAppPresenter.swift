@@ -1,5 +1,6 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
+import GenericJSON
 import OptimoveCore
 import StoreKit
 import UIKit
@@ -145,33 +146,40 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         defer {
             messageQueueLock.signal()
         }
+        do {
+            if messageQueue.count == 0 || displayMode == .paused {
+                DispatchQueue.main.async {
+                    self.destroyViews()
+                }
 
-        if messageQueue.count == 0 || displayMode == .paused {
-            DispatchQueue.main.async {
-                self.destroyViews()
+                return
             }
 
-            return
+            currentMessage = (messageQueue[0] as! InAppMessage)
+
+            var ready = false
+
+            runOnMainThreadSync {
+                initViews()
+                self.loadingSpinner?.startAnimating()
+                ready = self.webViewReady
+            }
+
+            guard ready else {
+                return
+            }
+
+            let content = try currentMessage!
+                .content
+                .toGenericJSON()
+                .merging(with: [
+                    JSON(["region": Optimobile.sharedInstance.config.region.rawValue])
+                ])
+
+            postClientMessage(type: "PRESENT_MESSAGE", data: content)
+        } catch {
+            Logger.error(error.localizedDescription)
         }
-
-        currentMessage = (messageQueue[0] as! InAppMessage)
-
-        var ready = false
-
-        runOnMainThreadSync {
-            initViews()
-            self.loadingSpinner?.startAnimating()
-            ready = self.webViewReady
-        }
-
-        guard ready else {
-            return
-        }
-
-        let content = NSMutableDictionary(dictionary: currentMessage!.content)
-        content["region"] = Optimobile.sharedInstance.config.region.rawValue
-
-        postClientMessage(type: "PRESENT_MESSAGE", data: content)
     }
 
     func handleMessageClosed() {
@@ -295,7 +303,9 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         }
 
         // Spinner
-        let loadingSpinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
+        let loadingSpinner = UIActivityIndicatorView(
+            style: UIActivityIndicatorView.Style.medium
+        )
         self.loadingSpinner = loadingSpinner
 
         loadingSpinner.translatesAutoresizingMaskIntoConstraints = true
@@ -333,17 +343,19 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         webViewReady = false
     }
 
-    func postClientMessage(type: String, data: Any?) {
+    func postClientMessage(type: String, data: JSON?) {
         guard let webView = webView else {
             return
         }
 
         do {
-            let msg: [String: Any] = ["type": type, "data": data != nil ? data! : NSNull()]
-            let json: Data = try JSONSerialization.data(withJSONObject: msg, options: [])
-
-            let jsonMsg = String(data: json, encoding: .utf8)
-            let evalString = String(format: "postHostMessage(%@);", jsonMsg!)
+            let message = try JSON([
+                [
+                    "type": type,
+                    "data": data ?? .null
+                ]
+            ])
+            let evalString = String(format: "postHostMessage(%@);", message.debugDescription)
 
             webView.evaluateJavaScript(evalString, completionHandler: nil)
         } catch {
@@ -352,34 +364,37 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     }
 
     func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
-        if message.name != "inAppHost" {
-            return
-        }
-
-        let body = message.body as! NSDictionary
-        let type = body["type"] as! String
-
-        if type == "READY" {
-            runOnMainThreadSync {
-                self.webViewReady = true
-            }
-
-            presentFromQueue()
-        } else if type == "MESSAGE_OPENED" {
-            loadingSpinner?.stopAnimating()
-            Optimobile.sharedInstance.inAppManager.handleMessageOpened(message: currentMessage!)
-        } else if type == "MESSAGE_CLOSED" {
-            handleMessageClosed()
-        } else if type == "EXECUTE_ACTIONS" {
-            guard let body = message.body as? [AnyHashable: Any],
-                  let data = body["data"] as? [AnyHashable: Any],
-                  let actions = data["actions"] as? [NSDictionary]
-            else {
+        do {
+            if message.name != "inAppHost" {
                 return
             }
-            handleActions(actions: actions)
-        } else {
-            print("Unknown message: \(message.body)")
+
+            let body = try JSON(message.body)
+            let type = body["type"]?.stringValue
+
+            if type == "READY" {
+                runOnMainThreadSync {
+                    self.webViewReady = true
+                }
+
+                presentFromQueue()
+            } else if type == "MESSAGE_OPENED" {
+                loadingSpinner?.stopAnimating()
+                Optimobile.sharedInstance.inAppManager.handleMessageOpened(message: currentMessage!)
+            } else if type == "MESSAGE_CLOSED" {
+                handleMessageClosed()
+            } else if type == "EXECUTE_ACTIONS" {
+                guard let data = body["data"],
+                      let actions = data["actions"]
+                else {
+                    return
+                }
+                try handleActions(actions: actions)
+            } else {
+                print("Unknown message: \(message.body)")
+            }
+        } catch {
+            Logger.error(error.localizedDescription)
         }
     }
 
@@ -417,23 +432,27 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         cancelCurrentPresentationQueue(waitForViewCleanup: false)
     }
 
-    func handleActions(actions: [NSDictionary]) {
+    func handleActions(actions: JSON) throws {
         if let message = currentMessage {
             var hasClose = false
             var conversionEvent: String?
-            var conversionEventData: [String: Any]?
-            var userAction: NSDictionary?
+            var conversionEventData: JSON?
+            var userAction: JSON?
 
-            for action in actions {
-                let type = InAppAction(rawValue: action["type"] as! String)!
-                let data = action["data"] as? [AnyHashable: Any]
+            for action in try unwrap(actions.arrayValue) {
+                guard let type = action["type"]?.stringValue,
+                      let inAppAction = InAppAction(rawValue: type)
+                else {
+                    continue
+                }
+                let data = action["data"]
 
-                switch type {
+                switch inAppAction {
                 case .CLOSE_MESSAGE:
                     hasClose = true
                 case .TRACK_EVENT:
-                    conversionEvent = data?["eventType"] as? String
-                    conversionEventData = data?["data"] as? [String: Any]
+                    conversionEvent = data?["eventType"]?.stringValue
+                    conversionEventData = data?["data"]
                 default:
                     userAction = action
                 }
@@ -445,7 +464,10 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             }
 
             if let conversionEvent = conversionEvent {
-                Optimobile.trackEventImmediately(eventType: conversionEvent, properties: conversionEventData)
+                Optimobile.trackEventImmediately(
+                    eventType: conversionEvent,
+                    properties: conversionEventData?.objectValue
+                )
             }
 
             if userAction != nil {
@@ -455,8 +477,8 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         }
     }
 
-    func handleUserAction(message: InAppMessage, userAction: NSDictionary) {
-        let type = userAction["type"] as! String
+    func handleUserAction(message: InAppMessage, userAction: JSON) {
+        let type = userAction["type"]?.stringValue
 
         if type == InAppAction.PROMPT_PUSH_PERMISSION.rawValue {
             Optimobile.pushRequestDeviceToken()
@@ -465,12 +487,22 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
                 return
             }
             DispatchQueue.main.async {
-                let data = userAction.value(forKeyPath: "data.deepLink") as? [AnyHashable: Any] ?? [:]
-                let buttonPress = InAppButtonPress(deepLinkData: data, messageId: message.id, messageData: message.data)
+                guard let data = userAction.queryKeyPath(["data", "deepLink"]) else {
+                    Logger.error("Deep link action missing deep link data")
+                    return
+                }
+                let buttonPress = InAppButtonPress(
+                    deepLinkData: data,
+                    messageId: message.id,
+                    messageData: message.data?.toGenericJSON()
+                )
                 Optimobile.sharedInstance.config.inAppDeepLinkHandlerBlock?(buttonPress)
             }
         } else if type == InAppAction.OPEN_URL.rawValue {
-            guard let url = URL(string: userAction.value(forKeyPath: "data.url") as! String) else {
+            guard let urlString = userAction.queryKeyPath(["data", "url"])?.stringValue,
+                  let url = URL(string: urlString)
+            else {
+                Logger.error("Open URL action missing URL data")
                 return
             }
 
@@ -487,7 +519,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             if #available(iOS 10.3.0, *) {
                 SKStoreReviewController.requestReview()
             } else {
-                NSLog("Requesting a rating not supported on this iOS version")
+                Logger.error("Requesting a rating not supported on this iOS version")
             }
         }
     }
