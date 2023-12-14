@@ -4,7 +4,7 @@ import Foundation
 import OptimoveCore
 
 /// Combined protocol for a convenince access to stored values and files.
-typealias OptimoveStorage = FileStorage & KeyValueStorage & StorageValue
+public typealias OptimoveStorage = FileStorage & KeyValueStorage & StorageValue
 
 enum StorageError: LocalizedError {
     case noValue(StorageKey)
@@ -18,14 +18,14 @@ enum StorageError: LocalizedError {
 }
 
 /// Class implements the Façade pattern for hiding complexity of the OptimoveStorage protocol.
-final class StorageFacade: OptimoveStorage {
+public final class StorageFacade: OptimoveStorage {
     // FIXME: - Split persistance storage to AppGroup and Standart
     private let standardStorage: KeyValueStorage
     private let appGroupStorage: KeyValueStorage
     private let inMemoryStorage: KeyValueStorage
     private let fileStorage: FileStorage
 
-    init(
+    public init(
         standardStorage: KeyValueStorage,
         appGroupStorage: KeyValueStorage,
         inMemoryStorage: KeyValueStorage,
@@ -50,7 +50,7 @@ final class StorageFacade: OptimoveStorage {
 
 // MARK: - KeyValueStorage
 
-extension StorageFacade {
+public extension StorageFacade {
     /// Use `storage.key` instead.
     /// Some variable have formatters, implemented in own setters. Set unformatted value could cause an issue.
     func set(value: Any?, key: StorageKey) {
@@ -70,7 +70,7 @@ extension StorageFacade {
         }
     }
 
-    subscript<T>(key: StorageKey) -> () throws -> T {
+    internal subscript<T>(key: StorageKey) -> () throws -> T {
         get {
             { try cast(self.getStorage(for: key).value(for: key)) }
         }
@@ -82,7 +82,7 @@ extension StorageFacade {
 
 // MARK: - FileStorage
 
-extension StorageFacade {
+public extension StorageFacade {
     func isExist(fileName: String, isTemporary: Bool) -> Bool {
         return fileStorage.isExist(fileName: fileName, isTemporary: isTemporary)
     }
@@ -110,7 +110,7 @@ extension StorageFacade {
 
 // MARK: - StorageValue
 
-extension KeyValueStorage where Self: StorageValue {
+public extension KeyValueStorage where Self: StorageValue {
     var installationID: String? {
         get {
             return self[.installationID]
