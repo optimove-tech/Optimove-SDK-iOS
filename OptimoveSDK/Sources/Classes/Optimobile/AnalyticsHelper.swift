@@ -114,12 +114,17 @@ final class AnalyticsHelper {
     // MARK: Event Tracking
 
     func trackEvent(eventType: String, properties: [String: Any]?, immediateFlush: Bool) {
-        trackEvent(eventType: eventType, atTime: Date(), properties: properties, immediateFlush: immediateFlush)
+        trackEvent(
+            eventType: eventType,
+            atTime: Date(),
+            properties: properties,
+            immediateFlush: immediateFlush
+        )
     }
 
     func trackEvent(eventType: String, atTime: Date, properties: [String: Any]?, immediateFlush: Bool, onSyncComplete: SyncCompletedBlock? = nil) {
         if eventType == "" || (properties != nil && !JSONSerialization.isValidJSONObject(properties as Any)) {
-            print("Ignoring invalid event with empty type or non-serializable properties")
+            Logger.error("Ignoring invalid event with empty type or non-serializable properties")
             return
         }
 

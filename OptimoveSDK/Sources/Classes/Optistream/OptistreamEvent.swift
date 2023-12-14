@@ -1,6 +1,7 @@
 //  Copyright © 2020 Optimove. All rights reserved.
 
 import Foundation
+import GenericJSON
 import OptimoveCore
 
 struct OptistreamEvent: Codable {
