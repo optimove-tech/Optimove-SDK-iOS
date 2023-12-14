@@ -42,6 +42,7 @@ final class PersistentContainer: NSPersistentContainer {
         let persistentStoreDescription = NSPersistentStoreDescription()
         persistentStoreDescription.type = storeType.coreDataValue
         persistentStoreDescription.url = try FileManager.default.defineStoreURL(
+            location: persistentContainerConfigurator.location,
             folderName: persistentContainerConfigurator.folderName,
             storeName: storeName
         )
@@ -88,14 +89,32 @@ final class PersistentContainer: NSPersistentContainer {
 }
 
 extension FileManager {
-    func defineStoreURL(folderName: String, storeName: String) throws -> URL {
-        let libraryDirectory = try unwrap(urls(for: .libraryDirectory, in: .userDomainMask).first)
-        let libraryStoreDirectoryURL = try unwrap(libraryDirectory.appendingPathComponent(folderName))
-        let storeURL = try unwrap(libraryStoreDirectoryURL.appendingPathComponent("\(storeName).sqlite"))
-        guard !directoryExists(atUrl: libraryStoreDirectoryURL, isDirectory: true) else {
+    func defineLocation(_ location: FileManagerLocation) throws -> URL {
+        switch location {
+        case let .appGroupDirectory(url):
+            return url
+        case .libraryDirectory:
+            return try unwrap(urls(for: .libraryDirectory, in: .userDomainMask).first)
+        }
+    }
+
+    func defineStoreURL(
+        location: FileManagerLocation,
+        folderName: String?,
+        storeName: String
+    ) throws -> URL {
+        let storeFolderURL = try {
+            let locationURL = try defineLocation(location)
+            if let folderName = folderName {
+                return try unwrap(locationURL.appendingPathComponent(folderName))
+            }
+            return locationURL
+        }()
+        let storeURL = try unwrap(storeFolderURL.appendingPathComponent("\(storeName).sqlite"))
+        guard !directoryExists(atUrl: storeFolderURL, isDirectory: true) else {
             return try addSkipBackupAttributeToItemAtURL(url: storeURL)
         }
-        try createDirectory(at: libraryStoreDirectoryURL, withIntermediateDirectories: true)
+        try createDirectory(at: storeFolderURL, withIntermediateDirectories: true)
         return try addSkipBackupAttributeToItemAtURL(url: storeURL)
     }
 

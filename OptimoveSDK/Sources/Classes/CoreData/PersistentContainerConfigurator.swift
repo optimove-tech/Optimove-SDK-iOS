@@ -6,8 +6,14 @@ import OptimoveCore
 
 typealias ManagedObjectModel = NSManagedObjectModel
 
+enum FileManagerLocation {
+    case libraryDirectory
+    case appGroupDirectory(URL)
+}
+
 protocol PersistentContainerConfigurator {
-    var folderName: String { get }
+    var folderName: String? { get }
     var modelName: String { get }
     var managedObjectModel: ManagedObjectModel { get }
+    var location: FileManagerLocation { get }
 }

@@ -15,9 +15,11 @@ final class OptistreamPersistentContainerConfigurator: PersistentContainerConfig
         self.version = version
     }
 
-    let folderName: String = Constants.folderName
+    let folderName: String? = Constants.folderName
     let modelName: String = Constants.modelName
     var managedObjectModel: ManagedObjectModel {
         CoreDataModelDescription.makeOptistreamEventModel(version: version)
     }
+
+    var location: FileManagerLocation = .libraryDirectory
 }
