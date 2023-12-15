@@ -93,6 +93,8 @@ extension FileManager {
         switch location {
         case let .appGroupDirectory(url):
             return url
+        case .documentDirectory:
+            return try unwrap(urls(for: .documentDirectory, in: .userDomainMask).first)
         case .libraryDirectory:
             return try unwrap(urls(for: .libraryDirectory, in: .userDomainMask).first)
         }
