@@ -28,4 +28,14 @@ extension Managed where Self: NSManagedObject {
         configurationBlock(request)
         return try context.fetch(request)
     }
+
+    static func delete(
+        in context: NSManagedObjectContext,
+        configurationBlock: (NSFetchRequest<NSFetchRequestResult>) -> Void = { _ in }
+    ) throws {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Self.entityName)
+        configurationBlock(fetchRequest)
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        try context.execute(deleteRequest)
+    }
 }
