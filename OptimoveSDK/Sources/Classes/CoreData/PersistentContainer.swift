@@ -152,6 +152,81 @@ extension CoreDataModelDescription {
         return makeAnalyticsEventModelv1()
     }
 
+    static func makeInAppMessageModel() -> NSManagedObjectModel {
+        let modelDescription = CoreDataModelDescription(
+            entities: [
+                .entity(
+                    name: InAppMessageEntity.entityName,
+                    managedObjectClass: InAppMessageEntity.self,
+                    attributes: [
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.id),
+                            type: .integer64AttributeType
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.updatedAt),
+                            type: .dateAttributeType
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.presentedWhen),
+                            type: .stringAttributeType
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.content),
+                            type: .binaryDataAttributeType
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.data),
+                            type: .binaryDataAttributeType,
+                            isOptional: true
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.badgeConfig),
+                            type: .binaryDataAttributeType,
+                            isOptional: true
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.inboxConfig),
+                            type: .binaryDataAttributeType,
+                            isOptional: true
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.inboxFrom),
+                            type: .dateAttributeType,
+                            isOptional: true
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.inboxTo),
+                            type: .dateAttributeType,
+                            isOptional: true
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.dismissedAt),
+                            type: .dateAttributeType,
+                            isOptional: true
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.expiresAt),
+                            type: .dateAttributeType,
+                            isOptional: true
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.readAt),
+                            type: .dateAttributeType,
+                            isOptional: true
+                        ),
+                        .attribute(
+                            name: #keyPath(InAppMessageEntity.sentAt),
+                            type: .dateAttributeType,
+                            isOptional: true
+                        ),
+                    ]
+                ),
+            ]
+        )
+        return modelDescription.makeModel()
+    }
+
     private static func makeOptistreamEventModelv1() -> NSManagedObjectModel {
         let modelDescription = CoreDataModelDescription(
             entities: [

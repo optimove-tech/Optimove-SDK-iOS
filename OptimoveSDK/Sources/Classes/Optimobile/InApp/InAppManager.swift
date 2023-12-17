@@ -13,21 +13,26 @@ public enum InAppMessagePresentationResult: String {
     case PAUSED = "paused"
 }
 
+enum InAppPresented: String {
+    case IMMEDIATELY = "immediately"
+    case NEXT_OPEN = "next-open"
+    case NEVER = "never"
+}
+
 typealias kumulos_applicationPerformFetchWithCompletionHandler = @convention(c) (_ obj: Any, _ _cmd: Selector, _ application: UIApplication, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void
 typealias fetchBlock = @convention(block) (_ obj: Any, _ application: UIApplication, _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void
 private var ks_existingBackgroundFetchDelegate: IMP?
 
 typealias InAppSyncCompletionHandler = (_ result: Int) -> Void
 
-class InAppManager {
+final class InAppManager {
+    let context: NSManagedObjectContext
     let httpClient: KSHttpClient
     let storage: OptimoveStorage
     let pendingNoticationHelper: PendingNotificationHelper
     let optimobileHelper: OptimobileHelper
     private(set) var presenter: InAppPresenter
     private var pendingTickleIds = NSMutableOrderedSet(capacity: 1)
-
-    var messagesContext: NSManagedObjectContext?
 
     let MESSAGE_TYPE_IN_APP = 2
 
@@ -45,8 +50,13 @@ class InAppManager {
         urlBuilder: UrlBuilder,
         storage: OptimoveStorage,
         pendingNoticationHelper: PendingNotificationHelper,
-        optimobileHelper: OptimobileHelper
-    ) {
+        optimobileHelper: OptimobileHelper,
+        container: PersistentContainer
+    ) throws {
+        try container.loadPersistentStores(
+            storeName: "KSMessagesDb"
+        )
+        context = container.newBackgroundContext()
         self.httpClient = httpClient
         self.storage = storage
         self.pendingNoticationHelper = pendingNoticationHelper
@@ -64,49 +74,6 @@ class InAppManager {
                 handleEnrollmentAndSyncSetup()
                 Logger.debug("Notification \(notification.name.rawValue) was processed")
             }
-    }
-
-    func initialize() {
-        initContext()
-    }
-
-    func initContext() {
-        let objectModel: NSManagedObjectModel? = getDataModel()
-
-        if objectModel == nil {
-            print("Failed to create object model")
-            return
-        }
-
-        var storeCoordinator: NSPersistentStoreCoordinator?
-        if let objectModel = objectModel {
-            storeCoordinator = NSPersistentStoreCoordinator(managedObjectModel: objectModel)
-        }
-
-        let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last
-        let storeUrl = URL(string: "KSMessagesDb.sqlite", relativeTo: docsUrl)
-
-        let options = [
-            NSMigratePersistentStoresAutomaticallyOption: NSNumber(value: true),
-            NSInferMappingModelAutomaticallyOption: NSNumber(value: true),
-        ]
-
-        do {
-            try storeCoordinator?.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeUrl, options: options)
-        } catch {
-            print("Failed to set up persistent store: \(error)")
-            return
-        }
-
-        messagesContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in initialization")
-            return
-        }
-
-        context.performAndWait {
-            context.persistentStoreCoordinator = storeCoordinator
-        }
     }
 
     @objc func appBecameActive() {
@@ -188,7 +155,7 @@ class InAppManager {
             handleEnrollmentAndSyncSetup()
         } else {
             DispatchQueue.global(qos: .default).async {
-                self.resetMessagingState()
+                try? self.resetMessagingState()
             }
         }
     }
@@ -202,7 +169,7 @@ class InAppManager {
         }
 
         DispatchQueue.global(qos: .default).async {
-            self.resetMessagingState()
+            try? self.resetMessagingState()
             self.handleEnrollmentAndSyncSetup()
         }
     }
@@ -232,36 +199,16 @@ class InAppManager {
         sync(onComplete)
     }
 
-    private func resetMessagingState() {
-        guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in resetMessagingState")
-            return
-        }
-
+    private func resetMessagingState() throws {
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
         UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
         UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue)
         UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_MOST_RECENT_UPDATED_AT.rawValue)
 
-        context.performAndWait {
-            let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
-            fetchRequest.includesPendingChanges = true
-
-            var messages: [InAppMessageEntity]
-            do {
-                messages = try context.fetch(fetchRequest) as! [InAppMessageEntity]
-            } catch {
-                return
-            }
-
-            for message in messages {
-                context.delete(message)
-            }
-
-            do {
-                try context.save()
-            } catch {
-                print("Failed to clean up messages: \(error)")
+        try context.safeTryPerformAndWait { _ in
+            try InAppMessageEntity.delete(in: context) { request in
+                request.returnsObjectsAsFaults = false
+                request.includesPendingChanges = false
             }
         }
     }
@@ -344,13 +291,9 @@ class InAppManager {
     }
 
     private func persistInAppMessages(messages: JSON) {
-        guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in persistInAppMessages")
-            return
-        }
-
         context.performAndWait {
             do {
+                // TODO: Use InAppMessageEntity
                 guard let entity = NSEntityDescription.entity(forEntityName: "Message", in: context) else {
                     print("Failed to get entity description for Message, aborting!")
                     return
@@ -512,11 +455,6 @@ class InAppManager {
 
     private func getMessagesToPresent(_ presentedWhenOptions: [String]) -> [InAppMessage] {
         var messages: [InAppMessage] = []
-        guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in getMessagesToPresent")
-            return messages
-        }
-
         context.performAndWait {
             let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
 
@@ -567,11 +505,6 @@ class InAppManager {
     }
 
     func markMessageDismissed(message: InAppMessage) {
-        guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in markMessageDismissed")
-            return
-        }
-
         let props: [String: Any] = ["type": MESSAGE_TYPE_IN_APP, "id": message.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DISMISSED, properties: props)
 
@@ -629,11 +562,6 @@ class InAppManager {
     }
 
     func presentMessage(withId: Int64) -> Bool {
-        guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in presentMessage")
-            return false
-        }
-
         var result = true
 
         context.performAndWait {
@@ -692,11 +620,6 @@ class InAppManager {
     }
 
     func deleteMessageFromInbox(withId: Int64) -> Bool {
-        guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in deleteMessageFromInbox")
-            return false
-        }
-
         let props: [String: Any] = ["type": MESSAGE_TYPE_IN_APP, "id": withId]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELETED_FROM_INBOX, properties: props)
 
@@ -746,14 +669,9 @@ class InAppManager {
     }
 
     func markInboxItemRead(withId: Int64, shouldWait: Bool) -> Bool {
-        guard let context = messagesContext else {
-            NSLog("InAppManager: NSManagedObjectContext is nil in markInboxItemRead")
-            return false
-        }
-
         var result = true
         let block = {
-            let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: context)
+            let entity: NSEntityDescription? = NSEntityDescription.entity(forEntityName: "Message", in: self.context)
 
             let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
             fetchRequest.entity = entity
@@ -763,7 +681,7 @@ class InAppManager {
 
             var messageEntities: [InAppMessageEntity]
             do {
-                messageEntities = try context.fetch(fetchRequest) as! [InAppMessageEntity]
+                messageEntities = try self.context.fetch(fetchRequest) as! [InAppMessageEntity]
             } catch {
                 result = false
                 print("Failed to mark as read message with id: \(withId) \(error)")
@@ -780,7 +698,7 @@ class InAppManager {
             }
 
             do {
-                try context.save()
+                try self.context.save()
             } catch {
                 result = false
                 print("Failed to mark as read message with id: \(withId) \(error)")
@@ -803,7 +721,7 @@ class InAppManager {
 
     func markAllInboxItemsAsRead() -> Bool {
         var result = true
-        let inboxItems = OptimoveInApp.getInboxItems(storage: storage)
+        let inboxItems = OptimoveInApp.getInboxItems(storage: storage, context: context)
         var inboxNeedsUpdate = false
         for item in inboxItems {
             if item.isRead() {
@@ -826,11 +744,6 @@ class InAppManager {
     }
 
     func readInboxSummary(inboxSummaryBlock: @escaping InboxSummaryBlock) {
-        guard let context = Optimobile.sharedInstance.inAppManager.messagesContext else {
-            fireInboxSummaryCallback(callback: inboxSummaryBlock, summary: nil)
-            return
-        }
-
         context.perform {
             let request = NSFetchRequest<InAppMessageEntity>(entityName: "Message")
             request.includesPendingChanges = false
@@ -839,7 +752,7 @@ class InAppManager {
 
             var items: [InAppMessageEntity] = []
             do {
-                items = try context.fetch(request) as [InAppMessageEntity]
+                items = try self.context.fetch(request) as [InAppMessageEntity]
             } catch {
                 print("Failed to fetch items: \(error)")
 
@@ -882,152 +795,5 @@ class InAppManager {
         }
 
         return models
-    }
-
-    private func getDataModel() -> NSManagedObjectModel {
-        let model = NSManagedObjectModel()
-
-        let messageEntity = NSEntityDescription()
-        messageEntity.name = "Message"
-        messageEntity.managedObjectClassName = NSStringFromClass(InAppMessageEntity.self)
-
-        var messageProps: [NSAttributeDescription] = []
-        messageProps.reserveCapacity(13)
-
-        let partId = NSAttributeDescription()
-        partId.name = "id"
-        partId.attributeType = NSAttributeType.integer64AttributeType
-        partId.isOptional = false
-        messageProps.append(partId)
-
-        let updatedAt = NSAttributeDescription()
-        updatedAt.name = "updatedAt"
-        updatedAt.attributeType = NSAttributeType.dateAttributeType
-        updatedAt.isOptional = false
-        messageProps.append(updatedAt)
-
-        let presentedWhen = NSAttributeDescription()
-        presentedWhen.name = "presentedWhen"
-        presentedWhen.attributeType = NSAttributeType.stringAttributeType
-        presentedWhen.isOptional = false
-        messageProps.append(presentedWhen)
-
-        let content = NSAttributeDescription()
-        content.name = "content"
-        content.attributeType = NSAttributeType.transformableAttributeType
-        content.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self)
-        content.isOptional = false
-        messageProps.append(content)
-
-        let data = NSAttributeDescription()
-        data.name = "data"
-        data.attributeType = NSAttributeType.transformableAttributeType
-        data.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self)
-        data.isOptional = true
-        messageProps.append(data)
-
-        let badgeConfig = NSAttributeDescription()
-        badgeConfig.name = "badgeConfig"
-        badgeConfig.attributeType = NSAttributeType.transformableAttributeType
-        badgeConfig.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self)
-        badgeConfig.isOptional = true
-        messageProps.append(badgeConfig)
-
-        let inboxConfig = NSAttributeDescription()
-        inboxConfig.name = "inboxConfig"
-        inboxConfig.attributeType = NSAttributeType.transformableAttributeType
-        inboxConfig.valueTransformerName = NSStringFromClass(KSJsonValueTransformer.self)
-        inboxConfig.isOptional = true
-        messageProps.append(inboxConfig)
-
-        let inboxFrom = NSAttributeDescription()
-        inboxFrom.name = "inboxFrom"
-        inboxFrom.attributeType = NSAttributeType.dateAttributeType
-        inboxFrom.isOptional = true
-        messageProps.append(inboxFrom)
-
-        let inboxTo = NSAttributeDescription()
-        inboxTo.name = "inboxTo"
-        inboxTo.attributeType = NSAttributeType.dateAttributeType
-        inboxTo.isOptional = true
-        messageProps.append(inboxTo)
-
-        let dismissedAt = NSAttributeDescription()
-        dismissedAt.name = "dismissedAt"
-        dismissedAt.attributeType = NSAttributeType.dateAttributeType
-        dismissedAt.isOptional = true
-        messageProps.append(dismissedAt)
-
-        let expiresAt = NSAttributeDescription()
-        expiresAt.name = "expiresAt"
-        expiresAt.attributeType = NSAttributeType.dateAttributeType
-        expiresAt.isOptional = true
-        messageProps.append(expiresAt)
-
-        let readAt = NSAttributeDescription()
-        readAt.name = "readAt"
-        readAt.attributeType = NSAttributeType.dateAttributeType
-        readAt.isOptional = true
-        messageProps.append(readAt)
-
-        let sentAt = NSAttributeDescription()
-        sentAt.name = "sentAt"
-        sentAt.attributeType = NSAttributeType.dateAttributeType
-        sentAt.isOptional = true
-        messageProps.append(sentAt)
-
-        messageEntity.properties = messageProps
-
-        model.entities = [messageEntity]
-
-        return model
-    }
-
-    @objc
-    class KSJsonValueTransformer: ValueTransformer {
-        override class func transformedValueClass() -> AnyClass {
-            return NSDictionary.self
-        }
-
-        override class func allowsReverseTransformation() -> Bool {
-            return true
-        }
-
-        override func transformedValue(_ value: Any?) -> Any? {
-            if value == nil || value is NSNull {
-                return nil
-            }
-
-            if let value = value {
-                if !JSONSerialization.isValidJSONObject(value) {
-                    print("Object cannot be transformed to JSON data object!")
-                    return nil
-                }
-            }
-
-            var data: Data?
-            do {
-                if let value = value {
-                    data = try JSONSerialization.data(withJSONObject: value, options: [])
-                }
-            } catch {
-                print("Failed to transform JSON to data object")
-            }
-
-            return data
-        }
-
-        override func reverseTransformedValue(_ value: Any?) -> Any? {
-            var obj: Any?
-            do {
-                if let value = value as? Data {
-                    obj = try JSONSerialization.jsonObject(with: value, options: [])
-                }
-            } catch {
-                print("Failed to transform data to JSON object")
-            }
-
-            return obj
-        }
     }
 }
