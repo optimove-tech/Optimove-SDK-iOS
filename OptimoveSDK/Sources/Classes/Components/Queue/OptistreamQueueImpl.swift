@@ -106,21 +106,22 @@ extension OptistreamQueueImpl: OptistreamQueue {
     }
 
     func remove(events: [OptistreamEvent]) {
-        let eventIds = events.map(\.metadata.eventId)
-        let predicate = EventCDv2.queueTypeAndEventIdsPredicate(eventIds: eventIds, queueType: queueType)
-        context.safePerformAndWait { isSafe in
-            if !isSafe {
-                Logger.error("Unable to remove events. Persistent store unavailable")
-                return
-            }
-            let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: EventCDv2.entityName)
-            fetch.predicate = predicate
-            tryCatch {
-                let results: [NSManagedObject] = try cast(context.fetch(fetch))
+        do {
+            let eventIds = events.map(\.metadata.eventId)
+            try context.safeTryPerformAndWait { isSafe in
+                if !isSafe {
+                    Logger.error("Unable to remove events. Persistent store unavailable")
+                    return
+                }
+                let results = try EventCDv2.fetch(in: context) { fetch in
+                    fetch.predicate = EventCDv2.queueTypeAndEventIdsPredicate(eventIds: eventIds, queueType: queueType)
+                }
                 results.forEach { object in
                     context.delete(object)
                 }
             }
+        } catch {
+            Logger.error(error.localizedDescription)
         }
     }
 }
