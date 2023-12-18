@@ -218,13 +218,16 @@ final class Optimobile {
         pendingNoticationHelper = PendingNotificationHelper(
             storage: storage
         )
-        inAppManager = InAppManager(
+        inAppManager = try InAppManager(
             config,
             httpClient: networkFactory.build(for: .push),
             urlBuilder: urlBuilder,
             storage: storage,
             pendingNoticationHelper: pendingNoticationHelper,
-            optimobileHelper: optimobileHelper
+            optimobileHelper: optimobileHelper,
+            container: PersistentContainer(
+                persistentContainerConfigurator: InAppPersistentContainerConfigurator()
+            )
         )
         pushHelper = PushHelper(
             optimobileHelper: optimobileHelper
@@ -246,7 +249,6 @@ final class Optimobile {
 
     private func initializeHelpers() {
         sessionHelper.initialize()
-        inAppManager.initialize()
         _ = pushHelper.pushInit
         deepLinkHelper?.checkForNonContinuationLinkMatch()
     }

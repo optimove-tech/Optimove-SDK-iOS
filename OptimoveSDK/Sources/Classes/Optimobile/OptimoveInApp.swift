@@ -34,11 +34,10 @@ enum OptimoveInApp {
         return Optimobile.sharedInstance.inAppManager.presenter.getDisplayMode()
     }
 
-    static func getInboxItems(storage: OptimoveStorage) -> [InAppInboxItem] {
-        guard let context = Optimobile.sharedInstance.inAppManager.messagesContext else {
-            return []
-        }
-
+    static func getInboxItems(
+        storage: OptimoveStorage,
+        context: NSManagedObjectContext
+    ) -> [InAppInboxItem] {
         var results: [InAppInboxItem] = []
         context.performAndWait {
             let request = NSFetchRequest<InAppMessageEntity>(entityName: "Message")

@@ -8,6 +8,7 @@ typealias ManagedObjectModel = NSManagedObjectModel
 
 enum FileManagerLocation {
     case libraryDirectory
+    case documentDirectory
     case appGroupDirectory(URL)
 }
 
