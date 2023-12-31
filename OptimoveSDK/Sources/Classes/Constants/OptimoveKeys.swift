@@ -23,7 +23,6 @@ enum OptimoveKeys {
         case userId = "user_id"
         case realtimeUserId = "userId"
         case realtimeupdatedVisitorId = "updatedVisitorId"
-        case setUserAgent = "user_agent_header_event"
         case email
     }
 }
