@@ -6,7 +6,6 @@ import OptimoveCore
 enum CoreEventType {
     case appOpen
     case metaData
-    case setUserAgent
     case setUserEmail(email: String)
     case setUser(user: User)
     case pageVisit(title: String, category: String?)
@@ -45,8 +44,6 @@ extension CoreEventFactoryImpl: CoreEventFactory {
             return try createMetaDataEvent()
         case let .pageVisit(title: t, category: c):
             return createPageVisitEvent(title: t, category: c)
-        case .setUserAgent:
-            return try createSetUserAgentEvent()
         case let .setUserEmail(email):
             return try createSetUserEmailEvent(email: email)
         }
@@ -94,12 +91,6 @@ private extension CoreEventFactoryImpl {
         })
         _ = semaphore.wait(timeout: .now() + .seconds(3))
         return try unwrap(event)
-    }
-
-    func createSetUserAgentEvent() throws -> SetUserAgent {
-        return try SetUserAgent(
-            userAgent: storage.getUserAgent()
-        )
     }
 
     func createPageVisitEvent(title: String, category: String?) -> PageVisitEvent {

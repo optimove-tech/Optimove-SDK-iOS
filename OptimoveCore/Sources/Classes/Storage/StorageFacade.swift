@@ -17,7 +17,6 @@ public enum StorageKey: String, CaseIterable {
     case tenantToken
     case visitorID
     case version
-    case userAgent
     case deviceResolutionWidth
     case deviceResolutionHeight
     case advertisingIdentifier
@@ -45,7 +44,6 @@ public protocol StorageValue {
     var tenantToken: String? { get set }
     var visitorID: String? { get set }
     var version: String? { get set }
-    var userAgent: String? { get set }
     var deviceResolutionWidth: Float? { get set }
     var deviceResolutionHeight: Float? { get set }
     var advertisingIdentifier: String? { get set }
@@ -64,7 +62,6 @@ public protocol StorageValue {
     func getTenantToken() throws -> String
     func getVisitorID() throws -> String
     func getVersion() throws -> String
-    func getUserAgent() throws -> String
     func getDeviceResolutionWidth() throws -> Float
     func getDeviceResolutionHeight() throws -> Float
     /// Called when a migration is finished for the version.
@@ -302,15 +299,6 @@ public extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var userAgent: String? {
-        get {
-            return self[.userAgent]
-        }
-        set {
-            self[.userAgent] = newValue
-        }
-    }
-
     var deviceResolutionWidth: Float? {
         get {
             return self[.deviceResolutionWidth]
@@ -468,13 +456,6 @@ public extension KeyValueStorage where Self: StorageValue {
     func getVersion() throws -> String {
         guard let value = version else {
             throw StorageError.noValue(.version)
-        }
-        return value
-    }
-
-    func getUserAgent() throws -> String {
-        guard let value = userAgent else {
-            throw StorageError.noValue(.userAgent)
         }
         return value
     }

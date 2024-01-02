@@ -32,7 +32,6 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
 
         // then
         let metaDataEventExpectation = expectation(description: "MetaDataEvent was not generated.")
-        let userAgentEventExpectation = expectation(description: "SetUserAgent was not generated.")
         let appOpenEventExpectation = expectation(description: "AppOpenEvent was not generated.")
         synchronizer.assertFunction = { operation in
             switch operation {
@@ -41,8 +40,6 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
                     switch event.name {
                     case MetaDataEvent.Constants.name:
                         metaDataEventExpectation.fulfill()
-                    case SetUserAgent.Constants.name:
-                        userAgentEventExpectation.fulfill()
                     case AppOpenEvent.Constants.name:
                         appOpenEventExpectation.fulfill()
                     default:
@@ -60,7 +57,6 @@ final class OnStartEventGeneratorTests: OptimoveTestCase {
         wait(
             for: [
                 metaDataEventExpectation,
-                userAgentEventExpectation,
                 appOpenEventExpectation,
             ],
             // Additional second to complete the async operation and prevent a flickering.

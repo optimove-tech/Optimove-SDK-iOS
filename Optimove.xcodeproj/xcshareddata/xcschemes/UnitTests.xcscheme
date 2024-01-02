@@ -11,15 +11,6 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7013308FB86B06E91BDD05C2"
-            BuildableName = "libOptimoveCore.a"
-            BlueprintName = "OptimoveCore"
-            ReferencedContainer = "container:Optimove.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -67,7 +58,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7013308FB86B06E91BDD05C2"
-            BuildableName = "libOptimoveCore.a"
+            BuildableName = "OptimoveCore.framework"
             BlueprintName = "OptimoveCore"
             ReferencedContainer = "container:Optimove.xcodeproj">
          </BuildableReference>
