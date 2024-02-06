@@ -33,7 +33,7 @@ final class Assembly {
     private func migrate() {
         let migrations: [MigrationWork] = [
             MigrationWork_3_3_0(),
-            MigrationWork_5_7_0(),
+            MigrationWork_6_0_0(),
         ]
         migrations
             .filter { $0.isAllowToMiragte(SDKVersion) }
