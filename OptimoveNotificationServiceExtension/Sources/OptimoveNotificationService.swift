@@ -37,7 +37,7 @@ public enum OptimoveNotificationService {
         let data = try JSONSerialization.data(withJSONObject: userInfo)
         let notification = try JSONDecoder().decode(PushNotification.self, from: data)
         if bestAttemptContent.categoryIdentifier.isEmpty {
-            bestAttemptContent.categoryIdentifier = await buildCategory(notification: notification)
+            bestAttemptContent.categoryIdentifier = await registerCategory(notification: notification)
         }
         if let storage = try? UserDefaults.optimoveAppGroup() {
             let mediaHelper = MediaHelper(storage: storage)
@@ -94,7 +94,7 @@ public enum OptimoveNotificationService {
         }
     }
 
-    static func buildCategory(notification: PushNotification) async -> String {
+    static func registerCategory(notification: PushNotification) async -> String {
         let categoryIdentifier = CategoryManager.getCategoryId(messageId: notification.message.id)
         let category = UNNotificationCategory(
             identifier: categoryIdentifier,
