@@ -81,7 +81,7 @@ struct InAppInboxSummary {
 typealias InboxUpdatedHandlerBlock = () -> Void
 typealias InboxSummaryBlock = (InAppInboxSummary?) -> Void
 
-enum OptimoveInApp {
+public enum OptimoveInApp {
     private static var _inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?
 
     static func updateConsent(forUser consentGiven: Bool) {
