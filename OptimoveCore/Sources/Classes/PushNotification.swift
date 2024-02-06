@@ -76,7 +76,7 @@ public struct PushNotification: Decodable {
     public let aps: Aps
     public let attachment: PushNotification.Attachment?
     /// Optimove badge
-    public let badge: Int?
+    public let badgeIncrement: Int?
     public let buttons: [PushNotification.Button]?
     public let deeplink: PushNotification.Data?
     public let message: PushNotification.Data
@@ -86,7 +86,7 @@ public struct PushNotification: Decodable {
         case a
         case aps
         case attachments
-        case badge = "badge_inc"
+        case badgeIncrement = "badge_inc"
         case buttons = "k.buttons"
         case custom
         case deeplink = "k.deepLink"
@@ -106,7 +106,7 @@ public struct PushNotification: Decodable {
         self.attachment = try container.decodeIfPresent(Attachment.self, forKey: .attachments)
 
         let custom = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .custom)
-        self.badge = try custom.decodeIfPresent(Int.self, forKey: .badge)
+        self.badgeIncrement = try custom.decodeIfPresent(Int.self, forKey: .badgeIncrement)
         self.url = try custom.decodeIfPresent(URL.self, forKey: .u)
 
         let a = try custom.nestedContainer(keyedBy: CodingKeys.self, forKey: .a)

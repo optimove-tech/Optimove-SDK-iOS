@@ -18,7 +18,7 @@ typealias Logger = OptimoveCore.Logger
     /// The shared instance of Optimove SDK.
     @objc public static let shared: Optimove = .init()
 
-    private let container: Container
+    let container: Container
     private var config: OptimoveConfig!
 
     override private init() {
@@ -310,6 +310,28 @@ public extension Optimove {
                     storage: serviceLocator.storage()
                 )
             }
+        }
+    }
+
+    enum Debug {
+        enum Constants {
+            static let undefined = ""
+        }
+
+        public static var state: SdkState {
+            return Optimove.shared.container.resolve { locator in
+                let storage = locator.storage()
+                return SdkState(
+                    appVersion: "\(Bundle.main.appVersion) build: \(Bundle.main.buildVersion)",
+                    sdkVersion: Optimove.version,
+                    installation: storage.installationID ?? Constants.undefined,
+                    tenant: storage.tenantID?.description ?? Constants.undefined,
+                    initialVisitor: storage.initialVisitorId ?? Constants.undefined,
+                    customer: storage.customerID ?? Constants.undefined,
+                    email: storage.userEmail ?? Constants.undefined,
+                    updateVisitor: storage.visitorID ?? Constants.undefined
+                )
+            } ?? SdkState.empty
         }
     }
 }

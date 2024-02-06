@@ -42,31 +42,14 @@ public struct OptimobileHelper {
         return installId()
     }
 
-    // FIXME: Use PushNotifcation
-    public func getBadgeFromUserInfo(userInfo: [AnyHashable: Any]) -> NSNumber? {
-        let custom = userInfo["custom"] as? [AnyHashable: Any]
-        let aps = userInfo["aps"] as? [AnyHashable: Any]
-
-        if custom == nil || aps == nil {
-            return nil
+    public func getBadge(notification: PushNotification) -> Int? {
+        if let incrementBy = notification.badgeIncrement,
+           let current: Int = storage[.badgeCount]
+        {
+            let badge = current + incrementBy
+            return badge < 0 ? 0 : badge
         }
 
-        let incrementBy: NSNumber? = custom!["badge_inc"] as? NSNumber
-        let badge: NSNumber? = aps!["badge"] as? NSNumber
-
-        if badge == nil {
-            return nil
-        }
-
-        var newBadge: NSNumber? = badge
-        if let incrementBy = incrementBy, let currentVal: NSNumber = storage[.badgeCount] {
-            newBadge = NSNumber(value: currentVal.intValue + incrementBy.intValue)
-
-            if newBadge!.intValue < 0 {
-                newBadge = 0
-            }
-        }
-
-        return newBadge
+        return notification.aps.badge
     }
 }
