@@ -12,6 +12,7 @@ typealias Logger = OptimoveCore.Logger
 /// - WARNING:
 ///  To initialize and configure SDK using `Optimove.configure(for:)` first.
 @objc public final class Optimove: NSObject {
+    public typealias InApp = OptimoveInApp
     /// The current OptimoveSDK version string value.
     public static let version = OptimoveCore.SDKVersion
 
