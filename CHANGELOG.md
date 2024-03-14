@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.7.0
+
+- Add Privacy Manifest
+- Fix explicit `self` for `weak self` captures to allow pre 5.8 Swift compilation
+
 ## 5.6.0
 
 - Support the delayed configuration for SDK. Add new public APIs:
