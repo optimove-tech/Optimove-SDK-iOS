@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		58371F3A2BA358CB00791552 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		FE31495485A751448C7DF822 /* SDK */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SDK; path = .; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -14,6 +15,7 @@
 		0FF4DF40AC6AAC3B8661208C = {
 			isa = PBXGroup;
 			children = (
+				58371F3A2BA358CB00791552 /* PrivacyInfo.xcprivacy */,
 				9BB5B51B953402330D6DC400 /* Packages */,
 			);
 			sourceTree = "<group>";
