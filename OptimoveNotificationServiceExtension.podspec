@@ -12,5 +12,8 @@ Pod::Spec.new do |s|
   s.swift_version = '5'
   base_dir = "OptimoveNotificationServiceExtension/"
   s.source_files = base_dir + 'Sources/**/*', 'OptimobileShared/**/*'
+  s.resource_bundles = {
+    'OptimoveNotificationServiceExtension' => ['OptimoveNotificationServiceExtension/PrivacyInfo.xcprivacy']
+  }
   s.frameworks = 'Foundation', 'UserNotifications', 'UIKit'
 end
