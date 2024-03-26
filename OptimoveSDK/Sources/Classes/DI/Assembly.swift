@@ -12,14 +12,14 @@ final class Assembly {
         /// A special storage migration, before an actual storage going to be in use.
         migrate()
         do {
-            let keyValureStorage = try UserDefaults.optimove()
             let fileStorage = try FileStorageImpl(
                 persistentStorageURL: FileManager.optimoveURL(),
                 temporaryStorageURL: FileManager.temporaryURL()
             )
-            return ServiceLocator(
+            return try ServiceLocator(
                 storageFacade: StorageFacade(
-                    persistantStorage: keyValureStorage,
+                    standardStorage: UserDefaults.optimove(),
+                    appGroupStorage: UserDefaults.optimoveAppGroup(),
                     inMemoryStorage: InMemoryStorage(),
                     fileStorage: fileStorage
                 )
@@ -33,6 +33,7 @@ final class Assembly {
     private func migrate() {
         let migrations: [MigrationWork] = [
             MigrationWork_3_3_0(),
+            MigrationWork_6_0_0(),
         ]
         migrations
             .filter { $0.isAllowToMiragte(SDKVersion) }

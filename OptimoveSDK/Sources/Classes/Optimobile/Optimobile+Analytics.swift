@@ -1,6 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 extension Optimobile {
     static func trackEvent(eventType: OptimobileEvent, properties: [String: Any]?, immediateFlush: Bool = false) {
@@ -39,8 +40,15 @@ extension Optimobile {
      Parameters:
      - userIdentifier: Unique identifier for the current user
      */
-    static func associateUserWithInstall(userIdentifier: String) {
-        associateUserWithInstallImpl(userIdentifier: userIdentifier, attributes: nil)
+    static func associateUserWithInstall(
+        userIdentifier: String,
+        storage: OptimoveStorage
+    ) {
+        associateUserWithInstallImpl(
+            userIdentifier: userIdentifier,
+            attributes: nil,
+            storage: storage
+        )
     }
 
     /**
@@ -50,16 +58,16 @@ extension Optimobile {
      - userIdentifier: Unique identifier for the current user
      - attributes: JSON encodable dictionary of attributes to store for the user
      */
-    static func associateUserWithInstall(userIdentifier: String, attributes: [String: AnyObject]) {
-        associateUserWithInstallImpl(userIdentifier: userIdentifier, attributes: attributes)
-    }
-
-    /**
-      Returns the identifier for the user currently associated with the Kumulos installation record
-      If no user is associated, it returns the Kumulos installation ID
-     */
-    static var currentUserIdentifier: String {
-        return OptimobileHelper.currentUserIdentifier
+    static func associateUserWithInstall(
+        userIdentifier: String,
+        attributes: [String: AnyObject],
+        storage: OptimoveStorage
+    ) {
+        associateUserWithInstallImpl(
+            userIdentifier: userIdentifier,
+            attributes: attributes,
+            storage: storage
+        )
     }
 
     /**
@@ -67,23 +75,27 @@ extension Optimobile {
 
      See associateUserWithInstall and currentUserIdentifier for further information.
      */
-    static func clearUserAssociation() {
+    static func clearUserAssociation(storage: OptimoveStorage) {
         OptimobileHelper.userIdLock.wait()
-        let currentUserId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue) as! String?
+        let currentUserId: String? = storage[.userID]
         OptimobileHelper.userIdLock.signal()
 
         Optimobile.trackEvent(eventType: OptimobileEvent.STATS_USER_ASSOCIATION_CLEARED, properties: ["oldUserIdentifier": currentUserId ?? NSNull()])
 
         OptimobileHelper.userIdLock.wait()
-        KeyValPersistenceHelper.removeObject(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue)
+        storage.set(value: nil, key: .userID)
         OptimobileHelper.userIdLock.signal()
 
-        if currentUserId != nil, currentUserId != Optimobile.installId {
+        if currentUserId != nil, currentUserId != Optimobile.sharedInstance.installId() {
             getInstance().inAppManager.handleAssociatedUserChange()
         }
     }
 
-    fileprivate static func associateUserWithInstallImpl(userIdentifier: String, attributes: [String: AnyObject]?) {
+    fileprivate static func associateUserWithInstallImpl(
+        userIdentifier: String,
+        attributes: [String: AnyObject]?,
+        storage: OptimoveStorage
+    ) {
         if userIdentifier == "" {
             print("User identifier cannot be empty, aborting!")
             return
@@ -97,8 +109,8 @@ extension Optimobile {
         }
 
         OptimobileHelper.userIdLock.wait()
-        let currentUserId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue) as! String?
-        KeyValPersistenceHelper.set(userIdentifier, forKey: OptimobileUserDefaultsKey.USER_ID.rawValue)
+        let currentUserId: String? = storage[.userID]
+        storage.set(value: userIdentifier, key: .userID)
         OptimobileHelper.userIdLock.signal()
 
         Optimobile.trackEvent(eventType: OptimobileEvent.STATS_ASSOCIATE_USER, properties: params, immediateFlush: true)

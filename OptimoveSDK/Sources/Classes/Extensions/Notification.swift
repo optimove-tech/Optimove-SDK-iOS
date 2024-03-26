@@ -2,6 +2,7 @@
 
 import Foundation
 
-public extension Notification.Name {
+extension Notification.Name {
     static let internetStatusChanged = Notification.Name("internetStatusChanged")
+    static let optimobileInializationFinished = Notification.Name("optimobileInializationFinished")
 }

@@ -4,10 +4,6 @@ import Foundation
 import OptimoveCore
 import UIKit
 
-typealias OptistreamEvent = OptimoveCore.OptistreamEvent
-typealias OptistreamEventBuilder = OptimoveCore.OptistreamEventBuilder
-typealias OptistreamNetworking = OptimoveCore.OptistreamNetworking
-
 final class OptiTrack {
     enum Constants {
         static let eventBatchLimit = 50

@@ -1,0 +1,19 @@
+{
+  "aps": {
+    "alert": {
+      "title": "title",
+      "body": "body"
+    }
+  },
+  "custom": {
+    "u": "https://www.optimove.com",
+    "a": {
+      "k.message": {
+        "type": 1,
+        "data": {
+          "id": 1
+        }
+      }
+    }
+  }
+}

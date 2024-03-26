@@ -1,12 +1,11 @@
 // swift-tools-version:5.3
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "Optimove",
     platforms: [
-        .iOS(.v10),
+        .iOS(.v13),
         .macOS(.v10_14),
     ],
     products: [
@@ -40,12 +39,15 @@ let package = Package(
         ),
         .target(
             name: "OptimoveNotificationServiceExtension",
+            dependencies: [
+                "OptimoveCore",
+            ],
             path: "OptimoveNotificationServiceExtension/Sources"
         ),
         .target(
             name: "OptimoveTest",
             dependencies: [
-                "OptimoveCore",
+                "OptimoveSDK",
             ],
             path: "Shared",
             resources: [
@@ -78,7 +80,10 @@ let package = Package(
         ),
         .testTarget(
             name: "OptimoveNotificationServiceExtensionTests",
-            dependencies: ["OptimoveNotificationServiceExtension"],
+            dependencies: [
+                "OptimoveNotificationServiceExtension",
+                "OptimoveTest",
+            ],
             path: "OptimoveNotificationServiceExtension/Tests"
         ),
     ],

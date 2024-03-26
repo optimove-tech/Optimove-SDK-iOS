@@ -2,23 +2,26 @@
 
 import CoreData
 import Foundation
+import OptimoveCore
 
-public class InAppInboxItem {
-    public internal(set) var id: Int64
-    public internal(set) var title: String
-    public internal(set) var subtitle: String
-    public internal(set) var availableFrom: Date?
-    public internal(set) var availableTo: Date?
-    public internal(set) var dismissedAt: Date?
-    public internal(set) var sentAt: Date
-    public internal(set) var data: NSDictionary?
+public class InAppInboxItem: Identifiable {
+    public private(set) var id: Int64
+    public private(set) var title: String
+    public private(set) var subtitle: String
+    public private(set) var availableFrom: Date?
+    public private(set) var availableTo: Date?
+    public private(set) var dismissedAt: Date?
+    public private(set) var sentAt: Date
+    public private(set) var data: NSDictionary?
     private var readAt: Date?
     private var imagePath: String?
 
     private static let defaultImageWidth: UInt = 300
+    let mediaHelper: MediaHelper
 
-    init(entity: InAppMessageEntity) {
+    init(entity: InAppMessageEntity, mediaHelper: MediaHelper) {
         id = Int64(entity.id)
+        self.mediaHelper = mediaHelper
 
         let inboxConfig = entity.inboxConfig?.copy() as! [String: Any]
 
@@ -60,7 +63,10 @@ public class InAppInboxItem {
 
     public func getImageUrl(width: UInt) -> URL? {
         if let imagePathNotNil = imagePath {
-            return MediaHelper.getCompletePictureUrl(pictureUrl: imagePathNotNil, width: width)
+            return try? mediaHelper.getCompletePictureUrl(
+                pictureUrlString: imagePathNotNil,
+                width: width
+            )
         }
 
         return nil
@@ -97,6 +103,13 @@ public enum OptimoveInApp {
     }
 
     public static func getInboxItems() -> [InAppInboxItem] {
+        return Optimove.shared.container.resolve { container in
+            let storage = container.storage()
+            return getInboxItems(storage: storage)
+        } ?? []
+    }
+
+    static func getInboxItems(storage: OptimoveStorage) -> [InAppInboxItem] {
         guard let context = Optimobile.sharedInstance.inAppManager.messagesContext else {
             return []
         }
@@ -123,7 +136,10 @@ public enum OptimoveInApp {
             }
 
             for item in items {
-                let inboxItem = InAppInboxItem(entity: item)
+                let inboxItem = InAppInboxItem(
+                    entity: item,
+                    mediaHelper: MediaHelper(storage: storage)
+                )
 
                 if inboxItem.isAvailable() == false {
                     continue

@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.0
+
+- Minimum supported iOS version is now 13.0.
+
 ## 5.6.0
 
 - Support the delayed configuration for SDK. Add new public APIs:
