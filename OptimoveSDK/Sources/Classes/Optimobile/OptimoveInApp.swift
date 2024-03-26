@@ -4,7 +4,7 @@ import CoreData
 import Foundation
 import OptimoveCore
 
-public class InAppInboxItem {
+public class InAppInboxItem: Identifiable {
     public private(set) var id: Int64
     public private(set) var title: String
     public private(set) var subtitle: String
@@ -103,8 +103,8 @@ public enum OptimoveInApp {
     }
 
     public static func getInboxItems() -> [InAppInboxItem] {
-        return Optimove.shared.container.resolve { locator in
-            let storage = locator.storage()
+        return Optimove.shared.container.resolve { container in
+            let storage = container.storage()
             return getInboxItems(storage: storage)
         } ?? []
     }
