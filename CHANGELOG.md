@@ -4,6 +4,7 @@
 
 - Add Privacy Manifest
 - Fix explicit `self` for `weak self` captures to allow pre 5.8 Swift compilation
+- Remove web to app banner code
 
 ## 5.6.0
 
