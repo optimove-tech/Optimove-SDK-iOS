@@ -12,11 +12,10 @@ public struct DeepLink {
     public let url: URL
     public let content: DeepLinkContent
     public let data: [AnyHashable: Any?]
-
-    init?(for url: URL, from jsonData: Data) {
-        guard let response = try? JSONSerialization.jsonObject(with: jsonData) as? [AnyHashable: Any],
-              let linkData = response["linkData"] as? [AnyHashable: Any?],
-              let content = response["content"] as? [AnyHashable: Any?]
+    
+    init?(for url: URL, from jsonData: [AnyHashable: Any]) {
+        guard let linkData = jsonData["linkData"] as? [AnyHashable: Any?],
+              let content = jsonData["content"] as? [AnyHashable: Any?]
         else {
             return nil
         }
@@ -124,8 +123,8 @@ final class DeepLinkHelper {
         httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { res, data in
             switch res?.statusCode {
             case 200:
-                guard let jsonData = data as? Data,
-                      let link = DeepLink(for: url, from: jsonData)
+                guard let dictionary = data as? [AnyHashable: Any],
+                      let link = DeepLink(for: url, from: dictionary)
                 else {
                     self.invokeDeepLinkHandler(.lookupFailed(url))
                     return
@@ -172,18 +171,39 @@ final class DeepLinkHelper {
         }
 
         guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-              let url = userActivity.webpageURL,
-              urlShouldBeHandled(url)
+              let url = userActivity.webpageURL
         else {
             return false
         }
 
+        return handleContinuation(for: url)
+    }
+    
+    @discardableResult
+    fileprivate func handleContinuation(for url: URL) -> Bool {
+        if config.deepLinkHandler == nil {
+            print("Optimobile deep link handler not configured, aborting...")
+            return false
+        }
+
+        return handleUrl(url: url)
+    }
+    
+    fileprivate func handleUrl(url: URL) -> Bool {
+        if !urlShouldBeHandled(url) {
+            return false
+        }
+        
         handleDeepLinkUrl(url)
         return true
     }
 }
 
 extension Optimobile {
+    static func urlOpened(url: URL) -> Bool {
+        return getInstance().deepLinkHelper?.handleContinuation(for: url) ?? false
+    }
+    
     static func application(_: UIApplication, continue userActivity: NSUserActivity, restorationHandler _: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return getInstance().deepLinkHelper?.handleContinuation(for: userActivity) ?? false
     }
