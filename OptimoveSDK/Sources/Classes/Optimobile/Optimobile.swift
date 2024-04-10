@@ -116,9 +116,9 @@ final class Optimobile {
             throw Error.configurationIsMissing
         }
         
-        writeDefaultsKeys(config: config, initialVisitorId: initialVisitorId)
-
         instance = Optimobile(config: config)
+        
+        writeDefaultsKeys(config: config, initialVisitorId: initialVisitorId)
  
         instance!.initializeHelpers()
 
