@@ -160,6 +160,7 @@ open class OptimoveConfigBuilder: NSObject {
         do {
             if let optimoveCredentials = optimoveCredentials, !optimoveCredentials.isEmpty {
                 let args = try OptimoveArguments(base64: optimoveCredentials)
+                features.insert(.optimove)
                 _tenantToken = args.tenantToken
                 _configName = args.configName
             }
@@ -169,6 +170,7 @@ open class OptimoveConfigBuilder: NSObject {
         do {
             if let optimobileCredentials = optimobileCredentials, !optimobileCredentials.isEmpty {
                 let args = try OptimobileArguments(base64: optimobileCredentials)
+                features.insert(.optimobile)
                 credentials = args.credentials
                 region = args.region
             }

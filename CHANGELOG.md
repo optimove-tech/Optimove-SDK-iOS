@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.8.0
+
+- Add a new public API `Optimove.shared.urlOpened(url: url)` to allow easily forwarding urls to Optimove instead of relying on AppDeletegate's `application(_:continue:restorationHandler:)`
+- Fix deeplink decoding issue
+- Fix immediate initialization of the SDK
+
 ## 5.7.0
 
 - Add Privacy Manifest
