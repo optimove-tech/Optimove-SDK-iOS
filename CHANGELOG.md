@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.9.0
+
+- Remove `SetUserAgent` event
+
 ## 5.8.0
 
 - Add a new public API `Optimove.shared.urlOpened(url: url)` to allow easily forwarding urls to Optimove instead of relying on AppDeletegate's `application(_:continue:restorationHandler:)`
