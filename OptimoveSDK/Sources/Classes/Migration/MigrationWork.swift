@@ -230,9 +230,9 @@ extension MigrationWork_3_3_0 {
     }
 }
 
-final class MigrationWork_5_7_0: MigrationWorker {
+final class MigrationWork_5_9_0: MigrationWorker {
     init() {
-        super.init(newVersion: .v_5_7_0)
+        super.init(newVersion: .v_5_9_0)
     }
 
     override func runMigration() {
