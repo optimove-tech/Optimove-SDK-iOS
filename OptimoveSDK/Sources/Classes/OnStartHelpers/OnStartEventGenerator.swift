@@ -30,11 +30,6 @@ final class OnStartEventGenerator {
     }
 
     private func asyncGenerate() {
-        UserAgentGenerator(
-            storage: storage,
-            synchronizer: synchronizer,
-            coreEventFactory: coreEventFactory
-        ).generate()
         AppOpenOnStartGenerator(
             synchronizer: synchronizer,
             coreEventFactory: coreEventFactory

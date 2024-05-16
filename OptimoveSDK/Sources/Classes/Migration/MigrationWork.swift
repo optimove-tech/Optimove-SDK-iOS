@@ -57,9 +57,10 @@ class MigrationWorkerWithStorage: MigrationWorker {
 final class MigrationWork_2_10_0: MigrationWorkerWithStorage {
     private let synchronizer: Pipeline
 
-    init(synchronizer: Pipeline,
-         storage: OptimoveStorage)
-    {
+    init(
+        synchronizer: Pipeline,
+        storage: OptimoveStorage
+    ) {
         self.synchronizer = synchronizer
         super.init(storage: storage, newVersion: .v_2_10_0)
     }
@@ -139,7 +140,6 @@ extension MigrationWork_3_3_0 {
                 .tenantToken,
                 .visitorID,
                 .version,
-                .userAgent,
                 .deviceResolutionWidth,
                 .deviceResolutionHeight,
                 .advertisingIdentifier,
@@ -227,5 +227,16 @@ extension MigrationWork_3_3_0 {
                 Logger.error(error.localizedDescription)
             }
         }
+    }
+}
+
+final class MigrationWork_5_9_0: MigrationWorker {
+    init() {
+        super.init(newVersion: .v_5_9_0)
+    }
+
+    override func runMigration() {
+        try? UserDefaults.optimove().removeObject(forKey: "userAgent")
+        super.runMigration()
     }
 }
