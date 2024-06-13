@@ -32,7 +32,7 @@ final class PushNotificationTests: XCTestCase, FileAccessible {
 
         XCTAssertEqual(notification.buttons?[1].id, "2")
         XCTAssertEqual(notification.buttons?[1].text, "action_2")
-        XCTAssertEqual(notification.buttons?[1].icon?.id, "sys_icon_id")
+        XCTAssertEqual(notification.buttons?[1].icon?.id, "sun.max.fill")
         XCTAssertEqual(notification.buttons?[1].icon?.type, .system)
 
         XCTAssertEqual(notification.buttons?[2].id, "3")

@@ -20,7 +20,6 @@ public enum OptimoveNotificationService {
                 let bestAttemptContent = try await didReceive(request)
                 contentHandler(bestAttemptContent)
             } catch {
-                assertionFailure(error.localizedDescription)
                 contentHandler(request.content)
             }
         }
