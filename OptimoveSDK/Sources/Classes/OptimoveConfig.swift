@@ -310,7 +310,7 @@ open class OptimoveConfigBuilder: NSObject {
 }
 
 public extension OptimobileConfig {
-    enum Region: String, CaseIterable {
+    enum Region: String, CaseIterable, Codable {
         case DEV = "uk-1"
         case EU = "eu-central-2"
         case US = "us-east-1"

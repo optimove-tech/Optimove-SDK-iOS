@@ -15,13 +15,13 @@ typealias Logger = OptimoveCore.Logger
 @objc public final class Optimove: NSObject {
     /// The current OptimoveSDK version string value.
     public static let version = OptimoveCore.SDKVersion
-
+    
     /// The shared instance of Optimove SDK.
     @objc public static let shared: Optimove = .init()
-
+    
     private let container: Container
     private var config: OptimoveConfig!
-
+    
     override private init() {
         container = Assembly().makeContainer()
         container.resolve { serviceLocator in
@@ -30,7 +30,7 @@ typealias Logger = OptimoveCore.Logger
         }
         super.init()
     }
-
+    
     /// The starting point of the Optimove SDK.
     static func configure(for config: OptimoveConfig) {
         /// FUTURE: To merge configure call with init.
@@ -42,20 +42,20 @@ typealias Logger = OptimoveCore.Logger
             shared.startSDK { _ in }
         }
     }
-
+    
     public static func initialize(with config: OptimoveConfig) {
         shared.config = config
-
+        
         if config.isOptimoveConfigured() {
             Optimove.configure(for: config)
         }
-
+        
         if config.isOptimobileConfigured() {
             shared.container.resolve { serviceLocator in
                 do {
                     let visitorId = try serviceLocator.storage().getInitialVisitorId()
                     let userId = try? serviceLocator.storage().getCustomerID()
-
+                    
                     try Optimobile.initialize(config: config, initialVisitorId: visitorId, initialUserId: userId)
                 } catch {
                     throw GuardError.custom("Failed on OptimobileSDK initialization. Reason: \(error.localizedDescription)")
@@ -63,7 +63,7 @@ typealias Logger = OptimoveCore.Logger
             }
         }
     }
-
+    
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
     public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
         guard let currentConfig = shared.config else {
@@ -75,7 +75,7 @@ typealias Logger = OptimoveCore.Logger
         let config = builder.build()
         initialize(with: config)
     }
-
+    
     public static func isFeatureRunning(_ feature: Feature) -> Bool {
         switch feature {
         case .optimobile:
@@ -102,7 +102,7 @@ public extension Optimove {
             serviceLocator.pipeline().deliver(.report(events: [tenantEvent]))
         }
     }
-
+    
     /// Report the event to Optimove SDK.
     ///
     /// - Parameters:
@@ -111,7 +111,54 @@ public extension Optimove {
     @objc static func reportEvent(name: String, parameters: [String: Any] = [:]) {
         shared.reportEvent(name: name, parameters: parameters)
     }
+    
+    
+ @available(iOS 13.0, *)
+    @objc func getPreferencesAsync() {
+        var prefs : Preferences
+        container.resolve { serviceLocator in
+            Task {
+                let preferences = try await serviceLocator.preferenceCenter().getPrefsAsync(
+                    for: "daniela-customer",
+                    brandGroupId: "eba9b5c8-7d18-4912-9af1-f3f2f68f5d87")
+                
+                print(preferences)
+                return preferences
+            }
+        }
+    }
 
+    @available(iOS 13.0, *)
+    @objc static func getPreferencesAsync()  {
+        return shared.getPreferencesAsync()
+    }
+    
+    
+    @available(iOS 13.0, *)
+    @objc func setPreferencesAsync() {
+        var preferenceUpdate : PreferenceUpdate
+        preferenceUpdate = PreferenceUpdate(topicId: "888f2371-7679-4f6d-bd87-cc94fcd744ec", subscribedChannels:  [.mobilePush, .sms])
+        let updatesArray = [preferenceUpdate]
+        
+        container.resolve { serviceLocator in
+            Task {
+                let result = try await serviceLocator.preferenceCenter().setPrefsAsync(
+                    for: "daniela-customer",
+                    brandGroupId: "eba9b5c8-7d18-4912-9af1-f3f2f68f5d87",
+                    updates: updatesArray
+                )
+                print(result)
+            }
+        }
+    }
+    
+    
+    @available(iOS 13.0, *)
+    @objc static func setPreferencesAsync()  {
+        shared.setPreferencesAsync()
+    }
+    
+    
     /// Report the event to Optimove SDK.
     ///
     /// - Parameters:
@@ -122,7 +169,7 @@ public extension Optimove {
             serviceLocator.pipeline().deliver(.report(events: [tenantEvent]))
         }
     }
-
+    
     /// Report the event to Optimove SDK.
     ///
     /// - Parameters:
@@ -151,7 +198,7 @@ public extension Optimove {
             }
         }
     }
-
+    
     /// Report the screen visit event.
     /// - Parameters:
     ///   - screenTitle: The screen title.
@@ -184,12 +231,12 @@ public extension Optimove {
             }
             container.resolve(function)
         }
-
+        
         if config.isOptimobileConfigured() {
             Optimobile.associateUserWithInstall(userIdentifier: userID)
         }
     }
-
+    
     /// Set a user ID and a user email.
     ///
     /// - Parameters:
@@ -198,7 +245,7 @@ public extension Optimove {
     @objc static func registerUser(sdkId userID: String, email: String) {
         shared.registerUser(sdkId: userID, email: email)
     }
-
+    
     /// Set a user ID to the Optimove SDK.
     ///
     /// - Parameter userID: The user unique identifier.
@@ -216,18 +263,18 @@ public extension Optimove {
             }
             container.resolve(function)
         }
-
+        
         if config.isOptimobileConfigured() {
             Optimobile.associateUserWithInstall(userIdentifier: userID)
         }
     }
-
+    
     /// get visitor id of optimove SDK.
     /// call this function if you need the internal visitor Id of Optimove
     @objc static func getVisitorID() -> String? {
         return shared.getVisitorID()
     }
-
+    
     private func getVisitorID() -> String? {
         let function: (ServiceLocator) -> String? = { serviceLocator in
             try? serviceLocator.storage().getVisitorID()
@@ -235,12 +282,12 @@ public extension Optimove {
         guard let id = container.resolve(function) else { return nil }
         return id
     }
-
+    
     /// Get the initial visitor identifier of Optimove SDK.
     @objc static func getInitialVisitorID() -> String? {
         return shared.getInitialVisitorID()
     }
-
+    
     /// Get the initial visitor identifier of Optimove SDK.
     @objc func getInitialVisitorID() -> String? {
         let function: (ServiceLocator) -> String? = { serviceLocator in
@@ -249,18 +296,18 @@ public extension Optimove {
         guard let id = container.resolve(function) else { return nil }
         return id
     }
-
+    
     /// Set a user ID to the Optimove SDK.
     ///
     /// - Parameter userID: The user unique identifier.
     @objc static func setUserId(_ userID: String) {
         shared.setUserId(userID)
     }
-
+    
     private func _setUser(_ user: User, _ serviceLocator: ServiceLocator) throws -> Event {
         return try serviceLocator.coreEventFactory().createEvent(.setUser(user: user))
     }
-
+    
     /// Set a user email to the Optimove SDK.
     ///
     /// - Parameter email: The user email.
@@ -273,24 +320,24 @@ public extension Optimove {
         }
         container.resolve(function)
     }
-
+    
     /// Set a user email to the Optimove SDK.
     ///
     /// - Parameter email: The user email.
     @objc static func setUserEmail(email: String) {
         shared.setUserEmail(email: email)
     }
-
+    
     private func _setUserEmail(_ email: String, _ serviceLocator: ServiceLocator) throws -> Event {
         return try serviceLocator.coreEventFactory().createEvent(.setUserEmail(email: email))
     }
-
+    
     /// Signout the user from the app
     ///  Call this function to unset the customerID and revert to an anonymous visitor
     @objc static func signOutUser() {
         shared.signOutUser()
     }
-
+    
     /// Signout the user from the app
     /// Call this function to unset the customerID and revert to an anonymous visitor
     func signOutUser() {
@@ -303,7 +350,7 @@ public extension Optimove {
             }
             container.resolve(function)
         }
-
+        
         if config.isOptimobileConfigured() {
             Optimobile.clearUserAssociation()
         }
@@ -314,89 +361,90 @@ public extension Optimove {
 
 public extension Optimove {
     /**
-         Helper method for requesting the device token with alert, badge and sound permissions.
-
-         On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+     Helper method for requesting the device token with alert, badge and sound permissions.
+     
+     On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
      */
     @objc func pushRequestDeviceToken() {
         Optimobile.pushRequestDeviceToken()
     }
-
+    
     /**
-         Helper method for requesting the device token with alert, badge and sound permissions.
-
-         On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
+     Helper method for requesting the device token with alert, badge and sound permissions.
+     
+     On success will raise the didRegisterForRemoteNotificationsWithDeviceToken UIApplication event
      */
     @available(iOS 10.0, *)
     @objc func pushRequestDeviceToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
         Optimobile.pushRequestDeviceToken(onAuthorizationStatus)
     }
-
+    
     /**
-         Register a device token with the Optimove Push service.
-
-         Note you shouldn't normally need to call this method, registration is handled by the SDK.
-
-         Parameters:
-             - deviceToken: The push token returned by the device
+     Register a device token with the Optimove Push service.
+     
+     Note you shouldn't normally need to call this method, registration is handled by the SDK.
+     
+     Parameters:
+     - deviceToken: The push token returned by the device
      */
     @objc func pushRegister(_ deviceToken: Data) {
         Optimobile.pushRegister(deviceToken)
     }
-
+    
     /**
-        Unregister the device token with the Optimove Push service.
-
-        Notifications will no longer be received until pushRequestDeviceToken is called again
+     Unregister the device token with the Optimove Push service.
+     
+     Notifications will no longer be received until pushRequestDeviceToken is called again
      */
     @objc func pushUnregister() {
         Optimobile.pushUnregister()
     }
-
+    
+    
     /**
-        Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed.
+     Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed.
      */
     @objc func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return Optimobile.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
     
     /**
-        Used for Deferred Deep Linking to pass the continuation url to the Optimove SDK to be processed.
+     Used for Deferred Deep Linking to pass the continuation url to the Optimove SDK to be processed.
      */
     @objc func urlOpened(url: URL) -> Bool {
         return Optimobile.urlOpened(url: url)
     }
-
+    
     /**
-        Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed in scene-based apps.
+     Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed in scene-based apps.
      */
     @available(iOS 13.0, *)
     @objc func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         Optimobile.scene(scene, continue: userActivity)
     }
-
+    
     /**
-         Updates the location of the current installation in Optimove. Accurate locaiton information is used for geofencing.
+     Updates the location of the current installation in Optimove. Accurate locaiton information is used for geofencing.
      */
     @objc func sendLocationUpdate(location: CLLocation) {
         Optimobile.sendLocationUpdate(location: location)
     }
-
+    
     /**
-         Records a proximity event for an iBeacon.
+     Records a proximity event for an iBeacon.
      */
     @objc func trackIBeaconProximity(beacon: CLBeacon) {
         Optimobile.trackIBeaconProximity(beacon: beacon)
     }
-
+    
     /// Records a notification open event
     /// - Parameter userInfo - The userInfo dictionary you received in the push notification payload
     @objc func trackOpenMetric(userInfo: [AnyHashable: Any]) {
         Optimobile.pushTrackOpen(userInfo: userInfo)
     }
-
+    
     /**
-         Records a proximity event for an Eddystone beacon.
+     Records a proximity event for an Eddystone beacon.
      */
     @objc func trackEddystoneBeaconProximity(hexNamespace: String, hexInstance: String, distanceMeters: NSNumber? = nil) {
         Optimobile.trackEddystoneBeaconProximity(hexNamespace: hexNamespace, hexInstance: hexInstance, distanceMeters: distanceMeters?.doubleValue)
@@ -407,7 +455,7 @@ public extension Optimove {
 
 private extension Optimove {
     // MARK: Initialization
-
+    
     /// The method use to fetch tenant config, initialize Optimove SDK and control this process.
     /// - Parameter completion: A result of initializtion.
     func startSDK(completion: @escaping (Result<Void, Error>) -> Void) {
@@ -437,9 +485,9 @@ private extension Optimove {
         }
         container.resolve(function)
     }
-
+    
     // MARK: Configuration
-
+    
     /// Initialization of SDK with a configuration.
     /// - Parameter configuration: A `Configuration` filetype.
     func initialize(with configuration: Configuration) {

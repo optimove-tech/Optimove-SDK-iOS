@@ -87,10 +87,14 @@ public extension HTTPHeader {
     enum Fields: String {
         case contentType = "Content-Type"
         case userAgent = "User-Agent"
+        case tenantId = "X-Tenant-Id"
+        case accept = "accept"
     }
 
     enum Values: String {
         case json = "application/json"
+        case tenantId = ""
+        case textplain = "text/plain"
     }
 }
 
@@ -99,6 +103,11 @@ public extension HTTPHeader {
         self.field = field.rawValue
         self.value = value.rawValue
     }
+    
+    public init(field: Fields, value: String) {
+         self.field = field.rawValue
+         self.value = value
+     }
 }
 
 extension HTTPHeader: CustomStringConvertible {
