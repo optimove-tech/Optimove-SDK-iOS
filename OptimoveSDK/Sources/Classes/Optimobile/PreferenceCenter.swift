@@ -40,13 +40,13 @@ class PreferenceCenter {
             //TODO: resolve this
             self.storage.set(value: "daniela-customer", key: .customerID)
             self.storage.set(value: 3013, key: .tenantID)
-
+            let region = "dev-pb"
             let customerId = try getCustomerId()
             let tenantId = try getTenantId()
 
             let request = try NetworkRequest(
                 method: .get,
-                baseURL: URL(string: "https://preference-center-dev-pb.optimove.net")!,
+                baseURL: URL(string: "https://preference-center-\(region).optimove.net")!,
                 path: "/api/v1/preferences",
                 headers: [
                     HTTPHeader(field: .accept, value: .textplain),
@@ -78,12 +78,13 @@ class PreferenceCenter {
             self.storage.set(value: "daniela-customer", key: .customerID)
             self.storage.set(value: 3013, key: .tenantID)
 
+            let region = "dev-pb"
             let customerId = try getCustomerId()
             let tenantId = try getTenantId()
 
             let request = try NetworkRequest(
                 method: .put,
-                baseURL: URL(string: "https://preference-center-dev-pb.optimove.net")!,
+                baseURL: URL(string: "https://preference-center-\(region).optimove.net")!,
                 path: "/api/v1/preferences",
                 headers: [
                     HTTPHeader(field: .accept, value: .textplain),
