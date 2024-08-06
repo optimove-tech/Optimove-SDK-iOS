@@ -499,7 +499,7 @@ private extension Optimove {
         }
         container.resolve(function)
     }
-    
+
     // MARK: Configuration
 
     /// Initialization of SDK with a configuration.

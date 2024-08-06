@@ -16,25 +16,31 @@ class PreferenceCenter {
     }
 
     private func getTenantId() throws -> String {
-        if let tenantIdValue = storage.value(for: .tenantID) as? Int {
-            return String(tenantIdValue)
-        } else {
+        do {
+            guard let tenantId: Int = try storage[.tenantID] else {
+                throw StorageError.noValue(.tenantID)
+            }
+
+            return String(tenantId)
+        } catch {
             throw TenantIDError.conversionFailed
         }
     }
 
     private func getCustomerId() throws -> String {
-        if let customerId = storage.value(for: .customerID) as? String {
-            return customerId
-        } else {
+        guard let customerId: String = try storage[.customerID] else {
             throw StorageError.noValue(.customerID)
         }
+
+        return String(customerId)
     }
 
     func getPreferences(brandGroupId: String) async throws -> Preferences {
         do {
+            //TODO: resolve this
             self.storage.set(value: "daniela-customer", key: .customerID)
             self.storage.set(value: 3013, key: .tenantID)
+
             let customerId = try getCustomerId()
             let tenantId = try getTenantId()
 
@@ -68,8 +74,10 @@ class PreferenceCenter {
 
     func setPreferences(for customerId: String, brandGroupId: String, updates preferenceUpdates : [PreferenceUpdate]) async throws -> Preferences {
         do {
+            // TODO: resolve this
             self.storage.set(value: "daniela-customer", key: .customerID)
             self.storage.set(value: 3013, key: .tenantID)
+
             let customerId = try getCustomerId()
             let tenantId = try getTenantId()
 
