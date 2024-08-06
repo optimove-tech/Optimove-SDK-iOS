@@ -4,6 +4,23 @@ import Foundation
 
 typealias NetworkServiceCompletion = (Result<NetworkResponse<Data?>, NetworkError>) -> Void
 
+extension NetworkClient {
+    @available(iOS 13.0, *)
+    func performAsync(_ request: NetworkRequest) async throws -> Data? {
+        return try await withCheckedThrowingContinuation { continuation in
+            perform(request) { result in
+                switch result {
+                case .success(let response):
+                    continuation.resume(returning: response.body)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+}
+
+
 protocol NetworkClient {
     func perform(_ request: NetworkRequest, _ completion: @escaping NetworkServiceCompletion)
 }
