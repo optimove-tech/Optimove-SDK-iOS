@@ -37,6 +37,7 @@ class PreferenceCenter {
 
     func getPreferences(brandGroupId: String) async throws -> Preferences {
         do {
+            // TODO: resolve region business
             let region = "dev-pb"
             let tenantId = try getTenantId()
             let customerId = try getCustomerId()
@@ -71,10 +72,7 @@ class PreferenceCenter {
 
     func setPreferences(for customerId: String, brandGroupId: String, updates preferenceUpdates : [PreferenceUpdate]) async throws -> Preferences {
         do {
-            // TODO: resolve this
-            //            self.storage.set(value: "daniela-customer", key: .customerID)
-            //            self.storage.set(value: 3013, key: .tenantID)
-
+            // TODO: resolve region business
             let region = "dev-pb"
             let customerId = try getCustomerId()
             let tenantId = try getTenantId()
