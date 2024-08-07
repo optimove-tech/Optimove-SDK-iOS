@@ -130,6 +130,66 @@ public extension Optimove {
     @objc static func reportEvent(_ event: OptimoveEvent) {
         shared.reportEvent(event)
     }
+
+    @available(iOS 13.0, *)
+    func getPreferences(brandGroupId: String) async throws -> Preferences {
+        return try await withCheckedThrowingContinuation { continuation in
+            container.resolve { serviceLocator in
+                Task {
+                    do {
+                        let preferences = try await serviceLocator.preferenceCenter().getPreferences(
+                            brandGroupId: brandGroupId
+                        )
+                        continuation.resume(returning: preferences)
+                    } catch {
+                        continuation.resume(throwing: error)
+                    }
+                }
+            }
+        }
+    }
+
+
+    @available(iOS 13.0, *)
+    @objc static func getPreferences(brandGroupId: String) async throws -> Preferences {
+        do {
+            return try await shared.getPreferences(brandGroupId: brandGroupId)
+        } catch {
+            print(error)
+            throw NetworkError.noData
+        }
+    }
+
+    @available(iOS 13.0, *)
+    func setPreferences(for customerId: String, brandGroupId: String, _ preferenceUpdates: [PreferenceUpdate]) async throws -> Preferences {
+
+        return try await withCheckedThrowingContinuation { continuation in
+            container.resolve { serviceLocator in
+                Task {
+                    do {
+                        let updatedPreferences = try await serviceLocator.preferenceCenter().setPreferences(
+                            for: customerId,
+                            brandGroupId: brandGroupId,
+                            updates: preferenceUpdates
+                        )
+                        continuation.resume(returning: updatedPreferences)
+                    } catch {
+                        continuation.resume(throwing: error)
+                    }
+                }
+            }
+        }
+    }
+
+    @available(iOS 13.0, *)
+    @objc static func setPreferences(for customerId: String, brandGroupId: String, updatedTopics preferenceUpdates: [PreferenceUpdate]) async throws -> Preferences {
+        do {
+            return try await shared.setPreferences(for: customerId, brandGroupId: brandGroupId, preferenceUpdates)
+        } catch {
+            print(error)
+            throw NetworkError.requestFailed
+        }
+    }
 }
 
 // MARK: - ScreenVisit API call
