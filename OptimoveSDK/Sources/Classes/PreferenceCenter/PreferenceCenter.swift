@@ -8,74 +8,43 @@ enum TenantIDError: Error {
 @available(iOS 13.0, *)
 class PreferenceCenter {
     private var networkClient: NetworkClient
-    private var storage: KeyValueStorage
+    private var storage: OptimoveStorage
 
-    init(storage: KeyValueStorage, networkClient: NetworkClient) {
+    init(storage: OptimoveStorage, networkClient: NetworkClient) {
         self.networkClient = networkClient
         self.storage = storage
     }
 
-    private func getTenantId() throws -> String {
-        do {
-            guard let tenantId: Int = storage[.tenantID] else {
-                throw StorageError.noValue(.tenantID)
-            }
-
-            return String(tenantId)
-        } catch {
-            throw TenantIDError.conversionFailed
-        }
-    }
-
-    private func getCustomerId() throws -> String {
-        guard let customerId: String = storage[.customerID] else {
-            throw StorageError.noValue(.customerID)
-        }
-
-        return String(customerId)
-    }
-
     func getPreferences(brandGroupId: String) async throws -> Preferences {
-        do {
-            // TODO: resolve region business
-            let region = "dev-pb"
-            let tenantId = try getTenantId()
-            let customerId = try getCustomerId()
+        // TODO: resolve region business
+        let region = "dev"
+        let tenantId = try storage.getTenantID().description
+        let customerId = try storage.getCustomerID()
 
-            let request = NetworkRequest(
-                method: .get,
-                baseURL: URL(string: "https://preference-center-\(region).optimove.net")!,
-                path: "/api/v1/preferences",
-                headers: [
-                    HTTPHeader(field: .accept, value: .textplain),
-                    HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
-                ],
-                queryItems:[
-                    URLQueryItem(name: "customerId", value: customerId),
-                    URLQueryItem(name: "brandGroupId", value: brandGroupId)
-                ]
-            )
+        let request = NetworkRequest(
+            method: .get,
+            baseURL: URL(string: "https://preference-center-\(region).optimove.net")!,
+            path: "/api/v1/preferences",
+            headers: [
+                HTTPHeader(field: .accept, value: .textplain),
+                HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
+            ],
+            queryItems: [
+                URLQueryItem(name: "customerId", value: customerId),
+                URLQueryItem(name: "brandGroupId", value: brandGroupId)
+            ]
+        )
 
-
-            let data: Data = try cast(await networkClient.performAsync(request))
-            let preferences = try JSONDecoder().decode(Preferences.self, from: data)
-
-            return preferences
-        }
-        catch {
-            print("Failed to create network request: \(error)")
-        }
-
-        throw NetworkError.requestFailed
+        let data: Data = try cast(await networkClient.performAsync(request))
+        return try JSONDecoder().decode(Preferences.self, from: data)
     }
 
-
-    func setPreferences(for customerId: String, brandGroupId: String, updates preferenceUpdates : [PreferenceUpdate]) async throws -> Preferences {
+    func setPreferences(for _: String, brandGroupId: String, updates preferenceUpdates: [PreferenceUpdateRequest]) async throws -> Preferences {
         do {
             // TODO: resolve region business
-            let region = "dev-pb"
-            let customerId = try getCustomerId()
-            let tenantId = try getTenantId()
+            let region = "dev"
+            let tenantId = try storage.getTenantID().description
+            let customerId = try storage.getCustomerID()
 
             let request = try NetworkRequest(
                 method: .put,
@@ -85,7 +54,7 @@ class PreferenceCenter {
                     HTTPHeader(field: .accept, value: .textplain),
                     HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
                 ],
-                queryItems:[
+                queryItems: [
                     URLQueryItem(name: "customerId", value: customerId),
                     URLQueryItem(name: "brandGroupId", value: brandGroupId)
                 ],
@@ -102,5 +71,4 @@ class PreferenceCenter {
             throw NetworkError.requestFailed
         }
     }
-
 }

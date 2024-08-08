@@ -1,33 +1,9 @@
 import Foundation
 
 struct PreferenceCenterConfig: Codable {
-    var region: Region
-    var tenantId: Int
-    var brandGroupId: String
-}
-
-public class Preferences: NSObject, Codable {
-    var topics: [Topic]
-    var channels: [Channel]
-
-    public func getChannels() -> [Channel] {
-        return channels
-    }
-
-    public func getTopics() -> [Topic] {
-        return topics
-    }
-
-    public init(topics: [Topic], channels: [Channel]) {
-        self.topics = topics
-        self.channels = channels
-    }
-
-    required public init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.topics = try container.decode([Topic].self, forKey: .topics)
-        self.channels = try container.decode([Channel].self, forKey: .channels)
-    }
+    let region: Region
+    let tenantId: Int
+    let brandGroupId: String
 }
 
 public enum Channel: Int, Codable {
@@ -36,56 +12,89 @@ public enum Channel: Int, Codable {
     case sms = 493
 }
 
-public class Topic: NSObject, Codable {
-    public var topicId: String
-    var topicName: String
-    var topicDescription: String
-    var channelSubscription: [Channel]
+public class PreferencesObjc: NSObject, Codable {
+    @nonobjc let preferences: Preferences
 
-    public func getId() -> String {
-        return topicId
+    init(preferences: Preferences) {
+        self.preferences = preferences
     }
 
-    public func getName() -> String {
-        return topicName
-    }
-
-    public func getDescription() -> String {
-        return topicDescription
-    }
-
-    public func getSubscribedChannels() -> [Channel] {
-        return channelSubscription
-    }
-
-    public init(id: String, name: String, description: String, subscribedChannels: [Channel]) {
-        topicId = id
-        topicName = name
-        topicDescription = description
-        channelSubscription = subscribedChannels
-    }
-
-    public required init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.topicId = try container.decode(String.self, forKey: .topicId)
-        self.topicName = try container.decode(String.self, forKey: .topicName)
-        self.topicDescription = try container.decode(String.self, forKey: .topicDescription)
-        self.channelSubscription = try container.decode([Channel].self, forKey: .channelSubscription)
+    public init(topics: [TopicObjc], channels: [Channel]) {
+        self.preferences = Preferences(
+            topics: topics.map { $0.topic },
+            channels: channels
+        )
     }
 }
 
-public class PreferenceUpdate: NSObject, Codable {
-    var topicId: String
-    var channelSubscription: [Channel]
+public class TopicObjc: NSObject, Codable {
+    @nonobjc let topic: Preferences.Topic
+    public var topicId: String {
+        return topic.topicId
+    }
+
+    public var topicName: String {
+        return topic.topicName
+    }
+
+    public var topicDescription: String {
+        return topic.topicDescription
+    }
+
+    public var channelSubscription: [Channel] {
+        return topic.channelSubscription
+    }
+}
+
+public struct Preferences: Codable {
+    public struct Topic: Codable {
+        public let topicId: String
+        public let topicName: String
+        public let topicDescription: String
+        public let channelSubscription: [Channel]
+
+        public init(topicId: String, topicName: String, topicDescription: String, channelSubscription: [Channel]) {
+            self.topicId = topicId
+            self.topicName = topicName
+            self.topicDescription = topicDescription
+            self.channelSubscription = channelSubscription
+        }
+    }
+
+    public let topics: [Topic]
+    public let channels: [Channel]
+
+    public init(topics: [Topic], channels: [Channel]) {
+        self.topics = topics
+        self.channels = channels
+    }
+}
+
+public class PreferenceUpdateRequestObjc: NSObject, Codable {
+    @nonobjc let preferenceUpdateRequest: PreferenceUpdateRequest
+    public var topicId: String {
+        return preferenceUpdateRequest.topicId
+    }
+
+    public var channelSubscription: [Channel] {
+        return preferenceUpdateRequest.channelSubscription
+    }
+
+    init(preferenceUpdateRequest: PreferenceUpdateRequest) {
+        self.preferenceUpdateRequest = preferenceUpdateRequest
+    }
+
+    public init(topicId: String, channelSubscription: [Channel]) {
+        self.preferenceUpdateRequest = PreferenceUpdateRequest(topicId: topicId, channelSubscription: channelSubscription)
+    }
+}
+
+public struct PreferenceUpdateRequest: Codable {
+    public let topicId: String
+    public let channelSubscription: [Channel]
 
     public init(topicId: String, channelSubscription: [Channel]) {
         self.topicId = topicId
         self.channelSubscription = channelSubscription
-    }
-
-    required public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.topicId = try container.decode(String.self, forKey: .topicId)
-        self.channelSubscription = try container.decode([Channel].self, forKey: .channelSubscription)
     }
 }

@@ -132,7 +132,7 @@ public extension Optimove {
     }
 
     @available(iOS 13.0, *)
-    func getPreferences(brandGroupId: String) async throws -> Preferences {
+    private func getPreferences(brandGroupId: String) async throws -> Preferences {
         return try await withCheckedThrowingContinuation { continuation in
             container.resolve { serviceLocator in
                 Task {
@@ -149,20 +149,18 @@ public extension Optimove {
         }
     }
 
-
     @available(iOS 13.0, *)
-    @objc static func getPreferences(brandGroupId: String) async throws -> Preferences {
-        do {
-            return try await shared.getPreferences(brandGroupId: brandGroupId)
-        } catch {
-            print(error)
-            throw NetworkError.noData
-        }
+    static func getPreferences(brandGroupId: String) async throws -> Preferences {
+        return try await shared.getPreferences(brandGroupId: brandGroupId)
     }
 
     @available(iOS 13.0, *)
-    func setPreferences(for customerId: String, brandGroupId: String, _ preferenceUpdates: [PreferenceUpdate]) async throws -> Preferences {
+    @objc static func getPreferences(brandGroupId: String) async throws -> PreferencesObjc {
+        return try PreferencesObjc(preferences: await shared.getPreferences(brandGroupId: brandGroupId))
+    }
 
+    @available(iOS 13.0, *)
+    private func setPreferences(for customerId: String, brandGroupId: String, _ preferenceUpdates: [PreferenceUpdateRequest]) async throws -> Preferences {
         return try await withCheckedThrowingContinuation { continuation in
             container.resolve { serviceLocator in
                 Task {
@@ -182,13 +180,19 @@ public extension Optimove {
     }
 
     @available(iOS 13.0, *)
-    @objc static func setPreferences(for customerId: String, brandGroupId: String, updatedTopics preferenceUpdates: [PreferenceUpdate]) async throws -> Preferences {
-        do {
-            return try await shared.setPreferences(for: customerId, brandGroupId: brandGroupId, preferenceUpdates)
-        } catch {
-            print(error)
-            throw NetworkError.requestFailed
-        }
+    static func setPreferences(for customerId: String, brandGroupId: String, updatedTopics preferenceUpdates: [PreferenceUpdateRequest]) async throws -> Preferences {
+        return try await shared.setPreferences(for: customerId, brandGroupId: brandGroupId, preferenceUpdates)
+    }
+
+    @available(iOS 13.0, *)
+    @objc static func setPreferences(for customerId: String, brandGroupId: String, updatedTopics preferenceUpdates: [PreferenceUpdateRequestObjc]) async throws -> PreferencesObjc {
+        return try PreferencesObjc(
+            preferences: await shared.setPreferences(
+                for: customerId,
+                brandGroupId: brandGroupId,
+                preferenceUpdates.map { $0.preferenceUpdateRequest }
+            )
+        )
     }
 }
 
@@ -419,7 +423,7 @@ public extension Optimove {
     @objc func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return Optimobile.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
-    
+
     /**
         Used for Deferred Deep Linking to pass the continuation url to the Optimove SDK to be processed.
      */
