@@ -1,5 +1,5 @@
 struct PreferenceCenterConfig: Codable {
-    var region: String
-    var tenantId: Int
-    var brandGroupId: String
+    let region: String
+    let tenantId: Int
+    let brandGroupId: String
 }

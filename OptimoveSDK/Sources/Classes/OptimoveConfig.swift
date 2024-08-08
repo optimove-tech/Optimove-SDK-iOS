@@ -493,7 +493,7 @@ struct PreferenceCenterArguments: Decodable {
     let version: String
     let environment: String //TODO: Change this to enum
     let tenantId: Int
-    var brandGroupId: String
+    let brandGroupId: String
 
     enum CodingKeys: String, CodingKey {
         case version
