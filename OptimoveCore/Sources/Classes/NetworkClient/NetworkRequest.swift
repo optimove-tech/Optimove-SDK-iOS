@@ -99,11 +99,11 @@ public extension HTTPHeader {
         var value: String {
             switch self {
             case .json:
-                "application/json"
+               return "application/json"
             case .tenantId(let id):
-                id
+               return id
             case .textplain:
-                "text/plain"
+                return "text/plain"
             }
         }
     }
