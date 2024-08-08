@@ -29,7 +29,7 @@ public class UrlBuilder {
 
     public typealias ServiceUrlMap = [Service: String]
 
-    let storage: KeyValPersistenceHelper.Type
+    let storage: KeyValueStorage
 
     // Overrided urls
     var runtimeUrlsMap: ServiceUrlMap?
@@ -46,14 +46,14 @@ public class UrlBuilder {
 
     var region: String {
         get throws {
-            if let regionString = storage.object(forKey: OptimobileUserDefaultsKey.REGION.rawValue) as? String {
+            if let regionString: String = storage[.region] {
                 return regionString
             }
             throw Error.regionNotSet
         }
     }
 
-    required init(storage: KeyValPersistenceHelper.Type, runtimeUrlsMap: ServiceUrlMap? = nil) {
+    required init(storage: KeyValueStorage, runtimeUrlsMap: ServiceUrlMap? = nil) {
         self.storage = storage
         if let runtimeUrlsMap = runtimeUrlsMap, isValidateUrlMap(urlsMap: runtimeUrlsMap) {
             self.runtimeUrlsMap = runtimeUrlsMap

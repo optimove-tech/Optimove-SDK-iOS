@@ -163,7 +163,7 @@ extension Optimobile {
         do {
             let notification = try PushNotification(userInfo: userInfo)
             pushHandleOpen(notification: notification)
-            PendingNotificationHelper.remove(id: notification.message.id)
+            pendingNoticationHelper.remove(id: notification.message.id)
             return true
         } catch {
             Logger.error(
@@ -212,7 +212,7 @@ extension Optimobile {
             let data = try JSONSerialization.data(withJSONObject: userInfo)
             let notification = try JSONDecoder().decode(PushNotification.self, from: data)
             pushHandleDismissed(notificationId: notification.message.id)
-            PendingNotificationHelper.remove(id: notification.message.id)
+            pendingNoticationHelper.remove(id: notification.message.id)
             return true
         } catch {
             Logger.error(
@@ -229,7 +229,7 @@ extension Optimobile {
 
     @available(iOS 10.0, *)
     private func pushHandleDismissed(notificationId: Int, dismissedAt: Date? = nil) {
-        PendingNotificationHelper.remove(id: notificationId)
+        pendingNoticationHelper.remove(id: notificationId)
         pushTrackDismissed(notificationId: notificationId, dismissedAt: dismissedAt)
     }
 
@@ -246,9 +246,6 @@ extension Optimobile {
 
     @available(iOS 10.0, *)
     func maybeTrackPushDismissedEvents() {
-        if !AppGroupsHelper.isKumulosAppGroupDefined() {
-            return
-        }
         Task {
             do {
                 let notifications = await UNUserNotificationCenter.current().deliveredNotifications()
@@ -259,7 +256,7 @@ extension Optimobile {
                     actualPendingNotificationIds.append(notification.message.id)
                 }
 
-                let recordedPendingNotifications = PendingNotificationHelper.readAll()
+                let recordedPendingNotifications = pendingNoticationHelper.readAll()
 
                 let deletions = recordedPendingNotifications.filter { !actualPendingNotificationIds.contains($0.id) }
                 for deletion in deletions {
@@ -351,7 +348,7 @@ class PushHelper {
                 let notification = try PushNotification(userInfo: userInfo)
                 let hasInApp = notification.deeplink != nil
 
-                self.setBadge(userInfo: userInfo)
+                self.setBadge(notification: notification)
                 self.trackPushDelivery(notification: notification)
 
                 if existingDidReceive == nil, !hasInApp {
@@ -416,10 +413,15 @@ class PushHelper {
         }
     }()
 
-    private func setBadge(userInfo: [AnyHashable: Any]) {
-        let badge: NSNumber? = OptimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
-        if let newBadge = badge {
-            UIApplication.shared.applicationIconBadgeNumber = newBadge.intValue
+    let optimobileHelper: OptimobileHelper
+
+    init(optimobileHelper: OptimobileHelper) {
+        self.optimobileHelper = optimobileHelper
+    }
+
+    private func setBadge(notification: PushNotification) {
+        if let badge = optimobileHelper.getBadge(notification: notification) {
+            UIApplication.shared.applicationIconBadgeNumber = badge
         }
     }
 

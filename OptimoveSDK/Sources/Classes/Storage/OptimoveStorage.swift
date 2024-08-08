@@ -1,142 +1,10 @@
-//  Copyright © 2019 Optimove. All rights reserved.
+//  Copyright © 2023 Optimove. All rights reserved.
 
 import Foundation
 import OptimoveCore
 
 /// Combined protocol for a convenince access to stored values and files.
 typealias OptimoveStorage = FileStorage & KeyValueStorage & StorageValue
-
-// MARK: - StorageCase
-
-// MARK: - StorageKey
-
-enum StorageKey: String, CaseIterable {
-    case installationID
-    case customerID
-    case configurationEndPoint
-    case initialVisitorId
-    case tenantToken
-    case visitorID
-    case version
-    case userAgent
-    case deviceResolutionWidth
-    case deviceResolutionHeight
-    case advertisingIdentifier
-    case migrationVersions /// For storing a migration history
-    case firstRunTimestamp
-    case pushNotificationChannels
-    case optitrackEndpoint
-    case tenantID
-    case userEmail
-    case siteID /// Legacy: See tenantID
-    case settingUserSuccess
-    case firstVisitTimestamp /// Legacy
-
-    static let inMemoryValues: Set<StorageKey> = [.tenantToken, .version]
-}
-
-// MARK: - StorageValue
-
-/// The protocol used as convenience accessor to storage values.
-protocol StorageValue {
-    var installationID: String? { get set }
-    var customerID: String? { get set }
-    var configurationEndPoint: URL? { get set }
-    var initialVisitorId: String? { get set }
-    var tenantToken: String? { get set }
-    var visitorID: String? { get set }
-    var version: String? { get set }
-    var userAgent: String? { get set }
-    var deviceResolutionWidth: Float? { get set }
-    var deviceResolutionHeight: Float? { get set }
-    var advertisingIdentifier: String? { get set }
-    var optitrackEndpoint: URL? { get set }
-    var tenantID: Int? { get set }
-    var userEmail: String? { get set }
-    /// Legacy: See tenantID
-    var siteID: Int? { get set }
-    var isSettingUserSuccess: Bool? { get set }
-    /// Legacy. Use `firstRunTimestamp` instead
-    var firstVisitTimestamp: Int64? { get set }
-
-    func getConfigurationEndPoint() throws -> URL
-    func getCustomerID() throws -> String
-    func getInitialVisitorId() throws -> String
-    func getTenantToken() throws -> String
-    func getVisitorID() throws -> String
-    func getVersion() throws -> String
-    func getUserAgent() throws -> String
-    func getDeviceResolutionWidth() throws -> Float
-    func getDeviceResolutionHeight() throws -> Float
-    /// Called when a migration is finished for the version.
-    mutating func finishedMigration(to version: String)
-    /// Use for checking if a migration was applied for the version.
-    func isAlreadyMigrated(to version: String) -> Bool
-    func getUserEmail() throws -> String
-    func getSiteID() throws -> Int
-}
-
-/// The protocol used for convenience implementation of any storage technology below this protocol.
-protocol KeyValueStorage {
-    func set(value: Any?, key: StorageKey)
-    func value(for: StorageKey) -> Any?
-    subscript<T>(_: StorageKey) -> T? { get set }
-}
-
-extension UserDefaults: KeyValueStorage {
-    func set(value: Any?, key: StorageKey) {
-        set(value, forKey: key.rawValue)
-    }
-
-    func value(for key: StorageKey) -> Any? {
-        return value(forKey: key.rawValue)
-    }
-
-    subscript<T>(key: StorageKey) -> T? {
-        get {
-            return value(for: key) as? T
-        }
-        set {
-            set(value: newValue, key: key)
-        }
-    }
-}
-
-final class InMemoryStorage: KeyValueStorage {
-    private var storage = [StorageKey: Any]()
-    private let queue = DispatchQueue(label: "com.optimove.sdk.inmemorystorage", attributes: .concurrent)
-
-    init() {}
-
-    func set(value: Any?, key: StorageKey) {
-        queue.async(flags: .barrier) { [self] in
-            storage[key] = value
-        }
-    }
-
-    subscript<T>(key: StorageKey) -> T? {
-        get {
-            var result: T?
-            queue.sync {
-                result = storage[key] as? T
-            }
-            return result
-        }
-        set {
-            queue.async(flags: .barrier) { [self] in
-                storage[key] = newValue
-            }
-        }
-    }
-
-    func value(for key: StorageKey) -> Any? {
-        var result: Any?
-        queue.sync {
-            result = storage[key]
-        }
-        return result
-    }
-}
 
 enum StorageError: LocalizedError {
     case noValue(StorageKey)
@@ -151,25 +19,32 @@ enum StorageError: LocalizedError {
 
 /// Class implements the Façade pattern for hiding complexity of the OptimoveStorage protocol.
 final class StorageFacade: OptimoveStorage {
-    private let persistantStorage: KeyValueStorage
+    // FIXME: - Split persistance storage to AppGroup and Standart
+    private let standardStorage: KeyValueStorage
+    private let appGroupStorage: KeyValueStorage
     private let inMemoryStorage: KeyValueStorage
     private let fileStorage: FileStorage
 
     init(
-        persistantStorage: KeyValueStorage,
+        standardStorage: KeyValueStorage,
+        appGroupStorage: KeyValueStorage,
         inMemoryStorage: KeyValueStorage,
         fileStorage: FileStorage
     ) {
         self.fileStorage = fileStorage
         self.inMemoryStorage = inMemoryStorage
-        self.persistantStorage = persistantStorage
+        self.appGroupStorage = appGroupStorage
+        self.standardStorage = standardStorage
     }
 
     func getStorage(for key: StorageKey) -> KeyValueStorage {
         if StorageKey.inMemoryValues.contains(key) {
             return inMemoryStorage
         }
-        return persistantStorage
+        if StorageKey.appGroupValues.contains(key) {
+            return appGroupStorage
+        }
+        return standardStorage
     }
 }
 

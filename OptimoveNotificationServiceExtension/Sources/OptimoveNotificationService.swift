@@ -37,14 +37,23 @@ public enum OptimoveNotificationService {
         let data = try JSONSerialization.data(withJSONObject: userInfo)
         let notification = try JSONDecoder().decode(PushNotification.self, from: data)
         if bestAttemptContent.categoryIdentifier.isEmpty {
-            bestAttemptContent.categoryIdentifier = await buildCategory(notification: notification)
+            bestAttemptContent.categoryIdentifier = await registerCategory(notification: notification)
         }
-        if AppGroupsHelper.isKumulosAppGroupDefined() {
-            if let attachment = try await maybeGetAttachment(notification: notification) {
+        if let storage = try? UserDefaults.optimoveAppGroup() {
+            let mediaHelper = MediaHelper(storage: storage)
+            if let attachment = try await maybeGetAttachment(
+                notification: notification,
+                mediaHelper: mediaHelper
+            ) {
                 bestAttemptContent.attachments = [attachment]
             }
-            maybeSetBadge(bestAttemptContent: bestAttemptContent, userInfo: userInfo)
-            PendingNotificationHelper.add(
+            let optimobileHelper = OptimobileHelper(storage: storage)
+            if let badge = optimobileHelper.getBadge(notification: notification) {
+                storage.set(value: badge, key: .badgeCount)
+                bestAttemptContent.badge = NSNumber(integerLiteral: badge)
+            }
+            let pendingNoticationHelper = PendingNotificationHelper(storage: storage)
+            pendingNoticationHelper.add(
                 notification: PendingNotification(
                     id: notification.message.id,
                     identifier: request.identifier
@@ -85,7 +94,7 @@ public enum OptimoveNotificationService {
         }
     }
 
-    static func buildCategory(notification: PushNotification) async -> String {
+    static func registerCategory(notification: PushNotification) async -> String {
         let categoryIdentifier = CategoryManager.getCategoryId(messageId: notification.message.id)
         let category = UNNotificationCategory(
             identifier: categoryIdentifier,
@@ -98,10 +107,10 @@ public enum OptimoveNotificationService {
         return categoryIdentifier
     }
 
-    static func maybeGetAttachment(notification: PushNotification) async throws -> UNNotificationAttachment? {
+    static func maybeGetAttachment(notification: PushNotification, mediaHelper: MediaHelper) async throws -> UNNotificationAttachment? {
         guard let picturePath = notification.attachment?.pictureUrl else { return nil }
 
-        let url = try await MediaHelper.getCompletePictureUrl(
+        let url = try await mediaHelper.getCompletePictureUrl(
             pictureUrlString: picturePath,
             width: UInt(floor(UIScreen.main.bounds.size.width))
         )
@@ -120,20 +129,5 @@ public enum OptimoveNotificationService {
             identifier: "",
             url: tempURL
         )
-    }
-
-    static func maybeSetBadge(bestAttemptContent: UNMutableNotificationContent, userInfo: [AnyHashable: Any]) {
-        let aps = userInfo["aps"] as! [AnyHashable: Any]
-        if let contentAvailable = aps["content-available"] as? Int, contentAvailable == 1 {
-            return
-        }
-
-        let newBadge: NSNumber? = OptimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
-        if newBadge == nil {
-            return
-        }
-
-        bestAttemptContent.badge = newBadge
-        KeyValPersistenceHelper.set(newBadge, forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue)
     }
 }

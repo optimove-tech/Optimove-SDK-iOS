@@ -16,17 +16,19 @@ typealias SyncCompletedBlock = (Error?) -> Void
 
 final class AnalyticsHelper {
     let eventsHttpClient: KSHttpClient
+    let optimobileHelper: OptimobileHelper
     private var analyticsContext: NSManagedObjectContext?
     private var migrationAnalyticsContext: NSManagedObjectContext?
     private var finishedInitializationToken: NSObjectProtocol?
 
     // MARK: Initialization
 
-    init(httpClient: KSHttpClient) {
+    init(httpClient: KSHttpClient, optimobileHelper: OptimobileHelper) {
         analyticsContext = nil
         migrationAnalyticsContext = nil
 
         eventsHttpClient = httpClient
+        self.optimobileHelper = optimobileHelper
 
         initContext()
 
@@ -67,7 +69,7 @@ final class AnalyticsHelper {
     }
 
     private func getSharedDbUrl() -> URL? {
-        let sharedContainerPath: URL? = AppGroupsHelper.getSharedContainerPath()
+        let sharedContainerPath = try? FileManager.optimoveAppGroupURL()
         if sharedContainerPath == nil {
             return nil
         }
@@ -78,7 +80,7 @@ final class AnalyticsHelper {
     private func initContext() {
         let appDbUrl = getAppDbUrl()
         let appDbExists = appDbUrl == nil ? false : FileManager.default.fileExists(atPath: appDbUrl!.path)
-        let appGroupExists = AppGroupsHelper.isKumulosAppGroupDefined()
+        let appGroupExists = true
 
         let storeUrl = getMainStoreUrl(appGroupExists: appGroupExists)
 
@@ -121,6 +123,7 @@ final class AnalyticsHelper {
             return
         }
 
+        let currentUserIdentifier = optimobileHelper.currentUserIdentifier()
         let work = {
             guard let context = self.analyticsContext else {
                 print("No context, aborting")
@@ -137,7 +140,7 @@ final class AnalyticsHelper {
             event.uuid = UUID().uuidString.lowercased()
             event.happenedAt = NSNumber(value: Int64(atTime.timeIntervalSince1970 * 1000))
             event.eventType = eventType
-            event.userIdentifier = OptimobileHelper.currentUserIdentifier
+            event.userIdentifier = currentUserIdentifier
 
             if properties != nil {
                 let propsJson = try? JSONSerialization.data(withJSONObject: properties as Any, options: JSONSerialization.WritingOptions(rawValue: 0))

@@ -18,7 +18,7 @@ typealias Logger = OptimoveCore.Logger
     /// The shared instance of Optimove SDK.
     @objc public static let shared: Optimove = .init()
 
-    private let container: Container
+    let container: Container
     private var config: OptimoveConfig!
 
     override private init() {
@@ -52,10 +52,10 @@ typealias Logger = OptimoveCore.Logger
         if config.isOptimobileConfigured() {
             shared.container.resolve { serviceLocator in
                 do {
-                    let visitorId = try serviceLocator.storage().getInitialVisitorId()
-                    let userId = try? serviceLocator.storage().getCustomerID()
-
-                    try Optimobile.initialize(config: config, initialVisitorId: visitorId, initialUserId: userId)
+                    try Optimobile.initialize(
+                        optimoveConfig: config,
+                        storage: serviceLocator.storage()
+                    )
                 } catch {
                     throw GuardError.custom("Failed on OptimobileSDK initialization. Reason: \(error.localizedDescription)")
                 }
@@ -170,22 +170,24 @@ public extension Optimove {
     ///   - email: The user email.
     @objc func registerUser(sdkId userID: String, email: String) {
         if config.isOptimoveConfigured() {
-            let function: (ServiceLocator) -> Void = { serviceLocator in
-                tryCatch {
-                    let user = User(userID: userID)
-                    let setUserIdEvent = try self._setUser(user, serviceLocator)
-                    let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
-                    serviceLocator.pipeline().deliver(.report(events: [setUserIdEvent, setUserEmailEvent]))
-                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-                        serviceLocator.pipeline().deliver(.setInstallation)
-                    }
+            container.resolve { serviceLocator in
+                let user = User(userID: userID)
+                let setUserIdEvent = try self._setUser(user, serviceLocator)
+                let setUserEmailEvent: Event = try self._setUserEmail(email, serviceLocator)
+                serviceLocator.pipeline().deliver(.report(events: [setUserIdEvent, setUserEmailEvent]))
+                if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
+                    serviceLocator.pipeline().deliver(.setInstallation)
                 }
             }
-            container.resolve(function)
         }
 
         if config.isOptimobileConfigured() {
-            Optimobile.associateUserWithInstall(userIdentifier: userID)
+            container.resolve { serviceLocator in
+                Optimobile.associateUserWithInstall(
+                    userIdentifier: userID,
+                    storage: serviceLocator.storage()
+                )
+            }
         }
     }
 
@@ -203,21 +205,23 @@ public extension Optimove {
     /// - Parameter userID: The user unique identifier.
     @objc func setUserId(_ userID: String) {
         if config.isOptimoveConfigured() {
-            let function: (ServiceLocator) -> Void = { serviceLocator in
-                tryCatch {
-                    let user = User(userID: userID)
-                    let event = try self._setUser(user, serviceLocator)
-                    serviceLocator.pipeline().deliver(.report(events: [event]))
-                    if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
-                        serviceLocator.pipeline().deliver(.setInstallation)
-                    }
+            container.resolve { serviceLocator in
+                let user = User(userID: userID)
+                let event = try self._setUser(user, serviceLocator)
+                serviceLocator.pipeline().deliver(.report(events: [event]))
+                if UserValidator(storage: serviceLocator.storage()).validateNewUser(user) == .valid {
+                    serviceLocator.pipeline().deliver(.setInstallation)
                 }
             }
-            container.resolve(function)
         }
 
         if config.isOptimobileConfigured() {
-            Optimobile.associateUserWithInstall(userIdentifier: userID)
+            container.resolve { serviceLocator in
+                Optimobile.associateUserWithInstall(
+                    userIdentifier: userID,
+                    storage: serviceLocator.storage()
+                )
+            }
         }
     }
 
@@ -294,17 +298,40 @@ public extension Optimove {
     /// Call this function to unset the customerID and revert to an anonymous visitor
     func signOutUser() {
         if config.isOptimoveConfigured() {
-            let function: (ServiceLocator) -> Void = { serviceLocator in
-                tryCatch {
-                    serviceLocator.storage().set(value: nil, key: StorageKey.customerID)
-                    serviceLocator.storage().set(value: serviceLocator.storage().initialVisitorId, key: StorageKey.visitorID)
-                }
+            container.resolve { serviceLocator in
+                serviceLocator.storage().set(value: nil, key: StorageKey.customerID)
+                serviceLocator.storage().set(value: serviceLocator.storage().initialVisitorId, key: StorageKey.visitorID)
             }
-            container.resolve(function)
         }
 
         if config.isOptimobileConfigured() {
-            Optimobile.clearUserAssociation()
+            container.resolve { serviceLocator in
+                Optimobile.clearUserAssociation(
+                    storage: serviceLocator.storage()
+                )
+            }
+        }
+    }
+
+    enum Debug {
+        enum Constants {
+            static let undefined = ""
+        }
+
+        public static var state: SdkState {
+            return Optimove.shared.container.resolve { locator in
+                let storage = locator.storage()
+                return SdkState(
+                    appVersion: "\(Bundle.main.appVersion) build: \(Bundle.main.buildVersion)",
+                    sdkVersion: Optimove.version,
+                    installation: storage.installationID ?? Constants.undefined,
+                    tenant: storage.tenantID?.description ?? Constants.undefined,
+                    initialVisitor: storage.initialVisitorId ?? Constants.undefined,
+                    customer: storage.customerID ?? Constants.undefined,
+                    email: storage.userEmail ?? Constants.undefined,
+                    updateVisitor: storage.visitorID ?? Constants.undefined
+                )
+            } ?? SdkState.empty
         }
     }
 }

@@ -1,5 +1,6 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
+import OptimoveCore
 @testable import OptimoveSDK
 import XCTest
 
@@ -8,7 +9,8 @@ class OptimoveStorageFacadeTests: XCTestCase {
 
     override func setUp() {
         storage = StorageFacade(
-            persistantStorage: MockKeyValueStorage(),
+            standardStorage: MockKeyValueStorage(),
+            appGroupStorage: MockKeyValueStorage(),
             inMemoryStorage: MockKeyValueStorage(),
             fileStorage: MockFileStorage()
         )

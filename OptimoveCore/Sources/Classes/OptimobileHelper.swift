@@ -2,23 +2,28 @@
 
 import Foundation
 
-public enum OptimobileHelper {
-    private static let installIdLock = DispatchSemaphore(value: 1)
+public struct OptimobileHelper {
+    static let installIdLock = DispatchSemaphore(value: 1)
     public static let userIdLock = DispatchSemaphore(value: 1)
 
-    public static var installId: String {
-        installIdLock.wait()
+    let storage: KeyValueStorage
+
+    public init(storage: KeyValueStorage) {
+        self.storage = storage
+    }
+
+    public func installId() -> String {
+        OptimobileHelper.installIdLock.wait()
         defer {
-            installIdLock.signal()
+            OptimobileHelper.installIdLock.signal()
         }
 
-        if let existingID = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue) {
-            return existingID as! String
+        if let existingID: String = storage[.installUUID] {
+            return existingID
         }
 
         let newID = UUID().uuidString
-        KeyValPersistenceHelper.set(newID, forKey: OptimobileUserDefaultsKey.INSTALL_UUID.rawValue)
-
+        storage.set(value: newID, key: .installUUID)
         return newID
     }
 
@@ -27,40 +32,24 @@ public enum OptimobileHelper {
 
       If no user is associated, it returns the Kumulos installation ID
      */
-    public static var currentUserIdentifier: String {
-        userIdLock.wait()
-        defer { userIdLock.signal() }
-        if let userId = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue) as! String? {
+    public func currentUserIdentifier() -> String {
+        OptimobileHelper.userIdLock.wait()
+        defer { OptimobileHelper.userIdLock.signal() }
+        if let userId: String = storage[.userID] {
             return userId
         }
 
-        return OptimobileHelper.installId
+        return installId()
     }
 
-    public static func getBadgeFromUserInfo(userInfo: [AnyHashable: Any]) -> NSNumber? {
-        let custom = userInfo["custom"] as? [AnyHashable: Any]
-        let aps = userInfo["aps"] as? [AnyHashable: Any]
-
-        if custom == nil || aps == nil {
-            return nil
+    public func getBadge(notification: PushNotification) -> Int? {
+        if let incrementBy = notification.badgeIncrement,
+           let current: Int = storage[.badgeCount]
+        {
+            let badge = current + incrementBy
+            return badge < 0 ? 0 : badge
         }
 
-        let incrementBy: NSNumber? = custom!["badge_inc"] as? NSNumber
-        let badge: NSNumber? = aps!["badge"] as? NSNumber
-
-        if badge == nil {
-            return nil
-        }
-
-        var newBadge: NSNumber? = badge
-        if let incrementBy = incrementBy, let currentVal = KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.BADGE_COUNT.rawValue) as? NSNumber {
-            newBadge = NSNumber(value: currentVal.intValue + incrementBy.intValue)
-
-            if newBadge!.intValue < 0 {
-                newBadge = 0
-            }
-        }
-
-        return newBadge
+        return notification.aps.badge
     }
 }

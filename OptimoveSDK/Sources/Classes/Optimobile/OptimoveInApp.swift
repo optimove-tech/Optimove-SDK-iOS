@@ -17,9 +17,11 @@ class InAppInboxItem {
     private var imagePath: String?
 
     private static let defaultImageWidth: UInt = 300
+    let mediaHelper: MediaHelper
 
-    init(entity: InAppMessageEntity) {
+    init(entity: InAppMessageEntity, mediaHelper: MediaHelper) {
         id = Int64(entity.id)
+        self.mediaHelper = mediaHelper
 
         let inboxConfig = entity.inboxConfig?.copy() as! [String: Any]
 
@@ -61,7 +63,7 @@ class InAppInboxItem {
 
     func getImageUrl(width: UInt) -> URL? {
         if let imagePathNotNil = imagePath {
-            return try? MediaHelper.getCompletePictureUrl(
+            return try? mediaHelper.getCompletePictureUrl(
                 pictureUrlString: imagePathNotNil,
                 width: width
             )
@@ -79,7 +81,7 @@ struct InAppInboxSummary {
 typealias InboxUpdatedHandlerBlock = () -> Void
 typealias InboxSummaryBlock = (InAppInboxSummary?) -> Void
 
-enum OptimoveInApp {
+public enum OptimoveInApp {
     private static var _inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?
 
     static func updateConsent(forUser consentGiven: Bool) {
@@ -100,7 +102,7 @@ enum OptimoveInApp {
         return Optimobile.sharedInstance.inAppManager.presenter.getDisplayMode()
     }
 
-    static func getInboxItems() -> [InAppInboxItem] {
+    static func getInboxItems(storage: OptimoveStorage) -> [InAppInboxItem] {
         guard let context = Optimobile.sharedInstance.inAppManager.messagesContext else {
             return []
         }
@@ -127,7 +129,10 @@ enum OptimoveInApp {
             }
 
             for item in items {
-                let inboxItem = InAppInboxItem(entity: item)
+                let inboxItem = InAppInboxItem(
+                    entity: item,
+                    mediaHelper: MediaHelper(storage: storage)
+                )
 
                 if inboxItem.isAvailable() == false {
                     continue
