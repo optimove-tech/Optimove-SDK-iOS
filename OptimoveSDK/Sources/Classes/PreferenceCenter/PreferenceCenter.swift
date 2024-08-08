@@ -38,7 +38,7 @@ class PreferenceCenter {
     func getPreferences(brandGroupId: String) async throws -> Preferences {
         do {
             // TODO: resolve region business
-            let region = "dev-pb"
+            let region = "dev"
             let tenantId = try getTenantId()
             let customerId = try getCustomerId()
 
