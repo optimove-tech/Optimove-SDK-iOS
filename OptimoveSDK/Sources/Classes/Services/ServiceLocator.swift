@@ -107,10 +107,10 @@ final class ServiceLocator {
         return _deviceStateObserver
     }
 
-    @available(iOS 13.0, *)
-    func preferenceCenter() -> PreferenceCenter {
-        return PreferenceCenter(storage: storage(), networkClient: NetworkClientImpl())
-    }
+//    @available(iOS 13.0, *)
+//    func preferenceCenter() -> PreferenceCenter {
+//        return PreferenceCenter(storage: storage(), networkClient: NetworkClientImpl())
+//    }
     // MARK: - Factories
 
     func componentFactory() -> ComponentFactory {

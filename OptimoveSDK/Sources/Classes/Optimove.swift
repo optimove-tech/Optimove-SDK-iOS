@@ -43,6 +43,7 @@ typealias Logger = OptimoveCore.Logger
         }
     }
 
+    @available(iOS 13.0, *)
     public static func initialize(with config: OptimoveConfig) {
         shared.config = config
 
@@ -61,27 +62,41 @@ typealias Logger = OptimoveCore.Logger
                     throw GuardError.custom("Failed on OptimobileSDK initialization. Reason: \(error.localizedDescription)")
                 }
             }
+        }   
+
+        if config.isPreferenceCenterConfigured() {
+            shared.container.resolve { serviceLocator in
+                do {
+                    try PreferenceCenter.initialize(config: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
+                } catch {
+                    throw GuardError.custom("Failed on PreferenceCenter initialization. Reason: \(error.localizedDescription)")
+                }
+            }
         }
     }
 
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
-    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
+    @available(iOS 13.0, *)
+    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
         guard let currentConfig = shared.config else {
             Logger.error("Optimove SDK is not configured yet. Please call Optimove.initialize(with:) first.")
             return
         }
         let builder = OptimoveConfigBuilder(from: currentConfig)
-        builder.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+        builder.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: preferenceCenterCredentials)
         let config = builder.build()
         initialize(with: config)
     }
 
+    @available(iOS 13.0, *)
     public static func isFeatureRunning(_ feature: Feature) -> Bool {
         switch feature {
         case .optimobile:
             return Optimobile.isSdkRunning
         case .optimove:
             return RunningFlagsIndication.isSdkRunning
+        case .preferenceCenter:
+            return PreferenceCenter.isSdkRunning   
         default:
             return false
         }
@@ -132,63 +147,100 @@ public extension Optimove {
     }
 
     @available(iOS 13.0, *)
-    func getPreferences(brandGroupId: String) async throws -> Preferences {
-        return try await withCheckedThrowingContinuation { continuation in
-            container.resolve { serviceLocator in
-                Task {
-                    do {
-                        let preferences = try await serviceLocator.preferenceCenter().getPreferences(
-                            brandGroupId: brandGroupId
-                        )
-                        continuation.resume(returning: preferences)
-                    } catch {
-                        continuation.resume(throwing: error)
-                    }
+    private func getPreferences() async throws -> Preferences {
+        if config.isPreferenceCenterConfigured() {
+            if let preferenceCenterConfig = config.preferenceCenterConfig {
+                do {
+                    let preferences = try await PreferenceCenter.getPreferences(config: preferenceCenterConfig)
+                    return preferences
+                } catch {
+                    Logger.error("Failed to get preferences: \(error)")
+                    throw error
                 }
+            } else {
+                Logger.error("Preference Center Config is not available.")
+                throw PreferenceCenter.Error.configurationIsMissing
             }
         }
+        throw NetworkError.requestFailed //TODO: change
+//        return try await withCheckedThrowingContinuation { continuation in
+//            container.resolve { serviceLocator in
+//                Task {
+//                    do {
+//
+//                        let preferences = try await serviceLocator.preferenceCenter().getPreferences(
+//                            brandGroupId: brandGroupId
+//                        )
+//                        continuation.resume(returning: preferences)
+//                    } catch {
+//                        continuation.resume(throwing: error)
+//                    }
+//                }
+//            }
+//        }
     }
 
-
     @available(iOS 13.0, *)
-    @objc static func getPreferences(brandGroupId: String) async throws -> Preferences {
-        do {
-            return try await shared.getPreferences(brandGroupId: brandGroupId)
-        } catch {
-            print(error)
-            throw NetworkError.noData
-        }
+    static func getPreferences() async throws -> Preferences {
+        return try await shared.getPreferences()
     }
 
     @available(iOS 13.0, *)
-    func setPreferences(for customerId: String, brandGroupId: String, _ preferenceUpdates: [PreferenceUpdate]) async throws -> Preferences {
+    @objc static func getPreferences() async throws -> PreferencesObjc {
+        return try PreferencesObjc(preferences: await shared.getPreferences())
+    }
 
-        return try await withCheckedThrowingContinuation { continuation in
-            container.resolve { serviceLocator in
-                Task {
-                    do {
-                        let updatedPreferences = try await serviceLocator.preferenceCenter().setPreferences(
-                            for: customerId,
-                            brandGroupId: brandGroupId,
-                            updates: preferenceUpdates
-                        )
-                        continuation.resume(returning: updatedPreferences)
-                    } catch {
-                        continuation.resume(throwing: error)
-                    }
+    @available(iOS 13.0, *)
+    private func setPreferences(_ preferenceUpdates: [PreferenceUpdateRequest]) async throws -> Preferences {
+
+        if config.isPreferenceCenterConfigured() {
+            if let preferenceCenterConfig = config.preferenceCenterConfig {
+                do {
+                    let preferences = try await PreferenceCenter.setPreferences(config: preferenceCenterConfig, updates: preferenceUpdates)
+                    return preferences
+                } catch {
+                    Logger.error("Failed to set preferences: \(error)")
+                    throw error
                 }
+            } else {
+                Logger.error("Preference Center Config is not available.")
+                throw PreferenceCenter.Error.configurationIsMissing
             }
         }
+
+        throw NetworkError.requestFailed
+
+//        return try await withCheckedThrowingContinuation { continuation in
+//            container.resolve { serviceLocator in
+//                Task {
+//                    do {
+//
+//                        let updatedPreferences = try await serviceLocator.preferenceCenter().setPreferences(
+//                            for: customerId,
+//                            brandGroupId: brandGroupId,
+//                            updates: preferenceUpdates
+//                        )
+//                        continuation.resume(returning: updatedPreferences)
+//                    } catch {
+//                        continuation.resume(throwing: error)
+//                    }
+//                }
+//            }
+//        }
     }
 
     @available(iOS 13.0, *)
-    @objc static func setPreferences(for customerId: String, brandGroupId: String, updatedTopics preferenceUpdates: [PreferenceUpdate]) async throws -> Preferences {
-        do {
-            return try await shared.setPreferences(for: customerId, brandGroupId: brandGroupId, preferenceUpdates)
-        } catch {
-            print(error)
-            throw NetworkError.requestFailed
-        }
+    static func setPreferences(updatedTopics preferenceUpdates: [PreferenceUpdateRequest]) async throws -> Preferences {
+        return try await shared.setPreferences( preferenceUpdates)
+    }
+
+    @available(iOS 13.0, *)
+    @objc static func setPreferences(updatedTopics preferenceUpdates: [PreferenceUpdateRequestObjc]) async throws -> PreferencesObjc {
+        return try PreferencesObjc(
+            preferences: await shared.setPreferences(
+                preferenceUpdates.map { $0.preferenceUpdateRequest }
+            )
+        )
     }
 }
 

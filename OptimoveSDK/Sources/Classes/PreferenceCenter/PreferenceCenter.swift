@@ -6,41 +6,76 @@ enum TenantIDError: Error {
 }
 
 @available(iOS 13.0, *)
-class PreferenceCenter {
-    private var networkClient: NetworkClient
-    private var storage: KeyValueStorage
+public class PreferenceCenter {
+    enum Error: LocalizedError {
+        case alreadyInitialized
+        case configurationIsMissing
 
-    init(storage: KeyValueStorage, networkClient: NetworkClient) {
+        var errorDescription: String? {
+            switch self {
+            case .alreadyInitialized:
+                return "The OptimobileSDK has already been initialized."
+            case .configurationIsMissing:
+                return "OptimobileConfig is missing."
+            }
+        }
+    }
+
+    fileprivate static var instance: PreferenceCenter?
+    private(set) var config: PreferenceCenterConfig?
+
+    private  var networkClient: NetworkClient?
+    private var storage: OptimoveStorage
+
+    static var isSdkRunning: Bool {
+        return PreferenceCenter.instance?.config != nil
+    }
+
+    static func initialize(config optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient ) throws {
+        if instance !== nil,
+           optimoveConfig.features.contains(.delayedConfiguration)
+        {
+            try completeDelayedConfiguration(config: optimoveConfig.preferenceCenterConfig!)
+            return
+        }
+
+        guard instance == nil else {
+            assertionFailure(Error.alreadyInitialized.localizedDescription)
+            throw Error.alreadyInitialized
+        }
+
+
+        guard let config = optimoveConfig.preferenceCenterConfig else {
+            throw Error.configurationIsMissing
+        }
+
+        instance = PreferenceCenter(config: config, storage: storage, networkClient: networkClient)
+    }
+
+
+    private init(config: PreferenceCenterConfig, storage: OptimoveStorage, networkClient: NetworkClient) {
+        self.config = config
         self.networkClient = networkClient
         self.storage = storage
+
+        Logger.debug("Preference center SDK was initialized with \(config)")
     }
 
-    private func getTenantId() throws -> String {
+    static func completeDelayedConfiguration(config: PreferenceCenterConfig) throws {
+        //Question: Do i need to do anything here for this?
+        Logger.info("complete Delayed Configuration")
+    }
+
+    static func getPreferences(config: PreferenceCenterConfig) async throws -> Preferences {
+        //Q: How do I actually use the config, I know I shouldn't be passing it as an arg, but it doesn't let me use it, same with storage.
         do {
-            guard let tenantId: Int = storage[.tenantID] else {
-                throw StorageError.noValue(.tenantID)
-            }
+            let region = "dev" //TODO: Use config
+            let customerId = "daniela-customer"
+            // let customerId = try storage.getCustomerID() // Q: why can't I use storage?
 
-            return String(tenantId)
-        } catch {
-            throw TenantIDError.conversionFailed
-        }
-    }
-
-    private func getCustomerId() throws -> String {
-        guard let customerId: String = storage[.customerID] else {
-            throw StorageError.noValue(.customerID)
-        }
-
-        return String(customerId)
-    }
-
-    func getPreferences(brandGroupId: String) async throws -> Preferences {
-        do {
-            // TODO: resolve region business
-            let region = "dev"
-            let tenantId = try getTenantId()
-            let customerId = try getCustomerId()
+            let brandGroupId = config.brandGroupId
+            let tenantId = config.tenantId.description
+            let networkClient = NetworkClientImpl()
 
             let request = NetworkRequest(
                 method: .get,
@@ -50,32 +85,30 @@ class PreferenceCenter {
                     HTTPHeader(field: .accept, value: .textplain),
                     HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
                 ],
-                queryItems:[
+                queryItems: [
                     URLQueryItem(name: "customerId", value: customerId),
                     URLQueryItem(name: "brandGroupId", value: brandGroupId)
                 ]
             )
 
-
             let data: Data = try cast(await networkClient.performAsync(request))
-            let preferences = try JSONDecoder().decode(Preferences.self, from: data)
-
-            return preferences
+            return try JSONDecoder().decode(Preferences.self, from: data)
         }
         catch {
-            print("Failed to create network request: \(error)")
+            throw NetworkError.requestFailed
         }
-
-        throw NetworkError.requestFailed
     }
 
+      static func setPreferences(config: PreferenceCenterConfig, updates preferenceUpdates: [PreferenceUpdateRequest]) async throws -> Preferences {
+         do {
+            
+             let region = "dev" //TODO: Use config
+             let customerId = "daniela-customer"
+             // let customerId = try storage.getCustomerID() // Q: why can't I use storage?
 
-    func setPreferences(for customerId: String, brandGroupId: String, updates preferenceUpdates : [PreferenceUpdate]) async throws -> Preferences {
-        do {
-            // TODO: resolve region business
-            let region = "dev-pb"
-            let customerId = try getCustomerId()
-            let tenantId = try getTenantId()
+             let brandGroupId = config.brandGroupId
+             let tenantId = config.tenantId.description
+             let networkClient = NetworkClientImpl()
 
             let request = try NetworkRequest(
                 method: .put,
@@ -85,12 +118,13 @@ class PreferenceCenter {
                     HTTPHeader(field: .accept, value: .textplain),
                     HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
                 ],
-                queryItems:[
+                queryItems: [
                     URLQueryItem(name: "customerId", value: customerId),
                     URLQueryItem(name: "brandGroupId", value: brandGroupId)
                 ],
                 body: preferenceUpdates
             )
+
 
             let data: Data = try cast(await networkClient.performAsync(request))
             let preferences = try JSONDecoder().decode(Preferences.self, from: data)
@@ -98,9 +132,7 @@ class PreferenceCenter {
             return preferences
         }
         catch {
-            print("Failed to create network request: \(error)")
             throw NetworkError.requestFailed
         }
     }
-
 }

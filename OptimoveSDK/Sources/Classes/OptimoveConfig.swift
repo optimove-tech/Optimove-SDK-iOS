@@ -13,12 +13,16 @@ public struct Feature: OptionSet, @unchecked Sendable, CustomStringConvertible {
     public static let optimobile = Feature(rawValue: 1 << 1)
     /// Optimove feature.
     public static let optimove = Feature(rawValue: 1 << 2)
+    /// Preference center feature.
+    public static let preferenceCenter = Feature(rawValue: 1 << 4)
     static let delayedConfiguration = Feature(rawValue: 1 << 3)
 
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }
 
+
+    //Question: Is this the way to go? I believe it's what Android sdk does
     public var description: String {
         var descriptions: [String] = []
         if contains(.optimobile) {
@@ -30,6 +34,9 @@ public struct Feature: OptionSet, @unchecked Sendable, CustomStringConvertible {
         if contains(.delayedConfiguration) {
             descriptions.append("Delayed Configuration")
         }
+        if contains(.preferenceCenter) {
+            descriptions.append("Preference Center")
+        }
 
         return descriptions.isEmpty ? "No Features" : descriptions.joined(separator: ", ")
     }
@@ -39,12 +46,17 @@ public struct OptimoveConfig {
     let features: Feature
     let tenantInfo: OptimoveTenantInfo?
     let optimobileConfig: OptimobileConfig?
+    let preferenceCenterConfig: PreferenceCenterConfig?
 
     func isOptimoveConfigured() -> Bool {
         return features.contains(.optimove)
     }
 
     func isOptimobileConfigured() -> Bool {
+        return features.contains(.optimobile)
+    }
+    
+    func isPreferenceCenterConfigured() -> Bool {
         return features.contains(.optimobile)
     }
 }
@@ -105,10 +117,13 @@ open class OptimoveConfigBuilder: NSObject {
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
+    private var environment: String?
+    private var tenantId: Int?
+    private var brandGroupId: String?
 
-    public convenience init(optimoveCredentials: String?, optimobileCredentials: String?) {
+    public convenience init(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
         self.init()
-        setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+        setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: preferenceCenterCredentials)
     }
 
     /// Intent to use for intialization for delayed configuration.
@@ -153,7 +168,7 @@ open class OptimoveConfigBuilder: NSObject {
         super.init()
     }
 
-    @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
+    @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) -> OptimoveConfigBuilder {
         if optimoveCredentials == nil, optimoveCredentials == nil {
             assertionFailure("Should provide at least optimove or optimobile credentials")
         }
@@ -173,6 +188,17 @@ open class OptimoveConfigBuilder: NSObject {
                 features.insert(.optimobile)
                 credentials = args.credentials
                 region = args.region
+            }
+        } catch {
+            Logger.error(error.localizedDescription)
+        }    
+        do {
+            if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
+                let args = try PreferenceCenterArguments(base64: preferenceCenterCredentials)
+                features.insert(.preferenceCenter)
+                environment = args.environment
+                tenantId = args.tenantId
+                brandGroupId = args.brandGroupId
             }
         } catch {
             Logger.error(error.localizedDescription)
@@ -261,7 +287,7 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func build() -> OptimoveConfig {
-        if features.intersection([.optimove, .optimobile]).isEmpty {
+        if features.intersection([.optimove, .optimobile, .preferenceCenter]).isEmpty {
             Logger.error("No features enabled. Please enable at least one feature.")
         }
 
@@ -299,12 +325,33 @@ open class OptimoveConfigBuilder: NSObject {
             }
             Logger.info("\(OptimobileConfig.self) building skipped.")
             return nil
+        }()    
+
+        let preferenceCenterConfig: PreferenceCenterConfig? = {
+            if features.contains(.preferenceCenter) {
+                if let environment = environment,
+                    let tenantId = tenantId,
+                    let brandGroupId = brandGroupId {
+                    return PreferenceCenterConfig(
+                        region: environment,
+                        tenantId: tenantId,
+                        brandGroupId: brandGroupId
+                    )
+                } else {
+                    Logger.info("Missing required values for \(PreferenceCenterConfig.self).")
+                }
+            } else {
+                Logger.info("\(PreferenceCenterConfig.self) building skipped.")
+            }
+            return nil
         }()
+
 
         return OptimoveConfig(
             features: features,
             tenantInfo: tenantInfo,
-            optimobileConfig: optimobileConfig
+            optimobileConfig: optimobileConfig,
+            preferenceCenterConfig: preferenceCenterConfig
         )
     }
 }
@@ -425,5 +472,52 @@ struct OptimobileArguments: Decodable {
 
         region = try OptimobileConfig.Region(string: regionString)
         credentials = OptimobileCredentials(apiKey: apiKey, secretKey: secretKey)
+    }
+}
+
+struct PreferenceCenterArguments: Decodable {
+    enum Error: Foundation.LocalizedError {
+        case emptyBase64
+        case failedDecodingBase64(String)
+
+        var errorDescription: String? {
+            switch self {
+            case .emptyBase64:
+                return "The base64 string is empty"
+            case let .failedDecodingBase64(string):
+                return "Failed on decoding base64 the value \(string)"
+            }
+        }
+    }
+
+    let version: String
+    let environment: String //TODO: Change this to enum
+    let tenantId: Int
+    var brandGroupId: String
+
+    enum CodingKeys: String, CodingKey {
+        case version
+        case environment
+        case tenantId
+        case brandGroupId
+    }
+
+    init(base64: String) throws {
+        guard !base64.isEmpty else {
+            throw Error.emptyBase64
+        }
+        guard let data = Data(base64Encoded: base64) else {
+            throw Error.failedDecodingBase64(base64)
+        }
+        self = try JSONDecoder().decode(PreferenceCenterArguments.self, from: data)
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+
+        version = try container.decode(String.self)
+        environment = try container.decode(String.self)
+        tenantId = try container.decode(Int.self)
+        brandGroupId = try container.decode(String.self)
     }
 }
