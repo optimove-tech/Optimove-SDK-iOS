@@ -67,7 +67,7 @@ typealias Logger = OptimoveCore.Logger
         if config.isPreferenceCenterConfigured() {
             shared.container.resolve { serviceLocator in
                 do {
-                    try PreferenceCenter.initialize(config: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
+                    try OptimovePreferenceCenter.initialize(config: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
                 } catch {
                     throw GuardError.custom("Failed on PreferenceCenter initialization. Reason: \(error.localizedDescription)")
                 }
@@ -96,7 +96,7 @@ typealias Logger = OptimoveCore.Logger
         case .optimove:
             return RunningFlagsIndication.isSdkRunning
         case .preferenceCenter:
-            return PreferenceCenter.isSdkRunning   
+            return OptimovePreferenceCenter.isSdkRunning   
         default:
             return false
         }
@@ -416,13 +416,6 @@ public extension Optimove {
     @objc func trackEddystoneBeaconProximity(hexNamespace: String, hexInstance: String, distanceMeters: NSNumber? = nil) {
         Optimobile.trackEddystoneBeaconProximity(hexNamespace: hexNamespace, hexInstance: hexInstance, distanceMeters: distanceMeters?.doubleValue)
     }
-}
-
-// MARK: - Preference Center
-
-@available(iOS 13.0, *)
-public extension Optimove {
-    typealias PreferenceCenter = PreferenceCenterNamespace.PreferenceCenter
 }
 
 // MARK: - Private
