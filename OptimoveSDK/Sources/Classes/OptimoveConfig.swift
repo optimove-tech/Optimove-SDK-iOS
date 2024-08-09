@@ -21,8 +21,6 @@ public struct Feature: OptionSet, @unchecked Sendable, CustomStringConvertible {
         self.rawValue = rawValue
     }
 
-
-    //Question: Is this the way to go? I believe it's what Android sdk does
     public var description: String {
         var descriptions: [String] = []
         if contains(.optimobile) {

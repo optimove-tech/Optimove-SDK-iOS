@@ -145,103 +145,6 @@ public extension Optimove {
     @objc static func reportEvent(_ event: OptimoveEvent) {
         shared.reportEvent(event)
     }
-
-    @available(iOS 13.0, *)
-    private func getPreferences() async throws -> Preferences {
-        if config.isPreferenceCenterConfigured() {
-            if let preferenceCenterConfig = config.preferenceCenterConfig {
-                do {
-                    let preferences = try await PreferenceCenter.getPreferences(config: preferenceCenterConfig)
-                    return preferences
-                } catch {
-                    Logger.error("Failed to get preferences: \(error)")
-                    throw error
-                }
-            } else {
-                Logger.error("Preference Center Config is not available.")
-                throw PreferenceCenter.Error.configurationIsMissing
-            }
-        }
-        throw NetworkError.requestFailed //TODO: change
-//        return try await withCheckedThrowingContinuation { continuation in
-//            container.resolve { serviceLocator in
-//                Task {
-//                    do {
-//
-//                        let preferences = try await serviceLocator.preferenceCenter().getPreferences(
-//                            brandGroupId: brandGroupId
-//                        )
-//                        continuation.resume(returning: preferences)
-//                    } catch {
-//                        continuation.resume(throwing: error)
-//                    }
-//                }
-//            }
-//        }
-    }
-
-    @available(iOS 13.0, *)
-    static func getPreferences() async throws -> Preferences {
-        return try await shared.getPreferences()
-    }
-
-    @available(iOS 13.0, *)
-    @objc static func getPreferences() async throws -> PreferencesObjc {
-        return try PreferencesObjc(preferences: await shared.getPreferences())
-    }
-
-    @available(iOS 13.0, *)
-    private func setPreferences(_ preferenceUpdates: [PreferenceUpdateRequest]) async throws -> Preferences {
-
-        if config.isPreferenceCenterConfigured() {
-            if let preferenceCenterConfig = config.preferenceCenterConfig {
-                do {
-                    let preferences = try await PreferenceCenter.setPreferences(config: preferenceCenterConfig, updates: preferenceUpdates)
-                    return preferences
-                } catch {
-                    Logger.error("Failed to set preferences: \(error)")
-                    throw error
-                }
-            } else {
-                Logger.error("Preference Center Config is not available.")
-                throw PreferenceCenter.Error.configurationIsMissing
-            }
-        }
-
-        throw NetworkError.requestFailed
-
-//        return try await withCheckedThrowingContinuation { continuation in
-//            container.resolve { serviceLocator in
-//                Task {
-//                    do {
-//
-//                        let updatedPreferences = try await serviceLocator.preferenceCenter().setPreferences(
-//                            for: customerId,
-//                            brandGroupId: brandGroupId,
-//                            updates: preferenceUpdates
-//                        )
-//                        continuation.resume(returning: updatedPreferences)
-//                    } catch {
-//                        continuation.resume(throwing: error)
-//                    }
-//                }
-//            }
-//        }
-    }
-
-    @available(iOS 13.0, *)
-    static func setPreferences(updatedTopics preferenceUpdates: [PreferenceUpdateRequest]) async throws -> Preferences {
-        return try await shared.setPreferences( preferenceUpdates)
-    }
-
-    @available(iOS 13.0, *)
-    @objc static func setPreferences(updatedTopics preferenceUpdates: [PreferenceUpdateRequestObjc]) async throws -> PreferencesObjc {
-        return try PreferencesObjc(
-            preferences: await shared.setPreferences(
-                preferenceUpdates.map { $0.preferenceUpdateRequest }
-            )
-        )
-    }
 }
 
 // MARK: - ScreenVisit API call
@@ -513,6 +416,13 @@ public extension Optimove {
     @objc func trackEddystoneBeaconProximity(hexNamespace: String, hexInstance: String, distanceMeters: NSNumber? = nil) {
         Optimobile.trackEddystoneBeaconProximity(hexNamespace: hexNamespace, hexInstance: hexInstance, distanceMeters: distanceMeters?.doubleValue)
     }
+}
+
+// MARK: - Preference Center
+
+@available(iOS 13.0, *)
+public extension Optimove {
+    typealias PreferenceCenter = PreferenceCenterNamespace.PreferenceCenter
 }
 
 // MARK: - Private
