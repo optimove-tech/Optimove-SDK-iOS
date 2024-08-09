@@ -119,7 +119,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var tenantId: Int?
     private var brandGroupId: String?
 
-    public convenience init(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
+    public convenience init(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String? = nil) {
         self.init()
         setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: preferenceCenterCredentials)
     }
