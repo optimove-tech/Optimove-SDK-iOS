@@ -41,7 +41,7 @@ public class OptimovePreferenceCenter {
         }
         return instance
     }
-    
+
     static func initialize(config optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
         guard instance == nil else {
             throw Error.alreadyInitialized
@@ -91,24 +91,36 @@ public class OptimovePreferenceCenter {
         return try JSONDecoder().decode(Preferences.self, from: data)
     }
 
-    private func createGetPreferencesRequest(customerId: String) -> NetworkRequest {
-        let region = config?.region ?? ""
-        let brandGroupId = config?.brandGroupId ?? ""
-        let tenantId = config?.tenantId.description ?? ""
+    private func getConfigValues() throws -> (region: String, brandGroupId: String, tenantId: String) {
+        guard let config = config else {
+            throw Error.configurationIsMissing
+        }
+        let region = config.region
+        let brandGroupId = config.brandGroupId
+        let tenantId = config.tenantId.description
+        return (region, brandGroupId, tenantId)
+    }
 
-        return NetworkRequest(
-            method: .get,
-            baseURL: URL(string: "https://preference-center-\(region).optimove.net")!,
-            path: "/api/v1/preferences",
-            headers: [
-                HTTPHeader(field: .accept, value: .textplain),
-                HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
-            ],
-            queryItems: [
-                URLQueryItem(name: "customerId", value: customerId),
-                URLQueryItem(name: "brandGroupId", value: brandGroupId)
-            ]
-        )
+    private func createGetPreferencesRequest(customerId: String) -> NetworkRequest {
+        do {
+            let (region, brandGroupId, tenantId) = try getConfigValues()
+
+            return NetworkRequest(
+                method: .get,
+                baseURL: URL(string: "https://preference-center-\(region).optimove.net")!,
+                path: "/api/v1/preferences",
+                headers: [
+                    HTTPHeader(field: .accept, value: .textplain),
+                    HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
+                ],
+                queryItems: [
+                    URLQueryItem(name: "customerId", value: customerId),
+                    URLQueryItem(name: "brandGroupId", value: brandGroupId)
+                ]
+            )
+        } catch {
+            fatalError("Configuration is missing. This should never happen if the SDK is initialized properly.")
+        }
     }
 
     public func setPreferencesAsync(updates: [PreferenceUpdateRequest], completion: @escaping PreferencesSetHandler) {
@@ -139,9 +151,7 @@ public class OptimovePreferenceCenter {
     }
 
     private func createSetPreferencesRequest(customerId: String, updates: [PreferenceUpdateRequest]) throws -> NetworkRequest {
-        let region = config?.region ?? ""
-        let brandGroupId = config?.brandGroupId ?? ""
-        let tenantId = config?.tenantId.description ?? ""
+        let (region, brandGroupId, tenantId) = try getConfigValues()
 
         return try NetworkRequest(
             method: .put,
