@@ -63,7 +63,13 @@ public class OptimovePreferenceCenter {
     }
 
     public func getPreferencesAsync(completion: @escaping PreferencesGetHandler) {
-        guard let customerId = try? storage?.getCustomerID() else {
+        guard let customerId = try? storage?.getCustomerID(), let visitorId = try? storage?.getVisitorID() else {
+            completion(.errorUserNotSet, nil)
+            return
+        }
+
+        if customerId == visitorId {
+            Logger.warn("Customer ID is not set")
             completion(.errorUserNotSet, nil)
             return
         }
@@ -124,7 +130,13 @@ public class OptimovePreferenceCenter {
     }
 
     public func setPreferencesAsync(updates: [PreferenceUpdateRequest], completion: @escaping PreferencesSetHandler) {
-        guard let customerId = try? storage?.getCustomerID() else {
+        guard let customerId = try? storage?.getCustomerID(), let visitorId = try? storage?.getVisitorID() else {
+            completion(.errorUserNotSet)
+            return
+        }
+
+        if customerId == visitorId {
+            Logger.warn("Customer ID is not set")
             completion(.errorUserNotSet)
             return
         }
