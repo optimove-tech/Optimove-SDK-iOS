@@ -116,9 +116,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
-    private var environment: String?
-    private var tenantId: Int?
-    private var brandGroupId: String?
+    private var preferenceCenterConfig: PreferenceCenterConfig?
 
     public convenience init(optimoveCredentials: String?, optimobileCredentials: String?) {
         self.init()
@@ -206,9 +204,8 @@ open class OptimoveConfigBuilder: NSObject {
                 self.preferenceCenterCredentials = preferenceCenterCredentials
                 let args = try PreferenceCenterArguments(base64: preferenceCenterCredentials)
                 features.insert(.preferenceCenter)
-                environment = args.environment
-                tenantId = args.tenantId
-                brandGroupId = args.brandGroupId
+
+                self.preferenceCenterConfig = PreferenceCenterConfig(region: args.region, tenantId: args.tenantId, brandGroupId: args.brandGroupId)
             }
         } catch {
             Logger.error(error.localizedDescription)
@@ -375,7 +372,7 @@ open class OptimoveConfigBuilder: NSObject {
                 let args = try PreferenceCenterArguments(base64: credentials)
 
                 return PreferenceCenterConfig(
-                    region: args.environment,
+                    region: args.region,
                     tenantId: args.tenantId,
                     brandGroupId: args.brandGroupId
                 )
@@ -527,7 +524,7 @@ struct PreferenceCenterArguments: Decodable {
     }
 
     let version: String
-    let environment: String //TODO: Change this to enum
+    let region: String
     let tenantId: Int
     let brandGroupId: String
 
@@ -552,7 +549,7 @@ struct PreferenceCenterArguments: Decodable {
         var container = try decoder.unkeyedContainer()
 
         version = try container.decode(String.self)
-        environment = try container.decode(String.self)
+        region = try container.decode(String.self)
         tenantId = try container.decode(Int.self)
         brandGroupId = try container.decode(String.self)
     }
