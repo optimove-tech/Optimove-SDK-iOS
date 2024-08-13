@@ -83,7 +83,7 @@ typealias Logger = OptimoveCore.Logger
             return
         }
         let builder = OptimoveConfigBuilder(from: currentConfig)
-        builder.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: preferenceCenterCredentials)
+        builder.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
         let config = builder.build()
         initialize(with: config)
     }

@@ -55,7 +55,7 @@ public struct OptimoveConfig {
     }
     
     func isPreferenceCenterConfigured() -> Bool {
-        return features.contains(.optimobile)
+        return features.contains(.preferenceCenter)
     }
 }
 
@@ -99,6 +99,7 @@ public typealias Region = OptimobileConfig.Region
 
 open class OptimoveConfigBuilder: NSObject {
     private var credentials: OptimobileCredentials?
+    private var preferenceCenterCredentials: String?
     public private(set) var features: Feature
     var region: OptimobileConfig.Region?
     var urlBuilder: UrlBuilder
@@ -119,9 +120,9 @@ open class OptimoveConfigBuilder: NSObject {
     private var tenantId: Int?
     private var brandGroupId: String?
 
-    public convenience init(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String? = nil) {
+    public convenience init(optimoveCredentials: String?, optimobileCredentials: String?) {
         self.init()
-        setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: preferenceCenterCredentials)
+        setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
     }
 
     /// Intent to use for intialization for delayed configuration.
@@ -166,10 +167,11 @@ open class OptimoveConfigBuilder: NSObject {
         super.init()
     }
 
-    @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) -> OptimoveConfigBuilder {
+    @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
         if optimoveCredentials == nil, optimoveCredentials == nil {
             assertionFailure("Should provide at least optimove or optimobile credentials")
         }
+
         do {
             if let optimoveCredentials = optimoveCredentials, !optimoveCredentials.isEmpty {
                 let args = try OptimoveArguments(base64: optimoveCredentials)
@@ -180,23 +182,13 @@ open class OptimoveConfigBuilder: NSObject {
         } catch {
             Logger.error(error.localizedDescription)
         }
+
         do {
             if let optimobileCredentials = optimobileCredentials, !optimobileCredentials.isEmpty {
                 let args = try OptimobileArguments(base64: optimobileCredentials)
                 features.insert(.optimobile)
                 credentials = args.credentials
                 region = args.region
-            }
-        } catch {
-            Logger.error(error.localizedDescription)
-        }    
-        do {
-            if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
-                let args = try PreferenceCenterArguments(base64: preferenceCenterCredentials)
-                features.insert(.preferenceCenter)
-                environment = args.environment
-                tenantId = args.tenantId
-                brandGroupId = args.brandGroupId
             }
         } catch {
             Logger.error(error.localizedDescription)
@@ -248,6 +240,14 @@ open class OptimoveConfigBuilder: NSObject {
         return self
     }
 
+    @discardableResult public func enablePreferenceCenter(credentials: String) -> OptimoveConfigBuilder
+    {
+        features.insert(.preferenceCenter)
+        preferenceCenterCredentials = credentials
+      
+        return self
+    }
+
     /**
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
      */
@@ -282,6 +282,10 @@ open class OptimoveConfigBuilder: NSObject {
         urlBuilder.runtimeUrlsMap = baseUrlMap
 
         return self
+    }
+
+    enum PreferenceCenterError: Error {
+        case invalidCredentials(message: String)
     }
 
     @discardableResult public func build() -> OptimoveConfig {
@@ -325,25 +329,7 @@ open class OptimoveConfigBuilder: NSObject {
             return nil
         }()    
 
-        let preferenceCenterConfig: PreferenceCenterConfig? = {
-            if features.contains(.preferenceCenter) {
-                if let environment = environment,
-                    let tenantId = tenantId,
-                    let brandGroupId = brandGroupId {
-                    return PreferenceCenterConfig(
-                        region: environment,
-                        tenantId: tenantId,
-                        brandGroupId: brandGroupId
-                    )
-                } else {
-                    Logger.info("Missing required values for \(PreferenceCenterConfig.self).")
-                }
-            } else {
-                Logger.info("\(PreferenceCenterConfig.self) building skipped.")
-            }
-            return nil
-        }()
-
+        let preferenceCenterConfig: PreferenceCenterConfig? = getPreferenceCenterConfig()
 
         return OptimoveConfig(
             features: features,
@@ -352,7 +338,39 @@ open class OptimoveConfigBuilder: NSObject {
             preferenceCenterConfig: preferenceCenterConfig
         )
     }
-}
+
+    private func getPreferenceCenterConfig() -> PreferenceCenterConfig? {
+            //I see Android throws, but here we don't (I don't see throw in the build methods at all), should I be adding it? 
+            if (!features.contains(.preferenceCenter)) {
+                Logger.error("Cannot set credentials for preference center as it is not in the desired feature set")
+                return nil
+            }
+
+            guard let credentials = self.preferenceCenterCredentials else {
+                Logger.error("Could not find preference center credentials")
+                return nil
+            }
+
+            do {
+                let args = try PreferenceCenterArguments(base64: credentials)
+
+                return PreferenceCenterConfig(
+                    region: args.environment,
+                    tenantId: args.tenantId,
+                    brandGroupId: args.brandGroupId
+                )
+
+            } catch {
+                //I see Android throws, but here we don't (I don't see throw in the build methods at all), should I be adding it?
+                Logger.error("Preference center credentials are not correct")
+                Logger.error(error.localizedDescription)
+            }
+
+            Logger.info("\(PreferenceCenterConfig.self) building skipped.")
+            return nil
+        }
+    }
+
 
 public extension OptimobileConfig {
     enum Region: String, CaseIterable, Codable {
