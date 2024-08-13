@@ -67,6 +67,7 @@ typealias Logger = OptimoveCore.Logger
         if config.isPreferenceCenterConfigured() {
             shared.container.resolve { serviceLocator in
                 do {
+                    //todo: what do i do about storage :o seems to only work when optimove is configured
                     try OptimovePreferenceCenter.initialize(config: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
                 } catch {
                     throw GuardError.custom("Failed on PreferenceCenter initialization. Reason: \(error.localizedDescription)")
@@ -77,15 +78,27 @@ typealias Logger = OptimoveCore.Logger
 
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
     @available(iOS 13.0, *)
-    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
+    private static func setCredentialsInternal(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
         guard let currentConfig = shared.config else {
             Logger.error("Optimove SDK is not configured yet. Please call Optimove.initialize(with:) first.")
             return
         }
+
         let builder = OptimoveConfigBuilder(from: currentConfig)
-        builder.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+        builder.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: preferenceCenterCredentials)
+
         let config = builder.build()
         initialize(with: config)
+    }
+   
+    @available(iOS 13.0, *)
+    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
+        setCredentialsInternal(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: nil)
+    }
+
+    @available(iOS 13.0, *)
+    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
+        setCredentialsInternal(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: preferenceCenterCredentials)
     }
 
     @available(iOS 13.0, *)

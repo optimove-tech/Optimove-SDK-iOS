@@ -195,6 +195,26 @@ open class OptimoveConfigBuilder: NSObject {
         }
 
         return self
+    } 
+
+    @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) -> OptimoveConfigBuilder {
+
+        setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+
+        do {
+            if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
+                self.preferenceCenterCredentials = preferenceCenterCredentials
+                let args = try PreferenceCenterArguments(base64: preferenceCenterCredentials)
+                features.insert(.preferenceCenter)
+                environment = args.environment
+                tenantId = args.tenantId
+                brandGroupId = args.brandGroupId
+            }
+        } catch {
+            Logger.error(error.localizedDescription)
+        }
+
+        return self
     }
 
     @discardableResult public func setFeatures(_ features: Feature) -> OptimoveConfigBuilder {
