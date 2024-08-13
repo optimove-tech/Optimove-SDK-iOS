@@ -65,9 +65,13 @@ typealias Logger = OptimoveCore.Logger
         }   
 
         if config.isPreferenceCenterConfigured() {
+            if !config.isOptimoveConfigured() {
+                Logger.error("Preference center requires optimove credentials");
+                return
+            }
+
             shared.container.resolve { serviceLocator in
                 do {
-                    //todo: what do i do about storage :o seems to only work when optimove is configured
                     try OptimovePreferenceCenter.initialize(config: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
                 } catch {
                     throw GuardError.custom("Failed on PreferenceCenter initialization. Reason: \(error.localizedDescription)")
