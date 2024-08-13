@@ -2,10 +2,15 @@ import Foundation
 
 public struct PreferenceUpdateRequest: Codable {
     public let topicId: String
-    public let channelSubscription: [Channel]
+    public let subscribedChannels: [Channel]
 
-    public init(topicId: String, channelSubscription: [Channel]) {
+    public init(topicId: String, subscribedChannels: [Channel]) {
         self.topicId = topicId
-        self.channelSubscription = channelSubscription
+        self.subscribedChannels = subscribedChannels
+
+        enum CodingKeys: String, CodingKey {
+            case topicId = "topicId"
+            case subscribedChannels = "channelSubscription"
+        }
     }
 }

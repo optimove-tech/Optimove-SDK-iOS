@@ -205,7 +205,11 @@ open class OptimoveConfigBuilder: NSObject {
                 let args = try PreferenceCenterArguments(base64: preferenceCenterCredentials)
                 features.insert(.preferenceCenter)
 
-                self.preferenceCenterConfig = PreferenceCenterConfig(region: args.region, tenantId: args.tenantId, brandGroupId: args.brandGroupId)
+                self.preferenceCenterConfig = PreferenceCenterConfig(
+                    region: args.region,
+                    tenantId: args.tenantId,
+                    brandGroupId: args.brandGroupId
+                )
             }
         } catch {
             Logger.error(error.localizedDescription)
