@@ -64,6 +64,7 @@ public class OptimovePreferenceCenter {
 
     public func getPreferencesAsync(completion: @escaping PreferencesGetHandler) {
         guard let customerId = try? storage?.getCustomerID(), let visitorId = try? storage?.getVisitorID() else {
+            Logger.warn("Customer ID is not set")
             completion(.errorUserNotSet, nil)
             return
         }
@@ -89,7 +90,10 @@ public class OptimovePreferenceCenter {
     }
 
     private func fetchPreferences(customerId: String) async throws -> Preferences {
-        guard config != nil else { throw Error.configurationIsMissing }
+        guard config != nil else {
+            Logger.error("Could not fetch preferences. Configuration is missing.")
+            throw Error.configurationIsMissing
+        }
 
         let request = createGetPreferencesRequest(customerId: customerId)
         let data = try await networkClient?.performAsync(request) ?? Data()
@@ -156,7 +160,10 @@ public class OptimovePreferenceCenter {
     }
 
     private func sendPreferences(customerId: String, updates: [PreferenceUpdateRequest]) async throws {
-        guard config != nil else { throw Error.configurationIsMissing }
+        guard config != nil else {
+            Logger.error("Could not update preferences. Configuration is missing.")
+            throw Error.configurationIsMissing
+        }
 
         let request = try createSetPreferencesRequest(customerId: customerId, updates: updates)
         _ = try await networkClient?.performAsync(request)
