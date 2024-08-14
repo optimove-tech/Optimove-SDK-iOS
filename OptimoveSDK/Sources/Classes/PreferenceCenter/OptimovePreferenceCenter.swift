@@ -120,7 +120,7 @@ public class OptimovePreferenceCenter {
     }
 
 
-    public func setPreferencesAsync(updates: [PreferenceUpdateRequest], completion: @escaping PreferencesSetHandler) {
+    public func setPreferencesAsync(updates: [PreferenceUpdate], completion: @escaping PreferencesSetHandler) {
         guard
             let customerId = try? storage?.getCustomerID(),
             let visitorId = try? storage?.getVisitorID(),
@@ -155,7 +155,7 @@ public class OptimovePreferenceCenter {
     private func createSetPreferencesRequest(
         for customerId: String,
         with config: PreferenceCenterConfig,
-        updates: [PreferenceUpdateRequest]) throws -> NetworkRequest {
+        updates: [PreferenceUpdate]) throws -> NetworkRequest {
         let (region, brandGroupId, tenantId) = try getConfigValues(from: config)
 
         return try NetworkRequest(

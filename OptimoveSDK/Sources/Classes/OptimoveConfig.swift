@@ -168,7 +168,7 @@ open class OptimoveConfigBuilder: NSObject {
         super.init()
     }
 
-    @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
+    @discardableResult func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
         if optimoveCredentials == nil, optimoveCredentials == nil {
             assertionFailure("Should provide at least optimove or optimobile credentials")
         }
@@ -198,7 +198,7 @@ open class OptimoveConfigBuilder: NSObject {
         return self
     } 
 
-    @discardableResult public func setCredentials(
+    @discardableResult func setCredentials(
         optimoveCredentials: String?,
         optimobileCredentials: String?,
         preferenceCenterCredentials: String?
