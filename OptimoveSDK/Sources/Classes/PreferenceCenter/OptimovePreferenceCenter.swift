@@ -18,12 +18,11 @@ public class OptimovePreferenceCenter {
     }
 
     private static var instance: OptimovePreferenceCenter?
-    private var config: PreferenceCenterConfig?
     private var networkClient: NetworkClient?
     private var storage: OptimoveStorage?
 
     static var isSdkRunning: Bool {
-        return OptimovePreferenceCenter.instance?.config != nil
+        return Optimove.getConfig()?.getPreferenceCenterConfig() != nil
     }
 
     public enum ResultType {
@@ -42,42 +41,44 @@ public class OptimovePreferenceCenter {
         return instance
     }
 
-    static func initialize(config optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
+    static func initialize(storage: OptimoveStorage, networkClient: NetworkClient) throws {
         guard instance == nil else {
             throw Error.alreadyInitialized
         }
 
-        guard let config = optimoveConfig.preferenceCenterConfig else {
-            throw Error.configurationIsMissing
-        }
-
-        instance = OptimovePreferenceCenter(config: config, storage: storage, networkClient: networkClient)
+        instance = OptimovePreferenceCenter(storage: storage, networkClient: networkClient)
     }
 
-    private init(config: PreferenceCenterConfig, storage: OptimoveStorage, networkClient: NetworkClient) {
-        self.config = config
+    private init(storage: OptimoveStorage, networkClient: NetworkClient) {
         self.networkClient = networkClient
         self.storage = storage
 
-        Logger.debug("Preference center SDK was initialized with \(config)")
+        Logger.debug("Preference center SDK was initialized")
     }
 
     public func getPreferencesAsync(completion: @escaping PreferencesGetHandler) {
-        guard let customerId = try? storage?.getCustomerID(), let visitorId = try? storage?.getVisitorID() else {
+        guard
+            let customerId = try? storage?.getCustomerID(),
+            let visitorId = try? storage?.getVisitorID(),
+            customerId != visitorId
+        else {
             Logger.warn("Customer ID is not set")
             completion(.errorUserNotSet, nil)
             return
         }
 
-        if customerId == visitorId {
-            Logger.warn("Customer ID is not set")
-            completion(.errorUserNotSet, nil)
+        guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
+            Logger.error("Could not fetch preferences. Configuration is missing.")
+            completion(.error, nil)
             return
         }
 
         Task {
             do {
-                let preferences = try await self.fetchPreferences(customerId: customerId)
+                let request = createGetPreferencesRequest(for: customerId, with: config)
+                let data = try await networkClient?.performAsync(request) ?? Data()
+                let preferences = try JSONDecoder().decode(Preferences.self, from: data)
+
                 DispatchQueue.main.async {
                     completion(.success, preferences)
                 }
@@ -89,31 +90,9 @@ public class OptimovePreferenceCenter {
         }
     }
 
-    private func fetchPreferences(customerId: String) async throws -> Preferences {
-        guard config != nil else {
-            Logger.error("Could not fetch preferences. Configuration is missing.")
-            throw Error.configurationIsMissing
-        }
-
-        let request = createGetPreferencesRequest(customerId: customerId)
-        let data = try await networkClient?.performAsync(request) ?? Data()
-
-        return try JSONDecoder().decode(Preferences.self, from: data)
-    }
-
-    private func getConfigValues() throws -> (region: String, brandGroupId: String, tenantId: String) {
-        guard let config = config else {
-            throw Error.configurationIsMissing
-        }
-        let region = config.region
-        let brandGroupId = config.brandGroupId
-        let tenantId = config.tenantId.description
-        return (region, brandGroupId, tenantId)
-    }
-
-    private func createGetPreferencesRequest(customerId: String) -> NetworkRequest {
+    private func createGetPreferencesRequest(for customerId: String, with config: PreferenceCenterConfig) -> NetworkRequest {
         do {
-            let (region, brandGroupId, tenantId) = try getConfigValues()
+            let (region, brandGroupId, tenantId) = try getConfigValues(from: config)
 
             return NetworkRequest(
                 method: .get,
@@ -133,21 +112,35 @@ public class OptimovePreferenceCenter {
         }
     }
 
-    public func setPreferencesAsync(updates: [PreferenceUpdateRequest], completion: @escaping PreferencesSetHandler) {
-        guard let customerId = try? storage?.getCustomerID(), let visitorId = try? storage?.getVisitorID() else {
-            completion(.errorUserNotSet)
-            return
-        }
+    private func getConfigValues(from config: PreferenceCenterConfig) throws -> (region: String, brandGroupId: String, tenantId: String) {
+        let region = config.region
+        let brandGroupId = config.brandGroupId
+        let tenantId = config.tenantId.description
+        return (region, brandGroupId, tenantId)
+    }
 
-        if customerId == visitorId {
+
+    public func setPreferencesAsync(updates: [PreferenceUpdateRequest], completion: @escaping PreferencesSetHandler) {
+        guard
+            let customerId = try? storage?.getCustomerID(),
+            let visitorId = try? storage?.getVisitorID(),
+            customerId != visitorId else {
             Logger.warn("Customer ID is not set")
             completion(.errorUserNotSet)
             return
         }
 
+        guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
+            Logger.error("Could not fetch preferences. Configuration is missing.")
+            completion(.error)
+            return
+        }
+
         Task {
             do {
-                try await self.sendPreferences(customerId: customerId, updates: updates)
+                let request = try createSetPreferencesRequest(for: customerId, with: config, updates: updates)
+                _ = try await networkClient?.performAsync(request)
+                
                 DispatchQueue.main.async {
                     completion(.success)
                 }
@@ -159,18 +152,11 @@ public class OptimovePreferenceCenter {
         }
     }
 
-    private func sendPreferences(customerId: String, updates: [PreferenceUpdateRequest]) async throws {
-        guard config != nil else {
-            Logger.error("Could not update preferences. Configuration is missing.")
-            throw Error.configurationIsMissing
-        }
-
-        let request = try createSetPreferencesRequest(customerId: customerId, updates: updates)
-        _ = try await networkClient?.performAsync(request)
-    }
-
-    private func createSetPreferencesRequest(customerId: String, updates: [PreferenceUpdateRequest]) throws -> NetworkRequest {
-        let (region, brandGroupId, tenantId) = try getConfigValues()
+    private func createSetPreferencesRequest(
+        for customerId: String,
+        with config: PreferenceCenterConfig,
+        updates: [PreferenceUpdateRequest]) throws -> NetworkRequest {
+        let (region, brandGroupId, tenantId) = try getConfigValues(from: config)
 
         return try NetworkRequest(
             method: .put,

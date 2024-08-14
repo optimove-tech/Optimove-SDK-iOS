@@ -72,12 +72,16 @@ typealias Logger = OptimoveCore.Logger
 
             shared.container.resolve { serviceLocator in
                 do {
-                    try OptimovePreferenceCenter.initialize(config: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
+                    try OptimovePreferenceCenter.initialize(storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
                 } catch {
                     throw GuardError.custom("Failed on PreferenceCenter initialization. Reason: \(error.localizedDescription)")
                 }
             }
         }
+    }
+
+    static func getConfig() -> OptimoveConfig? {
+        return shared.config
     }
 
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.

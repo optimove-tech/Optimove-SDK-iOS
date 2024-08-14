@@ -57,6 +57,10 @@ public struct OptimoveConfig {
     func isPreferenceCenterConfigured() -> Bool {
         return features.contains(.preferenceCenter)
     }
+
+    func getPreferenceCenterConfig() -> PreferenceCenterConfig? {
+        return preferenceCenterConfig
+    }
 }
 
 @objc public class OptimoveTenantInfo: NSObject {
@@ -310,7 +314,7 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func build() -> OptimoveConfig {
-        if features.intersection([.optimove, .optimobile, .preferenceCenter]).isEmpty {
+        if features.intersection([.optimove, .optimobile]).isEmpty {
             Logger.error("No features enabled. Please enable at least one feature.")
         }
 
