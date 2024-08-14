@@ -300,10 +300,6 @@ open class OptimoveConfigBuilder: NSObject {
         return self
     }
 
-    enum PreferenceCenterError: Error {
-        case invalidCredentials(message: String)
-    }
-
     @discardableResult public func build() -> OptimoveConfig {
         if features.intersection([.optimove, .optimobile]).isEmpty {
             Logger.error("No features enabled. Please enable at least one feature.")
