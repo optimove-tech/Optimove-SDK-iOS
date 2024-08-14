@@ -1,6 +1,6 @@
 import Foundation
 
-public struct PreferenceUpdateRequest: Codable {
+public struct PreferenceUpdate: Codable {
     public let topicId: String
     public let subscribedChannels: [Channel]
 
