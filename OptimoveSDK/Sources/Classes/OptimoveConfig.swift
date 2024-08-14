@@ -345,7 +345,7 @@ open class OptimoveConfigBuilder: NSObject {
             return nil
         }()    
 
-        let preferenceCenterConfig: PreferenceCenterConfig? = getPreferenceCenterConfig()
+        let preferenceCenterConfig: PreferenceCenterConfig? = features.contains(.preferenceCenter) ? getPreferenceCenterConfig() : nil
 
         return OptimoveConfig(
             features: features,
@@ -356,12 +356,7 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     private func getPreferenceCenterConfig() -> PreferenceCenterConfig? {
-            //I see Android throws, but here we don't (I don't see throw in the build methods at all), should I be adding it? 
-            guard features.contains(.preferenceCenter) else {
-                Logger.error("Cannot set credentials for preference center as it is not in the desired feature set")
-                return nil
-            }
-
+            //I see Android throws, but here we don't (I don't see throw in the build methods at all), should I be adding it?
             guard let credentials = self.preferenceCenterCredentials else {
                 Logger.error("Could not find preference center credentials")
                 return nil
