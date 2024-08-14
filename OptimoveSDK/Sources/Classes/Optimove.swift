@@ -86,14 +86,18 @@ typealias Logger = OptimoveCore.Logger
 
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
     @available(iOS 13.0, *)
-    private static func setCredentialsInternal(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
+    private static func setCredentialsInternal(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String? = nil) {
         guard let currentConfig = shared.config else {
             Logger.error("Optimove SDK is not configured yet. Please call Optimove.initialize(with:) first.")
             return
         }
 
         let builder = OptimoveConfigBuilder(from: currentConfig)
-        builder.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: preferenceCenterCredentials)
+        builder.setCredentials(
+            optimoveCredentials: optimoveCredentials,
+            optimobileCredentials: optimobileCredentials,
+            preferenceCenterCredentials: preferenceCenterCredentials
+        )
 
         let config = builder.build()
         initialize(with: config)
@@ -101,12 +105,16 @@ typealias Logger = OptimoveCore.Logger
    
     @available(iOS 13.0, *)
     public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
-        setCredentialsInternal(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: nil)
+        setCredentialsInternal(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
     }
 
     @available(iOS 13.0, *)
     public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
-        setCredentialsInternal(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials, preferenceCenterCredentials: preferenceCenterCredentials)
+        setCredentialsInternal(
+            optimoveCredentials: optimoveCredentials,
+            optimobileCredentials: optimobileCredentials,
+            preferenceCenterCredentials: preferenceCenterCredentials
+        )
     }
 
     @available(iOS 13.0, *)

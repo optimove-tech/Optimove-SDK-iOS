@@ -120,7 +120,6 @@ open class OptimoveConfigBuilder: NSObject {
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
-    private var preferenceCenterConfig: PreferenceCenterConfig?
 
     public convenience init(optimoveCredentials: String?, optimobileCredentials: String?) {
         self.init()
@@ -199,24 +198,16 @@ open class OptimoveConfigBuilder: NSObject {
         return self
     } 
 
-    @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) -> OptimoveConfigBuilder {
-
+    @discardableResult public func setCredentials(
+        optimoveCredentials: String?,
+        optimobileCredentials: String?,
+        preferenceCenterCredentials: String?
+    ) -> OptimoveConfigBuilder {
         setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
-
-        do {
-            if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
-                self.preferenceCenterCredentials = preferenceCenterCredentials
-                let args = try PreferenceCenterArguments(base64: preferenceCenterCredentials)
-                features.insert(.preferenceCenter)
-
-                self.preferenceCenterConfig = PreferenceCenterConfig(
-                    region: args.region,
-                    tenantId: args.tenantId,
-                    brandGroupId: args.brandGroupId
-                )
-            }
-        } catch {
-            Logger.error(error.localizedDescription)
+        
+        if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
+            self.preferenceCenterCredentials = preferenceCenterCredentials
+            features.insert(.preferenceCenter)
         }
 
         return self
@@ -366,7 +357,7 @@ open class OptimoveConfigBuilder: NSObject {
 
     private func getPreferenceCenterConfig() -> PreferenceCenterConfig? {
             //I see Android throws, but here we don't (I don't see throw in the build methods at all), should I be adding it? 
-            if (!features.contains(.preferenceCenter)) {
+            guard features.contains(.preferenceCenter) else {
                 Logger.error("Cannot set credentials for preference center as it is not in the desired feature set")
                 return nil
             }
