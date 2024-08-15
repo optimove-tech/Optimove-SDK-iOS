@@ -55,7 +55,7 @@ public struct OptimoveConfig {
     }
     
     func isPreferenceCenterConfigured() -> Bool {
-        return features.contains(.preferenceCenter)
+        return features.contains(.preferenceCenter) && preferenceCenterConfig != nil
     }
 
     func getPreferenceCenterConfig() -> PreferenceCenterConfig? {
@@ -342,7 +342,9 @@ open class OptimoveConfigBuilder: NSObject {
 
 
         let preferenceCenterConfig: PreferenceCenterConfig? = {
-            if features.contains(.preferenceCenter) {
+            if features.contains(.preferenceCenter),
+               preferenceCenterCredentials != nil
+            {
                 return getPreferenceCenterConfig()
             }
             Logger.info("\(PreferenceCenterConfig.self) building skipped.")

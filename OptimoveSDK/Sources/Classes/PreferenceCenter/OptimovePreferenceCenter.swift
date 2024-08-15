@@ -5,14 +5,14 @@ import OptimoveCore
 public class OptimovePreferenceCenter {
     enum Error: LocalizedError {
         case alreadyInitialized
-        case configurationIsMissing
+        case notInitialized
 
         var errorDescription: String? {
             switch self {
             case .alreadyInitialized:
                 return "The PreferenceCenterSDK has already been initialized."
-            case .configurationIsMissing:
-                return "Preference center config is missing."
+            case .notInitialized:
+                return "Preference center has not been initialized."
             }
         }
     }
@@ -37,7 +37,7 @@ public class OptimovePreferenceCenter {
 
     public static func getInstance() throws -> OptimovePreferenceCenter {
         guard let instance = instance else {
-            throw Error.configurationIsMissing
+            throw Error.notInitialized
         }
         return instance
     }
