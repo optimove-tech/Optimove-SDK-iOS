@@ -168,42 +168,42 @@ open class OptimoveConfigBuilder: NSObject {
         super.init()
     }
 
-    @discardableResult func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
-        if optimoveCredentials == nil, optimoveCredentials == nil {
-            assertionFailure("Should provide at least optimove or optimobile credentials")
-        }
+    @discardableResult func setCredentials(
+        optimoveCredentials: String?,
+        optimobileCredentials: String?,
+        preferenceCenterCredentials: String? = nil
+    ) -> OptimoveConfigBuilder {
 
-        do {
-            if let optimoveCredentials = optimoveCredentials, !optimoveCredentials.isEmpty {
+        var hasValidCredentials = false
+
+        if let optimoveCredentials = optimoveCredentials, !optimoveCredentials.isEmpty {
+            do {
                 let args = try OptimoveArguments(base64: optimoveCredentials)
                 features.insert(.optimove)
                 _tenantToken = args.tenantToken
                 _configName = args.configName
+                hasValidCredentials = true
+            } catch {
+                Logger.error("Invalid Optimove credentials: \(error.localizedDescription)")
             }
-        } catch {
-            Logger.error(error.localizedDescription)
         }
 
-        do {
-            if let optimobileCredentials = optimobileCredentials, !optimobileCredentials.isEmpty {
+        if let optimobileCredentials = optimobileCredentials, !optimobileCredentials.isEmpty {
+            do {
                 let args = try OptimobileArguments(base64: optimobileCredentials)
                 features.insert(.optimobile)
                 credentials = args.credentials
                 region = args.region
+                hasValidCredentials = true
+            } catch {
+                Logger.error("Invalid Optimobile credentials: \(error.localizedDescription)")
             }
-        } catch {
-            Logger.error(error.localizedDescription)
         }
 
-        return self
-    }
-
-    @discardableResult func setCredentials(
-        optimoveCredentials: String?,
-        optimobileCredentials: String?,
-        preferenceCenterCredentials: String?
-    ) -> OptimoveConfigBuilder {
-        setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+        if !hasValidCredentials {
+            Logger.error("At least one valid Optimove or Optimobile credential must be provided.")
+            assertionFailure("No valid Optimove or Optimobile credentials provided.")
+        }
 
         if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
             self.preferenceCenterCredentials = preferenceCenterCredentials
