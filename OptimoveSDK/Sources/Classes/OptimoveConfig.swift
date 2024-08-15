@@ -196,7 +196,7 @@ open class OptimoveConfigBuilder: NSObject {
         }
 
         return self
-    } 
+    }
 
     @discardableResult func setCredentials(
         optimoveCredentials: String?,
@@ -204,7 +204,7 @@ open class OptimoveConfigBuilder: NSObject {
         preferenceCenterCredentials: String?
     ) -> OptimoveConfigBuilder {
         setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
-        
+
         if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
             self.preferenceCenterCredentials = preferenceCenterCredentials
         }
@@ -259,7 +259,7 @@ open class OptimoveConfigBuilder: NSObject {
     {
         features.insert(.preferenceCenter)
         preferenceCenterCredentials = credentials
-      
+
         return self
     }
 
@@ -338,18 +338,30 @@ open class OptimoveConfigBuilder: NSObject {
             }
             Logger.info("\(OptimobileConfig.self) building skipped.")
             return nil
-        }()    
-
+        }()
 
         let preferenceCenterConfig: PreferenceCenterConfig? = {
-            if features.contains(.preferenceCenter),
-               preferenceCenterCredentials != nil
-            {
-                return getPreferenceCenterConfig()
+            guard features.contains(.preferenceCenter) else {
+                if preferenceCenterCredentials != nil {
+                    Logger.error("Preference center credentials provided, but the feature was not requested.")
+                }
+                return nil
             }
-            Logger.info("\(PreferenceCenterConfig.self) building skipped.")
-            return nil
+
+            if features.contains(.delayedConfiguration) {
+                if preferenceCenterCredentials == nil {
+                    return nil
+                }
+            } else {
+                if preferenceCenterCredentials == nil {
+                    Logger.error("Preference center could not be initialized due to missing credentials.")
+                    return nil
+                }
+            }
+
+            return getPreferenceCenterConfig(from: preferenceCenterCredentials)
         }()
+
 
         return OptimoveConfig(
             features: features,
@@ -359,30 +371,21 @@ open class OptimoveConfigBuilder: NSObject {
         )
     }
 
-    private func getPreferenceCenterConfig() -> PreferenceCenterConfig? {
-            guard let credentials = self.preferenceCenterCredentials else {
-                Logger.error("Could not find preference center credentials")
-                return nil
-            }
+    private func getPreferenceCenterConfig(from credentials: String?) -> PreferenceCenterConfig? {
+        do {
+            let args = try PreferenceCenterArguments(base64: credentials!)
 
-            do {
-                let args = try PreferenceCenterArguments(base64: credentials)
-
-                return PreferenceCenterConfig(
-                    region: args.region,
-                    tenantId: args.tenantId,
-                    brandGroupId: args.brandGroupId
-                )
-            } catch {
-                Logger.error("Preference center credentials are not correct")
-                Logger.error(error.localizedDescription)
-            }
-
-            Logger.info("\(PreferenceCenterConfig.self) building skipped.")
+            return PreferenceCenterConfig(
+                region: args.region,
+                tenantId: args.tenantId,
+                brandGroupId: args.brandGroupId
+            )
+        } catch {
+            Logger.error("Invalid preference center credentials: \(error.localizedDescription)")
             return nil
         }
     }
-
+}
 
 public extension OptimobileConfig {
     enum Region: String, CaseIterable, Codable {
