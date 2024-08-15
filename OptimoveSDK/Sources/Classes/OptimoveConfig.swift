@@ -173,16 +173,12 @@ open class OptimoveConfigBuilder: NSObject {
         optimobileCredentials: String?,
         preferenceCenterCredentials: String? = nil
     ) -> OptimoveConfigBuilder {
-
-        var hasValidCredentials = false
-
         if let optimoveCredentials = optimoveCredentials, !optimoveCredentials.isEmpty {
             do {
                 let args = try OptimoveArguments(base64: optimoveCredentials)
                 features.insert(.optimove)
                 _tenantToken = args.tenantToken
                 _configName = args.configName
-                hasValidCredentials = true
             } catch {
                 Logger.error("Invalid Optimove credentials: \(error.localizedDescription)")
             }
@@ -194,19 +190,24 @@ open class OptimoveConfigBuilder: NSObject {
                 features.insert(.optimobile)
                 credentials = args.credentials
                 region = args.region
-                hasValidCredentials = true
             } catch {
                 Logger.error("Invalid Optimobile credentials: \(error.localizedDescription)")
             }
         }
 
-        if !hasValidCredentials {
-            Logger.error("At least one valid Optimove or Optimobile credential must be provided.")
-            assertionFailure("No valid Optimove or Optimobile credentials provided.")
+        // Allow the method to be called with both Optimove and Optimobile credentials as nil; do we want to log? this thing maybe? Idk?
+        if optimoveCredentials == nil, optimobileCredentials == nil {
+            Logger.info("Both Optimove and Optimobile credentials are nil. Only preference center credentials might be used.")
         }
 
         if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
             self.preferenceCenterCredentials = preferenceCenterCredentials
+            features.insert(.preferenceCenter)
+        }
+
+        if features.isEmpty {
+            Logger.error("No valid credentials provided for Optimove, Optimobile, or Preference Center.")
+            assertionFailure("No valid features enabled.")
         }
 
         return self
