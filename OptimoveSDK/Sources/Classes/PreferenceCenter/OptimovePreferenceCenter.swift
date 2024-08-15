@@ -28,6 +28,7 @@ public class OptimovePreferenceCenter {
     public enum ResultType {
         case success
         case errorUserNotSet
+        case errorNotConfigured
         case error
     }
 
@@ -57,6 +58,12 @@ public class OptimovePreferenceCenter {
     }
 
     public func getPreferencesAsync(completion: @escaping PreferencesGetHandler) {
+        guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
+            Logger.error("Preference center credentials are not set")
+            completion(.errorNotConfigured, nil)
+            return
+        }
+
         guard
             let customerId = try? storage?.getCustomerID(),
             let visitorId = try? storage?.getVisitorID(),
@@ -64,12 +71,6 @@ public class OptimovePreferenceCenter {
         else {
             Logger.warn("Customer ID is not set")
             completion(.errorUserNotSet, nil)
-            return
-        }
-
-        guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
-            Logger.error("Could not fetch preferences. Configuration is missing.")
-            completion(.error, nil)
             return
         }
 
@@ -121,18 +122,18 @@ public class OptimovePreferenceCenter {
 
 
     public func setPreferencesAsync(updates: [PreferenceUpdate], completion: @escaping PreferencesSetHandler) {
+        guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
+            Logger.error("Preference center credentials are not set")
+            completion(.errorNotConfigured)
+            return
+        }
+
         guard
             let customerId = try? storage?.getCustomerID(),
             let visitorId = try? storage?.getVisitorID(),
             customerId != visitorId else {
             Logger.warn("Customer ID is not set")
             completion(.errorUserNotSet)
-            return
-        }
-
-        guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
-            Logger.error("Could not fetch preferences. Configuration is missing.")
-            completion(.error)
             return
         }
 

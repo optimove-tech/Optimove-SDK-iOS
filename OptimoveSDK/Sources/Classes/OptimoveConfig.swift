@@ -207,7 +207,6 @@ open class OptimoveConfigBuilder: NSObject {
         
         if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
             self.preferenceCenterCredentials = preferenceCenterCredentials
-            features.insert(.preferenceCenter)
         }
 
         return self
@@ -301,7 +300,7 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func build() -> OptimoveConfig {
-        if features.intersection([.optimove, .optimobile]).isEmpty {
+        if features.intersection([.optimove, .optimobile, .preferenceCenter]).isEmpty {
             Logger.error("No features enabled. Please enable at least one feature.")
         }
 
@@ -341,7 +340,14 @@ open class OptimoveConfigBuilder: NSObject {
             return nil
         }()    
 
-        let preferenceCenterConfig: PreferenceCenterConfig? = features.contains(.preferenceCenter) ? getPreferenceCenterConfig() : nil
+
+        let preferenceCenterConfig: PreferenceCenterConfig? = {
+            if features.contains(.preferenceCenter) {
+                return getPreferenceCenterConfig()
+            }
+            Logger.info("\(PreferenceCenterConfig.self) building skipped.")
+            return nil
+        }()
 
         return OptimoveConfig(
             features: features,
@@ -352,7 +358,6 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     private func getPreferenceCenterConfig() -> PreferenceCenterConfig? {
-            //I see Android throws, but here we don't (I don't see throw in the build methods at all), should I be adding it?
             guard let credentials = self.preferenceCenterCredentials else {
                 Logger.error("Could not find preference center credentials")
                 return nil
@@ -366,9 +371,7 @@ open class OptimoveConfigBuilder: NSObject {
                     tenantId: args.tenantId,
                     brandGroupId: args.brandGroupId
                 )
-
             } catch {
-                //I see Android throws, but here we don't (I don't see throw in the build methods at all), should I be adding it?
                 Logger.error("Preference center credentials are not correct")
                 Logger.error(error.localizedDescription)
             }

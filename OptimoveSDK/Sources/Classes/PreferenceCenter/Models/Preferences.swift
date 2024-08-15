@@ -22,16 +22,16 @@ public struct Preferences: Codable {
         }
     }
 
-    public let topics: [Topic]
+    public let customerPreferences: [Topic]
     public let configuredChannels: [Channel]
 
     public init(topics: [Topic], configuredChannels: [Channel]) {
-        self.topics = topics
+        self.customerPreferences = topics
         self.configuredChannels = configuredChannels
     }
 
     enum CodingKeys: String, CodingKey {
-        case topics = "topics"
+        case customerPreferences = "topics"
         case configuredChannels = "channels"
     }
 }
