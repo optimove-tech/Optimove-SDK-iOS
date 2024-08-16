@@ -32,7 +32,7 @@ public class OptimovePreferenceCenter {
         case error
     }
 
-    public typealias PreferencesGetHandler = (_ result: ResultType, _ preferences: Preferences?) -> Void
+    public typealias PreferencesGetHandler = (_ result: ResultType, _ preferences: OptimovePC.Preferences?) -> Void
     public typealias PreferencesSetHandler = (_ result: ResultType) -> Void
 
     public static func getInstance() throws -> OptimovePreferenceCenter {
@@ -84,7 +84,7 @@ public class OptimovePreferenceCenter {
                 guard let data = try await networkClient?.performAsync(request) else {
                     throw NetworkError.noData
                 }
-                let preferences = try JSONDecoder().decode(Preferences.self, from: data)
+                let preferences = try JSONDecoder().decode(OptimovePC.Preferences.self, from: data)
 
                 DispatchQueue.main.async {
                     completion(.success, preferences)
@@ -126,7 +126,7 @@ public class OptimovePreferenceCenter {
     }
 
 
-    public func setPreferencesAsync(updates: [PreferenceUpdate], completion: @escaping PreferencesSetHandler) {
+    public func setPreferencesAsync(updates: [OptimovePC.PreferenceUpdate], completion: @escaping PreferencesSetHandler) {
         guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
             Logger.error("Preference center credentials are not set")
             completion(.errorNotConfigured)
@@ -161,7 +161,7 @@ public class OptimovePreferenceCenter {
     private func createSetPreferencesRequest(
         for customerId: String,
         with config: PreferenceCenterConfig,
-        updates: [PreferenceUpdate]) throws -> NetworkRequest {
+        updates: [OptimovePC.PreferenceUpdate]) throws -> NetworkRequest {
         let (region, brandGroupId, tenantId) = try getConfigValues(from: config)
 
         return try NetworkRequest(
