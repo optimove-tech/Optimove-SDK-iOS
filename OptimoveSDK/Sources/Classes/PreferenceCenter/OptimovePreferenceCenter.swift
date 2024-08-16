@@ -59,8 +59,6 @@ public class OptimovePreferenceCenter {
     private init(storage: OptimoveStorage, networkClient: NetworkClient) {
         self.networkClient = networkClient
         self.storage = storage
-
-        Logger.debug("Preference center SDK was initialized")
     }
 
     public func getPreferencesAsync(completion: @escaping PreferencesGetHandler) {
@@ -82,23 +80,27 @@ public class OptimovePreferenceCenter {
 
         Task {
             do {
-                let request = createGetPreferencesRequest(for: customerId, with: config)
-                let data = try await networkClient?.performAsync(request) ?? Data()
+                let request = try createGetPreferencesRequest(for: customerId, with: config)
+                guard let data = try await networkClient?.performAsync(request) else {
+                    throw NetworkError.noData
+                }
                 let preferences = try JSONDecoder().decode(Preferences.self, from: data)
 
                 DispatchQueue.main.async {
                     completion(.success, preferences)
                 }
             } catch {
+                logFailedResponse(error)
                 DispatchQueue.main.async {
                     completion(.error, nil)
                 }
             }
         }
     }
-
-    private func createGetPreferencesRequest(for customerId: String, with config: PreferenceCenterConfig) -> NetworkRequest {
-        do {
+    
+    private func createGetPreferencesRequest(
+        for customerId: String,
+        with config: PreferenceCenterConfig) throws -> NetworkRequest {
             let (region, brandGroupId, tenantId) = try getConfigValues(from: config)
 
             return NetworkRequest(
@@ -114,9 +116,6 @@ public class OptimovePreferenceCenter {
                     URLQueryItem(name: "brandGroupId", value: brandGroupId)
                 ]
             )
-        } catch {
-            fatalError("Configuration is missing. This should never happen if the SDK is initialized properly.")
-        }
     }
 
     private func getConfigValues(from config: PreferenceCenterConfig) throws -> (region: String, brandGroupId: String, tenantId: String) {
