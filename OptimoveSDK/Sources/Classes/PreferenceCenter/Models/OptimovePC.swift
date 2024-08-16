@@ -17,7 +17,7 @@ public struct OptimovePC {
         public let description: String
         public let subscribedChannels: [Channel]
 
-        public init(id: String, name: String, description: String, subscribedChannels: [Channel]) {
+        init(id: String, name: String, description: String, subscribedChannels: [Channel]) {
             self.id = id
             self.name = name
             self.description = description
@@ -31,12 +31,12 @@ public struct OptimovePC {
             case subscribedChannels = "channelSubscription"
         }
     }
-   
+
     public struct Preferences: Codable {
         public let customerPreferences: [Topic]
         public let configuredChannels: [Channel]
 
-        public init(topics: [Topic], configuredChannels: [Channel]) {
+        init(topics: [Topic], configuredChannels: [Channel]) {
             self.customerPreferences = topics
             self.configuredChannels = configuredChannels
         }
@@ -51,15 +51,16 @@ public struct OptimovePC {
         public let topicId: String
         public let subscribedChannels: [Channel]
 
-        enum CodingKeys: String, CodingKey {
-            case topicId = "topicId"
-            case subscribedChannels = "channelSubscription"
-        }
-
         public init(topicId: String, subscribedChannels: [Channel]) {
             self.topicId = topicId
             self.subscribedChannels = subscribedChannels
         }
+
+        enum CodingKeys: String, CodingKey {
+            case topicId = "topicId"
+            case subscribedChannels = "channelSubscription"
+        }
     }
 }
+
 
