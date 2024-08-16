@@ -349,15 +349,11 @@ open class OptimoveConfigBuilder: NSObject {
                 return nil
             }
 
-            if features.contains(.delayedConfiguration) {
-                if preferenceCenterCredentials == nil {
-                    return nil
-                }
-            } else {
-                if preferenceCenterCredentials == nil {
+            if preferenceCenterCredentials == nil {
+                if !features.contains(.delayedConfiguration) {
                     Logger.error("Preference center could not be initialized due to missing credentials.")
-                    return nil
                 }
+                return nil
             }
 
             return getPreferenceCenterConfig(from: preferenceCenterCredentials)

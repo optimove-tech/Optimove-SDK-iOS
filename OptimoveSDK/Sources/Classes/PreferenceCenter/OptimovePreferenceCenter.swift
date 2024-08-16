@@ -43,6 +43,12 @@ public class OptimovePreferenceCenter {
     }
 
     static func initialize(storage: OptimoveStorage, networkClient: NetworkClient) throws {
+        if let config = Optimove.getConfig() {
+            if instance !== nil && config.features.contains(.delayedConfiguration) {
+                return
+            }
+        }
+
         guard instance == nil else {
             throw Error.alreadyInitialized
         }
