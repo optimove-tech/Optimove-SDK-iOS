@@ -65,8 +65,8 @@ typealias Logger = OptimoveCore.Logger
         }   
 
         if config.isPreferenceCenterConfigured() {
-            if !config.isOptimoveConfigured() {
-                Logger.error("Preference center requires optimove credentials");
+            guard config.isOptimoveConfigured() else {
+                Logger.error("Preference center requires optimove credentials")
                 return
             }
 

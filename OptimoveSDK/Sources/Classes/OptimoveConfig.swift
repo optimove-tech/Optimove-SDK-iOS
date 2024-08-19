@@ -55,7 +55,7 @@ public struct OptimoveConfig {
     }
     
     func isPreferenceCenterConfigured() -> Bool {
-        return features.contains(.preferenceCenter) && preferenceCenterConfig != nil
+        return features.contains(.preferenceCenter)
     }
 
     func getPreferenceCenterConfig() -> PreferenceCenterConfig? {
@@ -202,7 +202,8 @@ open class OptimoveConfigBuilder: NSObject {
 
         if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
             self.preferenceCenterCredentials = preferenceCenterCredentials
-            features.insert(.preferenceCenter)
+            if !features.contains(.delayedConfiguration) {
+                features.insert(.preferenceCenter) }
         }
 
         if features.isEmpty {
