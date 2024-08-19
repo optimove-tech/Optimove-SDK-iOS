@@ -101,7 +101,7 @@ public class OptimovePreferenceCenter {
     private func createGetPreferencesRequest(
         for customerId: String,
         with config: PreferenceCenterConfig) throws -> NetworkRequest {
-            let (region, brandGroupId, tenantId) = try getConfigValues(from: config)
+            let (region, brandGroupId, tenantId) = getConfigValues(from: config)
 
             return NetworkRequest(
                 method: .get,
@@ -118,7 +118,7 @@ public class OptimovePreferenceCenter {
             )
     }
 
-    private func getConfigValues(from config: PreferenceCenterConfig) throws -> (region: String, brandGroupId: String, tenantId: String) {
+    private func getConfigValues(from config: PreferenceCenterConfig) -> (region: String, brandGroupId: String, tenantId: String) {
         let region = config.region
         let brandGroupId = config.brandGroupId
         let tenantId = config.tenantId.description
@@ -126,7 +126,7 @@ public class OptimovePreferenceCenter {
     }
 
 
-    public func setPreferencesAsync(updates: [OptimovePC.PreferenceUpdate], completion: @escaping PreferencesSetHandler) {
+    public func setCustomerPreferencesAsync(completion: @escaping PreferencesSetHandler, updates: [OptimovePC.PreferenceUpdate]) {
         guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
             Logger.error("Preference center credentials are not set")
             completion(.errorNotConfigured)
@@ -151,6 +151,7 @@ public class OptimovePreferenceCenter {
                     completion(.success)
                 }
             } catch {
+                logFailedResponse(error)
                 DispatchQueue.main.async {
                     completion(.error)
                 }
@@ -162,7 +163,7 @@ public class OptimovePreferenceCenter {
         for customerId: String,
         with config: PreferenceCenterConfig,
         updates: [OptimovePC.PreferenceUpdate]) throws -> NetworkRequest {
-        let (region, brandGroupId, tenantId) = try getConfigValues(from: config)
+        let (region, brandGroupId, tenantId) = getConfigValues(from: config)
 
         return try NetworkRequest(
             method: .put,
