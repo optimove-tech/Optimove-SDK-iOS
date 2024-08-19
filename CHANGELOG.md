@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.10.0
+
+- Add Preference Center feature. The new functionality is available through the following methods:
+    - `OptimovePreferenceCenter.getInstance().setCustomerPreferencesAsync()`
+    - `OptimovePreferenceCenter.getInstance().getPreferencesAsync()`
+
 ## 5.9.0
 
 - Remove `SetUserAgent` event
