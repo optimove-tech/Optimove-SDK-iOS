@@ -195,15 +195,12 @@ open class OptimoveConfigBuilder: NSObject {
             }
         }
 
-        // Allow the method to be called with both Optimove and Optimobile credentials as nil; do we want to log? this thing maybe? Idk?
-        if optimoveCredentials == nil, optimobileCredentials == nil {
-            Logger.info("Both Optimove and Optimobile credentials are nil. Only preference center credentials might be used.")
-        }
-
         if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
-            self.preferenceCenterCredentials = preferenceCenterCredentials
-            if !features.contains(.delayedConfiguration) {
-                features.insert(.preferenceCenter) }
+            if optimoveCredentials == nil {
+                Logger.error("Preference Center requires optimove credentials set");
+            }  else {
+                self.preferenceCenterCredentials = preferenceCenterCredentials
+            }
         }
 
         if features.isEmpty {

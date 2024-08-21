@@ -28,7 +28,7 @@ public class OptimovePreferenceCenter {
     public enum ResultType {
         case success
         case errorUserNotSet
-        case errorNotConfigured
+        case errorCredentialsNotSet
         case error
     }
 
@@ -64,7 +64,7 @@ public class OptimovePreferenceCenter {
     public func getPreferencesAsync(completion: @escaping PreferencesGetHandler) {
         guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
             Logger.error("Preference center credentials are not set")
-            completion(.errorNotConfigured, nil)
+            completion(.errorCredentialsNotSet, nil)
             return
         }
 
@@ -129,7 +129,7 @@ public class OptimovePreferenceCenter {
     public func setCustomerPreferencesAsync(completion: @escaping PreferencesSetHandler, updates: [OptimovePC.PreferenceUpdate]) {
         guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
             Logger.error("Preference center credentials are not set")
-            completion(.errorNotConfigured)
+            completion(.errorCredentialsNotSet)
             return
         }
 
@@ -187,11 +187,14 @@ public class OptimovePreferenceCenter {
 
     private func logFailedResponse(_ response: URLResponse) {
         if let httpResponse = response as? HTTPURLResponse {
+            let code = httpResponse.statusCode;
+            let msg = "Request failed with code \(code): \(HTTPURLResponse.localizedString(forStatusCode: code))."
+
             switch httpResponse.statusCode {
             case 400:
-                Logger.error("Status code 400: check preference center configuration")
+                Logger.error("\(msg) Check preference center configuration");
             default:
-                Logger.error("Request failed with status code: \(httpResponse.statusCode)")
+                Logger.error(msg)
             }
         }
     }
