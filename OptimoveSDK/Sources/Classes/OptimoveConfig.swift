@@ -173,6 +173,10 @@ open class OptimoveConfigBuilder: NSObject {
         optimobileCredentials: String?,
         preferenceCenterCredentials: String? = nil
     ) -> OptimoveConfigBuilder {
+        if optimoveCredentials == nil, optimoveCredentials == nil {
+            assertionFailure("Should provide at least optimove or optimobile credentials")
+        }
+
         if let optimoveCredentials = optimoveCredentials, !optimoveCredentials.isEmpty {
             do {
                 let args = try OptimoveArguments(base64: optimoveCredentials)
@@ -201,11 +205,6 @@ open class OptimoveConfigBuilder: NSObject {
             }  else {
                 self.preferenceCenterCredentials = preferenceCenterCredentials
             }
-        }
-
-        if features.isEmpty {
-            Logger.error("No valid credentials provided for Optimove, Optimobile, or Preference Center.")
-            assertionFailure("No valid features enabled.")
         }
 
         return self
