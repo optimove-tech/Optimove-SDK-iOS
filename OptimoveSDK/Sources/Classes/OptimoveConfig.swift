@@ -298,7 +298,7 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     @discardableResult public func build() -> OptimoveConfig {
-        if features.intersection([.optimove, .optimobile, .preferenceCenter]).isEmpty {
+        if features.intersection([.optimove, .optimobile]).isEmpty {
             Logger.error("No features enabled. Please enable at least one feature.")
         }
 
@@ -343,6 +343,11 @@ open class OptimoveConfigBuilder: NSObject {
                 if preferenceCenterCredentials != nil {
                     Logger.error("Preference center credentials provided, but the feature was not requested.")
                 }
+                return nil
+            }  
+
+            if !features.contains(.optimove) && tenantInfo == nil && !features.contains(.delayedConfiguration) {
+                Logger.error("Preference center cannot be inialized without optimove")
                 return nil
             }
 
