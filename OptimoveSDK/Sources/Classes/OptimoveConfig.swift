@@ -173,7 +173,7 @@ open class OptimoveConfigBuilder: NSObject {
         optimobileCredentials: String?,
         preferenceCenterCredentials: String? = nil
     ) -> OptimoveConfigBuilder {
-        if optimoveCredentials == nil, optimoveCredentials == nil {
+        if optimoveCredentials == nil, optimobileCredentials == nil {
             assertionFailure("Should provide at least optimove or optimobile credentials")
         }
 
