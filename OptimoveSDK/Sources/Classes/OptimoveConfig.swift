@@ -204,6 +204,7 @@ open class OptimoveConfigBuilder: NSObject {
                 Logger.error("Preference Center requires optimove credentials set");
             }  else {
                 self.preferenceCenterCredentials = preferenceCenterCredentials
+                features.insert(.preferenceCenter)
             }
         }
 
@@ -339,14 +340,9 @@ open class OptimoveConfigBuilder: NSObject {
         }()
 
         let preferenceCenterConfig: PreferenceCenterConfig? = {
-            guard features.contains(.preferenceCenter) else {
-                if preferenceCenterCredentials != nil {
-                    Logger.error("Preference center credentials provided, but the feature was not requested.")
-                }
-                return nil
-            }  
-
-            if !features.contains(.optimove) && tenantInfo == nil && !features.contains(.delayedConfiguration) {
+            if !features.contains(.optimove),
+               tenantInfo == nil,
+               !features.contains(.delayedConfiguration) {
                 Logger.error("Preference center cannot be inialized without optimove")
                 return nil
             }
