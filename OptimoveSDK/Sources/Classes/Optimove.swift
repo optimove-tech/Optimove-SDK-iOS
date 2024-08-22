@@ -65,10 +65,6 @@ typealias Logger = OptimoveCore.Logger
         }   
 
         if config.isPreferenceCenterConfigured() {
-            guard config.preferenceCenterConfig != nil else {
-                return
-            }
-
             guard config.isOptimoveConfigured() else {
                 Logger.error("Preference Center requires the optimove feature enabled.")
                 return
@@ -76,7 +72,7 @@ typealias Logger = OptimoveCore.Logger
 
             shared.container.resolve { serviceLocator in
                 do {
-                    try OptimovePreferenceCenter.initialize(storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
+                    try OptimovePreferenceCenter.initialize(with: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
                 } catch {
                     throw GuardError.custom("Failed on PreferenceCenter initialization. Reason: \(error.localizedDescription)")
                 }

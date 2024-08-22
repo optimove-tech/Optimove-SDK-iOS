@@ -6,6 +6,7 @@ public class OptimovePreferenceCenter {
     enum Error: LocalizedError {
         case alreadyInitialized
         case notInitialized
+        case configurationIsMissing
 
         var errorDescription: String? {
             switch self {
@@ -13,6 +14,8 @@ public class OptimovePreferenceCenter {
                 return "The PreferenceCenterSDK has already been initialized."
             case .notInitialized:
                 return "Preference center has not been initialized."
+            case .configurationIsMissing:
+               return "Preference center configuration is missing, but the feauture was requested. Please provide valid credentials."
             }
         }
     }
@@ -42,14 +45,16 @@ public class OptimovePreferenceCenter {
         return instance
     }
 
-    static func initialize(storage: OptimoveStorage, networkClient: NetworkClient) throws {
-        if let config = Optimove.getConfig() {
-            if instance !== nil && config.features.contains(.delayedConfiguration) {
-                return
+    static func initialize(with optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
+        if instance !== nil, optimoveConfig.features.contains(.delayedConfiguration) {
+            guard optimoveConfig.preferenceCenterConfig != nil else {
+                throw Error.configurationIsMissing
             }
+            return
         }
 
         guard instance == nil else {
+            assertionFailure(Error.alreadyInitialized.localizedDescription)
             throw Error.alreadyInitialized
         }
 
