@@ -36,8 +36,8 @@ public struct OptimovePC {
         public let customerPreferences: [Topic]
         public let configuredChannels: [Channel]
 
-        init(topics: [Topic], configuredChannels: [Channel]) {
-            self.customerPreferences = topics
+        init(customerPreferences: [Topic], configuredChannels: [Channel]) {
+            self.customerPreferences = customerPreferences
             self.configuredChannels = configuredChannels
         }
 
