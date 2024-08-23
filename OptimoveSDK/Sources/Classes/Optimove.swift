@@ -43,7 +43,6 @@ typealias Logger = OptimoveCore.Logger
         }
     }
 
-    @available(iOS 13.0, *)
     public static func initialize(with config: OptimoveConfig) {
         shared.config = config
 
@@ -85,7 +84,6 @@ typealias Logger = OptimoveCore.Logger
     }
 
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
-    @available(iOS 13.0, *)
     private static func setCredentialsInternal(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String? = nil) {
         guard let currentConfig = shared.config else {
             Logger.error("Optimove SDK is not configured yet. Please call Optimove.initialize(with:) first.")
@@ -103,12 +101,10 @@ typealias Logger = OptimoveCore.Logger
         initialize(with: config)
     }
    
-    @available(iOS 13.0, *)
     public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
         setCredentialsInternal(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
     }
 
-    @available(iOS 13.0, *)
     public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
         setCredentialsInternal(
             optimoveCredentials: optimoveCredentials,
@@ -117,7 +113,6 @@ typealias Logger = OptimoveCore.Logger
         )
     }
 
-    @available(iOS 13.0, *)
     public static func isFeatureRunning(_ feature: Feature) -> Bool {
         switch feature {
         case .optimobile:
