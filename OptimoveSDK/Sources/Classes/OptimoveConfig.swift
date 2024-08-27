@@ -200,7 +200,7 @@ open class OptimoveConfigBuilder: NSObject {
         }
 
         if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
-            if optimoveCredentials == nil {
+            if optimoveCredentials == nil || optimoveCredentials == "" {
                 Logger.error("Preference Center requires optimove credentials set");
             }  else {
                 self.preferenceCenterCredentials = preferenceCenterCredentials
