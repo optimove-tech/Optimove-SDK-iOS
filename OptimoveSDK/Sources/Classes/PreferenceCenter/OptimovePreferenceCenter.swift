@@ -1,6 +1,7 @@
 import Foundation
 import OptimoveCore
 
+@available(iOS 13.0, *)
 public class OptimovePreferenceCenter {
     enum Error: LocalizedError {
         case alreadyInitialized
@@ -82,38 +83,26 @@ public class OptimovePreferenceCenter {
             return
         }
 
-        do {
-            let request = try createGetPreferencesRequest(for: customerId, with: config)
-
-            networkClient?.perform(request) { [self] result in
-                switch result {
-                case .success(let response):
-                    do {
-                        let preferences = try response.decode(to: OptimovePC.Preferences.self)
-                        DispatchQueue.main.async {
-                            completion(.success, preferences)
-                        }
-                    } catch {
-                        logFailedResponse(error)
-                        DispatchQueue.main.async {
-                            completion(.error, nil)
-                        }
-                    }
-                case .failure(let error):
-                    logFailedResponse(error)
-                    DispatchQueue.main.async {
-                        completion(.error, nil)
-                    }
+        Task {
+            do {
+                let request = try createGetPreferencesRequest(for: customerId, with: config)
+                guard let data = try await networkClient?.performAsync(request) else {
+                    throw NetworkError.noData
                 }
-            }
+                let preferences = try JSONDecoder().decode(OptimovePC.Preferences.self, from: data)
 
-        } catch {
-            logFailedResponse(error)
-            DispatchQueue.main.async {
-                completion(.error, nil)
+                DispatchQueue.main.async {
+                    completion(.success, preferences)
+                }
+            } catch {
+                logFailedResponse(error)
+                DispatchQueue.main.async {
+                    completion(.error, nil)
+                }
             }
         }
     }
+
 
     private func createGetPreferencesRequest(
         for customerId: String,
@@ -159,35 +148,19 @@ public class OptimovePreferenceCenter {
             return
         }
 
-        do {
-            let request = try createSetPreferencesRequest(for: customerId, with: config, updates: updates)
+        Task {
+            do {
+                let request = try createSetPreferencesRequest(for: customerId, with: config, updates: updates)
+                _ = try await networkClient?.performAsync(request)
 
-            networkClient?.perform(request) { [self] result in
-                switch result {
-                case .success(let response):
-                    do {
-                        _ = try response.unwrap()
-                        DispatchQueue.main.async {
-                            completion(.success)
-                        }
-                    } catch {
-                        logFailedResponse(error)
-                        DispatchQueue.main.async {
-                            completion(.error)
-                        }
-                    }
-                case .failure(let error):
-                    logFailedResponse(error)
-                    DispatchQueue.main.async {
-                        completion(.error)
-                    }
+                DispatchQueue.main.async {
+                    completion(.success)
                 }
-            }
-
-        } catch {
-            logFailedResponse(error)
-            DispatchQueue.main.async {
-                completion(.error)
+            } catch {
+                logFailedResponse(error)
+                DispatchQueue.main.async {
+                    completion(.error)
+                }
             }
         }
     }
