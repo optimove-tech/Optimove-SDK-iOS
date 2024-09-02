@@ -1,7 +1,6 @@
 import Foundation
 import OptimoveCore
 
-@available(iOS 13.0, *)
 public class OptimovePreferenceCenter {
     enum Error: LocalizedError {
         case alreadyInitialized
@@ -66,6 +65,7 @@ public class OptimovePreferenceCenter {
         self.storage = storage
     }
 
+    @available(iOS 13.0, *)
     public func getPreferencesAsync(completion: @escaping PreferencesGetHandler) {
         guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
             Logger.error("Preference center credentials are not set")
@@ -145,6 +145,7 @@ public class OptimovePreferenceCenter {
     }
 
 
+    @available(iOS 13.0, *)
     public func setCustomerPreferencesAsync(completion: @escaping PreferencesSetHandler, updates: [OptimovePC.PreferenceUpdate]) {
         guard let config = Optimove.getConfig()?.getPreferenceCenterConfig() else {
             Logger.error("Preference center credentials are not set")
