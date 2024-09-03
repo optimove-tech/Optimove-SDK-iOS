@@ -61,19 +61,56 @@ typealias Logger = OptimoveCore.Logger
                     throw GuardError.custom("Failed on OptimobileSDK initialization. Reason: \(error.localizedDescription)")
                 }
             }
+        }   
+
+        if config.isPreferenceCenterConfigured() {
+            guard config.isOptimoveConfigured() else {
+                Logger.error("Preference Center requires the optimove feature enabled.")
+                return
+            }
+
+            shared.container.resolve { serviceLocator in
+                do {
+                    try OptimovePreferenceCenter.initialize(with: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
+                } catch {
+                    throw GuardError.custom("Failed on PreferenceCenter initialization. Reason: \(error.localizedDescription)")
+                }
+            }
         }
     }
 
+    static func getConfig() -> OptimoveConfig? {
+        return shared.config
+    }
+
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
-    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
+    private static func setCredentialsInternal(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String? = nil) {
         guard let currentConfig = shared.config else {
             Logger.error("Optimove SDK is not configured yet. Please call Optimove.initialize(with:) first.")
             return
         }
+
         let builder = OptimoveConfigBuilder(from: currentConfig)
-        builder.setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+        builder.setCredentials(
+            optimoveCredentials: optimoveCredentials,
+            optimobileCredentials: optimobileCredentials,
+            preferenceCenterCredentials: preferenceCenterCredentials
+        )
+
         let config = builder.build()
         initialize(with: config)
+    }
+   
+    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) {
+        setCredentialsInternal(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
+    }
+
+    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
+        setCredentialsInternal(
+            optimoveCredentials: optimoveCredentials,
+            optimobileCredentials: optimobileCredentials,
+            preferenceCenterCredentials: preferenceCenterCredentials
+        )
     }
 
     public static func isFeatureRunning(_ feature: Feature) -> Bool {
@@ -82,6 +119,8 @@ typealias Logger = OptimoveCore.Logger
             return Optimobile.isSdkRunning
         case .optimove:
             return RunningFlagsIndication.isSdkRunning
+        case .preferenceCenter:
+            return OptimovePreferenceCenter.isSdkRunning   
         default:
             return false
         }

@@ -106,7 +106,6 @@ final class ServiceLocator {
     func deviceStateObserver() -> DeviceStateObserver {
         return _deviceStateObserver
     }
-
     // MARK: - Factories
 
     func componentFactory() -> ComponentFactory {
