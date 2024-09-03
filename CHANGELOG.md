@@ -6,7 +6,9 @@
     - `OptimovePreferenceCenter.getInstance().setCustomerPreferencesAsync()`
     - `OptimovePreferenceCenter.getInstance().getPreferencesAsync()`
     
-Major breaking update - iOS 13 required for using Preference Center.
+Breaking changes:
+- iOS 13 required for using Preference Center
+- removed `OptimoveConfigBuilder.setCredentials` unintentionally public method
 
 ## 5.9.0
 
