@@ -1,8 +1,10 @@
 # Changelog
 
-## 6.0.0
+## 5.7.0
 
-- Minimum supported iOS version is now 13.0.
+- Add Privacy Manifest
+- Fix explicit `self` for `weak self` captures to allow pre 5.8 Swift compilation
+- Remove web to app banner code
 
 ## 5.6.0
 

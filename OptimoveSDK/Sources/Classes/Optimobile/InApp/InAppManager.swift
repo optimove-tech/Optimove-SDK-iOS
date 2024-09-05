@@ -60,7 +60,7 @@ class InAppManager {
         finishedInitializationToken = NotificationCenter.default
             .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
                 guard let self = self else { return }
-                handleEnrollmentAndSyncSetup()
+                self.handleEnrollmentAndSyncSetup()
                 Logger.debug("Notification \(notification.name.rawValue) was processed")
             }
     }
