@@ -111,9 +111,9 @@ final class Optimobile {
             throw Error.configurationIsMissing
         }
 
-        try writeDefaultsKeys(config: config, storage: storage)
-
         instance = Optimobile(config: config, storage: storage)
+
+        try writeDefaultsKeys(config: config, storage: storage)
 
         instance!.initializeHelpers()
 

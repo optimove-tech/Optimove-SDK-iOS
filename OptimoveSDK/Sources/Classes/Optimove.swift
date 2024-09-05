@@ -386,6 +386,13 @@ public extension Optimove {
     @objc func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return Optimobile.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
+    
+    /**
+        Used for Deferred Deep Linking to pass the continuation url to the Optimove SDK to be processed.
+     */
+    @objc func urlOpened(url: URL) -> Bool {
+        return Optimobile.urlOpened(url: url)
+    }
 
     /**
         Used for Deferred Deep Linking to pass the continuation to the Optimove SDK to be processed in scene-based apps.
