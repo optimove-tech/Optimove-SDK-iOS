@@ -1,7 +1,7 @@
 //  Copyright © 2019 Optimove. All rights reserved.
 
 import Foundation
-import OptimoveCore
+@testable import OptimoveSDK
 
 public final class TenantConfigFixture {
     public init() {}

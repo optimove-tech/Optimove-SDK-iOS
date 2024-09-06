@@ -2,7 +2,7 @@
 
 import Foundation
 
-public extension utsname {
+extension utsname {
     var deviceModel: String {
         var systemInfo = self
         uname(&systemInfo)

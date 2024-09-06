@@ -3,13 +3,13 @@
 import CoreData
 import Foundation
 
-public enum InAppPresented: String {
+enum InAppPresented: String {
     case IMMEDIATELY = "immediately"
     case NEXT_OPEN = "next-open"
     case NEVER = "never"
 }
 
-class InAppMessageEntity: NSManagedObject {
+final class InAppMessageEntity: NSManagedObject {
     @NSManaged var id: Int64
     @NSManaged var updatedAt: NSDate
     @NSManaged var presentedWhen: String
@@ -38,16 +38,16 @@ class InAppMessageEntity: NSManagedObject {
     }
 }
 
-class InAppMessage: NSObject {
-    public internal(set) var id: Int64
-    public internal(set) var updatedAt: NSDate
-    public internal(set) var content: NSDictionary
-    public internal(set) var data: NSDictionary?
-    public internal(set) var badgeConfig: NSDictionary?
-    public internal(set) var inboxConfig: NSDictionary?
-    public internal(set) var dismissedAt: NSDate?
-    public internal(set) var readAt: NSDate?
-    public internal(set) var sentAt: NSDate?
+final class InAppMessage: NSObject {
+    private(set) var id: Int64
+    private(set) var updatedAt: NSDate
+    private(set) var content: NSDictionary
+    private(set) var data: NSDictionary?
+    private(set) var badgeConfig: NSDictionary?
+    private(set) var inboxConfig: NSDictionary?
+    private(set) var dismissedAt: NSDate?
+    private(set) var readAt: NSDate?
+    private(set) var sentAt: NSDate?
 
     init(entity: InAppMessageEntity) {
         id = Int64(entity.id)

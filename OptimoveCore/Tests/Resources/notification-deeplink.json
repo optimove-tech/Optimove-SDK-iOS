@@ -1,0 +1,24 @@
+{
+  "aps": {
+    "alert": {
+      "title": "title",
+      "body": "body"
+    }
+  },
+  "custom": {
+    "a": {
+      "k.message": {
+        "type": 1,
+        "data": {
+          "id": 1
+        }
+      },
+      "k.deepLink": {
+        "type": 2,
+        "data": {
+          "id": 1
+        }
+      }
+    }
+  }
+}
