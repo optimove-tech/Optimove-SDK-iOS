@@ -34,6 +34,7 @@ final class Assembly {
         let migrations: [MigrationWork] = [
             MigrationWork_3_3_0(),
             MigrationWork_6_0_0(),
+            MigrationWork_5_9_0()
         ]
         migrations
             .filter { $0.isAllowToMiragte(SDKVersion) }

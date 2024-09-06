@@ -140,7 +140,6 @@ extension MigrationWork_3_3_0 {
                 .tenantToken,
                 .visitorID,
                 .version,
-                .userAgent,
                 .deviceResolutionWidth,
                 .deviceResolutionHeight,
                 .advertisingIdentifier,
@@ -273,6 +272,15 @@ final class MigrationWork_6_0_0: MigrationWorker {
             }
         }
         Logger.info("Migration from Kumulos UserDefaults to Optimove UserDefaults completed")
+}
+    
+final class MigrationWork_5_9_0: MigrationWorker {
+    init() {
+        super.init(newVersion: .v_5_9_0)
+    }
+
+    override func runMigration() {
+        try? UserDefaults.optimove().removeObject(forKey: "userAgent")
         super.runMigration()
     }
 }

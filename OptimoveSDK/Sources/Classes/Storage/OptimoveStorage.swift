@@ -178,15 +178,6 @@ extension KeyValueStorage where Self: StorageValue {
         }
     }
 
-    var userAgent: String? {
-        get {
-            return self[.userAgent]
-        }
-        set {
-            self[.userAgent] = newValue
-        }
-    }
-
     var deviceResolutionWidth: Float? {
         get {
             return self[.deviceResolutionWidth]
@@ -344,13 +335,6 @@ extension KeyValueStorage where Self: StorageValue {
     func getVersion() throws -> String {
         guard let value = version else {
             throw StorageError.noValue(.version)
-        }
-        return value
-    }
-
-    func getUserAgent() throws -> String {
-        guard let value = userAgent else {
-            throw StorageError.noValue(.userAgent)
         }
         return value
     }
