@@ -14,6 +14,8 @@ public struct Feature: OptionSet, @unchecked Sendable, CustomStringConvertible {
     public static let optimobile = Feature(rawValue: 1 << 1)
     /// Optimove feature.
     public static let optimove = Feature(rawValue: 1 << 2)
+    /// Preference center feature.
+    public static let preferenceCenter = Feature(rawValue: 1 << 4)
     static let delayedConfiguration = Feature(rawValue: 1 << 3)
 
     public init(rawValue: Int) {
@@ -31,6 +33,9 @@ public struct Feature: OptionSet, @unchecked Sendable, CustomStringConvertible {
         if contains(.delayedConfiguration) {
             descriptions.append("Delayed Configuration")
         }
+        if contains(.preferenceCenter) {
+            descriptions.append("Preference Center")
+        }
 
         return descriptions.isEmpty ? "No Features" : descriptions.joined(separator: ", ")
     }
@@ -40,6 +45,7 @@ public struct OptimoveConfig {
     let features: Feature
     let tenantInfo: OptimoveTenantInfo?
     let optimobileConfig: OptimobileConfig?
+    let preferenceCenterConfig: PreferenceCenterConfig?
 
     func isOptimoveConfigured() -> Bool {
         return features.contains(.optimove)
@@ -47,6 +53,14 @@ public struct OptimoveConfig {
 
     func isOptimobileConfigured() -> Bool {
         return features.contains(.optimobile)
+    }
+    
+    func isPreferenceCenterConfigured() -> Bool {
+        return features.contains(.preferenceCenter)
+    }
+
+    func getPreferenceCenterConfig() -> PreferenceCenterConfig? {
+        return preferenceCenterConfig
     }
 }
 
@@ -90,6 +104,7 @@ public typealias Region = OptimobileConfig.Region
 
 open class OptimoveConfigBuilder: NSObject {
     private var credentials: OptimobileCredentials?
+    private var preferenceCenterCredentials: String?
     public private(set) var features: Feature
     var region: OptimobileConfig.Region?
     var urlBuilder: UrlBuilder
@@ -159,29 +174,44 @@ open class OptimoveConfigBuilder: NSObject {
         }
     }
 
-    @discardableResult public func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?) -> OptimoveConfigBuilder {
-        if optimoveCredentials == nil, optimoveCredentials == nil {
+    @discardableResult func setCredentials(
+        optimoveCredentials: String?,
+        optimobileCredentials: String?,
+        preferenceCenterCredentials: String? = nil
+    ) -> OptimoveConfigBuilder {
+        if optimoveCredentials == nil, optimobileCredentials == nil {
             assertionFailure("Should provide at least optimove or optimobile credentials")
         }
-        do {
-            if let optimoveCredentials = optimoveCredentials, !optimoveCredentials.isEmpty {
+
+        if let optimoveCredentials = optimoveCredentials, !optimoveCredentials.isEmpty {
+            do {
                 let args = try OptimoveArguments(base64: optimoveCredentials)
                 features.insert(.optimove)
                 _tenantToken = args.tenantToken
                 _configName = args.configName
+            } catch {
+                Logger.error("Invalid Optimove credentials: \(error.localizedDescription)")
             }
-        } catch {
-            Logger.error(error.localizedDescription)
         }
-        do {
-            if let optimobileCredentials = optimobileCredentials, !optimobileCredentials.isEmpty {
+
+        if let optimobileCredentials = optimobileCredentials, !optimobileCredentials.isEmpty {
+            do {
                 let args = try OptimobileArguments(base64: optimobileCredentials)
                 features.insert(.optimobile)
                 credentials = args.credentials
                 region = args.region
+            } catch {
+                Logger.error("Invalid Optimobile credentials: \(error.localizedDescription)")
             }
-        } catch {
-            Logger.error(error.localizedDescription)
+        }
+
+        if let preferenceCenterCredentials = preferenceCenterCredentials, !preferenceCenterCredentials.isEmpty {
+            if optimoveCredentials == nil || optimoveCredentials == "" {
+                Logger.error("Preference Center requires optimove credentials set");
+            }  else {
+                self.preferenceCenterCredentials = preferenceCenterCredentials
+                features.insert(.preferenceCenter)
+            }
         }
 
         return self
@@ -226,6 +256,14 @@ open class OptimoveConfigBuilder: NSObject {
     @discardableResult public func enableDeepLinking(cname: String? = nil, _ handler: @escaping DeepLinkHandler) -> OptimoveConfigBuilder {
         _deepLinkCname = URL(string: cname ?? "")
         _deepLinkHandler = handler
+
+        return self
+    }
+
+    @discardableResult public func enablePreferenceCenter(credentials: String) -> OptimoveConfigBuilder
+    {
+        features.insert(.preferenceCenter)
+        preferenceCenterCredentials = credentials
 
         return self
     }
@@ -307,16 +345,51 @@ open class OptimoveConfigBuilder: NSObject {
             return nil
         }()
 
+        let preferenceCenterConfig: PreferenceCenterConfig? = {
+            if !features.contains(.optimove),
+               tenantInfo == nil,
+               !features.contains(.delayedConfiguration) {
+                Logger.error("Preference center cannot be inialized without optimove")
+                return nil
+            }
+
+            if preferenceCenterCredentials == nil {
+                if !features.contains(.delayedConfiguration) {
+                    Logger.error("Preference center could not be initialized due to missing credentials.")
+                }
+                return nil
+            }
+
+            return getPreferenceCenterConfig(from: preferenceCenterCredentials)
+        }()
+
+
         return OptimoveConfig(
             features: features,
             tenantInfo: tenantInfo,
-            optimobileConfig: optimobileConfig
+            optimobileConfig: optimobileConfig,
+            preferenceCenterConfig: preferenceCenterConfig
         )
+    }
+
+    private func getPreferenceCenterConfig(from credentials: String?) -> PreferenceCenterConfig? {
+        do {
+            let args = try PreferenceCenterArguments(base64: credentials!)
+
+            return PreferenceCenterConfig(
+                region: args.region,
+                tenantId: args.tenantId,
+                brandGroupId: args.brandGroupId
+            )
+        } catch {
+            Logger.error("Invalid preference center credentials: \(error.localizedDescription)")
+            return nil
+        }
     }
 }
 
 public extension OptimobileConfig {
-    enum Region: String, CaseIterable {
+    enum Region: String, CaseIterable, Codable {
         case DEV = "uk-1"
         case EU = "eu-central-2"
         case US = "us-east-1"
@@ -431,5 +504,52 @@ struct OptimobileArguments: Decodable {
 
         region = try OptimobileConfig.Region(string: regionString)
         credentials = OptimobileCredentials(apiKey: apiKey, secretKey: secretKey)
+    }
+}
+
+struct PreferenceCenterArguments: Decodable {
+    enum Error: Foundation.LocalizedError {
+        case emptyBase64
+        case failedDecodingBase64(String)
+
+        var errorDescription: String? {
+            switch self {
+            case .emptyBase64:
+                return "The base64 string is empty"
+            case let .failedDecodingBase64(string):
+                return "Failed on decoding base64 the value \(string)"
+            }
+        }
+    }
+
+    let version: String
+    let region: String
+    let tenantId: Int
+    let brandGroupId: String
+
+    enum CodingKeys: String, CodingKey {
+        case version
+        case environment
+        case tenantId
+        case brandGroupId
+    }
+
+    init(base64: String) throws {
+        guard !base64.isEmpty else {
+            throw Error.emptyBase64
+        }
+        guard let data = Data(base64Encoded: base64) else {
+            throw Error.failedDecodingBase64(base64)
+        }
+        self = try JSONDecoder().decode(PreferenceCenterArguments.self, from: data)
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+
+        version = try container.decode(String.self)
+        region = try container.decode(String.self)
+        tenantId = try container.decode(Int.self)
+        brandGroupId = try container.decode(String.self)
     }
 }

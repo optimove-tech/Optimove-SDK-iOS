@@ -1,5 +1,15 @@
 # Changelog
 
+## 6.0.0
+
+- Add Preference Center feature. The new functionality is available through the following methods:
+    - `OptimovePreferenceCenter.getInstance().setCustomerPreferencesAsync()`
+    - `OptimovePreferenceCenter.getInstance().getPreferencesAsync()`
+    
+Breaking changes:
+- iOS 13 required for using Preference Center
+- removed `OptimoveConfigBuilder.setCredentials` unintentionally public method
+
 ## 5.9.0
 
 - Remove `SetUserAgent` event

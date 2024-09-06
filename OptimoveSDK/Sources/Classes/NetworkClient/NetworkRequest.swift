@@ -87,17 +87,32 @@ extension HTTPHeader {
     enum Fields: String {
         case contentType = "Content-Type"
         case userAgent = "User-Agent"
+        case tenantId = "X-Tenant-Id"
+        case accept
     }
 
-    enum Values: String {
-        case json = "application/json"
+    enum Values: CustomStringConvertible {
+        case json
+        case tenantId(id: String)
+        case textplain
+
+        public var description: String {
+            switch self {
+            case .json:
+                return "application/json"
+            case .tenantId(let id):
+                return id
+            case .textplain:
+                return "text/plain"
+            }
+        }
     }
 }
 
 extension HTTPHeader {
     init(field: Fields, value: Values) {
         self.field = field.rawValue
-        self.value = value.rawValue
+        self.value = String(describing: value) 
     }
 }
 
