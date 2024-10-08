@@ -233,6 +233,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
         let frame = UIView(frame: window!.frame)
         self.frame = frame
+        frame.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
         frame.backgroundColor = .clear
 
