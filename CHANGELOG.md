@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.1
+
+- Fix in app presentation issue in orientation change
+
 ## 6.0.0
 
 - Add Preference Center feature. The new functionality is available through the following methods:
