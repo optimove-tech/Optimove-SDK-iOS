@@ -1,6 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 /// A set of options for configuring the SDK.
 /// - Note: The SDK can be configured to support multiple features.
@@ -63,11 +64,11 @@ public struct OptimoveConfig {
     }
 }
 
-@objc public class OptimoveTenantInfo: NSObject {
-    @objc public var tenantToken: String
-    @objc public var configName: String
+class OptimoveTenantInfo: NSObject {
+    var tenantToken: String
+    var configName: String
 
-    @objc public init(tenantToken: String, configName: String) {
+    init(tenantToken: String, configName: String) {
         self.tenantToken = tenantToken
         self.configName = configName
     }
@@ -163,9 +164,14 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     override public required init() {
-        features = []
-        urlBuilder = UrlBuilder(storage: KeyValPersistenceHelper.self)
-        super.init()
+        do {
+            features = []
+            // FIXME: Move UrlBuilder out of OptimoveConfigBuilder
+            urlBuilder = try UrlBuilder(storage: UserDefaults.optimoveAppGroup())
+            super.init()
+        } catch {
+            fatalError(error.localizedDescription)
+        }
     }
 
     @discardableResult func setCredentials(

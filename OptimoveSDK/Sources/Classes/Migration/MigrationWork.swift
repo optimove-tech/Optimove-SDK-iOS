@@ -8,6 +8,10 @@ protocol MigrationWork {
     func runMigration()
 }
 
+private protocol Replacer {
+    func replace()
+}
+
 class MigrationWorker: MigrationWork {
     let version: Version
 
@@ -107,10 +111,6 @@ final class MigrationWork_3_3_0: MigrationWorker {
         replacers.forEach { $0.replace() }
         super.runMigration()
     }
-}
-
-private protocol Replacer {
-    func replace()
 }
 
 extension MigrationWork_3_3_0 {
@@ -230,6 +230,50 @@ extension MigrationWork_3_3_0 {
     }
 }
 
+/// Migration from Kumulos UserDefaults to Optimove UserDefaults.
+final class MigrationWork_6_0_0: MigrationWorker {
+    init() {
+        super.init(newVersion: .v_6_0_0)
+    }
+
+    override func isAllowToMiragte(_: String) -> Bool {
+        guard let storage = try? UserDefaults.optimove() else {
+            return true
+        }
+        let key = StorageKey.migrationVersions
+        let versions = storage.object(forKey: key.rawValue) as? [String] ?? []
+        return !versions.contains(version.rawValue)
+    }
+
+    override func runMigration() {
+        Logger.info("Migration from Kumulos UserDefaults to Optimove UserDefaults started")
+        let keyMapping: [OptimobileUserDefaultsKey: StorageKey] = [
+            .REGION: .region,
+            .MEDIA_BASE_URL: .mediaURL,
+            .INSTALL_UUID: .installUUID,
+            .USER_ID: .userID,
+            .BADGE_COUNT: .badgeCount,
+            .PENDING_NOTIFICATIONS: .pendingNotifications,
+            .PENDING_ANALYTICS: .pendingAnaltics,
+            .IN_APP_LAST_SYNCED_AT: .inAppLastSyncedAt,
+            .IN_APP_MOST_RECENT_UPDATED_AT: .inAppMostRecentUpdateAt,
+            .IN_APP_CONSENTED: .inAppConsented,
+            .DYNAMIC_CATEGORY: .dynamicCategory,
+        ]
+        /// Move values from Kumulos UserDefaults to Optimove UserDefaults.
+        let kumulosStorage = UserDefaults.standard
+        let optimoveStorage = try! UserDefaults.optimove()
+        OptimobileUserDefaultsKey.allCases.forEach { key in
+            if let value = kumulosStorage.object(forKey: key.rawValue),
+               let storageKey = keyMapping[key]
+            {
+                optimoveStorage.set(value: value, key: storageKey)
+                kumulosStorage.removeObject(forKey: key.rawValue)
+            }
+        }
+        Logger.info("Migration from Kumulos UserDefaults to Optimove UserDefaults completed")
+}
+    
 final class MigrationWork_5_9_0: MigrationWorker {
     init() {
         super.init(newVersion: .v_5_9_0)

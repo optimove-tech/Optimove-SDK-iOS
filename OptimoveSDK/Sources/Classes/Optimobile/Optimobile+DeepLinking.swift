@@ -1,11 +1,12 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 import UIKit
 
 public struct DeepLinkContent {
-    public let title: String?
-    public let description: String?
+    let title: String?
+    let description: String?
 }
 
 public struct DeepLink {
@@ -42,16 +43,18 @@ final class DeepLinkHelper {
         let wasDeferred: Bool
     }
 
-    fileprivate static let deferredLinkCheckedKey = "KUMULOS_DDL_CHECKED"
-
     let config: OptimobileConfig
     let httpClient: KSHttpClient
+    let storage: OptimoveStorage
+    var anyContinuationHandled: Bool
     var cachedLink: CachedLink?
     var finishedInitializationToken: NSObjectProtocol?
 
-    init(_ config: OptimobileConfig, httpClient: KSHttpClient) {
+    init(_ config: OptimobileConfig, httpClient: KSHttpClient, storage: OptimoveStorage) {
         self.config = config
         self.httpClient = httpClient
+        self.storage = storage
+        anyContinuationHandled = false
 
         finishedInitializationToken = NotificationCenter.default
             .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
@@ -82,7 +85,7 @@ final class DeepLinkHelper {
     private func checkForDeferredLinkOnClipboard() -> Bool {
         var handled = false
 
-        if let checked = KeyValPersistenceHelper.object(forKey: DeepLinkHelper.deferredLinkCheckedKey) as? Bool, checked == true {
+        if let checked: Bool? = storage[.deferredLinkChecked], checked == true {
             return handled
         }
 
@@ -99,7 +102,7 @@ final class DeepLinkHelper {
             handled = true
         }
 
-        KeyValPersistenceHelper.set(true, forKey: DeepLinkHelper.deferredLinkCheckedKey)
+        storage.set(value: true, key: .deferredLinkChecked)
 
         return handled
     }

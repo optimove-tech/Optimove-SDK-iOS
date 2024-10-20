@@ -2,6 +2,7 @@
 
 import CoreData
 import Foundation
+import OptimoveCore
 import UIKit
 
 public enum InAppMessagePresentationResult: String {
@@ -18,7 +19,10 @@ private var ks_existingBackgroundFetchDelegate: IMP?
 typealias InAppSyncCompletionHandler = (_ result: Int) -> Void
 
 class InAppManager {
-    private let httpClient: KSHttpClient
+    let httpClient: KSHttpClient
+    let storage: OptimoveStorage
+    let pendingNoticationHelper: PendingNotificationHelper
+    let optimobileHelper: OptimobileHelper
     private(set) var presenter: InAppPresenter
     private var pendingTickleIds = NSMutableOrderedSet(capacity: 1)
 
@@ -34,9 +38,23 @@ class InAppManager {
 
     // MARK: Initialization
 
-    init(_ config: OptimobileConfig, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
+    init(
+        _ config: OptimobileConfig,
+        httpClient: KSHttpClient,
+        urlBuilder: UrlBuilder,
+        storage: OptimoveStorage,
+        pendingNoticationHelper: PendingNotificationHelper,
+        optimobileHelper: OptimobileHelper
+    ) {
         self.httpClient = httpClient
-        presenter = InAppPresenter(displayMode: config.inAppDefaultDisplayMode, urlBuilder: urlBuilder)
+        self.storage = storage
+        self.pendingNoticationHelper = pendingNoticationHelper
+        self.optimobileHelper = optimobileHelper
+        presenter = InAppPresenter(
+            displayMode: config.inAppDefaultDisplayMode,
+            urlBuilder: urlBuilder,
+            pendingNoticationHelper: pendingNoticationHelper
+        )
         syncQueue = DispatchQueue(label: "com.optimove.inapp.sync")
 
         finishedInitializationToken = NotificationCenter.default
@@ -155,7 +173,7 @@ class InAppManager {
     func userConsented() -> Bool {
         // Note if this implementation is changed there is a usage in the main Optimobile initialisation path
         // that should be considered.
-        return UserDefaults.standard.bool(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
+        return storage[.inAppConsented] ?? false
     }
 
     func updateUserConsent(consentGiven: Bool) {
@@ -164,7 +182,7 @@ class InAppManager {
         Optimobile.trackEventImmediately(eventType: OptimobileEvent.IN_APP_CONSENT_CHANGED.rawValue, properties: props)
 
         if consentGiven {
-            UserDefaults.standard.set(consentGiven, forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
+            storage.set(value: consentGiven, key: .inAppConsented)
             handleEnrollmentAndSyncSetup()
         } else {
             DispatchQueue.global(qos: .default).async {
@@ -219,9 +237,9 @@ class InAppManager {
         }
 
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
-        UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_CONSENTED.rawValue)
-        UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue)
-        UserDefaults.standard.removeObject(forKey: OptimobileUserDefaultsKey.IN_APP_MOST_RECENT_UPDATED_AT.rawValue)
+        storage.set(value: nil, key: .inAppConsented)
+        storage.set(value: nil, key: .inAppLastSyncedAt)
+        storage.set(value: nil, key: .inAppMostRecentUpdateAt)
 
         context.performAndWait {
             let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
@@ -249,22 +267,23 @@ class InAppManager {
     // MARK: Message management
 
     func syncDebounced(_ onComplete: InAppSyncCompletionHandler? = nil) {
-        syncQueue.async {
-            let lastSyncedAt = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue) as? Date ?? Date(timeIntervalSince1970: 0)
-
-            if lastSyncedAt.timeIntervalSinceNow < self.SYNC_DEBOUNCE_SECONDS {
+        syncQueue.async { [unowned self] in
+            let lastSyncedAt = storage.value(for: .inAppLastSyncedAt) as? Date ?? Date(timeIntervalSince1970: 0)
+            if lastSyncedAt.timeIntervalSinceNow < SYNC_DEBOUNCE_SECONDS {
                 return
             }
 
-            self.sync(onComplete)
+            sync(onComplete)
         }
     }
 
     func sync(_ onComplete: InAppSyncCompletionHandler? = nil) {
-        syncQueue.async {
+        let currentUserIdentifier = optimobileHelper.currentUserIdentifier()
+        syncQueue.async { [unowned self] in
             let syncBarrier = DispatchSemaphore(value: 0)
 
-            let mostRecentUpdate = UserDefaults.standard.object(forKey: OptimobileUserDefaultsKey.IN_APP_MOST_RECENT_UPDATED_AT.rawValue) as? NSDate
+            let mostRecentUpdate = storage.value(for: .inAppMostRecentUpdateAt) as? Date
+
             var after = ""
 
             if let mostRecentUpdate = mostRecentUpdate {
@@ -276,12 +295,12 @@ class InAppManager {
                 after = "?after=\(KSHttpUtil.urlEncode(formatter.string(from: mostRecentUpdate as Date))!)"
             }
 
-            let encodedIdentifier = KSHttpUtil.urlEncode(OptimobileHelper.currentUserIdentifier)
+            let encodedIdentifier = KSHttpUtil.urlEncode(currentUserIdentifier)
             let path = "/v1/users/\(encodedIdentifier!)/messages\(after)"
 
-            self.httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { _, decodedBody in
+            httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { [weak self] _, decodedBody in
                 defer {
-                    UserDefaults.standard.set(Date(), forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue)
+                    self?.storage.set(value: Date(), key: .inAppLastSyncedAt)
                     syncBarrier.signal()
                 }
 
@@ -291,7 +310,7 @@ class InAppManager {
                     return
                 }
 
-                self.persistInAppMessages(messages: messagesToPersist!)
+                self?.persistInAppMessages(messages: messagesToPersist!)
                 onComplete?(1)
 
                 DispatchQueue.main.async {
@@ -299,9 +318,15 @@ class InAppManager {
                         return
                     }
 
-                    DispatchQueue.global(qos: .default).async {
-                        let messagesToPresent = self.getMessagesToPresent([InAppPresented.IMMEDIATELY.rawValue])
-                        self.presenter.queueMessagesForPresentation(messages: messagesToPresent, tickleIds: self.pendingTickleIds)
+                    DispatchQueue.global(qos: .default).async { [weak self] in
+                        if let messagesToPresent = self?.getMessagesToPresent([InAppPresented.IMMEDIATELY.rawValue]),
+                           let pendingTickleIds = self?.pendingTickleIds
+                        {
+                            self?.presenter.queueMessagesForPresentation(
+                                messages: messagesToPresent,
+                                tickleIds: pendingTickleIds
+                            )
+                        }
                     }
                 }
             }, onFailure: { _, _, _ in
@@ -428,8 +453,7 @@ class InAppManager {
                 removeNotificationTickle(id: idEvicted)
             }
 
-            UserDefaults.standard.set(mostRecentUpdate, forKey: OptimobileUserDefaultsKey.IN_APP_MOST_RECENT_UPDATED_AT.rawValue)
-
+            storage.set(value: mostRecentUpdate, key: .inAppMostRecentUpdateAt)
             trackMessageDelivery(messages: messages)
 
             let inboxUpdated = fetchedWithInbox || evictedWithInbox || evictedExceedersWithInbox
@@ -445,7 +469,7 @@ class InAppManager {
         if #available(iOS 10, *) {
             let tickleNotificationId = "k-in-app-message:\(id)"
             UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [tickleNotificationId])
-            PendingNotificationHelper.remove(identifier: tickleNotificationId)
+            pendingNoticationHelper.remove(identifier: tickleNotificationId)
         }
     }
 
@@ -670,24 +694,20 @@ class InAppManager {
     }
 
     func handlePushOpen(notification: PushNotification) {
-        let deepLink: [AnyHashable: Any]? = notification.inAppDeepLink()
-        if !inAppEnabled() || deepLink == nil {
+        guard let deepLink = notification.deeplink, !inAppEnabled() else {
             return
         }
 
         DispatchQueue.global(qos: .default).async {
-            let data = deepLink!["data"] as! [AnyHashable: Any]
-            let inAppPartId: Int = data["id"] as! Int
-
             objc_sync_enter(self.pendingTickleIds)
             defer { objc_sync_exit(self.pendingTickleIds) }
 
-            self.pendingTickleIds.add(inAppPartId)
+            self.pendingTickleIds.add(deepLink.id)
 
             let messagesToPresent = self.getMessagesToPresent([])
 
             let tickleMessageFound = messagesToPresent.contains(where: { message -> Bool in
-                message.id == inAppPartId
+                message.id == deepLink.id
             })
 
             if !tickleMessageFound {
@@ -811,7 +831,7 @@ class InAppManager {
 
     func markAllInboxItemsAsRead() -> Bool {
         var result = true
-        let inboxItems = OptimoveInApp.getInboxItems()
+        let inboxItems = OptimoveInApp.getInboxItems(storage: storage)
         var inboxNeedsUpdate = false
         for item in inboxItems {
             if item.isRead() {
