@@ -18,12 +18,14 @@ final class AnalyticsHelper {
     private var analyticsContext: NSManagedObjectContext?
     private var migrationAnalyticsContext: NSManagedObjectContext?
     private var finishedInitializationToken: NSObjectProtocol?
+    private let syncQueue : DispatchQueue
 
     // MARK: Initialization
 
     init(httpClient: KSHttpClient) {
         analyticsContext = nil
         migrationAnalyticsContext = nil
+        syncQueue = DispatchQueue(label: "com.optimove.optimobile.sync-q", target: .global(qos: .utility))
 
         eventsHttpClient = httpClient
 
@@ -149,9 +151,7 @@ final class AnalyticsHelper {
                 try context.save()
 
                 if immediateFlush {
-                    DispatchQueue.global().async {
-                        self.syncEvents(context: self.analyticsContext, onSyncComplete)
-                    }
+                    self.syncEvents(context: self.analyticsContext, onSyncComplete)
                 }
             } catch {
                 print("Failed to record event")
@@ -163,6 +163,16 @@ final class AnalyticsHelper {
     }
 
     private func syncEvents(context: NSManagedObjectContext?, _ onSyncComplete: SyncCompletedBlock? = nil) {
+        // Adding a small delay here can result in better grouping of sync calls -- should we do it?
+        self.syncQueue.asyncAfter(deadline: .now() + 1) {
+            let uuid = UUID().uuidString
+            print("begin \(uuid)")
+            self.syncEventsImpl(context: self.analyticsContext, onSyncComplete)
+            print("end \(uuid)")
+        }
+    }
+
+    private func syncEventsImpl(context: NSManagedObjectContext?, _ onSyncComplete: SyncCompletedBlock? = nil) {
         context?.performAndWait {
             let results = fetchEventsBatch(context)
 
@@ -224,23 +234,44 @@ final class AnalyticsHelper {
             eventIds.append(event.objectID)
         }
 
+        // TODO clean up logs
+        print("Syncing \(events.map({$0.uuid})) events")
+
         let path = "/v1/app-installs/\(OptimobileHelper.installId)/events"
 
+        var err : Error? = nil
+        let networkBarrier = DispatchSemaphore(value: 1)
+
         eventsHttpClient.sendRequest(.POST, toPath: path, data: data, onSuccess: { _, _ in
-            if let err = self.pruneEventsBatch(context, eventIds) {
-                print("Failed to prune events batch: " + err.localizedDescription)
-                onSyncComplete?(err)
-                return
-            }
-            self.syncEvents(context: context, onSyncComplete)
+            networkBarrier.signal()
         }) { _, error, _ in
             print("Failed to send events")
-            onSyncComplete?(error)
+            err = error
+            networkBarrier.signal()
         }
+
+        print("waiting on network")
+        networkBarrier.wait()
+        print("continuing...")
+
+        if err != nil {
+            onSyncComplete?(err)
+            return
+        }
+
+        if let err = self.pruneEventsBatch(context, eventIds) {
+            print("Failed to prune events batch: " + err.localizedDescription)
+            onSyncComplete?(err)
+            return
+        }
+
+        self.syncEventsImpl(context: context, onSyncComplete)
     }
 
     private func pruneEventsBatch(_ context: NSManagedObjectContext?, _ eventIds: [NSManagedObjectID]) -> Error? {
         var err: Error?
+
+        print("Pruning \(eventIds.count)")
 
         context?.performAndWait {
             let request = NSBatchDeleteRequest(objectIDs: eventIds)
