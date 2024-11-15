@@ -163,12 +163,8 @@ final class AnalyticsHelper {
     }
 
     private func syncEvents(context: NSManagedObjectContext?, _ onSyncComplete: SyncCompletedBlock? = nil) {
-        // Adding a small delay here can result in better grouping of sync calls -- should we do it?
-        self.syncQueue.asyncAfter(deadline: .now() + 1) {
-            let uuid = UUID().uuidString
-            print("begin \(uuid)")
+        self.syncQueue.async {
             self.syncEventsImpl(context: self.analyticsContext, onSyncComplete)
-            print("end \(uuid)")
         }
     }
 
@@ -234,25 +230,19 @@ final class AnalyticsHelper {
             eventIds.append(event.objectID)
         }
 
-        // TODO clean up logs
-        print("Syncing \(events.map({$0.uuid})) events")
-
         let path = "/v1/app-installs/\(OptimobileHelper.installId)/events"
 
         var err : Error? = nil
-        let networkBarrier = DispatchSemaphore(value: 1)
+        let networkBarrier = DispatchSemaphore(value: 0)
 
         eventsHttpClient.sendRequest(.POST, toPath: path, data: data, onSuccess: { _, _ in
             networkBarrier.signal()
         }) { _, error, _ in
-            print("Failed to send events")
             err = error
             networkBarrier.signal()
         }
 
-        print("waiting on network")
         networkBarrier.wait()
-        print("continuing...")
 
         if err != nil {
             onSyncComplete?(err)
@@ -270,8 +260,6 @@ final class AnalyticsHelper {
 
     private func pruneEventsBatch(_ context: NSManagedObjectContext?, _ eventIds: [NSManagedObjectID]) -> Error? {
         var err: Error?
-
-        print("Pruning \(eventIds.count)")
 
         context?.performAndWait {
             let request = NSBatchDeleteRequest(objectIDs: eventIds)
