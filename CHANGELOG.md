@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.2
+
+- Fix same immediate events sent multiple times
+
 ## 6.0.1
 
 - Fix in app presentation issue in orientation change
