@@ -32,6 +32,7 @@ In this guide we will go through the following steps necessary to have the basic
 
 1. [Tracking custom events](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Tracking-custom-events)
 2. [Location and Beacons](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Location-and-Beacons)
+3. [Preference Center](https://github.com/optimove-tech/Optimove-SDK-iOS/wiki/Preference-Center)
 
 ## Mobile Messaging
 

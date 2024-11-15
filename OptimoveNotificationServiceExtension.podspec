@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'OptimoveNotificationServiceExtension'
-  s.version          = '5.9.0'
+  s.version          = '6.0.1'
   s.summary          = 'Official Optimove SDK for iOS. Notification service extension framework.'
   s.description      = 'The notification service extension is used for handling additional content in push notifications.'
   s.homepage         = 'https://github.com/optimove-tech/Optimove-SDK-iOS'
