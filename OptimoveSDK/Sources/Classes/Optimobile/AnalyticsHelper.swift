@@ -18,14 +18,14 @@ final class AnalyticsHelper {
     private var analyticsContext: NSManagedObjectContext?
     private var migrationAnalyticsContext: NSManagedObjectContext?
     private var finishedInitializationToken: NSObjectProtocol?
-    private let syncQueue : DispatchQueue
+    private let serialQueue : DispatchQueue
 
     // MARK: Initialization
 
     init(httpClient: KSHttpClient) {
         analyticsContext = nil
         migrationAnalyticsContext = nil
-        syncQueue = DispatchQueue(label: "com.optimove.optimobile.sync-q", target: .global(qos: .utility))
+        serialQueue = DispatchQueue(label: "com.optimove.optimobile.serial-q", target: .global(qos: .utility))
 
         eventsHttpClient = httpClient
 
@@ -163,7 +163,7 @@ final class AnalyticsHelper {
     }
 
     private func syncEvents(context: NSManagedObjectContext?, _ onSyncComplete: SyncCompletedBlock? = nil) {
-        self.syncQueue.async {
+        self.serialQueue.async {
             self.syncEventsImpl(context: self.analyticsContext, onSyncComplete)
         }
     }
