@@ -228,7 +228,7 @@ final class AnalyticsHelper {
             eventIds.append(event.objectID)
         }
 
-        let path = "/v1/app-installs/\(OptimobileHelper.installId)/events"
+        let path = "/v1/app-installs/\(optimobileHelper.installId())/events"
 
         eventsHttpClient.sendRequest(.POST, toPath: path, data: data, onSuccess: { _, _ in
             if let err = self.pruneEventsBatch(context, eventIds) {
