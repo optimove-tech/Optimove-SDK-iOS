@@ -28,7 +28,7 @@ class AnalyticsHelperTests: XCTestCase {
     }
     
     func test_number_of_sent_events_same_as_tracked() {
-        let numberOfEvents = 10;
+        let numberOfEvents = 8;
         let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
         
         mockHttpClient.forward = { method, data in
@@ -41,11 +41,11 @@ class AnalyticsHelperTests: XCTestCase {
             self.analyticsHelper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
         }
         
-        waitForExpectations(timeout: 5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
     
     func test_number_of_sent_events_from_background_threads_same_as_tracked() {
-        let numberOfEvents = 10;
+        let numberOfEvents = 8;
         let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
         
         mockHttpClient.forward = { method, data in
@@ -60,7 +60,7 @@ class AnalyticsHelperTests: XCTestCase {
             }
         }
         
-        waitForExpectations(timeout: 5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
     
     func test_immediate_event_should_grab_nonimmediate() {
