@@ -13,7 +13,7 @@ class AnalyticsHelperTests: XCTestCase {
     
     var mockHttpClient: MockKSHttpClient!
     var analyticsHelper: AnalyticsHelper!
-    var longTimeoutInSeconds = 10.0;
+    var longTimeoutInSeconds = 10.0
     
     override func setUp() {
         super.setUp()

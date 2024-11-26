@@ -164,7 +164,7 @@ final class AnalyticsHelper {
 
     private func syncEvents(context: NSManagedObjectContext?, _ onSyncComplete: SyncCompletedBlock? = nil) {
         self.serialQueue.async {
-            self.syncEventsImpl(context: self.analyticsContext, onSyncComplete)
+            self.syncEventsImpl(context: context, onSyncComplete)
         }
     }
 
