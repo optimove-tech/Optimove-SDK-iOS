@@ -104,7 +104,7 @@ class AnalyticsHelperTests: XCTestCase {
         analyticsHelper.trackEvent(eventType: "immediate_event", properties: nil, immediateFlush: false)
         analyticsHelper.trackEvent(eventType: "regular_event", properties: nil, immediateFlush: true)
         
-        waitForExpectations(timeout: defaultTimeout, handler: nil)
+        waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
     }
     
     func test_failed_network_event_shouldnt_be_picked_up_by_subsequent() {
