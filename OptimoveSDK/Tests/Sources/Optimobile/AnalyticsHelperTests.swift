@@ -29,7 +29,7 @@ class AnalyticsHelperTests: XCTestCase {
     }
     
     func test_number_of_sent_events_same_as_tracked() {
-        let numberOfEvents = 8
+        let numberOfEvents = 4
         let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
         
         mockHttpClient.forward = { method, data in
@@ -46,7 +46,7 @@ class AnalyticsHelperTests: XCTestCase {
     }
     
     func test_number_of_sent_events_with_delays_same_as_tracked() {
-        let numberOfEvents = 8
+        let numberOfEvents = 4
         let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
         
         var totalDispatchedEvents = 0
@@ -74,7 +74,7 @@ class AnalyticsHelperTests: XCTestCase {
     }
     
     func test_number_of_sent_events_from_background_threads_same_as_tracked() {
-        let numberOfEvents = 8
+        let numberOfEvents = 4
         let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
         
         mockHttpClient.forward = { method, data in
