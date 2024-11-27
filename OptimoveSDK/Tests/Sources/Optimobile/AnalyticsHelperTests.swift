@@ -32,14 +32,14 @@ class AnalyticsHelperTests: XCTestCase {
         let numberOfEvents = 4
         let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
         
-        mockHttpClient.forward = { method, data in
-            if let data = data as? [[String: Any?]], data.count == numberOfEvents {
-                numberOfEventsExpectation.fulfill()
-            }
+        for i in 1...numberOfEvents - 1 {
+            analyticsHelper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
         }
         
-        for i in 1...numberOfEvents {
-            analyticsHelper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
+        self.analyticsHelper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+            if let data = self.mockHttpClient.capturedData as? [[String: Any?]], data.count == numberOfEvents {
+                numberOfEventsExpectation.fulfill()
+            }
         }
         
         waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
@@ -49,24 +49,17 @@ class AnalyticsHelperTests: XCTestCase {
         let numberOfEvents = 4
         let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
         
-        var totalDispatchedEvents = 0
-        mockHttpClient.forward = { method, data in
-            if let data = data as? [[String: Any?]] {
-                totalDispatchedEvents = totalDispatchedEvents + data.count
-            }
-            
-            if totalDispatchedEvents == numberOfEvents * 2 {
-                numberOfEventsExpectation.fulfill()
-            }
-        }
-        
-        for i in 1...numberOfEvents {
-            analyticsHelper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
-        }
+        analyticsHelper.trackEvent(eventType: "immediate_event_first", properties: nil, immediateFlush: true)
         
         DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
-            for i in 1...numberOfEvents {
+            for i in 1...numberOfEvents - 1 {
                 self.analyticsHelper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
+            }
+            
+            self.analyticsHelper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+                if let data = self.mockHttpClient.capturedData as? [[String: Any?]], data.count == numberOfEvents {
+                    numberOfEventsExpectation.fulfill()
+                }
             }
         }
         
@@ -76,16 +69,17 @@ class AnalyticsHelperTests: XCTestCase {
     func test_number_of_sent_events_from_background_threads_same_as_tracked() {
         let numberOfEvents = 4
         let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
+    
         
-        mockHttpClient.forward = { method, data in
-            if let data = data as? [[String: Any?]], data.count == numberOfEvents {
-                numberOfEventsExpectation.fulfill()
+        for i in 1...numberOfEvents - 1 {
+            DispatchQueue.global().async {
+                self.analyticsHelper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
             }
         }
         
-        for i in 1...numberOfEvents {
-            DispatchQueue.global().async {
-                self.analyticsHelper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
+        analyticsHelper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+            if let data = self.mockHttpClient.capturedData as? [[String: Any?]], data.count == numberOfEvents {
+                numberOfEventsExpectation.fulfill()
             }
         }
         
@@ -94,41 +88,32 @@ class AnalyticsHelperTests: XCTestCase {
     
     func test_immediate_event_should_grab_nonimmediate() {
         let nonImmediateSentExpectation = expectation(description: "Non immediate wasn't sent with immediate")
+    
         
-        mockHttpClient.forward = { method, data in
-            if let data = data as? [[String: Any?]], data.count == 2 {
+        analyticsHelper.trackEvent(eventType: "regular_event", properties: nil, immediateFlush: false)
+        analyticsHelper.trackEvent(eventType: "immediate_event", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+            if let data = self.mockHttpClient.capturedData as? [[String: Any?]], data.count == 2 {
                 nonImmediateSentExpectation.fulfill()
             }
         }
         
-        analyticsHelper.trackEvent(eventType: "immediate_event", properties: nil, immediateFlush: false)
-        analyticsHelper.trackEvent(eventType: "regular_event", properties: nil, immediateFlush: true)
-        
         waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
     }
     
-    func test_failed_network_event_shouldnt_be_picked_up_by_subsequent() {
+    func test_failed_network_event_should_be_picked_up_by_subsequent() {
         let mockKSHttpClientSingleFailure = MockKSHttpClientSingleFailure()
         let analyticsHelper = AnalyticsHelper(httpClient: mockKSHttpClientSingleFailure)
         
         let failedEventExpectation = expectation(description: "Failed event wasn't sent on next dispatch")
-        
-        var totalDispatchedEvents = 0
-        
-        mockKSHttpClientSingleFailure.forward = { method, data in
-            if let data = data as? [[String: Any?]] {
-                totalDispatchedEvents = totalDispatchedEvents + data.count
-                
-                if totalDispatchedEvents == 2 {
-                    failedEventExpectation.fulfill()
-                }
-            }
-        }
-        
+
         analyticsHelper.trackEvent(eventType: "immeditate_event", properties: nil, immediateFlush: true)
         
         DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
-            analyticsHelper.trackEvent(eventType: "delayed_immediate_event", properties: nil, immediateFlush: true)
+            analyticsHelper.trackEvent(eventType: "immediate_event_second", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+                if let data = mockKSHttpClientSingleFailure.capturedData as? [[String: Any?]], data.count == 2 {
+                    failedEventExpectation.fulfill()
+                }
+            }
         }
         
         waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
@@ -137,10 +122,10 @@ class AnalyticsHelperTests: XCTestCase {
 }
 
 class MockKSHttpClient: KSHttpClient {
-    var forward: ((_ method: OptimoveSDK.KSHttpMethod, _ data: Any?) -> Void)?
+    var capturedData: Any?
     
     func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
-        forward?(method, data)
+        capturedData = data
         onSuccess(nil, nil)
     }
     
@@ -151,7 +136,7 @@ class MockKSHttpClient: KSHttpClient {
 }
 
 class MockKSHttpClientSingleFailure: KSHttpClient {
-    var forward: ((_ method: OptimoveSDK.KSHttpMethod, _ data: Any?) -> Void)?
+    var capturedData: Any?
     var failed = false
     
     func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
@@ -159,7 +144,7 @@ class MockKSHttpClientSingleFailure: KSHttpClient {
             onFailure(nil, NSError(domain: "domain", code: 404), nil)
             failed = true
         } else {
-            forward?(method, data)
+            capturedData = data
             onSuccess(nil, nil)
         }
     }
