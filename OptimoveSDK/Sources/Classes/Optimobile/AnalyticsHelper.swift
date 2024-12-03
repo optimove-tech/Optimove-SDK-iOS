@@ -239,6 +239,7 @@ final class AnalyticsHelper {
             networkBarrier.signal()
         }) { _, error, _ in
             err = error
+            print("Failed to send events \(err?.localizedDescription ?? "")")
             networkBarrier.signal()
         }
 
