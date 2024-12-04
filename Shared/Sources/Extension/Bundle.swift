@@ -10,7 +10,7 @@ public extension Bundle {
             if let moduleName = Bundle(for: BundleFinder.self).bundleIdentifier,
                let testBundlePath = ProcessInfo.processInfo.environment["XCTestBundlePath"]
             {
-                if let resourceBundle = Bundle(path: testBundlePath + "/Optimove_\(moduleName).bundle") {
+                if let lastModuleComponent = moduleName.components(separatedBy: ".").last, let resourceBundle = Bundle(path: testBundlePath + "/Optimove_\(lastModuleComponent).bundle") {
                     return resourceBundle
                 }
             }

@@ -12,7 +12,7 @@ final class NetworkFactory {
     }
 
     func build(for service: UrlBuilder.Service) -> KSHttpClient {
-        return KSHttpClient(
+        return KSHttpClientImpl(
             serviceType: service,
             urlBuilder: urlBuilder,
             requestFormat: .json,

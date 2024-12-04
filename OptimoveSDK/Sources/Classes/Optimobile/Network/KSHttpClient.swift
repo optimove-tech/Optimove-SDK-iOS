@@ -23,7 +23,12 @@ enum KSHttpMethod: String {
     case DELETE
 }
 
-final class KSHttpClient {
+protocol KSHttpClient {
+    func invalidateSessionCancellingTasks(_ cancel: Bool)
+    func sendRequest(_ method: KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock)
+}
+
+final class KSHttpClientImpl: KSHttpClient {
     private let serviceType: UrlBuilder.Service
     private let urlBuilder: UrlBuilder
     private let urlSession: URLSession

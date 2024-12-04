@@ -18,12 +18,14 @@ final class AnalyticsHelper {
     private var analyticsContext: NSManagedObjectContext?
     private var migrationAnalyticsContext: NSManagedObjectContext?
     private var finishedInitializationToken: NSObjectProtocol?
+    private let serialQueue : DispatchQueue
 
     // MARK: Initialization
 
     init(httpClient: KSHttpClient) {
         analyticsContext = nil
         migrationAnalyticsContext = nil
+        serialQueue = DispatchQueue(label: "com.optimove.optimobile.serial-q", target: .global(qos: .utility))
 
         eventsHttpClient = httpClient
 
@@ -149,9 +151,7 @@ final class AnalyticsHelper {
                 try context.save()
 
                 if immediateFlush {
-                    DispatchQueue.global().async {
-                        self.syncEvents(context: self.analyticsContext, onSyncComplete)
-                    }
+                    self.syncEvents(context: self.analyticsContext, onSyncComplete)
                 }
             } catch {
                 print("Failed to record event")
@@ -163,6 +163,12 @@ final class AnalyticsHelper {
     }
 
     private func syncEvents(context: NSManagedObjectContext?, _ onSyncComplete: SyncCompletedBlock? = nil) {
+        self.serialQueue.async {
+            self.syncEventsImpl(context: context, onSyncComplete)
+        }
+    }
+
+    private func syncEventsImpl(context: NSManagedObjectContext?, _ onSyncComplete: SyncCompletedBlock? = nil) {
         context?.performAndWait {
             let results = fetchEventsBatch(context)
 
@@ -226,17 +232,31 @@ final class AnalyticsHelper {
 
         let path = "/v1/app-installs/\(OptimobileHelper.installId)/events"
 
+        var err : Error? = nil
+        let networkBarrier = DispatchSemaphore(value: 0)
+
         eventsHttpClient.sendRequest(.POST, toPath: path, data: data, onSuccess: { _, _ in
-            if let err = self.pruneEventsBatch(context, eventIds) {
-                print("Failed to prune events batch: " + err.localizedDescription)
-                onSyncComplete?(err)
-                return
-            }
-            self.syncEvents(context: context, onSyncComplete)
+            networkBarrier.signal()
         }) { _, error, _ in
-            print("Failed to send events")
-            onSyncComplete?(error)
+            err = error
+            print("Failed to send events \(err?.localizedDescription ?? "")")
+            networkBarrier.signal()
         }
+
+        networkBarrier.wait()
+
+        if err != nil {
+            onSyncComplete?(err)
+            return
+        }
+
+        if let err = self.pruneEventsBatch(context, eventIds) {
+            print("Failed to prune events batch: " + err.localizedDescription)
+            onSyncComplete?(err)
+            return
+        }
+
+        self.syncEventsImpl(context: context, onSyncComplete)
     }
 
     private func pruneEventsBatch(_ context: NSManagedObjectContext?, _ eventIds: [NSManagedObjectID]) -> Error? {
