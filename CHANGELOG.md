@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.1.0
+
+- Fix removed tasks to support pre 5.5 swift versions
+- Fix Xcode 16 OpitmoveSDK warnings
+
 ## 6.0.2
 
 - Fix same immediate events sent multiple times
