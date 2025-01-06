@@ -2,6 +2,7 @@
 
 ## 6.1.0
 
+- Fix invalidating sessions on NetworkClientImpl deinit
 - Fix removed tasks to support pre 5.5 swift versions
 - Fix Xcode 16 OpitmoveSDK warnings
 
