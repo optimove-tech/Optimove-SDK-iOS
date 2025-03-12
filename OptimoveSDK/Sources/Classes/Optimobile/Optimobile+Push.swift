@@ -366,11 +366,19 @@ class PushHelper {
     typealias didReceiveBlock = @convention(block) (_ obj: Any, _ application: UIApplication, _ userInfo: [AnyHashable: Any], _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void
 
     lazy var pushInit: Void = {
-        let klass: AnyClass = type(of: UIApplication.shared.delegate!)
-
-        // Did register push delegate
+        let delegate = UIApplication.shared.delegate!
+        
+        // Get the actual runtime class of the delegate instance to co-exist with other swizzling flows
+        let klass: AnyClass = object_getClass(delegate)!
+        
+        self.swizzleDidRegister(delegate: delegate, klass: klass)
+        self.swizzleDidFailRegister(delegate: delegate, klass: klass)
+        self.swizzleDidReceive(delegate: delegate, klass: klass)
+        self.setUserNotificationCenterDelegates()
+    }()
+    
+    private func swizzleDidRegister(delegate: UIApplicationDelegate, klass: AnyClass) {
         let didRegisterSelector = #selector(UIApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
-        let meth = class_getInstanceMethod(klass, didRegisterSelector)
         let regType = NSString(string: "v@:@@").utf8String
         let regBlock: didRegBlock = { (obj: UIApplicationDelegate, application: UIApplication, deviceToken: Data) in
             if let _ = existingDidReg {
@@ -381,8 +389,15 @@ class PushHelper {
         }
         let kumulosDidRegister = imp_implementationWithBlock(regBlock as Any)
         existingDidReg = class_replaceMethod(klass, didRegisterSelector, kumulosDidRegister, regType)
+        
+        if existingDidReg == nil {
+            existingDidReg = self.getForwardingImpl(target: delegate, originalSelector: didRegisterSelector)
+        }
+    }
+    
+    private func swizzleDidFailRegister(delegate: UIApplicationDelegate, klass: AnyClass) {
+        let klass: AnyClass = object_getClass(delegate)!
 
-        // Failed to register handler
         let didFailToRegisterSelector = #selector(UIApplicationDelegate.application(_:didFailToRegisterForRemoteNotificationsWithError:))
         let didFailToRegType = NSString(string: "v@:@@").utf8String
         let didFailToRegBlock: didFailToRegBlock = { (obj: Any, application: UIApplication, error: Error) in
@@ -392,9 +407,16 @@ class PushHelper {
 
             print("Failed to register for remote notifications: \(error)")
         }
+        
         let kumulosDidFailToRegister = imp_implementationWithBlock(didFailToRegBlock as Any)
         existingDidFailToReg = class_replaceMethod(klass, didFailToRegisterSelector, kumulosDidFailToRegister, didFailToRegType)
-
+        
+        if existingDidFailToReg == nil {
+            existingDidFailToReg = self.getForwardingImpl(target: delegate, originalSelector: didFailToRegisterSelector)
+        }
+    }
+    
+    private func swizzleDidReceive(delegate: UIApplicationDelegate, klass: AnyClass) {
         // iOS9+ content-available handler
         let didReceiveSelector = #selector(UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:))
         let receiveType = NSString(string: "v@:@@@?").utf8String
@@ -432,7 +454,7 @@ class PushHelper {
                     })
                 }
             }
-
+            
             if hasInApp {
                 group.enter()
                 Optimobile.sharedInstance.inAppManager.sync { (result: Int) in
@@ -455,14 +477,46 @@ class PushHelper {
         }
         let kumulosDidReceive = imp_implementationWithBlock(unsafeBitCast(didReceive, to: AnyObject.self))
         existingDidReceive = class_replaceMethod(klass, didReceiveSelector, kumulosDidReceive, receiveType)
+        
+        if existingDidReceive == nil {
+            existingDidReceive = self.getForwardingImpl(target: delegate, originalSelector: didReceiveSelector)
+        }
+    }
+    
+    private func setUserNotificationCenterDelegates(){
         if #available(iOS 10, *) {
             let delegate = OptimoveUserNotificationCenterDelegate()
 
             Optimobile.sharedInstance.notificationCenter = delegate
             UNUserNotificationCenter.current().delegate = delegate
         }
-    }()
-
+    }
+    
+    private func getForwardingImpl(target: AnyObject, originalSelector: Selector) -> IMP?{
+        let selector = NSSelectorFromString("forwardingTargetForSelector:")
+        if target.responds(to: selector),
+           let forwardingTargetMethod = class_getInstanceMethod(type(of: target), selector) {
+            
+            typealias ForwardingTargetFunction = @convention(c) (AnyObject, Selector, Selector) -> AnyObject?
+            let implementation = method_getImplementation(forwardingTargetMethod)
+            let function = unsafeBitCast(implementation, to: ForwardingTargetFunction.self)
+            
+            if let forwardingTarget = function(target, selector, originalSelector),
+               forwardingTarget.responds(to: originalSelector) {
+                guard let method = class_getInstanceMethod(type(of: forwardingTarget), originalSelector) else { return nil }
+                
+                let implementation = method_getImplementation(method)
+                
+                return implementation
+            }
+            
+            
+        }
+        
+        return nil
+    }
+     
+    
     private func setBadge(userInfo: [AnyHashable: Any]) {
         let badge: NSNumber? = OptimobileHelper.getBadgeFromUserInfo(userInfo: userInfo)
         if let newBadge = badge {

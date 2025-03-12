@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.2.0
+
+- Add support for coexisting with other push notification SDKs by resolving race conditions when multiple SDKs swizzle the following UIApplicationDelegate methods:
+    - `UIApplicationDelegate.application(:didRegisterForRemoteNotificationsWithDeviceToken:)`
+    - `UIApplicationDelegate.application(:didFailToRegisterForRemoteNotificationsWithError:)`
+    - `UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`
+- Fix swizzling forwarding for apps that use UIApplicationDelegateAdaptor
+
 ## 6.1.0
 
 - Fix invalidating sessions on NetworkClientImpl deinit
