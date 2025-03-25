@@ -9,7 +9,7 @@ derived_data_path = ${build_path}/derived_data
 .PHONY: setup
 setup:
 	test ${DEVELOPER_DIR}
-	brew bundle --file=./Brewfile --quiet --no-lock
+	brew bundle --file=./Brewfile --quiet
 
 .PHONY: all
 all: setup format headers test clean
