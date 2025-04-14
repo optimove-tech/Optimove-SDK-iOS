@@ -3,27 +3,48 @@ import Foundation
 
 public class EmbeddedMessagesService {
     
+    private static var instance: EmbeddedMessagesService?
+    
+    public enum Error: LocalizedError {
+        case alreadyInitialized
+        case notInitialized
+        case configurationIsMissing
+
+        public var errorDescription: String? {
+            switch self {
+            case .alreadyInitialized:
+                return "The PreferenceCenterSDK has already been initialized."
+            case .notInitialized:
+                return "Preference center has not been initialized."
+            case .configurationIsMissing:
+                return "Preference center configuration is missing, but the feature was requested. Please provide valid credentials."
+            }
+        }
+    }
+    
     static func initialize(with optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
         if instance !== nil, optimoveConfig.features.contains(.delayedConfiguration) {
-            guard optimoveConfig.getEmbeddedMessagingConfig() != nil else {
+            if optimoveConfig.getEmbeddedMessagingConfig() == nil {
                 throw Error.configurationIsMissing
             }
             return
         }
 
-        guard instance == nil else {
+        if instance != nil {
             assertionFailure(Error.alreadyInitialized.localizedDescription)
             throw Error.alreadyInitialized
         }
-
-        instance = EmbeddedMessagesService(storage: storage, networkClient: networkClient)
     }
-    
+
     private func getConfigValues(from config: EmbeddedMessagingConfig) -> (region: String, brandGroupId: String, tenantId: String) {
         let region = config.region
-        let brandGroupId = config.brandGroupId
+        let brandGroupId = config.brandId
         let tenantId = config.tenantId.description
         return (region, brandGroupId, tenantId)
+    }
+    
+    static var isSdkRunning: Bool {
+        return Optimove.getConfig()?.getPreferenceCenterConfig() != nil
     }
 
     public static func getEmbeddedMessagesAsync(
@@ -35,34 +56,18 @@ public class EmbeddedMessagesService {
         bodyData: [[String: Any]]? = nil,
         completion: @escaping (Result<Data, Error>) -> Void
     ) {
-        guard let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net") else {
-            let error = NSError(domain: "EmbeddedMessagesService", code: -2, userInfo: [NSLocalizedDescriptionKey: "Invalid base URL."])
-            completion(.failure(error))
-            return
-        }
-
+        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
         let path = "/api/v1/embeddedmessages/getembeddedmessages"
         
-        let queryItems = [
+        var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
+        urlComponents.queryItems = [
             URLQueryItem(name: "CustomerId", value: customerId),
             URLQueryItem(name: "VisitorId", value: visitorId),
             URLQueryItem(name: "TenantId", value: tenantId),
             URLQueryItem(name: "BrandId", value: brandId)
         ]
         
-        guard var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
-            let error = NSError(domain: "EmbeddedMessagesService", code: -3, userInfo: [NSLocalizedDescriptionKey: "Unable to construct URL components."])
-            completion(.failure(error))
-            return
-        }
-        urlComponents.queryItems = queryItems
-        
-        guard let finalURL = urlComponents.url else {
-            let error = NSError(domain: "EmbeddedMessagesService", code: -4, userInfo: [NSLocalizedDescriptionKey: "Final URL could not be created."])
-            completion(.failure(error))
-            return
-        }
-
+        let finalURL = urlComponents.url!
         print("Final Request URL: \(finalURL)")
         
         let body: Data?
@@ -73,7 +78,7 @@ public class EmbeddedMessagesService {
                 body = nil
             }
         } catch {
-            completion(.failure(error))
+            completion(.failure(.configurationIsMissing))
             return
         }
 
@@ -85,19 +90,18 @@ public class EmbeddedMessagesService {
         
         URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             if let error = error {
-                completion(.failure(error))
+                completion(.failure(.configurationIsMissing))
                 return
             }
 
             if let data = data {
                 completion(.success(data))
             } else {
-                let noDataError = NSError(domain: "EmbeddedMessagesService", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data returned from the server."])
-                completion(.failure(noDataError))
+                completion(.failure(.configurationIsMissing))
             }
         }.resume()
     }
-    
+
     public static func deleteMessageAsync(
         messageId: String,
         tenantId: String,
@@ -105,32 +109,17 @@ public class EmbeddedMessagesService {
         region: String,
         completion: @escaping (Result<Data, Error>) -> Void
     ) {
-        guard let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net") else {
-            let error = NSError(domain: "EmbeddedMessagesService", code: -2, userInfo: [NSLocalizedDescriptionKey: "Invalid base URL."])
-            completion(.failure(error))
-            return
-        }
-
+        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
         let path = "/api/v1/messages/\(messageId)"
         
-        let queryItems = [
+        var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
+        urlComponents.queryItems = [
             URLQueryItem(name: "TenantId", value: tenantId),
             URLQueryItem(name: "BrandId", value: brandId)
         ]
         
-        guard var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
-            let error = NSError(domain: "EmbeddedMessagesService", code: -3, userInfo: [NSLocalizedDescriptionKey: "Unable to construct URL components."])
-            completion(.failure(error))
-            return
-        }
-        urlComponents.queryItems = queryItems
+        let finalURL = urlComponents.url!
         
-        guard let finalURL = urlComponents.url else {
-            let error = NSError(domain: "EmbeddedMessagesService", code: -4, userInfo: [NSLocalizedDescriptionKey: "Final URL could not be created."])
-            completion(.failure(error))
-            return
-        }
-
         var urlRequest = URLRequest(url: finalURL)
         urlRequest.httpMethod = "DELETE"
         urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -138,15 +127,14 @@ public class EmbeddedMessagesService {
         
         URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             if let error = error {
-                completion(.failure(error))
+                completion(.failure(.configurationIsMissing))
                 return
             }
 
             if let data = data {
                 completion(.success(data))
             } else {
-                let noDataError = NSError(domain: "EmbeddedMessagesService", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data returned from the server."])
-                completion(.failure(noDataError))
+                completion(.failure(.configurationIsMissing))
             }
         }.resume()
     }

@@ -412,7 +412,8 @@ open class OptimoveConfigBuilder: NSObject {
             features: features,
             tenantInfo: tenantInfo,
             optimobileConfig: optimobileConfig,
-            preferenceCenterConfig: preferenceCenterConfig
+            preferenceCenterConfig: preferenceCenterConfig,
+            embeddedMessagingConfig: embeddedMessagingConfig
         )
     }
 
@@ -438,7 +439,7 @@ open class OptimoveConfigBuilder: NSObject {
             return EmbeddedMessagingConfig(
                 region: args.region,
                 tenantId: args.tenantId,
-                brandGroupId: args.brandGroupId
+                brandId: args.brandGroupId
             )
         } catch {
             Logger.error("Invalid embedded messaging credentials: \(error.localizedDescription)")
@@ -566,38 +567,96 @@ struct OptimobileArguments: Decodable {
     }
 }
 
-struct BaseArguments: Decodable {
+struct PreferenceCenterArguments: Decodable {
+    enum Error: Foundation.LocalizedError {
+        case emptyBase64
+        case failedDecodingBase64(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .emptyBase64:
+                return "The base64 string is empty"
+            case let .failedDecodingBase64(string):
+                return "Failed on decoding base64 the value \(string)"
+            }
+        }
+    }
+    
     let version: String
     let region: String
     let tenantId: Int
     let brandGroupId: String
-
     enum CodingKeys: String, CodingKey {
         case version
         case environment
         case tenantId
         case brandGroupId
     }
-
+    
+    init(base64: String) throws {
+        guard !base64.isEmpty else {
+            throw Error.emptyBase64
+        }
+        guard let data = Data(base64Encoded: base64) else {
+            throw Error.failedDecodingBase64(base64)
+        }
+        self = try JSONDecoder().decode(PreferenceCenterArguments.self, from: data)
+    }
+    
     init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
-
+        
         version = try container.decode(String.self)
         region = try container.decode(String.self)
         tenantId = try container.decode(Int.self)
         brandGroupId = try container.decode(String.self)
     }
-
-    init(base64: String) throws {
-        guard !base64.isEmpty else {
-            throw Base64DecodingError.emptyBase64
-        }
-        guard let data = Data(base64Encoded: base64) else {
-            throw Base64DecodingError.failedDecodingBase64(base64)
-        }
-        self = try JSONDecoder().decode(BaseArguments.self, from: data)
-    }
+    
+    
 }
 
-typealias PreferenceCenterArguments = BaseArguments
-typealias EmbeddedMessagingArguments = BaseArguments
+struct EmbeddedMessagingArguments: Decodable {
+    enum Error: Foundation.LocalizedError {
+        case emptyBase64
+        case failedDecodingBase64(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .emptyBase64:
+                return "The base64 string is empty"
+            case let .failedDecodingBase64(string):
+                return "Failed on decoding base64 the value \(string)"
+            }
+        }
+    }
+    
+    let version: String
+    let region: String
+    let tenantId: Int
+    let brandGroupId: String
+    enum CodingKeys: String, CodingKey {
+        case version
+        case environment
+        case tenantId
+        case brandGroupId
+    }
+    
+    init(base64: String) throws {
+        guard !base64.isEmpty else {
+            throw Error.emptyBase64
+        }
+        guard let data = Data(base64Encoded: base64) else {
+            throw Error.failedDecodingBase64(base64)
+        }
+        self = try JSONDecoder().decode(EmbeddedMessagingArguments.self, from: data)
+    }
+    
+    init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        
+        version = try container.decode(String.self)
+        region = try container.decode(String.self)
+        tenantId = try container.decode(Int.self)
+        brandGroupId = try container.decode(String.self)
+    }
+}
