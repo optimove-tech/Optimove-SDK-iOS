@@ -77,6 +77,21 @@ typealias Logger = OptimoveCore.Logger
                 }
             }
         }
+        
+        if config.isEmbeddedMessagingConfigured() {
+            guard config.isOptimoveConfigured() else {
+                Logger.error("Embedded Messaging requires the optimove feature enabled.")
+                return
+            }
+
+            shared.container.resolve { serviceLocator in
+                do {
+                    try EmbeddedMessagesService.initialize(with: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
+                } catch {
+                    throw GuardError.custom("Failed on Embedded Messaging initialization. Reason: \(error.localizedDescription)")
+                }
+            }
+        }
     }
 
     static func getConfig() -> OptimoveConfig? {
@@ -84,7 +99,7 @@ typealias Logger = OptimoveCore.Logger
     }
 
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
-    private static func setCredentialsInternal(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String? = nil) {
+    private static func setCredentialsInternal(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String? = nil, embeddedMessagingCredentials: String? = nil) {
         guard let currentConfig = shared.config else {
             Logger.error("Optimove SDK is not configured yet. Please call Optimove.initialize(with:) first.")
             return
@@ -94,7 +109,8 @@ typealias Logger = OptimoveCore.Logger
         builder.setCredentials(
             optimoveCredentials: optimoveCredentials,
             optimobileCredentials: optimobileCredentials,
-            preferenceCenterCredentials: preferenceCenterCredentials
+            preferenceCenterCredentials: preferenceCenterCredentials,
+            embeddedMessagingCredentials: embeddedMessagingCredentials
         )
 
         let config = builder.build()
@@ -105,11 +121,12 @@ typealias Logger = OptimoveCore.Logger
         setCredentialsInternal(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
     }
 
-    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?) {
+    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?, embeddedMessagingCredentials: String?) {
         setCredentialsInternal(
             optimoveCredentials: optimoveCredentials,
             optimobileCredentials: optimobileCredentials,
-            preferenceCenterCredentials: preferenceCenterCredentials
+            preferenceCenterCredentials: preferenceCenterCredentials,
+            embeddedMessagingCredentials: embeddedMessagingCredentials
         )
     }
 
@@ -120,7 +137,9 @@ typealias Logger = OptimoveCore.Logger
         case .optimove:
             return RunningFlagsIndication.isSdkRunning
         case .preferenceCenter:
-            return OptimovePreferenceCenter.isSdkRunning   
+            return OptimovePreferenceCenter.isSdkRunning
+        case .embeddedMessaging:
+            return EmbeddedMessagesService.isSdkRunning
         default:
             return false
         }

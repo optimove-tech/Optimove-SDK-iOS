@@ -1,26 +1,48 @@
 import OptimoveCore
 import Foundation
 
-// Define a public class
 public class EmbeddedMessagesService {
+    
+    static func initialize(with optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
+        if instance !== nil, optimoveConfig.features.contains(.delayedConfiguration) {
+            guard optimoveConfig.getEmbeddedMessagingConfig() != nil else {
+                throw Error.configurationIsMissing
+            }
+            return
+        }
 
-    // Define the method to create and send the network request
-    public static func GetEmbeddedMessagesRequest(
+        guard instance == nil else {
+            assertionFailure(Error.alreadyInitialized.localizedDescription)
+            throw Error.alreadyInitialized
+        }
+
+        instance = EmbeddedMessagesService(storage: storage, networkClient: networkClient)
+    }
+    
+    private func getConfigValues(from config: EmbeddedMessagingConfig) -> (region: String, brandGroupId: String, tenantId: String) {
+        let region = config.region
+        let brandGroupId = config.brandGroupId
+        let tenantId = config.tenantId.description
+        return (region, brandGroupId, tenantId)
+    }
+
+    public static func getEmbeddedMessagesAsync(
         customerId: String,
         visitorId: String,
         tenantId: String,
         brandId: String,
         region: String,
-        bodyData: [[String: Any]]? = nil,  // Optional body data
+        bodyData: [[String: Any]]? = nil,
         completion: @escaping (Result<Data, Error>) -> Void
     ) {
-        // Construct the base URL with the dynamic region
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        
-        // Construct the path
+        guard let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net") else {
+            let error = NSError(domain: "EmbeddedMessagesService", code: -2, userInfo: [NSLocalizedDescriptionKey: "Invalid base URL."])
+            completion(.failure(error))
+            return
+        }
+
         let path = "/api/v1/embeddedmessages/getembeddedmessages"
         
-        // Construct the query items with parameters
         let queryItems = [
             URLQueryItem(name: "CustomerId", value: customerId),
             URLQueryItem(name: "VisitorId", value: visitorId),
@@ -28,91 +50,104 @@ public class EmbeddedMessagesService {
             URLQueryItem(name: "BrandId", value: brandId)
         ]
         
-        // Create the full URL by appending the query items to the base URL and path
-        var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
+        guard var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
+            let error = NSError(domain: "EmbeddedMessagesService", code: -3, userInfo: [NSLocalizedDescriptionKey: "Unable to construct URL components."])
+            completion(.failure(error))
+            return
+        }
         urlComponents.queryItems = queryItems
         
-        // Log the final URL
-        print("Final Request URL: \(urlComponents.url!)")
+        guard let finalURL = urlComponents.url else {
+            let error = NSError(domain: "EmbeddedMessagesService", code: -4, userInfo: [NSLocalizedDescriptionKey: "Final URL could not be created."])
+            completion(.failure(error))
+            return
+        }
+
+        print("Final Request URL: \(finalURL)")
         
-        // Serialize bodyData into JSON
-        let body: Data? = try? JSONSerialization.data(withJSONObject: bodyData as Any, options: [])
-        
-        // Construct the URLRequest
-        var urlRequest = URLRequest(url: urlComponents.url!)
+        let body: Data?
+        do {
+            if let bodyData = bodyData {
+                body = try JSONSerialization.data(withJSONObject: bodyData, options: [])
+            } else {
+                body = nil
+            }
+        } catch {
+            completion(.failure(error))
+            return
+        }
+
+        var urlRequest = URLRequest(url: finalURL)
         urlRequest.httpMethod = "POST"
         urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
         urlRequest.httpBody = body
         
-        // Send the network request asynchronously using URLSession
         URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            // Handle the response asynchronously
             if let error = error {
-                // Return the error if there was a problem with the request
                 completion(.failure(error))
                 return
             }
-            
-            // Check if the response is valid and data is available
+
             if let data = data {
-                // Return the data as a success result
                 completion(.success(data))
             } else {
-                // If no data, return a custom error
                 let noDataError = NSError(domain: "EmbeddedMessagesService", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data returned from the server."])
                 completion(.failure(noDataError))
             }
-        }.resume()  // Start the network task
+        }.resume()
     }
     
-    public static func DeleteEmbeddedMessageRequest(
+    public static func deleteMessageAsync(
         messageId: String,
         tenantId: String,
         brandId: String,
         region: String,
-        completion: @escaping (Result<Data, Error>) -> Void  // Completion handler to return the result
+        completion: @escaping (Result<Data, Error>) -> Void
     ) {
-        // Construct the base URL with the dynamic region
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        
-        // Construct the path, including the messageId directly in the URL
+        guard let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net") else {
+            let error = NSError(domain: "EmbeddedMessagesService", code: -2, userInfo: [NSLocalizedDescriptionKey: "Invalid base URL."])
+            completion(.failure(error))
+            return
+        }
+
         let path = "/api/v1/messages/\(messageId)"
         
-        // Construct the query items with parameters
         let queryItems = [
             URLQueryItem(name: "TenantId", value: tenantId),
             URLQueryItem(name: "BrandId", value: brandId)
         ]
         
-        // Create the full URL by appending the query items to the base URL and path
-        var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
+        guard var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
+            let error = NSError(domain: "EmbeddedMessagesService", code: -3, userInfo: [NSLocalizedDescriptionKey: "Unable to construct URL components."])
+            completion(.failure(error))
+            return
+        }
         urlComponents.queryItems = queryItems
         
-        // Construct the URLRequest
-        var urlRequest = URLRequest(url: urlComponents.url!)
-        urlRequest.httpMethod = "DELETE"  // Use DELETE method instead of POST for deleting
+        guard let finalURL = urlComponents.url else {
+            let error = NSError(domain: "EmbeddedMessagesService", code: -4, userInfo: [NSLocalizedDescriptionKey: "Final URL could not be created."])
+            completion(.failure(error))
+            return
+        }
+
+        var urlRequest = URLRequest(url: finalURL)
+        urlRequest.httpMethod = "DELETE"
         urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
         
-        // Send the network request asynchronously using URLSession
         URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            // Handle the response asynchronously
             if let error = error {
-                // Return the error if there was a problem with the request
                 completion(.failure(error))
                 return
             }
-            
-            // Check if the response is valid and data is available
+
             if let data = data {
-                // Return the data as a success result
                 completion(.success(data))
             } else {
-                // If no data, return a custom error
                 let noDataError = NSError(domain: "EmbeddedMessagesService", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data returned from the server."])
                 completion(.failure(noDataError))
             }
-        }.resume()  // Start the network task
+        }.resume()
     }
 }

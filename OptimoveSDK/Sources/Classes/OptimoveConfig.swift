@@ -15,6 +15,9 @@ public struct Feature: OptionSet, @unchecked Sendable, CustomStringConvertible {
     public static let optimove = Feature(rawValue: 1 << 2)
     /// Preference center feature.
     public static let preferenceCenter = Feature(rawValue: 1 << 4)
+    /// Embedded messaing feature
+    public static let embeddedMessaging = Feature(rawValue: 1 << 4)
+
     static let delayedConfiguration = Feature(rawValue: 1 << 3)
 
     public init(rawValue: Int) {
@@ -45,6 +48,7 @@ public struct OptimoveConfig {
     let tenantInfo: OptimoveTenantInfo?
     let optimobileConfig: OptimobileConfig?
     let preferenceCenterConfig: PreferenceCenterConfig?
+    let embeddedMessagingConfig: EmbeddedMessagingConfig?
 
     func isOptimoveConfigured() -> Bool {
         return features.contains(.optimove)
@@ -60,6 +64,14 @@ public struct OptimoveConfig {
 
     func getPreferenceCenterConfig() -> PreferenceCenterConfig? {
         return preferenceCenterConfig
+    }
+    
+    func isEmbeddedMessagingConfigured() -> Bool {
+        return features.contains(.embeddedMessaging)
+    }
+
+    func getEmbeddedMessagingConfig() -> EmbeddedMessagingConfig? {
+        return embeddedMessagingConfig
     }
 }
 
@@ -104,6 +116,7 @@ public typealias Region = OptimobileConfig.Region
 open class OptimoveConfigBuilder: NSObject {
     private var credentials: OptimobileCredentials?
     private var preferenceCenterCredentials: String?
+    private var embeddedMessagingCredentials: String?
     public private(set) var features: Feature
     var region: OptimobileConfig.Region?
     var urlBuilder: UrlBuilder
@@ -171,7 +184,8 @@ open class OptimoveConfigBuilder: NSObject {
     @discardableResult func setCredentials(
         optimoveCredentials: String?,
         optimobileCredentials: String?,
-        preferenceCenterCredentials: String? = nil
+        preferenceCenterCredentials: String? = nil,
+        embeddedMessagingCredentials: String? = nil
     ) -> OptimoveConfigBuilder {
         if optimoveCredentials == nil, optimobileCredentials == nil {
             assertionFailure("Should provide at least optimove or optimobile credentials")
@@ -205,6 +219,15 @@ open class OptimoveConfigBuilder: NSObject {
             }  else {
                 self.preferenceCenterCredentials = preferenceCenterCredentials
                 features.insert(.preferenceCenter)
+            }
+        }
+        
+        if let embeddedMessagingCredentials = embeddedMessagingCredentials, !embeddedMessagingCredentials.isEmpty {
+            if optimoveCredentials == nil || optimoveCredentials == "" {
+                Logger.error("Embedded Center requires optimove credentials set");
+            }  else {
+                self.embeddedMessagingCredentials = embeddedMessagingCredentials
+                features.insert(.embeddedMessaging)
             }
         }
 
@@ -261,6 +284,15 @@ open class OptimoveConfigBuilder: NSObject {
 
         return self
     }
+    
+    @discardableResult public func enableEmbeddedMessaging(credentials: String) -> OptimoveConfigBuilder
+    {
+        features.insert(.embeddedMessaging)
+        embeddedMessagingCredentials = credentials
+
+        return self
+    }
+
 
     /**
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
@@ -356,6 +388,24 @@ open class OptimoveConfigBuilder: NSObject {
 
             return getPreferenceCenterConfig(from: preferenceCenterCredentials)
         }()
+        
+        let embeddedMessagingConfig: EmbeddedMessagingConfig? = {
+            if !features.contains(.optimove),
+               tenantInfo == nil,
+               !features.contains(.delayedConfiguration) {
+                Logger.error("Embedded messaging cannot be inialized without optimove")
+                return nil
+            }
+
+            if embeddedMessagingCredentials == nil {
+                if !features.contains(.delayedConfiguration) {
+                    Logger.error("Embedded Messaging could not be initialized due to missing credentials.")
+                }
+                return nil
+            }
+
+            return getEmbeddedMessagingConfig(from: embeddedMessagingCredentials)
+        }()
 
 
         return OptimoveConfig(
@@ -377,6 +427,21 @@ open class OptimoveConfigBuilder: NSObject {
             )
         } catch {
             Logger.error("Invalid preference center credentials: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    private func getEmbeddedMessagingConfig(from credentials: String?) -> EmbeddedMessagingConfig? {
+        do {
+            let args = try EmbeddedMessagingArguments(base64: credentials!)
+
+            return EmbeddedMessagingConfig(
+                region: args.region,
+                tenantId: args.tenantId,
+                brandGroupId: args.brandGroupId
+            )
+        } catch {
+            Logger.error("Invalid embedded messaging credentials: \(error.localizedDescription)")
             return nil
         }
     }
@@ -501,21 +566,7 @@ struct OptimobileArguments: Decodable {
     }
 }
 
-struct PreferenceCenterArguments: Decodable {
-    enum Error: Foundation.LocalizedError {
-        case emptyBase64
-        case failedDecodingBase64(String)
-
-        var errorDescription: String? {
-            switch self {
-            case .emptyBase64:
-                return "The base64 string is empty"
-            case let .failedDecodingBase64(string):
-                return "Failed on decoding base64 the value \(string)"
-            }
-        }
-    }
-
+struct BaseArguments: Decodable {
     let version: String
     let region: String
     let tenantId: Int
@@ -528,16 +579,6 @@ struct PreferenceCenterArguments: Decodable {
         case brandGroupId
     }
 
-    init(base64: String) throws {
-        guard !base64.isEmpty else {
-            throw Error.emptyBase64
-        }
-        guard let data = Data(base64Encoded: base64) else {
-            throw Error.failedDecodingBase64(base64)
-        }
-        self = try JSONDecoder().decode(PreferenceCenterArguments.self, from: data)
-    }
-
     init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
 
@@ -546,4 +587,17 @@ struct PreferenceCenterArguments: Decodable {
         tenantId = try container.decode(Int.self)
         brandGroupId = try container.decode(String.self)
     }
+
+    init(base64: String) throws {
+        guard !base64.isEmpty else {
+            throw Base64DecodingError.emptyBase64
+        }
+        guard let data = Data(base64Encoded: base64) else {
+            throw Base64DecodingError.failedDecodingBase64(base64)
+        }
+        self = try JSONDecoder().decode(BaseArguments.self, from: data)
+    }
 }
+
+typealias PreferenceCenterArguments = BaseArguments
+typealias EmbeddedMessagingArguments = BaseArguments
