@@ -4,6 +4,10 @@ import Foundation
 public class EmbeddedMessagesService {
     
     private static var instance: EmbeddedMessagesService?
+    private var storage: OptimoveStorage?
+    private var networkClient: NetworkClient?
+
+
     
     public enum Error: LocalizedError {
         case alreadyInitialized
@@ -13,13 +17,25 @@ public class EmbeddedMessagesService {
         public var errorDescription: String? {
             switch self {
             case .alreadyInitialized:
-                return "The PreferenceCenterSDK has already been initialized."
+                return "The EmbeddedMessagingSDK has already been initialized."
             case .notInitialized:
-                return "Preference center has not been initialized."
+                return "Embedded messaging has not been initialized."
             case .configurationIsMissing:
-                return "Preference center configuration is missing, but the feature was requested. Please provide valid credentials."
+                return "Embedded messaging configuration is missing, but the feature was requested. Please provide valid credentials."
             }
         }
+    }
+    
+    public enum ResultType {
+        case success
+        case errorUserNotSet
+        case errorCredentialsNotSet
+        case error
+    }
+    
+    public enum CampaignKind: Int {
+        case push = 0
+        case inApp = 1
     }
     
     static func initialize(with optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
@@ -35,17 +51,22 @@ public class EmbeddedMessagesService {
             throw Error.alreadyInitialized
         }
     }
+    
+    public typealias EmbeddedMessagingGetHandler = (Result<Data, Error>) -> Void
+    public typealias EmbeddedMessagingSetHandler = (Result<Data, Error>) -> Void
 
     private func getConfigValues(from config: EmbeddedMessagingConfig) -> (region: String, brandGroupId: String, tenantId: String) {
         let region = config.region
         let brandGroupId = config.brandId
         let tenantId = config.tenantId.description
-        return (region, brandGroupId, tenantId)
+//        return (region, brandGroupId, tenantId)
+        return ("dev", "9abb8d6d-62ed-42d1-97d1-c82d15f9c1fc", "3013")
     }
     
     static var isSdkRunning: Bool {
         return Optimove.getConfig()?.getPreferenceCenterConfig() != nil
     }
+    
 
     public static func getEmbeddedMessagesAsync(
         customerId: String,
@@ -102,6 +123,7 @@ public class EmbeddedMessagesService {
         }.resume()
     }
 
+
     public static func deleteMessageAsync(
         messageId: String,
         tenantId: String,
@@ -138,4 +160,78 @@ public class EmbeddedMessagesService {
             }
         }.resume()
     }
-}
+    
+    public static func setReadAsync(from message: EmbeddedMessage) {
+           guard let url = URL(string: "https://optimobile-inbox-srv-dev.optimove.net/api/v1/messages/status") else {
+               print("Invalid URL")
+               return
+           }
+           
+           let brandId = "9abb8d6d-62ed-42d1-97d1-c82d15f9c1fc"
+           let tenantId = "3013"
+           
+           // Parse readAt to Int64 from string
+           let readAtMillis: Int64? = {
+               if let readAtStr = message.readAt, let millis = Int64(readAtStr) {
+                   return millis
+               }
+               return nil
+           }()
+           
+           guard let readAt = readAtMillis else {
+               print("Invalid or missing readAt value")
+               return
+           }
+           
+           let statusMetric: [String: Any] = [
+               "messageId": message.id,
+               "engagementId": message.engagementId,
+               "executionDateTime": message.executionDateTime,
+               "campaignKind": message.campaignKind,
+               "customerId": message.customerId,
+               "readAt": readAt
+           ]
+           
+           let body: [String: Any] = [
+               "brandId": brandId,
+               "tenantId": tenantId,
+               "statusMetrics": [statusMetric]
+           ]
+           
+           var request = URLRequest(url: url)
+           request.httpMethod = "PUT"
+           request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+           
+           do {
+               request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+           } catch {
+               print("Failed to serialize JSON body: \(error)")
+               return
+           }
+           
+           let task = URLSession.shared.dataTask(with: request) { data, response, error in
+               if let error = error {
+                   print("Request failed: \(error)")
+                   return
+               }
+               
+               if let httpResponse = response as? HTTPURLResponse {
+                   print("Response status code: \(httpResponse.statusCode)")
+               }
+               
+               if let data = data, let responseText = String(data: data, encoding: .utf8) {
+                   print("Response body: \(responseText)")
+               }
+           }
+           
+           task.resume()
+       }
+   }
+    
+    
+    
+    
+    private func logFailedResponse(_ error: Swift.Error) {
+        Logger.error("Request failed with error: \(error.localizedDescription)")
+    }
+
