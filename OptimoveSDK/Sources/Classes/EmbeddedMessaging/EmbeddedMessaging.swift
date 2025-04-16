@@ -1,19 +1,16 @@
-import OptimoveCore
 import Foundation
+import OptimoveCore
 
 public class EmbeddedMessagesService {
-    
-    private static var instance: EmbeddedMessagesService?
-    private var storage: OptimoveStorage?
-    private var networkClient: NetworkClient?
-
-
     
     public enum Error: LocalizedError {
         case alreadyInitialized
         case notInitialized
         case configurationIsMissing
-
+        case errorSendingRequest
+        case errorUserNotSet
+        case errorCredentialsNotSet
+        
         public var errorDescription: String? {
             switch self {
             case .alreadyInitialized:
@@ -21,217 +18,199 @@ public class EmbeddedMessagesService {
             case .notInitialized:
                 return "Embedded messaging has not been initialized."
             case .configurationIsMissing:
-                return "Embedded messaging configuration is missing, but the feature was requested. Please provide valid credentials."
+                return "Embedded messaging configuration is missing. Please provide valid credentials."
+            case .errorSendingRequest:
+                return "Unable to retrieve embedded messages."
+            case .errorUserNotSet:
+                return "User is not set or invalid."
+            case .errorCredentialsNotSet:
+                return "Credentials for embedded messaging are not set."
             }
         }
-    }
-    
-    public enum ResultType {
-        case success
-        case errorUserNotSet
-        case errorCredentialsNotSet
-        case error
-    }
-    
-    public enum CampaignKind: Int {
-        case push = 0
-        case inApp = 1
-    }
-    
-    static func initialize(with optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
-        if instance !== nil, optimoveConfig.features.contains(.delayedConfiguration) {
-            if optimoveConfig.getEmbeddedMessagingConfig() == nil {
-                throw Error.configurationIsMissing
-            }
-            return
-        }
-
-        if instance != nil {
-            assertionFailure(Error.alreadyInitialized.localizedDescription)
-            throw Error.alreadyInitialized
-        }
-    }
-    
-    public typealias EmbeddedMessagingGetHandler = (Result<Data, Error>) -> Void
-    public typealias EmbeddedMessagingSetHandler = (Result<Data, Error>) -> Void
-
-    private func getConfigValues(from config: EmbeddedMessagingConfig) -> (region: String, brandGroupId: String, tenantId: String) {
-        let region = config.region
-        let brandGroupId = config.brandId
-        let tenantId = config.tenantId.description
-//        return (region, brandGroupId, tenantId)
-        return ("dev", "9abb8d6d-62ed-42d1-97d1-c82d15f9c1fc", "3013")
     }
     
     static var isSdkRunning: Bool {
         return Optimove.getConfig()?.getPreferenceCenterConfig() != nil
     }
     
+    struct Container {
+        let containerId: String
+        let limit: Int
+    }
+    
+    public enum ResultType {
+        case success(EmbeddedMessagingResponse)
+        case errorUserNotSet
+        case errorCredentialsNotSet
+        case error(Error)
+    }
 
-    public static func getEmbeddedMessagesAsync(
-        customerId: String,
-        visitorId: String,
-        tenantId: String,
-        brandId: String,
-        region: String,
-        bodyData: [[String: Any]]? = nil,
-        completion: @escaping (Result<Data, Error>) -> Void
-    ) {
+    public typealias EmbeddedMessagingGetHandler = (_ result: ResultType) -> Void
+    public typealias EmbeddedMessagingSetHandler = (_ result: ResultType) -> Void
+    public typealias EmbeddedMessagingDeleteHandler = (_ result: ResultType) -> Void
+    public typealias EmbeddedMessagingReportHandler = (_ result: ResultType) -> Void
+
+    private static var instance: EmbeddedMessagesService?
+    private var storage: OptimoveStorage?
+    private var networkClient: NetworkClient?
+
+    public static func getInstance() throws -> EmbeddedMessagesService {
+        guard let instance = instance else {
+            throw Error.notInitialized
+        }
+        return instance
+    }
+
+    public static func initialize(with optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
+        print("🔧 Initializing EmbeddedMessagesService...")
+
+        if instance != nil {
+            if optimoveConfig.features.contains(.delayedConfiguration),
+               optimoveConfig.getEmbeddedMessagingConfig() == nil {
+                throw Error.configurationIsMissing
+            }
+            print("⚠️ EmbeddedMessagesService already initialized")
+            return
+        }
+
+        guard instance == nil else {
+            assertionFailure(Error.alreadyInitialized.localizedDescription)
+            throw Error.alreadyInitialized
+        }
+
+        instance = EmbeddedMessagesService(storage: storage, networkClient: networkClient)
+        print("✅ EmbeddedMessagesService initialized")
+    }
+
+    private init(storage: OptimoveStorage, networkClient: NetworkClient) {
+        self.storage = storage
+        self.networkClient = networkClient
+    }
+
+    // MARK: - Get Messages
+
+    public func getMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler) {
+        guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
+            Logger.error("Embedded messaging credentials are not set")
+            completion(.error(.errorCredentialsNotSet))
+            return
+        }
+
+        let customerId = "opt__003"
+        let visitorId = "optimove" // Or any unique visitor ID
+
+        guard customerId != visitorId else {
+            Logger.warn("Customer ID matches visitor ID")
+            completion(.error(.errorUserNotSet))
+            return
+        }
+
+        do {
+            let request = try createGetMessagesRequest(customerId: customerId, visitorId: visitorId, config: config)
+         
+           
+            networkClient?.perform(request) { result in
+                switch result {
+                case .success(let response):
+                    do {
+                        // Log the response status code or any response info you need
+                        print("Response Body: \(response.description)") // If the response has a body that you can log
+                        
+                        
+
+                        let messages = try response.decode(to: EmbeddedMessagingResponse.self)
+                        DispatchQueue.main.async {
+                            completion(.success(messages))
+                        }
+                    } catch {
+                        self.logFailedResponse(error)
+                        DispatchQueue.main.async {
+                            completion(.error(.errorSendingRequest))
+                        }
+                    }
+
+                case .failure(let error):
+                    self.logFailedResponse(error)
+                    DispatchQueue.main.async {
+                        completion(.error(.errorSendingRequest))
+                    }
+                }
+            }
+
+        } catch {
+            logFailedResponse(error)
+            DispatchQueue.main.async {
+                completion(.error(.errorSendingRequest))
+            }
+        }
+    }
+    
+    // MARK: - Request Builders
+
+    private func createGetMessagesRequest(customerId: String, visitorId: String, config: EmbeddedMessagingConfig) throws -> NetworkRequest {
+        let (region, brandId, tenantId) = getConfigValues(from: config)
+
         let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/embeddedmessages/getembeddedmessages"
-        
-        var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
-        urlComponents.queryItems = [
+        let path = "/api/v1/embedded-messages/Get-Embedded-Messages"
+        let queryItems = [
             URLQueryItem(name: "CustomerId", value: customerId),
             URLQueryItem(name: "VisitorId", value: visitorId),
             URLQueryItem(name: "TenantId", value: tenantId),
             URLQueryItem(name: "BrandId", value: brandId)
         ]
-        
-        let finalURL = urlComponents.url!
-        print("Final Request URL: \(finalURL)")
-        
-        let body: Data?
-        do {
-            if let bodyData = bodyData {
-                body = try JSONSerialization.data(withJSONObject: bodyData, options: [])
-            } else {
-                body = nil
-            }
-        } catch {
-            completion(.failure(.configurationIsMissing))
-            return
+
+        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
+        components?.queryItems = queryItems
+
+        if let fullURL = components?.url {
+            print("📡 Full request URL: \(fullURL.absoluteString)")
+        } else {
+            print("⚠️ Failed to build full request URL")
         }
 
-        var urlRequest = URLRequest(url: finalURL)
-        urlRequest.httpMethod = "POST"
-        urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
-        urlRequest.httpBody = body
-        
-        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            if let error = error {
-                completion(.failure(.configurationIsMissing))
-                return
-            }
-
-            if let data = data {
-                completion(.success(data))
-            } else {
-                completion(.failure(.configurationIsMissing))
-            }
-        }.resume()
-    }
-
-
-    public static func deleteMessageAsync(
-        messageId: String,
-        tenantId: String,
-        brandId: String,
-        region: String,
-        completion: @escaping (Result<Data, Error>) -> Void
-    ) {
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/messages/\(messageId)"
-        
-        var urlComponents = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
-        urlComponents.queryItems = [
-            URLQueryItem(name: "TenantId", value: tenantId),
-            URLQueryItem(name: "BrandId", value: brandId)
-        ]
-        
-        let finalURL = urlComponents.url!
-        
-        var urlRequest = URLRequest(url: finalURL)
-        urlRequest.httpMethod = "DELETE"
-        urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
-        
-        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            if let error = error {
-                completion(.failure(.configurationIsMissing))
-                return
-            }
-
-            if let data = data {
-                completion(.success(data))
-            } else {
-                completion(.failure(.configurationIsMissing))
-            }
-        }.resume()
+        return NetworkRequest(
+            method: .post,
+            baseURL: baseURL,
+            path: path,
+            headers: [],
+            queryItems: queryItems
+        )
     }
     
-    public static func setReadAsync(from message: EmbeddedMessage) {
-           guard let url = URL(string: "https://optimobile-inbox-srv-dev.optimove.net/api/v1/messages/status") else {
-               print("Invalid URL")
-               return
-           }
-           
-           let brandId = "9abb8d6d-62ed-42d1-97d1-c82d15f9c1fc"
-           let tenantId = "3013"
-           
-           // Parse readAt to Int64 from string
-           let readAtMillis: Int64? = {
-               if let readAtStr = message.readAt, let millis = Int64(readAtStr) {
-                   return millis
-               }
-               return nil
-           }()
-           
-           guard let readAt = readAtMillis else {
-               print("Invalid or missing readAt value")
-               return
-           }
-           
-           let statusMetric: [String: Any] = [
-               "messageId": message.id,
-               "engagementId": message.engagementId,
-               "executionDateTime": message.executionDateTime,
-               "campaignKind": message.campaignKind,
-               "customerId": message.customerId,
-               "readAt": readAt
-           ]
-           
-           let body: [String: Any] = [
-               "brandId": brandId,
-               "tenantId": tenantId,
-               "statusMetrics": [statusMetric]
-           ]
-           
-           var request = URLRequest(url: url)
-           request.httpMethod = "PUT"
-           request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-           
-           do {
-               request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-           } catch {
-               print("Failed to serialize JSON body: \(error)")
-               return
-           }
-           
-           let task = URLSession.shared.dataTask(with: request) { data, response, error in
-               if let error = error {
-                   print("Request failed: \(error)")
-                   return
-               }
-               
-               if let httpResponse = response as? HTTPURLResponse {
-                   print("Response status code: \(httpResponse.statusCode)")
-               }
-               
-               if let data = data, let responseText = String(data: data, encoding: .utf8) {
-                   print("Response body: \(responseText)")
-               }
-           }
-           
-           task.resume()
-       }
-   }
-    
-    
-    
-    
+    private func createGetEmbeddedMessagesRequest(customerId: String, visitorId: String, config: EmbeddedMessagingConfig, containers: [Container]) throws -> NetworkRequest {
+        let (region, brandId, tenantId) = getConfigValues(from: config)
+
+        // Build the body with the dynamic containers
+        let body: [[String: Any]] = containers.map { container in
+            return [
+                "containerId": container.containerId,
+                "limit": container.limit
+            ]
+        }
+
+        // Serialize the body into JSON data
+        let bodyData = try JSONSerialization.data(withJSONObject: body, options: [])
+
+        return try NetworkRequest(
+            method: .put,  // Changed to PUT
+            baseURL: URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!,
+            path: "/api/v1/embeddedmessages/getembeddedmessages",
+            headers: [
+                HTTPHeader(field: .accept, value: .textplain),
+                HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
+            ],
+            body: bodyData  // Include the request body
+        )
+    }
+
+    private func getConfigValues(from config: EmbeddedMessagingConfig) -> (region: String, brandId: String, tenantId: String) {
+        let region = config.region
+        let brandId = config.brandId
+        let tenantId = config.tenantId.description
+        return (region, brandId, tenantId)
+    }
+
     private func logFailedResponse(_ error: Swift.Error) {
-        Logger.error("Request failed with error: \(error.localizedDescription)")
+        Logger.error("Request failed: \(error.localizedDescription)")
     }
-
+}

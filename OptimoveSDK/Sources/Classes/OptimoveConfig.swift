@@ -139,6 +139,7 @@ open class OptimoveConfigBuilder: NSObject {
         setCredentials(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
     }
 
+
     /// Intent to use for intialization for delayed configuration.
     /// - Parameter region: ``Region`` - region to be configured.
     /// - Parameter features: ``Feature`` - single or multiple features to be configured.
@@ -390,12 +391,12 @@ open class OptimoveConfigBuilder: NSObject {
         }()
         
         let embeddedMessagingConfig: EmbeddedMessagingConfig? = {
-            if !features.contains(.optimove),
-               tenantInfo == nil,
-               !features.contains(.delayedConfiguration) {
-                Logger.error("Embedded messaging cannot be inialized without optimove")
-                return nil
-            }
+//            if !features.contains(.optimove),
+//               tenantInfo == nil,
+//               !features.contains(.delayedConfiguration) {
+//                Logger.error("Embedded messaging cannot be inialized without optimove")
+//                return nil
+//            }
 
             if embeddedMessagingCredentials == nil {
                 if !features.contains(.delayedConfiguration) {
@@ -439,7 +440,7 @@ open class OptimoveConfigBuilder: NSObject {
             return EmbeddedMessagingConfig(
                 region: args.region,
                 tenantId: args.tenantId,
-                brandId: args.brandGroupId
+                brandId: args.brandId
             )
         } catch {
             Logger.error("Invalid embedded messaging credentials: \(error.localizedDescription)")
@@ -630,15 +631,13 @@ struct EmbeddedMessagingArguments: Decodable {
         }
     }
     
-    let version: String
     let region: String
     let tenantId: Int
-    let brandGroupId: String
+    let brandId: String
     enum CodingKeys: String, CodingKey {
-        case version
         case environment
         case tenantId
-        case brandGroupId
+        case brandId
     }
     
     init(base64: String) throws {
@@ -654,9 +653,8 @@ struct EmbeddedMessagingArguments: Decodable {
     init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
         
-        version = try container.decode(String.self)
         region = try container.decode(String.self)
         tenantId = try container.decode(Int.self)
-        brandGroupId = try container.decode(String.self)
+        brandId = try container.decode(String.self)
     }
 }

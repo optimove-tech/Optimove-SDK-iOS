@@ -61,7 +61,22 @@ typealias Logger = OptimoveCore.Logger
                     throw GuardError.custom("Failed on OptimobileSDK initialization. Reason: \(error.localizedDescription)")
                 }
             }
-        }   
+        }
+        
+        if config.isEmbeddedMessagingConfigured() {
+//            guard config.isOptimoveConfigured() else {
+//                Logger.error("Embedded Messaging requires the optimove feature enabled.")
+//                return
+//            }
+
+            shared.container.resolve { serviceLocator in
+                do {
+                    try EmbeddedMessagesService.initialize(with: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
+                } catch {
+                    throw GuardError.custom("Failed on Embedded Messaging initialization. Reason: \(error.localizedDescription)")
+                }
+            }
+        }
 
         if config.isPreferenceCenterConfigured() {
             guard config.isOptimoveConfigured() else {
@@ -78,20 +93,7 @@ typealias Logger = OptimoveCore.Logger
             }
         }
         
-        if config.isEmbeddedMessagingConfigured() {
-            guard config.isOptimoveConfigured() else {
-                Logger.error("Embedded Messaging requires the optimove feature enabled.")
-                return
-            }
-
-            shared.container.resolve { serviceLocator in
-                do {
-                    try EmbeddedMessagesService.initialize(with: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
-                } catch {
-                    throw GuardError.custom("Failed on Embedded Messaging initialization. Reason: \(error.localizedDescription)")
-                }
-            }
-        }
+       
     }
 
     static func getConfig() -> OptimoveConfig? {
