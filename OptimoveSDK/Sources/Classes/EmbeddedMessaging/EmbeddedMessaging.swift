@@ -39,7 +39,7 @@ public class EmbeddedMessagesService {
     }
     
     public enum ResultType {
-        case success(EmbeddedMessagingResponse)
+        case success(EmbeddedMessagesResponse)
         case errorUserNotSet
         case errorCredentialsNotSet
         case error(Error)
@@ -89,6 +89,62 @@ public class EmbeddedMessagesService {
 
     // MARK: - Get Messages
 
+//    public func getEmbeddedMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler) {
+//        guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
+//            Logger.error("Embedded messaging credentials are not set")
+//            completion(.error(.errorCredentialsNotSet))
+//            return
+//        }
+//
+//        let customerId = "opt__003"
+//        let visitorId = "optimove" // Or any unique visitor ID
+//
+//        guard customerId != visitorId else {
+//            Logger.warn("Customer ID matches visitor ID")
+//            completion(.error(.errorUserNotSet))
+//            return
+//        }
+//
+//        do {
+//            let request = try createGetMessagesRequest(customerId: customerId, visitorId: visitorId, config: config)
+//         
+//           
+//            networkClient?.perform(request) { result in
+//                switch result {
+//                case .success(let response):
+//                    do {
+//                        // Log the response status code or any response info you need
+//                        print("Response Body: \(response.description)") // If the response has a body that you can log
+//                        
+//                        
+//
+//                        let messages = try response.decode(to: EmbeddedMessagingResponse.self)
+//                        DispatchQueue.main.async {
+//                            completion(.success(messages))
+//                        }
+//                    } catch {
+//                        self.logFailedResponse(error)
+//                        DispatchQueue.main.async {
+//                            completion(.error(.errorSendingRequest))
+//                        }
+//                    }
+//
+//                case .failure(let error):
+//                    self.logFailedResponse(error)
+//                    DispatchQueue.main.async {
+//                        completion(.error(.errorSendingRequest))
+//                    }
+//                }
+//            }
+//
+//        } catch {
+//            logFailedResponse(error)
+//            DispatchQueue.main.async {
+//                completion(.error(.errorSendingRequest))
+//            }
+//        }
+//    }
+    
     public func getMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
@@ -118,9 +174,15 @@ public class EmbeddedMessagesService {
                         
                         
 
-                        let messages = try response.decode(to: EmbeddedMessagingResponse.self)
+                        let APIResponse = try response.decode(to: EmbeddedMessagingAPIResponse.self)
+                             
+                        var containers:  EmbeddedMessagesResponse = [:]
+                        for (containerId, messages) in APIResponse.containers {
+                            containers[containerId] = EmbeddedMessagingContainer(containerId: containerId, messages: messages)
+                        }
+                        
                         DispatchQueue.main.async {
-                            completion(.success(messages))
+                            completion(.success(containers))
                         }
                     } catch {
                         self.logFailedResponse(error)
