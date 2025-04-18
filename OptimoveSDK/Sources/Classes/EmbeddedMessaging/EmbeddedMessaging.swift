@@ -92,8 +92,54 @@ public class EmbeddedMessagesService {
         self.storage = storage
         self.networkClient = networkClient
     }
+    
+    
+    public func setReadAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage, isRead: Bool = false) {
+        guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
+            Logger.error("Embedded messaging credentials are not set")
+            completion(.error(.errorCredentialsNotSet))
+            return
+        }
 
-    public func deleteMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage) {
+        let customerId = "opt__003"
+        let visitorId = "optimove"
+        let messageId = embeddedMessage.id
+
+        guard customerId != visitorId else {
+            Logger.warn("Customer ID matches visitor ID")
+            completion(.error(.errorUserNotSet))
+            return
+        }
+
+        do {
+            let request = try createReadAtMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, message: embeddedMessage, isRead: isRead)
+            
+            print("request: \(String(describing: request))")
+            networkClient?.perform(request) { result in
+                switch result {
+                case .success(let response):
+                    DispatchQueue.main.async {
+                        completion(.DeleteSuccess)
+                    }
+                    
+                case .failure(let error):
+                    self.logFailedResponse(error)
+                    DispatchQueue.main.async {
+                        completion(.error(.errorSendingRequest))
+                    }
+                }
+            }
+
+        } catch {
+            self.logFailedResponse(error)
+            DispatchQueue.main.async {
+                completion(.error(.errorSendingRequest))
+            }
+        }
+    }
+    
+
+    public func deleteMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage, isRead: Bool = false) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -259,6 +305,65 @@ public class EmbeddedMessagesService {
             path: path,
             headers: [],
             queryItems: queryItems
+        )
+    }
+    
+    
+    private func createReadAtMessagesRequest(
+        customerId: String,
+        visitorId: String,
+        config: EmbeddedMessagingConfig,
+        message: EmbeddedMessage,
+        isRead: Bool
+    ) throws -> NetworkRequest {
+        
+        let (region, brandId, tenantId) = getConfigValues(from: config)
+        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
+        let path = "/api/v1/messages/status"
+
+        // Conditionally set readAt timestamp
+        let readAtTimestamp: Int? = isRead ? Int(Date().timeIntervalSince1970 * 1000) : nil
+
+        // Create the metric
+        let metric = MessageStatusMetric(
+            messageId: message.id,
+            engagementId: message.engagementId,
+            executionDateTime: message.executionDateTime,
+            campaignKind: message.campaignKind,
+            customerId: customerId,
+            readAt: readAtTimestamp
+        )
+
+        // Create the request object
+        let request = MessageStatusUpdateRequest(
+            brandId: brandId,
+            tenantId: tenantId,
+            statusMetrics: [metric]
+        )
+
+        // Encode to JSON
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let bodyData = try encoder.encode(request)
+
+        // Headers
+        let headers: [HTTPHeader] = [
+            HTTPHeader(field: .contentType, value: .json),
+            HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId)) // Optional: only include if the API requires it
+        ]
+
+        // No query items now
+        let queryItems: [URLQueryItem] = []
+        
+        print("bodyData: \(String(data: bodyData, encoding: .utf8) )")
+
+        return NetworkRequest(
+            method: .put,
+            baseURL: baseURL,
+            path: path,
+            headers: headers,
+            queryItems: queryItems,
+            httpBody: bodyData
         )
     }
     

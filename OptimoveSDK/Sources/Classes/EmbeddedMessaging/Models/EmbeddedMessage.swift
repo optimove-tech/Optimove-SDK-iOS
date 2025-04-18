@@ -21,3 +21,18 @@ public struct EmbeddedMessage: Codable {
     public let updatedAt: String?  // Optional, to allow null values
     public let deletedAt: String?  // Optional, to allow null values
 }
+
+public struct MessageStatusUpdateRequest: Codable {
+    public let brandId: String
+    public let tenantId: String
+    public let statusMetrics: [MessageStatusMetric]
+}
+
+public struct MessageStatusMetric: Codable {
+    public let messageId: String
+    public let engagementId: String
+    public let executionDateTime: String
+    public let campaignKind: Int
+    public let customerId: String
+    public let readAt: Int?
+}
