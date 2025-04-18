@@ -101,7 +101,7 @@ public class EmbeddedMessagesService {
         }
 
         let customerId = "opt__003"
-        let visitorId = "optimove" // Or any unique visitor ID
+        let visitorId = "optimove"
         let messageId = embeddedMessage.id
 
         guard customerId != visitorId else {
@@ -111,23 +111,19 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            // Create the delete request for the message
             let request = try createDeleteMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, messageId: messageId)
             
-            // Perform the network request
             networkClient?.perform(request) { result in
                 switch result {
                 case .success(let response):
-                    // Success Case: no need to check the status code directly, as it's being handled by the result.
                     DispatchQueue.main.async {
-                        completion(.DeleteSuccess) // Success, just indicate the operation completed (no content needed).
+                        completion(.DeleteSuccess)
                     }
                     
                 case .failure(let error):
-                    // Failure Case: Handle failure from network client (requestInvalid, requestFailed, etc.)
                     self.logFailedResponse(error)
                     DispatchQueue.main.async {
-                        completion(.error(.errorSendingRequest)) // Return error if network request failed.
+                        completion(.error(.errorSendingRequest))
                     }
                 }
             }
@@ -135,7 +131,7 @@ public class EmbeddedMessagesService {
         } catch {
             self.logFailedResponse(error)
             DispatchQueue.main.async {
-                completion(.error(.errorSendingRequest)) // Handle error in request creation
+                completion(.error(.errorSendingRequest))
             }
         }
     }
@@ -240,20 +236,19 @@ public class EmbeddedMessagesService {
         let (region, brandId, tenantId) = getConfigValues(from: config)
 
         let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/embedded-messages/Get-Embedded-Messages"
+        let path = "/api/v1/messages/\(messageId)" // Add messageId directly to the path
+        
+        // Add query items for TenantId and BrandId
         let queryItems = [
-            URLQueryItem(name: "CustomerId", value: customerId),
-            URLQueryItem(name: "VisitorId", value: visitorId),
             URLQueryItem(name: "TenantId", value: tenantId),
-            URLQueryItem(name: "BrandId", value: brandId),
-            URLQueryItem(name: "MessageId", value: messageId)
+            URLQueryItem(name: "BrandId", value: brandId)
         ]
-
+        
         var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
         components?.queryItems = queryItems
 
         if let fullURL = components?.url {
-            print("📡 Full request URL: \(fullURL.absoluteString)")
+            print("📡 Full request URL: \(fullURL.absoluteString)") // This will print the full URL to the console
         } else {
             print("⚠️ Failed to build full request URL")
         }
