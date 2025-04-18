@@ -94,6 +94,14 @@ public class EmbeddedMessagesService {
     }
     
     
+    private func getConfigValues(from config: EmbeddedMessagingConfig) -> (region: String, brandId: String, tenantId: String) {
+        let region = config.region
+        let brandId = config.brandId
+        let tenantId = config.tenantId.description
+        return (region, brandId, tenantId)
+    }
+    
+    
     public func setReadAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage, isRead: Bool = false) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
@@ -103,7 +111,6 @@ public class EmbeddedMessagesService {
 
         let customerId = "opt__003"
         let visitorId = "optimove"
-        let messageId = embeddedMessage.id
 
         guard customerId != visitorId else {
             Logger.warn("Customer ID matches visitor ID")
@@ -192,7 +199,7 @@ public class EmbeddedMessagesService {
         }
 
         let customerId = "opt__003"
-        let visitorId = "optimove" // Or any unique visitor ID
+        let visitorId = "optimove"
 
         guard customerId != visitorId else {
             Logger.warn("Customer ID matches visitor ID")
@@ -208,11 +215,6 @@ public class EmbeddedMessagesService {
                 switch result {
                 case .success(let response):
                     do {
-                        // Log the response status code or any response info you need
-                        print("Response Body: \(response.description)") // If the response has a body that you can log
-                        
-                        
-
                         let APIResponse = try response.decode(to: EmbeddedMessagingAPIResponse.self)
                              
                         var containers:  EmbeddedMessagesResponse = [:]
@@ -246,9 +248,35 @@ public class EmbeddedMessagesService {
         }
     }
     
-    // MARK: - Request Builders
+
+    // MARK: - Create Get Messages Request
 
     private func createGetMessagesRequest(customerId: String, visitorId: String, config: EmbeddedMessagingConfig) throws -> NetworkRequest {
+        let (region, brandId, tenantId) = getConfigValues(from: config)
+
+        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
+        let path = "/api/v1/embedded-messages/Get-Embedded-Messages"
+        let queryItems = [
+            URLQueryItem(name: "CustomerId", value: customerId),
+            URLQueryItem(name: "VisitorId", value: visitorId),
+            URLQueryItem(name: "TenantId", value: tenantId),
+            URLQueryItem(name: "BrandId", value: brandId)
+        ]
+
+        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
+        components?.queryItems = queryItems
+
+        return NetworkRequest(
+            method: .post,
+            baseURL: baseURL,
+            path: path,
+            headers: [],
+            queryItems: queryItems
+        )
+    }
+    
+    // MARK: - Create Get Embedded Messages Request
+    private func createGetEmbeddedMessagesRequest(customerId: String, visitorId: String, config: EmbeddedMessagingConfig, containers: EmbeddedMessagingContainer) throws -> NetworkRequest {
         let (region, brandId, tenantId) = getConfigValues(from: config)
 
         let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
@@ -278,13 +306,13 @@ public class EmbeddedMessagesService {
         )
     }
     
+    // MARK: - Create Delete Messages Request
     private func createDeleteMessagesRequest(customerId: String, visitorId: String, config: EmbeddedMessagingConfig, messageId: String) throws -> NetworkRequest {
         let (region, brandId, tenantId) = getConfigValues(from: config)
 
         let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/messages/\(messageId)" // Add messageId directly to the path
+        let path = "/api/v1/messages/\(messageId)"
         
-        // Add query items for TenantId and BrandId
         let queryItems = [
             URLQueryItem(name: "TenantId", value: tenantId),
             URLQueryItem(name: "BrandId", value: brandId)
@@ -292,12 +320,6 @@ public class EmbeddedMessagesService {
         
         var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
         components?.queryItems = queryItems
-
-        if let fullURL = components?.url {
-            print("📡 Full request URL: \(fullURL.absoluteString)") // This will print the full URL to the console
-        } else {
-            print("⚠️ Failed to build full request URL")
-        }
 
         return NetworkRequest(
             method: .delete,
@@ -308,7 +330,7 @@ public class EmbeddedMessagesService {
         )
     }
     
-    
+    // MARK: - Create ReadAt Messages Request
     private func createReadAtMessagesRequest(
         customerId: String,
         visitorId: String,
@@ -321,11 +343,10 @@ public class EmbeddedMessagesService {
         let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
         let path = "/api/v1/messages/status"
 
-        // Conditionally set readAt timestamp
         let readAtTimestamp: Int? = isRead ? Int(Date().timeIntervalSince1970 * 1000) : nil
 
         // Create the metric
-        let metric = MessageStatusMetric(
+        let metric = ReadMessageStatusMetric(
             messageId: message.id,
             engagementId: message.engagementId,
             executionDateTime: message.executionDateTime,
@@ -335,7 +356,7 @@ public class EmbeddedMessagesService {
         )
 
         // Create the request object
-        let request = MessageStatusUpdateRequest(
+        let request = ReadMessageStatusUpdateRequest(
             brandId: brandId,
             tenantId: tenantId,
             statusMetrics: [metric]
@@ -355,8 +376,6 @@ public class EmbeddedMessagesService {
         // No query items now
         let queryItems: [URLQueryItem] = []
         
-        print("bodyData: \(String(data: bodyData, encoding: .utf8) )")
-
         return NetworkRequest(
             method: .put,
             baseURL: baseURL,
@@ -366,15 +385,8 @@ public class EmbeddedMessagesService {
             httpBody: bodyData
         )
     }
-    
 
-    private func getConfigValues(from config: EmbeddedMessagingConfig) -> (region: String, brandId: String, tenantId: String) {
-        let region = config.region
-        let brandId = config.brandId
-        let tenantId = config.tenantId.description
-        return (region, brandId, tenantId)
-    }
-
+    // MARK: - Log Failed Response
     private func logFailedResponse(_ error: Swift.Error) {
         Logger.error("Request failed: \(error.localizedDescription)")
     }

@@ -22,13 +22,13 @@ public struct EmbeddedMessage: Codable {
     public let deletedAt: String?  // Optional, to allow null values
 }
 
-public struct MessageStatusUpdateRequest: Codable {
+public struct ReadMessageStatusUpdateRequest: Codable {
     public let brandId: String
     public let tenantId: String
-    public let statusMetrics: [MessageStatusMetric]
+    public let statusMetrics: [ReadMessageStatusMetric]
 }
 
-public struct MessageStatusMetric: Codable {
+public struct ReadMessageStatusMetric: Codable {
     public let messageId: String
     public let engagementId: String
     public let executionDateTime: String
