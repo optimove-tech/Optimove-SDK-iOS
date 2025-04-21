@@ -30,13 +30,9 @@ public class EmbeddedMessagesService {
     }
     
     static var isSdkRunning: Bool {
-        return Optimove.getConfig()?.getPreferenceCenterConfig() != nil
+        return Optimove.getConfig()?.getEmbeddedMessagingConfig() != nil
     }
-    
-    struct Container {
-        let containerId: String
-        let limit: Int
-    }
+
     
     public enum ResultType {
         case success(EmbeddedMessagesResponse)
@@ -61,11 +57,7 @@ public class EmbeddedMessagesService {
         }
         return instance
     }
-    
-    struct EmbeddedMessageOptions: Codable {
-        var containerId: String
-        var limit: Int
-    }
+
 
     public static func initialize(with optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
         print("🔧 Initializing EmbeddedMessagesService...")
@@ -102,7 +94,11 @@ public class EmbeddedMessagesService {
     }
     
     
-    public func setReadAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage, isRead: Bool = false) {
+    // MARK: - Get Messages
+    public func getMessagesAsync(
+        completion: @escaping EmbeddedMessagingGetHandler,
+        containers: [EmbeddedMessageOptions]? = nil
+    ) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -112,23 +108,35 @@ public class EmbeddedMessagesService {
         let customerId = "opt__003"
         let visitorId = "optimove"
 
-        guard customerId != visitorId else {
-            Logger.warn("Customer ID matches visitor ID")
-            completion(.error(.errorUserNotSet))
-            return
-        }
-
+        
         do {
-            let request = try createReadAtMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, message: embeddedMessage, isRead: isRead)
+            let request = try createGetEmbeddedMessagesRequest(
+                customerId: customerId,
+                visitorId: visitorId,
+                config: config,
+                containers: containers
+            )
             
-            print("request: \(String(describing: request))")
             networkClient?.perform(request) { result in
                 switch result {
                 case .success(let response):
-                    DispatchQueue.main.async {
-                        completion(.DeleteSuccess)
+                    do {
+                        let APIResponse = try response.decode(to: EmbeddedMessagingAPIResponse.self)
+                        var containers: EmbeddedMessagesResponse = [:]
+                        for (containerId, messages) in APIResponse.containers {
+                            containers[containerId] = EmbeddedMessagingContainer(containerId: containerId, messages: messages)
+                        }
+
+                        DispatchQueue.main.async {
+                            completion(.success(containers))
+                        }
+                    } catch {
+                        self.logFailedResponse(error)
+                        DispatchQueue.main.async {
+                            completion(.error(.errorSendingRequest))
+                        }
                     }
-                    
+
                 case .failure(let error):
                     self.logFailedResponse(error)
                     DispatchQueue.main.async {
@@ -138,14 +146,14 @@ public class EmbeddedMessagesService {
             }
 
         } catch {
-            self.logFailedResponse(error)
+            logFailedResponse(error)
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
         }
     }
     
-
+    // MARK: - Delete Messages
     public func deleteMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage, isRead: Bool = false) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
@@ -189,9 +197,9 @@ public class EmbeddedMessagesService {
         }
     }
     
-    // MARK: - Get Messages
     
-    public func getMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler) {
+    // MARK: - Set Read Async
+    public func setAsReadAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage, isRead: Bool = false) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -208,30 +216,16 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            let request = try createGetMessagesRequest(customerId: customerId, visitorId: visitorId, config: config)
-         
-           
+            let request = try createReadAtMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, message: embeddedMessage, isRead: isRead)
+            
+            print("request: \(String(describing: request))")
             networkClient?.perform(request) { result in
                 switch result {
                 case .success(let response):
-                    do {
-                        let APIResponse = try response.decode(to: EmbeddedMessagingAPIResponse.self)
-                             
-                        var containers:  EmbeddedMessagesResponse = [:]
-                        for (containerId, messages) in APIResponse.containers {
-                            containers[containerId] = EmbeddedMessagingContainer(containerId: containerId, messages: messages)
-                        }
-                        
-                        DispatchQueue.main.async {
-                            completion(.success(containers))
-                        }
-                    } catch {
-                        self.logFailedResponse(error)
-                        DispatchQueue.main.async {
-                            completion(.error(.errorSendingRequest))
-                        }
+                    DispatchQueue.main.async {
+                        completion(.DeleteSuccess)
                     }
-
+                    
                 case .failure(let error):
                     self.logFailedResponse(error)
                     DispatchQueue.main.async {
@@ -241,7 +235,51 @@ public class EmbeddedMessagesService {
             }
 
         } catch {
-            logFailedResponse(error)
+            self.logFailedResponse(error)
+            DispatchQueue.main.async {
+                completion(.error(.errorSendingRequest))
+            }
+        }
+    }
+    
+    // MARK: - Report Click metric Async
+    public func reportClickMetricAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage) {
+        guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
+            Logger.error("Embedded messaging credentials are not set")
+            completion(.error(.errorCredentialsNotSet))
+            return
+        }
+
+        let customerId = "opt__003"
+        let visitorId = "optimove"
+
+        guard customerId != visitorId else {
+            Logger.warn("Customer ID matches visitor ID")
+            completion(.error(.errorUserNotSet))
+            return
+        }
+
+        do {
+            let request = try createReportMetricsRequest(customerId: customerId, visitorId: visitorId, config: config, message: embeddedMessage)
+            
+            print("request: \(String(describing: request))")
+            networkClient?.perform(request) { result in
+                switch result {
+                case .success(let response):
+                    DispatchQueue.main.async {
+                        completion(.DeleteSuccess)
+                    }
+                    
+                case .failure(let error):
+                    self.logFailedResponse(error)
+                    DispatchQueue.main.async {
+                        completion(.error(.errorSendingRequest))
+                    }
+                }
+            }
+
+        } catch {
+            self.logFailedResponse(error)
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
@@ -250,61 +288,41 @@ public class EmbeddedMessagesService {
     
 
     // MARK: - Create Get Messages Request
-
-    private func createGetMessagesRequest(customerId: String, visitorId: String, config: EmbeddedMessagingConfig) throws -> NetworkRequest {
+    private func createGetEmbeddedMessagesRequest(
+        customerId: String,
+        visitorId: String,
+        config: EmbeddedMessagingConfig,
+        containers: [EmbeddedMessageOptions]? = nil
+    ) throws -> NetworkRequest {
+        
         let (region, brandId, tenantId) = getConfigValues(from: config)
-
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/embedded-messages/Get-Embedded-Messages"
-        let queryItems = [
+        let queryItems: [URLQueryItem] = [
             URLQueryItem(name: "CustomerId", value: customerId),
             URLQueryItem(name: "VisitorId", value: visitorId),
             URLQueryItem(name: "TenantId", value: tenantId),
             URLQueryItem(name: "BrandId", value: brandId)
         ]
+        
+        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
+        let path = "/api/v1/embedded-messages/Get-Embedded-Messages"
 
-        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
-        components?.queryItems = queryItems
+        let encoder = JSONEncoder()
+        let bodyData = try encoder.encode(containers) // encoding the array
+
+        let headers: [HTTPHeader] = [
+            HTTPHeader(field: .contentType, value: .json)
+        ]
 
         return NetworkRequest(
             method: .post,
             baseURL: baseURL,
             path: path,
-            headers: [],
-            queryItems: queryItems
+            headers: headers,
+            queryItems: queryItems,
+            httpBody: bodyData
         )
     }
     
-    // MARK: - Create Get Embedded Messages Request
-    private func createGetEmbeddedMessagesRequest(customerId: String, visitorId: String, config: EmbeddedMessagingConfig, containers: EmbeddedMessagingContainer) throws -> NetworkRequest {
-        let (region, brandId, tenantId) = getConfigValues(from: config)
-
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/embedded-messages/Get-Embedded-Messages"
-        let queryItems = [
-            URLQueryItem(name: "CustomerId", value: customerId),
-            URLQueryItem(name: "VisitorId", value: visitorId),
-            URLQueryItem(name: "TenantId", value: tenantId),
-            URLQueryItem(name: "BrandId", value: brandId)
-        ]
-
-        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
-        components?.queryItems = queryItems
-
-        if let fullURL = components?.url {
-            print("📡 Full request URL: \(fullURL.absoluteString)")
-        } else {
-            print("⚠️ Failed to build full request URL")
-        }
-
-        return NetworkRequest(
-            method: .post,
-            baseURL: baseURL,
-            path: path,
-            headers: [],
-            queryItems: queryItems
-        )
-    }
     
     // MARK: - Create Delete Messages Request
     private func createDeleteMessagesRequest(customerId: String, visitorId: String, config: EmbeddedMessagingConfig, messageId: String) throws -> NetworkRequest {
@@ -370,7 +388,7 @@ public class EmbeddedMessagesService {
         // Headers
         let headers: [HTTPHeader] = [
             HTTPHeader(field: .contentType, value: .json),
-            HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId)) // Optional: only include if the API requires it
+            HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
         ]
 
         // No query items now
@@ -385,6 +403,62 @@ public class EmbeddedMessagesService {
             httpBody: bodyData
         )
     }
+    
+    // MARK: - Create report metrics Request
+    private func createReportMetricsRequest(
+        customerId: String,
+        visitorId: String,
+        config: EmbeddedMessagingConfig,
+        message: EmbeddedMessage
+    ) throws -> NetworkRequest {
+        
+        let (region, brandId, tenantId) = getConfigValues(from: config)
+        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
+        let path = "/api/v1/messages/status"
+
+
+        // Create the metric
+        let metric = ReadMessageStatusMetric(
+            messageId: message.id,
+            engagementId: message.engagementId,
+            executionDateTime: message.executionDateTime,
+            campaignKind: message.campaignKind,
+            customerId: customerId,
+            readAt: readAtTimestamp
+        )
+
+        // Create the request object
+        let request = ReadMessageStatusUpdateRequest(
+            brandId: brandId,
+            tenantId: tenantId,
+            statusMetrics: [metric]
+        )
+
+        // Encode to JSON
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let bodyData = try encoder.encode(request)
+
+        // Headers
+        let headers: [HTTPHeader] = [
+            HTTPHeader(field: .contentType, value: .json),
+            HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
+        ]
+
+        // No query items now
+        let queryItems: [URLQueryItem] = []
+        
+        return NetworkRequest(
+            method: .put,
+            baseURL: baseURL,
+            path: path,
+            headers: headers,
+            queryItems: queryItems,
+            httpBody: bodyData
+        )
+    }
+    
+   
 
     // MARK: - Log Failed Response
     private func logFailedResponse(_ error: Swift.Error) {
