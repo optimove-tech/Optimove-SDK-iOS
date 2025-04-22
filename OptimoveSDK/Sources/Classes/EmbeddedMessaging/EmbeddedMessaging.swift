@@ -253,15 +253,6 @@ public class EmbeddedMessagesService {
             completion(.error(.errorCredentialsNotSet))
             return
         }
-       
-//        guard
-//            let customerId = try? storage?.getCustomerID(),
-//            let visitorId = try? storage?.getVisitorID(),
-//            customerId != visitorId else {
-//            Logger.warn("Customer ID is not set")
-//            completion(.errorUserNotSet)
-//            return
-//        }
         
         guard
             let customerId = "opt__003" as String?,
@@ -430,21 +421,17 @@ public class EmbeddedMessagesService {
         let path = "/api/v1/messages/metrics"
 
 
-        // Get the current date and time
         let currentDate = Date()
-
-        // Convert it to ISO 8601 format string
         let dateFormatter = ISO8601DateFormatter()
         let formattedCurrentTimestamp = dateFormatter.string(from: currentDate)
 
-        // Create the metric with the current timestamp as "now"
         let metric = ClickMetric(
             messageId: message.id,
             engagementId: message.engagementId,
             executionDateTime: message.executionDateTime,
             campaignKind: message.campaignKind,
             customerId: customerId,
-            now: formattedCurrentTimestamp // Set "now" to the current timestamp
+            now: formattedCurrentTimestamp
         )
 
         // Create the request object
@@ -478,8 +465,6 @@ public class EmbeddedMessagesService {
         )
     }
     
-   
-
     // MARK: - Log Failed Response
     private func logFailedResponse(_ error: Swift.Error) {
         Logger.error("Request failed: \(error.localizedDescription)")
