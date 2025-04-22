@@ -105,9 +105,14 @@ public class EmbeddedMessagesService {
             return
         }
 
-        let customerId = "opt__003"
-        let visitorId = "optimove"
-
+        guard
+            let customerId = try? storage?.getCustomerID(),
+            let visitorId = try? storage?.getVisitorID(),
+            customerId != visitorId else {
+            Logger.warn("Customer ID is not set")
+            completion(.errorUserNotSet)
+            return
+        }
         
         do {
             let request = try createGetEmbeddedMessagesRequest(
@@ -161,18 +166,17 @@ public class EmbeddedMessagesService {
             return
         }
 
-        let customerId = "opt__003"
-        let visitorId = "optimove"
-        let messageId = embeddedMessage.id
-
-        guard customerId != visitorId else {
-            Logger.warn("Customer ID matches visitor ID")
-            completion(.error(.errorUserNotSet))
+        guard
+            let customerId = try? storage?.getCustomerID(),
+            let visitorId = try? storage?.getVisitorID(),
+            customerId != visitorId else {
+            Logger.warn("Customer ID is not set")
+            completion(.errorUserNotSet)
             return
         }
 
         do {
-            let request = try createDeleteMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, messageId: messageId)
+            let request = try createDeleteMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, messageId: embeddedMessage.id)
             
             networkClient?.perform(request) { result in
                 switch result {
@@ -206,12 +210,12 @@ public class EmbeddedMessagesService {
             return
         }
 
-        let customerId = "opt__003"
-        let visitorId = "optimove"
-
-        guard customerId != visitorId else {
-            Logger.warn("Customer ID matches visitor ID")
-            completion(.error(.errorUserNotSet))
+        guard
+            let customerId = try? storage?.getCustomerID(),
+            let visitorId = try? storage?.getVisitorID(),
+            customerId != visitorId else {
+            Logger.warn("Customer ID is not set")
+            completion(.errorUserNotSet)
             return
         }
 
@@ -249,16 +253,25 @@ public class EmbeddedMessagesService {
             completion(.error(.errorCredentialsNotSet))
             return
         }
-
-        let customerId = "opt__003"
-        let visitorId = "optimove"
-
-        guard customerId != visitorId else {
-            Logger.warn("Customer ID matches visitor ID")
-            completion(.error(.errorUserNotSet))
+       
+//        guard
+//            let customerId = try? storage?.getCustomerID(),
+//            let visitorId = try? storage?.getVisitorID(),
+//            customerId != visitorId else {
+//            Logger.warn("Customer ID is not set")
+//            completion(.errorUserNotSet)
+//            return
+//        }
+        
+        guard
+            let customerId = "opt__003" as String?,
+            let visitorId = "visitor_001" as String?,
+            customerId != visitorId else {
+            Logger.warn("Customer ID is not set or matches Visitor ID")
+            completion(.errorUserNotSet)
             return
         }
-
+        
         do {
             let request = try createReportMetricsRequest(customerId: customerId, visitorId: visitorId, config: config, message: embeddedMessage)
             
@@ -374,7 +387,7 @@ public class EmbeddedMessagesService {
         )
 
         // Create the request object
-        let request = ReadMessageStatusUpdateRequest(
+        let request = ReadAtMetricRequest(
             brandId: brandId,
             tenantId: tenantId,
             statusMetrics: [metric]
@@ -404,7 +417,7 @@ public class EmbeddedMessagesService {
         )
     }
     
-    // MARK: - Create report metrics Request
+     // MARK: - Create report metrics Request
     private func createReportMetricsRequest(
         customerId: String,
         visitorId: String,
@@ -414,21 +427,28 @@ public class EmbeddedMessagesService {
         
         let (region, brandId, tenantId) = getConfigValues(from: config)
         let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/messages/status"
+        let path = "/api/v1/messages/metrics"
 
 
-        // Create the metric
-        let metric = ReadMessageStatusMetric(
+        // Get the current date and time
+        let currentDate = Date()
+
+        // Convert it to ISO 8601 format string
+        let dateFormatter = ISO8601DateFormatter()
+        let formattedCurrentTimestamp = dateFormatter.string(from: currentDate)
+
+        // Create the metric with the current timestamp as "now"
+        let metric = ClickMetric(
             messageId: message.id,
             engagementId: message.engagementId,
             executionDateTime: message.executionDateTime,
             campaignKind: message.campaignKind,
             customerId: customerId,
-            readAt: readAtTimestamp
+            now: formattedCurrentTimestamp // Set "now" to the current timestamp
         )
 
         // Create the request object
-        let request = ReadMessageStatusUpdateRequest(
+        let request = ClickMetricRequest(
             brandId: brandId,
             tenantId: tenantId,
             statusMetrics: [metric]
