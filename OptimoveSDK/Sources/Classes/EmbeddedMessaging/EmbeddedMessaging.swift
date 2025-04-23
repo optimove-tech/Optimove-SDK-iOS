@@ -104,7 +104,7 @@ public class EmbeddedMessagesService {
             completion(.error(.errorCredentialsNotSet))
             return
         }
-
+        
         guard
             let customerId = try? storage?.getCustomerID(),
             let visitorId = try? storage?.getVisitorID(),
@@ -311,7 +311,7 @@ public class EmbeddedMessagesService {
         let path = "/api/v1/embedded-messages/Get-Embedded-Messages"
 
         let encoder = JSONEncoder()
-        let bodyData = try encoder.encode(containers) // encoding the array
+        let bodyData = try encoder.encode(containers)
 
         let headers: [HTTPHeader] = [
             HTTPHeader(field: .contentType, value: .json)
@@ -367,7 +367,6 @@ public class EmbeddedMessagesService {
 
         let readAtTimestamp: Int? = isRead ? Int(Date().timeIntervalSince1970 * 1000) : nil
 
-        // Create the metric
         let metric = ReadMessageStatusMetric(
             messageId: message.id,
             engagementId: message.engagementId,
@@ -377,14 +376,12 @@ public class EmbeddedMessagesService {
             readAt: readAtTimestamp
         )
 
-        // Create the request object
         let request = ReadAtMetricRequest(
             brandId: brandId,
             tenantId: tenantId,
             statusMetrics: [metric]
         )
 
-        // Encode to JSON
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         let bodyData = try encoder.encode(request)
@@ -434,14 +431,12 @@ public class EmbeddedMessagesService {
             now: formattedCurrentTimestamp
         )
 
-        // Create the request object
         let request = ClickMetricRequest(
             brandId: brandId,
             tenantId: tenantId,
             statusMetrics: [metric]
         )
 
-        // Encode to JSON
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         let bodyData = try encoder.encode(request)

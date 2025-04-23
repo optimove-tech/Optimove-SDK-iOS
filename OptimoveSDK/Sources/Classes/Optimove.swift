@@ -64,11 +64,6 @@ typealias Logger = OptimoveCore.Logger
         }
         
         if config.isEmbeddedMessagingConfigured() {
-//            guard config.isOptimoveConfigured() else {
-//                Logger.error("Embedded Messaging requires the optimove feature enabled.")
-//                return
-//            }
-
             shared.container.resolve { serviceLocator in
                 do {
                     try EmbeddedMessagesService.initialize(with: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
