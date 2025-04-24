@@ -255,14 +255,14 @@ public class EmbeddedMessagesService {
         }
         
         guard
-            let customerId = "opt__003" as String?,
-            let visitorId = "visitor_001" as String?,
+            let customerId = try? storage?.getCustomerID(),
+            let visitorId = try? storage?.getVisitorID(),
             customerId != visitorId else {
-            Logger.warn("Customer ID is not set or matches Visitor ID")
+            Logger.warn("Customer ID is not set")
             completion(.errorUserNotSet)
             return
         }
-        
+
         do {
             let request = try createReportMetricsRequest(customerId: customerId, visitorId: visitorId, config: config, message: embeddedMessage)
             
