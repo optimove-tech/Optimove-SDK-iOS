@@ -48,7 +48,7 @@ public class EmbeddedMessagesService {
     public typealias EmbeddedMessagingReportHandler = (_ result: ResultType) -> Void
 
    
-    private static var instance: EmbeddedMessagesService?
+    public static var instance: EmbeddedMessagesService?
      private var storage: OptimoveStorage?
     private var networkClient: NetworkClient?
 
