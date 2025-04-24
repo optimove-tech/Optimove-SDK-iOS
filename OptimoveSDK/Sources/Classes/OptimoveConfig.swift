@@ -391,12 +391,6 @@ open class OptimoveConfigBuilder: NSObject {
         }()
         
         let embeddedMessagingConfig: EmbeddedMessagingConfig? = {
-//            if !features.contains(.optimove),
-//               tenantInfo == nil,
-//               !features.contains(.delayedConfiguration) {
-//                Logger.error("Embedded messaging cannot be inialized without optimove")
-//                return nil
-//            }
 
             if embeddedMessagingCredentials == nil {
                 if !features.contains(.delayedConfiguration) {

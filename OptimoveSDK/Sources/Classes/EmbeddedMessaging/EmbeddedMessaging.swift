@@ -47,8 +47,9 @@ public class EmbeddedMessagesService {
     public typealias EmbeddedMessagingDeleteHandler = (_ result: ResultType) -> Void
     public typealias EmbeddedMessagingReportHandler = (_ result: ResultType) -> Void
 
+   
     private static var instance: EmbeddedMessagesService?
-    private var storage: OptimoveStorage?
+     private var storage: OptimoveStorage?
     private var networkClient: NetworkClient?
 
     public static func getInstance() throws -> EmbeddedMessagesService {
@@ -97,7 +98,7 @@ public class EmbeddedMessagesService {
     // MARK: - Get Messages
     public func getMessagesAsync(
         completion: @escaping EmbeddedMessagingGetHandler,
-        containers: [EmbeddedMessageOptions]? = nil
+        containers: [ContainerRequestOptions]? = nil
     ) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
@@ -159,7 +160,7 @@ public class EmbeddedMessagesService {
     }
     
     // MARK: - Delete Messages
-    public func deleteMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage, isRead: Bool = false) {
+    public func deleteMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler, message: EmbeddedMessage, isRead: Bool = false) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -176,11 +177,11 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            let request = try createDeleteMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, messageId: embeddedMessage.id)
+            let request = try createDeleteMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, messageId: message.id)
             
             networkClient?.perform(request) { result in
                 switch result {
-                case .success(let response):
+                case .success(_):
                     DispatchQueue.main.async {
                         completion(.DeleteSuccess)
                     }
@@ -203,7 +204,7 @@ public class EmbeddedMessagesService {
     
     
     // MARK: - Set Read Async
-    public func setAsReadAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage, isRead: Bool = false) {
+    public func setAsReadAsync(completion: @escaping EmbeddedMessagingGetHandler, message: EmbeddedMessage, isRead: Bool = false) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -220,12 +221,12 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            let request = try createReadAtMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, message: embeddedMessage, isRead: isRead)
+            let request = try createReadAtMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, message: message, isRead: isRead)
             
             print("request: \(String(describing: request))")
             networkClient?.perform(request) { result in
                 switch result {
-                case .success(let response):
+                case .success(_):
                     DispatchQueue.main.async {
                         completion(.DeleteSuccess)
                     }
@@ -247,7 +248,7 @@ public class EmbeddedMessagesService {
     }
     
     // MARK: - Report Click metric Async
-    public func reportClickMetricAsync(completion: @escaping EmbeddedMessagingGetHandler, embeddedMessage: EmbeddedMessage) {
+    public func reportClickMetricAsync(completion: @escaping EmbeddedMessagingGetHandler, message: EmbeddedMessage) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -264,12 +265,12 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            let request = try createReportMetricsRequest(customerId: customerId, visitorId: visitorId, config: config, message: embeddedMessage)
+            let request = try createReportMetricsRequest(customerId: customerId, visitorId: visitorId, config: config, message: message)
             
             print("request: \(String(describing: request))")
             networkClient?.perform(request) { result in
                 switch result {
-                case .success(let response):
+                case .success(_):
                     DispatchQueue.main.async {
                         completion(.DeleteSuccess)
                     }
@@ -296,7 +297,7 @@ public class EmbeddedMessagesService {
         customerId: String,
         visitorId: String,
         config: EmbeddedMessagingConfig,
-        containers: [EmbeddedMessageOptions]? = nil
+        containers: [ContainerRequestOptions]? = nil
     ) throws -> NetworkRequest {
         
         let (region, brandId, tenantId) = getConfigValues(from: config)

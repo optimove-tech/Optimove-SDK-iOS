@@ -22,6 +22,13 @@ public struct EmbeddedMessage: Codable {
     public let deletedAt: String?
 }
 
+public typealias EmbeddedMessagesResponse = [String: EmbeddedMessagingContainer]
+
+
+public struct EmbeddedMessagingAPIResponse: Codable {
+    public let containers: [String: [EmbeddedMessage]]
+}
+
 public struct ReadAtMetricRequest: Codable {
     public let brandId: String
     public let tenantId: String
@@ -52,3 +59,20 @@ public struct ClickMetric: Codable {
     public let customerId: String
     public let now: String
 }
+
+public struct EmbeddedMessagingConfig: Codable {
+    let region: String
+    let tenantId: Int
+    let brandId: String
+}
+
+public struct EmbeddedMessagingContainer: Codable {
+    public let containerId: String
+    public let messages: [EmbeddedMessage]
+}
+
+public struct ContainerRequestOptions: Codable {
+    let containerId: String
+    let limit: Int?
+}
+
