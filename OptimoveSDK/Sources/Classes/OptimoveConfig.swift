@@ -16,7 +16,7 @@ public struct Feature: OptionSet, @unchecked Sendable, CustomStringConvertible {
     /// Preference center feature.
     public static let preferenceCenter = Feature(rawValue: 1 << 4)
     /// Embedded messaing feature
-    public static let embeddedMessaging = Feature(rawValue: 1 << 4)
+    public static let embeddedMessaging = Feature(rawValue: 1 << 5)
 
     static let delayedConfiguration = Feature(rawValue: 1 << 3)
 
