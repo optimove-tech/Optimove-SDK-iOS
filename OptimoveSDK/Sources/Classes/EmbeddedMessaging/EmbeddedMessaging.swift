@@ -94,7 +94,10 @@ public class EmbeddedMessagesService {
         return (region, brandId, tenantId)
     }
     
-    
+    /// Gets the embedded messages from the server.
+    ///
+    /// - Parameter containerRequestOptions: The options for the container request.
+    /// - Returns: The embedded messages response.
     // MARK: - Get Messages
     public func getMessagesAsync(
         completion: @escaping EmbeddedMessagingGetHandler,
@@ -159,6 +162,10 @@ public class EmbeddedMessagesService {
         }
     }
     
+    /// Deletes the given message from the server.
+    ///
+    /// - Parameter message: The message to delete.
+    /// - Returns: A promise indicating the completion of the delete operation.
     // MARK: - Delete Messages
     public func deleteMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler, message: EmbeddedMessage, isRead: Bool = false) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
@@ -202,7 +209,12 @@ public class EmbeddedMessagesService {
         }
     }
     
-    
+    /// Updates the read status of the given message on the server.
+    ///
+    /// - Parameters:
+    ///   - message: The message to update.
+    ///   - isRead: The new read status of the message.
+    /// - Returns: A promise indicating the completion of the read status update.
     // MARK: - Set Read Async
     public func setAsReadAsync(completion: @escaping EmbeddedMessagingGetHandler, message: EmbeddedMessage, isRead: Bool = false) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
@@ -247,6 +259,10 @@ public class EmbeddedMessagesService {
         }
     }
     
+    /// Reports a click metric for the given message.
+    ///
+    /// - Parameter message: The message to report the click metric for.
+    /// - Returns: A promise indicating the completion of the click metric report.
     // MARK: - Report Click metric Async
     public func reportClickMetricAsync(completion: @escaping EmbeddedMessagingGetHandler, message: EmbeddedMessage) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
