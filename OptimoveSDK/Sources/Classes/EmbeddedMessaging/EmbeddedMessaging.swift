@@ -81,7 +81,7 @@ public class EmbeddedMessagesService {
         print("✅ EmbeddedMessagesService initialized")
     }
 
-    private init(storage: OptimoveStorage, networkClient: NetworkClient) {
+    internal init(storage: OptimoveStorage, networkClient: NetworkClient) {
         self.storage = storage
         self.networkClient = networkClient
     }
