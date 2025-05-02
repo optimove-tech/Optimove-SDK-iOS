@@ -185,27 +185,8 @@ final class EmbeddedMessagingTests: XCTestCase {
            // Given
            let expectation = self.expectation(description: "reportClickMetricAsync calls completion with DeleteSuccess")
 
-           let message = EmbeddedMessage(
-               customerId: "adam_b@optimove.com",
-               isVisitor: false,
-               templateId: 1,
-               title: "Test Title",
-               content: "Test message",
-               media: nil,
-               readAt: nil,
-               url: nil,
-               engagementId: "eng123",
-               payload: [:],
-               campaignKind: 1,
-               executionDateTime: "2025-01-01T12:00:00Z",
-               messageLayoutType: nil,
-               expiryDate: nil,
-               containerId: "test-container",
-               id: "test-id",
-               createdAt: 1234567890,
-               updatedAt: nil,
-               deletedAt: nil
-           )
+        let message = makeTestMessage(id: "test-id", title: "Test Title", content: "Test message")
+
 
            // Mock network response to simulate successful click metric reporting
            let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
