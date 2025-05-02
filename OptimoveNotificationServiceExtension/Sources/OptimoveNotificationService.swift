@@ -136,15 +136,17 @@ public class OptimoveNotificationService {
     }
 
     private class func getPictureExtension(_ pictureUrl: String?) -> String? {
-        if pictureUrl == nil {
+        guard let pictureUrl = pictureUrl else {
             return nil
         }
-        let pictureExtension = URL(fileURLWithPath: pictureUrl!).pathExtension
-        if pictureExtension == "" {
-            return nil
+        
+        if let url = URL(string: pictureUrl) {
+            let pictureExtension = url.pathExtension
+            return pictureExtension.isEmpty ? nil : "." + pictureExtension
         }
-
-        return "." + pictureExtension
+        
+        let pictureExtension = URL(fileURLWithPath: pictureUrl).pathExtension
+        return pictureExtension.isEmpty ? nil : "." + pictureExtension
     }
 
     private class func loadAttachment(_ url: URL, withExtension pictureExtension: String?, completionHandler: @escaping (UNNotificationAttachment?) -> Void) {
