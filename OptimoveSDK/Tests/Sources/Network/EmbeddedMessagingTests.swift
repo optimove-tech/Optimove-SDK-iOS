@@ -61,21 +61,14 @@ final class EmbeddedMessagingTests: XCTestCase {
 
         service = EmbeddedMessagesService(storage: mockStorage, networkClient: mockNetworkClient)
     }
-
-    func testShouldBeTrue() {
-        XCTAssertTrue(true, "This test always passes because 'true' is always true.")
-    }
-
-    func testGetMessagesAsync_callsSuccessCompletion() throws {
-        // Given
-        let expectation = self.expectation(description: "getMessagesAsync calls completion with success")
-
-        let message = EmbeddedMessage(
+    // MARK: - Make test Message
+    func makeTestMessage(id: String, title: String, content: String) -> EmbeddedMessage {
+        return EmbeddedMessage(
             customerId: "adam_b@optimove.com",
             isVisitor: false,
             templateId: 1,
-            title: "Test Title",
-            content: "Test message",
+            title: title,
+            content: content,
             media: nil,
             readAt: nil,
             url: nil,
@@ -86,11 +79,18 @@ final class EmbeddedMessagingTests: XCTestCase {
             messageLayoutType: nil,
             expiryDate: nil,
             containerId: "test-container",
-            id: "test-id",
+            id: id,
             createdAt: 1234567890,
             updatedAt: nil,
             deletedAt: nil
         )
+    }
+    // MARK: - Test Get Messages
+    func testGetMessagesAsync_callsSuccessCompletion() throws {
+        // Given
+        let expectation = self.expectation(description: "getMessagesAsync calls completion with success")
+
+        let message = makeTestMessage(id: "test-id", title: "Test Title", content: "Test message")
 
         let apiResponse = EmbeddedMessagingAPIResponse(containers: ["test-container": [message]])
         let jsonData = try JSONEncoder().encode(apiResponse)
@@ -103,13 +103,13 @@ final class EmbeddedMessagingTests: XCTestCase {
         service.getMessagesAsync { result in
             // Then
             switch result {
-            case .success(let containers):
+            case .successMessages(let containers):
                 XCTAssertEqual(containers["test-container"]?.messages.first?.id, "test-id")
                 expectation.fulfill()
             case .error(let error):
                 XCTFail("Expected success but got error: \(error)")
-            case .DeleteSuccess:
-                XCTFail("Expected success but got DeleteSuccess")
+            case .Success:
+                XCTFail("Expected successMessages but got Success")
             case .errorUserNotSet:
                 XCTFail("Expected success but got errorUserNotSet")
             case .errorCredentialsNotSet:
@@ -119,4 +119,116 @@ final class EmbeddedMessagingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 2)
     }
+    // MARK: - Test Delete Messages
+    func testDeleteMessagesAsync_callsDeleteSuccessCompletion() throws {
+        // Given
+        let expectation = self.expectation(description: "deleteMessagesAsync calls completion with DeleteSuccess")
+
+        let message = makeTestMessage(id: "test-id", title: "Test Title", content: "Test message")
+
+
+        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 204, body: nil)
+        mockNetworkClient.mockResponse = .success(mockNetworkResponse)
+
+        // When
+        service.deleteMessagesAsync(completion: { result in
+            // Then
+            switch result {
+            case .Success:
+                expectation.fulfill()
+            case .successMessages(_):
+                XCTFail("Expected Success but got successMessages")
+            case .error(let error):
+                XCTFail("Expected DeleteSuccess but got error: \(error)")
+            case .errorUserNotSet:
+                XCTFail("Expected DeleteSuccess but got errorUserNotSet")
+            case .errorCredentialsNotSet:
+                XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
+            }
+        }, message: message)
+
+        wait(for: [expectation], timeout: 2)
+    }
+    // MARK: - Test Set As Read Async
+    func testSetAsReadAsync_callsSuccessCompletion() throws {
+            // Given
+            let expectation = self.expectation(description: "setAsReadAsync calls completion with DeleteSuccess")
+
+            let message = makeTestMessage(id: "test-id", title: "Test Title", content: "Test message")
+
+            // Mock network response to simulate successful update
+            let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
+            mockNetworkClient.mockResponse = .success(mockNetworkResponse)
+
+            // When
+            service.setAsReadAsync(completion: { result in
+                // Then
+                switch result {
+                case .Success:
+                    expectation.fulfill()
+                case .successMessages(_):
+                    XCTFail("Expected Success but got successMessages")
+                case .error(let error):
+                    XCTFail("Expected DeleteSuccess but got error: \(error)")
+                case .errorUserNotSet:
+                    XCTFail("Expected DeleteSuccess but got errorUserNotSet")
+                case .errorCredentialsNotSet:
+                    XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
+                }
+            }, message: message, isRead: true)
+
+            wait(for: [expectation], timeout: 2)
+        }
+    
+    // MARK: - Test Repost Click Metrics
+    func testReportClickMetricAsync_callsSuccessCompletion() throws {
+           // Given
+           let expectation = self.expectation(description: "reportClickMetricAsync calls completion with DeleteSuccess")
+
+           let message = EmbeddedMessage(
+               customerId: "adam_b@optimove.com",
+               isVisitor: false,
+               templateId: 1,
+               title: "Test Title",
+               content: "Test message",
+               media: nil,
+               readAt: nil,
+               url: nil,
+               engagementId: "eng123",
+               payload: [:],
+               campaignKind: 1,
+               executionDateTime: "2025-01-01T12:00:00Z",
+               messageLayoutType: nil,
+               expiryDate: nil,
+               containerId: "test-container",
+               id: "test-id",
+               createdAt: 1234567890,
+               updatedAt: nil,
+               deletedAt: nil
+           )
+
+           // Mock network response to simulate successful click metric reporting
+           let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
+           mockNetworkClient.mockResponse = .success(mockNetworkResponse)
+
+           // When
+           service.reportClickMetricAsync(completion: { result in
+               // Then
+               switch result {
+               case .Success:
+                   expectation.fulfill()
+               case .successMessages(_):
+                   XCTFail("Expected Success but got successMessages")
+               case .error(let error):
+                   XCTFail("Expected DeleteSuccess but got error: \(error)")
+               case .errorUserNotSet:
+                   XCTFail("Expected DeleteSuccess but got errorUserNotSet")
+               case .errorCredentialsNotSet:
+                   XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
+               }
+           }, message: message)
+
+           wait(for: [expectation], timeout: 2)
+       }
+
 }

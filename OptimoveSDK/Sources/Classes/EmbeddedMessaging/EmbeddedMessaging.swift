@@ -35,8 +35,8 @@ public class EmbeddedMessagesService {
 
     
     public enum ResultType {
-        case success(EmbeddedMessagesResponse)
-        case DeleteSuccess
+        case successMessages(EmbeddedMessagesResponse)
+        case Success
         case errorUserNotSet
         case errorCredentialsNotSet
         case error(Error)
@@ -137,7 +137,7 @@ public class EmbeddedMessagesService {
                         }
 
                         DispatchQueue.main.async {
-                            completion(.success(containers))
+                            completion(.successMessages(containers))
                         }
                     } catch {
                         self.logFailedResponse(error)
@@ -190,7 +190,7 @@ public class EmbeddedMessagesService {
                 switch result {
                 case .success(_):
                     DispatchQueue.main.async {
-                        completion(.DeleteSuccess)
+                        completion(.Success)
                     }
                     
                 case .failure(let error):
@@ -240,7 +240,7 @@ public class EmbeddedMessagesService {
                 switch result {
                 case .success(_):
                     DispatchQueue.main.async {
-                        completion(.DeleteSuccess)
+                        completion(.Success)
                     }
                     
                 case .failure(let error):
@@ -288,7 +288,7 @@ public class EmbeddedMessagesService {
                 switch result {
                 case .success(_):
                     DispatchQueue.main.async {
-                        completion(.DeleteSuccess)
+                        completion(.Success)
                     }
                     
                 case .failure(let error):
