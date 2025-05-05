@@ -8,16 +8,6 @@ public final class MockOptimoveStorage: OptimoveStorage {
 
     public var assertFunction: ((_ value: Any?, _ key: StorageKey) -> Void)?
     public var state: [StorageKey: Any?] = [:]
-    
-    public var customerID: String? {
-        get { return value(for: .customerID) as? String }
-        set { set(value: newValue, key: .customerID) }
-    }
-
-    public var visitorID: String? {
-        get { return value(for: .visitorID) as? String }
-        set { set(value: newValue, key: .visitorID) }
-    }
 
     public func set(value: Any?, key: StorageKey) {
         state[key] = value

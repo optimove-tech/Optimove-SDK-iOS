@@ -53,8 +53,8 @@ final class EmbeddedMessagingTests: XCTestCase {
         mockConfig = EmbeddedMessagingConfig(region: "eu", tenantId: 456, brandId: "123")
         mockNetworkClient = MockNetworkClient()
 
-        mockStorage.set(value: "adam_b@optimove.com", key: .customerID)
-        mockStorage.set(value: "Optimove", key: .visitorID)
+        mockStorage[.customerID] = "adam_b@optimove.com"
+        mockStorage[.visitorID] = "Optimove"
 
         let mockOptimoveConfig = MockOptimoveConfig(embeddedMessagingConfig: mockConfig).config
         Optimove.initialize(with: mockOptimoveConfig)
