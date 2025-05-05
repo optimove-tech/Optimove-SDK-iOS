@@ -48,11 +48,11 @@ public class EmbeddedMessagesService {
     public typealias EmbeddedMessagingReportHandler = (_ result: ResultType) -> Void
 
    
-    public static var instance: EmbeddedMessagesService?
-     private var storage: OptimoveStorage?
+    internal static var instance: EmbeddedMessagesService?
+    private var storage: OptimoveStorage?
     private var networkClient: NetworkClient?
 
-    public static func getInstance() throws -> EmbeddedMessagesService {
+    internal static func getInstance() throws -> EmbeddedMessagesService {
         guard let instance = instance else {
             throw Error.notInitialized
         }
