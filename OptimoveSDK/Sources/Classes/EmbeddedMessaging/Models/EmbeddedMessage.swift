@@ -25,7 +25,7 @@ public struct EmbeddedMessage: Codable {
 public typealias EmbeddedMessagesResponse = [String: EmbeddedMessagingContainer]
 
 
-public struct EmbeddedMessagingAPIResponse: Codable {
+internal struct EmbeddedMessagingAPIResponse: Codable {
     public let containers: [String: [EmbeddedMessage]]
 }
 
