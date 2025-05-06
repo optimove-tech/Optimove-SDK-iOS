@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.2.1
+- Resolve issue where images with query parameters in dynamic image URLs were not displaying correctly
+
 ## 6.2.0
 
 - Add support for coexisting with other push notification SDKs by resolving race conditions when multiple SDKs swizzle the following UIApplicationDelegate methods:
