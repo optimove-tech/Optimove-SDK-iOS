@@ -73,15 +73,15 @@ final class EmbeddedMessagingTests: XCTestCase {
             readAt: nil,
             url: nil,
             engagementId: "eng123",
-            payload: [:],
+            payload: "string",
             campaignKind: 1,
-            executionDateTime: "2025-01-01T12:00:00Z",
+            executionDateTime: ISO8601DateFormatter().date(from: "2025-01-01T12:00:00Z")!,
             messageLayoutType: nil,
             expiryDate: nil,
             containerId: "test-container",
             id: id,
-            createdAt: 1234567890,
-            updatedAt: nil,
+            createdAt: Date(timeIntervalSince1970: 1715097600),
+            updatedAt: Date(timeIntervalSince1970: 1715097600),
             deletedAt: nil
         )
     }

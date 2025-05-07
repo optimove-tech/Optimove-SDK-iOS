@@ -38,7 +38,7 @@ public struct ReadAtMetricRequest: Codable {
 public struct ReadMessageStatusMetric: Codable {
     public let messageId: String
     public let engagementId: String
-    public let executionDateTime: String
+    public let executionDateTime: Date
     public let campaignKind: Int
     public let customerId: String
     public let readAt: Int?
@@ -54,7 +54,7 @@ public struct ClickMetricRequest: Codable {
 public struct ClickMetric: Codable {
     public let messageId: String
     public let engagementId: String
-    public let executionDateTime: String
+    public let executionDateTime: Date
     public let campaignKind: Int
     public let customerId: String
     public let now: String
