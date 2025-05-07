@@ -7,18 +7,18 @@ public struct EmbeddedMessage: Codable {
     public let title: String
     public let content: String?
     public let media: String?
-    public let readAt: Int?
+    public let readAt: Date?
     public let url: String?
     public let engagementId: String
-    public let payload: [String: String]
+    public let payload: String
     public let campaignKind: Int
-    public let executionDateTime: String
+    public let executionDateTime: Date
     public let messageLayoutType: Int?
-    public let expiryDate: String?
+    public let expiryDate: Date?
     public let containerId: String?
     public let id: String
-    public let createdAt: Int
-    public let updatedAt: String?
+    public let createdAt: Date
+    public let updatedAt: Date
     public let deletedAt: String?
 }
 
