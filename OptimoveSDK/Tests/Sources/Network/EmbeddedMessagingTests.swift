@@ -131,7 +131,7 @@ final class EmbeddedMessagingTests: XCTestCase {
         mockNetworkClient.mockResponse = .success(mockNetworkResponse)
 
         // When
-        service.deleteMessagesAsync(completion: { result in
+        service.deleteMessagesAsync(message: message, completion: { result in
             // Then
             switch result {
             case .Success:
@@ -145,7 +145,7 @@ final class EmbeddedMessagingTests: XCTestCase {
             case .errorCredentialsNotSet:
                 XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
             }
-        }, message: message)
+        })
 
         wait(for: [expectation], timeout: 2)
     }
@@ -161,21 +161,21 @@ final class EmbeddedMessagingTests: XCTestCase {
             mockNetworkClient.mockResponse = .success(mockNetworkResponse)
 
             // When
-            service.setAsReadAsync(completion: { result in
-                // Then
-                switch result {
-                case .Success:
-                    expectation.fulfill()
-                case .successMessages(_):
-                    XCTFail("Expected Success but got successMessages")
-                case .error(let error):
-                    XCTFail("Expected DeleteSuccess but got error: \(error)")
-                case .errorUserNotSet:
-                    XCTFail("Expected DeleteSuccess but got errorUserNotSet")
-                case .errorCredentialsNotSet:
-                    XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
-                }
-            }, message: message, isRead: true)
+        service.setAsReadAsync(message: message, isRead: true, completion: { result in
+            // Then
+            switch result {
+            case .Success:
+                expectation.fulfill()
+            case .successMessages(_):
+                XCTFail("Expected Success but got successMessages")
+            case .error(let error):
+                XCTFail("Expected DeleteSuccess but got error: \(error)")
+            case .errorUserNotSet:
+                XCTFail("Expected DeleteSuccess but got errorUserNotSet")
+            case .errorCredentialsNotSet:
+                XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
+            }
+        })
 
             wait(for: [expectation], timeout: 2)
         }
@@ -193,21 +193,21 @@ final class EmbeddedMessagingTests: XCTestCase {
            mockNetworkClient.mockResponse = .success(mockNetworkResponse)
 
            // When
-           service.reportClickMetricAsync(completion: { result in
-               // Then
-               switch result {
-               case .Success:
-                   expectation.fulfill()
-               case .successMessages(_):
-                   XCTFail("Expected Success but got successMessages")
-               case .error(let error):
-                   XCTFail("Expected DeleteSuccess but got error: \(error)")
-               case .errorUserNotSet:
-                   XCTFail("Expected DeleteSuccess but got errorUserNotSet")
-               case .errorCredentialsNotSet:
-                   XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
-               }
-           }, message: message)
+        service.reportClickMetricAsync(message: message, completion: { result in
+            // Then
+            switch result {
+            case .Success:
+                expectation.fulfill()
+            case .successMessages(_):
+                XCTFail("Expected Success but got successMessages")
+            case .error(let error):
+                XCTFail("Expected DeleteSuccess but got error: \(error)")
+            case .errorUserNotSet:
+                XCTFail("Expected DeleteSuccess but got errorUserNotSet")
+            case .errorCredentialsNotSet:
+                XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
+            }
+        })
 
            wait(for: [expectation], timeout: 2)
        }
