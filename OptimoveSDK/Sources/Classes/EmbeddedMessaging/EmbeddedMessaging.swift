@@ -51,12 +51,27 @@ public class EmbeddedMessagesService {
     internal static var instance: EmbeddedMessagesService?
     private var storage: OptimoveStorage?
     private var networkClient: NetworkClient?
-
+    private var payload: String = ""
+    
     internal static func getInstance() throws -> EmbeddedMessagesService {
         guard let instance = instance else {
             throw Error.notInitialized
         }
         return instance
+    }
+    
+    public func getPayload() -> String {
+        return payload
+    }
+
+    public func getJSONPayload() throws -> Any {
+        let data = Data(payload.utf8)
+        return try JSONSerialization.jsonObject(with: data, options: [])
+    }
+
+    public func getPayload<T: Decodable>(_ type: T.Type) throws -> T {
+        let data = Data(payload.utf8)
+        return try JSONDecoder().decode(T.self, from: data)
     }
 
 
@@ -100,8 +115,8 @@ public class EmbeddedMessagesService {
     /// - Returns: The embedded messages response.
     // MARK: - Get Messages
     public func getMessagesAsync(
+        containers: [ContainerRequestOptions]? = nil,
         completion: @escaping EmbeddedMessagingGetHandler,
-        containers: [ContainerRequestOptions]? = nil
     ) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
@@ -167,7 +182,7 @@ public class EmbeddedMessagesService {
     /// - Parameter message: The message to delete.
     /// - Returns: A promise indicating the completion of the delete operation.
     // MARK: - Delete Messages
-    public func deleteMessagesAsync(completion: @escaping EmbeddedMessagingGetHandler, message: EmbeddedMessage, isRead: Bool = false) {
+    public func deleteMessagesAsync(message: EmbeddedMessage, isRead: Bool = false, completion: @escaping EmbeddedMessagingGetHandler, ) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -216,7 +231,7 @@ public class EmbeddedMessagesService {
     ///   - isRead: The new read status of the message.
     /// - Returns: A promise indicating the completion of the read status update.
     // MARK: - Set Read Async
-    public func setAsReadAsync(completion: @escaping EmbeddedMessagingGetHandler, message: EmbeddedMessage, isRead: Bool = false) {
+    public func setAsReadAsync(message: EmbeddedMessage, isRead: Bool = false, completion: @escaping EmbeddedMessagingGetHandler,) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -264,7 +279,7 @@ public class EmbeddedMessagesService {
     /// - Parameter message: The message to report the click metric for.
     /// - Returns: A promise indicating the completion of the click metric report.
     // MARK: - Report Click metric Async
-    public func reportClickMetricAsync(completion: @escaping EmbeddedMessagingGetHandler, message: EmbeddedMessage) {
+    public func reportClickMetricAsync(message: EmbeddedMessage, completion: @escaping EmbeddedMessagingGetHandler,) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -481,4 +496,6 @@ public class EmbeddedMessagesService {
     private func logFailedResponse(_ error: Swift.Error) {
         Logger.error("Request failed: \(error.localizedDescription)")
     }
+    
+    
 }
