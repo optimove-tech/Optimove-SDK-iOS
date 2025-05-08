@@ -116,7 +116,7 @@ public class EmbeddedMessagesService {
     // MARK: - Get Messages
     public func getMessagesAsync(
         containers: [ContainerRequestOptions]? = nil,
-        completion: @escaping EmbeddedMessagingGetHandler,
+        completion: @escaping EmbeddedMessagingGetHandler
     ) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
@@ -182,7 +182,7 @@ public class EmbeddedMessagesService {
     /// - Parameter message: The message to delete.
     /// - Returns: A promise indicating the completion of the delete operation.
     // MARK: - Delete Messages
-    public func deleteMessagesAsync(message: EmbeddedMessage, isRead: Bool = false, completion: @escaping EmbeddedMessagingGetHandler, ) {
+    public func deleteMessagesAsync(message: EmbeddedMessage, isRead: Bool = false, completion: @escaping EmbeddedMessagingGetHandler) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -231,7 +231,7 @@ public class EmbeddedMessagesService {
     ///   - isRead: The new read status of the message.
     /// - Returns: A promise indicating the completion of the read status update.
     // MARK: - Set Read Async
-    public func setAsReadAsync(message: EmbeddedMessage, isRead: Bool = false, completion: @escaping EmbeddedMessagingGetHandler,) {
+    public func setAsReadAsync(message: EmbeddedMessage, isRead: Bool = false, completion: @escaping EmbeddedMessagingGetHandler) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -279,7 +279,7 @@ public class EmbeddedMessagesService {
     /// - Parameter message: The message to report the click metric for.
     /// - Returns: A promise indicating the completion of the click metric report.
     // MARK: - Report Click metric Async
-    public func reportClickMetricAsync(message: EmbeddedMessage, completion: @escaping EmbeddedMessagingGetHandler,) {
+    public func reportClickMetricAsync(message: EmbeddedMessage, completion: @escaping EmbeddedMessagingGetHandler) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
