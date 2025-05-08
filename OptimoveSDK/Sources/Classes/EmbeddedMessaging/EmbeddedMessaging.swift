@@ -51,8 +51,8 @@ public class EmbeddedMessagesService {
     internal static var instance: EmbeddedMessagesService?
     private var storage: OptimoveStorage?
     private var networkClient: NetworkClient?
-    private var payload: String = ""
-    
+    private var payload: [String: Any] = [:]  
+
     internal static func getInstance() throws -> EmbeddedMessagesService {
         guard let instance = instance else {
             throw Error.notInitialized
@@ -60,21 +60,19 @@ public class EmbeddedMessagesService {
         return instance
     }
     
-    public func getPayload() -> String {
+    public func getPayload() -> [String: Any] {
         return payload
     }
 
-    public func getJSONPayload() throws -> Any {
-        let data = Data(payload.utf8)
-        return try JSONSerialization.jsonObject(with: data, options: [])
+    public func getJSONPayload() -> Any {
+        return payload
     }
 
     public func getPayload<T: Decodable>(_ type: T.Type) throws -> T {
-        let data = Data(payload.utf8)
+        let data = try JSONSerialization.data(withJSONObject: payload, options: [])
         return try JSONDecoder().decode(T.self, from: data)
     }
-
-
+    
     public static func initialize(with optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
         print("🔧 Initializing EmbeddedMessagesService...")
 
