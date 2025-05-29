@@ -1,14 +1,19 @@
 # Changelog
 
+## 6.2.2
+
+- Added Embedded Messaging API end points
+
 ## 6.2.1
+
 - Resolve issue where images with query parameters in dynamic image URLs were not displaying correctly
 
 ## 6.2.0
 
 - Add support for coexisting with other push notification SDKs by resolving race conditions when multiple SDKs swizzle the following UIApplicationDelegate methods:
-    - `UIApplicationDelegate.application(:didRegisterForRemoteNotificationsWithDeviceToken:)`
-    - `UIApplicationDelegate.application(:didFailToRegisterForRemoteNotificationsWithError:)`
-    - `UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`
+  - `UIApplicationDelegate.application(:didRegisterForRemoteNotificationsWithDeviceToken:)`
+  - `UIApplicationDelegate.application(:didFailToRegisterForRemoteNotificationsWithError:)`
+  - `UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`
 - Fix swizzling forwarding for apps that use UIApplicationDelegateAdaptor
 
 ## 6.1.0
@@ -28,10 +33,11 @@
 ## 6.0.0
 
 - Add Preference Center feature. The new functionality is available through the following methods:
-    - `OptimovePreferenceCenter.getInstance().setCustomerPreferencesAsync()`
-    - `OptimovePreferenceCenter.getInstance().getPreferencesAsync()`
-    
+  - `OptimovePreferenceCenter.getInstance().setCustomerPreferencesAsync()`
+  - `OptimovePreferenceCenter.getInstance().getPreferencesAsync()`
+
 Breaking changes:
+
 - iOS 13 required for using Preference Center
 - removed `OptimoveConfigBuilder.setCredentials` unintentionally public method
 
@@ -54,8 +60,8 @@ Breaking changes:
 ## 5.6.0
 
 - Support the delayed configuration for SDK. Add new public APIs:
-    - `OptimoveConfigBuilder(region: Region, features: [Feature])` - call for creating delayed configuration builder.
-    - `Optimove.setCredentials(optimoveCredentials: String?, optimobileCredentials: String?)` - call for setting credentials for delayed configuration.
+  - `OptimoveConfigBuilder(region: Region, features: [Feature])` - call for creating delayed configuration builder.
+  - `Optimove.setCredentials(optimoveCredentials: String?, optimobileCredentials: String?)` - call for setting credentials for delayed configuration.
 
 ## 5.5.0
 
