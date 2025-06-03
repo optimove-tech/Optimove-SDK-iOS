@@ -571,19 +571,18 @@ class PushHelper {
                 }
             }
             
-            if hasInApp {
-                group.enter()
-                Optimobile.sharedInstance.inAppManager.sync { (result: Int) in
-                    DispatchQueue.main.async {
-                        if result < 0 {
-                            fetchResult = .failed
-                        } else if result > 0 {
-                            fetchResult = .newData
-                        }
-                        // No data case is default, allow override from other handler
-                        
-                        group.leave()
+            // hasInApp true
+            group.enter()
+            Optimobile.sharedInstance.inAppManager.sync { (result: Int) in
+                DispatchQueue.main.async {
+                    if result < 0 {
+                        fetchResult = .failed
+                    } else if result > 0 {
+                        fetchResult = .newData
                     }
+                    // No data case is default, allow override from other handler
+                    
+                    group.leave()
                 }
             }
             
