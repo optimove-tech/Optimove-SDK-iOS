@@ -118,7 +118,7 @@ typealias Logger = OptimoveCore.Logger
         setCredentialsInternal(optimoveCredentials: optimoveCredentials, optimobileCredentials: optimobileCredentials)
     }
 
-    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?, embeddedMessagingCredentials: String?) {
+    public static func setCredentials(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String?, embeddedMessagingCredentials: String? = nil) {
         setCredentialsInternal(
             optimoveCredentials: optimoveCredentials,
             optimobileCredentials: optimobileCredentials,

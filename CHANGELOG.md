@@ -1,6 +1,15 @@
 # Changelog
 
+## 6.2.3
+
+- Fix potential crash when handling push notifications due to method swizzling target resolution in apps using delegate forwarding patterns (such as Flutter)
+
+## 6.2.2
+
+- Add the Embedded messaging APIs for GetMessages, Mark as Read, Send metrics
+
 ## 6.2.1
+
 - Resolve issue where images with query parameters in dynamic image URLs were not displaying correctly
 
 ## 6.2.0
