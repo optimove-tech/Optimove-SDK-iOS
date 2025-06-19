@@ -352,11 +352,16 @@ extension Optimobile {
 // MARK: Swizzling
 
 private var existingDidReg: IMP?
+private var existingDidRegTarget: AnyObject?
+
 private var existingDidFailToReg: IMP?
+private var existingDidFailTarget: AnyObject?
+
 private var existingDidReceive: IMP?
+private var existingDidReceiveTarget: AnyObject?
 
 class PushHelper {
-    typealias kumulos_applicationDidRegisterForRemoteNotifications = @convention(c) (_ obj: UIApplicationDelegate, _ _cmd: Selector, _ application: UIApplication, _ deviceToken: Data) -> Void
+    typealias kumulos_applicationDidRegisterForRemoteNotifications = @convention(c) (_ obj: Any, _ _cmd: Selector, _ application: UIApplication, _ deviceToken: Data) -> Void
     typealias didRegBlock = @convention(block) (_ obj: UIApplicationDelegate, _ application: UIApplication, _ deviceToken: Data) -> Void
 
     typealias kumulos_applicationDidFailToRegisterForRemoteNotificaitons = @convention(c) (_ obj: Any, _ _cmd: Selector, _ application: UIApplication, _ error: Error) -> Void
@@ -380,9 +385,12 @@ class PushHelper {
     private func swizzleDidRegister(delegate: UIApplicationDelegate, klass: AnyClass) {
         let didRegisterSelector = #selector(UIApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
         let regType = NSString(string: "v@:@@").utf8String
-        let regBlock: didRegBlock = { (obj: UIApplicationDelegate, application: UIApplication, deviceToken: Data) in
+        let regBlock: didRegBlock = { (obj: Any, application: UIApplication, deviceToken: Data) in
             if let _ = existingDidReg {
-                unsafeBitCast(existingDidReg, to: kumulos_applicationDidRegisterForRemoteNotifications.self)(obj, didRegisterSelector, application, deviceToken)
+                let targetObj = existingDidRegTarget ?? obj
+                if (targetObj as AnyObject).responds(to: didRegisterSelector) {
+                    unsafeBitCast(existingDidReg, to: kumulos_applicationDidRegisterForRemoteNotifications.self)(targetObj, didRegisterSelector, application, deviceToken)
+                }
             }
 
             Optimobile.pushRegister(deviceToken)
@@ -390,9 +398,20 @@ class PushHelper {
         let kumulosDidRegister = imp_implementationWithBlock(regBlock as Any)
         existingDidReg = class_replaceMethod(klass, didRegisterSelector, kumulosDidRegister, regType)
         
-        if existingDidReg == nil {
-            existingDidReg = self.getForwardingImpl(target: delegate, originalSelector: didRegisterSelector)
+        if existingDidReg != nil {
+            return
         }
+        
+        existingDidReg = self.getForwardingImpl(target: delegate, originalSelector: didRegisterSelector)
+        
+        if existingDidReg == nil {
+            return
+        }
+        
+        if let obj = delegate as? NSObject, let ft = obj.forwardingTarget(for: didRegisterSelector) {
+            existingDidRegTarget = ft as AnyObject
+        }
+        
     }
     
     private func swizzleDidFailRegister(delegate: UIApplicationDelegate, klass: AnyClass) {
@@ -402,7 +421,10 @@ class PushHelper {
         let didFailToRegType = NSString(string: "v@:@@").utf8String
         let didFailToRegBlock: didFailToRegBlock = { (obj: Any, application: UIApplication, error: Error) in
             if let _ = existingDidFailToReg {
-                unsafeBitCast(existingDidFailToReg, to: kumulos_applicationDidFailToRegisterForRemoteNotificaitons.self)(obj, didFailToRegisterSelector, application, error)
+                let targetObj = existingDidFailTarget ?? obj
+                if (targetObj as AnyObject).responds(to: didFailToRegisterSelector) {
+                    unsafeBitCast(existingDidFailToReg, to: kumulos_applicationDidFailToRegisterForRemoteNotificaitons.self)(targetObj, didFailToRegisterSelector, application, error)
+                }
             }
 
             print("Failed to register for remote notifications: \(error)")
@@ -411,8 +433,18 @@ class PushHelper {
         let kumulosDidFailToRegister = imp_implementationWithBlock(didFailToRegBlock as Any)
         existingDidFailToReg = class_replaceMethod(klass, didFailToRegisterSelector, kumulosDidFailToRegister, didFailToRegType)
         
+        if existingDidFailToReg != nil {
+            return
+        }
+        
+        existingDidFailToReg = self.getForwardingImpl(target: delegate, originalSelector: didFailToRegisterSelector)
+        
         if existingDidFailToReg == nil {
-            existingDidFailToReg = self.getForwardingImpl(target: delegate, originalSelector: didFailToRegisterSelector)
+            return
+        }
+        
+        if let obj = delegate as? NSObject, let ft = obj.forwardingTarget(for: didFailToRegisterSelector) {
+            existingDidFailTarget = ft as AnyObject
         }
     }
     
@@ -420,66 +452,24 @@ class PushHelper {
         // iOS9+ content-available handler
         let didReceiveSelector = #selector(UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:))
         let receiveType = NSString(string: "v@:@@@?").utf8String
-        let didReceive: didReceiveBlock = { (obj: Any, _ application: UIApplication, userInfo: [AnyHashable: Any], completionHandler: @escaping (UIBackgroundFetchResult) -> Void) in
-            let notification = PushNotification(userInfo: userInfo)
-            let hasInApp = notification.inAppDeepLink() != nil
-
-            self.setBadge(userInfo: userInfo)
-            self.trackPushDelivery(notification: notification)
-
-            if existingDidReceive == nil, !hasInApp {
-                // Nothing to do
-                completionHandler(.noData)
-                return
-            } else if existingDidReceive != nil, !hasInApp {
-                // Only existing delegate work to do
-                unsafeBitCast(existingDidReceive, to: kumulos_applicationDidReceiveRemoteNotificationFetchCompletionHandler.self)(obj, didReceiveSelector, application, userInfo, completionHandler)
-                return
-            }
-
-            var fetchResult: UIBackgroundFetchResult = .noData
-            let group = DispatchGroup()
-
-            if existingDidReceive != nil {
-                group.enter()
-                DispatchQueue.main.async {
-                    unsafeBitCast(existingDidReceive, to: kumulos_applicationDidReceiveRemoteNotificationFetchCompletionHandler.self)(obj, didReceiveSelector, application, userInfo, { (result: UIBackgroundFetchResult) in
-                        DispatchQueue.main.async {
-                            if fetchResult == .noData {
-                                fetchResult = result
-                            }
-
-                            group.leave()
-                        }
-                    })
-                }
-            }
-            
-            if hasInApp {
-                group.enter()
-                Optimobile.sharedInstance.inAppManager.sync { (result: Int) in
-                    DispatchQueue.main.async {
-                        if result < 0 {
-                            fetchResult = .failed
-                        } else if result > 0 {
-                            fetchResult = .newData
-                        }
-                        // No data case is default, allow override from other handler
-
-                        group.leave()
-                    }
-                }
-            }
-
-            group.notify(queue: .main) {
-                completionHandler(fetchResult)
-            }
-        }
+        let didReceive = createDidReceiveBlock(didReceiveSelector: didReceiveSelector)
+        
         let kumulosDidReceive = imp_implementationWithBlock(unsafeBitCast(didReceive, to: AnyObject.self))
         existingDidReceive = class_replaceMethod(klass, didReceiveSelector, kumulosDidReceive, receiveType)
         
+        if existingDidReceive != nil {
+            return
+        }
+        
+        existingDidReceive = self.getForwardingImpl(target: delegate, originalSelector: didReceiveSelector)
+        
+        
         if existingDidReceive == nil {
-            existingDidReceive = self.getForwardingImpl(target: delegate, originalSelector: didReceiveSelector)
+            return
+        }
+        
+        if let obj = delegate as? NSObject, let ft = obj.forwardingTarget(for: didReceiveSelector) {
+            existingDidReceiveTarget = ft as AnyObject
         }
     }
     
@@ -531,5 +521,74 @@ class PushHelper {
 
         let props: [String: Any] = ["type": KS_MESSAGE_TYPE_PUSH, "id": notification.id]
         Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED, properties: props, immediateFlush: true)
+    }
+
+    private func createDidReceiveBlock(didReceiveSelector: Selector) -> didReceiveBlock {
+        return { (obj: Any, application: UIApplication, userInfo: [AnyHashable: Any], completionHandler: @escaping (UIBackgroundFetchResult) -> Void) in
+            let notification = PushNotification(userInfo: userInfo)
+            let hasInApp = notification.inAppDeepLink() != nil
+            
+            self.setBadge(userInfo: userInfo)
+            self.trackPushDelivery(notification: notification)
+                        
+            if existingDidReceive == nil, !hasInApp {
+                // Nothing to do
+                completionHandler(.noData)
+                return
+            }
+            
+            if existingDidReceive != nil, !hasInApp {
+                // Only existing delegate work to do
+                let targetObj = existingDidReceiveTarget ?? obj
+                if (targetObj as AnyObject).responds(to: didReceiveSelector) {
+                    unsafeBitCast(existingDidReceive, to: kumulos_applicationDidReceiveRemoteNotificationFetchCompletionHandler.self)(targetObj, didReceiveSelector, application, userInfo, completionHandler)
+                }
+                
+                return
+            }
+            
+            var fetchResult: UIBackgroundFetchResult = .noData
+            let group = DispatchGroup()
+            
+            if existingDidReceive != nil {
+                group.enter()
+                DispatchQueue.main.async {
+                    let targetObj = existingDidReceiveTarget ?? obj
+                    if (targetObj as AnyObject).responds(to: didReceiveSelector) {
+                        
+                        unsafeBitCast(existingDidReceive, to: kumulos_applicationDidReceiveRemoteNotificationFetchCompletionHandler.self)(targetObj, didReceiveSelector, application, userInfo, { (result: UIBackgroundFetchResult) in
+                            DispatchQueue.main.async {
+                                if fetchResult == .noData {
+                                    fetchResult = result
+                                }
+                                
+                                group.leave()
+                            }
+                        })
+                    } else {
+                        group.leave()
+                    }
+                }
+            }
+            
+            // hasInApp true
+            group.enter()
+            Optimobile.sharedInstance.inAppManager.sync { (result: Int) in
+                DispatchQueue.main.async {
+                    if result < 0 {
+                        fetchResult = .failed
+                    } else if result > 0 {
+                        fetchResult = .newData
+                    }
+                    // No data case is default, allow override from other handler
+                    
+                    group.leave()
+                }
+            }
+            
+            group.notify(queue: .main) {
+                completionHandler(fetchResult)
+            }
+        }
     }
 }
