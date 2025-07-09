@@ -197,7 +197,7 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            let request = try createDeleteMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, messageId: message.id)
+            let request = try createReportEventRequest(customerId: customerId, visitorId: visitorId, message: message, event: EventType.delete,  config: config)
             
             networkClient?.perform(request) { result in
                 switch result {
@@ -246,7 +246,7 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            let request = try createReadAtMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, message: message, isRead: isRead)
+            let request = try createReportEventRequest(customerId: customerId, visitorId: visitorId, message: message, event: EventType.markAsRead,  config: config)
             
             print("request: \(String(describing: request))")
             networkClient?.perform(request) { result in
@@ -294,7 +294,7 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            let request = try createReportMetricsRequest(customerId: customerId, visitorId: visitorId, config: config, message: message)
+            let request = try createReportEventRequest(customerId: customerId, visitorId: visitorId, message: message, event: EventType.clickMetric,  config: config)
             
             print("request: \(String(describing: request))")
             networkClient?.perform(request) { result in
@@ -320,7 +320,7 @@ public class EmbeddedMessagesService {
         }
     }
     
-
+    
     // MARK: - Create Get Messages Request
     private func createGetEmbeddedMessagesRequest(
         customerId: String,
@@ -338,7 +338,7 @@ public class EmbeddedMessagesService {
         ]
         
         let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/embedded-messages/Get-Embedded-Messages"
+        let path = "/api/v2/embedded-messages/get"
 
         let encoder = JSONEncoder()
         let bodyData = try encoder.encode(containers)
@@ -356,77 +356,48 @@ public class EmbeddedMessagesService {
             httpBody: bodyData
         )
     }
-    
-    
-    // MARK: - Create Delete Messages Request
-    private func createDeleteMessagesRequest(customerId: String, visitorId: String, config: EmbeddedMessagingConfig, messageId: String) throws -> NetworkRequest {
-        let (region, brandId, tenantId) = getConfigValues(from: config)
 
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/messages/\(messageId)"
+    
+    // MARK: - Report Event
+    private func createReportEventRequest(
+        customerId: String,
+        visitorId: String,
+        message: EmbeddedMessage,
+        event: EventType,
+        config: EmbeddedMessagingConfig
+    ) throws -> NetworkRequest {
         
-        let queryItems = [
+        let (region, brandId, tenantId) = getConfigValues(from: config)
+        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
+        let path = "/api/v2/events/report"
+        
+        // Headers
+        let headers: [HTTPHeader] = [
+            HTTPHeader(field: .contentType, value: .json),
+            HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
+        ]
+        
+        let queryItems: [URLQueryItem] = [
             URLQueryItem(name: "TenantId", value: tenantId),
             URLQueryItem(name: "BrandId", value: brandId)
         ]
-        
-        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
-        components?.queryItems = queryItems
-
-        return NetworkRequest(
-            method: .delete,
-            baseURL: baseURL,
-            path: path,
-            headers: [],
-            queryItems: queryItems
-        )
-    }
-    
-    // MARK: - Create ReadAt Messages Request
-    private func createReadAtMessagesRequest(
-        customerId: String,
-        visitorId: String,
-        config: EmbeddedMessagingConfig,
-        message: EmbeddedMessage,
-        isRead: Bool
-    ) throws -> NetworkRequest {
-        
-        let (region, brandId, tenantId) = getConfigValues(from: config)
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/messages/status"
-
-        let readAtTimestamp: Int? = isRead ? Int(Date().timeIntervalSince1970 * 1000) : nil
-
-        let metric = ReadMessageStatusMetric(
-            messageId: message.id,
-            engagementId: message.engagementId,
-            executionDateTime: message.executionDateTime,
-            campaignKind: message.campaignKind,
+        // Prepare the body
+        let isoDate = ISO8601DateFormatter().string(from: Date())
+        let eventBody = [EventBody(
+            timestamp: isoDate,
+            uuid: UUID().uuidString,
+            eventType: event.rawValue,
             customerId: customerId,
-            readAt: readAtTimestamp
-        )
+            visitorId: visitorId,
+            context: [
+                "messageId": message.id,
+            ]
+        )]
 
-        let request = ReadAtMetricRequest(
-            brandId: brandId,
-            tenantId: tenantId,
-            statusMetrics: [metric]
-        )
+        let bodyData = try JSONEncoder().encode(eventBody)
 
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        let bodyData = try encoder.encode(request)
-
-        // Headers
-        let headers: [HTTPHeader] = [
-            HTTPHeader(field: .contentType, value: .json),
-            HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
-        ]
-
-        // No query items now
-        let queryItems: [URLQueryItem] = []
-        
         return NetworkRequest(
-            method: .put,
+            method: .post,
             baseURL: baseURL,
             path: path,
             headers: headers,
@@ -435,60 +406,6 @@ public class EmbeddedMessagesService {
         )
     }
     
-     // MARK: - Create report metrics Request
-    private func createReportMetricsRequest(
-        customerId: String,
-        visitorId: String,
-        config: EmbeddedMessagingConfig,
-        message: EmbeddedMessage
-    ) throws -> NetworkRequest {
-        
-        let (region, brandId, tenantId) = getConfigValues(from: config)
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/messages/metrics"
-
-
-        let currentDate = Date()
-        let dateFormatter = ISO8601DateFormatter()
-        let formattedCurrentTimestamp = dateFormatter.string(from: currentDate)
-
-        let metric = ClickMetric(
-            messageId: message.id,
-            engagementId: message.engagementId,
-            executionDateTime: message.executionDateTime,
-            campaignKind: message.campaignKind,
-            customerId: customerId,
-            now: formattedCurrentTimestamp
-        )
-
-        let request = ClickMetricRequest(
-            brandId: brandId,
-            tenantId: tenantId,
-            statusMetrics: [metric]
-        )
-
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        let bodyData = try encoder.encode(request)
-
-        // Headers
-        let headers: [HTTPHeader] = [
-            HTTPHeader(field: .contentType, value: .json),
-            HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
-        ]
-
-        // No query items now
-        let queryItems: [URLQueryItem] = []
-        
-        return NetworkRequest(
-            method: .put,
-            baseURL: baseURL,
-            path: path,
-            headers: headers,
-            queryItems: queryItems,
-            httpBody: bodyData
-        )
-    }
     
     // MARK: - Log Failed Response
     private func logFailedResponse(_ error: Swift.Error) {
