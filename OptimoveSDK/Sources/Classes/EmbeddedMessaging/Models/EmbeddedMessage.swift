@@ -76,3 +76,21 @@ public struct ContainerRequestOptions: Codable {
     let limit: Int?
 }
 
+public enum EventType: String, Codable {
+    case markAsRead = "markAsRead"
+    case markAsUnread = "markAsUnread"
+    case delete = "delete"
+    case clickMetric = "clickMetric"
+}
+
+
+struct EventBody: Codable {
+    let timestamp: String
+    let uuid: String
+    let eventType: String
+    let customerId: String
+    let visitorId: String
+    let context: [String: String]
+}
+
+
