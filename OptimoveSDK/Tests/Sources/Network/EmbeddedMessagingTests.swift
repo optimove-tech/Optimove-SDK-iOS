@@ -14,7 +14,24 @@ extension NetworkResponse {
 class MockNetworkClient: NetworkClient {
     var mockResponse: Result<NetworkResponse<Data?>, NetworkError>?
 
+    var lastRequest: NetworkRequest?
+    var lastURLRequest: URLRequest?
+
+    // Add this property to capture body bytes
+    var lastRequestBody: Data?
+
     func perform(_ request: NetworkRequest, _ completion: @escaping NetworkServiceCompletion) {
+        lastRequest = request
+
+        do {
+            let urlRequest = try request.asURLRequest()
+            lastURLRequest = urlRequest
+            lastRequestBody = urlRequest.httpBody  // Capture the body here
+        } catch {
+            lastURLRequest = nil
+            lastRequestBody = nil
+        }
+
         if let response = mockResponse {
             completion(response)
         } else {
@@ -22,7 +39,37 @@ class MockNetworkClient: NetworkClient {
         }
     }
 }
+// MARK: - Mock network request
+extension NetworkRequest {
+    func asURLRequest() throws -> URLRequest {
+        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
+            throw NSError(domain: "Invalid baseURL", code: 0)
+        }
+        components.path = path ?? ""
+        if let queryItems = queryItems {
+            components.queryItems = queryItems
+        }
+        guard let url = components.url else {
+            throw NSError(domain: "Invalid URL components", code: 0)
+        }
 
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = method.rawValue
+
+        headers?.forEach { urlRequest.addValue($0.value, forHTTPHeaderField: $0.field) }
+
+        urlRequest.httpBody = httpBody
+
+        return urlRequest
+    }
+
+    var url: URL {
+        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
+        components.path = path ?? ""
+        components.queryItems = queryItems
+        return components.url ?? baseURL
+    }
+}
 // MARK: - Mock Optimove Config
 struct MockOptimoveConfig {
     let config: OptimoveConfig
@@ -149,36 +196,78 @@ final class EmbeddedMessagingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 2)
     }
+   
     // MARK: - Test Set As Read Async
     func testSetAsReadAsync_callsSuccessCompletion() throws {
-            // Given
-            let expectation = self.expectation(description: "setAsReadAsync calls completion with DeleteSuccess")
+        // Given
+        let expectation = self.expectation(description: "setAsReadAsync calls completion with Success")
 
-            let message = makeTestMessage(id: "test-id", title: "Test Title", content: "Test message")
+        let message = makeTestMessage(id: "test-id", title: "Test Title", content: "Test message")
 
-            // Mock network response to simulate successful update
-            let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
-            mockNetworkClient.mockResponse = .success(mockNetworkResponse)
+        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
+        mockNetworkClient.mockResponse = .success(mockNetworkResponse)
 
-            // When
+        // When
         service.setAsReadAsync(message: message, isRead: true, completion: { result in
-            // Then
             switch result {
             case .Success:
+                // Check captured request
+                guard let request = self.mockNetworkClient.lastRequest else {
+                    XCTFail("No request captured")
+                    return
+                }
+
+                // Check HTTP Method
+                XCTAssertEqual(request.method, .post)
+
+                // Check URL path
+                XCTAssertEqual(request.url.path, "/api/v2/events/report")
+
+                // Check URL query parameters
+                let components = URLComponents(url: request.url, resolvingAgainstBaseURL: false)
+                let queryItems = components?.queryItems ?? []
+
+                XCTAssertTrue(queryItems.contains(URLQueryItem(name: "TenantId", value: "456")))
+                XCTAssertTrue(queryItems.contains(URLQueryItem(name: "BrandId", value: "123")))
+
+          
+                // Check HTTP body data in the captured URLRequest
+                if let body = self.mockNetworkClient.lastRequestBody {
+                    do {
+                        // Decode JSON body into an array of dictionaries
+                        let jsonArray = try JSONSerialization.jsonObject(with: body, options: []) as? [[String: Any]]
+
+                        guard let firstEvent = jsonArray?.first else {
+                            XCTFail("Expected at least one event in request body")
+                            return
+                        }
+
+                        // ✅ Check eventType is "read"
+                        XCTAssertEqual(firstEvent["eventType"] as? String, "markAsRead", "Expected eventType to be 'read'")
+
+                        // ✅ Check context contains messageId
+                        if let context = firstEvent["context"] as? [String: Any],
+                           let messageId = context["messageId"] as? String {
+                            XCTAssertFalse(messageId.isEmpty, "Expected non-empty messageId in context")
+                        } else {
+                            XCTFail("Expected context with messageId")
+                        }
+
+                    } catch {
+                        XCTFail("Failed to parse request body as JSON: \(error)")
+                    }
+                } else {
+                    XCTFail("Expected non-nil body with message ID")
+                }
                 expectation.fulfill()
-            case .successMessages(_):
-                XCTFail("Expected Success but got successMessages")
-            case .error(let error):
-                XCTFail("Expected DeleteSuccess but got error: \(error)")
-            case .errorUserNotSet:
-                XCTFail("Expected DeleteSuccess but got errorUserNotSet")
-            case .errorCredentialsNotSet:
-                XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
+
+            default:
+                XCTFail("Expected Success but got \(result)")
             }
         })
 
-            wait(for: [expectation], timeout: 2)
-        }
+        wait(for: [expectation], timeout: 2)
+    }
     
     // MARK: - Test Repost Click Metrics
     func testReportClickMetricAsync_callsSuccessCompletion() throws {
