@@ -166,31 +166,72 @@ final class EmbeddedMessagingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 2)
     }
-    // MARK: - Test Delete Messages
-    func testDeleteMessagesAsync_callsDeleteSuccessCompletion() throws {
+    // MARK: - Test Delete Message Async
+    func testDeleteMessage_callsSuccessCompletion() throws {
         // Given
-        let expectation = self.expectation(description: "deleteMessagesAsync calls completion with DeleteSuccess")
+        let expectation = self.expectation(description: "ReportClickMetrics calls completion with Success")
 
         let message = makeTestMessage(id: "test-id", title: "Test Title", content: "Test message")
 
-
-        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 204, body: nil)
+        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
         mockNetworkClient.mockResponse = .success(mockNetworkResponse)
 
         // When
         service.deleteMessagesAsync(message: message, completion: { result in
-            // Then
             switch result {
             case .Success:
+                // Check captured request
+                guard let request = self.mockNetworkClient.lastRequest else {
+                    XCTFail("No request captured")
+                    return
+                }
+
+                // Check HTTP Method
+                XCTAssertEqual(request.method, .post)
+
+                // Check URL path
+                XCTAssertEqual(request.url.path, "/api/v2/events/report")
+
+                // Check URL query parameters
+                let components = URLComponents(url: request.url, resolvingAgainstBaseURL: false)
+                let queryItems = components?.queryItems ?? []
+
+                XCTAssertTrue(queryItems.contains(URLQueryItem(name: "TenantId", value: "456")))
+                XCTAssertTrue(queryItems.contains(URLQueryItem(name: "BrandId", value: "123")))
+
+          
+                // Check HTTP body data in the captured URLRequest
+                if let body = self.mockNetworkClient.lastRequestBody {
+                    do {
+                        // Decode JSON body into an array of dictionaries
+                        let jsonArray = try JSONSerialization.jsonObject(with: body, options: []) as? [[String: Any]]
+
+                        guard let firstEvent = jsonArray?.first else {
+                            XCTFail("Expected at least one event in request body")
+                            return
+                        }
+
+                        // ✅ Check eventType is "read"
+                        XCTAssertEqual(firstEvent["eventType"] as? String, "delete", "Expected eventType to be 'read'")
+
+                        // ✅ Check context contains messageId
+                        if let context = firstEvent["context"] as? [String: Any],
+                           let messageId = context["messageId"] as? String {
+                            XCTAssertFalse(messageId.isEmpty, "Expected non-empty messageId in context")
+                        } else {
+                            XCTFail("Expected context with messageId")
+                        }
+
+                    } catch {
+                        XCTFail("Failed to parse request body as JSON: \(error)")
+                    }
+                } else {
+                    XCTFail("Expected non-nil body with message ID")
+                }
                 expectation.fulfill()
-            case .successMessages(_):
-                XCTFail("Expected Success but got successMessages")
-            case .error(let error):
-                XCTFail("Expected DeleteSuccess but got error: \(error)")
-            case .errorUserNotSet:
-                XCTFail("Expected DeleteSuccess but got errorUserNotSet")
-            case .errorCredentialsNotSet:
-                XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
+
+            default:
+                XCTFail("Expected Success but got \(result)")
             }
         })
 
@@ -269,36 +310,78 @@ final class EmbeddedMessagingTests: XCTestCase {
         wait(for: [expectation], timeout: 2)
     }
     
-    // MARK: - Test Repost Click Metrics
-    func testReportClickMetricAsync_callsSuccessCompletion() throws {
-           // Given
-           let expectation = self.expectation(description: "reportClickMetricAsync calls completion with DeleteSuccess")
+    
+    
+    // MARK: - Test Report click metrics Async
+    func testReportClickMetricsc_callsSuccessCompletion() throws {
+        // Given
+        let expectation = self.expectation(description: "ReportClickMetrics calls completion with Success")
 
         let message = makeTestMessage(id: "test-id", title: "Test Title", content: "Test message")
 
+        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
+        mockNetworkClient.mockResponse = .success(mockNetworkResponse)
 
-           // Mock network response to simulate successful click metric reporting
-           let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
-           mockNetworkClient.mockResponse = .success(mockNetworkResponse)
-
-           // When
+        // When
         service.reportClickMetricAsync(message: message, completion: { result in
-            // Then
             switch result {
             case .Success:
+                // Check captured request
+                guard let request = self.mockNetworkClient.lastRequest else {
+                    XCTFail("No request captured")
+                    return
+                }
+
+                // Check HTTP Method
+                XCTAssertEqual(request.method, .post)
+
+                // Check URL path
+                XCTAssertEqual(request.url.path, "/api/v2/events/report")
+
+                // Check URL query parameters
+                let components = URLComponents(url: request.url, resolvingAgainstBaseURL: false)
+                let queryItems = components?.queryItems ?? []
+
+                XCTAssertTrue(queryItems.contains(URLQueryItem(name: "TenantId", value: "456")))
+                XCTAssertTrue(queryItems.contains(URLQueryItem(name: "BrandId", value: "123")))
+
+          
+                // Check HTTP body data in the captured URLRequest
+                if let body = self.mockNetworkClient.lastRequestBody {
+                    do {
+                        // Decode JSON body into an array of dictionaries
+                        let jsonArray = try JSONSerialization.jsonObject(with: body, options: []) as? [[String: Any]]
+
+                        guard let firstEvent = jsonArray?.first else {
+                            XCTFail("Expected at least one event in request body")
+                            return
+                        }
+
+                        // ✅ Check eventType is "read"
+                        XCTAssertEqual(firstEvent["eventType"] as? String, "clickMetric", "Expected eventType to be 'read'")
+
+                        // ✅ Check context contains messageId
+                        if let context = firstEvent["context"] as? [String: Any],
+                           let messageId = context["messageId"] as? String {
+                            XCTAssertFalse(messageId.isEmpty, "Expected non-empty messageId in context")
+                        } else {
+                            XCTFail("Expected context with messageId")
+                        }
+
+                    } catch {
+                        XCTFail("Failed to parse request body as JSON: \(error)")
+                    }
+                } else {
+                    XCTFail("Expected non-nil body with message ID")
+                }
                 expectation.fulfill()
-            case .successMessages(_):
-                XCTFail("Expected Success but got successMessages")
-            case .error(let error):
-                XCTFail("Expected DeleteSuccess but got error: \(error)")
-            case .errorUserNotSet:
-                XCTFail("Expected DeleteSuccess but got errorUserNotSet")
-            case .errorCredentialsNotSet:
-                XCTFail("Expected DeleteSuccess but got errorCredentialsNotSet")
+
+            default:
+                XCTFail("Expected Success but got \(result)")
             }
         })
 
-           wait(for: [expectation], timeout: 2)
-       }
+        wait(for: [expectation], timeout: 2)
+    }
 
 }
