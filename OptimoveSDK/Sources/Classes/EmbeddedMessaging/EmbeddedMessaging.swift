@@ -53,7 +53,7 @@ public class EmbeddedMessagesService {
     private var networkClient: NetworkClient?
     private var payload: [String: Any] = [:]  
 
-    internal static func getInstance() throws -> EmbeddedMessagesService {
+    public static func getInstance() throws -> EmbeddedMessagesService {
         guard let instance = instance else {
             throw Error.notInitialized
         }
