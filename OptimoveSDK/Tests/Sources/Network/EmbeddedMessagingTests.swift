@@ -120,15 +120,15 @@ final class EmbeddedMessagingTests: XCTestCase {
             readAt: nil,
             url: nil,
             engagementId: "eng123",
-            payload: "string",
+            payload: ["key": AnyCodable("string")],
             campaignKind: 1,
-            executionDateTime: ISO8601DateFormatter().date(from: "2025-01-01T12:00:00Z")!,
+            executionDateTime: "2025-01-01T12:00:00Z",
             messageLayoutType: nil,
             expiryDate: nil,
             containerId: "test-container",
             id: id,
-            createdAt: Date(timeIntervalSince1970: 1715097600),
-            updatedAt: Date(timeIntervalSince1970: 1715097600),
+            createdAt: Int64(Date(timeIntervalSince1970: 1715097600).timeIntervalSince1970 * 1000),
+            updatedAt: Int64(Date(timeIntervalSince1970: 1715097600).timeIntervalSince1970 * 1000),
             deletedAt: nil
         )
     }

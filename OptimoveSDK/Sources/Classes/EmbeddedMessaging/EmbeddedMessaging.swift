@@ -51,7 +51,7 @@ public class EmbeddedMessagesService {
     internal static var instance: EmbeddedMessagesService?
     private var storage: OptimoveStorage?
     private var networkClient: NetworkClient?
-    private var payload: [String: Any] = [:]  
+    private var payload: [String: Any] = [:]
 
     public static func getInstance() throws -> EmbeddedMessagesService {
         guard let instance = instance else {
@@ -138,7 +138,6 @@ public class EmbeddedMessagesService {
                 config: config,
                 containers: containers
             )
-            
             networkClient?.perform(request) { result in
                 switch result {
                 case .success(let response):
@@ -166,7 +165,7 @@ public class EmbeddedMessagesService {
                     }
                 }
             }
-
+            
         } catch {
             logFailedResponse(error)
             DispatchQueue.main.async {
@@ -198,7 +197,6 @@ public class EmbeddedMessagesService {
 
         do {
             let request = try createReportEventRequest(customerId: customerId, visitorId: visitorId, message: message, event: EventType.delete,  config: config)
-            
             networkClient?.perform(request) { result in
                 switch result {
                 case .success(_):
