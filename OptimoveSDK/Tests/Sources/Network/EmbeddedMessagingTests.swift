@@ -93,8 +93,8 @@ func assertValidContext(_ context: Any?, file: StaticString = #file, line: UInt 
         return
     }
 
-    XCTAssertFalse(messageId.isEmpty, "Expected non-empty messageId in context", file: file, line: line)
-    XCTAssertFalse(containerId.isEmpty, "Expected non-empty containerId in context", file: file, line: line)
+    XCTAssertFalse(messageId.isEmpty, "Expected messageId in context", file: file, line: line)
+    XCTAssertFalse(containerId.isEmpty, "Expected containerId in context", file: file, line: line)
 }
 
 // MARK: - Test Class
