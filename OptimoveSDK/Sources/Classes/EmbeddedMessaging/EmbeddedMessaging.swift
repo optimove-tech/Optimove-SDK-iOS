@@ -389,6 +389,7 @@ public class EmbeddedMessagesService {
             visitorId: visitorId,
             context: [
                 "messageId": message.id,
+                "containerId": message.containerId
             ]
         )]
 

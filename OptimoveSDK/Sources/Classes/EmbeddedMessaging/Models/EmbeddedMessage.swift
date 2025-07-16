@@ -15,7 +15,7 @@ public struct EmbeddedMessage: Codable {
     public let executionDateTime: String // kept as ISO8601 string
     public let messageLayoutType: Int?
     public let expiryDate: String?
-    public let containerId: String?
+    public let containerId: String
     public let id: String
     public let createdAt: Int64
     public let updatedAt: Int64?
