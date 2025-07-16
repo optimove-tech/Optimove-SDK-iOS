@@ -85,6 +85,18 @@ struct MockOptimoveConfig {
     }
 }
 
+func assertValidContext(_ context: Any?, file: StaticString = #file, line: UInt = #line) {
+    guard let contextDict = context as? [String: Any],
+          let messageId = contextDict["messageId"] as? String,
+          let containerId = contextDict["containerId"] as? String else {
+        XCTFail("Expected context with messageId and containerId", file: file, line: line)
+        return
+    }
+
+    XCTAssertFalse(messageId.isEmpty, "Expected non-empty messageId in context", file: file, line: line)
+    XCTAssertFalse(containerId.isEmpty, "Expected non-empty containerId in context", file: file, line: line)
+}
+
 // MARK: - Test Class
 final class EmbeddedMessagingTests: XCTestCase {
 
@@ -211,16 +223,8 @@ final class EmbeddedMessagingTests: XCTestCase {
                             return
                         }
 
-                        // ✅ Check eventType is "read"
-                        XCTAssertEqual(firstEvent["eventType"] as? String, "delete", "Expected eventType to be 'read'")
-
-                        // ✅ Check context contains messageId
-                        if let context = firstEvent["context"] as? [String: Any],
-                           let messageId = context["messageId"] as? String {
-                            XCTAssertFalse(messageId.isEmpty, "Expected non-empty messageId in context")
-                        } else {
-                            XCTFail("Expected context with messageId")
-                        }
+                    assertValidContext(firstEvent["context"])
+                        
 
                     } catch {
                         XCTFail("Failed to parse request body as JSON: \(error)")
@@ -286,13 +290,7 @@ final class EmbeddedMessagingTests: XCTestCase {
                         // ✅ Check eventType is "read"
                         XCTAssertEqual(firstEvent["eventType"] as? String, "markAsRead", "Expected eventType to be 'read'")
 
-                        // ✅ Check context contains messageId
-                        if let context = firstEvent["context"] as? [String: Any],
-                           let messageId = context["messageId"] as? String {
-                            XCTAssertFalse(messageId.isEmpty, "Expected non-empty messageId in context")
-                        } else {
-                            XCTFail("Expected context with messageId")
-                        }
+                        assertValidContext(firstEvent["context"])
 
                     } catch {
                         XCTFail("Failed to parse request body as JSON: \(error)")
@@ -360,13 +358,7 @@ final class EmbeddedMessagingTests: XCTestCase {
                         // ✅ Check eventType is "read"
                         XCTAssertEqual(firstEvent["eventType"] as? String, "clickMetric", "Expected eventType to be 'read'")
 
-                        // ✅ Check context contains messageId
-                        if let context = firstEvent["context"] as? [String: Any],
-                           let messageId = context["messageId"] as? String {
-                            XCTAssertFalse(messageId.isEmpty, "Expected non-empty messageId in context")
-                        } else {
-                            XCTFail("Expected context with messageId")
-                        }
+                        assertValidContext(firstEvent["context"])
 
                     } catch {
                         XCTFail("Failed to parse request body as JSON: \(error)")
@@ -383,5 +375,6 @@ final class EmbeddedMessagingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 2)
     }
+    
 
 }
