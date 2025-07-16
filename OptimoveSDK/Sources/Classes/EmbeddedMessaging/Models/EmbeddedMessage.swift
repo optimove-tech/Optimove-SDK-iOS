@@ -7,18 +7,18 @@ public struct EmbeddedMessage: Codable {
     public let title: String
     public let content: String?
     public let media: String?
-    public let readAt: Int64?
+    public let readAt: String?
     public let url: String?
     public let engagementId: String
     public let payload: [String: AnyCodable]
     public let campaignKind: Int
-    public let executionDateTime: String // kept as ISO8601 string
+    public let executionDateTime: String
     public let messageLayoutType: Int?
     public let expiryDate: String?
-    public let containerId: String
+    public let containerId: String?
     public let id: String
-    public let createdAt: Int64
-    public let updatedAt: Int64?
+    public let createdAt: String
+    public let updatedAt: String?
     public let deletedAt: String?
 }
 
@@ -75,10 +75,10 @@ public struct ContainerRequestOptions: Codable {
 }
 
 public enum EventType: String, Codable {
-    case markAsRead = "markAsRead"
-    case markAsUnread = "markAsUnread"
-    case delete = "delete"
-    case clickMetric = "clickMetric"
+    case markAsRead = "embedded-message.read"
+    case markAsUnread = "embedded-message.unread"
+    case delete = "embedded-message.deleted"
+    case clickMetric = "embedded-message.clicked"
 }
 
 struct EventBody: Codable {

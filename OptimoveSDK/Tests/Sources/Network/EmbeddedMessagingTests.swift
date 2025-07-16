@@ -139,8 +139,8 @@ final class EmbeddedMessagingTests: XCTestCase {
             expiryDate: nil,
             containerId: "test-container",
             id: id,
-            createdAt: Int64(Date(timeIntervalSince1970: 1715097600).timeIntervalSince1970 * 1000),
-            updatedAt: Int64(Date(timeIntervalSince1970: 1715097600).timeIntervalSince1970 * 1000),
+            createdAt: "1752663497311",
+            updatedAt: "1752663497311",
             deletedAt: nil
         )
     }
@@ -167,7 +167,7 @@ final class EmbeddedMessagingTests: XCTestCase {
                 expectation.fulfill()
             case .error(let error):
                 XCTFail("Expected success but got error: \(error)")
-            case .Success:
+            case .success:
                 XCTFail("Expected successMessages but got Success")
             case .errorUserNotSet:
                 XCTFail("Expected success but got errorUserNotSet")
@@ -191,7 +191,7 @@ final class EmbeddedMessagingTests: XCTestCase {
         // When
         service.deleteMessagesAsync(message: message, completion: { result in
             switch result {
-            case .Success:
+            case .success:
                 // Check captured request
                 guard let request = self.mockNetworkClient.lastRequest else {
                     XCTFail("No request captured")
@@ -255,7 +255,7 @@ final class EmbeddedMessagingTests: XCTestCase {
         // When
         service.setAsReadAsync(message: message, isRead: true, completion: { result in
             switch result {
-            case .Success:
+            case .success:
                 // Check captured request
                 guard let request = self.mockNetworkClient.lastRequest else {
                     XCTFail("No request captured")
@@ -288,7 +288,7 @@ final class EmbeddedMessagingTests: XCTestCase {
                         }
 
                         // ✅ Check eventType is "read"
-                        XCTAssertEqual(firstEvent["eventType"] as? String, "markAsRead", "Expected eventType to be 'read'")
+                        XCTAssertEqual(firstEvent["eventType"] as? String, "embedded-message.read", "Expected eventType to be 'read'")
 
                         assertValidContext(firstEvent["context"])
 
@@ -323,7 +323,7 @@ final class EmbeddedMessagingTests: XCTestCase {
         // When
         service.reportClickMetricAsync(message: message, completion: { result in
             switch result {
-            case .Success:
+            case .success:
                 // Check captured request
                 guard let request = self.mockNetworkClient.lastRequest else {
                     XCTFail("No request captured")
@@ -356,7 +356,7 @@ final class EmbeddedMessagingTests: XCTestCase {
                         }
 
                         // ✅ Check eventType is "read"
-                        XCTAssertEqual(firstEvent["eventType"] as? String, "clickMetric", "Expected eventType to be 'read'")
+                        XCTAssertEqual(firstEvent["eventType"] as? String, "embedded-message.clicked", "Expected eventType to be 'clicked'")
 
                         assertValidContext(firstEvent["context"])
 
