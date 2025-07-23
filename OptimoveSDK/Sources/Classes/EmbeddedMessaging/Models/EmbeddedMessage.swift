@@ -14,12 +14,12 @@ public struct EmbeddedMessage: Codable {
     public let campaignKind: Int
     public let executionDateTime: String
     public let messageLayoutType: Int?
-    public let expiryDate: String?
+    public let expiryDate: Date?
     public let containerId: String?
     public let id: String
-    public let createdAt: String
-    public let updatedAt: String?
-    public let deletedAt: String?
+    public let createdAt: Date
+    public let updatedAt: Date?
+    public let deletedAt: Date?
 }
 
 public typealias EmbeddedMessagesResponse = [String: EmbeddedMessagingContainer]

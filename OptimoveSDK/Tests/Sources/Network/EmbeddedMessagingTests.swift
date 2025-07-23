@@ -122,6 +122,10 @@ final class EmbeddedMessagingTests: XCTestCase {
     }
     // MARK: - Make test Message
     func makeTestMessage(id: String, title: String, content: String) -> EmbeddedMessage {
+        // Convert milliseconds to Date
+        let createdAt = Date(timeIntervalSince1970: 1752663497311 / 1000)
+        let updatedAt = Date(timeIntervalSince1970: 1752663497311 / 1000)
+
         return EmbeddedMessage(
             customerId: "adam_b@optimove.com",
             isVisitor: false,
@@ -139,8 +143,8 @@ final class EmbeddedMessagingTests: XCTestCase {
             expiryDate: nil,
             containerId: "test-container",
             id: id,
-            createdAt: "1752663497311",
-            updatedAt: "1752663497311",
+            createdAt: createdAt,      // ✅ Now a Date
+            updatedAt: updatedAt,      // ✅ Now a Date
             deletedAt: nil
         )
     }
