@@ -36,7 +36,7 @@ public class EmbeddedMessagesService {
     
     public enum ResultType {
         case successMessages(EmbeddedMessagesResponse)
-        case Success
+        case success
         case errorUserNotSet
         case errorCredentialsNotSet
         case error(Error)
@@ -51,9 +51,13 @@ public class EmbeddedMessagesService {
     internal static var instance: EmbeddedMessagesService?
     private var storage: OptimoveStorage?
     private var networkClient: NetworkClient?
-    private var payload: [String: Any] = [:]  
+    private var payload: [String: Any] = [:]
+    
+    private func handleRequestError(_ error: Swift.Error) {
+        logFailedResponse(error)
+    }
 
-    internal static func getInstance() throws -> EmbeddedMessagesService {
+    public static func getInstance() throws -> EmbeddedMessagesService {
         guard let instance = instance else {
             throw Error.notInitialized
         }
@@ -121,7 +125,7 @@ public class EmbeddedMessagesService {
             completion(.error(.errorCredentialsNotSet))
             return
         }
-        
+
         guard
             let customerId = try? storage?.getCustomerID(),
             let visitorId = try? storage?.getVisitorID(),
@@ -130,7 +134,7 @@ public class EmbeddedMessagesService {
             completion(.errorUserNotSet)
             return
         }
-        
+
         do {
             let request = try createGetEmbeddedMessagesRequest(
                 customerId: customerId,
@@ -138,14 +142,14 @@ public class EmbeddedMessagesService {
                 config: config,
                 containers: containers
             )
-            
+
             networkClient?.perform(request) { result in
                 switch result {
                 case .success(let response):
                     do {
-                        let APIResponse = try response.decode(to: EmbeddedMessagingAPIResponse.self)
+                        let apiResponse = try response.decode(to: EmbeddedMessagingAPIResponse.self)
                         var containers: EmbeddedMessagesResponse = [:]
-                        for (containerId, messages) in APIResponse.containers {
+                        for (containerId, messages) in apiResponse.containers {
                             containers[containerId] = EmbeddedMessagingContainer(containerId: containerId, messages: messages)
                         }
 
@@ -153,14 +157,14 @@ public class EmbeddedMessagesService {
                             completion(.successMessages(containers))
                         }
                     } catch {
-                        self.logFailedResponse(error)
+                        self.handleRequestError(error)
                         DispatchQueue.main.async {
                             completion(.error(.errorSendingRequest))
                         }
                     }
 
                 case .failure(let error):
-                    self.logFailedResponse(error)
+                    self.handleRequestError(error)
                     DispatchQueue.main.async {
                         completion(.error(.errorSendingRequest))
                     }
@@ -168,7 +172,7 @@ public class EmbeddedMessagesService {
             }
 
         } catch {
-            logFailedResponse(error)
+            handleRequestError(error)
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
@@ -180,7 +184,11 @@ public class EmbeddedMessagesService {
     /// - Parameter message: The message to delete.
     /// - Returns: A promise indicating the completion of the delete operation.
     // MARK: - Delete Messages
-    public func deleteMessagesAsync(message: EmbeddedMessage, isRead: Bool = false, completion: @escaping EmbeddedMessagingGetHandler) {
+    public func deleteMessagesAsync(
+        message: EmbeddedMessage,
+        isRead: Bool = false,
+        completion: @escaping EmbeddedMessagingGetHandler
+    ) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -197,17 +205,26 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            let request = try createDeleteMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, messageId: message.id)
+            let request = try createReportEventRequest(
+                customerId: customerId,
+                visitorId: visitorId,
+                message: message,
+                event: EventType.delete,
+                config: config
+            )
             
+            print("➡️ Request: \(request)")
+
+
             networkClient?.perform(request) { result in
                 switch result {
-                case .success(_):
+                case .success:
                     DispatchQueue.main.async {
-                        completion(.Success)
+                        completion(.success)
                     }
-                    
+
                 case .failure(let error):
-                    self.logFailedResponse(error)
+                    self.handleRequestError(error)
                     DispatchQueue.main.async {
                         completion(.error(.errorSendingRequest))
                     }
@@ -215,7 +232,7 @@ public class EmbeddedMessagesService {
             }
 
         } catch {
-            self.logFailedResponse(error)
+            self.handleRequestError(error)
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
@@ -229,7 +246,11 @@ public class EmbeddedMessagesService {
     ///   - isRead: The new read status of the message.
     /// - Returns: A promise indicating the completion of the read status update.
     // MARK: - Set Read Async
-    public func setAsReadAsync(message: EmbeddedMessage, isRead: Bool = false, completion: @escaping EmbeddedMessagingGetHandler) {
+    public func setAsReadAsync(
+        message: EmbeddedMessage,
+        isRead: Bool = false,
+        completion: @escaping EmbeddedMessagingGetHandler
+    ) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
@@ -246,18 +267,23 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            let request = try createReadAtMessagesRequest(customerId: customerId, visitorId: visitorId, config: config, message: message, isRead: isRead)
-            
-            print("request: \(String(describing: request))")
+            let request = try createReportEventRequest(
+                customerId: customerId,
+                visitorId: visitorId,
+                message: message,
+                event: EventType.markAsRead,
+                config: config
+            )
+
             networkClient?.perform(request) { result in
                 switch result {
-                case .success(_):
+                case .success:
                     DispatchQueue.main.async {
-                        completion(.Success)
+                        completion(.success)
                     }
-                    
+
                 case .failure(let error):
-                    self.logFailedResponse(error)
+                    self.handleRequestError(error)
                     DispatchQueue.main.async {
                         completion(.error(.errorSendingRequest))
                     }
@@ -265,7 +291,66 @@ public class EmbeddedMessagesService {
             }
 
         } catch {
-            self.logFailedResponse(error)
+            self.handleRequestError(error)
+            DispatchQueue.main.async {
+                completion(.error(.errorSendingRequest))
+            }
+        }
+    }
+    
+    /// Updates the read status of the given message on the server.
+    ///
+    /// - Parameters:
+    ///   - message: The message to update.
+    ///   - isRead: The new read status of the message.
+    /// - Returns: A promise indicating the completion of the read status update.
+    // MARK: - Set UnRead Async
+    public func setAsUnReadAsync(
+        message: EmbeddedMessage,
+        isRead: Bool = false,
+        completion: @escaping EmbeddedMessagingGetHandler
+    ) {
+        guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
+            Logger.error("Embedded messaging credentials are not set")
+            completion(.error(.errorCredentialsNotSet))
+            return
+        }
+
+        guard
+            let customerId = try? storage?.getCustomerID(),
+            let visitorId = try? storage?.getVisitorID(),
+            customerId != visitorId else {
+            Logger.warn("Customer ID is not set")
+            completion(.errorUserNotSet)
+            return
+        }
+
+        do {
+            let request = try createReportEventRequest(
+                customerId: customerId,
+                visitorId: visitorId,
+                message: message,
+                event: EventType.markAsUnread,
+                config: config
+            )
+
+            networkClient?.perform(request) { result in
+                switch result {
+                case .success:
+                    DispatchQueue.main.async {
+                        completion(.success)
+                    }
+
+                case .failure(let error):
+                    self.handleRequestError(error)
+                    DispatchQueue.main.async {
+                        completion(.error(.errorSendingRequest))
+                    }
+                }
+            }
+
+        } catch {
+            self.handleRequestError(error)
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
@@ -277,13 +362,16 @@ public class EmbeddedMessagesService {
     /// - Parameter message: The message to report the click metric for.
     /// - Returns: A promise indicating the completion of the click metric report.
     // MARK: - Report Click metric Async
-    public func reportClickMetricAsync(message: EmbeddedMessage, completion: @escaping EmbeddedMessagingGetHandler) {
+    public func reportClickMetricAsync(
+        message: EmbeddedMessage,
+        completion: @escaping EmbeddedMessagingGetHandler
+    ) {
         guard let config = Optimove.getConfig()?.getEmbeddedMessagingConfig() else {
             Logger.error("Embedded messaging credentials are not set")
             completion(.error(.errorCredentialsNotSet))
             return
         }
-        
+
         guard
             let customerId = try? storage?.getCustomerID(),
             let visitorId = try? storage?.getVisitorID(),
@@ -294,18 +382,25 @@ public class EmbeddedMessagesService {
         }
 
         do {
-            let request = try createReportMetricsRequest(customerId: customerId, visitorId: visitorId, config: config, message: message)
-            
+            let request = try createReportEventRequest(
+                customerId: customerId,
+                visitorId: visitorId,
+                message: message,
+                event: EventType.clickMetric,
+                config: config
+            )
+
             print("request: \(String(describing: request))")
+
             networkClient?.perform(request) { result in
                 switch result {
-                case .success(_):
+                case .success:
                     DispatchQueue.main.async {
-                        completion(.Success)
+                        completion(.success)
                     }
-                    
+
                 case .failure(let error):
-                    self.logFailedResponse(error)
+                    self.handleRequestError(error)
                     DispatchQueue.main.async {
                         completion(.error(.errorSendingRequest))
                     }
@@ -313,14 +408,14 @@ public class EmbeddedMessagesService {
             }
 
         } catch {
-            self.logFailedResponse(error)
+            self.handleRequestError(error)
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
         }
     }
     
-
+    
     // MARK: - Create Get Messages Request
     private func createGetEmbeddedMessagesRequest(
         customerId: String,
@@ -338,7 +433,7 @@ public class EmbeddedMessagesService {
         ]
         
         let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/embedded-messages/Get-Embedded-Messages"
+        let path = "/api/v2/embedded-messages/get"
 
         let encoder = JSONEncoder()
         let bodyData = try encoder.encode(containers)
@@ -356,77 +451,49 @@ public class EmbeddedMessagesService {
             httpBody: bodyData
         )
     }
-    
-    
-    // MARK: - Create Delete Messages Request
-    private func createDeleteMessagesRequest(customerId: String, visitorId: String, config: EmbeddedMessagingConfig, messageId: String) throws -> NetworkRequest {
-        let (region, brandId, tenantId) = getConfigValues(from: config)
 
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/messages/\(messageId)"
+    
+    // MARK: - Report Event
+    private func createReportEventRequest(
+        customerId: String,
+        visitorId: String,
+        message: EmbeddedMessage,
+        event: EventType,
+        config: EmbeddedMessagingConfig
+    ) throws -> NetworkRequest {
         
-        let queryItems = [
+        let (region, brandId, tenantId) = getConfigValues(from: config)
+        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
+        let path = "/api/v2/events/report"
+        
+        // Headers
+        let headers: [HTTPHeader] = [
+            HTTPHeader(field: .contentType, value: .json),
+            HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
+        ]
+        
+        let queryItems: [URLQueryItem] = [
             URLQueryItem(name: "TenantId", value: tenantId),
             URLQueryItem(name: "BrandId", value: brandId)
         ]
-        
-        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
-        components?.queryItems = queryItems
-
-        return NetworkRequest(
-            method: .delete,
-            baseURL: baseURL,
-            path: path,
-            headers: [],
-            queryItems: queryItems
-        )
-    }
-    
-    // MARK: - Create ReadAt Messages Request
-    private func createReadAtMessagesRequest(
-        customerId: String,
-        visitorId: String,
-        config: EmbeddedMessagingConfig,
-        message: EmbeddedMessage,
-        isRead: Bool
-    ) throws -> NetworkRequest {
-        
-        let (region, brandId, tenantId) = getConfigValues(from: config)
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/messages/status"
-
-        let readAtTimestamp: Int? = isRead ? Int(Date().timeIntervalSince1970 * 1000) : nil
-
-        let metric = ReadMessageStatusMetric(
-            messageId: message.id,
-            engagementId: message.engagementId,
-            executionDateTime: message.executionDateTime,
-            campaignKind: message.campaignKind,
+        // Prepare the body
+        let isoDate = ISO8601DateFormatter().string(from: Date())
+        let eventBody = [EventBody(
+            timestamp: isoDate,
+            uuid: UUID().uuidString,
+            eventType: event.rawValue,
             customerId: customerId,
-            readAt: readAtTimestamp
-        )
+            visitorId: visitorId,
+            context: [
+                "messageId": message.id,
+                "containerId": message.containerId ?? ""  // provide a default non-nil string
+            ]
+        )]
 
-        let request = ReadAtMetricRequest(
-            brandId: brandId,
-            tenantId: tenantId,
-            statusMetrics: [metric]
-        )
+        let bodyData = try JSONEncoder().encode(eventBody)
 
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        let bodyData = try encoder.encode(request)
-
-        // Headers
-        let headers: [HTTPHeader] = [
-            HTTPHeader(field: .contentType, value: .json),
-            HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
-        ]
-
-        // No query items now
-        let queryItems: [URLQueryItem] = []
-        
         return NetworkRequest(
-            method: .put,
+            method: .post,
             baseURL: baseURL,
             path: path,
             headers: headers,
@@ -435,60 +502,6 @@ public class EmbeddedMessagesService {
         )
     }
     
-     // MARK: - Create report metrics Request
-    private func createReportMetricsRequest(
-        customerId: String,
-        visitorId: String,
-        config: EmbeddedMessagingConfig,
-        message: EmbeddedMessage
-    ) throws -> NetworkRequest {
-        
-        let (region, brandId, tenantId) = getConfigValues(from: config)
-        let baseURL = URL(string: "https://optimobile-inbox-srv-\(region).optimove.net")!
-        let path = "/api/v1/messages/metrics"
-
-
-        let currentDate = Date()
-        let dateFormatter = ISO8601DateFormatter()
-        let formattedCurrentTimestamp = dateFormatter.string(from: currentDate)
-
-        let metric = ClickMetric(
-            messageId: message.id,
-            engagementId: message.engagementId,
-            executionDateTime: message.executionDateTime,
-            campaignKind: message.campaignKind,
-            customerId: customerId,
-            now: formattedCurrentTimestamp
-        )
-
-        let request = ClickMetricRequest(
-            brandId: brandId,
-            tenantId: tenantId,
-            statusMetrics: [metric]
-        )
-
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        let bodyData = try encoder.encode(request)
-
-        // Headers
-        let headers: [HTTPHeader] = [
-            HTTPHeader(field: .contentType, value: .json),
-            HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
-        ]
-
-        // No query items now
-        let queryItems: [URLQueryItem] = []
-        
-        return NetworkRequest(
-            method: .put,
-            baseURL: baseURL,
-            path: path,
-            headers: headers,
-            queryItems: queryItems,
-            httpBody: bodyData
-        )
-    }
     
     // MARK: - Log Failed Response
     private func logFailedResponse(_ error: Swift.Error) {

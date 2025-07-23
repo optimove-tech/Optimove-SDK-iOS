@@ -7,23 +7,22 @@ public struct EmbeddedMessage: Codable {
     public let title: String
     public let content: String?
     public let media: String?
-    public let readAt: Date?
+    public let readAt: String?
     public let url: String?
     public let engagementId: String
-    public let payload: String
+    public let payload: [String: AnyCodable]
     public let campaignKind: Int
-    public let executionDateTime: Date
+    public let executionDateTime: String
     public let messageLayoutType: Int?
     public let expiryDate: Date?
     public let containerId: String?
     public let id: String
     public let createdAt: Date
-    public let updatedAt: Date
-    public let deletedAt: String?
+    public let updatedAt: Date?
+    public let deletedAt: Date?
 }
 
 public typealias EmbeddedMessagesResponse = [String: EmbeddedMessagingContainer]
-
 
 internal struct EmbeddedMessagingAPIResponse: Codable {
     public let containers: [String: [EmbeddedMessage]]
@@ -50,7 +49,6 @@ public struct ClickMetricRequest: Codable {
     public let statusMetrics: [ClickMetric]
 }
 
-
 public struct ClickMetric: Codable {
     public let messageId: String
     public let engagementId: String
@@ -76,3 +74,68 @@ public struct ContainerRequestOptions: Codable {
     let limit: Int?
 }
 
+public enum EventType: String, Codable {
+    case markAsRead = "embedded-message.read"
+    case markAsUnread = "embedded-message.unread"
+    case delete = "embedded-message.deleted"
+    case clickMetric = "embedded-message.clicked"
+}
+
+struct EventBody: Codable {
+    let timestamp: String
+    let uuid: String
+    let eventType: String
+    let customerId: String
+    let visitorId: String
+    let context: [String: String]
+}
+
+// MARK: - AnyCodable to support arbitrary JSON objects in payload
+public struct AnyCodable: Codable {
+    public let value: Any
+
+    public init(_ value: Any) {
+        self.value = value
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+
+        if let int = try? container.decode(Int.self) {
+            value = int
+        } else if let double = try? container.decode(Double.self) {
+            value = double
+        } else if let bool = try? container.decode(Bool.self) {
+            value = bool
+        } else if let string = try? container.decode(String.self) {
+            value = string
+        } else if let dict = try? container.decode([String: AnyCodable].self) {
+            value = dict
+        } else if let array = try? container.decode([AnyCodable].self) {
+            value = array
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unsupported JSON value")
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+
+        switch value {
+        case let int as Int:
+            try container.encode(int)
+        case let double as Double:
+            try container.encode(double)
+        case let bool as Bool:
+            try container.encode(bool)
+        case let string as String:
+            try container.encode(string)
+        case let dict as [String: AnyCodable]:
+            try container.encode(dict)
+        case let array as [AnyCodable]:
+            try container.encode(array)
+        default:
+            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: encoder.codingPath, debugDescription: "Unsupported value"))
+        }
+    }
+}
