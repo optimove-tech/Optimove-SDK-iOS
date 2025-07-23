@@ -142,17 +142,6 @@ public class EmbeddedMessagesService {
                 config: config,
                 containers: containers
             )
-            
-     
-
-            if let body = request.httpBody,
-               let bodyString = String(data: body, encoding: .utf8) {
-                print("➡️ Body: \(bodyString)")
-            } else {
-                print("➡️ No Body")
-            }
-            
-            print("➡️ Request: \(request)")
 
             networkClient?.perform(request) { result in
                 switch result {
