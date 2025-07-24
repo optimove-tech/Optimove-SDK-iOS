@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.2.4
+
+- Updated Embedded Messages to use the V2 endpoints
+
 ## 6.2.3
 
 - Fix potential crash when handling push notifications due to method swizzling target resolution in apps using delegate forwarding patterns (such as Flutter)
