@@ -3,7 +3,7 @@
 import Foundation
 
 public extension FileManager {
-    static func optimoveURL() throws -> URL {
+    static func optimoveURL() -> URL {
         if let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
             return url
         }
@@ -13,7 +13,7 @@ public extension FileManager {
         return FileManager.default.temporaryDirectory
     }
 
-    static func temporaryURL() throws -> URL {
+    static func temporaryURL() -> URL {
         return FileManager.default.temporaryDirectory
     }
 }
