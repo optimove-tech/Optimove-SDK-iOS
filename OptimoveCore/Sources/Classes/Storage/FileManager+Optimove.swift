@@ -2,31 +2,18 @@
 
 import Foundation
 
-private var temporaryDirectoryURL: URL?
-
 public extension FileManager {
-    static func optimoveURL() throws -> URL {
-        return try FileManager.default.url(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        )
+    static func optimoveURL() -> URL {
+        if let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            return url
+        }
+        if let fallback = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first {
+            return fallback
+        }
+        return FileManager.default.temporaryDirectory
     }
 
-    static func temporaryURL() throws -> URL {
-        if let temporaryDirectoryURL = temporaryDirectoryURL {
-            return temporaryDirectoryURL
-        }
-        temporaryDirectoryURL = try FileManager.default.url(
-            for: .itemReplacementDirectory,
-            in: .userDomainMask,
-            appropriateFor: URL(
-                fileURLWithPath: NSTemporaryDirectory(),
-                isDirectory: true
-            ),
-            create: true
-        )
-        return try temporaryURL()
+    static func temporaryURL() -> URL {
+        return FileManager.default.temporaryDirectory
     }
 }
