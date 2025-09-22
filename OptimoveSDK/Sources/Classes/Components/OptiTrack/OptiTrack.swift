@@ -24,7 +24,7 @@ final class OptiTrack {
     private let configuration: OptitrackConfig
     private var backgroundTaskId: UIBackgroundTaskIdentifier = .invalid
     private var dispatchTimer: Timer?
-    private let dispatchQueue = DispatchQueue(label: "com.optimove.track")
+    private let dispatchQueue = DispatchQueue(label: "com.optimove.track", qos: .userInitiated)
 
     private var isDispatching = false
 

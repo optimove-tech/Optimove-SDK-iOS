@@ -25,7 +25,7 @@ final class AnalyticsHelper {
     init(httpClient: KSHttpClient) {
         analyticsContext = nil
         migrationAnalyticsContext = nil
-        serialQueue = DispatchQueue(label: "com.optimove.optimobile.serial-q", target: .global(qos: .utility))
+        serialQueue = DispatchQueue(label: "com.optimove.optimobile.serial-q", target: .global(qos: .userInitiated))
 
         eventsHttpClient = httpClient
 
@@ -33,7 +33,7 @@ final class AnalyticsHelper {
 
         finishedInitializationToken = NotificationCenter.default
             .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
-                DispatchQueue.global().async {
+                DispatchQueue.global(qos: .userInitiated).async {
                     guard let self = self else { return }
                     self.flushEvents()
                 }
