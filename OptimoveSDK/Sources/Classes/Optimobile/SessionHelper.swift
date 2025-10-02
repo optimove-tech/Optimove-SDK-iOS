@@ -13,7 +13,7 @@ class SessionIdleTimer {
         invalidated = false
         self.helper = helper
 
-        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + .seconds(Int(timeout))) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(Int(timeout))) {
             self.invalidationLock.wait()
 
             if self.invalidated {
@@ -114,16 +114,15 @@ class SessionHelper {
         guard let sessionEndTime = becameInactiveAt else {
             return
         }
-
+        
         startNewSession = true
         sessionIdleTimer = nil
-
-        // Track the background event asynchronously to avoid blocking the calling thread
+        
         Optimobile.trackEvent(eventType: OptimobileEvent.STATS_BACKGROUND.rawValue, atTime: sessionEndTime, properties: nil, immediateFlush: true, onSyncComplete: { _ in
-            // Clean up on completion without blocking the main flow
+            
             DispatchQueue.main.async {
                 self.becameInactiveAt = nil
-
+                
                 if self.bgTask != UIBackgroundTaskIdentifier.invalid {
                     UIApplication.shared.endBackgroundTask(self.bgTask)
                     self.bgTask = UIBackgroundTaskIdentifier.invalid
