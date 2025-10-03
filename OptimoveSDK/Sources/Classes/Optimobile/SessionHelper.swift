@@ -39,13 +39,22 @@ class SessionHelper {
     private var sessionIdleTimer: SessionIdleTimer?
     private var bgTask: UIBackgroundTaskIdentifier
     private var sessionIdleTimeout: UInt
+    private let trackBackground: (Date, @escaping SyncCompletedBlock) -> Void
 
-    init(sessionIdleTimeout: UInt) {
+    init(sessionIdleTimeout: UInt,
+         trackBackground: @escaping (Date, @escaping SyncCompletedBlock) -> Void = { date, done in
+             Optimobile.trackEvent(eventType: OptimobileEvent.STATS_BACKGROUND.rawValue,
+                                   atTime: date,
+                                   properties: nil,
+                                   immediateFlush: true,
+                                   onSyncComplete: done)
+         }) {
         startNewSession = true
         sessionIdleTimer = nil
         bgTask = UIBackgroundTaskIdentifier.invalid
         becameInactiveAt = nil
         self.sessionIdleTimeout = sessionIdleTimeout
+        self.trackBackground = trackBackground
     }
 
     func initialize() {
@@ -110,7 +119,7 @@ class SessionHelper {
         }
     }
 
-    fileprivate func sessionDidEnd() {
+    func sessionDidEnd() {
         guard let sessionEndTime = becameInactiveAt else {
             return
         }
@@ -118,9 +127,9 @@ class SessionHelper {
         startNewSession = true
         sessionIdleTimer = nil
         
-        Optimobile.trackEvent(eventType: OptimobileEvent.STATS_BACKGROUND.rawValue, atTime: sessionEndTime, properties: nil, immediateFlush: true, onSyncComplete: { _ in
-            
+        trackBackground(sessionEndTime) { [weak self] _ in
             DispatchQueue.main.async {
+                guard let self = self else { return }
                 self.becameInactiveAt = nil
                 
                 if self.bgTask != UIBackgroundTaskIdentifier.invalid {
@@ -128,6 +137,14 @@ class SessionHelper {
                     self.bgTask = UIBackgroundTaskIdentifier.invalid
                 }
             }
-        })
+        }
     }
 }
+
+#if DEBUG
+extension SessionHelper {
+    func setBecameInactiveAtForTest(_ date: Date) {
+        becameInactiveAt = date
+    }
+}
+#endif
