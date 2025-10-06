@@ -45,9 +45,9 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
     func setDisplayMode(_ mode: InAppDisplayMode) {
         ensureMain {
-            let resumed = mode != displayMode && mode != .paused
-            displayMode = mode
-            if resumed { presentFromQueue() } // safe: runs inline when already on main
+            let resumed = mode != self.displayMode && mode != .paused
+            self.displayMode = mode
+            if resumed { self.presentFromQueue() }
         }
     }
 
