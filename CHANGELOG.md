@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.2.6
+
+- Remove semaphore wait in session end to avoid QoS inversion during background flush
+
 ## 6.2.5
 
 - Update storage directory helpers: `optimoveURL()` uses Application Support with Caches/temp fallback and `temporaryURL()` returns system temp; no directory creation.
