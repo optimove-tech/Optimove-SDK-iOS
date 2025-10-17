@@ -21,6 +21,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     private var frame: UIView?
     private var window: UIWindow?
     private var webViewReady = false
+    private var interceptionInProgress = false
 
     private var contentController: WKUserContentController?
 
@@ -31,6 +32,40 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     private var currentMessage: InAppMessage?
 
     let urlBuilder: UrlBuilder
+
+    private class InterceptionDecision: InAppMessageInterceptorDecision {
+        private var resolved: Bool = false
+        private let onShow: () -> Void
+        private let onSuppress: () -> Void
+        private var cancelTimeout: (() -> Void)?
+
+        init(onShow: @escaping () -> Void, onSuppress: @escaping () -> Void) {
+            self.onShow = onShow
+            self.onSuppress = onSuppress
+        }
+
+        func setCancelTimeout(_ cancel: @escaping () -> Void) {
+            self.cancelTimeout = cancel
+        }
+
+        func show() {
+            DispatchQueue.main.async {
+                guard !self.resolved else { return }
+                self.resolved = true
+                self.cancelTimeout?()
+                self.onShow()
+            }
+        }
+
+        func suppress() {
+            DispatchQueue.main.async {
+                guard !self.resolved else { return }
+                self.resolved = true
+                self.cancelTimeout?()
+                self.onSuppress()
+            }
+        }
+    }
 
     init(displayMode: InAppDisplayMode, urlBuilder: UrlBuilder) {
         messageQueue = NSMutableOrderedSet(capacity: 5)
@@ -132,7 +167,17 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             return
         }
 
-        currentMessage = (messageQueue[0] as! InAppMessage)
+        let head = (messageQueue[0] as! InAppMessage)
+
+        if interceptionInProgress {
+            return
+        }
+
+        if let interceptor = OptimoveInApp.getInAppMessageInterceptor(), currentMessage?.id != head.id {
+            interceptionInProgress = true
+            applyMessageInterception(head, interceptor: interceptor)
+            return
+        }
 
         initViews()
         self.loadingSpinner?.startAnimating()
@@ -141,10 +186,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             return
         }
 
-        let content = NSMutableDictionary(dictionary: currentMessage!.content)
-        content["region"] = Optimobile.sharedInstance.config.region.rawValue
-
-        postClientMessage(type: "PRESENT_MESSAGE", data: content)
+        showMessage(head)
     }
 
     func handleMessageClosed() {
@@ -153,22 +195,8 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             return
         }
 
-        if #available(iOS 10, *) {
-            let tickleNotificationId = "k-in-app-message:\(message.id)"
-            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [tickleNotificationId])
-
-            PendingNotificationHelper.remove(identifier: tickleNotificationId)
-        }
-
         messageQueue.removeObject(at: 0)
-        pendingTickleIds.remove(message.id)
-        currentMessage = nil
-
-        if messageQueue.count == 0 {
-            pendingTickleIds.removeAllObjects()
-        }
-
-        presentFromQueue_onMain()
+        cleanupMessageAndAdvance(message)
     }
 
     func cancelCurrentPresentationQueue(waitForViewCleanup: Bool) {
@@ -421,6 +449,97 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
                 cancelCurrentPresentationQueue(waitForViewCleanup: true)
             }
         }
+    }
+
+    private func showMessage(_ message: InAppMessage) {
+        assertOnMainThread()
+
+        currentMessage = message
+
+        let content = NSMutableDictionary(dictionary: message.content)
+        content["region"] = Optimobile.sharedInstance.config.region.rawValue
+
+        postClientMessage(type: "PRESENT_MESSAGE", data: content)
+    }
+
+    private func applyMessageInterception(_ message: InAppMessage, interceptor: InAppMessageInterceptor) {
+        assertOnMainThread()
+
+        let decision = InterceptionDecision(
+            onShow: { [weak self] in
+                self?.handleShowDecision(for: message)
+            },
+            onSuppress: { [weak self] in
+                self?.handleSuppressDecision(for: message)
+            }
+        )
+
+        let timeoutMs = max(0, interceptor.getTimeoutMs())
+        let timeoutItem = DispatchWorkItem { [weak decision] in
+            decision?.suppress()
+        }
+
+        decision.setCancelTimeout {
+            timeoutItem.cancel()
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(timeoutMs), execute: timeoutItem)
+
+        let data = message.data as? [String: Any]
+        
+        do {
+            interceptor.processMessage(data: data, decision: decision)
+        } catch {
+            Logger.error("Error in message interceptor: \(error.localizedDescription)")
+            decision.suppress()
+        }
+    }
+
+    private func handleShowDecision(for message: InAppMessage) {
+        assertOnMainThread()
+
+        currentMessage = message
+        interceptionInProgress = false
+
+        initViews()
+        loadingSpinner?.startAnimating()
+        if webViewReady {
+            showMessage(message)
+        }
+    }
+
+    private func handleSuppressDecision(for message: InAppMessage) {
+        assertOnMainThread()
+
+        interceptionInProgress = false
+
+        Optimobile.sharedInstance.inAppManager.markMessageDismissed(message: message)
+
+        let idx = messageQueue.index(of: message)
+        if idx != NSNotFound {
+            messageQueue.removeObject(at: idx)
+        }
+
+        cleanupMessageAndAdvance(message)
+    }
+
+    private func cleanupMessageAndAdvance(_ message: InAppMessage) {
+        assertOnMainThread()
+
+        if #available(iOS 10, *) {
+            let tickleNotificationId = "k-in-app-message:\(message.id)"
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [tickleNotificationId])
+            PendingNotificationHelper.remove(identifier: tickleNotificationId)
+        }
+
+        pendingTickleIds.remove(message.id)
+        currentMessage = nil
+
+        if messageQueue.count == 0 {
+            pendingTickleIds.removeAllObjects()
+        }
+
+        presentFromQueue_onMain()
     }
 
     func handleUserAction(message: InAppMessage, userAction: NSDictionary) {
