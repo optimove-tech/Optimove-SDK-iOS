@@ -142,9 +142,8 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         }
 
         let notShowingCurrentTickle = currentMessage != nil
-            && messageQueue.count > 0
             && currentMessage!.id != (messageQueue[0] as! InAppMessage).id
-            && (messageQueue[0] as! InAppMessage).id == pendingTickleIds.firstObject as? Int64
+            && (messageQueue[0] as! InAppMessage).id == pendingTickleIds[0] as! Int64
 
         let queueNotEmptyAndNotShowingAnything = currentMessage == nil && messageQueue.count > 0
 
