@@ -15,7 +15,6 @@ enum InAppAction: String {
 }
 
 final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
-    private let messageQueueLock = DispatchSemaphore(value: 1)
 
     private var webView: WKWebView?
     private var loadingSpinner: UIActivityIndicatorView?
@@ -45,32 +44,25 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     }
 
     func setDisplayMode(_ mode: InAppDisplayMode) {
-        runOnMainThreadSync {
-            let resumed = mode != displayMode && mode != .paused
-
-            displayMode = mode
-
-            if resumed {
-                presentFromQueue()
-            }
+        ensureMain {
+            let resumed = mode != self.displayMode && mode != .paused
+            self.displayMode = mode
+            if resumed { self.presentFromQueue() }
         }
     }
 
     func getDisplayMode() -> InAppDisplayMode {
-        var mode: InAppDisplayMode = .automatic
-
-        runOnMainThreadSync {
-            mode = displayMode
-        }
-
-        return mode
+        return displayMode
     }
 
     func queueMessagesForPresentation(messages: [InAppMessage], tickleIds: NSOrderedSet) {
-        messageQueueLock.wait()
+        ensureMain { self.queueMessagesForPresentation_onMain(messages: messages, tickleIds: tickleIds) }
+    }
+
+    private func queueMessagesForPresentation_onMain(messages: [InAppMessage], tickleIds: NSOrderedSet) {
+        assertOnMainThread()
 
         if messages.count == 0 && messageQueue.count == 0 {
-            messageQueueLock.signal()
             return
         }
 
@@ -78,7 +70,6 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             if messageQueue.contains(message) {
                 continue
             }
-
             messageQueue.add(message)
         }
 
@@ -123,40 +114,29 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
         let shouldShowSomething = notShowingCurrentTickle || queueNotEmptyAndNotShowingAnything
 
-        messageQueueLock.signal()
-
         if shouldShowSomething {
-            DispatchQueue.main.async {
-                self.presentFromQueue()
-            }
+            presentFromQueue_onMain()
         }
     }
 
     func presentFromQueue() {
-        messageQueueLock.wait()
-        defer {
-            messageQueueLock.signal()
-        }
+        ensureMain { self.presentFromQueue_onMain() }
+    }
+
+    private func presentFromQueue_onMain() {
+        assertOnMainThread()
 
         if messageQueue.count == 0 || displayMode == .paused {
-            DispatchQueue.main.async {
-                self.destroyViews()
-            }
-
+            self.destroyViews()
             return
         }
 
         currentMessage = (messageQueue[0] as! InAppMessage)
 
-        var ready = false
+        initViews()
+        self.loadingSpinner?.startAnimating()
 
-        runOnMainThreadSync {
-            initViews()
-            self.loadingSpinner?.startAnimating()
-            ready = self.webViewReady
-        }
-
-        guard ready else {
+        guard self.webViewReady else {
             return
         }
 
@@ -167,6 +147,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     }
 
     func handleMessageClosed() {
+        assertOnMainThread()
         guard let message = currentMessage else {
             return
         }
@@ -178,8 +159,6 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             PendingNotificationHelper.remove(identifier: tickleNotificationId)
         }
 
-        messageQueueLock.wait()
-
         messageQueue.removeObject(at: 0)
         pendingTickleIds.remove(message.id)
         currentMessage = nil
@@ -188,28 +167,24 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             pendingTickleIds.removeAllObjects()
         }
 
-        messageQueueLock.signal()
-
-        presentFromQueue()
+        presentFromQueue_onMain()
     }
 
     func cancelCurrentPresentationQueue(waitForViewCleanup: Bool) {
-        messageQueueLock.wait()
+        ensureMain { self.cancelCurrentPresentationQueue_onMain(waitForViewCleanup: waitForViewCleanup) }
+    }
+
+    private func cancelCurrentPresentationQueue_onMain(waitForViewCleanup: Bool) {
+        assertOnMainThread()
 
         messageQueue.removeAllObjects()
         pendingTickleIds.removeAllObjects()
         currentMessage = nil
 
-        messageQueueLock.signal()
-
         if waitForViewCleanup == true {
-            runOnMainThreadSync {
-                self.destroyViews()
-            }
+            self.destroyViews()
         } else {
-            DispatchQueue.main.async {
-                self.destroyViews()
-            }
+            self.destroyViews()
         }
     }
 
@@ -327,6 +302,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     }
 
     func postClientMessage(type: String, data: Any?) {
+        assertOnMainThread()
         guard let webView = webView else {
             return
         }
@@ -353,11 +329,9 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         let type = body["type"] as! String
 
         if type == "READY" {
-            runOnMainThreadSync {
-                self.webViewReady = true
-            }
+            self.webViewReady = true
 
-            presentFromQueue()
+            presentFromQueue_onMain()
         } else if type == "MESSAGE_OPENED" {
             loadingSpinner?.stopAnimating()
             Optimobile.sharedInstance.inAppManager.handleMessageOpened(message: currentMessage!)
@@ -382,12 +356,12 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
     func webView(_: WKWebView, didFail _: WKNavigation!, withError _: Error) {
         // Handles transfer errors after starting load
-        cancelCurrentPresentationQueue(waitForViewCleanup: false)
+        cancelCurrentPresentationQueue_onMain(waitForViewCleanup: false)
     }
 
     func webView(_: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError _: Error) {
         // Handles connection/timeout errors for the main frame load
-        cancelCurrentPresentationQueue(waitForViewCleanup: false)
+        cancelCurrentPresentationQueue_onMain(waitForViewCleanup: false)
     }
 
     func webView(_: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
@@ -398,7 +372,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         {
             if url.absoluteString.starts(with: baseUrl.absoluteString), httpResponse.statusCode >= 400 {
                 decisionHandler(.cancel)
-                cancelCurrentPresentationQueue(waitForViewCleanup: false)
+                cancelCurrentPresentationQueue_onMain(waitForViewCleanup: false)
                 return
             }
         }
@@ -407,7 +381,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     }
 
     func webViewWebContentProcessDidTerminate(_: WKWebView) {
-        cancelCurrentPresentationQueue(waitForViewCleanup: false)
+        cancelCurrentPresentationQueue_onMain(waitForViewCleanup: false)
     }
 
     func handleActions(actions: [NSDictionary]) {
@@ -485,11 +459,15 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         }
     }
 
-    private func runOnMainThreadSync(_ work: () -> Void) {
+    private func ensureMain(_ work: @escaping () -> Void) {
         if Thread.isMainThread {
             work()
         } else {
-            DispatchQueue.main.sync(execute: work)
+            DispatchQueue.main.async(execute: work)
         }
+    }
+
+    private func assertOnMainThread(_ message: String = "Must be on main thread") {
+        assert(Thread.isMainThread, message)
     }
 }
