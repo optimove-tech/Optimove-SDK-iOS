@@ -77,6 +77,7 @@ public typealias InboxSummaryBlock = (InAppInboxSummary?) -> Void
 
 public enum OptimoveInApp {
     private static var _inboxUpdatedHandlerBlock: InboxUpdatedHandlerBlock?
+    private static var _inAppMessageInterceptor: InAppMessageInterceptor?
 
     public static func updateConsent(forUser consentGiven: Bool) {
         if Optimobile.inAppConsentStrategy != InAppConsentStrategy.explicitByUser {
@@ -188,4 +189,32 @@ public enum OptimoveInApp {
             }
         }
     }
+
+    // MARK: Interceptor API
+
+    public static func setInAppMessageInterceptor(_ interceptor: InAppMessageInterceptor) {
+        _inAppMessageInterceptor = interceptor
+    }
+
+    static func getInAppMessageInterceptor() -> InAppMessageInterceptor? {
+        return _inAppMessageInterceptor
+    }
+}
+
+// MARK: - Interceptor Protocols
+
+public protocol InAppMessageInterceptor {
+    // Async decision, call either decision.show() or decision.suppress()
+    func processMessage(data: [String: Any]?, decision: InAppMessageInterceptorDecision)
+
+    func getTimeoutMs() -> Int
+}
+
+public protocol InAppMessageInterceptorDecision {
+    func show()
+    func suppress()
+}
+
+public extension InAppMessageInterceptor {
+    func getTimeoutMs() -> Int { 5000 }
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.3.0
+
+- Add In-App Message Interceptor API `OptimoveInApp.setInAppMessageInterceptor(_:)` to allow apps to control when in-app messages are shown or suppressed based on custom logic. If no decision is made within the timeout (default 5s), the message is automatically suppressed.
+
 ## 6.2.6
 
 - Remove semaphore wait in session end to avoid QoS inversion during background flush
