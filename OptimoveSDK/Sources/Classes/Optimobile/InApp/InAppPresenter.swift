@@ -456,7 +456,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         currentMessage = message
 
         let content = NSMutableDictionary(dictionary: message.content)
-        content["region"] = Optimobile.sharedInstance.config.region.rawValue
+        content["region"] = (try? urlBuilder.region) ?? ""
 
         postClientMessage(type: "PRESENT_MESSAGE", data: content)
     }
