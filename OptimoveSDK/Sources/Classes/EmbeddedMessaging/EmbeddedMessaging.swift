@@ -51,6 +51,7 @@ public class EmbeddedMessagesService {
     internal static var instance: EmbeddedMessagesService?
     private var storage: OptimoveStorage?
     private var networkClient: NetworkClient?
+    private var authManager: AuthManager?
     private var payload: [String: Any] = [:]
     
     private func handleRequestError(_ error: Swift.Error) {
@@ -77,15 +78,15 @@ public class EmbeddedMessagesService {
         return try JSONDecoder().decode(T.self, from: data)
     }
     
-    public static func initialize(with optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient) throws {
-        print("🔧 Initializing EmbeddedMessagesService...")
+    public static func initialize(with optimoveConfig: OptimoveConfig, storage: OptimoveStorage, networkClient: NetworkClient, authManager: AuthManager? = nil) throws {
+        Logger.info("Initializing EmbeddedMessagesService...")
 
         if instance != nil {
             if optimoveConfig.features.contains(.delayedConfiguration),
                optimoveConfig.getEmbeddedMessagingConfig() == nil {
                 throw Error.configurationIsMissing
             }
-            print("⚠️ EmbeddedMessagesService already initialized")
+            Logger.warn("EmbeddedMessagesService already initialized")
             return
         }
 
@@ -94,13 +95,14 @@ public class EmbeddedMessagesService {
             throw Error.alreadyInitialized
         }
 
-        instance = EmbeddedMessagesService(storage: storage, networkClient: networkClient)
-        print("✅ EmbeddedMessagesService initialized")
+        instance = EmbeddedMessagesService(storage: storage, networkClient: networkClient, authManager: authManager)
+        Logger.info("EmbeddedMessagesService initialized")
     }
 
-    internal init(storage: OptimoveStorage, networkClient: NetworkClient) {
+    internal init(storage: OptimoveStorage, networkClient: NetworkClient, authManager: AuthManager? = nil) {
         self.storage = storage
         self.networkClient = networkClient
+        self.authManager = authManager
     }
     
     
@@ -135,48 +137,56 @@ public class EmbeddedMessagesService {
             return
         }
 
-        do {
-            let request = try createGetEmbeddedMessagesRequest(
-                customerId: customerId,
-                visitorId: visitorId,
-                config: config,
-                containers: containers
-            )
+        resolveJWT(userId: customerId, action: { [weak self] jwt in
+            guard let self = self else { return }
+            do {
+                let request = try self.createGetEmbeddedMessagesRequest(
+                    customerId: customerId,
+                    visitorId: visitorId,
+                    config: config,
+                    containers: containers,
+                    jwt: jwt
+                )
 
-            networkClient?.perform(request) { result in
-                switch result {
-                case .success(let response):
-                    do {
-                        let apiResponse = try response.decode(to: EmbeddedMessagingAPIResponse.self)
-                        var containers: EmbeddedMessagesResponse = [:]
-                        for (containerId, messages) in apiResponse.containers {
-                            containers[containerId] = EmbeddedMessagingContainer(containerId: containerId, messages: messages)
+                self.networkClient?.perform(request) { result in
+                    switch result {
+                    case .success(let response):
+                        do {
+                            let apiResponse = try response.decode(to: EmbeddedMessagingAPIResponse.self)
+                            var containers: EmbeddedMessagesResponse = [:]
+                            for (containerId, messages) in apiResponse.containers {
+                                containers[containerId] = EmbeddedMessagingContainer(containerId: containerId, messages: messages)
+                            }
+
+                            DispatchQueue.main.async {
+                                completion(.successMessages(containers))
+                            }
+                        } catch {
+                            self.handleRequestError(error)
+                            DispatchQueue.main.async {
+                                completion(.error(.errorSendingRequest))
+                            }
                         }
 
-                        DispatchQueue.main.async {
-                            completion(.successMessages(containers))
-                        }
-                    } catch {
+                    case .failure(let error):
                         self.handleRequestError(error)
                         DispatchQueue.main.async {
                             completion(.error(.errorSendingRequest))
                         }
                     }
+                }
 
-                case .failure(let error):
-                    self.handleRequestError(error)
-                    DispatchQueue.main.async {
-                        completion(.error(.errorSendingRequest))
-                    }
+            } catch {
+                self.handleRequestError(error)
+                DispatchQueue.main.async {
+                    completion(.error(.errorSendingRequest))
                 }
             }
-
-        } catch {
-            handleRequestError(error)
+        }, onFailure: { _ in
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
-        }
+        })
     }
     
     /// Deletes the given message from the server.
@@ -204,39 +214,44 @@ public class EmbeddedMessagesService {
             return
         }
 
-        do {
-            let request = try createReportEventRequest(
-                customerId: customerId,
-                visitorId: visitorId,
-                message: message,
-                event: EventType.delete,
-                config: config
-            )
-            
-            print("➡️ Request: \(request)")
+        resolveJWT(userId: customerId, action: { [weak self] jwt in
+            guard let self = self else { return }
+            do {
+                let request = try self.createReportEventRequest(
+                    customerId: customerId,
+                    visitorId: visitorId,
+                    message: message,
+                    event: EventType.delete,
+                    config: config,
+                    jwt: jwt
+                )
 
+                self.networkClient?.perform(request) { result in
+                    switch result {
+                    case .success:
+                        DispatchQueue.main.async {
+                            completion(.success)
+                        }
 
-            networkClient?.perform(request) { result in
-                switch result {
-                case .success:
-                    DispatchQueue.main.async {
-                        completion(.success)
-                    }
-
-                case .failure(let error):
-                    self.handleRequestError(error)
-                    DispatchQueue.main.async {
-                        completion(.error(.errorSendingRequest))
+                    case .failure(let error):
+                        self.handleRequestError(error)
+                        DispatchQueue.main.async {
+                            completion(.error(.errorSendingRequest))
+                        }
                     }
                 }
-            }
 
-        } catch {
-            self.handleRequestError(error)
+            } catch {
+                self.handleRequestError(error)
+                DispatchQueue.main.async {
+                    completion(.error(.errorSendingRequest))
+                }
+            }
+        }, onFailure: { _ in
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
-        }
+        })
     }
     
     /// Updates the read status of the given message on the server.
@@ -266,36 +281,44 @@ public class EmbeddedMessagesService {
             return
         }
 
-        do {
-            let request = try createReportEventRequest(
-                customerId: customerId,
-                visitorId: visitorId,
-                message: message,
-                event: EventType.markAsRead,
-                config: config
-            )
+        resolveJWT(userId: customerId, action: { [weak self] jwt in
+            guard let self = self else { return }
+            do {
+                let request = try self.createReportEventRequest(
+                    customerId: customerId,
+                    visitorId: visitorId,
+                    message: message,
+                    event: EventType.markAsRead,
+                    config: config,
+                    jwt: jwt
+                )
 
-            networkClient?.perform(request) { result in
-                switch result {
-                case .success:
-                    DispatchQueue.main.async {
-                        completion(.success)
-                    }
+                self.networkClient?.perform(request) { result in
+                    switch result {
+                    case .success:
+                        DispatchQueue.main.async {
+                            completion(.success)
+                        }
 
-                case .failure(let error):
-                    self.handleRequestError(error)
-                    DispatchQueue.main.async {
-                        completion(.error(.errorSendingRequest))
+                    case .failure(let error):
+                        self.handleRequestError(error)
+                        DispatchQueue.main.async {
+                            completion(.error(.errorSendingRequest))
+                        }
                     }
                 }
-            }
 
-        } catch {
-            self.handleRequestError(error)
+            } catch {
+                self.handleRequestError(error)
+                DispatchQueue.main.async {
+                    completion(.error(.errorSendingRequest))
+                }
+            }
+        }, onFailure: { _ in
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
-        }
+        })
     }
     
     /// Updates the read status of the given message on the server.
@@ -325,36 +348,44 @@ public class EmbeddedMessagesService {
             return
         }
 
-        do {
-            let request = try createReportEventRequest(
-                customerId: customerId,
-                visitorId: visitorId,
-                message: message,
-                event: EventType.markAsUnread,
-                config: config
-            )
+        resolveJWT(userId: customerId, action: { [weak self] jwt in
+            guard let self = self else { return }
+            do {
+                let request = try self.createReportEventRequest(
+                    customerId: customerId,
+                    visitorId: visitorId,
+                    message: message,
+                    event: EventType.markAsUnread,
+                    config: config,
+                    jwt: jwt
+                )
 
-            networkClient?.perform(request) { result in
-                switch result {
-                case .success:
-                    DispatchQueue.main.async {
-                        completion(.success)
-                    }
+                self.networkClient?.perform(request) { result in
+                    switch result {
+                    case .success:
+                        DispatchQueue.main.async {
+                            completion(.success)
+                        }
 
-                case .failure(let error):
-                    self.handleRequestError(error)
-                    DispatchQueue.main.async {
-                        completion(.error(.errorSendingRequest))
+                    case .failure(let error):
+                        self.handleRequestError(error)
+                        DispatchQueue.main.async {
+                            completion(.error(.errorSendingRequest))
+                        }
                     }
                 }
-            }
 
-        } catch {
-            self.handleRequestError(error)
+            } catch {
+                self.handleRequestError(error)
+                DispatchQueue.main.async {
+                    completion(.error(.errorSendingRequest))
+                }
+            }
+        }, onFailure: { _ in
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
-        }
+        })
     }
     
     /// Reports a click metric for the given message.
@@ -381,38 +412,44 @@ public class EmbeddedMessagesService {
             return
         }
 
-        do {
-            let request = try createReportEventRequest(
-                customerId: customerId,
-                visitorId: visitorId,
-                message: message,
-                event: EventType.clickMetric,
-                config: config
-            )
+        resolveJWT(userId: customerId, action: { [weak self] jwt in
+            guard let self = self else { return }
+            do {
+                let request = try self.createReportEventRequest(
+                    customerId: customerId,
+                    visitorId: visitorId,
+                    message: message,
+                    event: EventType.clickMetric,
+                    config: config,
+                    jwt: jwt
+                )
 
-            print("request: \(String(describing: request))")
+                self.networkClient?.perform(request) { result in
+                    switch result {
+                    case .success:
+                        DispatchQueue.main.async {
+                            completion(.success)
+                        }
 
-            networkClient?.perform(request) { result in
-                switch result {
-                case .success:
-                    DispatchQueue.main.async {
-                        completion(.success)
-                    }
-
-                case .failure(let error):
-                    self.handleRequestError(error)
-                    DispatchQueue.main.async {
-                        completion(.error(.errorSendingRequest))
+                    case .failure(let error):
+                        self.handleRequestError(error)
+                        DispatchQueue.main.async {
+                            completion(.error(.errorSendingRequest))
+                        }
                     }
                 }
-            }
 
-        } catch {
-            self.handleRequestError(error)
+            } catch {
+                self.handleRequestError(error)
+                DispatchQueue.main.async {
+                    completion(.error(.errorSendingRequest))
+                }
+            }
+        }, onFailure: { _ in
             DispatchQueue.main.async {
                 completion(.error(.errorSendingRequest))
             }
-        }
+        })
     }
     
     
@@ -421,7 +458,8 @@ public class EmbeddedMessagesService {
         customerId: String,
         visitorId: String,
         config: EmbeddedMessagingConfig,
-        containers: [ContainerRequestOptions]? = nil
+        containers: [ContainerRequestOptions]? = nil,
+        jwt: String? = nil
     ) throws -> NetworkRequest {
         
         let (region, brandId, tenantId) = getConfigValues(from: config)
@@ -438,9 +476,12 @@ public class EmbeddedMessagesService {
         let encoder = JSONEncoder()
         let bodyData = try encoder.encode(containers)
 
-        let headers: [HTTPHeader] = [
+        var headers: [HTTPHeader] = [
             HTTPHeader(field: .contentType, value: .json)
         ]
+        if let jwt = jwt {
+            headers.append(HTTPHeader(field: .userJwt, value: jwt))
+        }
 
         return NetworkRequest(
             method: .post,
@@ -459,7 +500,8 @@ public class EmbeddedMessagesService {
         visitorId: String,
         message: EmbeddedMessage,
         event: EventType,
-        config: EmbeddedMessagingConfig
+        config: EmbeddedMessagingConfig,
+        jwt: String? = nil
     ) throws -> NetworkRequest {
         
         let (region, brandId, tenantId) = getConfigValues(from: config)
@@ -467,10 +509,13 @@ public class EmbeddedMessagesService {
         let path = "/api/v2/events/report"
         
         // Headers
-        let headers: [HTTPHeader] = [
+        var headers: [HTTPHeader] = [
             HTTPHeader(field: .contentType, value: .json),
             HTTPHeader(field: .tenantId, value: .tenantId(id: tenantId))
         ]
+        if let jwt = jwt {
+            headers.append(HTTPHeader(field: .userJwt, value: jwt))
+        }
         
         let queryItems: [URLQueryItem] = [
             URLQueryItem(name: "TenantId", value: tenantId),
@@ -503,6 +548,31 @@ public class EmbeddedMessagesService {
     }
     
     
+    // MARK: - Auth Helper
+
+    /// Resolves a JWT if auth is configured, then calls `action`.
+    /// If auth is not configured, calls `action(nil)` (proceed without JWT).
+    /// If auth is configured but the token fetch fails, calls `onFailure` (fail-closed).
+    private func resolveJWT(
+        userId: String,
+        action: @escaping (_ jwt: String?) -> Void,
+        onFailure: @escaping (_ error: Error) -> Void
+    ) {
+        guard let authManager = authManager else {
+            action(nil)
+            return
+        }
+        authManager.getToken(userId: userId) { result in
+            switch result {
+            case .success(let jwt):
+                action(jwt)
+            case .failure(let error):
+                Logger.error("Auth token fetch failed for EmbeddedMessaging: \(error.localizedDescription). Dropping request.")
+                onFailure(error)
+            }
+        }
+    }
+
     // MARK: - Log Failed Response
     private func logFailedResponse(_ error: Swift.Error) {
         Logger.error("Request failed: \(error.localizedDescription)")
