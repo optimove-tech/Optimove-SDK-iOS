@@ -124,7 +124,7 @@ class AnalyticsHelperTests: XCTestCase {
 class MockKSHttpClient: KSHttpClient {
     var capturedData: Any?
     
-    func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
+    func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, authUserId: String?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
         capturedData = data
         onSuccess(nil, nil)
     }
@@ -139,7 +139,7 @@ class MockKSHttpClientSingleFailure: KSHttpClient {
     var capturedData: Any?
     var failed = false
     
-    func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
+    func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, authUserId: String?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
         if !failed {
             onFailure(nil, NSError(domain: "domain", code: 404), nil)
             failed = true

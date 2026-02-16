@@ -1,6 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 import UserNotifications
 
 public typealias InAppDeepLinkHandlerBlock = (InAppButtonPress) -> Void
@@ -101,7 +102,7 @@ final class Optimobile {
     /**
          Initialize the Optimobile SDK.
      */
-    static func initialize(config optimoveConfig: OptimoveConfig, initialVisitorId: String, initialUserId: String?) throws {
+    static func initialize(config optimoveConfig: OptimoveConfig, initialVisitorId: String, initialUserId: String?, authManager: AuthManager? = nil) throws {
         if instance !== nil, optimoveConfig.features.contains(.delayedConfiguration) {
             try completeDelayedConfiguration(config: optimoveConfig.optimobileConfig!)
             return
@@ -116,7 +117,7 @@ final class Optimobile {
             throw Error.configurationIsMissing
         }
         
-        instance = Optimobile(config: config)
+        instance = Optimobile(config: config, authManager: authManager)
         
         writeDefaultsKeys(config: config, initialVisitorId: initialVisitorId)
  
@@ -196,14 +197,15 @@ final class Optimobile {
         Optimobile.associateUserWithInstall(userIdentifier: initialUserId!)
     }
 
-    private init(config: OptimobileConfig) {
+    private init(config: OptimobileConfig, authManager: AuthManager? = nil) {
         self.config = config
         let urlBuilder = UrlBuilder(storage: KeyValPersistenceHelper.self)
         networkFactory = NetworkFactory(
             urlBuilder: urlBuilder,
             authorization: AuthorizationMediator(provider: {
                 Optimobile.instance?.credentials
-            })
+            }),
+            authManager: authManager
         )
         inAppConsentStrategy = config.inAppConsentStrategy
 
