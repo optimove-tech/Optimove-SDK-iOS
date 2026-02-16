@@ -17,19 +17,19 @@ final class RealTime {
     private let realTimeQueue = DispatchQueue(label: "com.optimove.sdk.realtime", qos: .userInitiated)
     private var storage: OptimoveStorage
     private let queue: OptistreamQueue
-    private let networking: OptistreamNetworking
+    private let dispatcher: OptistreamDispatcher
 
     // MARK: - Public
 
     required init(
         configuration: RealtimeConfig,
         storage: OptimoveStorage,
-        networking: OptistreamNetworking,
+        dispatcher: OptistreamDispatcher,
         queue: OptistreamQueue
     ) {
         self.configuration = configuration
         self.storage = storage
-        self.networking = networking
+        self.dispatcher = dispatcher
         self.queue = queue
     }
 }
@@ -90,19 +90,23 @@ private extension RealTime {
     // MARK: Send report
 
     func sentReportEvent(_ events: [OptistreamEvent]) {
-        networking.send(events: events, path: Constants.path) { [weak self] result in
-            guard let self = self else { return }
-            self.realTimeQueue.async { [weak self] in
+        dispatcher.sendBatch(
+            events: events,
+            path: Constants.path,
+            onGroupResult: { [weak self] groupEvents, result in
                 guard let self = self else { return }
-                switch result {
-                case .success:
-                    self.onSuccess(events)
-                case let .failure(error):
-                    Logger.error(error.localizedDescription)
-                    self.onError(events)
+                self.realTimeQueue.async {
+                    switch result {
+                    case .success:
+                        self.onSuccess(groupEvents)
+                    case let .failure(error):
+                        Logger.error(error.localizedDescription)
+                        self.onError(groupEvents)
+                    }
                 }
-            }
-        }
+            },
+            completion: { }
+        )
     }
 
     func onSuccess(_ events: [OptistreamEvent]) {

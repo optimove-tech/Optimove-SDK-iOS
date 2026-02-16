@@ -6,7 +6,7 @@ import UIKit
 
 typealias OptistreamEvent = OptimoveCore.OptistreamEvent
 typealias OptistreamEventBuilder = OptimoveCore.OptistreamEventBuilder
-typealias OptistreamNetworking = OptimoveCore.OptistreamNetworking
+typealias OptistreamDispatcher = OptimoveCore.OptistreamDispatcher
 
 final class OptiTrack {
     enum Constants {
@@ -20,7 +20,7 @@ final class OptiTrack {
     }
 
     private let queue: OptistreamQueue
-    private let networking: OptistreamNetworking
+    private let dispatcher: OptistreamDispatcher
     private let configuration: OptitrackConfig
     private var backgroundTaskId: UIBackgroundTaskIdentifier = .invalid
     private var dispatchTimer: Timer?
@@ -30,11 +30,11 @@ final class OptiTrack {
 
     init(
         queue: OptistreamQueue,
-        networking: OptistreamNetworking,
+        dispatcher: OptistreamDispatcher,
         configuration: OptitrackConfig
     ) {
         self.queue = queue
-        self.networking = networking
+        self.dispatcher = dispatcher
         self.configuration = configuration
         startDispatchTimer()
     }
@@ -154,25 +154,35 @@ private extension OptiTrack {
             Logger.info("Finished dispatching events")
             return
         }
-        networking.send(events: events) { [weak self] result in
-            guard let self = self else { return }
-            self.dispatchQueue.async {
-                switch result {
-                case .success:
-                    self.queue.remove(events: events)
-                    self.dispatchBatch()
-                case let .failure(error):
-                    Logger.error(error.localizedDescription)
-                    switch error {
-                    case .requestInvalid:
-                        self.queue.remove(events: events)
-                    default:
-                        break
+
+        var hasRetryableError = false
+
+        dispatcher.sendBatch(
+            events: events,
+            path: nil,
+            onGroupResult: { [weak self] groupEvents, result in
+                guard let self = self else { return }
+                self.dispatchQueue.async {
+                    switch result {
+                    case .success:
+                        self.queue.remove(events: groupEvents)
+                    case let .failure(error):
+                        Logger.error(error.localizedDescription)
+                        hasRetryableError = true
                     }
-                    self.stopDispatching()
+                }
+            },
+            completion: { [weak self] in
+                guard let self = self else { return }
+                self.dispatchQueue.async {
+                    if hasRetryableError {
+                        self.stopDispatching()
+                    } else {
+                        self.dispatchBatch()
+                    }
                 }
             }
-        }
+        )
     }
 
     func stopDispatching() {

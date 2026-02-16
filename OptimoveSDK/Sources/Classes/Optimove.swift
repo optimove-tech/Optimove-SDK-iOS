@@ -32,12 +32,13 @@ typealias Logger = OptimoveCore.Logger
     }
 
     /// The starting point of the Optimove SDK.
-    static func configure(for config: OptimoveConfig) {
+    static func configure(for config: OptimoveConfig, authManager: AuthManager? = nil) {
         /// FUTURE: To merge configure call with init.
         shared.container.resolve { serviceLocator in
             if let tenantInfo = config.tenantInfo {
                 serviceLocator.newTenantInfoHandler().handle(tenantInfo)
             }
+            serviceLocator.authManager = authManager
             serviceLocator.deviceStateObserver().start()
             shared.startSDK { _ in }
         }
@@ -46,8 +47,10 @@ typealias Logger = OptimoveCore.Logger
     public static func initialize(with config: OptimoveConfig) {
         shared.config = config
 
+        let authManager: AuthManager? = config.authTokenProvider.map { AuthManager(provider: $0) }
+
         if config.isOptimoveConfigured() {
-            Optimove.configure(for: config)
+            Optimove.configure(for: config, authManager: authManager)
         }
 
         if config.isOptimobileConfigured() {
@@ -56,7 +59,7 @@ typealias Logger = OptimoveCore.Logger
                     let visitorId = try serviceLocator.storage().getInitialVisitorId()
                     let userId = try? serviceLocator.storage().getCustomerID()
 
-                    try Optimobile.initialize(config: config, initialVisitorId: visitorId, initialUserId: userId)
+                    try Optimobile.initialize(config: config, initialVisitorId: visitorId, initialUserId: userId, authManager: authManager)
                 } catch {
                     throw GuardError.custom("Failed on OptimobileSDK initialization. Reason: \(error.localizedDescription)")
                 }
@@ -66,7 +69,7 @@ typealias Logger = OptimoveCore.Logger
         if config.isEmbeddedMessagingConfigured() {
             shared.container.resolve { serviceLocator in
                 do {
-                    try EmbeddedMessagesService.initialize(with: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
+                    try EmbeddedMessagesService.initialize(with: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl(), authManager: authManager)
                 } catch {
                     throw GuardError.custom("Failed on Embedded Messaging initialization. Reason: \(error.localizedDescription)")
                 }
@@ -81,7 +84,7 @@ typealias Logger = OptimoveCore.Logger
 
             shared.container.resolve { serviceLocator in
                 do {
-                    try OptimovePreferenceCenter.initialize(with: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl())
+                    try OptimovePreferenceCenter.initialize(with: config, storage: serviceLocator.storage(), networkClient: NetworkClientImpl(), authManager: authManager)
                 } catch {
                     throw GuardError.custom("Failed on PreferenceCenter initialization. Reason: \(error.localizedDescription)")
                 }
