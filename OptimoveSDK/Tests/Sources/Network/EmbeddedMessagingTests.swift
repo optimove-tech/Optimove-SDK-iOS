@@ -80,7 +80,8 @@ struct MockOptimoveConfig {
             tenantInfo: nil,
             optimobileConfig: nil,
             preferenceCenterConfig: nil,
-            embeddedMessagingConfig: embeddedMessagingConfig
+            embeddedMessagingConfig: embeddedMessagingConfig,
+            authTokenProvider: nil
         )
     }
 }

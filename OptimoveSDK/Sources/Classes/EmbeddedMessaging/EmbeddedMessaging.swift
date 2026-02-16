@@ -556,7 +556,7 @@ public class EmbeddedMessagesService {
     private func resolveJWT(
         userId: String,
         action: @escaping (_ jwt: String?) -> Void,
-        onFailure: @escaping (_ error: Error) -> Void
+        onFailure: @escaping (_ error: Swift.Error) -> Void
     ) {
         guard let authManager = authManager else {
             action(nil)
