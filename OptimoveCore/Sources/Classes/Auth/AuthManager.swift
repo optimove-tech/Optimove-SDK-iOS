@@ -28,7 +28,7 @@ public enum AuthError: Error, LocalizedError {
 
 /// Manages JWT token retrieval from the client-provided closure.
 /// - Threading: `getToken` can be called from any queue. The `completion` callback is invoked
-///   on whatever queue the client's `AuthTokenProvider` closure dispatches to — callers should
+///   on the queue the client's `AuthTokenProvider` closure dispatches to — callers should
 ///   not assume any specific queue and should dispatch to their target queue if needed.
 public final class AuthManager {
     private let provider: AuthTokenProvider

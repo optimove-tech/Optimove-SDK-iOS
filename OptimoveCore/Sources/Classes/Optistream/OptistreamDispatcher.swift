@@ -54,7 +54,7 @@ public final class OptistreamDispatcherImpl: OptistreamDispatcher {
         }
 
         // Group events by customer identity so each request carries a single JWT.
-        // Anonymous events (customer nil/empty) are grouped together and sent without JWT.
+        // Anonymous events (customer nil) are grouped together and sent without JWT.
         let grouped = Dictionary(grouping: events) { $0.customer ?? "" }
         let groups = Array(grouped)
 

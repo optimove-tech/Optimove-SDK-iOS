@@ -105,7 +105,7 @@ final class KSHttpClientImpl: KSHttpClient {
                     request.addValue(jwt, forHTTPHeaderField: "X-User-JWT")
                     self.sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
                 case .failure(let error):
-                    // Fail-closed: drop the request (matches Web SDK behavior)
+                    // Fail-closed: drop the request
                     Logger.error("Auth token failed for Optimobile request: \(error.localizedDescription). Dropping request.")
                     onFailure(nil, error, nil)
                 }
