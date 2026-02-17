@@ -7,11 +7,7 @@ public final class OptistreamNetworkingMock: OptistreamNetworking {
 
     public var assetEventsFunction: ((_ events: [OptistreamEvent], _ completion: (Result<Void, NetworkError>) -> Void) -> Void)?
 
-    public func send(events: [OptistreamEvent], completion: @escaping (Result<Void, NetworkError>) -> Void) {
-        assetEventsFunction?(events, completion)
-    }
-
-    public func send(events: [OptistreamEvent], path _: String, completion: @escaping (Result<Void, NetworkError>) -> Void) {
+    public func send(events: [OptistreamEvent], path _: String?, jwt _: String?, completion: @escaping (Result<Void, NetworkError>) -> Void) {
         assetEventsFunction?(events, completion)
     }
 }

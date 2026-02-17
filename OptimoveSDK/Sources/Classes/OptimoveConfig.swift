@@ -1,6 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 /// A set of options for configuring the SDK.
 /// - Note: The SDK can be configured to support multiple features.
@@ -49,6 +50,7 @@ public struct OptimoveConfig {
     let optimobileConfig: OptimobileConfig?
     let preferenceCenterConfig: PreferenceCenterConfig?
     let embeddedMessagingConfig: EmbeddedMessagingConfig?
+    let authTokenProvider: AuthTokenProvider?
 
     func isOptimoveConfigured() -> Bool {
         return features.contains(.optimove)
@@ -130,6 +132,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var _pushReceivedInForegroundHandlerBlock: Any?
     private var _deepLinkCname: URL?
     private var _deepLinkHandler: DeepLinkHandler?
+    private var _authTokenProvider: AuthTokenProvider?
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
@@ -173,6 +176,7 @@ open class OptimoveConfigBuilder: NSObject {
             _sdkInfo = optimobileConfig.sdkInfo
             _isRelease = optimobileConfig.isRelease
         }
+        _authTokenProvider = config.authTokenProvider
         features = config.features
     }
 
@@ -294,6 +298,20 @@ open class OptimoveConfigBuilder: NSObject {
         return self
     }
 
+    /// Enable JWT-based federated authentication for all user-identified requests.
+    ///
+    /// When enabled, the SDK will call this closure before each user-identified request to obtain
+    /// a JWT, which is attached via the `X-User-JWT` header.
+    ///
+    /// - Parameter provider: A closure that receives a userId and a completion callback.
+    ///   Call `completion(jwt, nil)` on success or `completion(nil, error)` on failure.
+    /// - Returns: The builder instance for chaining.
+    @discardableResult public func enableAuth(
+        _ provider: @escaping AuthTokenProvider
+    ) -> OptimoveConfigBuilder {
+        _authTokenProvider = provider
+        return self
+    }
 
     /**
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
@@ -408,7 +426,8 @@ open class OptimoveConfigBuilder: NSObject {
             tenantInfo: tenantInfo,
             optimobileConfig: optimobileConfig,
             preferenceCenterConfig: preferenceCenterConfig,
-            embeddedMessagingConfig: embeddedMessagingConfig
+            embeddedMessagingConfig: embeddedMessagingConfig,
+            authTokenProvider: _authTokenProvider
         )
     }
 

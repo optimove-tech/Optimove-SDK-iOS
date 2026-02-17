@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.4.0
+
+- Add federated JWT authentication support. Use `enableAuth()` on the config builder to supply a token provider. The SDK attaches `X-User-JWT` to all user-identified requests (OptiTrack, RealTime, PreferenceCenter, EmbeddedMessaging, AnalyticsHelper, InAppManager).
+- Add `X-Optimove-Auth-Capable: 1` header to all requests to signal auth-capable SDK versions to backends.
+- Fix multi-customer event batching: OptiTrack/RealTime now group events by customer identity so each request carries a single valid JWT. AnalyticsHelper fetches events per user to ensure JWT matches the batch.
+
 ## 6.3.0
 
 - Add In-App Message Interceptor API `OptimoveInApp.setInAppMessageInterceptor(_:)` to allow apps to control when in-app messages are shown or suppressed based on custom logic. If no decision is made within the timeout (default 5s), the message is automatically suppressed.

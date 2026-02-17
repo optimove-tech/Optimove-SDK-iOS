@@ -28,6 +28,9 @@ final class ServiceLocator {
         storage: storage()
     ).build()
 
+    /// Auth manager for JWT-based federated authentication (nil if auth not configured).
+    var authManager: AuthManager?
+
     // MARK: - Initializer
 
     init(storageFacade: StorageFacade) {
@@ -111,7 +114,8 @@ final class ServiceLocator {
     func componentFactory() -> ComponentFactory {
         return ComponentFactory(
             serviceLocator: self,
-            coreEventFactory: coreEventFactory()
+            coreEventFactory: coreEventFactory(),
+            authManager: authManager
         )
     }
 

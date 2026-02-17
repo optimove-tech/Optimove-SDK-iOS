@@ -53,6 +53,9 @@ extension NetworkClientImpl: NetworkClient {
 
         request.headers?.forEach { urlRequest.addValue($0.value, forHTTPHeaderField: $0.field) }
 
+        // Signal that this SDK version supports auth.
+        urlRequest.addValue("1", forHTTPHeaderField: "X-Optimove-Auth-Capable")
+
         let task = session.dataTask(with: urlRequest) { data, response, error in
             if let error = error {
                 completion(.failure(NetworkError.error(error)))

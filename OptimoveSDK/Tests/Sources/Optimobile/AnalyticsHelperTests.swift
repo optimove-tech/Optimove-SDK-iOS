@@ -123,9 +123,13 @@ class AnalyticsHelperTests: XCTestCase {
 
 class MockKSHttpClient: KSHttpClient {
     var capturedData: Any?
+    var capturedAuthUserId: String?
+    var capturedAuthUserIds: [String?] = []
     
-    func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
+    func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, authUserId: String?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
         capturedData = data
+        capturedAuthUserId = authUserId
+        capturedAuthUserIds.append(authUserId)
         onSuccess(nil, nil)
     }
     
@@ -135,11 +139,70 @@ class MockKSHttpClient: KSHttpClient {
 
 }
 
+// MARK: - Auth-specific Tests
+
+class AnalyticsHelperAuthTests: XCTestCase {
+
+    var mockHttpClient: MockKSHttpClient!
+    var analyticsHelper: AnalyticsHelper!
+    var longTimeoutInSeconds = 10.0
+
+    override func setUp() {
+        super.setUp()
+        mockHttpClient = MockKSHttpClient()
+        analyticsHelper = AnalyticsHelper(httpClient: mockHttpClient)
+    }
+
+    override func tearDown() {
+        analyticsHelper = nil
+        mockHttpClient = nil
+        super.tearDown()
+    }
+
+    // By default, without calling associateUserWithInstall, currentUserIdentifier == installId.
+    // The syncEventsBatch code detects this as a visitor batch and passes authUserId: nil.
+
+    func test_syncEventsBatch_defaultVisitorEvents_passesNilAuthUserId() {
+        let authUserIdExpectation = expectation(description: "authUserId should be nil for visitor events")
+
+        analyticsHelper.trackEvent(eventType: "visitor_event", atTime: Date(), properties: nil, immediateFlush: true) { _ in
+            if self.mockHttpClient.capturedAuthUserId == nil {
+                authUserIdExpectation.fulfill()
+            }
+        }
+
+        waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
+    }
+
+    // After associateUserWithInstall, currentUserIdentifier returns the user's ID.
+    // Events stamped with that ID should be sent with authUserId set.
+
+    func test_syncEventsBatch_associatedUser_passesAuthUserId() {
+        let testUserId = "user-123"
+
+        // Associate a user. This changes OptimobileHelper.currentUserIdentifier.
+        KeyValPersistenceHelper.set(testUserId, forKey: OptimobileUserDefaultsKey.USER_ID.rawValue)
+
+        let authUserIdExpectation = expectation(description: "authUserId should be the user's identifier")
+
+        analyticsHelper.trackEvent(eventType: "user_event", atTime: Date(), properties: nil, immediateFlush: true) { _ in
+            if self.mockHttpClient.capturedAuthUserId == testUserId {
+                authUserIdExpectation.fulfill()
+            }
+        }
+
+        waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
+
+        // Cleanup: restore to visitor
+        KeyValPersistenceHelper.removeObject(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue)
+    }
+}
+
 class MockKSHttpClientSingleFailure: KSHttpClient {
     var capturedData: Any?
     var failed = false
     
-    func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
+    func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, authUserId: String?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
         if !failed {
             onFailure(nil, NSError(domain: "domain", code: 404), nil)
             failed = true

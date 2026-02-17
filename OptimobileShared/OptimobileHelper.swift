@@ -39,6 +39,12 @@ enum OptimobileHelper {
         return OptimobileHelper.installId
     }
 
+    static var associatedUserId: String? {
+        userIdLock.wait()
+        defer { userIdLock.signal() }
+        return KeyValPersistenceHelper.object(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue) as? String
+    }
+
     static func getBadgeFromUserInfo(userInfo: [AnyHashable: Any]) -> NSNumber? {
         let custom = userInfo["custom"] as? [AnyHashable: Any]
         let aps = userInfo["aps"] as? [AnyHashable: Any]
