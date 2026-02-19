@@ -2,6 +2,7 @@
 
 import CoreData
 import Foundation
+import OptimoveCore
 
 class KSEventModel: NSManagedObject {
     @NSManaged var uuid: String
@@ -252,9 +253,11 @@ final class AnalyticsHelper {
 
         networkBarrier.wait()
 
-        if err != nil {
-            onSyncComplete?(err)
-            return
+        if let err {
+            guard case .authNotConfigured? = err as? NetworkError else {
+                onSyncComplete?(err)
+                return
+            }
         }
 
         if let err = self.pruneEventsBatch(context, eventIds) {

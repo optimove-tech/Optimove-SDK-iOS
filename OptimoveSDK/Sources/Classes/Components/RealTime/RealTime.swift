@@ -14,7 +14,8 @@ final class RealTime {
     }
 
     private let configuration: RealtimeConfig
-    private let realTimeQueue = DispatchQueue(label: "com.optimove.sdk.realtime", qos: .userInitiated)
+    private let realTimeQueue = DispatchQueue(
+        label: "com.optimove.sdk.realtime", qos: .userInitiated)
     private var storage: OptimoveStorage
     private let queue: OptistreamQueue
     private let dispatcher: OptistreamDispatcher
@@ -40,7 +41,7 @@ extension RealTime: OptistreamComponent {
         let handleOperationOnQueue: () -> Void = { [weak self] in
             guard let self = self else { return }
             switch operation {
-            case let .report(events: events):
+            case .report(events: let events):
                 let allowedEvents = events.filter(self.isAllowedToReport)
                 guard !allowedEvents.isEmpty else { break }
                 self.report(allowedEvents)
@@ -52,18 +53,18 @@ extension RealTime: OptistreamComponent {
     }
 }
 
-private extension RealTime {
-    func isAllowedToReport(_ event: OptistreamEvent) -> Bool {
-        return event.metadata.realtime &&
-            !configuration.isEnableRealtimeThroughOptistream
+extension RealTime {
+    fileprivate func isAllowedToReport(_ event: OptistreamEvent) -> Bool {
+        return event.metadata.realtime && !configuration.isEnableRealtimeThroughOptistream
     }
 
-    func report(_ events: [OptistreamEvent]) {
+    fileprivate func report(_ events: [OptistreamEvent]) {
         if queue.isEmpty {
             /// Simply send incoming events if the queue is empty
             sentReportEvent(events)
         } else {
-            let failProtectedEvents = queue.first(limit: max(Constants.eventBatchLimit - events.count, 1))
+            let failProtectedEvents = queue.first(
+                limit: max(Constants.eventBatchLimit - events.count, 1))
             /// Check if we have intersection between `failProtectedEvents` and incoming events.
             if events.filter(isFailProtectedEvent).isEmpty {
                 /// If no intersection found – merge them and send.
@@ -86,10 +87,10 @@ private extension RealTime {
 
 // MARK: - Private
 
-private extension RealTime {
+extension RealTime {
     // MARK: Send report
 
-    func sentReportEvent(_ events: [OptistreamEvent]) {
+    fileprivate func sentReportEvent(_ events: [OptistreamEvent]) {
         dispatcher.sendBatch(
             events: events,
             path: Constants.path,
@@ -99,25 +100,30 @@ private extension RealTime {
                     switch result {
                     case .success:
                         self.onSuccess(groupEvents)
-                    case let .failure(error):
+                    case .failure(let error):
                         Logger.error(error.localizedDescription)
-                        self.onError(groupEvents)
+                        //authNotConfigured is a permanent error, so we remove all events from the queue
+                        if case .authNotConfigured = error {
+                            self.queue.remove(events: groupEvents)
+                        } else {
+                            self.onError(groupEvents)
+                        }
                     }
                 }
             },
-            completion: { }
+            completion: {}
         )
     }
 
-    func onSuccess(_ events: [OptistreamEvent]) {
+    fileprivate func onSuccess(_ events: [OptistreamEvent]) {
         queue.remove(events: events.filter(isFailProtectedEvent))
     }
 
-    func onError(_ events: [OptistreamEvent]) {
+    fileprivate func onError(_ events: [OptistreamEvent]) {
         queue.enqueue(events: events.filter(isFailProtectedEvent))
     }
 
-    func isFailProtectedEvent(_ event: OptistreamEvent) -> Bool {
+    fileprivate func isFailProtectedEvent(_ event: OptistreamEvent) -> Bool {
         return Constants.failProtectedEvents.contains(event.event)
     }
 }

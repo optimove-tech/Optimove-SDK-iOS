@@ -45,9 +45,14 @@ public final class OptistreamDispatcherImpl: OptistreamDispatcher {
         completion: @escaping () -> Void
     ) {
         guard let authManager = authManager else {
-            // No auth configured — send the entire batch as-is, no JWT
+            // No auth configured — send the entire batch as-is, no JWT.
+            // If the backend returns 401, this is permanent (no AuthManager to produce a JWT).
             networking.send(events: events, path: path, jwt: nil) { result in
-                onGroupResult(events, result)
+                if case .failure(.unauthorized) = result {
+                    onGroupResult(events, .failure(.authNotConfigured))
+                } else {
+                    onGroupResult(events, result)
+                }
                 completion()
             }
             return
@@ -117,9 +122,9 @@ public final class OptistreamDispatcherImpl: OptistreamDispatcher {
                 }
             case .failure(let error):
                 Logger.error(
-                    "Auth token fetch failed for userId '\(customerId)': \(error.localizedDescription). Dropping group."
+                    "Auth token fetch failed for userId '\(customerId)': \(error.localizedDescription)"
                 )
-                onGroupResult(events, .failure(NetworkError.error(error)))
+                onGroupResult(events, .failure(NetworkError.authFailed(error)))
                 completion()
             }
         }

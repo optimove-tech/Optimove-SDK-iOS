@@ -139,7 +139,7 @@ private extension OptiTrack {
         }
         guard !queue.isEmpty else {
             Logger.debug("No need to dispatch. Dispatch queue is empty.")
-            stopDispatching()
+            temporarilyStopDispatching()
             return
         }
         Logger.info("Start dispatching events")
@@ -150,7 +150,7 @@ private extension OptiTrack {
     func dispatchBatch() {
         let events = queue.first(limit: Constants.eventBatchLimit)
         guard !events.isEmpty else {
-            stopDispatching()
+            temporarilyStopDispatching()
             Logger.info("Finished dispatching events")
             return
         }
@@ -168,7 +168,11 @@ private extension OptiTrack {
                         self.queue.remove(events: groupEvents)
                     case let .failure(error):
                         Logger.error(error.localizedDescription)
-                        hasRetryableError = true
+                        if case .authNotConfigured = error {
+                            self.queue.remove(events: groupEvents)
+                        } else {
+                            hasRetryableError = true
+                        }
                     }
                 }
             },
@@ -176,7 +180,7 @@ private extension OptiTrack {
                 guard let self = self else { return }
                 self.dispatchQueue.async {
                     if hasRetryableError {
-                        self.stopDispatching()
+                        self.temporarilyStopDispatching()
                     } else {
                         self.dispatchBatch()
                     }
@@ -185,7 +189,7 @@ private extension OptiTrack {
         )
     }
 
-    func stopDispatching() {
+    func temporarilyStopDispatching() {
         isDispatching = false
         stopBackgroundTask()
         startDispatchTimer()

@@ -68,7 +68,9 @@ extension NetworkClientImpl: NetworkClient {
             switch httpResponse.statusCode {
             case 200 ... 299:
                 completion(.success(NetworkResponse<Data?>(statusCode: httpResponse.statusCode, body: data)))
-            case 400 ... 499:
+            case 401:
+                completion(.failure(NetworkError.unauthorized(data)))
+            case 400, 402 ... 499:
                 completion(.failure(NetworkError.requestInvalid(data)))
             case 500 ... 599:
                 completion(.failure(NetworkError.requestFailed))

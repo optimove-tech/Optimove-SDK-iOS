@@ -95,7 +95,17 @@ final class KSHttpClientImpl: KSHttpClient {
             request.addValue("1", forHTTPHeaderField: "X-Optimove-Auth-Capable")
 
             guard let authManager = authManager, let userId = authUserId else {
-                sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
+                if authManager == nil, authUserId != nil {
+                    sendRequest(request: request, onSuccess: onSuccess) { response, error, decodedBody in
+                        if response?.statusCode == 401 {
+                            onFailure(response, NetworkError.authNotConfigured, decodedBody)
+                        } else {
+                            onFailure(response, error, decodedBody)
+                        }
+                    }
+                } else {
+                    sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
+                }
                 return
             }
 

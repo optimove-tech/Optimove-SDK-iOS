@@ -105,14 +105,29 @@ final class OptistreamNetworkingTests: XCTestCase {
     }
 
     func test_send_requestInvalid_callsCompletionWithSuccess() {
-        let completionExpectation = expectation(description: "completion called with success on 4xx")
+        let completionExpectation = expectation(description: "completion called with success on non-401 4xx")
         networkClientSpy.mockResult = .failure(.requestInvalid(nil))
 
         networking.send(events: [makeEvent()], path: nil, jwt: nil) { result in
             if case .success = result {
                 completionExpectation.fulfill()
             } else {
-                XCTFail("Expected success on requestInvalid (4xx should still prune events)")
+                XCTFail("Expected success on requestInvalid (non-401 4xx should still prune events)")
+            }
+        }
+
+        waitForExpectations(timeout: 1)
+    }
+
+    func test_send_unauthorized_callsCompletionWithFailure() {
+        let completionExpectation = expectation(description: "completion called with failure on 401")
+        networkClientSpy.mockResult = .failure(.unauthorized(nil))
+
+        networking.send(events: [makeEvent()], path: nil, jwt: nil) { result in
+            if case .failure = result {
+                completionExpectation.fulfill()
+            } else {
+                XCTFail("Expected failure on 401 (events should be retried)")
             }
         }
 

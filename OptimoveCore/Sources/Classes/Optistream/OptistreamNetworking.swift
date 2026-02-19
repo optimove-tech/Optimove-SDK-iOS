@@ -71,6 +71,21 @@ private extension OptistreamNetworkingImpl {
                 """
             )
             completion(.success(()))
+        } catch let NetworkError.unauthorized(data) {
+            let body: String = {
+                guard let data = data else { return "no data" }
+                return String(decoding: data, as: UTF8.self)
+            }()
+            Logger.error(
+                """
+                Optistream unauthorized (401):
+                    request:
+                    \(events.map(\.event).joined(separator: "\n"))
+                    response body:
+                    \(body)
+                """
+            )
+            completion(.failure(NetworkError.unauthorized(data)))
         } catch let NetworkError.requestInvalid(data) {
             let response: () -> String = {
                 guard let data = data else { return "no data" }
