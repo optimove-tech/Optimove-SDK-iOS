@@ -178,7 +178,9 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             return
         }
 
-        initViews()
+        guard initViews() else {
+            return
+        }
         self.loadingSpinner?.startAnimating()
 
         guard self.webViewReady else {
@@ -216,9 +218,15 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         }
     }
 
-    func initViews() {
+    @discardableResult
+    func initViews() -> Bool {
         if window != nil {
-            return
+            return true
+        }
+
+        guard let url = try? urlBuilder.urlForService(.iar) else {
+            Logger.error("Failed to resolve IAR service URL, deferring in-app presentation")
+            return false
         }
 
         // Window / frame setup
@@ -285,10 +293,8 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         #else
             let cachePolicy = URLRequest.CachePolicy.reloadIgnoringCacheData
         #endif
-        if let url = try? urlBuilder.urlForService(.iar) {
-            let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
-            webView.load(request)
-        }
+        let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
+        webView.load(request)
 
         // Spinner
         let loadingSpinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
@@ -302,6 +308,8 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
         loadingSpinner.center = frame.center
         frame.bringSubviewToFront(loadingSpinner)
+
+        return true
     }
 
     // Expects to be called from the main thread
@@ -453,10 +461,16 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     private func showMessage(_ message: InAppMessage) {
         assertOnMainThread()
 
+        guard let region = try? urlBuilder.region else {
+            Logger.error("Region not available, skipping in-app message presentation")
+            cleanupMessageAndAdvance(message)
+            return
+        }
+
         currentMessage = message
 
         let content = NSMutableDictionary(dictionary: message.content)
-        content["region"] = Optimobile.sharedInstance.config.region.rawValue
+        content["region"] = region
 
         postClientMessage(type: "PRESENT_MESSAGE", data: content)
     }
@@ -500,7 +514,9 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         currentMessage = message
         interceptionInProgress = false
 
-        initViews()
+        guard initViews() else {
+            return
+        }
         loadingSpinner?.startAnimating()
         if webViewReady {
             showMessage(message)
