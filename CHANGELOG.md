@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.4.0
+
+- Update delayed configuration to no longer require a redundant region parameter. Region is now inferred from credentials. Deprecated `OptimoveConfigBuilder.init(region:features:)` — use `init(features:)` instead.
+
 ## 6.3.0
 
 - Add In-App Message Interceptor API `OptimoveInApp.setInAppMessageInterceptor(_:)` to allow apps to control when in-app messages are shown or suppressed based on custom logic. If no decision is made within the timeout (default 5s), the message is automatically suppressed.
