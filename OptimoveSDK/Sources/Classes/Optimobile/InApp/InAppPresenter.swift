@@ -463,7 +463,6 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
         guard let region = try? urlBuilder.region else {
             Logger.error("Region not available, skipping in-app message presentation")
-            cleanupMessageAndAdvance(message)
             return
         }
 
