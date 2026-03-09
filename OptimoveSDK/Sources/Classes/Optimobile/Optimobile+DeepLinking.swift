@@ -143,6 +143,10 @@ final class DeepLinkHelper {
                     self.cachedLink = CachedLink(url: url, wasDeferred: wasDeferred)
                     return
                 }
+                if case UrlBuilder.Error.regionNotSet = error {
+                    self.cachedLink = CachedLink(url: url, wasDeferred: wasDeferred)
+                    return
+                }
             }
             switch res?.statusCode {
             case 404:

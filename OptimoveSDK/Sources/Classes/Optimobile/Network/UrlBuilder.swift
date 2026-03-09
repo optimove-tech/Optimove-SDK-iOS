@@ -52,11 +52,8 @@ public class UrlBuilder {
         }
     }
 
-    required init(storage: KeyValPersistenceHelper.Type, runtimeUrlsMap: ServiceUrlMap? = nil) {
+    required init(storage: KeyValPersistenceHelper.Type) {
         self.storage = storage
-        if let runtimeUrlsMap = runtimeUrlsMap, isValidateUrlMap(urlsMap: runtimeUrlsMap) {
-            self.runtimeUrlsMap = runtimeUrlsMap
-        }
     }
 
     func urlForService(_ service: Service) throws -> URL {
