@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.author           = { 'Mobius Solutions' => 'mobile@optimove.com' }
   s.source           = { :git => 'https://github.com/optimove-tech/Optimove-SDK-iOS.git', :tag => s.version.to_s }
   s.platform = 'ios'
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '11.0'
   s.swift_version = '5'
   base_dir = "OptimoveCore/"
   s.source_files = base_dir + 'Sources/Classes/**/*'

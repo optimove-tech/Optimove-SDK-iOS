@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/optimove-tech/Optimove-SDK-iOS.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/Optimove'
   s.platform = 'ios'
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '11.0'
   # s.static_framework = true
   s.swift_version = '5'
   base_dir = "OptimoveSDK/"
