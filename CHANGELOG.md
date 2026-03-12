@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.5.0
+
+- Add `postpone()` to the In-App Message Interceptor API. When called, the message is not displayed and not marked as dismissed — it is moved to the back of the queue and will be re-intercepted on the next natural presentation trigger (e.g. app foreground, push tickle). Existing `show()` and `suppress()` behavior is unchanged.
+
 ## 6.4.1
 
 - Correct parsing of Embedded Messaging V2 endpoint response
