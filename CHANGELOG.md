@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.4.1
+
+- Correct parsing of Embedded Messaging V2 endpoint response
+
 ## 6.4.0
 
 - Update delayed configuration to no longer require a redundant region parameter. Region is now inferred from credentials. Deprecated `OptimoveConfigBuilder.init(region:features:)` — use `init(features:)` instead.

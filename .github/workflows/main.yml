@@ -2,7 +2,7 @@ name: CI
 on: [push]
 jobs:
   unit-tests:
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v1
       - run: make test
