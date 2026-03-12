@@ -204,7 +204,6 @@ public enum OptimoveInApp {
 // MARK: - Interceptor Protocols
 
 public protocol InAppMessageInterceptor {
-    // Async decision, call either decision.show() or decision.suppress()
     func processMessage(data: [String: Any]?, decision: InAppMessageInterceptorDecision)
 
     func getTimeoutMs() -> Int
@@ -213,6 +212,7 @@ public protocol InAppMessageInterceptor {
 public protocol InAppMessageInterceptorDecision {
     func show()
     func suppress()
+    func postpone()
 }
 
 public extension InAppMessageInterceptor {
