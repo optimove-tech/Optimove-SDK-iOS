@@ -455,12 +455,13 @@ class InAppManager {
 
         let messageExpiredCondition = "(expiresAt != nil AND expiresAt <= %@)"
 
-        let noInboxAndMessageDismissed = "(inboxConfig = nil AND dismissedAt != nil)"
+        let dismissGracePeriod = Date(timeIntervalSinceNow: -3600) as NSDate
+        let noInboxAndMessageDismissed = "(inboxConfig = nil AND dismissedAt != nil AND dismissedAt <= %@)"
         let noInboxAndMessageExpired = "(inboxConfig = nil AND " + messageExpiredCondition + ")"
         let inboxExpiredAndMessageDismissedOrExpired = "(inboxTo != nil AND inboxTo < %@ AND (dismissedAt != nil OR " + messageExpiredCondition + "))"
 
         let predicate: NSPredicate? =
-            NSPredicate(format: noInboxAndMessageDismissed + " OR " + noInboxAndMessageExpired + " OR " + inboxExpiredAndMessageDismissedOrExpired, NSDate(), NSDate(), NSDate())
+            NSPredicate(format: noInboxAndMessageDismissed + " OR " + noInboxAndMessageExpired + " OR " + inboxExpiredAndMessageDismissedOrExpired, dismissGracePeriod, NSDate(), NSDate(), NSDate())
         fetchRequest.predicate = predicate
 
         var toEvict: [InAppMessageEntity]

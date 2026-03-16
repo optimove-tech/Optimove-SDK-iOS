@@ -3,6 +3,7 @@
 ## 6.5.0
 
 - Add `postpone()` to the In-App Message Interceptor API. When called, the message is not displayed and not marked as dismissed — it is moved to the back of the queue and will be re-intercepted on the next natural presentation trigger (e.g. app foreground, push tickle). Existing `show()` and `suppress()` behavior is unchanged.
+- Fix dismissed non-inbox in-app messages reappearing after app reopen due to race between local DB cleanup and backend sync. Dismissed rows are now kept for 1 hour before eviction.
 
 ## 6.4.1
 
