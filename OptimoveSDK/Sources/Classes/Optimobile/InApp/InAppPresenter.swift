@@ -221,6 +221,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         messageQueue.removeAllObjects()
         pendingTickleIds.removeAllObjects()
         currentMessage = nil
+        interceptionInProgress = false
 
         if waitForViewCleanup == true {
             self.destroyViews()

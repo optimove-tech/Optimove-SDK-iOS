@@ -213,6 +213,8 @@ class InAppManager {
     }
 
     private func resetMessagingState() {
+        presenter.cancelCurrentPresentationQueue(waitForViewCleanup: true)
+
         guard let context = messagesContext else {
             NSLog("InAppManager: NSManagedObjectContext is nil in resetMessagingState")
             return
