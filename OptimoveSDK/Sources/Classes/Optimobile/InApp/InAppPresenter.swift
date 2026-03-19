@@ -37,11 +37,13 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         private var resolved: Bool = false
         private let onShow: () -> Void
         private let onSuppress: () -> Void
+        private let onPostpone: () -> Void
         private var cancelTimeout: (() -> Void)?
 
-        init(onShow: @escaping () -> Void, onSuppress: @escaping () -> Void) {
+        init(onShow: @escaping () -> Void, onSuppress: @escaping () -> Void, onPostpone: @escaping () -> Void) {
             self.onShow = onShow
             self.onSuppress = onSuppress
+            self.onPostpone = onPostpone
         }
 
         func setCancelTimeout(_ cancel: @escaping () -> Void) {
@@ -63,6 +65,15 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
                 self.resolved = true
                 self.cancelTimeout?()
                 self.onSuppress()
+            }
+        }
+
+        func postpone() {
+            DispatchQueue.main.async {
+                guard !self.resolved else { return }
+                self.resolved = true
+                self.cancelTimeout?()
+                self.onPostpone()
             }
         }
     }
@@ -210,6 +221,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         messageQueue.removeAllObjects()
         pendingTickleIds.removeAllObjects()
         currentMessage = nil
+        interceptionInProgress = false
 
         if waitForViewCleanup == true {
             self.destroyViews()
@@ -483,6 +495,9 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             },
             onSuppress: { [weak self] in
                 self?.handleSuppressDecision(for: message)
+            },
+            onPostpone: { [weak self] in
+                self?.handlePostponeDecision(for: message)
             }
         )
 
@@ -520,6 +535,23 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         if webViewReady {
             showMessage(message)
         }
+    }
+
+    private func handlePostponeDecision(for message: InAppMessage) {
+        assertOnMainThread()
+
+        interceptionInProgress = false
+
+        destroyViews()
+
+        let idx = messageQueue.index(of: message)
+        if idx != NSNotFound {
+            messageQueue.removeObject(at: idx)
+            messageQueue.add(message)
+        }
+
+        pendingTickleIds.remove(message.id)
+        currentMessage = nil
     }
 
     private func handleSuppressDecision(for message: InAppMessage) {
