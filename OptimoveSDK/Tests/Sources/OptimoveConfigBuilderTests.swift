@@ -6,7 +6,7 @@ import XCTest
 final class OptimoveConfigBuilderTests: XCTestCase {
     var optimoveConfigBuilder: OptimoveConfigBuilder!
     override func setUpWithError() throws {
-        optimoveConfigBuilder = OptimoveConfigBuilder(region: .DEV, features: [.optimobile, .optimove])
+        optimoveConfigBuilder = OptimoveConfigBuilder(features: [.optimobile, .optimove])
     }
 
     override func tearDownWithError() throws {
@@ -19,7 +19,7 @@ final class OptimoveConfigBuilderTests: XCTestCase {
     }
 
     func testBuildWithEmptyFeatures() throws {
-        optimoveConfigBuilder = OptimoveConfigBuilder(region: .DEV, features: [])
+        optimoveConfigBuilder = OptimoveConfigBuilder(features: [])
         let config = optimoveConfigBuilder.build()
         XCTAssertTrue(config.features.contains(.delayedConfiguration), "delayedConfiguration feature should be enabled if no features are passed")
     }

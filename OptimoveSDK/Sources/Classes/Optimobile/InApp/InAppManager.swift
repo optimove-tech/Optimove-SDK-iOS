@@ -213,6 +213,8 @@ class InAppManager {
     }
 
     private func resetMessagingState() {
+        presenter.cancelCurrentPresentationQueue(waitForViewCleanup: true)
+
         guard let context = messagesContext else {
             NSLog("InAppManager: NSManagedObjectContext is nil in resetMessagingState")
             return
@@ -455,12 +457,13 @@ class InAppManager {
 
         let messageExpiredCondition = "(expiresAt != nil AND expiresAt <= %@)"
 
-        let noInboxAndMessageDismissed = "(inboxConfig = nil AND dismissedAt != nil)"
+        let dismissGracePeriod = Date(timeIntervalSinceNow: -3600) as NSDate
+        let noInboxAndMessageDismissed = "(inboxConfig = nil AND dismissedAt != nil AND dismissedAt <= %@)"
         let noInboxAndMessageExpired = "(inboxConfig = nil AND " + messageExpiredCondition + ")"
         let inboxExpiredAndMessageDismissedOrExpired = "(inboxTo != nil AND inboxTo < %@ AND (dismissedAt != nil OR " + messageExpiredCondition + "))"
 
         let predicate: NSPredicate? =
-            NSPredicate(format: noInboxAndMessageDismissed + " OR " + noInboxAndMessageExpired + " OR " + inboxExpiredAndMessageDismissedOrExpired, NSDate(), NSDate(), NSDate())
+            NSPredicate(format: noInboxAndMessageDismissed + " OR " + noInboxAndMessageExpired + " OR " + inboxExpiredAndMessageDismissedOrExpired, dismissGracePeriod, NSDate(), NSDate(), NSDate())
         fetchRequest.predicate = predicate
 
         var toEvict: [InAppMessageEntity]

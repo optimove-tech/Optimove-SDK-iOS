@@ -37,11 +37,13 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         private var resolved: Bool = false
         private let onShow: () -> Void
         private let onSuppress: () -> Void
+        private let onPostpone: () -> Void
         private var cancelTimeout: (() -> Void)?
 
-        init(onShow: @escaping () -> Void, onSuppress: @escaping () -> Void) {
+        init(onShow: @escaping () -> Void, onSuppress: @escaping () -> Void, onPostpone: @escaping () -> Void) {
             self.onShow = onShow
             self.onSuppress = onSuppress
+            self.onPostpone = onPostpone
         }
 
         func setCancelTimeout(_ cancel: @escaping () -> Void) {
@@ -63,6 +65,15 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
                 self.resolved = true
                 self.cancelTimeout?()
                 self.onSuppress()
+            }
+        }
+
+        func postpone() {
+            DispatchQueue.main.async {
+                guard !self.resolved else { return }
+                self.resolved = true
+                self.cancelTimeout?()
+                self.onPostpone()
             }
         }
     }
@@ -178,7 +189,9 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             return
         }
 
-        initViews()
+        guard initViews() else {
+            return
+        }
         self.loadingSpinner?.startAnimating()
 
         guard self.webViewReady else {
@@ -208,6 +221,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         messageQueue.removeAllObjects()
         pendingTickleIds.removeAllObjects()
         currentMessage = nil
+        interceptionInProgress = false
 
         if waitForViewCleanup == true {
             self.destroyViews()
@@ -216,9 +230,15 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         }
     }
 
-    func initViews() {
+    @discardableResult
+    func initViews() -> Bool {
         if window != nil {
-            return
+            return true
+        }
+
+        guard let url = try? urlBuilder.urlForService(.iar) else {
+            Logger.error("Failed to resolve IAR service URL, deferring in-app presentation")
+            return false
         }
 
         // Window / frame setup
@@ -285,10 +305,8 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         #else
             let cachePolicy = URLRequest.CachePolicy.reloadIgnoringCacheData
         #endif
-        if let url = try? urlBuilder.urlForService(.iar) {
-            let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
-            webView.load(request)
-        }
+        let request = URLRequest(url: url, cachePolicy: cachePolicy, timeoutInterval: 8)
+        webView.load(request)
 
         // Spinner
         let loadingSpinner = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
@@ -302,6 +320,8 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
         loadingSpinner.center = frame.center
         frame.bringSubviewToFront(loadingSpinner)
+
+        return true
     }
 
     // Expects to be called from the main thread
@@ -453,10 +473,15 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     private func showMessage(_ message: InAppMessage) {
         assertOnMainThread()
 
+        guard let region = try? urlBuilder.region else {
+            Logger.error("Region not available, skipping in-app message presentation")
+            return
+        }
+
         currentMessage = message
 
         let content = NSMutableDictionary(dictionary: message.content)
-        content["region"] = Optimobile.sharedInstance.config.region.rawValue
+        content["region"] = region
 
         postClientMessage(type: "PRESENT_MESSAGE", data: content)
     }
@@ -470,6 +495,9 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
             },
             onSuppress: { [weak self] in
                 self?.handleSuppressDecision(for: message)
+            },
+            onPostpone: { [weak self] in
+                self?.handlePostponeDecision(for: message)
             }
         )
 
@@ -500,11 +528,30 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         currentMessage = message
         interceptionInProgress = false
 
-        initViews()
+        guard initViews() else {
+            return
+        }
         loadingSpinner?.startAnimating()
         if webViewReady {
             showMessage(message)
         }
+    }
+
+    private func handlePostponeDecision(for message: InAppMessage) {
+        assertOnMainThread()
+
+        interceptionInProgress = false
+
+        destroyViews()
+
+        let idx = messageQueue.index(of: message)
+        if idx != NSNotFound {
+            messageQueue.removeObject(at: idx)
+            messageQueue.add(message)
+        }
+
+        pendingTickleIds.remove(message.id)
+        currentMessage = nil
     }
 
     private func handleSuppressDecision(for message: InAppMessage) {

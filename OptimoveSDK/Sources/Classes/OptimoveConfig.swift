@@ -89,7 +89,7 @@ public struct OptimoveConfig {
 
 public struct OptimobileConfig {
     let credentials: OptimobileCredentials?
-    let region: Region
+    let region: Region?
     let urlBuilder: UrlBuilder
 
     let sessionIdleTimeout: UInt
@@ -144,13 +144,20 @@ open class OptimoveConfigBuilder: NSObject {
 
 
     /// Intent to use for intialization for delayed configuration.
-    /// - Parameter region: ``Region`` - region to be configured.
     /// - Parameter features: ``Feature`` - single or multiple features to be configured.
     ///
-    /// - Multiple feature usage example: `OptimoveConfigBuilder(region: .US, features: [.optimove, .optimobile])`
+    /// - Multiple feature usage example: `OptimoveConfigBuilder(features: [.optimove, .optimobile])`
+    public convenience init(features: Feature) {
+        self.init()
+        self.features = [features, .delayedConfiguration]
+    }
+
+    /// Intent to use for intialization for delayed configuration.
+    /// - Parameter region: ``Region`` - region to be configured.
+    /// - Parameter features: ``Feature`` - single or multiple features to be configured.
+    @available(*, deprecated, message: "Region is inferred from credentials. Use init(features:) instead.")
     public convenience init(region: Region, features: Feature) {
         self.init()
-        self.region = region
         self.features = [features, .delayedConfiguration]
     }
 
@@ -366,8 +373,7 @@ open class OptimoveConfigBuilder: NSObject {
         }()
 
         let optimobileConfig: OptimobileConfig? = {
-            if features.contains(.optimobile),
-               let region = region
+            if features.contains(.optimobile)
             {
                 return OptimobileConfig(
                     credentials: credentials,

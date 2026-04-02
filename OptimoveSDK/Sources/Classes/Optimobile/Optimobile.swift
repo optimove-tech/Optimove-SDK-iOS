@@ -146,6 +146,7 @@ final class Optimobile {
         }
         Logger.info("Completing delayed configuration with credentials: \(credentials)")
         updateStorageValues(config)
+        instance?.config = config
         setCredentials(credentials)
         NotificationCenter.default.post(name: .optimobileInializationFinished, object: nil)
     }
@@ -155,8 +156,10 @@ final class Optimobile {
     }
 
     static func updateStorageValues(_ config: OptimobileConfig) {
-        KeyValPersistenceHelper.set(config.region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
-        let baseUrlMap = UrlBuilder.defaultMapping(for: config.region.rawValue)
+        guard let region = config.region else { return }
+
+        KeyValPersistenceHelper.set(region.rawValue, forKey: OptimobileUserDefaultsKey.REGION.rawValue)
+        let baseUrlMap = UrlBuilder.defaultMapping(for: region.rawValue)
         KeyValPersistenceHelper.set(baseUrlMap[.media], forKey: OptimobileUserDefaultsKey.MEDIA_BASE_URL.rawValue)
     }
 

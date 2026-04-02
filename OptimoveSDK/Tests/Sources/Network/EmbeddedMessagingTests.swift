@@ -137,9 +137,9 @@ final class EmbeddedMessagingTests: XCTestCase {
             readAt: nil,
             url: nil,
             engagementId: "eng123",
-            payload: ["key": AnyCodable("string")],
+            payload: "{\"key\":\"string\"}",
             campaignKind: 1,
-            executionDateTime: "2025-01-01T12:00:00Z",
+            executionDateTime: Date(timeIntervalSince1970: 1735732800),
             messageLayoutType: nil,
             expiryDate: nil,
             containerId: "test-container",
@@ -149,40 +149,78 @@ final class EmbeddedMessagingTests: XCTestCase {
             deletedAt: nil
         )
     }
-    // MARK: - Test Get Messages
-    func testGetMessagesAsync_callsSuccessCompletion() throws {
-        // Given
-        let expectation = self.expectation(description: "getMessagesAsync calls completion with success")
+    // MARK: - Test decoding real server response with ISO 8601 dates
+    func testGetMessagesAsync_decodesISO8601DatesFromServerResponse() throws {
+        let expectation = self.expectation(description: "decodes ISO 8601 dates")
 
-        let message = makeTestMessage(id: "test-id", title: "Test Title", content: "Test message")
+        let json = """
+        {"containers":{"stuart":[{
+            "id":"3842b5cd-9751-4cf1-9f9b-9636b38182c6",
+            "containerId":"stuart",
+            "customerId":"adam_b@optimove.com",
+            "isVisitor":false,
+            "templateId":1744118753960,
+            "title":"Testing stuart container",
+            "content":"here is a test template",
+            "media":"B04wM4Y7/yGxgri37bzmGBknvP4wgQdDy123Z9HfEUqYw9gmN.png",
+            "readAt":"2026-03-08T12:13:51.305+00:00",
+            "url":"https://google.com",
+            "engagementId":"1000",
+            "payload":{"key1":"value1","key2":"value2"},
+            "campaignKind":1,
+            "executionDateTime":"2026-03-08T11:58:54.739155Z",
+            "messageLayoutType":0,
+            "expiryDate":"2026-04-07T23:59:00Z",
+            "createdAt":"2025-04-08T13:32:16.000+00:00",
+            "updatedAt":"2026-03-08T12:13:50.573+00:00",
+            "deletedAt":null
+        }]}}
+        """.data(using: .utf8)
 
-        let apiResponse = EmbeddedMessagingAPIResponse(containers: ["test-container": [message]])
-        let jsonData = try JSONEncoder().encode(apiResponse)
-
-        // 👇 Using test-only extension to bypass inaccessible initializer
-        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: jsonData)
+        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: json)
         mockNetworkClient.mockResponse = .success(mockNetworkResponse)
 
-        // When
+        let fmt = DateFormatter()
+        fmt.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        fmt.timeZone = TimeZone(identifier: "UTC")
+
         service.getMessagesAsync { result in
-            // Then
             switch result {
             case .successMessages(let containers):
-                XCTAssertEqual(containers["test-container"]?.messages.first?.id, "test-id")
+                guard let msg = containers["stuart"]?.messages.first else {
+                    XCTFail("Expected message in 'stuart' container")
+                    return
+                }
+
+                // identity
+                XCTAssertEqual(msg.id, "3842b5cd-9751-4cf1-9f9b-9636b38182c6")
+                XCTAssertEqual(msg.containerId, "stuart")
+                XCTAssertEqual(msg.templateId, 1744118753960)
+                XCTAssertEqual(msg.title, "Testing stuart container")
+                XCTAssertEqual(msg.content, "here is a test template")
+                XCTAssertEqual(msg.engagementId, "1000")
+                XCTAssertEqual(msg.url, "https://google.com")
+
+                // dates — all formats including microseconds and 2-digit fractional
+                XCTAssertEqual(fmt.string(from: msg.executionDateTime), "2026-03-08T11:58:54") // 6-digit fractional
+                XCTAssertEqual(fmt.string(from: msg.createdAt), "2025-04-08T13:32:16")
+                XCTAssertEqual(fmt.string(from: msg.updatedAt), "2026-03-08T12:13:50")        // 3-digit fractional
+                XCTAssertEqual(fmt.string(from: msg.readAt!), "2026-03-08T12:13:51")
+                XCTAssertEqual(fmt.string(from: msg.expiryDate!), "2026-04-07T23:59:00") // no fractional
+
+                // payload serialized to string
+                XCTAssertTrue(msg.payload.contains("key1"))
+                XCTAssertTrue(msg.payload.contains("value1"))
+
                 expectation.fulfill()
-            case .error(let error):
-                XCTFail("Expected success but got error: \(error)")
-            case .success:
-                XCTFail("Expected successMessages but got Success")
-            case .errorUserNotSet:
-                XCTFail("Expected success but got errorUserNotSet")
-            case .errorCredentialsNotSet:
-                XCTFail("Expected success but got errorCredentialsNotSet")
+            default:
+                XCTFail("Expected successMessages but got \(result)")
             }
         }
 
         wait(for: [expectation], timeout: 2)
     }
+
     // MARK: - Test Delete Message Async
     func testDeleteMessage_callsSuccessCompletion() throws {
         // Given

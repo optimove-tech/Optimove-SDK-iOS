@@ -1,10 +1,23 @@
 # Changelog
 
-## 6.4.0
+## 6.6.0
 
 - Add federated JWT authentication support. Use `enableAuth()` on the config builder to supply a token provider. The SDK attaches `X-User-JWT` to all user-identified requests (OptiTrack, RealTime, PreferenceCenter, EmbeddedMessaging, AnalyticsHelper, InAppManager).
 - Add `X-Optimove-Auth-Capable: 1` header to all requests to signal auth-capable SDK versions to backends.
 - Fix multi-customer event batching: OptiTrack/RealTime now group events by customer identity so each request carries a single valid JWT. AnalyticsHelper fetches events per user to ensure JWT matches the batch.
+
+## 6.5.0
+
+- Add `postpone()` to the In-App Message Interceptor API. When called, the message is not displayed and not marked as dismissed — it is moved to the back of the queue and will be re-intercepted on the next natural presentation trigger (e.g. app foreground, push tickle). Existing `show()` and `suppress()` behavior is unchanged.
+- Fix dismissed non-inbox in-app messages reappearing after app reopen due to race between local DB cleanup and backend sync. Dismissed rows are now kept for 1 hour before eviction.
+
+## 6.4.1
+
+- Correct parsing of Embedded Messaging V2 endpoint response
+
+## 6.4.0
+
+- Update delayed configuration to no longer require a redundant region parameter. Region is now inferred from credentials. Deprecated `OptimoveConfigBuilder.init(region:features:)` — use `init(features:)` instead.
 
 ## 6.3.0
 
