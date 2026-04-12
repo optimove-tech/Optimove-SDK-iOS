@@ -18,6 +18,10 @@ public class OptimoveOverlayMessaging {
 
     // MARK: - Public API
 
+    public static func setInterceptor(_ interceptor: OverlayMessagingInterceptor?) {
+        shared?.manager.setInterceptor(interceptor)
+    }
+
     public static func resetSession() {
         shared?.sessionManager?.resetSession()
     }
@@ -50,4 +54,21 @@ public class OptimoveOverlayMessaging {
             }
         )
     }
+}
+
+// MARK: - Interceptor protocols
+
+public protocol OverlayMessagingInterceptorCallback: AnyObject {
+    func show()
+    func discard()
+    func deferMessage()
+}
+
+public protocol OverlayMessagingInterceptor: AnyObject {
+    func onMessageLoaded(_ message: OverlayMessagingMessage, callback: OverlayMessagingInterceptorCallback)
+    func getTimeoutMs() -> Int
+}
+
+public extension OverlayMessagingInterceptor {
+    func getTimeoutMs() -> Int { 5000 }
 }
