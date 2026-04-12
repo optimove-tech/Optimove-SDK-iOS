@@ -225,6 +225,10 @@ final class Optimobile {
             deepLinkHelper = DeepLinkHelper(config, httpClient: networkFactory.build(for: .ddl))
         }
 
+        if config.isOverlayMessagingEnabled {
+            OptimoveOverlayMessaging.initialize(config: config)
+        }
+
         Logger.debug("Optimobile SDK was initialized with \(config)")
     }
 
