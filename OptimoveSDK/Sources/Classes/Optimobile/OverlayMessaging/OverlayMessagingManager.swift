@@ -11,7 +11,11 @@ class OverlayMessagingManager {
     private var immediateSlotCount = 0
 
     private var displayQueue: [OverlayMessagingMessage] = []
-    private let requestService = OverlayMessagingRequestService()
+    private let requestService: OverlayMessagingRequestService
+
+    init(httpClient: KSHttpClient) {
+        requestService = OverlayMessagingRequestService(httpClient: httpClient)
+    }
 
     // MARK: - Triggers
 
@@ -42,8 +46,7 @@ class OverlayMessagingManager {
     // MARK: - Loading
 
     private func loadMessage(_ type: OverlayMessagingMessage.MessageType) {
-        DispatchQueue.global(qos: .default).async {
-            let message = self.requestService.readOverlayMessage(type: type)
+        requestService.readOverlayMessage(type: type) { message in
             DispatchQueue.main.async {
                 self.onMessageLoaded(type: type, message: message)
             }

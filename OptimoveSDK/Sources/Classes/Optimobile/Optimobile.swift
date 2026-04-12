@@ -226,7 +226,7 @@ final class Optimobile {
         }
 
         if config.isOverlayMessagingEnabled {
-            OptimoveOverlayMessaging.initialize(config: config)
+            OptimoveOverlayMessaging.initialize(config: config, httpClient: networkFactory.build(for: .overlayMessaging))
         }
 
         Logger.debug("Optimobile SDK was initialized with \(config)")

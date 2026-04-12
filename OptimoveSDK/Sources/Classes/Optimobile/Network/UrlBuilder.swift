@@ -23,6 +23,7 @@ public class UrlBuilder {
         case events
         case iar
         case media
+        case overlayMessaging
         case push
     }
 
@@ -69,8 +70,12 @@ public class UrlBuilder {
             .crm: "https://crm-\(region).kumulos.com",
             .ddl: "https://links-\(region).kumulos.com",
             .events: "https://events-\(region).kumulos.com",
-            .iar: "https://iar.app.delivery",
+            // .iar: "https://iar.app.delivery",
+            // TODO: revert to prod URL
+            .iar: "https://optimobile-iar-dev.optimove.net",
             .media: "https://i-\(region).app.delivery",
+            // TODO: proper url
+            .overlayMessaging: "http://optimobile-overlay-srv-dev.optimove.net",
             .push: "https://push-\(region).kumulos.com",
         ]
     }
