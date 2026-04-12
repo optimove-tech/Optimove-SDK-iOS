@@ -22,6 +22,10 @@ public class OptimoveOverlayMessaging {
 
     // MARK: - Internal
 
+    static func onPushTriggerReceived() {
+        // Will forward to OverlayMessagingManager.onTriggerReceived(.immediate)
+    }
+
     static func initialize(config: OptimobileConfig) {
         shared = OptimoveOverlayMessaging(sessionLengthHours: config.overlayMessagingSessionLengthHours)
 

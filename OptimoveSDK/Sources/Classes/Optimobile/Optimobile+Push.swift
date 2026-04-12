@@ -7,6 +7,7 @@ import UserNotifications
 
 public class PushNotification: NSObject {
     static let DeepLinkTypeInApp: Int = 1
+    static let DeepLinkTypeOverlayMessaging: Int = 2
 
     public internal(set) var id: Int
     public internal(set) var aps: [AnyHashable: Any]
@@ -63,6 +64,11 @@ public class PushNotification: NSObject {
                 actionIdentifier = notificationResponse.actionIdentifier
             }
         }
+    }
+
+    var isOverlayMessagingTrigger: Bool {
+        guard let deepLink = data["k.deepLink"] as? [AnyHashable: Any] else { return false }
+        return deepLink["type"] as? Int == PushNotification.DeepLinkTypeOverlayMessaging
     }
 
     public func inAppDeepLink() -> [AnyHashable: Any]? {
@@ -527,10 +533,17 @@ class PushHelper {
         return { (obj: Any, application: UIApplication, userInfo: [AnyHashable: Any], completionHandler: @escaping (UIBackgroundFetchResult) -> Void) in
             let notification = PushNotification(userInfo: userInfo)
             let hasInApp = notification.inAppDeepLink() != nil
-            
+
             self.setBadge(userInfo: userInfo)
             self.trackPushDelivery(notification: notification)
-                        
+
+            if notification.isOverlayMessagingTrigger,
+               Optimobile.sharedInstance.config.isOverlayMessagingEnabled {
+                DispatchQueue.main.async {
+                    OptimoveOverlayMessaging.onPushTriggerReceived()
+                }
+            }
+
             if existingDidReceive == nil, !hasInApp {
                 // Nothing to do
                 completionHandler(.noData)
