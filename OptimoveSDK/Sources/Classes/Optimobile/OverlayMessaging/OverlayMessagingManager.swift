@@ -12,10 +12,13 @@ class OverlayMessagingManager {
 
     private var displayQueue: [OverlayMessagingMessage] = []
     private let requestService: OverlayMessagingRequestService
+    private let urlBuilder: UrlBuilder
     private var interceptor: OverlayMessagingInterceptor?
+    private var presenter: OverlayMessagingPresenter?
 
-    init(httpClient: KSHttpClient) {
+    init(httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
         requestService = OverlayMessagingRequestService(httpClient: httpClient)
+        self.urlBuilder = urlBuilder
     }
 
     // MARK: - Interceptor
@@ -111,8 +114,61 @@ class OverlayMessagingManager {
         )
     }
 
+    // MARK: - Display
+
     private func maybeShowNext() {
-        // TODO: display view
+        guard let next = displayQueue.first else {
+            presenter?.dispose()
+            presenter = nil
+            return
+        }
+
+        if let presenter = presenter {
+            presenter.showMessage(next)
+            return
+        }
+
+        presenter = OverlayMessagingPresenter(message: next, urlBuilder: urlBuilder, delegate: self)
+    }
+
+    // MARK: - Event tracking
+
+    private func trackRendererEvents(messageId: Int64, events: [OverlayMessagingRendererEvent]) {
+        for event in events {
+            var props: [String: Any] = event.data.flatMap { $0 as? [String: Any] } ?? [:]
+            props["id"] = messageId
+            Optimobile.trackEvent(
+                eventType: event.type,
+                atTime: Date(),
+                properties: props,
+                immediateFlush: event.immediateFlush
+            )
+        }
+    }
+
+}
+
+// MARK: - OverlayMessagingPresenterDelegate
+
+extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
+
+    func onMessageClosed(_ message: OverlayMessagingMessage) {
+        displayQueue.removeFirst()
+        onSlotCleared(message.type)
+        maybeShowNext()
+    }
+
+    func onEvents(_ message: OverlayMessagingMessage, events: [OverlayMessagingRendererEvent]) {
+        trackRendererEvents(messageId: message.id, events: events)
+    }
+
+    func onViewError(_ message: OverlayMessagingMessage) {
+        presenter?.dispose()
+        presenter = nil
+        // Immediate messages are short-lived. In case of an error we dont want them to stay on queue and surface later
+        displayQueue.removeFirst()
+        onSlotCleared(message.type)
+        maybeShowNext()
     }
 }
 
