@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.6.0
+
+- Implementation for Overlay Messaging channel. Check optimove developer docs for more.
+
 ## 6.5.0
 
 - Add `postpone()` to the In-App Message Interceptor API. When called, the message is not displayed and not marked as dismissed — it is moved to the back of the queue and will be re-intercepted on the next natural presentation trigger (e.g. app foreground, push tickle). Existing `show()` and `suppress()` behavior is unchanged.
@@ -44,9 +48,9 @@
 ## 6.2.0
 
 - Add support for coexisting with other push notification SDKs by resolving race conditions when multiple SDKs swizzle the following UIApplicationDelegate methods:
-    - `UIApplicationDelegate.application(:didRegisterForRemoteNotificationsWithDeviceToken:)`
-    - `UIApplicationDelegate.application(:didFailToRegisterForRemoteNotificationsWithError:)`
-    - `UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`
+  - `UIApplicationDelegate.application(:didRegisterForRemoteNotificationsWithDeviceToken:)`
+  - `UIApplicationDelegate.application(:didFailToRegisterForRemoteNotificationsWithError:)`
+  - `UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`
 - Fix swizzling forwarding for apps that use UIApplicationDelegateAdaptor
 
 ## 6.1.0
@@ -66,10 +70,11 @@
 ## 6.0.0
 
 - Add Preference Center feature. The new functionality is available through the following methods:
-    - `OptimovePreferenceCenter.getInstance().setCustomerPreferencesAsync()`
-    - `OptimovePreferenceCenter.getInstance().getPreferencesAsync()`
-    
+  - `OptimovePreferenceCenter.getInstance().setCustomerPreferencesAsync()`
+  - `OptimovePreferenceCenter.getInstance().getPreferencesAsync()`
+
 Breaking changes:
+
 - iOS 13 required for using Preference Center
 - removed `OptimoveConfigBuilder.setCredentials` unintentionally public method
 
@@ -92,8 +97,8 @@ Breaking changes:
 ## 5.6.0
 
 - Support the delayed configuration for SDK. Add new public APIs:
-    - `OptimoveConfigBuilder(region: Region, features: [Feature])` - call for creating delayed configuration builder.
-    - `Optimove.setCredentials(optimoveCredentials: String?, optimobileCredentials: String?)` - call for setting credentials for delayed configuration.
+  - `OptimoveConfigBuilder(region: Region, features: [Feature])` - call for creating delayed configuration builder.
+  - `Optimove.setCredentials(optimoveCredentials: String?, optimobileCredentials: String?)` - call for setting credentials for delayed configuration.
 
 ## 5.5.0
 
