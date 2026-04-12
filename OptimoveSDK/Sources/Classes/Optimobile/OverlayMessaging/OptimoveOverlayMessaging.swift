@@ -6,6 +6,7 @@ public class OptimoveOverlayMessaging {
 
     private static var shared: OptimoveOverlayMessaging?
 
+    private let manager = OverlayMessagingManager()
     private var sessionManager: OverlayMessagingSessionManager?
     private let sessionLengthHours: Int
     private var initializationToken: NSObjectProtocol?
@@ -23,7 +24,7 @@ public class OptimoveOverlayMessaging {
     // MARK: - Internal
 
     static func onPushTriggerReceived() {
-        // Will forward to OverlayMessagingManager.onTriggerReceived(.immediate)
+        shared?.manager.onTriggerReceived(.immediate)
     }
 
     static func initialize(config: OptimobileConfig) {
@@ -38,16 +39,14 @@ public class OptimoveOverlayMessaging {
             }
     }
 
+    // MARK: - Private
+
     private func startSessionManager() {
         sessionManager = OverlayMessagingSessionManager(
             sessionLengthHours: sessionLengthHours,
             listener: { [weak self] in
-                self?.onSessionStarted()
+                self?.manager.onTriggerReceived(.session)
             }
         )
-    }
-
-    private func onSessionStarted() {
-        // Will forward to OverlayMessagingManager.onTriggerReceived(.session)
     }
 }
