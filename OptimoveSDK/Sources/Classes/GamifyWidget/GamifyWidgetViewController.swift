@@ -4,7 +4,8 @@ import UIKit
 import WebKit
 
 private enum BridgeMessage {
-    static let handlerName = "nativeBridge"
+    static let receiveMessage = "receiveMessage"
+    static let closeWidget = "closeWidget"
 }
 
 final class GamifyWidgetViewController: UIViewController {
@@ -46,7 +47,8 @@ final class GamifyWidgetViewController: UIViewController {
 
     private func setupWebView() {
         let contentController = WKUserContentController()
-        contentController.add(self, name: BridgeMessage.handlerName)
+        contentController.add(self, name: BridgeMessage.receiveMessage)
+        contentController.add(self, name: BridgeMessage.closeWidget)
 
         let config = WKWebViewConfiguration()
         config.userContentController = contentController
@@ -131,14 +133,15 @@ final class GamifyWidgetViewController: UIViewController {
 
 extension GamifyWidgetViewController: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard message.name == BridgeMessage.handlerName,
+        if message.name == BridgeMessage.closeWidget {
+            DispatchQueue.main.async { self.dismissSelf() }
+            return
+        }
+        guard message.name == BridgeMessage.receiveMessage,
               let body = message.body as? [String: Any],
               let type = body["type"] as? String else { return }
-
         if type == "READY" {
             DispatchQueue.main.async { self.sendInit() }
-        } else if type == "CLOSE" {
-            DispatchQueue.main.async { self.dismissSelf() }
         }
     }
 }
