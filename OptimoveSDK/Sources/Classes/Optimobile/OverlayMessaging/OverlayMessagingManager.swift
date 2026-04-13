@@ -179,9 +179,9 @@ private enum InterceptorOutcome {
 
     var eventValue: String {
         switch self {
-        case .show: return "shown"
-        case .discard: return "discarded"
-        case .deferred: return "deferred"
+        case .show: return "show"
+        case .discard: return "discard"
+        case .deferred: return "defer"
         case .timeout: return "timeout"
         }
     }
