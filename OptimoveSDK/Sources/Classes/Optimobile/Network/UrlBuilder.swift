@@ -70,12 +70,9 @@ public class UrlBuilder {
             .crm: "https://crm-\(region).kumulos.com",
             .ddl: "https://links-\(region).kumulos.com",
             .events: "https://events-\(region).kumulos.com",
-            // .iar: "https://iar.app.delivery",
-            // TODO: revert to prod URL
-            .iar: "https://optimobile-iar-dev.optimove.net",
+            .iar: "https://iar.app.delivery",
             .media: "https://i-\(region).app.delivery",
-            // TODO: proper url
-            .overlayMessaging: "http://optimobile-overlay-srv-dev.optimove.net",
+            .overlayMessaging: "https://optimobile-overlay-srv-\(region).optimove.net",
             .push: "https://push-\(region).kumulos.com",
         ]
     }
