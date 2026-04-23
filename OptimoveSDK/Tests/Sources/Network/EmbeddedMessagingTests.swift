@@ -456,9 +456,9 @@ final class EmbeddedMessagingAuthTests: XCTestCase {
             readAt: nil,
             url: nil,
             engagementId: "eng123",
-            payload: ["key": AnyCodable("string")],
+            payload: "{\"key\":\"string\"}",
             campaignKind: 1,
-            executionDateTime: "2025-01-01T12:00:00Z",
+            executionDateTime: Date(timeIntervalSince1970: 1735732800),
             messageLayoutType: nil,
             expiryDate: nil,
             containerId: "test-container",
@@ -469,11 +469,39 @@ final class EmbeddedMessagingAuthTests: XCTestCase {
         )
     }
 
+    // EmbeddedMessagingAPIResponse is intentionally decode-only (it remaps
+    // raw wire shape → public model). For tests we craft the wire JSON directly.
+    private func makeMockGetMessagesResponseData() -> Data {
+        let json = """
+        {"containers":{"test-container":[{
+            "id":"test-id",
+            "containerId":"test-container",
+            "customerId":"adam_b@optimove.com",
+            "isVisitor":false,
+            "templateId":1,
+            "title":"Test Title",
+            "content":"Test content",
+            "media":null,
+            "readAt":null,
+            "url":null,
+            "engagementId":"eng123",
+            "payload":{"key":"string"},
+            "campaignKind":1,
+            "executionDateTime":"2025-01-01T12:00:00Z",
+            "messageLayoutType":null,
+            "expiryDate":null,
+            "createdAt":"2025-07-16T12:00:00Z",
+            "updatedAt":"2025-07-16T12:00:00Z",
+            "deletedAt":null
+        }]}}
+        """
+        return json.data(using: .utf8)!
+    }
+
     func test_getMessagesAsync_noAuthManager_sendsRequestWithoutJWT() throws {
         let service = EmbeddedMessagesService(storage: mockStorage, networkClient: mockNetworkClient, authManager: nil)
 
-        let apiResponse = EmbeddedMessagingAPIResponse(containers: ["test-container": [makeTestMessage()]])
-        let jsonData = try JSONEncoder().encode(apiResponse)
+        let jsonData = makeMockGetMessagesResponseData()
         let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: jsonData)
         mockNetworkClient.mockResponse = .success(mockNetworkResponse)
 
@@ -501,8 +529,7 @@ final class EmbeddedMessagingAuthTests: XCTestCase {
         }
         let service = EmbeddedMessagesService(storage: mockStorage, networkClient: mockNetworkClient, authManager: authManager)
 
-        let apiResponse = EmbeddedMessagingAPIResponse(containers: ["test-container": [makeTestMessage()]])
-        let jsonData = try JSONEncoder().encode(apiResponse)
+        let jsonData = makeMockGetMessagesResponseData()
         let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: jsonData)
         mockNetworkClient.mockResponse = .success(mockNetworkResponse)
 
