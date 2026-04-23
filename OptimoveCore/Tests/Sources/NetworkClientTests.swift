@@ -77,7 +77,7 @@ class NetworkClientTests: XCTestCase {
 
     func test_perform_addsXOptimoveAuthCapableHeader() {
         // given
-        let headerExpectation = expectation(description: "X-Optimove-Auth-Capable header should be present")
+        let headerExpectation = expectation(description: "X-Optimove-Auth-Capable and X-Optimove-Platform headers should be present")
 
         var mock = Mock(
             url: StubVariables.url,
@@ -88,6 +88,8 @@ class NetworkClientTests: XCTestCase {
         mock.onRequestHandler = OnRequestHandler(requestCallback: { urlRequest in
             let authCapable = urlRequest.value(forHTTPHeaderField: "X-Optimove-Auth-Capable")
             XCTAssertEqual(authCapable, "1", "Every request should include X-Optimove-Auth-Capable: 1")
+            let platform = urlRequest.value(forHTTPHeaderField: "X-Optimove-Platform")
+            XCTAssertEqual(platform, "ios", "Every request should include X-Optimove-Platform: ios")
             headerExpectation.fulfill()
         })
         Mocker.register(mock)

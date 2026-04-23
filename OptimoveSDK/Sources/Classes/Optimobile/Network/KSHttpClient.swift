@@ -93,32 +93,34 @@ final class KSHttpClientImpl: KSHttpClient {
 
             // Signal that this SDK version supports auth.
             request.addValue("1", forHTTPHeaderField: "X-Optimove-Auth-Capable")
+            request.addValue("ios", forHTTPHeaderField: "X-Optimove-Platform")
 
-            guard let authManager = authManager, let userId = authUserId else {
-                if authManager == nil, authUserId != nil {
-                    sendRequest(request: request, onSuccess: onSuccess) { response, error, decodedBody in
-                        if response?.statusCode == 401 {
-                            onFailure(response, NetworkError.authNotConfigured, decodedBody)
-                        } else {
-                            onFailure(response, error, decodedBody)
-                        }
+            switch (authManager, authUserId) {
+            case let (authManager?, userId?):
+                // Auth configured + user-identified request → resolve JWT, then send.
+                authManager.getToken(userId: userId) { [self] result in
+                    switch result {
+                    case .success(let jwt):
+                        request.addValue(jwt, forHTTPHeaderField: "X-User-JWT")
+                        self.sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
+                    case .failure(let error):
+                        // Fail-closed: drop the request
+                        Logger.error("Auth token failed for Optimobile request: \(error.localizedDescription). Dropping request.")
+                        onFailure(nil, error, nil)
                     }
-                } else {
-                    sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
                 }
-                return
-            }
 
-            authManager.getToken(userId: userId) { [self] result in
-                switch result {
-                case .success(let jwt):
-                    request.addValue(jwt, forHTTPHeaderField: "X-User-JWT")
-                    self.sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
-                case .failure(let error):
-                    // Fail-closed: drop the request
-                    Logger.error("Auth token failed for Optimobile request: \(error.localizedDescription). Dropping request.")
-                    onFailure(nil, error, nil)
+            case (nil, _?):
+                sendRequest(request: request, onSuccess: onSuccess) { response, error, decodedBody in
+                    if response?.statusCode == 401 {
+                        onFailure(response, NetworkError.authNotConfigured, decodedBody)
+                    } else {
+                        onFailure(response, error, decodedBody)
+                    }
                 }
+
+            default:
+                sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
             }
         } catch {
             onFailure(nil, error, nil)
