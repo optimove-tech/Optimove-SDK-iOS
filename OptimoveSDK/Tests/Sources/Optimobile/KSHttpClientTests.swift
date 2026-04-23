@@ -15,22 +15,20 @@ private class StubAuthorization: HttpAuthorizationProtocol {
 // MARK: - Stub URL Builder with runtime URLs
 
 private class StubUrlBuilder: UrlBuilder {
-    init() {
-        super.init(
-            storage: KeyValPersistenceHelper.self,
-            runtimeUrlsMap: [
-                .events: "https://test-events.example.com",
-                .crm: "https://test-crm.example.com",
-                .ddl: "https://test-ddl.example.com",
-                .iar: "https://test-iar.example.com",
-                .media: "https://test-media.example.com",
-                .push: "https://test-push.example.com",
-            ]
-        )
+    convenience init() {
+        self.init(storage: KeyValPersistenceHelper.self)
+        self.runtimeUrlsMap = [
+            .events: "https://test-events.example.com",
+            .crm: "https://test-crm.example.com",
+            .ddl: "https://test-ddl.example.com",
+            .iar: "https://test-iar.example.com",
+            .media: "https://test-media.example.com",
+            .push: "https://test-push.example.com",
+        ]
     }
 
-    required init(storage: KeyValPersistenceHelper.Type, runtimeUrlsMap: ServiceUrlMap? = nil) {
-        super.init(storage: storage, runtimeUrlsMap: runtimeUrlsMap)
+    required init(storage: KeyValPersistenceHelper.Type) {
+        super.init(storage: storage)
     }
 }
 
