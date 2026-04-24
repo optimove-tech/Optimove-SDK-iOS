@@ -15,6 +15,9 @@ class OverlayMessagingManager {
     private let urlBuilder: UrlBuilder
     private var interceptor: OverlayMessagingInterceptor?
     private var presenter: OverlayMessagingPresenter?
+    // Prevents showing the same message twice if triggers fire in quick succession
+    // (after slot cleared but before backend state updates)
+    private var seenMessageIds = Set<Int64>()
 
     init(httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
         requestService = OverlayMessagingRequestService(httpClient: httpClient)
@@ -30,13 +33,18 @@ class OverlayMessagingManager {
     // MARK: - Triggers
 
     func onTriggerReceived(_ type: OverlayMessagingMessage.MessageType) {
+
         switch type {
         case .session:
-            guard sessionSlotCount < Self.sessionSlotCapacity else { return }
+            guard sessionSlotCount < Self.sessionSlotCapacity else {
+                return
+            }
             sessionSlotCount += 1
             loadMessage(type)
         case .immediate:
-            guard immediateSlotCount < Self.immediateSlotCapacity else { return }
+            guard immediateSlotCount < Self.immediateSlotCapacity else {
+                return
+            }
             immediateSlotCount += 1
             loadMessage(type)
         }
@@ -68,6 +76,11 @@ class OverlayMessagingManager {
             onSlotCleared(type)
             return
         }
+        guard !seenMessageIds.contains(message.id) else {
+            onSlotCleared(type)
+            return
+        }
+        seenMessageIds.insert(message.id)
         processMessage(message)
     }
 
@@ -101,7 +114,10 @@ class OverlayMessagingManager {
         case .show:
             displayQueue.append(message)
             maybeShowNext()
-        case .discard, .deferred, .timeout:
+        case .deferred, .timeout:
+            seenMessageIds.remove(message.id)
+            onSlotCleared(message.type)
+        case .discard:
             onSlotCleared(message.type)
         }
         trackInterceptedEvent(messageId: message.id, outcome: outcome)
