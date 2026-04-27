@@ -29,7 +29,11 @@ final class GamifyWidgetViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        if #available(iOS 13.0, *) {
+            view.backgroundColor = .systemBackground
+        } else {
+            view.backgroundColor = .white
+        }
         setupNavigationBar()
         setupWebView()
         setupLoadingIndicator()
@@ -38,11 +42,13 @@ final class GamifyWidgetViewController: UIViewController {
     }
 
     private func setupNavigationBar() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            barButtonSystemItem: .close,
-            target: self,
-            action: #selector(dismissSelf)
-        )
+        let closeItem: UIBarButtonItem
+        if #available(iOS 13.0, *) {
+            closeItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(dismissSelf))
+        } else {
+            closeItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissSelf))
+        }
+        navigationItem.rightBarButtonItem = closeItem
     }
 
     private func setupWebView() {
@@ -67,7 +73,11 @@ final class GamifyWidgetViewController: UIViewController {
     }
 
     private func setupLoadingIndicator() {
-        activityIndicator = UIActivityIndicatorView(style: .medium)
+        if #available(iOS 13.0, *) {
+            activityIndicator = UIActivityIndicatorView(style: .medium)
+        } else {
+            activityIndicator = UIActivityIndicatorView(style: .gray)
+        }
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         activityIndicator.hidesWhenStopped = true
         view.addSubview(activityIndicator)
