@@ -34,21 +34,10 @@ final class GamifyWidgetViewController: UIViewController {
         } else {
             view.backgroundColor = .white
         }
-        setupNavigationBar()
         setupWebView()
         setupLoadingIndicator()
         setupErrorLabel()
         loadWidget()
-    }
-
-    private func setupNavigationBar() {
-        let closeItem: UIBarButtonItem
-        if #available(iOS 13.0, *) {
-            closeItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(dismissSelf))
-        } else {
-            closeItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissSelf))
-        }
-        navigationItem.rightBarButtonItem = closeItem
     }
 
     private func setupWebView() {

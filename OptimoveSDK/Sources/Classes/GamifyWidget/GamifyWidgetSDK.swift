@@ -34,15 +34,14 @@ public final class GamifyWidgetSDK {
             userId: userId,
             token: token
         )
-        let nav = UINavigationController(rootViewController: vc)
         if #available(iOS 15.0, *) {
-            if let sheet = nav.sheetPresentationController {
+            if let sheet = vc.sheetPresentationController {
                 sheet.detents = [.large()]
                 sheet.prefersGrabberVisible = true
             }
         } else {
-            nav.modalPresentationStyle = .pageSheet
+            vc.modalPresentationStyle = .pageSheet
         }
-        viewController.present(nav, animated: true)
+        viewController.present(vc, animated: true)
     }
 }
