@@ -84,4 +84,58 @@ final class AuthManagerTests: XCTestCase {
         }
         waitForExpectations(timeout: 1)
     }
+
+    // MARK: - 1.5 getToken returns timeout when provider does not complete
+
+    func test_getToken_returnsTimeoutWhenProviderDoesNotComplete() {
+        let completionExpectation = expectation(description: "Completion should receive .failure(tokenFetchTimedOut)")
+        let authManager = AuthManager(tokenFetchTimeout: 0.05) { _, _ in
+            // Simulates a tenant token provider that never calls completion.
+        }
+
+        authManager.getToken(userId: "user-123") { result in
+            switch result {
+            case .success:
+                XCTFail("Expected failure but got success")
+            case .failure(let error):
+                guard let authError = error as? AuthError else {
+                    XCTFail("Expected AuthError but got \(type(of: error))")
+                    completionExpectation.fulfill()
+                    return
+                }
+                XCTAssertEqual(authError, AuthError.tokenFetchTimedOut)
+            }
+            completionExpectation.fulfill()
+        }
+        waitForExpectations(timeout: 1)
+    }
+
+    // MARK: - 1.6 getToken ignores provider completion after timeout
+
+    func test_getToken_ignoresProviderCompletionAfterTimeout() {
+        let timeoutExpectation = expectation(description: "Completion should receive timeout once")
+        let lateCompletionExpectation = expectation(description: "Late provider completion should be ignored")
+        lateCompletionExpectation.isInverted = true
+
+        let authManager = AuthManager(tokenFetchTimeout: 0.05) { _, completion in
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {
+                completion("late-token", nil)
+            }
+        }
+
+        authManager.getToken(userId: "user-123") { result in
+            switch result {
+            case .success:
+                lateCompletionExpectation.fulfill()
+            case .failure(let error):
+                guard let authError = error as? AuthError else {
+                    XCTFail("Expected AuthError but got \(type(of: error))")
+                    return
+                }
+                XCTAssertEqual(authError, AuthError.tokenFetchTimedOut)
+                timeoutExpectation.fulfill()
+            }
+        }
+        wait(for: [timeoutExpectation, lateCompletionExpectation], timeout: 0.3)
+    }
 }
