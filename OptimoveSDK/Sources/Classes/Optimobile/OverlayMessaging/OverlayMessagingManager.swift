@@ -98,8 +98,8 @@ class OverlayMessagingManager {
         }
         
         let timeoutMs = max(0, interceptor.getTimeoutMs())
-        let timeoutItem = DispatchWorkItem { [weak callback] in
-            callback?.timeout()
+        let timeoutItem = DispatchWorkItem {
+            callback.timeout()
         }
         
         callback.setCancelTimeout { timeoutItem.cancel() }
