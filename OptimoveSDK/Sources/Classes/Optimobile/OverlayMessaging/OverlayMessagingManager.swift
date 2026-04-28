@@ -169,20 +169,20 @@ class OverlayMessagingManager {
 extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
     
     func onMessageClosed(_ message: OverlayMessagingMessage) {
-        displayQueue.removeFirst()
+        if !displayQueue.isEmpty { displayQueue.removeFirst() }
         onSlotCleared(message.type)
         maybeShowNext()
     }
-    
+
     func onEvents(_ message: OverlayMessagingMessage, events: [OverlayMessagingRendererEvent]) {
         trackRendererEvents(messageId: message.id, events: events)
     }
-    
+
     func onViewError(_ message: OverlayMessagingMessage) {
         presenter?.dispose()
         presenter = nil
         // Immediate messages are short-lived. In case of an error we dont want them to stay on queue and surface later
-        displayQueue.removeFirst()
+        if !displayQueue.isEmpty { displayQueue.removeFirst() }
         onSlotCleared(message.type)
         maybeShowNext()
     }
