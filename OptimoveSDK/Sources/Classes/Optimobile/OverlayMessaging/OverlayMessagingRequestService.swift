@@ -3,22 +3,22 @@
 import Foundation
 
 class OverlayMessagingRequestService {
-
+    
     private let httpClient: KSHttpClient
-
+    
     init(httpClient: KSHttpClient) {
         self.httpClient = httpClient
     }
-
+    
     func readOverlayMessage(type: OverlayMessagingMessage.MessageType, onComplete: @escaping (OverlayMessagingMessage?) -> Void) {
         guard let encodedIdentifier = KSHttpUtil.urlEncode(OptimobileHelper.currentUserIdentifier) else {
             onComplete(nil)
             return
         }
-
+        
         let messageType = type == .session ? "session" : "immediate"
         let path = "/api/v1/users/\(encodedIdentifier)/messages/mobile?messageType=\(messageType)"
-
+        
         httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { response, decodedBody in
             if response?.statusCode == 204 {
                 onComplete(nil)
@@ -29,7 +29,7 @@ class OverlayMessagingRequestService {
             onComplete(nil)
         })
     }
-
+    
     private static func buildMessage(from body: Any?, type: OverlayMessagingMessage.MessageType) -> OverlayMessagingMessage? {
         guard let json = body as? [AnyHashable: Any],
               let id = (json["id"] as? NSNumber)?.int64Value,

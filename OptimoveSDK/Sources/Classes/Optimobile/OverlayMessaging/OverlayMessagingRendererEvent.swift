@@ -6,7 +6,7 @@ struct OverlayMessagingRendererEvent {
     let type: String
     let immediateFlush: Bool
     let data: NSDictionary?
-
+    
     static func parseAll(from raw: [Any]?) -> [OverlayMessagingRendererEvent] {
         guard let raw = raw else { return [] }
         return raw.compactMap { item -> OverlayMessagingRendererEvent? in

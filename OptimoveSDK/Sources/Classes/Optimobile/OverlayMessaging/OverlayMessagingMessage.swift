@@ -7,7 +7,7 @@ public struct OverlayMessagingMessage {
         case session
         case immediate
     }
-
+    
     public let id: Int64
     public let content: NSDictionary
     public let data: NSDictionary?
