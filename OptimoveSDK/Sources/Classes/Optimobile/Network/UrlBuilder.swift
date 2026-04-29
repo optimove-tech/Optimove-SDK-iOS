@@ -23,6 +23,7 @@ public class UrlBuilder {
         case events
         case iar
         case media
+        case overlayMessaging
         case push
     }
 
@@ -71,6 +72,7 @@ public class UrlBuilder {
             .events: "https://events-\(region).kumulos.com",
             .iar: "https://iar.app.delivery",
             .media: "https://i-\(region).app.delivery",
+            .overlayMessaging: "https://optimobile-overlay-srv-\(region).optimove.net",
             .push: "https://push-\(region).kumulos.com",
         ]
     }
