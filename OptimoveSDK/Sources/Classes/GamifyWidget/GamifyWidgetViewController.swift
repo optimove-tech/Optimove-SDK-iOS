@@ -1,4 +1,4 @@
-// Copyright © 2024 Optimove. All rights reserved.
+//  Copyright © 2026 Optimove. All rights reserved.
 
 import UIKit
 import WebKit
@@ -57,7 +57,7 @@ final class GamifyWidgetViewController: UIViewController {
             webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
     }
 
@@ -125,7 +125,7 @@ final class GamifyWidgetViewController: UIViewController {
         }
     }
 
-    @objc private func dismissSelf() {
+    private func dismissSelf() {
         dismiss(animated: true)
     }
 }

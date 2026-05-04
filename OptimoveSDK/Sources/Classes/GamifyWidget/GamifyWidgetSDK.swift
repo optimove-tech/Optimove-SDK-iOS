@@ -1,4 +1,4 @@
-// Copyright © 2024 Optimove. All rights reserved.
+//  Copyright © 2026 Optimove. All rights reserved.
 
 import UIKit
 
