@@ -15,6 +15,7 @@ public final class GamifyWidgetSDK {
 
     /// Configure the widget URL before opening.
     public static func initialize(widgetUrl: String) {
+        assertOnMainThread()
         self.widgetUrl = widgetUrl
     }
 
@@ -29,6 +30,7 @@ public final class GamifyWidgetSDK {
         userId: String? = nil,
         token: String? = nil
     ) {
+        assertOnMainThread()
         let vc = GamifyWidgetViewController(
             widgetUrl: widgetUrl,
             userId: userId,
@@ -43,5 +45,9 @@ public final class GamifyWidgetSDK {
             vc.modalPresentationStyle = .pageSheet
         }
         viewController.present(vc, animated: true)
+    }
+
+    private static func assertOnMainThread(_ message: String = "Must be on main thread") {
+        assert(Thread.isMainThread, message)
     }
 }
