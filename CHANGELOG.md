@@ -1,10 +1,14 @@
 # Changelog
 
-## 6.6.0
+## 6.7.0
 
 - Add federated JWT authentication support. Use `enableAuth()` on the config builder to supply a token provider. The SDK attaches `X-User-JWT` to all user-identified requests (OptiTrack, RealTime, PreferenceCenter, EmbeddedMessaging, AnalyticsHelper, InAppManager).
 - Add `X-Optimove-Auth-Capable: 1` header to all requests to signal auth-capable SDK versions to backends.
 - Fix multi-customer event batching: OptiTrack/RealTime now group events by customer identity so each request carries a single valid JWT. AnalyticsHelper fetches events per user to ensure JWT matches the batch.
+
+## 6.6.0
+
+- Implementation for Overlay Messaging channel. Check optimove developer docs for more.
 
 ## 6.5.0
 
@@ -50,9 +54,9 @@
 ## 6.2.0
 
 - Add support for coexisting with other push notification SDKs by resolving race conditions when multiple SDKs swizzle the following UIApplicationDelegate methods:
-    - `UIApplicationDelegate.application(:didRegisterForRemoteNotificationsWithDeviceToken:)`
-    - `UIApplicationDelegate.application(:didFailToRegisterForRemoteNotificationsWithError:)`
-    - `UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`
+  - `UIApplicationDelegate.application(:didRegisterForRemoteNotificationsWithDeviceToken:)`
+  - `UIApplicationDelegate.application(:didFailToRegisterForRemoteNotificationsWithError:)`
+  - `UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`
 - Fix swizzling forwarding for apps that use UIApplicationDelegateAdaptor
 
 ## 6.1.0
@@ -72,10 +76,11 @@
 ## 6.0.0
 
 - Add Preference Center feature. The new functionality is available through the following methods:
-    - `OptimovePreferenceCenter.getInstance().setCustomerPreferencesAsync()`
-    - `OptimovePreferenceCenter.getInstance().getPreferencesAsync()`
-    
+  - `OptimovePreferenceCenter.getInstance().setCustomerPreferencesAsync()`
+  - `OptimovePreferenceCenter.getInstance().getPreferencesAsync()`
+
 Breaking changes:
+
 - iOS 13 required for using Preference Center
 - removed `OptimoveConfigBuilder.setCredentials` unintentionally public method
 
@@ -98,8 +103,8 @@ Breaking changes:
 ## 5.6.0
 
 - Support the delayed configuration for SDK. Add new public APIs:
-    - `OptimoveConfigBuilder(region: Region, features: [Feature])` - call for creating delayed configuration builder.
-    - `Optimove.setCredentials(optimoveCredentials: String?, optimobileCredentials: String?)` - call for setting credentials for delayed configuration.
+  - `OptimoveConfigBuilder(region: Region, features: [Feature])` - call for creating delayed configuration builder.
+  - `Optimove.setCredentials(optimoveCredentials: String?, optimobileCredentials: String?)` - call for setting credentials for delayed configuration.
 
 ## 5.5.0
 

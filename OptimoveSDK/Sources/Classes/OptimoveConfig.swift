@@ -111,6 +111,9 @@ public struct OptimobileConfig {
     let runtimeInfo: [String: AnyObject]?
     let sdkInfo: [String: AnyObject]?
     let isRelease: Bool?
+
+    let isOverlayMessagingEnabled: Bool
+    let overlayMessagingSessionLengthHours: Int
 }
 
 public typealias Region = OptimobileConfig.Region
@@ -133,6 +136,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var _deepLinkCname: URL?
     private var _deepLinkHandler: DeepLinkHandler?
     private var _authTokenProvider: AuthTokenProvider?
+    private var _overlayMessagingSessionLengthHours: Int?
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
@@ -182,6 +186,7 @@ open class OptimoveConfigBuilder: NSObject {
             _runtimeInfo = optimobileConfig.runtimeInfo
             _sdkInfo = optimobileConfig.sdkInfo
             _isRelease = optimobileConfig.isRelease
+            _overlayMessagingSessionLengthHours = optimobileConfig.isOverlayMessagingEnabled ? optimobileConfig.overlayMessagingSessionLengthHours : nil
         }
         _authTokenProvider = config.authTokenProvider
         features = config.features
@@ -253,6 +258,12 @@ open class OptimoveConfigBuilder: NSObject {
 
     @discardableResult public func setSessionIdleTimeout(seconds: UInt) -> OptimoveConfigBuilder {
         _sessionIdleTimeout = seconds
+        return self
+    }
+
+    @discardableResult public func enableOverlayMessaging(sessionLengthHours: Int = 1) -> OptimoveConfigBuilder {
+        precondition(sessionLengthHours >= 1, "sessionLengthHours must be at least 1")
+        _overlayMessagingSessionLengthHours = sessionLengthHours
         return self
     }
 
@@ -389,7 +400,9 @@ open class OptimoveConfigBuilder: NSObject {
                     deepLinkHandler: _deepLinkHandler,
                     runtimeInfo: _runtimeInfo,
                     sdkInfo: _sdkInfo,
-                    isRelease: _isRelease
+                    isRelease: _isRelease,
+                    isOverlayMessagingEnabled: _overlayMessagingSessionLengthHours != nil,
+                    overlayMessagingSessionLengthHours: _overlayMessagingSessionLengthHours ?? 1
                 )
             }
             Logger.info("\(OptimobileConfig.self) building skipped.")
