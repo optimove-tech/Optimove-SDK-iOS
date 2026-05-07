@@ -7,6 +7,7 @@ enum OptimobileEvent: String, Codable {
     case ENGAGE_LOCATION_UPDATED = "k.engage.locationUpdated"
     case IN_APP_CONSENT_CHANGED = "k.inApp.statusUpdated"
     case MESSAGE_DELETED_FROM_INBOX = "k.message.inbox.deleted"
+    case OM_INTERCEPTED = "optimove.om.intercepted"
     case MESSAGE_DELIVERED = "k.message.delivered"
     case MESSAGE_DISMISSED = "k.message.dismissed"
     case MESSAGE_OPENED = "k.message.opened"

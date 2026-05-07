@@ -31,6 +31,7 @@ final class OptimoveConfigBuilderTests: XCTestCase {
             UrlBuilder.Service.events: "https://www.optimove.com",
             UrlBuilder.Service.iar: "https://www.optimove.com",
             UrlBuilder.Service.media: "https://www.optimove.com",
+            UrlBuilder.Service.overlayMessaging: "https://www.optimove.com",
             UrlBuilder.Service.push: "https://www.optimove.com",
         ]
         optimoveConfigBuilder.setBaseUrlMapping(baseUrlMap: urlsMap)

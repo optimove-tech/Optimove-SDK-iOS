@@ -17,8 +17,18 @@ class AnalyticsHelperTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
+        clearAnalyticsStore()
         mockHttpClient = MockKSHttpClient()
         analyticsHelper = AnalyticsHelper(httpClient: mockHttpClient)
+    }
+
+    private func clearAnalyticsStore() {
+        guard let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last else { return }
+        let dbUrl = docsUrl.appendingPathComponent("KAnalyticsDb.sqlite")
+        for suffix in ["", "-shm", "-wal"] {
+            let url = dbUrl.deletingLastPathComponent().appendingPathComponent(dbUrl.lastPathComponent + suffix)
+            try? FileManager.default.removeItem(at: url)
+        }
     }
     
     override func tearDown()
@@ -57,7 +67,10 @@ class AnalyticsHelperTests: XCTestCase {
             }
             
             self.analyticsHelper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
-                if let data = self.mockHttpClient.capturedData as? [[String: Any?]], data.count == numberOfEvents {
+                // +1 for immediate_event_first tracked before the delay
+                let count = self.mockHttpClient.totalEventCount
+            
+                if self.mockHttpClient.totalEventCount == numberOfEvents + 1 {
                     numberOfEventsExpectation.fulfill()
                 }
             }
@@ -122,10 +135,18 @@ class AnalyticsHelperTests: XCTestCase {
 }
 
 class MockKSHttpClient: KSHttpClient {
-    var capturedData: Any?
-    
+    private var allBatches: [[String: Any?]] = []
+
+    // Last batch sent (used by tests that check a single-batch payload)
+    var capturedData: Any? { allBatches.isEmpty ? nil : allBatches }
+
+    // Total events accumulated across all requests
+    var totalEventCount: Int { allBatches.count }
+
     func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
-        capturedData = data
+        if let batch = data as? [[String: Any?]] {
+            allBatches.append(contentsOf: batch)
+        }
         onSuccess(nil, nil)
     }
     
