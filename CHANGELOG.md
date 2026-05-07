@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.7.0
+
+- Add federated JWT authentication support. Use `enableAuth()` on the config builder to supply a token provider. The SDK attaches `X-User-JWT` to all user-identified requests (OptiTrack, RealTime, PreferenceCenter, EmbeddedMessaging, AnalyticsHelper, InAppManager).
+- Add `X-Optimove-Auth-Capable: 1` header to all requests to signal auth-capable SDK versions to backends.
+- Fix multi-customer event batching: OptiTrack/RealTime now group events by customer identity so each request carries a single valid JWT. AnalyticsHelper fetches events per user to ensure JWT matches the batch.
+
 ## 6.6.0
 
 - Implementation for Overlay Messaging channel. Check optimove developer docs for more.
