@@ -19,4 +19,17 @@ final class GamifyWidgetSDKTests: XCTestCase {
         GamifyWidgetSDK.initialize(widgetUrl: "https://second.example.com")
         XCTAssertEqual(GamifyWidgetSDK.widgetUrl, "https://second.example.com")
     }
+
+    func testInitializeFromBackgroundThreadDispatchesToMain() {
+        let url = "https://background.example.com"
+        let expectation = expectation(description: "widgetUrl set from background call")
+        DispatchQueue.global().async {
+            GamifyWidgetSDK.initialize(widgetUrl: url)
+            DispatchQueue.main.async {
+                XCTAssertEqual(GamifyWidgetSDK.widgetUrl, url)
+                expectation.fulfill()
+            }
+        }
+        wait(for: [expectation], timeout: 2.0)
+    }
 }

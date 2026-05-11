@@ -15,6 +15,10 @@ public final class GamifyWidgetSDK {
 
     /// Configure the widget URL before opening.
     public static func initialize(widgetUrl: String) {
+        ensureMain { initialize_onMain(widgetUrl: widgetUrl) }
+    }
+
+    private static func initialize_onMain(widgetUrl: String) {
         assertOnMainThread()
         self.widgetUrl = widgetUrl
     }
@@ -26,6 +30,14 @@ public final class GamifyWidgetSDK {
     ///   - userId: Optional user ID injected via INIT handshake.
     ///   - token: Optional auth token injected via INIT handshake.
     public static func open(
+        from viewController: UIViewController,
+        userId: String? = nil,
+        token: String? = nil
+    ) {
+        ensureMain { open_onMain(from: viewController, userId: userId, token: token) }
+    }
+
+    private static func open_onMain(
         from viewController: UIViewController,
         userId: String? = nil,
         token: String? = nil
@@ -45,6 +57,14 @@ public final class GamifyWidgetSDK {
             vc.modalPresentationStyle = .pageSheet
         }
         viewController.present(vc, animated: true)
+    }
+
+    private static func ensureMain(_ work: @escaping () -> Void) {
+        if Thread.isMainThread {
+            work()
+        } else {
+            DispatchQueue.main.async(execute: work)
+        }
     }
 
     private static func assertOnMainThread(_ message: String = "Must be on main thread") {
