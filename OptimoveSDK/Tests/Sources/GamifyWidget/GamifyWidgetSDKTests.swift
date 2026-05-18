@@ -3,20 +3,34 @@ import XCTest
 
 final class GamifyWidgetSDKTests: XCTestCase {
 
+    private func runOnMainSync(_ block: @escaping () -> Void) {
+        if Thread.isMainThread {
+            block()
+        } else {
+            DispatchQueue.main.sync(execute: block)
+        }
+    }
+
     override func setUp() {
         super.setUp()
-        GamifyWidgetSDK.initialize(widgetUrl: "")
+        runOnMainSync {
+            GamifyWidgetSDK.initialize(widgetUrl: "")
+        }
     }
 
     func testInitializeSetsWidgetUrl() {
         let url = "https://gamify-widget.example.com"
-        GamifyWidgetSDK.initialize(widgetUrl: url)
+        runOnMainSync {
+            GamifyWidgetSDK.initialize(widgetUrl: url)
+        }
         XCTAssertEqual(GamifyWidgetSDK.widgetUrl, url)
     }
 
     func testInitializeOverwritesPreviousUrl() {
-        GamifyWidgetSDK.initialize(widgetUrl: "https://first.example.com")
-        GamifyWidgetSDK.initialize(widgetUrl: "https://second.example.com")
+        runOnMainSync {
+            GamifyWidgetSDK.initialize(widgetUrl: "https://first.example.com")
+            GamifyWidgetSDK.initialize(widgetUrl: "https://second.example.com")
+        }
         XCTAssertEqual(GamifyWidgetSDK.widgetUrl, "https://second.example.com")
     }
 
