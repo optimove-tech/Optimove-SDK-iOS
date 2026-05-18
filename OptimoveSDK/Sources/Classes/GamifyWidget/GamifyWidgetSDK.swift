@@ -43,6 +43,10 @@ public final class GamifyWidgetSDK {
         token: String? = nil
     ) {
         assertOnMainThread()
+        guard !widgetUrl.isEmpty, URL(string: widgetUrl) != nil else {
+            Logger.error("GamifyWidgetSDK.open called with an invalid widgetUrl.")
+            return
+        }
         let vc = GamifyWidgetViewController(
             widgetUrl: widgetUrl,
             userId: userId,

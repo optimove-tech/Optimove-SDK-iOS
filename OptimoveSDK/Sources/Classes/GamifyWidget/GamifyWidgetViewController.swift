@@ -16,7 +16,6 @@ final class GamifyWidgetViewController: UIViewController {
 
     private var webView: WKWebView!
     private var activityIndicator: UIActivityIndicatorView!
-    private var errorLabel: UILabel!
 
     init(widgetUrl: String, userId: String?, token: String?) {
         self.widgetUrl = widgetUrl
@@ -36,7 +35,6 @@ final class GamifyWidgetViewController: UIViewController {
         }
         setupWebView()
         setupLoadingIndicator()
-        setupErrorLabel()
         loadWidget()
     }
 
@@ -77,25 +75,9 @@ final class GamifyWidgetViewController: UIViewController {
         activityIndicator.startAnimating()
     }
 
-    private func setupErrorLabel() {
-        errorLabel = UILabel()
-        errorLabel.text = "Unable to load widget.\nCheck your connection and try again."
-        errorLabel.numberOfLines = 0
-        errorLabel.textAlignment = .center
-        errorLabel.isHidden = true
-        errorLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(errorLabel)
-        NSLayoutConstraint.activate([
-            errorLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            errorLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            errorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            errorLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-        ])
-    }
-
     private func loadWidget() {
         guard let url = URL(string: widgetUrl) else {
-            showError()
+            dismissSelf()
             return
         }
         webView.load(URLRequest(url: url))
@@ -115,14 +97,6 @@ final class GamifyWidgetViewController: UIViewController {
         var redacted = payload
         if redacted["token"] != nil { redacted["token"] = "[REDACTED]" }
         return "\(redacted)"
-    }
-
-    private func showError() {
-        DispatchQueue.main.async {
-            self.activityIndicator.stopAnimating()
-            self.webView.isHidden = true
-            self.errorLabel.isHidden = false
-        }
     }
 
     private func dismissSelf() {
@@ -150,11 +124,11 @@ extension GamifyWidgetViewController: WKNavigationDelegate {
         activityIndicator.stopAnimating()
     }
 
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        showError()
+    func webView(_: WKWebView, didFail _: WKNavigation!, withError _: Error) {
+        dismissSelf()
     }
 
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        showError()
+    func webView(_: WKWebView, didFailProvisionalNavigation _: WKNavigation!, withError _: Error) {
+        dismissSelf()
     }
 }
