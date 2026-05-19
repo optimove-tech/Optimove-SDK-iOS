@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.7.0
+
+- Add Gamify Widget SDK — `GamifyWidgetSDK.initialize(widgetUrl:)` and `GamifyWidgetSDK.open(from:userId:token:)` present the widget in a modal `WKWebView` with a JS bridge for `READY` / `INIT` / `CLOSE` handshakes.
+
 ## 6.6.0
 
 - Implementation for Overlay Messaging channel. Check optimove developer docs for more.
