@@ -12,6 +12,7 @@ protocol OverlayMessagingPresenterDelegate: AnyObject {
 final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
     
     private static let sdkActionOpenDeepLink = "OPEN_DEEP_LINK"
+    private static let sdkActionRunHandler = "RUN_ACTION_HANDLER"
     
     private var webView: WKWebView?
     private var loadingSpinner: UIActivityIndicatorView?
@@ -23,12 +24,14 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     
     private var currentMessage: OverlayMessagingMessage
     private weak var delegate: OverlayMessagingPresenterDelegate?
+    private weak var actionHandler: OverlayMessagingActionHandler?
     private let urlBuilder: UrlBuilder
-    
-    init(message: OverlayMessagingMessage, urlBuilder: UrlBuilder, delegate: OverlayMessagingPresenterDelegate) {
+
+    init(message: OverlayMessagingMessage, urlBuilder: UrlBuilder, delegate: OverlayMessagingPresenterDelegate, actionHandler: OverlayMessagingActionHandler?) {
         self.currentMessage = message
         self.urlBuilder = urlBuilder
         self.delegate = delegate
+        self.actionHandler = actionHandler
         super.init()
         initViews()
     }
@@ -248,20 +251,23 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
             else { continue }
             
             switch type {
-            case Self.sdkActionOpenDeepLink:
-                if let actionData = action["data"] as? NSDictionary,
-                   let urlString = actionData["url"] as? String,
-                   let url = URL(string: urlString)
-                {
-                    if #available(iOS 10.0, *) {
-                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    } else {
-                        UIApplication.shared.openURL(url)
+                case Self.sdkActionOpenDeepLink:
+                    if let actionData = action["data"] as? NSDictionary,
+                       let urlString = actionData["url"] as? String,
+                       let url = URL(string: urlString)
+                    {
+                        if #available(iOS 10.0, *) {
+                            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                        } else {
+                            UIApplication.shared.openURL(url)
+                        }
                     }
+                case Self.sdkActionRunHandler:
+                    let data = (action["data"] as? NSDictionary)?["data"] as? String
+                    actionHandler?.handle(OverlayAction(type: .buttonClick, data: data))
+                default:
+                    break
                 }
-            default:
-                break
             }
-        }
     }
 }

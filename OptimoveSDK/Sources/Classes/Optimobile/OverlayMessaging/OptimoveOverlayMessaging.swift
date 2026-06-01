@@ -21,7 +21,11 @@ public class OptimoveOverlayMessaging {
     public static func setInterceptor(_ interceptor: OverlayMessagingInterceptor?) {
         shared?.manager.setInterceptor(interceptor)
     }
-    
+
+    public static func setActionHandler(_ handler: OverlayMessagingActionHandler?) {
+        shared?.manager.setActionHandler(handler)
+    }
+
     public static func resetSession() {
         shared?.sessionManager?.resetSession()
     }
@@ -54,6 +58,21 @@ public class OptimoveOverlayMessaging {
             }
         )
     }
+}
+
+// MARK: - Action handler
+
+public enum OverlayActionType {
+    case buttonClick
+}
+
+public struct OverlayAction {
+    public let type: OverlayActionType
+    public let data: String?
+}
+
+public protocol OverlayMessagingActionHandler: AnyObject {
+    func handle(_ action: OverlayAction)
 }
 
 // MARK: - Interceptor protocols

@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.8.0
+
+- Add handler to process overlay actions with customer-set data.
+
 ## 6.7.0
 
 - Add Gamify Widget SDK — `GamifyWidgetSDK.initialize(widgetUrl:)` and `GamifyWidgetSDK.open(from:userId:token:)` present the widget in a modal `WKWebView` with a JS bridge for `READY` / `INIT` / `CLOSE` handshakes.
