@@ -127,19 +127,23 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     }
     
     private func destroyViews() {
+        contentController?.removeScriptMessageHandler(forName: "inAppHost")
+        contentController = nil
+
         if let window = window {
             window.isHidden = true
-            
+
             loadingSpinner?.removeFromSuperview()
             loadingSpinner = nil
-            
+
+            webView?.navigationDelegate = nil
             webView?.removeFromSuperview()
             webView = nil
-            
+
             frame?.removeFromSuperview()
             frame = nil
         }
-        
+
         window = nil
         webViewReady = false
     }
