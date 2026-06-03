@@ -2,7 +2,7 @@
 
 ## 6.8.0
 
-- Add handler to process overlay actions with customer-set data.
+- Add `OptimoveOverlayMessaging.setActionHandler` for overlay click handling. Handler receives the message and action payload (`deepLinkButtonClick` with `{ url }`). When no handler is set, URLs open via the system default (universal/app links).
 
 ## 6.7.0
 

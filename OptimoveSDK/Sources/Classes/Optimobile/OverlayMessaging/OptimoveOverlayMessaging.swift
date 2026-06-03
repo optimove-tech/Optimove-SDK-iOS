@@ -63,16 +63,23 @@ public class OptimoveOverlayMessaging {
 // MARK: - Action handler
 
 public enum OverlayActionType {
-    case buttonClick
+    case deepLinkButtonClick
 }
 
 public struct OverlayAction {
+    public let message: OverlayMessagingMessage
     public let type: OverlayActionType
-    public let data: String?
+    public let data: NSDictionary?
+
+    public init(message: OverlayMessagingMessage, type: OverlayActionType, data: NSDictionary?) {
+        self.message = message
+        self.type = type
+        self.data = data
+    }
 }
 
 public protocol OverlayMessagingActionHandler: AnyObject {
-    func handle(_ action: OverlayAction)
+    func handle(_ message: OverlayMessagingMessage, _ action: OverlayAction)
 }
 
 // MARK: - Interceptor protocols
