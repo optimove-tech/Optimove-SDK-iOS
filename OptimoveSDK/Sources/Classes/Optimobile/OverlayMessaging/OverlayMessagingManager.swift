@@ -38,10 +38,6 @@ class OverlayMessagingManager {
             actionHandlers.removeValue(forKey: type)
         }
     }
-
-    func actionHandler(for type: OverlayActionType) -> OverlayActionHandler? {
-        actionHandlers[type]
-    }
     
     // MARK: - Triggers
     
@@ -161,7 +157,7 @@ class OverlayMessagingManager {
             message: next,
             urlBuilder: urlBuilder,
             delegate: self,
-            actionHandlerForType: { [weak self] type in self?.actionHandler(for: type) }
+            actionHandlerForType: { [weak self] type in self?.actionHandlers[type] }
         )
     }
     
