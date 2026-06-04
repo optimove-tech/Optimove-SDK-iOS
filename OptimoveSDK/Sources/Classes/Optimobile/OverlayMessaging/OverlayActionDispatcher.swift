@@ -2,32 +2,36 @@
 
 import Foundation
 
+/// Internal representation of an overlay action routed from IAR to a handler method.
+enum OverlayAction {
+    case linkAction(LinkActionData)
+}
+
+/// Dispatches actions to `handlers ?? defaults` so unoverridden actions fall back to the SDK default.
 final class OverlayActionDispatcher {
 
-    private var handlers: [OverlayActionType: OverlayActionHandler] = [:]
+    private let defaults: OverlayActionHandlers
+    private var handlers: OverlayActionHandlers
     private let logError: (String) -> Void
 
-    init(logError: @escaping (String) -> Void = { Logger.error($0) }) {
+    init(defaults: OverlayActionHandlers, logError: @escaping (String) -> Void = { Logger.error($0) }) {
+        self.defaults = defaults
+        self.handlers = defaults
         self.logError = logError
     }
 
-    func setHandler(_ type: OverlayActionType, _ handler: OverlayActionHandler?) {
-        if let handler = handler {
-            handlers[type] = handler
-        } else {
-            handlers.removeValue(forKey: type)
-        }
+    func setOverrides(_ handlers: OverlayActionHandlers?) {
+        self.handlers = handlers ?? defaults
     }
 
-    /// Returns true if a handler was registered and invoked (SDK must not run its default).
-    @discardableResult
-    func dispatch(_ type: OverlayActionType, message: OverlayMessagingMessage, data: [String: Any]) -> Bool {
-        guard let handler = handlers[type] else { return false }
+    func dispatch(_ action: OverlayAction, message: OverlayMessagingMessage) {
         do {
-            try handler(message, data)
+            switch action {
+            case .linkAction(let data):
+                try handlers.linkAction(message: message, data: data)
+            }
         } catch {
-            logError("Overlay action handler for \(type) threw: \(error.localizedDescription)")
+            logError("Overlay action handler threw: \(error.localizedDescription)")
         }
-        return true
     }
 }

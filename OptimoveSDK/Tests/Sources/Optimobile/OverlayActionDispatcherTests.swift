@@ -7,96 +7,107 @@ final class OverlayActionDispatcherTests: XCTestCase {
         OverlayMessagingMessage(id: 1, content: [:], data: nil, type: .immediate)
     }
 
-    // MARK: - No handler
-
-    func testDispatchReturnsFalseWhenNoHandlerRegistered() {
-        let dispatcher = OverlayActionDispatcher()
-        let consumed = dispatcher.dispatch(.linkAction, message: makeMessage(), data: ["url": "https://example.com"])
-        XCTAssertFalse(consumed)
+    private func makeLinkAction(url: String = "https://example.com") -> OverlayAction {
+        .linkAction(LinkActionData(url: url))
     }
 
-    // MARK: - Registered handler
+    // MARK: - SDK default
 
-    func testDispatchInvokesHandlerWithMessageAndDataAndReturnsTrue() {
+    func testUsesSDKDefaultWhenNoOverrideIsRegistered() {
+        var defaultCalled = false
+        let defaults = SpyHandlers(onLinkAction: { _, _ in defaultCalled = true })
+        let dispatcher = OverlayActionDispatcher(defaults: defaults)
+
+        dispatcher.dispatch(makeLinkAction(), message: makeMessage())
+
+        XCTAssertTrue(defaultCalled)
+    }
+
+    // MARK: - Client override
+
+    func testCallsOverrideInsteadOfDefaultForOverriddenAction() {
+        var defaultCalled = false
+        var overrideCalled = false
+        let defaults = SpyHandlers(onLinkAction: { _, _ in defaultCalled = true })
+        let override = SpyHandlers(onLinkAction: { _, _ in overrideCalled = true })
+        let dispatcher = OverlayActionDispatcher(defaults: defaults)
+
+        dispatcher.setOverrides(override)
+        dispatcher.dispatch(makeLinkAction(), message: makeMessage())
+
+        XCTAssertTrue(overrideCalled)
+        XCTAssertFalse(defaultCalled)
+    }
+
+    func testOverrideReceivesCorrectMessageAndData() {
         var receivedMessage: OverlayMessagingMessage?
-        var receivedData: [String: Any]?
-        let dispatcher = OverlayActionDispatcher()
-        let message = makeMessage()
-        let data: [String: Any] = ["url": "https://example.com"]
-
-        dispatcher.setHandler(.linkAction) { msg, d in
+        var receivedData: LinkActionData?
+        let dispatcher = OverlayActionDispatcher(defaults: SpyHandlers())
+        let override = SpyHandlers(onLinkAction: { msg, data in
             receivedMessage = msg
-            receivedData = d
-        }
+            receivedData = data
+        })
+        let message = makeMessage()
 
-        let consumed = dispatcher.dispatch(.linkAction, message: message, data: data)
+        dispatcher.setOverrides(override)
+        dispatcher.dispatch(makeLinkAction(url: "https://example.com/path"), message: message)
 
-        XCTAssertTrue(consumed)
         XCTAssertEqual(receivedMessage?.id, message.id)
-        XCTAssertEqual(receivedData?["url"] as? String, "https://example.com")
+        XCTAssertEqual(receivedData?.url, "https://example.com/path")
+    }
+
+    // MARK: - Clear overrides restores default
+
+    func testClearingOverridesRestoresSDKDefault() {
+        var defaultCalled = false
+        var overrideCalled = false
+        let defaults = SpyHandlers(onLinkAction: { _, _ in defaultCalled = true })
+        let override = SpyHandlers(onLinkAction: { _, _ in overrideCalled = true })
+        let dispatcher = OverlayActionDispatcher(defaults: defaults)
+
+        dispatcher.setOverrides(override)
+        dispatcher.setOverrides(nil)
+        dispatcher.dispatch(makeLinkAction(), message: makeMessage())
+
+        XCTAssertTrue(defaultCalled)
+        XCTAssertFalse(overrideCalled)
     }
 
     // MARK: - Fail-closed
 
-    func testThrowingHandlerStillReturnsTrueAndLogsError() {
+    func testThrowingHandlerIsLoggedAndDoesNotPropagate() {
         struct TestError: Error {}
         var loggedMessage: String?
-        let dispatcher = OverlayActionDispatcher(logError: { loggedMessage = $0 })
+        let throwing = SpyHandlers(onLinkAction: { _, _ in throw TestError() })
+        let dispatcher = OverlayActionDispatcher(defaults: throwing, logError: { loggedMessage = $0 })
 
-        dispatcher.setHandler(.linkAction) { _, _ in throw TestError() }
-
-        let consumed = dispatcher.dispatch(.linkAction, message: makeMessage(), data: ["url": "x"])
-
-        XCTAssertTrue(consumed)
+        XCTAssertNoThrow(dispatcher.dispatch(makeLinkAction(), message: makeMessage()))
         XCTAssertNotNil(loggedMessage)
     }
 
-    // MARK: - Unregistered type falls through
+    func testThrowingOverrideIsLoggedAndDoesNotPropagate() {
+        struct TestError: Error {}
+        var loggedMessage: String?
+        let throwing = SpyHandlers(onLinkAction: { _, _ in throw TestError() })
+        let dispatcher = OverlayActionDispatcher(defaults: SpyHandlers(), logError: { loggedMessage = $0 })
 
-    func testDispatchReturnsFalseForTypeWithNoHandler() {
-        let dispatcher = OverlayActionDispatcher()
-        let consumed = dispatcher.dispatch(.linkAction, message: makeMessage(), data: ["url": "x"])
-        XCTAssertFalse(consumed)
+        dispatcher.setOverrides(throwing)
+
+        XCTAssertNoThrow(dispatcher.dispatch(makeLinkAction(), message: makeMessage()))
+        XCTAssertNotNil(loggedMessage)
+    }
+}
+
+// MARK: - Test helpers
+
+private final class SpyHandlers: OverlayActionHandlers {
+    private let onLinkAction: (OverlayMessagingMessage, LinkActionData) throws -> Void
+
+    init(onLinkAction: @escaping (OverlayMessagingMessage, LinkActionData) throws -> Void = { _, _ in }) {
+        self.onLinkAction = onLinkAction
     }
 
-    func testHandlerForRegisteredTypeDoesNotAffectUnregisteredDispatch() {
-        var handlerCalled = false
-        let dispatcherA = OverlayActionDispatcher()
-        dispatcherA.setHandler(.linkAction) { _, _ in handlerCalled = true }
-
-        let dispatcherB = OverlayActionDispatcher()
-        let consumed = dispatcherB.dispatch(.linkAction, message: makeMessage(), data: [:])
-
-        XCTAssertFalse(consumed)
-        XCTAssertFalse(handlerCalled)
-    }
-
-    // MARK: - Clear handler
-
-    func testClearedHandlerFallsBackToDefault() {
-        var handlerCalled = false
-        let dispatcher = OverlayActionDispatcher()
-        dispatcher.setHandler(.linkAction) { _, _ in handlerCalled = true }
-        dispatcher.setHandler(.linkAction, nil)
-
-        let consumed = dispatcher.dispatch(.linkAction, message: makeMessage(), data: ["url": "x"])
-
-        XCTAssertFalse(consumed)
-        XCTAssertFalse(handlerCalled)
-    }
-
-    // MARK: - Re-register replaces
-
-    func testReRegisteringReplacesHandler() {
-        var firstCalled = false
-        var secondCalled = false
-        let dispatcher = OverlayActionDispatcher()
-        dispatcher.setHandler(.linkAction) { _, _ in firstCalled = true }
-        dispatcher.setHandler(.linkAction) { _, _ in secondCalled = true }
-
-        dispatcher.dispatch(.linkAction, message: makeMessage(), data: ["url": "x"])
-
-        XCTAssertFalse(firstCalled)
-        XCTAssertTrue(secondCalled)
+    func linkAction(message: OverlayMessagingMessage, data: LinkActionData) throws {
+        try onLinkAction(message, data)
     }
 }

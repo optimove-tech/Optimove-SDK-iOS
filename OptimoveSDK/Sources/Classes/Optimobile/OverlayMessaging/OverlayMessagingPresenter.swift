@@ -264,16 +264,7 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
                       let urlString = actionData["url"] as? String
                 else { continue }
 
-                let payload = actionData as? [String: Any] ?? ["url": urlString]
-                let consumed = actionDispatcher.dispatch(.linkAction, message: currentMessage, data: payload)
-                if !consumed {
-                    guard let url = URL(string: urlString) else { continue }
-                    if #available(iOS 10.0, *) {
-                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    } else {
-                        UIApplication.shared.openURL(url)
-                    }
-                }
+                actionDispatcher.dispatch(.linkAction(LinkActionData(url: urlString)), message: currentMessage)
             default:
                 break
             }

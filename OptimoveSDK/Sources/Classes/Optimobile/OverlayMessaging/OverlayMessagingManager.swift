@@ -14,7 +14,7 @@ class OverlayMessagingManager {
     private let requestService: OverlayMessagingRequestService
     private let urlBuilder: UrlBuilder
     private var interceptor: OverlayMessagingInterceptor?
-    private let actionDispatcher = OverlayActionDispatcher()
+    private let actionDispatcher = OverlayActionDispatcher(defaults: DefaultOverlayActionHandlers())
     private var presenter: OverlayMessagingPresenter?
     // Prevents showing the same message twice if triggers fire in quick succession
     // (after slot cleared but before backend state updates)
@@ -31,8 +31,8 @@ class OverlayMessagingManager {
         self.interceptor = interceptor
     }
 
-    func setActionHandler(_ handler: OverlayActionHandler?, for type: OverlayActionType) {
-        actionDispatcher.setHandler(type, handler)
+    func setActionHandlers(_ handlers: OverlayActionHandlers?) {
+        actionDispatcher.setOverrides(handlers)
     }
     
     // MARK: - Triggers

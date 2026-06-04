@@ -2,7 +2,7 @@
 
 ## 6.8.0
 
-- Add `Optimove.shared.overlayMessaging.setActionHandler(.linkAction) { message, data in … }` — register a per-type closure to handle overlay CTA clicks. The handler receives the message and raw action data (`["url": "…"]`); the SDK does not open the URL. Pass `nil` to restore the default system open.
+- Add `Optimove.shared.overlayMessaging.setActionHandlers(…)` — register an `OverlayActionHandlers` conformer to take over one or more overlay CTA actions. Override only the methods you need; unoverridden actions automatically keep the SDK's built-in behaviour (link buttons open via `UIApplication.shared.open`). Pass `nil` to clear overrides and restore all SDK defaults. `linkAction(message:data:)` receives a typed `LinkActionData(url:)` payload; if the handler throws, the error is logged and the SDK does not re-attempt the default.
 
 ## 6.7.0
 

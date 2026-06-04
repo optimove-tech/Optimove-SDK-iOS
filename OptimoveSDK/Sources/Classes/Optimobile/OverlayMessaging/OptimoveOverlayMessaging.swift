@@ -22,8 +22,8 @@ public class OptimoveOverlayMessaging {
         shared?.manager.setInterceptor(interceptor)
     }
 
-    public static func setActionHandler(_ type: OverlayActionType, _ handler: OverlayActionHandler?) {
-        shared?.manager.setActionHandler(handler, for: type)
+    public static func setActionHandlers(_ handlers: OverlayActionHandlers?) {
+        shared?.manager.setActionHandlers(handlers)
     }
 
     public static func resetSession() {
@@ -62,11 +62,19 @@ public class OptimoveOverlayMessaging {
 
 // MARK: - Action handler
 
-public enum OverlayActionType: String {
-    case linkAction = "LINK_ACTION"
+/// Typed payload for a link CTA. New fields may be added in future SDK versions.
+public struct LinkActionData {
+    public let url: String
 }
 
-public typealias OverlayActionHandler = (_ message: OverlayMessagingMessage, _ data: [String: Any]) throws -> Void
+/// One method per overlay action type, each with its own typed payload. Conform to this protocol
+/// and pass an instance to `setActionHandlers` to take over one or more actions. Every method has
+/// a default implementation in a protocol extension — only override the actions you want to own.
+/// New action types will be added as new methods with defaults, so existing conformers are never
+/// broken by SDK updates.
+public protocol OverlayActionHandlers {
+    func linkAction(message: OverlayMessagingMessage, data: LinkActionData) throws
+}
 
 // MARK: - Interceptor protocols
 
@@ -86,7 +94,10 @@ public extension OverlayMessagingInterceptor {
 }
 
 public struct OptimoveOverlayMessagingAPI {
-    public func setActionHandler(_ type: OverlayActionType, _ handler: OverlayActionHandler?) {
-        OptimoveOverlayMessaging.setActionHandler(type, handler)
+    /// Register handlers for overlay actions. Pass a conforming type to take over one or more
+    /// actions; any action whose method you don't implement keeps the SDK's built-in default.
+    /// Pass `nil` to clear your overrides and restore all SDK defaults.
+    public func setActionHandlers(_ handlers: OverlayActionHandlers?) {
+        OptimoveOverlayMessaging.setActionHandlers(handlers)
     }
 }
