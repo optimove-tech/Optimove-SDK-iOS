@@ -84,3 +84,9 @@ public protocol OverlayMessagingInterceptor: AnyObject {
 public extension OverlayMessagingInterceptor {
     func getTimeoutMs() -> Int { 5000 }
 }
+
+public struct OptimoveOverlayMessagingAPI {
+    public func setActionHandler(_ type: OverlayActionType, _ handler: OverlayActionHandler?) {
+        OptimoveOverlayMessaging.setActionHandler(type, handler)
+    }
+}
