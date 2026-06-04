@@ -23,14 +23,19 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     
     private var currentMessage: OverlayMessagingMessage
     private weak var delegate: OverlayMessagingPresenterDelegate?
-    private weak var actionHandler: OverlayMessagingActionHandler?
+    private let actionDispatcher: OverlayActionDispatcher
     private let urlBuilder: UrlBuilder
 
-    init(message: OverlayMessagingMessage, urlBuilder: UrlBuilder, delegate: OverlayMessagingPresenterDelegate, actionHandler: OverlayMessagingActionHandler?) {
+    init(
+        message: OverlayMessagingMessage,
+        urlBuilder: UrlBuilder,
+        delegate: OverlayMessagingPresenterDelegate,
+        actionHandlerForType: @escaping (OverlayActionType) -> OverlayActionHandler?
+    ) {
         self.currentMessage = message
         self.urlBuilder = urlBuilder
         self.delegate = delegate
-        self.actionHandler = actionHandler
+        self.actionDispatcher = OverlayActionDispatcher(handlerForType: actionHandlerForType)
         super.init()
         initViews()
     }
@@ -255,34 +260,14 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
 
             switch type {
             case Self.sdkActionOpenDeepLink:
-                if let actionData = action["data"] as? NSDictionary,
-                   let urlString = actionData["url"] as? String
-                {
-                    handleDeepLinkButtonClick(urlString: urlString)
+                if let actionData = action["data"] as? NSDictionary {
+                    actionDispatcher.performButtonLink(
+                        message: currentMessage,
+                        data: actionData
+                    )
                 }
             default:
                 break
-            }
-        }
-    }
-
-    private func handleDeepLinkButtonClick(urlString: String) {
-        if let actionHandler = actionHandler {
-            let action = OverlayAction(
-                message: currentMessage,
-                type: .deepLinkButtonClick,
-                data: ["url": urlString]
-            )
-            DispatchQueue.main.async {
-                actionHandler.handle(self.currentMessage, action)
-            }
-        } else {
-            guard let url = URL(string: urlString) else { return }
-
-            if #available(iOS 10.0, *) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                UIApplication.shared.openURL(url)
             }
         }
     }

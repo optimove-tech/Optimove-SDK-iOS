@@ -127,6 +127,11 @@ typealias Logger = OptimoveCore.Logger
         )
     }
 
+    /// Overlay messaging APIs (action handlers, interceptors).
+    public var overlayMessaging: OptimoveOverlayMessagingClient {
+        OptimoveOverlayMessagingClient()
+    }
+
     public static func isFeatureRunning(_ feature: Feature) -> Bool {
         switch feature {
         case .optimobile:

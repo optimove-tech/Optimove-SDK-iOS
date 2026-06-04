@@ -22,8 +22,8 @@ public class OptimoveOverlayMessaging {
         shared?.manager.setInterceptor(interceptor)
     }
 
-    public static func setActionHandler(_ handler: OverlayMessagingActionHandler?) {
-        shared?.manager.setActionHandler(handler)
+    public static func setActionHandler(_ type: OverlayActionType, _ handler: OverlayActionHandler?) {
+        shared?.manager.setActionHandler(handler, for: type)
     }
 
     public static func resetSession() {
@@ -63,24 +63,10 @@ public class OptimoveOverlayMessaging {
 // MARK: - Action handler
 
 public enum OverlayActionType {
-    case deepLinkButtonClick
+    case buttonLink
 }
 
-public struct OverlayAction {
-    public let message: OverlayMessagingMessage
-    public let type: OverlayActionType
-    public let data: NSDictionary?
-
-    public init(message: OverlayMessagingMessage, type: OverlayActionType, data: NSDictionary?) {
-        self.message = message
-        self.type = type
-        self.data = data
-    }
-}
-
-public protocol OverlayMessagingActionHandler: AnyObject {
-    func handle(_ message: OverlayMessagingMessage, _ action: OverlayAction)
-}
+public typealias OverlayActionHandler = (_ message: OverlayMessagingMessage, _ data: [String: Any]) throws -> Void
 
 // MARK: - Interceptor protocols
 
