@@ -2,7 +2,7 @@
 
 ## 6.8.0
 
-- Add `OptimoveOverlayMessaging.setActionHandler` for overlay click handling. Handler receives the message and action payload (`deepLinkButtonClick` with `{ url }`). When no handler is set, URLs open via the system default (universal/app links).
+- Add `Optimove.shared.overlayMessaging.setActionHandler(.linkAction) { message, data in … }` — register a per-type closure to handle overlay CTA clicks. The handler receives the message and raw action data (`["url": "…"]`); the SDK does not open the URL. Pass `nil` to restore the default system open.
 
 ## 6.7.0
 

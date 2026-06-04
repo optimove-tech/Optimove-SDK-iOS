@@ -62,8 +62,8 @@ public class OptimoveOverlayMessaging {
 
 // MARK: - Action handler
 
-public enum OverlayActionType {
-    case buttonLink
+public enum OverlayActionType: String {
+    case linkAction = "LINK_ACTION"
 }
 
 public typealias OverlayActionHandler = (_ message: OverlayMessagingMessage, _ data: [String: Any]) throws -> Void

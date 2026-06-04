@@ -23,19 +23,19 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     
     private var currentMessage: OverlayMessagingMessage
     private weak var delegate: OverlayMessagingPresenterDelegate?
-    private let actionHandlerForType: (OverlayActionType) -> OverlayActionHandler?
+    private let actionDispatcher: OverlayActionDispatcher
     private let urlBuilder: UrlBuilder
 
     init(
         message: OverlayMessagingMessage,
         urlBuilder: UrlBuilder,
         delegate: OverlayMessagingPresenterDelegate,
-        actionHandlerForType: @escaping (OverlayActionType) -> OverlayActionHandler?
+        actionDispatcher: OverlayActionDispatcher
     ) {
         self.currentMessage = message
         self.urlBuilder = urlBuilder
         self.delegate = delegate
-        self.actionHandlerForType = actionHandlerForType
+        self.actionDispatcher = actionDispatcher
         super.init()
         initViews()
     }
@@ -264,14 +264,9 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
                       let urlString = actionData["url"] as? String
                 else { continue }
 
-                if let handler = actionHandlerForType(.buttonLink) {
-                    let payload = actionData as? [String: Any] ?? ["url": urlString]
-                    do {
-                        try handler(currentMessage, payload)
-                    } catch {
-                        Logger.error("Overlay action handler failed: \(error.localizedDescription)")
-                    }
-                } else {
+                let payload = actionData as? [String: Any] ?? ["url": urlString]
+                let consumed = actionDispatcher.dispatch(.linkAction, message: currentMessage, data: payload)
+                if !consumed {
                     guard let url = URL(string: urlString) else { continue }
                     if #available(iOS 10.0, *) {
                         UIApplication.shared.open(url, options: [:], completionHandler: nil)
