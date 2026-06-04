@@ -31,8 +31,8 @@ class OverlayMessagingManager {
         self.interceptor = interceptor
     }
 
-    func setActionHandlers(_ handlers: OverlayActionHandler?) {
-        actionDispatcher.setOverrides(handlers)
+    func setActionHandler(_ handler: OverlayActionHandler?) {
+        actionDispatcher.setOverrides(handler)
     }
     
     // MARK: - Triggers

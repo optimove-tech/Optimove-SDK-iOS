@@ -22,8 +22,8 @@ public class OptimoveOverlayMessaging {
         shared?.manager.setInterceptor(interceptor)
     }
 
-    public static func setActionHandlers(_ handlers: OverlayActionHandler?) {
-        shared?.manager.setActionHandlers(handlers)
+    public static func setActionHandler(_ handler: OverlayActionHandler?) {
+        shared?.manager.setActionHandler(handler)
     }
 
     public static func resetSession() {
@@ -68,7 +68,7 @@ public struct LinkActionPayload {
 }
 
 /// One method per overlay action type, each with its own typed payload. Conform to this protocol
-/// and pass an instance to `setActionHandlers` to take over one or more actions. Every method has
+/// and pass an instance to `setActionHandler` to take over one or more actions. Every method has
 /// a default implementation in a protocol extension — only override the actions you want to own.
 /// New action types will be added as new methods with defaults, so existing conformers are never
 /// broken by SDK updates.
