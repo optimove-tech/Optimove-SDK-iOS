@@ -152,8 +152,7 @@ class OverlayMessagingManager {
         presenter = OverlayMessagingPresenter(
             message: next,
             urlBuilder: urlBuilder,
-            delegate: self,
-            actionDispatcher: actionDispatcher
+            delegate: self
         )
     }
     
@@ -186,6 +185,10 @@ extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
 
     func onEvents(_ message: OverlayMessagingMessage, events: [OverlayMessagingRendererEvent]) {
         trackRendererEvents(messageId: message.id, events: events)
+    }
+
+    func onAction(_ message: OverlayMessagingMessage, action: OverlayAction) {
+        actionDispatcher.dispatch(action, message: message)
     }
 
     func onViewError(_ message: OverlayMessagingMessage) {

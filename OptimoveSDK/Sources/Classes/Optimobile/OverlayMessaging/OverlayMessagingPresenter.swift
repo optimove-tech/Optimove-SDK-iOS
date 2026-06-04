@@ -7,6 +7,7 @@ protocol OverlayMessagingPresenterDelegate: AnyObject {
     func onMessageClosed(_ message: OverlayMessagingMessage)
     func onEvents(_ message: OverlayMessagingMessage, events: [OverlayMessagingRendererEvent])
     func onViewError(_ message: OverlayMessagingMessage)
+    func onAction(_ message: OverlayMessagingMessage, action: OverlayAction)
 }
 
 final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
@@ -23,19 +24,16 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     
     private var currentMessage: OverlayMessagingMessage
     private weak var delegate: OverlayMessagingPresenterDelegate?
-    private let actionDispatcher: OverlayActionDispatcher
     private let urlBuilder: UrlBuilder
 
     init(
         message: OverlayMessagingMessage,
         urlBuilder: UrlBuilder,
-        delegate: OverlayMessagingPresenterDelegate,
-        actionDispatcher: OverlayActionDispatcher
+        delegate: OverlayMessagingPresenterDelegate
     ) {
         self.currentMessage = message
         self.urlBuilder = urlBuilder
         self.delegate = delegate
-        self.actionDispatcher = actionDispatcher
         super.init()
         initViews()
     }
@@ -264,7 +262,7 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
                       let urlString = actionData["url"] as? String
                 else { continue }
 
-                actionDispatcher.dispatch(.linkAction(LinkActionPayload(url: urlString)), message: currentMessage)
+                delegate?.onAction(currentMessage, action: .linkAction(LinkActionPayload(url: urlString)))
             default:
                 break
             }
