@@ -127,8 +127,6 @@ typealias Logger = OptimoveCore.Logger
         )
     }
 
-    public var overlayMessaging: OptimoveOverlayMessagingAPI { OptimoveOverlayMessagingAPI() }
-
     public static func isFeatureRunning(_ feature: Feature) -> Bool {
         switch feature {
         case .optimobile:

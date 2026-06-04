@@ -93,11 +93,3 @@ public extension OverlayMessagingInterceptor {
     func getTimeoutMs() -> Int { 5000 }
 }
 
-public struct OptimoveOverlayMessagingAPI {
-    /// Register handlers for overlay actions. Pass a conforming type to take over one or more
-    /// actions; any action whose method you don't implement keeps the SDK's built-in default.
-    /// Pass `nil` to clear your overrides and restore all SDK defaults.
-    public func setActionHandlers(_ handlers: OverlayActionHandlers?) {
-        OptimoveOverlayMessaging.setActionHandlers(handlers)
-    }
-}
