@@ -15,7 +15,7 @@ final class OverlayActionDispatcherTests: XCTestCase {
 
     func testUsesSDKDefaultWhenNoOverrideIsRegistered() {
         var defaultCalled = false
-        let defaults = SpyHandlers(onLinkAction: { _, _ in defaultCalled = true })
+        let defaults = SpyHandler(onLinkAction: { _, _ in defaultCalled = true })
         let dispatcher = OverlayActionDispatcher(defaults: defaults)
 
         dispatcher.dispatch(makeLinkAction(), message: makeMessage())
@@ -28,8 +28,8 @@ final class OverlayActionDispatcherTests: XCTestCase {
     func testCallsOverrideInsteadOfDefaultForOverriddenAction() {
         var defaultCalled = false
         var overrideCalled = false
-        let defaults = SpyHandlers(onLinkAction: { _, _ in defaultCalled = true })
-        let override = SpyHandlers(onLinkAction: { _, _ in overrideCalled = true })
+        let defaults = SpyHandler(onLinkAction: { _, _ in defaultCalled = true })
+        let override = SpyHandler(onLinkAction: { _, _ in overrideCalled = true })
         let dispatcher = OverlayActionDispatcher(defaults: defaults)
 
         dispatcher.setOverrides(override)
@@ -42,8 +42,8 @@ final class OverlayActionDispatcherTests: XCTestCase {
     func testOverrideReceivesCorrectMessageAndData() {
         var receivedMessage: OverlayMessagingMessage?
         var receivedData: LinkActionPayload?
-        let dispatcher = OverlayActionDispatcher(defaults: SpyHandlers())
-        let override = SpyHandlers(onLinkAction: { msg, payload in
+        let dispatcher = OverlayActionDispatcher(defaults: SpyHandler())
+        let override = SpyHandler(onLinkAction: { msg, payload in
             receivedMessage = msg
             receivedData = payload
         })
@@ -61,8 +61,8 @@ final class OverlayActionDispatcherTests: XCTestCase {
     func testClearingOverridesRestoresSDKDefault() {
         var defaultCalled = false
         var overrideCalled = false
-        let defaults = SpyHandlers(onLinkAction: { _, _ in defaultCalled = true })
-        let override = SpyHandlers(onLinkAction: { _, _ in overrideCalled = true })
+        let defaults = SpyHandler(onLinkAction: { _, _ in defaultCalled = true })
+        let override = SpyHandler(onLinkAction: { _, _ in overrideCalled = true })
         let dispatcher = OverlayActionDispatcher(defaults: defaults)
 
         dispatcher.setOverrides(override)
@@ -78,7 +78,7 @@ final class OverlayActionDispatcherTests: XCTestCase {
     func testThrowingHandlerIsLoggedAndDoesNotPropagate() {
         struct TestError: Error {}
         var loggedMessage: String?
-        let throwing = SpyHandlers(onLinkAction: { _, _ in throw TestError() })
+        let throwing = SpyHandler(onLinkAction: { _, _ in throw TestError() })
         let dispatcher = OverlayActionDispatcher(defaults: throwing, logError: { loggedMessage = $0 })
 
         XCTAssertNoThrow(dispatcher.dispatch(makeLinkAction(), message: makeMessage()))
@@ -88,8 +88,8 @@ final class OverlayActionDispatcherTests: XCTestCase {
     func testThrowingOverrideIsLoggedAndDoesNotPropagate() {
         struct TestError: Error {}
         var loggedMessage: String?
-        let throwing = SpyHandlers(onLinkAction: { _, _ in throw TestError() })
-        let dispatcher = OverlayActionDispatcher(defaults: SpyHandlers(), logError: { loggedMessage = $0 })
+        let throwing = SpyHandler(onLinkAction: { _, _ in throw TestError() })
+        let dispatcher = OverlayActionDispatcher(defaults: SpyHandler(), logError: { loggedMessage = $0 })
 
         dispatcher.setOverrides(throwing)
 
@@ -100,7 +100,7 @@ final class OverlayActionDispatcherTests: XCTestCase {
 
 // MARK: - Test helpers
 
-private final class SpyHandlers: OverlayActionHandler {
+private final class SpyHandler: OverlayActionHandler {
     private let onLinkAction: (OverlayMessagingMessage, LinkActionPayload) throws -> Void
 
     init(onLinkAction: @escaping (OverlayMessagingMessage, LinkActionPayload) throws -> Void = { _, _ in }) {
