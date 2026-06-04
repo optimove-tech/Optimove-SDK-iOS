@@ -8,7 +8,7 @@ final class OverlayActionDispatcherTests: XCTestCase {
     }
 
     private func makeLinkAction(url: String = "https://example.com") -> OverlayAction {
-        .linkAction(LinkActionData(url: url))
+        .linkAction(LinkActionPayload(url: url))
     }
 
     // MARK: - SDK default
@@ -41,11 +41,11 @@ final class OverlayActionDispatcherTests: XCTestCase {
 
     func testOverrideReceivesCorrectMessageAndData() {
         var receivedMessage: OverlayMessagingMessage?
-        var receivedData: LinkActionData?
+        var receivedData: LinkActionPayload?
         let dispatcher = OverlayActionDispatcher(defaults: SpyHandlers())
-        let override = SpyHandlers(onLinkAction: { msg, data in
+        let override = SpyHandlers(onLinkAction: { msg, payload in
             receivedMessage = msg
-            receivedData = data
+            receivedData = payload
         })
         let message = makeMessage()
 
@@ -100,14 +100,14 @@ final class OverlayActionDispatcherTests: XCTestCase {
 
 // MARK: - Test helpers
 
-private final class SpyHandlers: OverlayActionHandlers {
-    private let onLinkAction: (OverlayMessagingMessage, LinkActionData) throws -> Void
+private final class SpyHandlers: OverlayActionHandler {
+    private let onLinkAction: (OverlayMessagingMessage, LinkActionPayload) throws -> Void
 
-    init(onLinkAction: @escaping (OverlayMessagingMessage, LinkActionData) throws -> Void = { _, _ in }) {
+    init(onLinkAction: @escaping (OverlayMessagingMessage, LinkActionPayload) throws -> Void = { _, _ in }) {
         self.onLinkAction = onLinkAction
     }
 
-    func linkAction(message: OverlayMessagingMessage, data: LinkActionData) throws {
-        try onLinkAction(message, data)
+    func linkAction(message: OverlayMessagingMessage, payload: LinkActionPayload) throws {
+        try onLinkAction(message, payload)
     }
 }

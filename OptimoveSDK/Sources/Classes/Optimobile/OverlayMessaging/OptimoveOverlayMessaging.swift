@@ -22,7 +22,7 @@ public class OptimoveOverlayMessaging {
         shared?.manager.setInterceptor(interceptor)
     }
 
-    public static func setActionHandlers(_ handlers: OverlayActionHandlers?) {
+    public static func setActionHandlers(_ handlers: OverlayActionHandler?) {
         shared?.manager.setActionHandlers(handlers)
     }
 
@@ -63,7 +63,7 @@ public class OptimoveOverlayMessaging {
 // MARK: - Action handler
 
 /// Typed payload for a link CTA. New fields may be added in future SDK versions.
-public struct LinkActionData {
+public struct LinkActionPayload {
     public let url: String
 }
 
@@ -72,8 +72,8 @@ public struct LinkActionData {
 /// a default implementation in a protocol extension — only override the actions you want to own.
 /// New action types will be added as new methods with defaults, so existing conformers are never
 /// broken by SDK updates.
-public protocol OverlayActionHandlers {
-    func linkAction(message: OverlayMessagingMessage, data: LinkActionData) throws
+public protocol OverlayActionHandler {
+    func linkAction(message: OverlayMessagingMessage, payload: LinkActionPayload) throws
 }
 
 // MARK: - Interceptor protocols

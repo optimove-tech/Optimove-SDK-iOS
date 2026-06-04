@@ -264,7 +264,7 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
                       let urlString = actionData["url"] as? String
                 else { continue }
 
-                actionDispatcher.dispatch(.linkAction(LinkActionData(url: urlString)), message: currentMessage)
+                actionDispatcher.dispatch(.linkAction(LinkActionPayload(url: urlString)), message: currentMessage)
             default:
                 break
             }
