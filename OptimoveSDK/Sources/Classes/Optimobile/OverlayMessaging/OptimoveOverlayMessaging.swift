@@ -21,7 +21,11 @@ public class OptimoveOverlayMessaging {
     public static func setInterceptor(_ interceptor: OverlayMessagingInterceptor?) {
         shared?.manager.setInterceptor(interceptor)
     }
-    
+
+    public static func setActionHandler(_ handler: OverlayActionHandler?) {
+        shared?.manager.setActionHandler(handler)
+    }
+
     public static func resetSession() {
         shared?.sessionManager?.resetSession()
     }
@@ -56,6 +60,22 @@ public class OptimoveOverlayMessaging {
     }
 }
 
+// MARK: - Action handler
+
+/// Typed payload for a link CTA. New fields may be added in future SDK versions.
+public struct LinkActionPayload {
+    public let url: String
+}
+
+/// One method per overlay action type, each with its own typed payload. Conform to this protocol
+/// and pass an instance to `setActionHandler` to take over one or more actions. Every method has
+/// a default implementation in a protocol extension — only override the actions you want to own.
+/// New action types will be added as new methods with defaults, so existing conformers are never
+/// broken by SDK updates.
+public protocol OverlayActionHandler {
+    func linkAction(message: OverlayMessagingMessage, payload: LinkActionPayload) throws
+}
+
 // MARK: - Interceptor protocols
 
 public protocol OverlayMessagingInterceptorCallback: AnyObject {
@@ -72,3 +92,4 @@ public protocol OverlayMessagingInterceptor: AnyObject {
 public extension OverlayMessagingInterceptor {
     func getTimeoutMs() -> Int { 5000 }
 }
+

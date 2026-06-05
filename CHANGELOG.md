@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.8.0
+
+- Add `OptimoveOverlayMessaging.setActionHandler(_:)` — register a handler to intercept overlay CTA clicks and perform custom navigation instead of the SDK opening the URL.
+
 ## 6.7.0
 
 - Add Gamify Widget SDK — `GamifyWidgetSDK.initialize(widgetUrl:)` and `GamifyWidgetSDK.open(from:userId:token:)` present the widget in a modal `WKWebView` with a JS bridge for `READY` / `INIT` / `CLOSE` handshakes.
