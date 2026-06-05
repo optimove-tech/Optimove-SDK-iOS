@@ -487,6 +487,28 @@ public extension OptimobileConfig {
     }
 }
 
+/// Decodes an Int from either a JSON number or a JSON string (e.g. 1 or "1").
+private struct IntOrStringDecodable: Decodable {
+    let value: Int
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let v = try? container.decode(Int.self) {
+            value = v
+        } else if let s = try? container.decode(String.self), let v = Int(s) {
+            value = v
+        } else {
+            throw DecodingError.typeMismatch(
+                Int.self,
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Expected Int or numeric String for version"
+                )
+            )
+        }
+    }
+}
+
 struct OptimoveArguments: Decodable {
     enum Error: Foundation.LocalizedError {
         case emptyBase64
@@ -525,8 +547,7 @@ struct OptimoveArguments: Decodable {
     init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
 
-        // Assuming the order and type of elements is known and fixed
-        version = try container.decode(Int.self)
+        version = try container.decode(IntOrStringDecodable.self).value
         tenantToken = try container.decode(String.self)
         configName = try container.decode(String.self)
     }
