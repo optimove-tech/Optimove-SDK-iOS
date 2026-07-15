@@ -8,11 +8,11 @@ public class OptimoveOverlayMessaging {
     
     private let manager: OverlayMessagingManager
     private var sessionManager: OverlayMessagingSessionManager?
-    private let sessionLengthHours: Double
+    private let sessionLengthMinutes: Int
     private var initializationToken: NSObjectProtocol?
 
-    private init(sessionLengthHours: Double, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
-        self.sessionLengthHours = sessionLengthHours
+    private init(sessionLengthMinutes: Int, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
+        self.sessionLengthMinutes = sessionLengthMinutes
         self.manager = OverlayMessagingManager(httpClient: httpClient, urlBuilder: urlBuilder)
     }
     
@@ -37,7 +37,7 @@ public class OptimoveOverlayMessaging {
     }
     
     static func initialize(config: OptimobileConfig, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
-        shared = OptimoveOverlayMessaging(sessionLengthHours: config.overlayMessagingSessionLengthHours, httpClient: httpClient, urlBuilder: urlBuilder)
+        shared = OptimoveOverlayMessaging(sessionLengthMinutes: config.overlayMessagingSessionLengthMinutes, httpClient: httpClient, urlBuilder: urlBuilder)
         
         shared?.initializationToken = NotificationCenter.default
             .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { _ in
@@ -52,7 +52,7 @@ public class OptimoveOverlayMessaging {
     
     private func startSessionManager() {
         sessionManager = OverlayMessagingSessionManager(
-            sessionLengthHours: sessionLengthHours,
+            sessionLengthMinutes: sessionLengthMinutes,
             listener: { [weak self] in
                 self?.manager.onTriggerReceived(.session)
             }

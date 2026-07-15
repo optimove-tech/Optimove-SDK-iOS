@@ -111,7 +111,7 @@ public struct OptimobileConfig {
     let isRelease: Bool?
 
     let isOverlayMessagingEnabled: Bool
-    let overlayMessagingSessionLengthHours: Double
+    let overlayMessagingSessionLengthMinutes: Int
 }
 
 public typealias Region = OptimobileConfig.Region
@@ -133,7 +133,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var _pushReceivedInForegroundHandlerBlock: Any?
     private var _deepLinkCname: URL?
     private var _deepLinkHandler: DeepLinkHandler?
-    private var _overlayMessagingSessionLengthHours: Double?
+    private var _overlayMessagingSessionLengthMinutes: Int?
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
@@ -183,7 +183,7 @@ open class OptimoveConfigBuilder: NSObject {
             _runtimeInfo = optimobileConfig.runtimeInfo
             _sdkInfo = optimobileConfig.sdkInfo
             _isRelease = optimobileConfig.isRelease
-            _overlayMessagingSessionLengthHours = optimobileConfig.isOverlayMessagingEnabled ? optimobileConfig.overlayMessagingSessionLengthHours : nil
+            _overlayMessagingSessionLengthMinutes = optimobileConfig.isOverlayMessagingEnabled ? optimobileConfig.overlayMessagingSessionLengthMinutes : nil
         }
         features = config.features
     }
@@ -258,10 +258,18 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     /// Enables Overlay Messaging.
-    /// - Parameter sessionLengthHours: Length of a session, in hours, before overlay triggers can fire again. Must be at least 0.25 (15 minutes).
-    @discardableResult public func enableOverlayMessaging(sessionLengthHours: Double = 1) -> OptimoveConfigBuilder {
-        precondition(sessionLengthHours >= 0.25, "Session duration must be at least 15 minutes.")
-        _overlayMessagingSessionLengthHours = sessionLengthHours
+    /// - Parameter sessionLengthHours: Length of a session, in hours, before overlay triggers can fire again. Must be at least 1.
+    @discardableResult public func enableOverlayMessaging(sessionLengthHours: Int = 1) -> OptimoveConfigBuilder {
+        precondition(sessionLengthHours >= 1, "sessionLengthHours must be at least 1 hour.")
+        _overlayMessagingSessionLengthMinutes = sessionLengthHours * 60
+        return self
+    }
+
+    /// Enables Overlay Messaging.
+    /// - Parameter sessionLengthMinutes: Length of a session, in minutes, before overlay triggers can fire again. Must be at least 15.
+    @discardableResult public func enableOverlayMessaging(sessionLengthMinutes: Int) -> OptimoveConfigBuilder {
+        precondition(sessionLengthMinutes >= 15, "sessionLengthMinutes must be at least 15 minutes.")
+        _overlayMessagingSessionLengthMinutes = sessionLengthMinutes
         return self
     }
 
@@ -385,8 +393,8 @@ open class OptimoveConfigBuilder: NSObject {
                     runtimeInfo: _runtimeInfo,
                     sdkInfo: _sdkInfo,
                     isRelease: _isRelease,
-                    isOverlayMessagingEnabled: _overlayMessagingSessionLengthHours != nil,
-                    overlayMessagingSessionLengthHours: _overlayMessagingSessionLengthHours ?? 1
+                    isOverlayMessagingEnabled: _overlayMessagingSessionLengthMinutes != nil,
+                    overlayMessagingSessionLengthMinutes: _overlayMessagingSessionLengthMinutes ?? 60
                 )
             }
             Logger.info("\(OptimobileConfig.self) building skipped.")

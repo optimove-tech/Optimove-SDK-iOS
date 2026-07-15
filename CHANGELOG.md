@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Lower the minimum `sessionLengthHours` for `OptimoveConfigBuilder.enableOverlayMessaging(sessionLengthHours:)` from 1 hour to 0.25 hours (15 minutes), and change its type from `Int` to `Double` to support fractional-hour values.
+- Add `OptimoveConfigBuilder.enableOverlayMessaging(sessionLengthMinutes:)` overload to configure the overlay messaging session window in minutes (minimum 15). The existing `enableOverlayMessaging(sessionLengthHours:)` overload is unchanged.
 
 ## 6.8.0
 
