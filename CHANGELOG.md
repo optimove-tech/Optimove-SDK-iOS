@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Lower the minimum `sessionLengthHours` for `OptimoveConfigBuilder.enableOverlayMessaging(sessionLengthHours:)` from 1 hour to 0.25 hours (15 minutes), and change its type from `Int` to `Double` to support fractional-hour values.
+
 ## 6.8.0
 
 - Add `OptimoveOverlayMessaging.setActionHandler(_:)` — register a handler to intercept overlay CTA clicks and perform custom navigation instead of the SDK opening the URL.

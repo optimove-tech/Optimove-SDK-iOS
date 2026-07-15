@@ -8,10 +8,10 @@ public class OptimoveOverlayMessaging {
     
     private let manager: OverlayMessagingManager
     private var sessionManager: OverlayMessagingSessionManager?
-    private let sessionLengthHours: Int
+    private let sessionLengthHours: Double
     private var initializationToken: NSObjectProtocol?
-    
-    private init(sessionLengthHours: Int, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
+
+    private init(sessionLengthHours: Double, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
         self.sessionLengthHours = sessionLengthHours
         self.manager = OverlayMessagingManager(httpClient: httpClient, urlBuilder: urlBuilder)
     }
