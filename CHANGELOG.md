@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 6.9.0
 
 - Add `OptimoveConfigBuilder.enableOverlayMessaging(sessionLengthMinutes:)` overload to configure the overlay messaging session window in minutes (minimum 15). The existing `enableOverlayMessaging(sessionLengthHours:)` overload is unchanged.
 
