@@ -7,6 +7,7 @@ protocol OverlayMessagingPresenterDelegate: AnyObject {
     func onMessageClosed(_ message: OverlayMessagingMessage)
     func onEvents(_ message: OverlayMessagingMessage, events: [OverlayMessagingRendererEvent])
     func onViewError(_ message: OverlayMessagingMessage)
+    func onAction(_ message: OverlayMessagingMessage, action: OverlayAction)
 }
 
 final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
@@ -24,8 +25,12 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     private var currentMessage: OverlayMessagingMessage
     private weak var delegate: OverlayMessagingPresenterDelegate?
     private let urlBuilder: UrlBuilder
-    
-    init(message: OverlayMessagingMessage, urlBuilder: UrlBuilder, delegate: OverlayMessagingPresenterDelegate) {
+
+    init(
+        message: OverlayMessagingMessage,
+        urlBuilder: UrlBuilder,
+        delegate: OverlayMessagingPresenterDelegate
+    ) {
         self.currentMessage = message
         self.urlBuilder = urlBuilder
         self.delegate = delegate
@@ -124,19 +129,23 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     }
     
     private func destroyViews() {
+        contentController?.removeScriptMessageHandler(forName: "inAppHost")
+        contentController = nil
+
         if let window = window {
             window.isHidden = true
-            
+
             loadingSpinner?.removeFromSuperview()
             loadingSpinner = nil
-            
+
+            webView?.navigationDelegate = nil
             webView?.removeFromSuperview()
             webView = nil
-            
+
             frame?.removeFromSuperview()
             frame = nil
         }
-        
+
         window = nil
         webViewReady = false
     }
@@ -246,19 +255,14 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
             guard let action = item as? NSDictionary,
                   let type = action["type"] as? String
             else { continue }
-            
+
             switch type {
             case Self.sdkActionOpenDeepLink:
-                if let actionData = action["data"] as? NSDictionary,
-                   let urlString = actionData["url"] as? String,
-                   let url = URL(string: urlString)
-                {
-                    if #available(iOS 10.0, *) {
-                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    } else {
-                        UIApplication.shared.openURL(url)
-                    }
-                }
+                guard let actionData = action["data"] as? NSDictionary,
+                      let urlString = actionData["url"] as? String
+                else { continue }
+
+                delegate?.onAction(currentMessage, action: .linkAction(LinkActionPayload(url: urlString)))
             default:
                 break
             }

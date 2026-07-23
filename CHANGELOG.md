@@ -1,10 +1,18 @@
 # Changelog
 
-## 6.7.0
+## 6.9.0
 
 - Add federated JWT authentication support. Use `enableAuth()` on the config builder to supply a token provider. The SDK attaches `X-User-JWT` to all user-identified requests (OptiTrack, RealTime, PreferenceCenter, EmbeddedMessaging, AnalyticsHelper, InAppManager).
 - Add `X-Optimove-Auth-Capable: 1` header to all requests to signal auth-capable SDK versions to backends.
 - Fix multi-customer event batching: OptiTrack/RealTime now group events by customer identity so each request carries a single valid JWT. AnalyticsHelper fetches events per user to ensure JWT matches the batch.
+
+## 6.8.0
+
+- Add `OptimoveOverlayMessaging.setActionHandler(_:)` — register a handler to intercept overlay CTA clicks and perform custom navigation instead of the SDK opening the URL.
+
+## 6.7.0
+
+- Add Gamify Widget SDK — `GamifyWidgetSDK.initialize(widgetUrl:)` and `GamifyWidgetSDK.open(from:userId:token:)` present the widget in a modal `WKWebView` with a JS bridge for `READY` / `INIT` / `CLOSE` handshakes.
 
 ## 6.6.0
 
