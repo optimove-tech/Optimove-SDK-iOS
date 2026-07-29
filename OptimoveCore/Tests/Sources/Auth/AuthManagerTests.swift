@@ -117,8 +117,10 @@ final class AuthManagerTests: XCTestCase {
         let lateCompletionExpectation = expectation(description: "Late provider completion should be ignored")
         lateCompletionExpectation.isInverted = true
 
-        let authManager = AuthManager(tokenFetchTimeout: 0.05) { _, completion in
-            DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {
+        let authManager = AuthManager(tokenFetchTimeout: 0.1) { _, completion in
+            // Match the .utility QoS that AuthManager's own timeout timer runs on, so this
+            // isn't racing a lower-priority timer under system load (which caused flakiness).
+            DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.3) {
                 completion("late-token", nil)
             }
         }
@@ -136,6 +138,6 @@ final class AuthManagerTests: XCTestCase {
                 timeoutExpectation.fulfill()
             }
         }
-        wait(for: [timeoutExpectation, lateCompletionExpectation], timeout: 0.3)
+        wait(for: [timeoutExpectation, lateCompletionExpectation], timeout: 0.6)
     }
 }
