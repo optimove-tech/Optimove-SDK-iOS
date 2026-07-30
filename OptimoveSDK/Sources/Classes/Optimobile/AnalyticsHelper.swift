@@ -23,14 +23,18 @@ final class AnalyticsHelper {
 
     // MARK: Initialization
 
-    init(httpClient: KSHttpClient) {
+    /// - Parameter storeUrlOverride: Test-only hook to point the analytics store at a
+    ///   caller-controlled file instead of the app/shared-container path resolved by
+    ///   `initContext()`. When set, legacy-database migration is skipped since it only
+    ///   applies to the real on-device paths. Leave `nil` in production.
+    init(httpClient: KSHttpClient, storeUrlOverride: URL? = nil) {
         analyticsContext = nil
         migrationAnalyticsContext = nil
         serialQueue = DispatchQueue(label: "com.optimove.optimobile.serial-q", target: .global(qos: .utility))
 
         eventsHttpClient = httpClient
 
-        initContext()
+        initContext(storeUrlOverride: storeUrlOverride)
 
         finishedInitializationToken = NotificationCenter.default
             .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { [weak self] notification in
@@ -77,7 +81,12 @@ final class AnalyticsHelper {
         return URL(string: "KAnalyticsDbShared.sqlite", relativeTo: sharedContainerPath)
     }
 
-    private func initContext() {
+    private func initContext(storeUrlOverride: URL? = nil) {
+        if let storeUrlOverride = storeUrlOverride {
+            analyticsContext = getManagedObjectContext(storeUrl: storeUrlOverride)
+            return
+        }
+
         let appDbUrl = getAppDbUrl()
         let appDbExists = appDbUrl == nil ? false : FileManager.default.fileExists(atPath: appDbUrl!.path)
         let appGroupExists = AppGroupsHelper.isKumulosAppGroupDefined()

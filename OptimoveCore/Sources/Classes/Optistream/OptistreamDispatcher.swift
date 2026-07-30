@@ -60,8 +60,18 @@ public final class OptistreamDispatcherImpl: OptistreamDispatcher {
 
         // Group events by customer identity so each request carries a single JWT.
         // Anonymous events (customer nil) are grouped together and sent without JWT.
-        let grouped = Dictionary(grouping: events) { $0.customer }
-        let groups = Array(grouped)
+        // Groups preserve first-occurrence order so requests are sent in queue order
+        // (e.g. pre-login visitor events go out before the post-login customer group).
+        var groups: [(key: String?, events: [OptistreamEvent])] = []
+        var groupIndexByCustomer: [String?: Int] = [:]
+        for event in events {
+            if let index = groupIndexByCustomer[event.customer] {
+                groups[index].events.append(event)
+            } else {
+                groupIndexByCustomer[event.customer] = groups.count
+                groups.append((key: event.customer, events: [event]))
+            }
+        }
 
         if groups.count <= 1, let first = groups.first {
             // All events belong to the same customer (or all anonymous) — no splitting needed

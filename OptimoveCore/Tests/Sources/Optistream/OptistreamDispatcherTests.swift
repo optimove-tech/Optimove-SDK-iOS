@@ -283,6 +283,42 @@ final class OptistreamDispatcherTests: XCTestCase {
         XCTAssertEqual(networkingSpy.sendCalls.count, 3, "Should have 3 send calls")
     }
 
+    func test_sendBatch_groupsAreSentInFirstOccurrenceOrder() {
+        let networkingSpy = OptistreamNetworkingSpy()
+        let authManager = AuthManager { userId, completion in
+            completion("jwt-\(userId)", nil)
+        }
+        let dispatcher = OptistreamDispatcherImpl(networking: networkingSpy, authManager: authManager)
+
+        let events = [
+            makeEvent(customer: nil, event: "v1"),
+            makeEvent(customer: nil, event: "v2"),
+            makeEvent(customer: "user-A", event: "a1"),
+            makeEvent(customer: "user-B", event: "b1"),
+        ]
+
+        let completionExpectation = expectation(description: "completion called")
+        dispatcher.sendBatch(
+            events: events,
+            path: nil,
+            onGroupResult: { _, _ in },
+            completion: {
+                completionExpectation.fulfill()
+            }
+        )
+        waitForExpectations(timeout: 1)
+
+        XCTAssertEqual(
+            networkingSpy.sendCalls.map(\.jwt),
+            [nil, "jwt-user-A", "jwt-user-B"],
+            "Groups must be sent in first-occurrence order: visitor first, then user-A, then user-B"
+        )
+        XCTAssertEqual(
+            networkingSpy.sendCalls.map { $0.events.map(\.event) },
+            [["v1", "v2"], ["a1"], ["b1"]]
+        )
+    }
+
     func test_sendBatch_authConfigured_singleCustomer_callsOnGroupResultAndCompletion() {
         let networkingSpy = OptistreamNetworkingSpy()
         let authManager = AuthManager { _, completion in

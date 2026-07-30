@@ -14,27 +14,44 @@ class AnalyticsHelperTests: XCTestCase {
     var mockHttpClient: MockKSHttpClient!
     var analyticsHelper: AnalyticsHelper!
     var longTimeoutInSeconds = 10.0
+    private var storeUrl: URL!
     
     override func setUp() {
         super.setUp()
-        clearAnalyticsStore()
+        storeUrl = Self.makeTemporaryStoreUrl()
         mockHttpClient = MockKSHttpClient()
-        analyticsHelper = AnalyticsHelper(httpClient: mockHttpClient)
+        analyticsHelper = AnalyticsHelper(httpClient: mockHttpClient, storeUrlOverride: storeUrl)
     }
 
-    private func clearAnalyticsStore() {
-        guard let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last else { return }
-        let dbUrl = docsUrl.appendingPathComponent("KAnalyticsDb.sqlite")
+    /// A fresh, uniquely-named store per test/instance, in a scratch directory.
+    ///
+    /// Deliberately does not rely on `AnalyticsHelper`'s own Documents/shared-container
+    /// path resolution: on the simulator, `containerURL(forSecurityApplicationGroupIdentifier:)`
+    /// resolves successfully for arbitrary group identifiers (entitlements aren't enforced
+    /// there), so `AnalyticsHelper` silently opens the shared-container database instead of
+    /// the Documents one — a previous version of this helper cleared the Documents database,
+    /// which was never the one actually in use, so tests never had real isolation.
+    static func makeTemporaryStoreUrl() -> URL {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("AnalyticsHelperTests-\(UUID().uuidString)")
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory.appendingPathComponent("KAnalyticsDb.sqlite")
+    }
+
+    static func removeStore(at url: URL) {
         for suffix in ["", "-shm", "-wal"] {
-            let url = dbUrl.deletingLastPathComponent().appendingPathComponent(dbUrl.lastPathComponent + suffix)
-            try? FileManager.default.removeItem(at: url)
+            let fileUrl = url.deletingLastPathComponent().appendingPathComponent(url.lastPathComponent + suffix)
+            try? FileManager.default.removeItem(at: fileUrl)
         }
+        try? FileManager.default.removeItem(at: url.deletingLastPathComponent())
     }
     
     override func tearDown()
     {
         analyticsHelper = nil
         mockHttpClient = nil
+        Self.removeStore(at: storeUrl)
+        storeUrl = nil
         super.tearDown()
     }
     
@@ -61,26 +78,31 @@ class AnalyticsHelperTests: XCTestCase {
 
     func test_number_of_sent_events_with_delays_same_as_tracked() {
         let numberOfEvents = 4
-        let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
+        let numberOfEventsExpectation = expectation(description: "Completion for delayed burst fired")
         let mock = mockHttpClient!
         let helper = analyticsHelper!
 
         helper.trackEvent(eventType: "immediate_event_first", properties: nil, immediateFlush: true)
 
-        DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
+        // A short real sleep is enough to exercise the "second burst after the first drain
+        // completed" path; it doesn't need to be long, and a smaller value leaves more of the
+        // longTimeoutInSeconds budget as margin against CI slowness.
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
             for i in 1...numberOfEvents - 1 {
                 helper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
             }
 
-            helper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
-                // +1 for immediate_event_first tracked before the delay
-                if mock.totalEventCount == numberOfEvents + 1 {
-                    numberOfEventsExpectation.fulfill()
-                }
+            helper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) { _ in
+                // Fulfill unconditionally so a count mismatch fails fast with the actual number
+                // below, instead of silently burning the full timeout with an opaque
+                // "Asynchronous wait failed" error.
+                numberOfEventsExpectation.fulfill()
             }
         }
 
         waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
+        // +1 for immediate_event_first tracked before the delay
+        XCTAssertEqual(mock.totalEventCount, numberOfEvents + 1)
     }
 
     func test_number_of_sent_events_from_background_threads_same_as_tracked() {
@@ -122,7 +144,7 @@ class AnalyticsHelperTests: XCTestCase {
     
     func test_failed_network_event_should_be_picked_up_by_subsequent() {
         let mockKSHttpClientSingleFailure = MockKSHttpClientSingleFailure()
-        let analyticsHelper = AnalyticsHelper(httpClient: mockKSHttpClientSingleFailure)
+        let analyticsHelper = AnalyticsHelper(httpClient: mockKSHttpClientSingleFailure, storeUrlOverride: Self.makeTemporaryStoreUrl())
         
         let failedEventExpectation = expectation(description: "Failed event wasn't sent on next dispatch")
 
@@ -174,30 +196,24 @@ class AnalyticsHelperAuthTests: XCTestCase {
     var mockHttpClient: MockKSHttpClient!
     var analyticsHelper: AnalyticsHelper!
     var longTimeoutInSeconds = 10.0
+    private var storeUrl: URL!
 
     override func setUp() {
         super.setUp()
         // Isolate from prior runs: stale events / leftover USER_ID can corrupt expectations.
-        clearAnalyticsStore()
+        storeUrl = AnalyticsHelperTests.makeTemporaryStoreUrl()
         KeyValPersistenceHelper.removeObject(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue)
         mockHttpClient = MockKSHttpClient()
-        analyticsHelper = AnalyticsHelper(httpClient: mockHttpClient)
+        analyticsHelper = AnalyticsHelper(httpClient: mockHttpClient, storeUrlOverride: storeUrl)
     }
 
     override func tearDown() {
         KeyValPersistenceHelper.removeObject(forKey: OptimobileUserDefaultsKey.USER_ID.rawValue)
         analyticsHelper = nil
         mockHttpClient = nil
+        AnalyticsHelperTests.removeStore(at: storeUrl)
+        storeUrl = nil
         super.tearDown()
-    }
-
-    private func clearAnalyticsStore() {
-        guard let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last else { return }
-        let dbUrl = docsUrl.appendingPathComponent("KAnalyticsDb.sqlite")
-        for suffix in ["", "-shm", "-wal"] {
-            let url = dbUrl.deletingLastPathComponent().appendingPathComponent(dbUrl.lastPathComponent + suffix)
-            try? FileManager.default.removeItem(at: url)
-        }
     }
 
     // No user associated → currentUserIdentifier == installId → syncEventsBatch passes authUserId: nil.
