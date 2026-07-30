@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.9.0
+
+- Added Adact campaign support to `GamifyWidgetSDK`: `initialize(widgetUrl:adactUrl:)`, `openAdactCampaign(from:params:)`, `closeAdactCampaign()`, `closeWidget()`, and `buildAdactCampaignUrl(params:)`. Opens `{adactUrl}/embedded/{campaignId}` with optional `cid` and `customerIdToken` query params (same contract as the Web / Android SDKs). Adact does not use the loyalty READY→INIT handshake.
+
 ## 6.8.0
 
 - Add `OptimoveOverlayMessaging.setActionHandler(_:)` — register a handler to intercept overlay CTA clicks and perform custom navigation instead of the SDK opening the URL.
