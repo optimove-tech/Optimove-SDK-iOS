@@ -3,6 +3,12 @@
 import XCTest
 @testable import OptimoveCore
 
+/// Deliberately generous: the waits in these tests bound work that has already been forced to
+/// happen, so a slow machine can only make them take longer, never change the outcome. A tight
+/// bound is what turns a deterministic test back into a flaky one — the suite has been measured
+/// taking 11x longer under full CPU load.
+private let generousTimeout: TimeInterval = 10
+
 final class AuthManagerTests: XCTestCase {
 
     // MARK: - 1.1 getToken calls provider with correct userId
@@ -107,37 +113,66 @@ final class AuthManagerTests: XCTestCase {
             }
             completionExpectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        // Unlike the tests above, this one waits on a real timer rather than a synchronous
+        // callback, so it gets the generous bound.
+        waitForExpectations(timeout: generousTimeout)
     }
 
     // MARK: - 1.6 getToken ignores provider completion after timeout
 
+    /// The ordering under test — provider answers *after* the timeout — is enforced rather than
+    /// raced. The provider holds its token until the test has seen the timeout, so no arrangement
+    /// of wall-clock delays can invert the two, however loaded the machine is. Every wait is then
+    /// a generous upper bound on something that has already been made to happen, which is what
+    /// makes the test deterministic: load can only make it slower, never wrong.
     func test_getToken_ignoresProviderCompletionAfterTimeout() {
-        let timeoutExpectation = expectation(description: "Completion should receive timeout once")
-        let lateCompletionExpectation = expectation(description: "Late provider completion should be ignored")
-        lateCompletionExpectation.isInverted = true
+        let releaseLateToken = DispatchSemaphore(value: 0)
+        let providerAsked = expectation(description: "The provider was asked for a token")
+        let firstCompletion = expectation(description: "getToken called its completion")
+        let lateTokenDelivered = expectation(description: "The provider delivered its token after the timeout")
 
-        let authManager = AuthManager(tokenFetchTimeout: 0.1) { _, completion in
-            // Match the .utility QoS that AuthManager's own timeout timer runs on, so this
-            // isn't racing a lower-priority timer under system load (which caused flakiness).
-            DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.3) {
+        let authManager = AuthManager(tokenFetchTimeout: 0.05) { _, completion in
+            providerAsked.fulfill()
+            DispatchQueue.global(qos: .utility).async {
+                releaseLateToken.wait()
                 completion("late-token", nil)
+                lateTokenDelivered.fulfill()
             }
         }
+
+        // Record rather than assert inside the callback: a callback that never runs cannot fail a
+        // test from the inside, and a second, wrongly delivered call has to be counted to be seen.
+        let resultsLock = NSLock()
+        var results: [Result<String, Error>] = []
 
         authManager.getToken(userId: "user-123") { result in
-            switch result {
-            case .success:
-                lateCompletionExpectation.fulfill()
-            case .failure(let error):
-                guard let authError = error as? AuthError else {
-                    XCTFail("Expected AuthError but got \(type(of: error))")
-                    return
-                }
-                XCTAssertEqual(authError, AuthError.tokenFetchTimedOut)
-                timeoutExpectation.fulfill()
+            resultsLock.lock()
+            results.append(result)
+            let isFirst = results.count == 1
+            resultsLock.unlock()
+
+            if isFirst {
+                firstCompletion.fulfill()
             }
         }
-        wait(for: [timeoutExpectation, lateCompletionExpectation], timeout: 0.6)
+
+        wait(for: [providerAsked, firstCompletion], timeout: generousTimeout)
+
+        // The timeout has now been observed, so anything the provider delivers from here is late
+        // by construction.
+        releaseLateToken.signal()
+        wait(for: [lateTokenDelivered], timeout: generousTimeout)
+
+        resultsLock.lock()
+        let observed = results
+        resultsLock.unlock()
+
+        XCTAssertEqual(observed.count, 1, "The token that arrived after the timeout should have been dropped")
+
+        guard case let .failure(error)? = observed.first else {
+            XCTFail("Expected a single timeout failure, got \(observed)")
+            return
+        }
+        XCTAssertEqual(error as? AuthError, AuthError.tokenFetchTimedOut)
     }
 }
