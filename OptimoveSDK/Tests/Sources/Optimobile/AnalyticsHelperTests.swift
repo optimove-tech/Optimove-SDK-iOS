@@ -22,12 +22,31 @@ class AnalyticsHelperTests: XCTestCase {
         analyticsHelper = AnalyticsHelper(httpClient: mockHttpClient)
     }
 
+    // AnalyticsHelper picks its store the same way, and in this test bundle an app
+    // group IS defined, so the store it actually uses is KAnalyticsDbShared.sqlite
+    // in the group container. Deleting only KAnalyticsDb.sqlite under Documents
+    // removed a file that never exists, so the store was never cleared and events
+    // accumulated across every test in this class. A single event left behind by an
+    // earlier test is enough to break the strict count assertions below, because
+    // the next flush picks it up and delivers it to that test's mock.
     private func clearAnalyticsStore() {
-        guard let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last else { return }
-        let dbUrl = docsUrl.appendingPathComponent("KAnalyticsDb.sqlite")
-        for suffix in ["", "-shm", "-wal"] {
-            let url = dbUrl.deletingLastPathComponent().appendingPathComponent(dbUrl.lastPathComponent + suffix)
-            try? FileManager.default.removeItem(at: url)
+        var stores: [URL] = []
+
+        if let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last,
+           let appDb = URL(string: "KAnalyticsDb.sqlite", relativeTo: docsUrl) {
+            stores.append(appDb.absoluteURL)
+        }
+
+        if let sharedContainerPath = AppGroupsHelper.getSharedContainerPath(),
+           let sharedDb = URL(string: "KAnalyticsDbShared.sqlite", relativeTo: sharedContainerPath) {
+            stores.append(sharedDb.absoluteURL)
+        }
+
+        for store in stores {
+            for suffix in ["", "-shm", "-wal"] {
+                let url = store.deletingLastPathComponent().appendingPathComponent(store.lastPathComponent + suffix)
+                try? FileManager.default.removeItem(at: url)
+            }
         }
     }
 
