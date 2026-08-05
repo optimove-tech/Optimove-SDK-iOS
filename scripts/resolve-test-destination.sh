@@ -24,13 +24,15 @@ fi
 PREFERRED_NAME="${1:-}"
 
 # "<os-version>|<device-name>|<udid>" for every booted-or-bootable iOS simulator,
-# oldest runtime first.
+# oldest runtime first. Clones are skipped: xcodebuild creates them for parallel
+# testing, so they appear mid-run and would make repeated resolution unstable.
 DEVICES=$(
     xcrun simctl list devices available |
         awk '
             /^-- iOS /              { os = $3; next }
             /^-- /                  { os = "";  next }
             os == ""                { next }
+            /Clone [0-9]+ of /      { next }
             match($0, /\(([0-9A-Fa-f-]{36})\)/) {
                 udid = substr($0, RSTART + 1, RLENGTH - 2)
                 name = $0

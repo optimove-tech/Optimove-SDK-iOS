@@ -7,8 +7,16 @@ set -x
 # Set the project variables
 source $PWD/configurations/test.xcconfig
 
-# Resolve a simulator that exists on this machine (honors TEST_DESTINATION)
-DESTINATION=$(bash "$(dirname "$0")/resolve-test-destination.sh" "$DEVICE_NAME")
+# Reuse the destination build-for-testing resolved. Resolving independently can
+# pick a different device, because xcodebuild adds simulator clones for parallel
+# testing while it runs, and there would be no built products for that device.
+if [ -n "$TEST_DESTINATION" ]; then
+    DESTINATION="$TEST_DESTINATION"
+elif [ -f "$1/test-destination" ]; then
+    DESTINATION=$(cat "$1/test-destination")
+else
+    DESTINATION=$(bash "$(dirname "$0")/resolve-test-destination.sh" "$DEVICE_NAME")
+fi
 
 # xcbeautify only prettifies the log, so run without it when it isn't installed
 if command -v xcbeautify >/dev/null 2>&1; then
