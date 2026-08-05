@@ -10,11 +10,11 @@ import XCTest
 import OptimoveTest
 
 class AnalyticsHelperTests: XCTestCase {
-
+    
     var mockHttpClient: MockKSHttpClient!
     var analyticsHelper: AnalyticsHelper!
     var longTimeoutInSeconds = 10.0
-
+    
     override func setUp() {
         super.setUp()
         clearAnalyticsStore()
@@ -22,202 +22,134 @@ class AnalyticsHelperTests: XCTestCase {
         analyticsHelper = AnalyticsHelper(httpClient: mockHttpClient)
     }
 
-    // AnalyticsHelper picks its store the same way, and in this test bundle an app
-    // group IS defined, so the store it actually uses is KAnalyticsDbShared.sqlite
-    // in the group container. Deleting only KAnalyticsDb.sqlite under Documents
-    // removed a file that never exists, so the store was never cleared and events
-    // accumulated across every test in this class. A single event left behind by an
-    // earlier test is enough to break the strict count assertions below, because
-    // the next flush picks it up and delivers it to that test's mock.
     private func clearAnalyticsStore() {
-        var stores: [URL] = []
-
-        if let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last,
-           let appDb = URL(string: "KAnalyticsDb.sqlite", relativeTo: docsUrl) {
-            stores.append(appDb.absoluteURL)
-        }
-
-        if let sharedContainerPath = AppGroupsHelper.getSharedContainerPath(),
-           let sharedDb = URL(string: "KAnalyticsDbShared.sqlite", relativeTo: sharedContainerPath) {
-            stores.append(sharedDb.absoluteURL)
-        }
-
-        for store in stores {
-            for suffix in ["", "-shm", "-wal"] {
-                let url = store.deletingLastPathComponent().appendingPathComponent(store.lastPathComponent + suffix)
-                try? FileManager.default.removeItem(at: url)
-            }
+        guard let docsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last else { return }
+        let dbUrl = docsUrl.appendingPathComponent("KAnalyticsDb.sqlite")
+        for suffix in ["", "-shm", "-wal"] {
+            let url = dbUrl.deletingLastPathComponent().appendingPathComponent(dbUrl.lastPathComponent + suffix)
+            try? FileManager.default.removeItem(at: url)
         }
     }
-
+    
     override func tearDown()
     {
         analyticsHelper = nil
         mockHttpClient = nil
         super.tearDown()
     }
-
-    // A flush completion can outlive waitForExpectations, and tearDown then sets
-    // mockHttpClient and analyticsHelper to nil. Reading them through self from
-    // inside a completion crashes the whole test binary on the implicit unwrap,
-    // which shows up as an unrelated test failing later in the run. Capture what
-    // the completion needs before tracking, so it holds its own strong reference.
-
+    
     func test_number_of_sent_events_same_as_tracked() {
-        let helper = analyticsHelper!
-        let mock = mockHttpClient!
         let numberOfEvents = 4
         let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
-
+        
         for i in 1...numberOfEvents - 1 {
-            helper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
+            analyticsHelper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
         }
-
-        helper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
-            if let data = mock.capturedData as? [[String: Any?]], data.count == numberOfEvents {
+        
+        self.analyticsHelper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+            if let data = self.mockHttpClient.capturedData as? [[String: Any?]], data.count == numberOfEvents {
                 numberOfEventsExpectation.fulfill()
             }
         }
-
-        wait(for: [numberOfEventsExpectation], timeout: longTimeoutInSeconds)
+        
+        waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
     }
-
+    
     func test_number_of_sent_events_with_delays_same_as_tracked() {
-        let helper = analyticsHelper!
-        let mock = mockHttpClient!
         let numberOfEvents = 4
-
-        // The point of this test is that events tracked in a later, separate flush
-        // are still all delivered. Waiting for the first flush to report completion
-        // establishes that separation directly. A sleep only made it likely, and
-        // spent 2 of the 10 second budget doing nothing, which is what tipped this
-        // test into timing out on a loaded CI runner.
-        let firstEventFlushed = expectation(description: "First event was flushed")
-        helper.trackEvent(eventType: "immediate_event_first", atTime: Date(), properties: nil, immediateFlush: true) {_ in
-            firstEventFlushed.fulfill()
-        }
-        wait(for: [firstEventFlushed], timeout: longTimeoutInSeconds)
-
-        let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents + 1)")
-
-        for i in 1...numberOfEvents - 1 {
-            helper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
-        }
-
-        helper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
-            // +1 for immediate_event_first tracked before the first flush
-            if mock.totalEventCount == numberOfEvents + 1 {
-                numberOfEventsExpectation.fulfill()
+        let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
+        
+        analyticsHelper.trackEvent(eventType: "immediate_event_first", properties: nil, immediateFlush: true)
+        
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
+            for i in 1...numberOfEvents - 1 {
+                self.analyticsHelper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
             }
-        }
-
-        wait(for: [numberOfEventsExpectation], timeout: longTimeoutInSeconds)
-    }
-
-    func test_number_of_sent_events_from_background_threads_same_as_tracked() {
-        let helper = analyticsHelper!
-        let mock = mockHttpClient!
-        let numberOfEvents = 4
-
-        // Nothing ordered the background blocks before the final event, so if they
-        // had not been scheduled yet the final flush completed against a smaller
-        // store. The completion only runs once, so it never re-checked and the test
-        // sat out its whole timeout. Wait for the background events to be flushed
-        // before tracking the last one; they are still issued concurrently, which is
-        // what this test is about.
-        let backgroundEventsFlushed = expectation(description: "Background events weren't flushed")
-        backgroundEventsFlushed.expectedFulfillmentCount = numberOfEvents - 1
-
-        for i in 1...numberOfEvents - 1 {
-            DispatchQueue.global().async {
-                helper.trackEvent(eventType: "immediate_event\(i)", atTime: Date(), properties: nil, immediateFlush: true) {_ in
-                    backgroundEventsFlushed.fulfill()
+            
+            self.analyticsHelper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+                // +1 for immediate_event_first tracked before the delay
+                let count = self.mockHttpClient.totalEventCount
+            
+                if self.mockHttpClient.totalEventCount == numberOfEvents + 1 {
+                    numberOfEventsExpectation.fulfill()
                 }
             }
         }
-
-        wait(for: [backgroundEventsFlushed], timeout: longTimeoutInSeconds)
-
+        
+        waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
+    }
+    
+    func test_number_of_sent_events_from_background_threads_same_as_tracked() {
+        let numberOfEvents = 4
         let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
-
-        helper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
-            if let data = mock.capturedData as? [[String: Any?]], data.count == numberOfEvents {
+    
+        
+        for i in 1...numberOfEvents - 1 {
+            DispatchQueue.global().async {
+                self.analyticsHelper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
+            }
+        }
+        
+        analyticsHelper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+            if let data = self.mockHttpClient.capturedData as? [[String: Any?]], data.count == numberOfEvents {
                 numberOfEventsExpectation.fulfill()
             }
         }
-
-        wait(for: [numberOfEventsExpectation], timeout: longTimeoutInSeconds)
+        
+        waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
     }
-
+    
     func test_immediate_event_should_grab_nonimmediate() {
-        let helper = analyticsHelper!
-        let mock = mockHttpClient!
         let nonImmediateSentExpectation = expectation(description: "Non immediate wasn't sent with immediate")
-
-        helper.trackEvent(eventType: "regular_event", properties: nil, immediateFlush: false)
-        helper.trackEvent(eventType: "immediate_event", atTime: Date(), properties: nil, immediateFlush: true) {_ in
-            if let data = mock.capturedData as? [[String: Any?]], data.count == 2 {
+    
+        
+        analyticsHelper.trackEvent(eventType: "regular_event", properties: nil, immediateFlush: false)
+        analyticsHelper.trackEvent(eventType: "immediate_event", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+            if let data = self.mockHttpClient.capturedData as? [[String: Any?]], data.count == 2 {
                 nonImmediateSentExpectation.fulfill()
             }
         }
-
-        wait(for: [nonImmediateSentExpectation], timeout: longTimeoutInSeconds)
+        
+        waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
     }
-
+    
     func test_failed_network_event_should_be_picked_up_by_subsequent() {
         let mockKSHttpClientSingleFailure = MockKSHttpClientSingleFailure()
         let analyticsHelper = AnalyticsHelper(httpClient: mockKSHttpClientSingleFailure)
-
-        // Wait for the send to actually fail instead of sleeping and assuming it
-        // has, so the second event is guaranteed to be the subsequent dispatch.
-        let firstSendFailed = expectation(description: "First send wasn't failed")
-        mockKSHttpClientSingleFailure.onFailureDelivered = { firstSendFailed.fulfill() }
-
-        analyticsHelper.trackEvent(eventType: "immeditate_event", properties: nil, immediateFlush: true)
-        wait(for: [firstSendFailed], timeout: longTimeoutInSeconds)
-
+        
         let failedEventExpectation = expectation(description: "Failed event wasn't sent on next dispatch")
 
-        analyticsHelper.trackEvent(eventType: "immediate_event_second", atTime: Date(), properties: nil, immediateFlush: true) {_ in
-            if let data = mockKSHttpClientSingleFailure.capturedData as? [[String: Any?]], data.count == 2 {
-                failedEventExpectation.fulfill()
+        analyticsHelper.trackEvent(eventType: "immeditate_event", properties: nil, immediateFlush: true)
+        
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
+            analyticsHelper.trackEvent(eventType: "immediate_event_second", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+                if let data = mockKSHttpClientSingleFailure.capturedData as? [[String: Any?]], data.count == 2 {
+                    failedEventExpectation.fulfill()
+                }
             }
         }
-
-        wait(for: [failedEventExpectation], timeout: longTimeoutInSeconds)
+        
+        waitForExpectations(timeout: longTimeoutInSeconds, handler: nil)
     }
-
+    
 }
 
 class MockKSHttpClient: KSHttpClient {
-    // Written on whichever queue AnalyticsHelper flushes from and read from test
-    // completions, so every access is behind the lock.
-    private let lock = NSLock()
     private var allBatches: [[String: Any?]] = []
 
-    // Every event delivered so far, across all requests, in delivery order
-    var capturedData: Any? {
-        lock.lock()
-        defer { lock.unlock() }
-        return allBatches.isEmpty ? nil : allBatches
-    }
+    // Last batch sent (used by tests that check a single-batch payload)
+    var capturedData: Any? { allBatches.isEmpty ? nil : allBatches }
 
     // Total events accumulated across all requests
-    var totalEventCount: Int {
-        lock.lock()
-        defer { lock.unlock() }
-        return allBatches.count
-    }
+    var totalEventCount: Int { allBatches.count }
 
     func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
         if let batch = data as? [[String: Any?]] {
-            lock.lock()
             allBatches.append(contentsOf: batch)
-            lock.unlock()
         }
         onSuccess(nil, nil)
     }
-
+    
     func invalidateSessionCancellingTasks(_ cancel: Bool) {
         return
     }
@@ -225,37 +157,19 @@ class MockKSHttpClient: KSHttpClient {
 }
 
 class MockKSHttpClientSingleFailure: KSHttpClient {
-    private let lock = NSLock()
-    private var _capturedData: Any?
-    private var failed = false
-
-    // Called once the first, deliberately failed, send has been reported back.
-    var onFailureDelivered: (() -> Void)?
-
-    var capturedData: Any? {
-        lock.lock()
-        defer { lock.unlock() }
-        return _capturedData
-    }
-
+    var capturedData: Any?
+    var failed = false
+    
     func sendRequest(_ method: OptimoveSDK.KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping OptimoveSDK.KSHttpSuccessBlock, onFailure: @escaping OptimoveSDK.KSHttpFailureBlock) {
-        lock.lock()
-        let alreadyFailed = failed
-        if !alreadyFailed {
+        if !failed {
+            onFailure(nil, NSError(domain: "domain", code: 404), nil)
             failed = true
         } else {
-            _capturedData = data
-        }
-        lock.unlock()
-
-        if !alreadyFailed {
-            onFailure(nil, NSError(domain: "domain", code: 404), nil)
-            onFailureDelivered?()
-        } else {
+            capturedData = data
             onSuccess(nil, nil)
         }
     }
-
+    
     func invalidateSessionCancellingTasks(_ cancel: Bool) {
         return
     }
