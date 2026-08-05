@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.8.2
+
+- Fix the tenant configuration being downloaded in full on every launch. It exceeded the size `URLSession` will store in `URLCache.shared`, so it was never cached and never revalidated. Configuration networking now uses its own cache with a larger capacity, and the response is served from disk while fresh or revalidated with `If-None-Match`.
+
 ## 6.8.0
 
 - Add `OptimoveOverlayMessaging.setActionHandler(_:)` — register a handler to intercept overlay CTA clicks and perform custom navigation instead of the SDK opening the URL.
