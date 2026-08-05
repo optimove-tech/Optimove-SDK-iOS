@@ -43,7 +43,10 @@ final class SessionHelperTests: XCTestCase {
         releaseTracking.signal()
     }
 
-    func test_sessionDidEnd_invokesTrackingCompletionAsynchronously() {
+    // The mock is what defers here, so this only covers that sessionDidEnd routes
+    // through trackBackground and its completion runs. Asynchrony of the SDK's own
+    // call is covered by the test above.
+    func test_sessionDidEnd_invokesTrackingCompletion() {
         let completionFired = expectation(description: "onSyncComplete fired")
 
         let asyncMock: (Date, @escaping SyncCompletedBlock) -> Void = { _, done in

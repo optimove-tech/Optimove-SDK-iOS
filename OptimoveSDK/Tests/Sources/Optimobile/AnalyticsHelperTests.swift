@@ -118,13 +118,27 @@ class AnalyticsHelperTests: XCTestCase {
         let helper = analyticsHelper!
         let mock = mockHttpClient!
         let numberOfEvents = 4
-        let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
+
+        // Nothing ordered the background blocks before the final event, so if they
+        // had not been scheduled yet the final flush completed against a smaller
+        // store. The completion only runs once, so it never re-checked and the test
+        // sat out its whole timeout. Wait for the background events to be flushed
+        // before tracking the last one; they are still issued concurrently, which is
+        // what this test is about.
+        let backgroundEventsFlushed = expectation(description: "Background events weren't flushed")
+        backgroundEventsFlushed.expectedFulfillmentCount = numberOfEvents - 1
 
         for i in 1...numberOfEvents - 1 {
             DispatchQueue.global().async {
-                helper.trackEvent(eventType: "immediate_event\(i)", properties: nil, immediateFlush: true)
+                helper.trackEvent(eventType: "immediate_event\(i)", atTime: Date(), properties: nil, immediateFlush: true) {_ in
+                    backgroundEventsFlushed.fulfill()
+                }
             }
         }
+
+        wait(for: [backgroundEventsFlushed], timeout: longTimeoutInSeconds)
+
+        let numberOfEventsExpectation = expectation(description: "Number of events wasnt \(numberOfEvents)")
 
         helper.trackEvent(eventType: "immediate_event_last", atTime: Date(), properties: nil, immediateFlush: true) {_ in
             if let data = mock.capturedData as? [[String: Any?]], data.count == numberOfEvents {
@@ -181,7 +195,7 @@ class MockKSHttpClient: KSHttpClient {
     private let lock = NSLock()
     private var allBatches: [[String: Any?]] = []
 
-    // Last batch sent (used by tests that check a single-batch payload)
+    // Every event delivered so far, across all requests, in delivery order
     var capturedData: Any? {
         lock.lock()
         defer { lock.unlock() }
