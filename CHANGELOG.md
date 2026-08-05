@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.8.4
+
+- Fix a crash when parsing a notification payload that carries `k.message` without a well-formed `data.id`. The payload is now treated as not belonging to the SDK and forwarded to the host app's delegate, as any other unrecognised notification is.
+
 ## 6.8.0
 
 - Add `OptimoveOverlayMessaging.setActionHandler(_:)` — register a handler to intercept overlay CTA clicks and perform custom navigation instead of the SDK opening the URL.

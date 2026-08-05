@@ -44,10 +44,21 @@ public class PushNotification: NSObject {
             return
         }
         
-        let msgData = msg["data"] as! [AnyHashable: Any]
-        
-        id = msgData["id"] as! Int
-        
+        // Anything below here is a payload that looks like ours but is not shaped like ours.
+        // Leaving `id` at 0 marks the notification as not ours, which is what the delegate
+        // needs in order to forward it to the host app instead of answering it.
+        guard let msgData = msg["data"] as? [AnyHashable: Any] else {
+            Logger.warn("Ignoring a notification whose k.message carries no data dictionary")
+            return
+        }
+
+        guard let messageId = msgData["id"] as? Int else {
+            Logger.warn("Ignoring a notification whose k.message data carries no numeric id")
+            return
+        }
+
+        id = messageId
+
         if let urlStr = custom["u"] as? String {
             url = URL(string: urlStr)
         } else {
