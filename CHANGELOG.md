@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.8.1
+
+- Fix `stopDispatchTimer()` starting the dispatch timer instead of stopping it when called off the main thread.
+
 ## 6.8.0
 
 - Add `OptimoveOverlayMessaging.setActionHandler(_:)` — register a handler to intercept overlay CTA clicks and perform custom navigation instead of the SDK opening the URL.
