@@ -123,9 +123,32 @@ final class ServiceLocator {
         )
     }
 
+    /// URLSession will not store a response larger than roughly 5% of its cache
+    /// capacity. `URLCache.shared` has a 10 MB disk capacity, i.e. a ~500 KB ceiling,
+    /// and the tenant configuration decodes to more than that. It was therefore never
+    /// cached, so no validator was ever kept, no conditional request was ever sent,
+    /// and the whole file was downloaded again on every launch. A dedicated cache with
+    /// a higher capacity keeps the entry, letting URLSession revalidate with
+    /// `If-None-Match` and serve from disk while the response is fresh.
+    ///
+    /// Scoped to configuration networking so nothing else changes caching behaviour,
+    /// and deliberately not `URLCache.shared`, which belongs to the host app.
+    ///
+    /// `static`, because `networkingFactory()` returns a new instance per call and the
+    /// cache has to outlive them to be of any use.
+    static let configurationURLCache = URLCache(
+        memoryCapacity: 2 << 20,
+        diskCapacity: 20 << 20,
+        diskPath: "com.optimove.configuration-cache"
+    )
+
     func networkingFactory() -> NetworkingFactory {
+        let configuration = URLSessionConfiguration.default
+        configuration.urlCache = ServiceLocator.configurationURLCache
+        configuration.requestCachePolicy = .useProtocolCachePolicy
+
         return NetworkingFactory(
-            networkClient: NetworkClientImpl(),
+            networkClient: NetworkClientImpl(configuration: configuration),
             requestBuilderFactory: NetworkRequestBuilderFactory(
                 serviceLocator: self
             )
