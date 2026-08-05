@@ -106,7 +106,7 @@ private extension OptiTrack {
     func stopDispatchTimer() {
         guard Thread.isMainThread else {
             DispatchQueue.main.sync {
-                self.startDispatchTimer()
+                self.stopDispatchTimer()
             }
             return
         }
