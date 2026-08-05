@@ -376,18 +376,48 @@ class PushHelper {
     typealias kumulos_applicationDidReceiveRemoteNotificationFetchCompletionHandler = @convention(c) (_ obj: Any, _ _cmd: Selector, _ application: UIApplication, _ userInfo: [AnyHashable: Any], _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void
     typealias didReceiveBlock = @convention(block) (_ obj: Any, _ application: UIApplication, _ userInfo: [AnyHashable: Any], _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void
     
+    private var didInstall = false
+
     lazy var pushInit: Void = {
-        let delegate = UIApplication.shared.delegate!
-        
-        // Get the actual runtime class of the delegate instance to co-exist with other swizzling flows
-        let klass: AnyClass = object_getClass(delegate)!
-        
-        self.swizzleDidRegister(delegate: delegate, klass: klass)
-        self.swizzleDidFailRegister(delegate: delegate, klass: klass)
-        self.swizzleDidReceive(delegate: delegate, klass: klass)
-        self.setUserNotificationCenterDelegates()
+        // `UIApplication.shared` and its delegate are main-thread only, and the swizzling
+        // below writes the file-scope IMP globals. Confining the install to the main thread
+        // keeps both correct no matter which thread the SDK was initialized from.
+        if Thread.isMainThread {
+            self.install()
+        } else {
+            DispatchQueue.main.async {
+                self.install()
+            }
+        }
     }()
-    
+
+    private func install() {
+        guard !didInstall else {
+            // Replacing again would make `class_replaceMethod` hand back our own IMP, and
+            // the swizzled method would then call itself until the stack runs out.
+            Logger.debug("Push notification handling is already installed")
+            return
+        }
+
+        guard let delegate = UIApplication.shared.delegate else {
+            Logger.error("The application has no UIApplicationDelegate, so push notification handling could not be installed. Initialize the SDK from application(_:didFinishLaunchingWithOptions:).")
+            return
+        }
+
+        // Get the actual runtime class of the delegate instance to co-exist with other swizzling flows
+        guard let klass: AnyClass = object_getClass(delegate) else {
+            Logger.error("Could not resolve the runtime class of the UIApplicationDelegate, so push notification handling could not be installed.")
+            return
+        }
+
+        didInstall = true
+
+        swizzleDidRegister(delegate: delegate, klass: klass)
+        swizzleDidFailRegister(delegate: delegate, klass: klass)
+        swizzleDidReceive(delegate: delegate, klass: klass)
+        setUserNotificationCenterDelegate()
+    }
+
     private func swizzleDidRegister(delegate: UIApplicationDelegate, klass: AnyClass) {
         let didRegisterSelector = #selector(UIApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
         let regType = NSString(string: "v@:@@").utf8String
@@ -421,8 +451,6 @@ class PushHelper {
     }
     
     private func swizzleDidFailRegister(delegate: UIApplicationDelegate, klass: AnyClass) {
-        let klass: AnyClass = object_getClass(delegate)!
-        
         let didFailToRegisterSelector = #selector(UIApplicationDelegate.application(_:didFailToRegisterForRemoteNotificationsWithError:))
         let didFailToRegType = NSString(string: "v@:@@").utf8String
         let didFailToRegBlock: didFailToRegBlock = { (obj: Any, application: UIApplication, error: Error) in
@@ -479,15 +507,38 @@ class PushHelper {
         }
     }
     
-    private func setUserNotificationCenterDelegates(){
+    private func setUserNotificationCenterDelegate() {
         if #available(iOS 10, *) {
-            let delegate = OptimoveUserNotificationCenterDelegate()
-            
+            let center = UNUserNotificationCenter.current()
+            // Chain to whatever the host app installed, so that their notifications keep
+            // reaching them. `UNUserNotificationCenter` allows a single delegate, so this is
+            // the only way to co-exist with it.
+            let delegate = OptimoveUserNotificationCenterDelegate(existingDelegate: center.delegate)
+
+            // The center holds its delegate weakly; this is what keeps ours alive.
             Optimobile.sharedInstance.notificationCenter = delegate
-            UNUserNotificationCenter.current().delegate = delegate
+            center.delegate = delegate
+
+            warnIfReplaced(delegate)
         }
     }
-    
+
+    /// Chaining only covers a delegate the host app installed *before* the SDK. One
+    /// installed afterwards replaces ours outright and the SDK stops seeing notifications
+    /// entirely — until now without leaving a trace. Checking once the current run loop turn
+    /// has drained catches the common case, the assignment happening later in
+    /// `application(_:didFinishLaunchingWithOptions:)`.
+    @available(iOS 10, *)
+    private func warnIfReplaced(_ delegate: UNUserNotificationCenterDelegate) {
+        DispatchQueue.main.async {
+            guard UNUserNotificationCenter.current().delegate !== delegate else {
+                return
+            }
+
+            Logger.warn("UNUserNotificationCenter.current().delegate was replaced after the Optimove SDK was initialized, so the SDK will no longer be notified about push notifications. Either set your delegate before initializing the SDK, so that the SDK can forward to it, or report opens yourself with Optimove.shared.trackOpenMetric(userInfo:).")
+        }
+    }
+
     private func getForwardingImpl(target: AnyObject, originalSelector: Selector) -> IMP?{
         let selector = NSSelectorFromString("forwardingTargetForSelector:")
         if target.responds(to: selector),
