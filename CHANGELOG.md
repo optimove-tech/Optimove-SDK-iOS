@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.8.3
+
+- Harden installation of the `UNUserNotificationCenter` delegate. Notifications that are not Optimove's are still forwarded to the delegate the host app had installed, and that rule is now covered by tests; re-installing over our own delegate no longer nests the chain; and a delegate the host app installs *after* the SDK, which silently takes push handling away from the SDK, is now reported in the log.
+- Fix the push swizzling crashing when the SDK is initialized before `UIApplication`'s delegate is set, and install it on the main thread rather than whichever thread initialized the SDK.
+
 ## 6.8.0
 
 - Add `OptimoveOverlayMessaging.setActionHandler(_:)` — register a handler to intercept overlay CTA clicks and perform custom navigation instead of the SDK opening the URL.
