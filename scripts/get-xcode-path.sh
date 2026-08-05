@@ -39,7 +39,7 @@ for APP in $XCODE_APPS; do
     fi
 done
 
-echo "Failed to find Xcode $XCODE_ARG. Available versions: " 1>&2
+echo "Requested Xcode $XCODE_ARG not found. Available versions: " 1>&2
 
 for APP in $XCODE_APPS; do
     APP_VERSION=$(get_version $APP)
@@ -49,12 +49,13 @@ done
 # Pinning an Xcode version that isn't installed should not make every target
 # unrunnable. Fall back to the active toolchain and say so, unless the caller
 # asked for a strict match (CI does, so a missing pinned Xcode fails loudly).
-if [ -n "$XCODE_STRICT" ]; then
+if [ -n "$XCODE_STRICT" ] && [ "$XCODE_STRICT" != "0" ]; then
     echo "XCODE_STRICT is set, refusing to fall back." 1>&2
     exit 1
 fi
 
-ACTIVE_XCODE=$(xcode-select -p 2>/dev/null)
+# Keep the failure non-fatal under `set -e` so the check below reports it.
+ACTIVE_XCODE=$(xcode-select -p 2>/dev/null) || true
 
 if [ -z "$ACTIVE_XCODE" ]; then
     echo "No active Xcode found via xcode-select." 1>&2

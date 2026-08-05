@@ -28,7 +28,7 @@ xcodebuild build-for-testing \
     -destination "$DESTINATION" \
     -sdk "$SDK" \
     -configuration "$CONFIGURATION" \
-    -derivedDataPath $1 |
+    -derivedDataPath "$1" |
     "${FORMATTER[@]}"
 
 echo "Process completed successfully."

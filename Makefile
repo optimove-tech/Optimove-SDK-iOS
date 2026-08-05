@@ -13,7 +13,7 @@ derived_data_path = ${build_path}/derived_data
 
 .PHONY: setup
 setup:
-	test -n "${DEVELOPER_DIR}"
+	test -d "${DEVELOPER_DIR}"
 	brew bundle --file=./Brewfile --quiet || echo "brew bundle failed; xcbeautify and swiftformat may be missing." 1>&2
 
 .PHONY: all
