@@ -330,18 +330,19 @@ class InAppManager {
             }
 
             var mostRecentUpdate = NSDate(timeIntervalSince1970: 0)
-            let dateParser = DateFormatter()
-            dateParser.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
-            dateParser.locale = Locale(identifier: "en_US_POSIX")
-            dateParser.timeZone = TimeZone(secondsFromGMT: 0)
+            let dateParser = InAppMessageParser.makeDateParser()
 
             var fetchedWithInbox = false
+            var persistedMessages: [[AnyHashable: Any]] = []
             for message in messages {
-                let partId = message["id"] as! Int64
+                guard let parsed = InAppMessageParser.parseRequiredFields(from: message, dateParser: dateParser) else {
+                    print("InAppManager: Skipping message with invalid required fields")
+                    continue
+                }
 
                 let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Message")
                 fetchRequest.entity = entity
-                let predicate = NSPredicate(format: "id = %i", partId)
+                let predicate = NSPredicate(format: "id = %i", parsed.id)
                 fetchRequest.predicate = predicate
 
                 var fetchedObjects: [InAppMessageEntity]
@@ -354,12 +355,12 @@ class InAppManager {
                 // Upsert
                 let model: InAppMessageEntity = fetchedObjects.count == 1 ? fetchedObjects[0] : InAppMessageEntity(entity: entity!, insertInto: context)
 
-                model.id = partId
-                model.updatedAt = dateParser.date(from: message["updatedAt"] as! String)! as NSDate
+                model.id = parsed.id
+                model.updatedAt = parsed.updatedAt as NSDate
                 if model.dismissedAt == nil {
                     model.dismissedAt = dateParser.date(from: message["openedAt"] as? String ?? "") as NSDate?
                 }
-                model.presentedWhen = message["presentedWhen"] as! String
+                model.presentedWhen = parsed.presentedWhen
 
                 if model.readAt == nil {
                     model.readAt = dateParser.date(from: message["readAt"] as? String ?? "") as NSDate?
@@ -369,7 +370,7 @@ class InAppManager {
                     model.sentAt = dateParser.date(from: message["sentAt"] as? String ?? "") as NSDate?
                 }
 
-                model.content = message["content"] as! NSDictionary
+                model.content = parsed.content
                 model.data = message["data"] as? NSDictionary
                 model.badgeConfig = message["badge"] as? NSDictionary
                 model.inboxConfig = message["inbox"] as? NSDictionary
@@ -400,6 +401,8 @@ class InAppManager {
                 if model.updatedAt.timeIntervalSince1970 > mostRecentUpdate.timeIntervalSince1970 {
                     mostRecentUpdate = model.updatedAt
                 }
+
+                persistedMessages.append(message)
             }
 
             // Evict
@@ -432,7 +435,7 @@ class InAppManager {
 
             UserDefaults.standard.set(mostRecentUpdate, forKey: OptimobileUserDefaultsKey.IN_APP_MOST_RECENT_UPDATED_AT.rawValue)
 
-            trackMessageDelivery(messages: messages)
+            trackMessageDelivery(messages: persistedMessages)
 
             let inboxUpdated = fetchedWithInbox || evictedWithInbox || evictedExceedersWithInbox
             OptimoveInApp.maybeRunInboxUpdatedHandler(inboxNeedsUpdate: inboxUpdated)
@@ -620,7 +623,10 @@ class InAppManager {
 
     private func trackMessageDelivery(messages: [[AnyHashable: Any]]) {
         for message in messages {
-            let props: [String: Any] = ["type": MESSAGE_TYPE_IN_APP, "id": message["id"] as! Int]
+            guard let id = (message["id"] as? NSNumber)?.intValue else {
+                continue
+            }
+            let props: [String: Any] = ["type": MESSAGE_TYPE_IN_APP, "id": id]
             Optimobile.trackEvent(eventType: OptimobileEvent.MESSAGE_DELIVERED, properties: props)
         }
     }
