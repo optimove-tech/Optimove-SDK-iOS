@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.8.1
+
+- Fix crash during in-app message sync when remote message `content` is missing or not a dictionary. Invalid payloads are now skipped using Overlay-style safe parsing instead of force-casting during Core Data persistence.
+
 ## 6.8.0
 
 - Add `OptimoveOverlayMessaging.setActionHandler(_:)` — register a handler to intercept overlay CTA clicks and perform custom navigation instead of the SDK opening the URL.
