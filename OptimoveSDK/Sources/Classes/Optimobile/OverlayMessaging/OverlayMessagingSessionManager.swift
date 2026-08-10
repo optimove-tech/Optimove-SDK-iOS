@@ -15,8 +15,8 @@ class OverlayMessagingSessionManager {
     private var timer: Timer?
     private var appInForeground = false
     
-    init(sessionLengthHours: Int, listener: @escaping SessionStartedListener) {
-        self.sessionLength = TimeInterval(sessionLengthHours) * 3600.0
+    init(sessionLengthMinutes: Int, listener: @escaping SessionStartedListener) {
+        self.sessionLength = TimeInterval(sessionLengthMinutes) * 60.0
         self.listener = listener
         registerListeners()
     }

@@ -1,8 +1,12 @@
 # Changelog
 
+## 6.10.0
+
+- Add Adact campaign support to `GamifyWidgetSDK`: `initialize(widgetUrl:adactUrl:)`, `openAdactCampaign(from:params:)`, `closeAdactCampaign()`, `closeWidget()`, and `buildAdactCampaignUrl(params:)`. Opens `{adactUrl}/embedded/{campaignId}` with optional `cid` and `customerIdToken` query params (same contract as the Web / Android SDKs). Adact does not use the loyalty READY→INIT handshake.
+
 ## 6.9.0
 
-- Added Adact campaign support to `GamifyWidgetSDK`: `initialize(widgetUrl:adactUrl:)`, `openAdactCampaign(from:params:)`, `closeAdactCampaign()`, `closeWidget()`, and `buildAdactCampaignUrl(params:)`. Opens `{adactUrl}/embedded/{campaignId}` with optional `cid` and `customerIdToken` query params (same contract as the Web / Android SDKs). Adact does not use the loyalty READY→INIT handshake.
+- Add `OptimoveConfigBuilder.enableOverlayMessaging(sessionLengthMinutes:)` overload to configure the overlay messaging session window in minutes (minimum 15). The existing `enableOverlayMessaging(sessionLengthHours:)` overload is unchanged.
 
 ## 6.8.0
 
