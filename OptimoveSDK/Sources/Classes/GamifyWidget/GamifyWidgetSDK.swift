@@ -70,17 +70,18 @@ public final class GamifyWidgetSDK {
         if loyaltyViewController != nil {
             return
         }
-        // Both surfaces are modal overlays on iOS — only one at a time.
-        closeAdactCampaign_onMain()
 
-        let vc = GamifyWidgetViewController(
-            widgetUrl: widgetUrl,
-            userId: userId,
-            token: token,
-            enableInitHandshake: true
-        )
-        present(vc, from: viewController)
-        loyaltyViewController = vc
+        // Dismiss Adact first (if open), then present — avoids UIKit "presentation in progress" races.
+        dismissOverlay(adactViewController, clearing: { adactViewController = nil }) {
+            let vc = GamifyWidgetViewController(
+                widgetUrl: widgetUrl,
+                userId: userId,
+                token: token,
+                enableInitHandshake: true
+            )
+            present(vc, from: viewController)
+            loyaltyViewController = vc
+        }
     }
 
     /// Opens an Adact embedded campaign overlay.
@@ -105,16 +106,17 @@ public final class GamifyWidgetSDK {
         if adactViewController != nil {
             return
         }
-        closeWidget_onMain()
 
-        let vc = GamifyWidgetViewController(
-            widgetUrl: campaignUrl,
-            userId: nil,
-            token: nil,
-            enableInitHandshake: false
-        )
-        present(vc, from: viewController)
-        adactViewController = vc
+        dismissOverlay(loyaltyViewController, clearing: { loyaltyViewController = nil }) {
+            let vc = GamifyWidgetViewController(
+                widgetUrl: campaignUrl,
+                userId: nil,
+                token: nil,
+                enableInitHandshake: false
+            )
+            present(vc, from: viewController)
+            adactViewController = vc
+        }
     }
 
     /// Builds `{adactUrl}/embedded/{campaignId}?cid=&customerIdToken=`.
@@ -148,8 +150,7 @@ public final class GamifyWidgetSDK {
 
     private static func closeWidget_onMain() {
         assertOnMainThread()
-        loyaltyViewController?.dismiss(animated: true)
-        loyaltyViewController = nil
+        dismissOverlay(loyaltyViewController, clearing: { loyaltyViewController = nil })
     }
 
     public static func closeAdactCampaign() {
@@ -158,8 +159,20 @@ public final class GamifyWidgetSDK {
 
     private static func closeAdactCampaign_onMain() {
         assertOnMainThread()
-        adactViewController?.dismiss(animated: true)
-        adactViewController = nil
+        dismissOverlay(adactViewController, clearing: { adactViewController = nil })
+    }
+
+    private static func dismissOverlay(
+        _ overlay: GamifyWidgetViewController?,
+        clearing: () -> Void,
+        completion: (() -> Void)? = nil
+    ) {
+        guard let overlay = overlay else {
+            completion?()
+            return
+        }
+        clearing()
+        overlay.dismiss(animated: true, completion: completion)
     }
 
     private static func present(_ vc: GamifyWidgetViewController, from presenter: UIViewController) {
