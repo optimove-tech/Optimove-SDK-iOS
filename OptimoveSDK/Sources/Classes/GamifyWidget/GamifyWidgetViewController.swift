@@ -13,14 +13,18 @@ final class GamifyWidgetViewController: UIViewController {
     private let widgetUrl: String
     private let userId: String?
     private let token: String?
+    private let enableInitHandshake: Bool
 
     private var webView: WKWebView!
     private var activityIndicator: UIActivityIndicatorView!
 
-    init(widgetUrl: String, userId: String?, token: String?) {
+    /// - Parameter enableInitHandshake: Loyalty widgets use READY→INIT. Adact campaigns pass
+    ///   identity via URL query params and set this to `false`.
+    init(widgetUrl: String, userId: String?, token: String?, enableInitHandshake: Bool = true) {
         self.widgetUrl = widgetUrl
         self.userId = userId
         self.token = token
+        self.enableInitHandshake = enableInitHandshake
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -102,6 +106,18 @@ final class GamifyWidgetViewController: UIViewController {
     private func dismissSelf() {
         dismiss(animated: true)
     }
+
+    private func parseMessageBody(_ body: Any) -> [String: Any]? {
+        if let dict = body as? [String: Any] {
+            return dict
+        }
+        if let string = body as? String,
+           let data = string.data(using: .utf8),
+           let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            return dict
+        }
+        return nil
+    }
 }
 
 extension GamifyWidgetViewController: WKScriptMessageHandler {
@@ -111,10 +127,17 @@ extension GamifyWidgetViewController: WKScriptMessageHandler {
             return
         }
         guard message.name == BridgeMessage.receiveMessage,
-              let body = message.body as? [String: Any],
+              let body = parseMessageBody(message.body),
               let type = body["type"] as? String else { return }
-        if type == "READY" {
+
+        switch type {
+        case "READY":
+            guard enableInitHandshake else { return }
             DispatchQueue.main.async { self.sendInit() }
+        case "CLOSE":
+            DispatchQueue.main.async { self.dismissSelf() }
+        default:
+            break
         }
     }
 }
