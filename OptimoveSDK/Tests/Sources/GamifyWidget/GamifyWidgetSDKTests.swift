@@ -14,7 +14,7 @@ final class GamifyWidgetSDKTests: XCTestCase {
     override func setUp() {
         super.setUp()
         runOnMainSync {
-            GamifyWidgetSDK.initialize(widgetUrl: "")
+            GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: nil)
         }
     }
 
@@ -45,5 +45,77 @@ final class GamifyWidgetSDKTests: XCTestCase {
             }
         }
         wait(for: [expectation], timeout: 2.0)
+    }
+
+    func testInitializeStoresNormalizedAdactUrl() {
+        runOnMainSync {
+            GamifyWidgetSDK.initialize(
+                widgetUrl: "https://loyalty.example.com",
+                adactUrl: "https://campaign.adact.me/"
+            )
+        }
+        XCTAssertEqual(GamifyWidgetSDK.adactUrl, "https://campaign.adact.me")
+        XCTAssertEqual(GamifyWidgetSDK.getAdactUrl(), "https://campaign.adact.me/")
+    }
+
+    func testGetAdactUrlEmptyWhenNotConfigured() {
+        runOnMainSync {
+            GamifyWidgetSDK.initialize(widgetUrl: "https://loyalty.example.com")
+        }
+        XCTAssertEqual(GamifyWidgetSDK.getAdactUrl(), "")
+    }
+
+    func testBuildAdactCampaignUrlBuildsEmbeddedPath() {
+        runOnMainSync {
+            GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: "https://campaign.adact.me/")
+        }
+        XCTAssertEqual(
+            GamifyWidgetSDK.buildAdactCampaignUrl(params: OpenAdactParams(campaignId: 179)),
+            "https://campaign.adact.me/embedded/179"
+        )
+    }
+
+    func testBuildAdactCampaignUrlAddsCidAndCustomerIdToken() {
+        runOnMainSync {
+            GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: "https://campaign.adact.me/")
+        }
+        let url = GamifyWidgetSDK.buildAdactCampaignUrl(
+            params: OpenAdactParams(
+                campaignId: 179,
+                cid: "customer@example.com",
+                token: "jwt-token"
+            )
+        )
+        XCTAssertTrue(url.hasPrefix("https://campaign.adact.me/embedded/179?"))
+        XCTAssertTrue(url.contains("cid=customer%40example.com") || url.contains("cid=customer@example.com"))
+        XCTAssertTrue(url.contains("customerIdToken=jwt-token"))
+    }
+
+    func testBuildAdactCampaignUrlEmptyWhenAdactUrlOrCampaignIdMissing() {
+        runOnMainSync {
+            GamifyWidgetSDK.initialize(widgetUrl: "https://loyalty.example.com")
+        }
+        XCTAssertEqual(
+            GamifyWidgetSDK.buildAdactCampaignUrl(params: OpenAdactParams(campaignId: 179)),
+            ""
+        )
+
+        runOnMainSync {
+            GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: "https://campaign.adact.me/")
+        }
+        XCTAssertEqual(
+            GamifyWidgetSDK.buildAdactCampaignUrl(params: OpenAdactParams(cid: "cid")),
+            ""
+        )
+    }
+
+    func testBuildAdactCampaignUrlRejectsNonHttps() {
+        runOnMainSync {
+            GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: "http://campaign.adact.me/")
+        }
+        XCTAssertEqual(
+            GamifyWidgetSDK.buildAdactCampaignUrl(params: OpenAdactParams(campaignId: 179)),
+            ""
+        )
     }
 }
