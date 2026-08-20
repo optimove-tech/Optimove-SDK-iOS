@@ -7,7 +7,7 @@ import XCTest
 
 class OptitrackTests: OptimoveTestCase {
     var optitrack: OptiTrack!
-    var networking: OptistreamNetworkingMock!
+    var dispatcher: OptistreamDispatcherMock!
     var builder: OptistreamEventBuilder!
     let dispatchInterval: TimeInterval = 1
 
@@ -15,7 +15,7 @@ class OptitrackTests: OptimoveTestCase {
         let configuration = ConfigurationFixture.build(
             Options(isEnableRealtime: true, isEnableRealtimeThroughOptistream: true)
         )
-        networking = OptistreamNetworkingMock()
+        dispatcher = OptistreamDispatcherMock()
         let queue = try OptistreamQueueImpl(
             queueType: .track,
             container: PersistentContainer(),
@@ -27,7 +27,7 @@ class OptitrackTests: OptimoveTestCase {
         )
         optitrack = OptiTrack(
             queue: queue,
-            networking: networking,
+            dispatcher: dispatcher,
             configuration: configuration.optitrack
         )
         optitrack?.dispatchInterval = dispatchInterval
@@ -35,7 +35,7 @@ class OptitrackTests: OptimoveTestCase {
 
     override func tearDownWithError() throws {
         optitrack = nil
-        networking = nil
+        dispatcher = nil
         builder = nil
     }
 
@@ -68,7 +68,7 @@ class OptitrackTests: OptimoveTestCase {
         )
         batchExpectation.expectedFulfillmentCount = batchTimes
         var eventIds: [String] = []
-        networking.assetEventsFunction = { events, completion in
+        dispatcher.assetEventsFunction = { events, completion in
             events.enumerated().forEach { event in
                 let eventId = event.element.metadata.eventId
                 if eventIds.contains(eventId) {
