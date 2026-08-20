@@ -1,6 +1,11 @@
+# Preferred Xcode version. When it isn't installed the scripts fall back to the
+# active toolchain; set XCODE_STRICT=1 to require an exact match instead.
 XCODE ?= 15.2
 
-export TEST_DESTINATION ?= platform=iOS Simulator,OS=17.7,name=iPhone 15
+# Optional override for the simulator to test on, e.g.
+#   make test TEST_DESTINATION="platform=iOS Simulator,OS=18.0,name=iPhone 16"
+# When unset, scripts/resolve-test-destination.sh picks an available simulator.
+export TEST_DESTINATION
 export DEVELOPER_DIR = $(shell bash ./scripts/get-xcode-path.sh ${XCODE} $(XCODE_PATH))
 
 build_path = .build
@@ -8,8 +13,8 @@ derived_data_path = ${build_path}/derived_data
 
 .PHONY: setup
 setup:
-	test ${DEVELOPER_DIR}
-	brew bundle --file=./Brewfile --quiet
+	test -d "${DEVELOPER_DIR}"
+	brew bundle --file=./Brewfile --quiet || echo "brew bundle failed; xcbeautify and swiftformat may be missing." 1>&2
 
 .PHONY: all
 all: setup format headers test clean
