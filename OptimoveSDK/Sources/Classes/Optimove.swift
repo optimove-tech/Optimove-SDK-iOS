@@ -90,8 +90,10 @@ typealias Logger = OptimoveCore.Logger
                 }
             }
         }
-        
-       
+
+        if config.isLiveActivitiesConfigured() {
+            OptimoveLiveActivities.start(with: config)
+        }
     }
 
     static func getConfig() -> OptimoveConfig? {
