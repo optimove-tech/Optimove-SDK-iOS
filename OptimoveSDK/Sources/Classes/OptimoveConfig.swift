@@ -1,6 +1,11 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
+
+#if canImport(ActivityKit)
+    import ActivityKit
+#endif
 
 /// A set of options for configuring the SDK.
 /// - Note: The SDK can be configured to support multiple features.
@@ -17,6 +22,8 @@ public struct Feature: OptionSet, @unchecked Sendable, CustomStringConvertible {
     public static let preferenceCenter = Feature(rawValue: 1 << 4)
     /// Embedded messaing feature
     public static let embeddedMessaging = Feature(rawValue: 1 << 5)
+    /// Live Activities feature. Requires ``optimobile`` and iOS 18.0 or newer to do anything.
+    public static let liveActivities = Feature(rawValue: 1 << 6)
 
     static let delayedConfiguration = Feature(rawValue: 1 << 3)
 
@@ -38,6 +45,9 @@ public struct Feature: OptionSet, @unchecked Sendable, CustomStringConvertible {
         if contains(.preferenceCenter) {
             descriptions.append("Preference Center")
         }
+        if contains(.liveActivities) {
+            descriptions.append("Live Activities")
+        }
 
         return descriptions.isEmpty ? "No Features" : descriptions.joined(separator: ", ")
     }
@@ -49,6 +59,8 @@ public struct OptimoveConfig {
     let optimobileConfig: OptimobileConfig?
     let preferenceCenterConfig: PreferenceCenterConfig?
     let embeddedMessagingConfig: EmbeddedMessagingConfig?
+    let authTokenProvider: AuthTokenProvider?
+    let liveActivityRegistrations: [OptimoveLiveActivityRegistration]
 
     func isOptimoveConfigured() -> Bool {
         return features.contains(.optimove)
@@ -72,6 +84,10 @@ public struct OptimoveConfig {
 
     func getEmbeddedMessagingConfig() -> EmbeddedMessagingConfig? {
         return embeddedMessagingConfig
+    }
+
+    func isLiveActivitiesConfigured() -> Bool {
+        return features.contains(.liveActivities)
     }
 }
 
@@ -133,10 +149,13 @@ open class OptimoveConfigBuilder: NSObject {
     private var _pushReceivedInForegroundHandlerBlock: Any?
     private var _deepLinkCname: URL?
     private var _deepLinkHandler: DeepLinkHandler?
+    private var _authTokenProvider: AuthTokenProvider?
+    private var _overlayMessagingSessionLengthHours: Int?
     private var _overlayMessagingSessionLengthMinutes: Int?
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
+    private var _liveActivityRegistrations: [OptimoveLiveActivityRegistration] = []
 
     public convenience init(optimoveCredentials: String?, optimobileCredentials: String?) {
         self.init()
@@ -185,6 +204,8 @@ open class OptimoveConfigBuilder: NSObject {
             _isRelease = optimobileConfig.isRelease
             _overlayMessagingSessionLengthMinutes = optimobileConfig.isOverlayMessagingEnabled ? optimobileConfig.overlayMessagingSessionLengthMinutes : nil
         }
+        _authTokenProvider = config.authTokenProvider
+        _liveActivityRegistrations = config.liveActivityRegistrations
         features = config.features
     }
 
@@ -322,6 +343,41 @@ open class OptimoveConfigBuilder: NSObject {
         return self
     }
 
+    #if canImport(ActivityKit)
+        /// Enables Live Activities for a host `ActivityAttributes` type (iOS 18+).
+        /// Conform the type to ``OptimoveLiveActivityAttributes`` in the app target, not the widget.
+        @available(iOS 18.0, *)
+        @discardableResult public func enableLiveActivities<Attributes: ActivityAttributes & OptimoveLiveActivityAttributes>(
+            _ type: Attributes.Type
+        ) -> OptimoveConfigBuilder {
+            let registration = OptimoveLiveActivityRegistration(type)
+
+            guard !_liveActivityRegistrations.contains(where: { $0.attributesTypeName == registration.attributesTypeName }) else {
+                Logger.warn("enableLiveActivities called twice for \(registration.attributesTypeName); ignoring the repeat.")
+                return self
+            }
+
+            features.insert(.liveActivities)
+            _liveActivityRegistrations.append(registration)
+
+            return self
+        }
+    #endif
+
+    /// Enable JWT-based federated authentication for all user-identified requests.
+    ///
+    /// When enabled, the SDK will call this closure before each user-identified request to obtain
+    /// a JWT, which is attached via the `X-User-JWT` header.
+    ///
+    /// - Parameter provider: A closure that receives a userId and a completion callback.
+    ///   Call `completion(jwt, nil)` on success or `completion(nil, error)` on failure.
+    /// - Returns: The builder instance for chaining.
+    @discardableResult public func enableAuth(
+        _ provider: @escaping AuthTokenProvider
+    ) -> OptimoveConfigBuilder {
+        _authTokenProvider = provider
+        return self
+    }
 
     /**
      Internal SDK embedding API to support override of stats data in x-plat SDKs. Do not call or depend on this method in your app
@@ -437,7 +493,9 @@ open class OptimoveConfigBuilder: NSObject {
             tenantInfo: tenantInfo,
             optimobileConfig: optimobileConfig,
             preferenceCenterConfig: preferenceCenterConfig,
-            embeddedMessagingConfig: embeddedMessagingConfig
+            embeddedMessagingConfig: embeddedMessagingConfig,
+            authTokenProvider: _authTokenProvider,
+            liveActivityRegistrations: _liveActivityRegistrations
         )
     }
 

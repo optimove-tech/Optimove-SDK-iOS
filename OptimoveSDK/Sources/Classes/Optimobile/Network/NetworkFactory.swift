@@ -1,14 +1,17 @@
 //  Copyright © 2023 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 final class NetworkFactory {
     var urlBuilder: UrlBuilder
     var authorization: HttpAuthorizationProtocol
+    var authManager: AuthManager?
 
-    init(urlBuilder: UrlBuilder, authorization: HttpAuthorizationProtocol) {
+    init(urlBuilder: UrlBuilder, authorization: HttpAuthorizationProtocol, authManager: AuthManager? = nil) {
         self.urlBuilder = urlBuilder
         self.authorization = authorization
+        self.authManager = authManager
     }
 
     func build(for service: UrlBuilder.Service) -> KSHttpClient {
@@ -17,7 +20,8 @@ final class NetworkFactory {
             urlBuilder: urlBuilder,
             requestFormat: .json,
             responseFormat: .json,
-            authorization: authorization
+            authorization: authorization,
+            authManager: authManager
         )
     }
 }
