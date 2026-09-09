@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.11.0
+
+- Add `OptimoveOverlayMessaging.hide()` / `show()` — temporarily take a displayed overlay off screen and restore it in place, for hosts that need the screen for a higher-priority popup of their own. The message resumes where it was, with no re-trigger and no second interceptor call. Messages arriving while hidden are held until `show()`.
+
 ## 6.10.0
 
 - Add Adact campaign support to `GamifyWidgetSDK`: `initialize(widgetUrl:adactUrl:)`, `openAdactCampaign(from:params:)`, `closeAdactCampaign()`, `closeWidget()`, and `buildAdactCampaignUrl(params:)`. Opens `{adactUrl}/embedded/{campaignId}` with optional `cid` and `customerIdToken` query params (same contract as the Web / Android SDKs). Adact does not use the loyalty READY→INIT handshake.

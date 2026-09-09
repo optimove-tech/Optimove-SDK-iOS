@@ -19,7 +19,8 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     private var frame: UIView?
     private var window: UIWindow?
     private var webViewReady = false
-    
+    private var hidden = false
+
     private var contentController: WKUserContentController?
     
     private var currentMessage: OverlayMessagingMessage
@@ -44,6 +45,11 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
         sendCurrentMessageToClient()
     }
     
+    func setHidden(_ hidden: Bool) {
+        self.hidden = hidden
+        applyVisibility()
+    }
+
     func dispose() {
         destroyViews()
     }
@@ -72,7 +78,7 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
         frame.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         frame.backgroundColor = .clear
         
-        window!.isHidden = false
+        applyVisibility()
         window!.rootViewController!.view = frame
         
         contentController = WKUserContentController()
@@ -128,6 +134,12 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
         frame.bringSubviewToFront(loadingSpinner)
     }
     
+    private func applyVisibility() {
+        guard let window = window else { return }
+        window.isHidden = hidden
+        window.isUserInteractionEnabled = !hidden
+    }
+
     private func destroyViews() {
         contentController?.removeScriptMessageHandler(forName: "inAppHost")
         contentController = nil

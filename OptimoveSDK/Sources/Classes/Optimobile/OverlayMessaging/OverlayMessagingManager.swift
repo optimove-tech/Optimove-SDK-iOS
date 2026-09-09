@@ -16,6 +16,7 @@ class OverlayMessagingManager {
     private var interceptor: OverlayMessagingInterceptor?
     private let actionDispatcher = OverlayActionDispatcher(defaults: DefaultOverlayActionHandler())
     private var presenter: OverlayMessagingPresenter?
+    private var hidden = false
     // Prevents showing the same message twice if triggers fire in quick succession
     // (after slot cleared but before backend state updates)
     private var seenMessageIds = Set<Int64>()
@@ -33,6 +34,20 @@ class OverlayMessagingManager {
 
     func setActionHandler(_ handler: OverlayActionHandler?) {
         actionDispatcher.setOverrides(handler)
+    }
+
+    // MARK: - Visibility
+
+    func setHidden(_ hidden: Bool) {
+        guard self.hidden != hidden else { return }
+        self.hidden = hidden
+
+        if hidden {
+            presenter?.setHidden(true)
+        } else {
+            maybeShowNext()
+            presenter?.setHidden(false)
+        }
     }
     
     // MARK: - Triggers
@@ -138,6 +153,8 @@ class OverlayMessagingManager {
     // MARK: - Display
     
     private func maybeShowNext() {
+        guard !hidden else { return }
+
         guard let next = displayQueue.first else {
             presenter?.dispose()
             presenter = nil
