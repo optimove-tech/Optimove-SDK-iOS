@@ -157,7 +157,7 @@ extension MigrationWork_3_3_0 {
         func moveFilesFromAppGroup() throws {
             let bundleID = try Bundle.getApplicationNameSpace()
             let oldURL = try getDeprecatedFileManagerGroupContainerURL(tenantBundleIdentifier: bundleID).appendingPathComponent("OptimoveSDK")
-            let newURL = try FileManager.optimoveURL()
+            let newURL = FileManager.optimoveURL()
             let fileManager = FileManager.default
             var isDirectory: ObjCBool = false
             let exists = FileManager.default.fileExists(atPath: oldURL.absoluteString, isDirectory: &isDirectory)

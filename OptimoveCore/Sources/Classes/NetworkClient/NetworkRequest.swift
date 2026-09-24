@@ -88,6 +88,7 @@ public extension HTTPHeader {
         case contentType = "Content-Type"
         case userAgent = "User-Agent"
         case tenantId = "X-Tenant-Id"
+        case userJwt = "X-User-JWT"
         case accept
     }
 
@@ -113,6 +114,11 @@ public extension HTTPHeader {
     init(field: Fields, value: Values) {
         self.field = field.rawValue
         self.value = String(describing: value) 
+    }
+
+    init(field: Fields, value: String) {
+        self.field = field.rawValue
+        self.value = value
     }
 }
 
