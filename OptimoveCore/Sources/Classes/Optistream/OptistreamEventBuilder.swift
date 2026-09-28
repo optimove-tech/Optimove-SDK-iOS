@@ -28,7 +28,7 @@ public final class OptistreamEventBuilder {
             category: event.category,
             event: event.name,
             origin: Constants.Values.origin,
-            customer: storage.customerID,
+            customer: storage.customerID.flatMap { $0.isEmpty ? nil : $0 },
             visitor: storage.getVisitorID(),
             timestamp: Formatter.iso8601withFractionalSeconds.string(from: event.timestamp),
             context: JSON(event.context),

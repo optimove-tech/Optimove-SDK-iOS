@@ -7,7 +7,7 @@ import XCTest
 
 class RealtimeComponentTests: OptimoveTestCase {
     var realtime: RealTime!
-    var networking = OptistreamNetworkingMock()
+    var dispatcher = OptistreamDispatcherMock()
     var queue = MockOptistreamQueue()
 
     func test_RT_events_order() throws {
@@ -15,7 +15,7 @@ class RealtimeComponentTests: OptimoveTestCase {
         realtime = RealTime(
             configuration: configuration.realtime,
             storage: storage,
-            networking: networking,
+            dispatcher: dispatcher,
             queue: queue
         )
 
@@ -23,7 +23,7 @@ class RealtimeComponentTests: OptimoveTestCase {
         let event2 = FixtureOptistreamEvent.generateEvent(event: "event2")
         let event1Expectation = expectation(description: "\(event1.event) was not generated")
         let event2Expectation = expectation(description: "\(event2.event) was not generated")
-        networking.assetEventsFunction = { events, _ in
+        dispatcher.assetEventsFunction = { events, _ in
             events.forEach { event in
                 switch event.event {
                 case event1.event:
@@ -53,13 +53,13 @@ class RealtimeComponentTests: OptimoveTestCase {
         realtime = RealTime(
             configuration: configuration.realtime,
             storage: storage,
-            networking: networking,
+            dispatcher: dispatcher,
             queue: queue
         )
         let event1 = FixtureOptistreamEvent.generateEvent(event: "event1")
         let event1Expectation = expectation(description: "\(event1.event) was not generated")
         event1Expectation.isInverted.toggle()
-        networking.assetEventsFunction = { events, _ in
+        dispatcher.assetEventsFunction = { events, _ in
             events.forEach { event in
                 switch event.event {
                 case event1.event:

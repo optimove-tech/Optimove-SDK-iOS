@@ -281,7 +281,7 @@ class InAppManager {
             let encodedIdentifier = KSHttpUtil.urlEncode(OptimobileHelper.currentUserIdentifier)
             let path = "/v1/users/\(encodedIdentifier!)/messages\(after)"
 
-            self.httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { _, decodedBody in
+            self.httpClient.sendRequest(.GET, toPath: path, data: nil, authUserId: OptimobileHelper.associatedUserId, onSuccess: { _, decodedBody in
                 defer {
                     UserDefaults.standard.set(Date(), forKey: OptimobileUserDefaultsKey.IN_APP_LAST_SYNCED_AT.rawValue)
                     syncBarrier.signal()

@@ -9,13 +9,13 @@ final class OptiTrackMockQueueTests: OptimoveTestCase {
     var optitrack: OptiTrack!
     var dateProvider = MockDateTimeProvider()
     var statisticService = MockStatisticService()
-    var networking: OptistreamNetworkingMock!
+    var dispatcher: OptistreamDispatcherMock!
     var queue: MockOptistreamQueue!
     var builder: OptistreamEventBuilder!
     let dispatchInterval: TimeInterval = 1
 
     override func setUp() {
-        networking = OptistreamNetworkingMock()
+        dispatcher = OptistreamDispatcherMock()
         queue = MockOptistreamQueue()
         let configuration = ConfigurationFixture.build(
             Options(isEnableRealtime: true, isEnableRealtimeThroughOptistream: true)
@@ -26,7 +26,7 @@ final class OptiTrackMockQueueTests: OptimoveTestCase {
         )
         optitrack = OptiTrack(
             queue: queue,
-            networking: networking,
+            dispatcher: dispatcher,
             configuration: configuration.optitrack
         )
         optitrack.dispatchInterval = dispatchInterval
@@ -39,7 +39,7 @@ final class OptiTrackMockQueueTests: OptimoveTestCase {
 
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
-        networking.assetEventsFunction = { events, _ in
+        dispatcher.assetEventsFunction = { events, _ in
             XCTAssertEqual(events.count, 1)
             networkExpectation.fulfill()
         }
@@ -57,7 +57,7 @@ final class OptiTrackMockQueueTests: OptimoveTestCase {
 
         // then
         let networkExpectation = expectation(description: "track event haven't been generated.")
-        networking.assetEventsFunction = { events, _ in
+        dispatcher.assetEventsFunction = { events, _ in
             XCTAssertEqual(stubEvents.count, events.count)
             networkExpectation.fulfill()
         }

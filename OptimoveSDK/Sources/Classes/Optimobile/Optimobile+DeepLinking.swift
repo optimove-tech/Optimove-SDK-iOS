@@ -120,7 +120,7 @@ final class DeepLinkHelper {
             path = path + "&" + query
         }
 
-        httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { res, data in
+        httpClient.sendRequest(.GET, toPath: path, data: nil, authUserId: nil, onSuccess: { res, data in
             switch res?.statusCode {
             case 200:
                 guard let dictionary = data as? [AnyHashable: Any],

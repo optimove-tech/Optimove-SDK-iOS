@@ -19,7 +19,7 @@ class OverlayMessagingRequestService {
         let messageType = type == .session ? "session" : "immediate"
         let path = "/api/v1/users/\(encodedIdentifier)/messages/mobile?messageType=\(messageType)"
         
-        httpClient.sendRequest(.GET, toPath: path, data: nil, onSuccess: { response, decodedBody in
+        httpClient.sendRequest(.GET, toPath: path, data: nil, authUserId: OptimobileHelper.associatedUserId, onSuccess: { response, decodedBody in
             if response?.statusCode == 204 {
                 onComplete(nil)
                 return

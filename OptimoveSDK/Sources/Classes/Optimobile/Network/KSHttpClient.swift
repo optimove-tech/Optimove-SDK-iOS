@@ -1,6 +1,7 @@
 //  Copyright © 2022 Optimove. All rights reserved.
 
 import Foundation
+import OptimoveCore
 
 enum KSHttpError: Error {
     case responseCastingError
@@ -25,7 +26,10 @@ enum KSHttpMethod: String {
 
 protocol KSHttpClient {
     func invalidateSessionCancellingTasks(_ cancel: Bool)
-    func sendRequest(_ method: KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock)
+    /// Send an HTTP request.
+    /// - `authUserId == nil`: no JWT is attached (visitor / unauthenticated requests).
+    /// - `authUserId == <userId>`: a JWT is resolved for that user and attached.
+    func sendRequest(_ method: KSHttpMethod, toPath path: String, data: Any?, authUserId: String?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock)
 }
 
 final class KSHttpClientImpl: KSHttpClient {
@@ -36,6 +40,7 @@ final class KSHttpClientImpl: KSHttpClient {
     private let requestFormat: KSHttpDataFormat
     private let responseFormat: KSHttpDataFormat
     private let authorization: HttpAuthorizationProtocol
+    private let authManager: AuthManager?
 
     // MARK: Initializers & Configs
 
@@ -45,13 +50,15 @@ final class KSHttpClientImpl: KSHttpClient {
         requestFormat: KSHttpDataFormat,
         responseFormat: KSHttpDataFormat,
         authorization: HttpAuthorizationProtocol,
-        additionalHeaders: [AnyHashable: Any]? = nil
+        additionalHeaders: [AnyHashable: Any]? = nil,
+        authManager: AuthManager? = nil
     ) {
         self.authorization = authorization
         self.serviceType = serviceType
         self.urlBuilder = urlBuilder
         self.requestFormat = requestFormat
         self.responseFormat = responseFormat
+        self.authManager = authManager
 
         let config = URLSessionConfiguration.ephemeral
 
@@ -77,14 +84,44 @@ final class KSHttpClientImpl: KSHttpClient {
 
     // MARK: HTTP Methods
 
-    func sendRequest(_ method: KSHttpMethod, toPath path: String, data: Any?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
+    func sendRequest(_ method: KSHttpMethod, toPath path: String, data: Any?, authUserId: String?, onSuccess: @escaping KSHttpSuccessBlock, onFailure: @escaping KSHttpFailureBlock) {
         do {
             var request = try buildRequest(for: path, method: method, body: data)
 
             let headers = try authorization.getAuthorizationHeader(strategy: .basic)
             request.allHTTPHeaderFields = request.allHTTPHeaderFields?.merging(headers) { _, new in new } ?? headers
 
-            sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
+            // Signal that this SDK version supports auth.
+            request.addValue("1", forHTTPHeaderField: "X-Optimove-Auth-Capable")
+            request.addValue("ios", forHTTPHeaderField: "X-Optimove-Platform")
+
+            switch (authManager, authUserId) {
+            case let (authManager?, userId?):
+                // Auth configured + user-identified request → resolve JWT, then send.
+                authManager.getToken(userId: userId) { [self] result in
+                    switch result {
+                    case .success(let jwt):
+                        request.addValue(jwt, forHTTPHeaderField: "X-User-JWT")
+                        self.sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
+                    case .failure(let error):
+                        // Fail-closed: drop the request
+                        Logger.error("Auth token failed for Optimobile request: \(error.localizedDescription). Dropping request.")
+                        onFailure(nil, error, nil)
+                    }
+                }
+
+            case (nil, _?):
+                sendRequest(request: request, onSuccess: onSuccess) { response, error, decodedBody in
+                    if response?.statusCode == 401 {
+                        onFailure(response, NetworkError.authNotConfigured, decodedBody)
+                    } else {
+                        onFailure(response, error, decodedBody)
+                    }
+                }
+
+            default:
+                sendRequest(request: request, onSuccess: onSuccess, onFailure: onFailure)
+            }
         } catch {
             onFailure(nil, error, nil)
         }

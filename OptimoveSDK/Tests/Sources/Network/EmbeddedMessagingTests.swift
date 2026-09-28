@@ -80,7 +80,8 @@ struct MockOptimoveConfig {
             tenantInfo: nil,
             optimobileConfig: nil,
             preferenceCenterConfig: nil,
-            embeddedMessagingConfig: embeddedMessagingConfig
+            embeddedMessagingConfig: embeddedMessagingConfig,
+            authTokenProvider: nil
         )
     }
 }
@@ -417,6 +418,241 @@ final class EmbeddedMessagingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 2)
     }
-    
+}
 
+// MARK: - Auth-specific Tests
+
+final class EmbeddedMessagingAuthTests: XCTestCase {
+
+    var mockStorage: MockOptimoveStorage!
+    var mockConfig: EmbeddedMessagingConfig!
+    var mockNetworkClient: MockNetworkClient!
+
+    override func setUp() {
+        super.setUp()
+
+        mockStorage = MockOptimoveStorage()
+        mockConfig = EmbeddedMessagingConfig(region: "eu", tenantId: 456, brandId: "123")
+        mockNetworkClient = MockNetworkClient()
+
+        mockStorage[.customerID] = "adam_b@optimove.com"
+        mockStorage[.visitorID] = "Optimove"
+
+        let mockOptimoveConfig = MockOptimoveConfig(embeddedMessagingConfig: mockConfig).config
+        Optimove.initialize(with: mockOptimoveConfig)
+    }
+
+    private func makeTestMessage() -> EmbeddedMessage {
+        let createdAt = Date(timeIntervalSince1970: 1752663497311 / 1000)
+        let updatedAt = Date(timeIntervalSince1970: 1752663497311 / 1000)
+
+        return EmbeddedMessage(
+            customerId: "adam_b@optimove.com",
+            isVisitor: false,
+            templateId: 1,
+            title: "Test Title",
+            content: "Test content",
+            media: nil,
+            readAt: nil,
+            url: nil,
+            engagementId: "eng123",
+            payload: "{\"key\":\"string\"}",
+            campaignKind: 1,
+            executionDateTime: Date(timeIntervalSince1970: 1735732800),
+            messageLayoutType: nil,
+            expiryDate: nil,
+            containerId: "test-container",
+            id: "test-id",
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            deletedAt: nil
+        )
+    }
+
+    // EmbeddedMessagingAPIResponse is intentionally decode-only (it remaps
+    // raw wire shape → public model). For tests we craft the wire JSON directly.
+    private func makeMockGetMessagesResponseData() -> Data {
+        let json = """
+        {"containers":{"test-container":[{
+            "id":"test-id",
+            "containerId":"test-container",
+            "customerId":"adam_b@optimove.com",
+            "isVisitor":false,
+            "templateId":1,
+            "title":"Test Title",
+            "content":"Test content",
+            "media":null,
+            "readAt":null,
+            "url":null,
+            "engagementId":"eng123",
+            "payload":{"key":"string"},
+            "campaignKind":1,
+            "executionDateTime":"2025-01-01T12:00:00Z",
+            "messageLayoutType":null,
+            "expiryDate":null,
+            "createdAt":"2025-07-16T12:00:00Z",
+            "updatedAt":"2025-07-16T12:00:00Z",
+            "deletedAt":null
+        }]}}
+        """
+        return json.data(using: .utf8)!
+    }
+
+    func test_getMessagesAsync_noAuthManager_sendsRequestWithoutJWT() throws {
+        let service = EmbeddedMessagesService(storage: mockStorage, networkClient: mockNetworkClient, authManager: nil)
+
+        let jsonData = makeMockGetMessagesResponseData()
+        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: jsonData)
+        mockNetworkClient.mockResponse = .success(mockNetworkResponse)
+
+        let exp = expectation(description: "getMessagesAsync completes")
+
+        service.getMessagesAsync { result in
+            switch result {
+            case .successMessages:
+                let headers = self.mockNetworkClient.lastRequest?.headers ?? []
+                let jwtHeader = headers.first(where: { $0.field == "X-User-JWT" })
+                XCTAssertNil(jwtHeader, "Should NOT include X-User-JWT header when no authManager")
+            default:
+                XCTFail("Expected successMessages but got \(result)")
+            }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 2)
+    }
+
+    func test_getMessagesAsync_authConfigured_success_includesJWT() throws {
+        let authManager = AuthManager { userId, completion in
+            XCTAssertEqual(userId, "adam_b@optimove.com")
+            completion("jwt-123", nil)
+        }
+        let service = EmbeddedMessagesService(storage: mockStorage, networkClient: mockNetworkClient, authManager: authManager)
+
+        let jsonData = makeMockGetMessagesResponseData()
+        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: jsonData)
+        mockNetworkClient.mockResponse = .success(mockNetworkResponse)
+
+        let exp = expectation(description: "getMessagesAsync with JWT completes")
+
+        service.getMessagesAsync { result in
+            switch result {
+            case .successMessages:
+                let headers = self.mockNetworkClient.lastRequest?.headers ?? []
+                let jwtHeader = headers.first(where: { $0.field == "X-User-JWT" })
+                XCTAssertNotNil(jwtHeader, "Should include X-User-JWT header")
+                XCTAssertEqual(jwtHeader?.value, "jwt-123")
+            default:
+                XCTFail("Expected successMessages but got \(result)")
+            }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 2)
+    }
+
+    func test_getMessagesAsync_authConfigured_getTokenFails_returnsError() {
+        let authManager = AuthManager { _, completion in
+            completion(nil, NSError(domain: "auth", code: 401))
+        }
+        let service = EmbeddedMessagesService(storage: mockStorage, networkClient: mockNetworkClient, authManager: authManager)
+
+        let exp = expectation(description: "getMessagesAsync fails when auth fails")
+
+        service.getMessagesAsync { result in
+            switch result {
+            case .error:
+                // Fail-closed: auth failure → error returned to caller
+                break
+            default:
+                XCTFail("Expected error but got \(result)")
+            }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 2)
+
+        XCTAssertNil(mockNetworkClient.lastRequest, "No network request should be made when auth fails")
+    }
+
+    func test_deleteMessagesAsync_authConfigured_includesJWT() {
+        let authManager = AuthManager { _, completion in
+            completion("jwt-delete-456", nil)
+        }
+        let service = EmbeddedMessagesService(storage: mockStorage, networkClient: mockNetworkClient, authManager: authManager)
+
+        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
+        mockNetworkClient.mockResponse = .success(mockNetworkResponse)
+
+        let exp = expectation(description: "deleteMessagesAsync with JWT completes")
+
+        service.deleteMessagesAsync(message: makeTestMessage()) { result in
+            switch result {
+            case .success:
+                let headers = self.mockNetworkClient.lastRequest?.headers ?? []
+                let jwtHeader = headers.first(where: { $0.field == "X-User-JWT" })
+                XCTAssertNotNil(jwtHeader, "Should include X-User-JWT header for delete")
+                XCTAssertEqual(jwtHeader?.value, "jwt-delete-456")
+            default:
+                XCTFail("Expected success but got \(result)")
+            }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 2)
+    }
+
+    func test_setAsReadAsync_authConfigured_includesJWT() {
+        let authManager = AuthManager { _, completion in
+            completion("jwt-read-789", nil)
+        }
+        let service = EmbeddedMessagesService(storage: mockStorage, networkClient: mockNetworkClient, authManager: authManager)
+
+        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
+        mockNetworkClient.mockResponse = .success(mockNetworkResponse)
+
+        let exp = expectation(description: "setAsReadAsync with JWT completes")
+
+        service.setAsReadAsync(message: makeTestMessage(), isRead: true) { result in
+            switch result {
+            case .success:
+                let headers = self.mockNetworkClient.lastRequest?.headers ?? []
+                let jwtHeader = headers.first(where: { $0.field == "X-User-JWT" })
+                XCTAssertNotNil(jwtHeader, "Should include X-User-JWT header for setAsRead")
+                XCTAssertEqual(jwtHeader?.value, "jwt-read-789")
+            default:
+                XCTFail("Expected success but got \(result)")
+            }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 2)
+    }
+
+    func test_reportClickMetricAsync_authConfigured_includesJWT() {
+        let authManager = AuthManager { _, completion in
+            completion("jwt-click-101", nil)
+        }
+        let service = EmbeddedMessagesService(storage: mockStorage, networkClient: mockNetworkClient, authManager: authManager)
+
+        let mockNetworkResponse = NetworkResponse<Data?>.testMock(statusCode: 200, body: nil)
+        mockNetworkClient.mockResponse = .success(mockNetworkResponse)
+
+        let exp = expectation(description: "reportClickMetricAsync with JWT completes")
+
+        service.reportClickMetricAsync(message: makeTestMessage()) { result in
+            switch result {
+            case .success:
+                let headers = self.mockNetworkClient.lastRequest?.headers ?? []
+                let jwtHeader = headers.first(where: { $0.field == "X-User-JWT" })
+                XCTAssertNotNil(jwtHeader, "Should include X-User-JWT header for reportClick")
+                XCTAssertEqual(jwtHeader?.value, "jwt-click-101")
+            default:
+                XCTFail("Expected success but got \(result)")
+            }
+            exp.fulfill()
+        }
+
+        wait(for: [exp], timeout: 2)
+    }
 }
