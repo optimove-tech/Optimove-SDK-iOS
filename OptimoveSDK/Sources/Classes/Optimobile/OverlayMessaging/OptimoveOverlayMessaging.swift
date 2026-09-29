@@ -29,6 +29,14 @@ public class OptimoveOverlayMessaging {
     public static func resetSession() {
         shared?.sessionManager?.resetSession()
     }
+
+    public static func hide() {
+        ensureMain { shared?.manager.setHidden(true) }
+    }
+
+    public static func show() {
+        ensureMain { shared?.manager.setHidden(false) }
+    }
     
     // MARK: - Internal
     
@@ -50,6 +58,14 @@ public class OptimoveOverlayMessaging {
     
     // MARK: - Private
     
+    private static func ensureMain(_ work: @escaping () -> Void) {
+        if Thread.isMainThread {
+            work()
+        } else {
+            DispatchQueue.main.async(execute: work)
+        }
+    }
+
     private func startSessionManager() {
         sessionManager = OverlayMessagingSessionManager(
             sessionLengthMinutes: sessionLengthMinutes,
