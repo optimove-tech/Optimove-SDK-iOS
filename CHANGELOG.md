@@ -1,8 +1,11 @@
 # Changelog
 
-## 6.11.0
+## 6.12.0
 
 - Add `OptimoveOverlayMessaging.hide()` / `show()` — temporarily take a displayed overlay off screen and restore it in place, for hosts that need the screen for a higher-priority popup of their own. The message resumes where it was, with no re-trigger and no second interceptor call. Messages arriving while hidden are held until `show()`.
+
+## 6.11.0
+
 - Add federated JWT authentication support. Use `enableAuth()` on the config builder to supply a token provider. The SDK attaches `X-User-JWT` to all user-identified requests (OptiTrack, RealTime, PreferenceCenter, EmbeddedMessaging, AnalyticsHelper, InAppManager).
 - Add `X-Optimove-Auth-Capable: 1` header to all requests to signal auth-capable SDK versions to backends.
 - Fix multi-customer event batching: OptiTrack/RealTime now group events by customer identity so each request carries a single valid JWT. AnalyticsHelper fetches events per user to ensure JWT matches the batch.
