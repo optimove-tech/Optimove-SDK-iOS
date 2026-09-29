@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.12.0
+
+- Add Live Activities (iOS 18+). Call `enableLiveActivities(YourAttributes.self)` on the config builder after conforming the host `ActivityAttributes` type to `OptimoveLiveActivityAttributes` in the app target (not the widget). The SDK reports `k.liveActivity.pushToStartTokenRegistered` and `k.liveActivity.started` (the latter only when `optimoveActivityId` is set). ActivityKit is weakly linked.
+
 ## 6.11.0
 
 - Add `OptimoveOverlayMessaging.hide()` / `show()` — temporarily take a displayed overlay off screen and restore it in place, for hosts that need the screen for a higher-priority popup of their own. The message resumes where it was, with no re-trigger and no second interceptor call. Messages arriving while hidden are held until `show()`.
