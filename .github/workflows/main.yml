@@ -7,3 +7,6 @@ jobs:
       - uses: actions/checkout@v1
       - run: make test
         name: Test
+        env:
+          # CI must use the pinned Xcode, never silently fall back to another one.
+          XCODE_STRICT: 1
