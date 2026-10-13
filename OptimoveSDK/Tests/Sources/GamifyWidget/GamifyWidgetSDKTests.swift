@@ -37,7 +37,8 @@ final class GamifyWidgetSDKTests: XCTestCase {
     private func resolveToken(for userId: String?) -> Result<String?, Error>? {
         let expectation = expectation(description: "token resolved")
         var resolved: Result<String?, Error>?
-        GamifyWidgetSDK.tokenSource(for: userId) { result in
+        let tokenSource = GamifyWidgetSDK.tokenSource(for: userId)
+        tokenSource { result in
             resolved = result
             expectation.fulfill()
         }
