@@ -244,8 +244,6 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         // Window / frame setup
         window = UIWindow(frame: UIScreen.main.bounds)
         window!.windowLevel = UIWindow.Level.alert
-        window!.rootViewController = UIViewController()
-
         #if swift(>=5.1)
             if #available(iOS 13.0, *) {
                 window?.windowScene = UIApplication.shared
@@ -253,6 +251,8 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
                     .first as? UIWindowScene
             }
         #endif
+
+        window!.rootViewController = HostSnapshotViewController(for: window!)
 
         let frame = UIView(frame: window!.frame)
         self.frame = frame
