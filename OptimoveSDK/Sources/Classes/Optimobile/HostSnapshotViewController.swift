@@ -29,15 +29,28 @@ final class HostSnapshotViewController: UIViewController {
         
         windows = windows.filter { $0 !== window }
 
-        let hostWindow = windows.first { $0.isKeyWindow }
-            ?? windows
+        // Not the key window: other SDKs' popups often take key. Staying below .alert
+        // skips those and system windows; a wrong pick here is usually a plain overlay
+        // whose defaults match pre-existing behaviour.
+        let hostWindow = windows
             .filter { !$0.isHidden && $0.windowLevel < .alert && $0.rootViewController != nil }
             .max { $0.windowLevel.rawValue < $1.windowLevel.rawValue }
 
         var top = hostWindow?.rootViewController
-        while let presented = top?.presentedViewController {
+        // Stop before a VC that is going away; its orientations are about to stop applying.
+        while let presented = top?.presentedViewController, !presented.isBeingDismissed {
             top = presented
         }
-        return top?.supportedInterfaceOrientations
+        guard let orientations = top?.supportedInterfaceOrientations else {
+            return nil
+        }
+
+        // UIKit throws if a window's root VC and the app (Info.plist / app delegate)
+        // share no orientation; keep UIKit defaults rather than risk it.
+        let appOrientations = UIApplication.shared.supportedInterfaceOrientations(for: window)
+        if orientations.intersection(appOrientations).isEmpty {
+            return nil
+        }
+        return orientations
     }
 }
