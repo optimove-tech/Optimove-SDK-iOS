@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Gamify: the optional `gamify` block of the tenant configuration (`adactUrl`, `loyaltyWidgetUrl`) is now parsed and applied, so neither URL is hardcoded by the host app.
+- Gamify: federated auth for the loyalty widget. New `GamifyWidgetSDK.openWidget(from:params:)` opens `{loyaltyWidgetUrl}/{tenantId}[/brand/{brand}]/{userId}`, defaulting to the identified SDK user. When `enableAuth()` is used, a JWT for that user is fetched from the `AuthTokenProvider` and passed in the widget's INIT message; if the token can't be fetched the widget closes instead of opening unauthenticated.
+- **Breaking:** removed `GamifyWidgetSDK.initialize(widgetUrl:adactUrl:)` and `open(from:userId:token:)`. Both URLs come from the tenant configuration and the token from the `AuthTokenProvider`; use `openWidget(from:params:)` for the loyalty widget, and `openAdactCampaign(from:params:)` needs no setup.
+
 ## 6.12.0
 
 - Add `OptimoveOverlayMessaging.hide()` / `show()` — temporarily take a displayed overlay off screen and restore it in place, for hosts that need the screen for a higher-priority popup of their own. The message resumes where it was, with no re-trigger and no second interceptor call. Messages arriving while hidden are held until `show()`.

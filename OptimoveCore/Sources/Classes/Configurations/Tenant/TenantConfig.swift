@@ -8,6 +8,7 @@ public struct TenantConfig: Codable, Equatable {
     public let realtime: TenantRealtimeConfig
     public var optitrack: TenantOptitrackConfig
     public let events: [String: EventsConfig]
+    public let gamify: TenantGamifyConfig?
 
     public init(
         realtime: TenantRealtimeConfig,
@@ -16,7 +17,8 @@ public struct TenantConfig: Codable, Equatable {
         isEnableRealtime: Bool,
         isSupportedAirship: Bool,
         isEnableRealtimeThroughOptistream: Bool,
-        isProductionLogsEnabled: Bool
+        isProductionLogsEnabled: Bool,
+        gamify: TenantGamifyConfig? = nil
     ) {
         self.realtime = realtime
         self.optitrack = optitrack
@@ -25,6 +27,7 @@ public struct TenantConfig: Codable, Equatable {
         self.isSupportedAirship = isSupportedAirship
         self.isEnableRealtimeThroughOptistream = isEnableRealtimeThroughOptistream
         self.isProductionLogsEnabled = isProductionLogsEnabled
+        self.gamify = gamify
     }
 
     public init(from decoder: Decoder) throws {
@@ -36,6 +39,7 @@ public struct TenantConfig: Codable, Equatable {
         realtime = try container.decode(TenantRealtimeConfig.self, forKey: .realtime)
         optitrack = try container.decode(TenantOptitrackConfig.self, forKey: .optitrack)
         events = try container.decode([String: EventsConfig].self, forKey: .events)
+        gamify = try container.decodeIfPresent(TenantGamifyConfig.self, forKey: .gamify)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -47,6 +51,7 @@ public struct TenantConfig: Codable, Equatable {
         try container.encode(realtime, forKey: .realtime)
         try container.encode(optitrack, forKey: .optitrack)
         try container.encode(events, forKey: .events)
+        try container.encodeIfPresent(gamify, forKey: .gamify)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -59,5 +64,6 @@ public struct TenantConfig: Codable, Equatable {
         case mobile
         case events
         case siteId
+        case gamify
     }
 }
