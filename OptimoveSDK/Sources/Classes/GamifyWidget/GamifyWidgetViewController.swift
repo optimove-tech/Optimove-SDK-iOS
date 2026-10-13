@@ -10,22 +10,42 @@ private enum BridgeMessage {
 
 final class GamifyWidgetViewController: UIViewController {
 
+    /// Supplies the token for the loyalty INIT; the completion may be invoked on any queue.
+    typealias TokenSource = (_ completion: @escaping (Result<String?, Error>) -> Void) -> Void
+
     private let widgetUrl: String
     private let userId: String?
-    private let token: String?
-    private let enableInitHandshake: Bool
+    private let tokenSource: TokenSource?
+    private var handshake: LoyaltyInitHandshake?
 
     private var webView: WKWebView!
     private var activityIndicator: UIActivityIndicatorView!
+    private var dismissWhenPresented = false
 
-    /// - Parameter enableInitHandshake: Loyalty widgets use READY→INIT. Adact campaigns pass
-    ///   identity via URL query params and set this to `false`.
-    init(widgetUrl: String, userId: String?, token: String?, enableInitHandshake: Bool = true) {
+    /// Loyalty widget — READY→INIT handshake with optional userId and the token from `tokenSource`.
+    convenience init(widgetUrl: String, userId: String?, tokenSource: @escaping TokenSource) {
+        self.init(widgetUrl: widgetUrl, userId: userId, tokenSource: tokenSource, enableInitHandshake: true)
+    }
+
+    /// Adact campaign — no INIT handshake; identity is passed via URL query params.
+    convenience init(widgetUrl: String) {
+        self.init(widgetUrl: widgetUrl, userId: nil, tokenSource: nil, enableInitHandshake: false)
+    }
+
+    private init(widgetUrl: String, userId: String?, tokenSource: TokenSource?, enableInitHandshake: Bool) {
         self.widgetUrl = widgetUrl
         self.userId = userId
-        self.token = token
-        self.enableInitHandshake = enableInitHandshake
+        self.tokenSource = tokenSource
         super.init(nibName: nil, bundle: nil)
+        if enableInitHandshake {
+            handshake = LoyaltyInitHandshake(
+                sendInit: { [weak self] token in self?.sendInit(token: token) },
+                onTokenFailed: { [weak self] error in
+                    Logger.error("Auth token unavailable for loyalty widget, closing: \(error.localizedDescription)")
+                    self?.dismissSelf()
+                }
+            )
+        }
     }
 
     required init?(coder: NSCoder) { fatalError() }
@@ -40,6 +60,23 @@ final class GamifyWidgetViewController: UIViewController {
         setupWebView()
         setupLoadingIndicator()
         loadWidget()
+        fetchToken()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // isBeingPresented is still true here, so dismiss directly rather than via dismissSelf().
+        if dismissWhenPresented {
+            dismissWhenPresented = false
+            dismiss(animated: true)
+        }
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if isBeingDismissed {
+            handshake?.cancel()
+        }
     }
 
     private func setupWebView() {
@@ -87,7 +124,15 @@ final class GamifyWidgetViewController: UIViewController {
         webView.load(URLRequest(url: url))
     }
 
-    private func sendInit() {
+    private func fetchToken() {
+        guard let handshake = handshake, let tokenSource = tokenSource else { return }
+        tokenSource { result in
+            DispatchQueue.main.async { handshake.onTokenResult(result) }
+        }
+    }
+
+    private func sendInit(token: String?) {
+        guard webView != nil else { return }
         var payload: [String: Any] = ["type": "INIT"]
         if let userId = userId { payload["userId"] = userId }
         if let token = token { payload["token"] = token }
@@ -104,6 +149,11 @@ final class GamifyWidgetViewController: UIViewController {
     }
 
     private func dismissSelf() {
+        handshake?.cancel()
+        if isBeingPresented {
+            dismissWhenPresented = true
+            return
+        }
         dismiss(animated: true)
     }
 
@@ -132,8 +182,8 @@ extension GamifyWidgetViewController: WKScriptMessageHandler {
 
         switch type {
         case "READY":
-            guard enableInitHandshake else { return }
-            DispatchQueue.main.async { self.sendInit() }
+            guard let handshake = handshake else { return }
+            DispatchQueue.main.async { handshake.onReady() }
         case "CLOSE":
             DispatchQueue.main.async { self.dismissSelf() }
         default:

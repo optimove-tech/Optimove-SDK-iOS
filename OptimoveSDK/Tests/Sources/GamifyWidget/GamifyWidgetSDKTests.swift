@@ -1,74 +1,159 @@
+import OptimoveCore
 import XCTest
 @testable import OptimoveSDK
 
 final class GamifyWidgetSDKTests: XCTestCase {
+    private struct TokenError: Error {}
 
-    private func runOnMainSync(_ block: @escaping () -> Void) {
-        if Thread.isMainThread {
-            block()
-        } else {
-            DispatchQueue.main.sync(execute: block)
-        }
-    }
+    private let widgetUrl = "https://opti-ls-widget-dev.optimove.net"
+    private let tenantId = 593
+
+    private var sdkUserId: String?
+    private var authManager: AuthManager?
 
     override func setUp() {
         super.setUp()
-        runOnMainSync {
-            GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: nil)
-        }
+        sdkUserId = nil
+        authManager = nil
+        GamifyWidgetSDK.resetForTesting(environment: GamifyWidgetSDK.Environment(
+            currentUserId: { [unowned self] in self.sdkUserId },
+            authManager: { [unowned self] in self.authManager }
+        ))
     }
 
-    func testInitializeSetsWidgetUrl() {
-        let url = "https://gamify-widget.example.com"
-        runOnMainSync {
-            GamifyWidgetSDK.initialize(widgetUrl: url)
-        }
-        XCTAssertEqual(GamifyWidgetSDK.widgetUrl, url)
+    override func tearDown() {
+        GamifyWidgetSDK.resetForTesting()
+        super.tearDown()
     }
 
-    func testInitializeOverwritesPreviousUrl() {
-        runOnMainSync {
-            GamifyWidgetSDK.initialize(widgetUrl: "https://first.example.com")
-            GamifyWidgetSDK.initialize(widgetUrl: "https://second.example.com")
-        }
-        XCTAssertEqual(GamifyWidgetSDK.widgetUrl, "https://second.example.com")
+    private func applyConfig(adactUrl: String? = nil, loyaltyWidgetUrl: String? = nil, tenantId: Int? = nil) {
+        GamifyWidgetSDK.applyTenantConfiguration(
+            adactUrl: adactUrl,
+            loyaltyWidgetUrl: loyaltyWidgetUrl,
+            tenantId: tenantId ?? self.tenantId
+        )
     }
 
-    func testInitializeFromBackgroundThreadDispatchesToMain() {
-        let url = "https://background.example.com"
-        let expectation = expectation(description: "widgetUrl set from background call")
-        DispatchQueue.global().async {
-            GamifyWidgetSDK.initialize(widgetUrl: url)
-            DispatchQueue.main.async {
-                XCTAssertEqual(GamifyWidgetSDK.widgetUrl, url)
-                expectation.fulfill()
-            }
+    private func resolveToken(for userId: String?) -> Result<String?, Error>? {
+        let expectation = expectation(description: "token resolved")
+        var resolved: Result<String?, Error>?
+        GamifyWidgetSDK.tokenSource(for: userId) { result in
+            resolved = result
+            expectation.fulfill()
         }
         wait(for: [expectation], timeout: 2.0)
+        return resolved
     }
 
-    func testInitializeStoresNormalizedAdactUrl() {
-        runOnMainSync {
-            GamifyWidgetSDK.initialize(
-                widgetUrl: "https://loyalty.example.com",
-                adactUrl: "https://campaign.adact.me/"
-            )
-        }
-        XCTAssertEqual(GamifyWidgetSDK.adactUrl, "https://campaign.adact.me")
+    // MARK: Tenant configuration
+
+    func testApplyTenantConfigurationStoresNormalizedUrls() {
+        applyConfig(adactUrl: "https://campaign.adact.me/", loyaltyWidgetUrl: widgetUrl + "/")
+
+        XCTAssertEqual(GamifyWidgetSDK.tenantOptions, GamifyWidgetSDK.TenantOptions(
+            adactUrl: "https://campaign.adact.me",
+            loyaltyWidgetUrl: widgetUrl,
+            tenantId: tenantId
+        ))
         XCTAssertEqual(GamifyWidgetSDK.getAdactUrl(), "https://campaign.adact.me/")
     }
 
-    func testGetAdactUrlEmptyWhenNotConfigured() {
-        runOnMainSync {
-            GamifyWidgetSDK.initialize(widgetUrl: "https://loyalty.example.com")
+    func testApplyTenantConfigurationFromBackgroundThread() {
+        let expectation = expectation(description: "applied from background")
+        DispatchQueue.global().async {
+            self.applyConfig(loyaltyWidgetUrl: self.widgetUrl)
+            expectation.fulfill()
         }
+        wait(for: [expectation], timeout: 2.0)
+        XCTAssertEqual(GamifyWidgetSDK.tenantOptions.loyaltyWidgetUrl, widgetUrl)
+    }
+
+    func testGetAdactUrlEmptyWhenNotConfigured() {
+        applyConfig(loyaltyWidgetUrl: widgetUrl)
         XCTAssertEqual(GamifyWidgetSDK.getAdactUrl(), "")
     }
 
-    func testBuildAdactCampaignUrlBuildsEmbeddedPath() {
-        runOnMainSync {
-            GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: "https://campaign.adact.me/")
+    // MARK: Loyalty widget URL
+
+    func testBuildLoyaltyWidgetUrl() {
+        applyConfig(loyaltyWidgetUrl: widgetUrl + "/")
+        XCTAssertEqual(
+            GamifyWidgetSDK.buildLoyaltyWidgetUrl(userId: "customer-1", brand: nil),
+            "\(widgetUrl)/593/customer-1"
+        )
+    }
+
+    func testBuildLoyaltyWidgetUrlAddsBrandSegment() {
+        applyConfig(loyaltyWidgetUrl: widgetUrl)
+        XCTAssertEqual(
+            GamifyWidgetSDK.buildLoyaltyWidgetUrl(userId: "customer-1", brand: "brand-a"),
+            "\(widgetUrl)/593/brand/brand-a/customer-1"
+        )
+        XCTAssertEqual(
+            GamifyWidgetSDK.buildLoyaltyWidgetUrl(userId: "customer-1", brand: ""),
+            "\(widgetUrl)/593/customer-1"
+        )
+    }
+
+    func testBuildLoyaltyWidgetUrlEncodesPathSegments() {
+        applyConfig(loyaltyWidgetUrl: widgetUrl)
+        XCTAssertEqual(
+            GamifyWidgetSDK.buildLoyaltyWidgetUrl(userId: "a/b c", brand: "x/y"),
+            "\(widgetUrl)/593/brand/x%2Fy/a%2Fb%20c"
+        )
+    }
+
+    func testBuildLoyaltyWidgetUrlEmptyWhenInputsMissing() {
+        XCTAssertEqual(GamifyWidgetSDK.buildLoyaltyWidgetUrl(userId: "customer-1", brand: nil), "")
+
+        applyConfig(loyaltyWidgetUrl: widgetUrl)
+        XCTAssertEqual(GamifyWidgetSDK.buildLoyaltyWidgetUrl(userId: nil, brand: nil), "")
+        XCTAssertEqual(GamifyWidgetSDK.buildLoyaltyWidgetUrl(userId: "", brand: nil), "")
+
+        applyConfig(loyaltyWidgetUrl: widgetUrl, tenantId: -1)
+        XCTAssertEqual(GamifyWidgetSDK.buildLoyaltyWidgetUrl(userId: "customer-1", brand: nil), "")
+    }
+
+    func testBuildLoyaltyWidgetUrlRejectsNonHttps() {
+        applyConfig(loyaltyWidgetUrl: "http://opti-ls-widget-dev.optimove.net")
+        XCTAssertEqual(GamifyWidgetSDK.buildLoyaltyWidgetUrl(userId: "customer-1", brand: nil), "")
+    }
+
+    // MARK: Auth token
+
+    func testTokenSourceMintsJwtForGivenUser() {
+        var requestedFor: [String] = []
+        authManager = AuthManager { userId, completion in
+            requestedFor.append(userId)
+            completion("jwt-token", nil)
         }
+
+        guard case let .success(token) = resolveToken(for: "customer-1") else {
+            return XCTFail("Expected a token")
+        }
+        XCTAssertEqual(token, "jwt-token")
+        XCTAssertEqual(requestedFor, ["customer-1"])
+    }
+
+    func testTokenSourceResolvesNilWhenAuthNotEnabled() {
+        guard case let .success(token) = resolveToken(for: "customer-1") else {
+            return XCTFail("Expected success without a token")
+        }
+        XCTAssertNil(token)
+    }
+
+    func testTokenSourceFailsWhenTokenCannotBeMinted() {
+        authManager = AuthManager { _, completion in completion(nil, TokenError()) }
+
+        guard case .failure = resolveToken(for: "customer-1") else {
+            return XCTFail("Expected failure")
+        }
+    }
+
+    // MARK: Adact
+
+    func testBuildAdactCampaignUrlBuildsEmbeddedPath() {
+        applyConfig(adactUrl: "https://campaign.adact.me/")
         XCTAssertEqual(
             GamifyWidgetSDK.buildAdactCampaignUrl(params: OpenAdactParams(campaignId: 179)),
             "https://campaign.adact.me/embedded/179"
@@ -76,9 +161,7 @@ final class GamifyWidgetSDKTests: XCTestCase {
     }
 
     func testBuildAdactCampaignUrlAddsCidAndCustomerIdToken() {
-        runOnMainSync {
-            GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: "https://campaign.adact.me/")
-        }
+        applyConfig(adactUrl: "https://campaign.adact.me/")
         let url = GamifyWidgetSDK.buildAdactCampaignUrl(
             params: OpenAdactParams(
                 campaignId: 179,
@@ -92,17 +175,13 @@ final class GamifyWidgetSDKTests: XCTestCase {
     }
 
     func testBuildAdactCampaignUrlEmptyWhenAdactUrlOrCampaignIdMissing() {
-        runOnMainSync {
-            GamifyWidgetSDK.initialize(widgetUrl: "https://loyalty.example.com")
-        }
+        applyConfig(loyaltyWidgetUrl: widgetUrl)
         XCTAssertEqual(
             GamifyWidgetSDK.buildAdactCampaignUrl(params: OpenAdactParams(campaignId: 179)),
             ""
         )
 
-        runOnMainSync {
-            GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: "https://campaign.adact.me/")
-        }
+        applyConfig(adactUrl: "https://campaign.adact.me/")
         XCTAssertEqual(
             GamifyWidgetSDK.buildAdactCampaignUrl(params: OpenAdactParams(cid: "cid")),
             ""
@@ -110,9 +189,7 @@ final class GamifyWidgetSDKTests: XCTestCase {
     }
 
     func testBuildAdactCampaignUrlRejectsNonHttps() {
-        runOnMainSync {
-            GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: "http://campaign.adact.me/")
-        }
+        applyConfig(adactUrl: "http://campaign.adact.me/")
         XCTAssertEqual(
             GamifyWidgetSDK.buildAdactCampaignUrl(params: OpenAdactParams(campaignId: 179)),
             ""
