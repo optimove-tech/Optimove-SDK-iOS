@@ -85,7 +85,7 @@ public final class GamifyWidgetSDK {
         params: OpenLoyaltyWidgetParams
     ) {
         assertOnMainThread()
-        let userId = params.userId ?? environment.currentUserId()
+        let userId = (params.userId ?? environment.currentUserId())?.trimmingCharacters(in: .whitespacesAndNewlines)
         let widgetSrc = buildLoyaltyWidgetUrl(userId: userId, brand: params.brand)
         guard !widgetSrc.isEmpty else {
             Logger.error("Cannot open the loyalty widget: \(describeMissingLoyaltyInputs(userId: userId))")

@@ -10,10 +10,11 @@ private enum BridgeMessage {
 
 final class GamifyWidgetViewController: UIViewController {
 
-    /// Supplies the token for the loyalty INIT and REFRESH_TOKEN replies; the completion may be invoked on any queue.
+    /// Supplies the token for the loyalty INIT and TOKEN_REFRESHED replies; the completion may be invoked on any queue.
     typealias TokenSource = (_ completion: @escaping (Result<String?, Error>) -> Void) -> Void
 
     private let widgetUrl: String
+    private let widgetOrigin: String?
     private let userId: String?
     private let tokenSource: TokenSource?
     private var handshake: LoyaltyInitHandshake?
@@ -22,6 +23,7 @@ final class GamifyWidgetViewController: UIViewController {
     private var activityIndicator: UIActivityIndicatorView!
     private var dismissWhenPresented = false
     private var isClosed = false
+    private var refreshInFlight = false
 
     /// Loyalty widget — READY→INIT handshake with optional userId and the token from `tokenSource`.
     convenience init(widgetUrl: String, userId: String?, tokenSource: @escaping TokenSource) {
@@ -35,6 +37,7 @@ final class GamifyWidgetViewController: UIViewController {
 
     private init(widgetUrl: String, userId: String?, tokenSource: TokenSource?, enableInitHandshake: Bool) {
         self.widgetUrl = widgetUrl
+        self.widgetOrigin = URL(string: widgetUrl).flatMap(Self.origin(of:))
         self.userId = userId
         self.tokenSource = tokenSource
         super.init(nibName: nil, bundle: nil)
@@ -140,11 +143,17 @@ final class GamifyWidgetViewController: UIViewController {
         postToWidget(payload)
     }
 
+    /// Fetches a fresh token when the loyalty widget asks for one and posts it back as TOKEN_REFRESHED. A failed fetch
+    /// is reported as a `null` token rather than closing the widget.
+    /// Requests arriving while a fetch is in flight are dropped; the pending reply answers them.
     private func refreshToken() {
-        guard let tokenSource = tokenSource, !isClosed else { return }
+        guard let tokenSource = tokenSource, !isClosed, !refreshInFlight else { return }
+        refreshInFlight = true
         tokenSource { [weak self] result in
             DispatchQueue.main.async {
-                guard let self = self, !self.isClosed else { return }
+                guard let self = self else { return }
+                self.refreshInFlight = false
+                guard !self.isClosed else { return }
                 let token: String?
                 switch result {
                 case let .success(value):
@@ -153,17 +162,58 @@ final class GamifyWidgetViewController: UIViewController {
                     Logger.error("Auth token refresh failed for loyalty widget: \(error.localizedDescription)")
                     token = nil
                 }
-                self.postToWidget(["type": "REFRESH_TOKEN", "token": token.map { $0 as Any } ?? NSNull()])
+                self.postToWidget(["type": "TOKEN_REFRESHED", "token": token.map { $0 as Any } ?? NSNull()])
             }
         }
     }
 
+    /// Posts with the widget origin as targetOrigin, so the browser drops the message if the page has left it.
     private func postToWidget(_ payload: [String: Any]) {
         guard webView != nil else { return }
+        guard let widgetOrigin = widgetOrigin else {
+            Logger.error("Widget URL has no origin, not posting: \(widgetUrl)")
+            return
+        }
         guard let data = try? JSONSerialization.data(withJSONObject: payload),
               let json = String(data: data, encoding: .utf8) else { return }
         Logger.debug("GamifyWidget sending \(payload["type"] ?? ""): \(redactedLog(payload))")
-        webView.evaluateJavaScript("window.postMessage(\(json), '*');", completionHandler: nil)
+        webView.evaluateJavaScript(
+            "window.postMessage(\(json), \(Self.jsStringLiteral(widgetOrigin)));",
+            completionHandler: nil
+        )
+    }
+
+    private static func jsStringLiteral(_ value: String) -> String {
+        guard let data = try? JSONSerialization.data(withJSONObject: [value]),
+              let array = String(data: data, encoding: .utf8) else { return "''" }
+        return String(array.dropFirst().dropLast())
+    }
+
+    /// `scheme://host[:port]` as a browser serializes an origin, or nil for opaque URLs.
+    static func origin(of url: URL) -> String? {
+        guard let scheme = url.scheme?.lowercased(), let host = url.host?.lowercased(), !host.isEmpty else {
+            return nil
+        }
+        let origin = "\(scheme)://\(host)"
+        guard let port = url.port,
+              !(scheme == "https" && port == 443),
+              !(scheme == "http" && port == 80) else {
+            return origin
+        }
+        return "\(origin):\(port)"
+    }
+
+    /// Keeps the loyalty web view on the widget origin: the script message handlers are exposed to every document the
+    /// web view loads, so an off-origin page could otherwise request a token. Such navigations go to the system browser.
+    /// Adact campaigns have no token bridge and navigate freely.
+    private func leavesWidgetOrigin(_ target: URL) -> Bool {
+        guard handshake != nil else { return false }
+        if let widgetOrigin = widgetOrigin, widgetOrigin == Self.origin(of: target) {
+            return false
+        }
+        Logger.debug("GamifyWidget opening off-origin navigation externally: \(target)")
+        UIApplication.shared.open(target, options: [:], completionHandler: nil)
+        return true
     }
 
     private func redactedLog(_ payload: [String: Any]) -> String {
@@ -220,6 +270,20 @@ extension GamifyWidgetViewController: WKScriptMessageHandler {
 }
 
 extension GamifyWidgetViewController: WKNavigationDelegate {
+    func webView(
+        _: WKWebView,
+        decidePolicyFor navigationAction: WKNavigationAction,
+        decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+    ) {
+        if navigationAction.targetFrame?.isMainFrame == true,
+           let url = navigationAction.request.url,
+           leavesWidgetOrigin(url) {
+            decisionHandler(.cancel)
+            return
+        }
+        decisionHandler(.allow)
+    }
+
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         activityIndicator.stopAnimating()
     }
