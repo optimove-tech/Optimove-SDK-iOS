@@ -26,7 +26,8 @@ public final class ConfigurationBuilder {
             optitrack: buildOptitrackConfig(),
             events: events,
             isEnableRealtime: tenantConfig.isEnableRealtime,
-            isSupportedAirship: tenantConfig.isSupportedAirship
+            isSupportedAirship: tenantConfig.isSupportedAirship,
+            gamify: tenantConfig.gamify
         )
     }
 }
