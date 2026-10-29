@@ -238,6 +238,12 @@ public final class OptimoveLiveActivities {
             return
         }
 
+        // Checked before the activity is marked as reported, so it is reported on a later launch instead of never.
+        guard Optimobile.isInitialized() else {
+            Logger.error("Live Activities: cannot report activity \(activityId), Optimobile is not initialized.")
+            return
+        }
+
         let dedupeKey = Self.activityDedupeKey(
             attributesTypeName: attributesTypeName,
             optimoveActivityId: optimoveActivityId
@@ -373,6 +379,12 @@ private final class LiveActivityBackgroundTask {
         id = UIApplication.shared.beginBackgroundTask(withName: name) { [weak self] in
             self?.end()
         }
+    }
+
+    // trackEvent drops its completion without calling it on some early returns. Ending here stops the
+    // task from staying open until iOS kills the app.
+    deinit {
+        end()
     }
 
     func end() {
