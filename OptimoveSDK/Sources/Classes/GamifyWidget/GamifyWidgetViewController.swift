@@ -43,6 +43,7 @@ final class GamifyWidgetViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         if enableInitHandshake {
             handshake = LoyaltyInitHandshake(
+                requestToken: { [weak self] in self?.fetchInitToken() },
                 sendInit: { [weak self] token in self?.sendInit(token: token) },
                 onTokenFailed: { [weak self] error in
                     Logger.error("Auth token unavailable for loyalty widget, closing: \(error.localizedDescription)")
@@ -64,7 +65,7 @@ final class GamifyWidgetViewController: UIViewController {
         setupWebView()
         setupLoadingIndicator()
         loadWidget()
-        fetchToken()
+        handshake?.start()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -86,8 +87,10 @@ final class GamifyWidgetViewController: UIViewController {
 
     private func setupWebView() {
         let contentController = WKUserContentController()
-        contentController.add(self, name: BridgeMessage.receiveMessage)
-        contentController.add(self, name: BridgeMessage.closeWidget)
+        // WebKit retains message handlers strongly; the proxy keeps the screen from retaining itself via its web view.
+        let handler = WeakScriptMessageHandler(self)
+        contentController.add(handler, name: BridgeMessage.receiveMessage)
+        contentController.add(handler, name: BridgeMessage.closeWidget)
 
         let config = WKWebViewConfiguration()
         config.userContentController = contentController
@@ -129,7 +132,7 @@ final class GamifyWidgetViewController: UIViewController {
         webView.load(URLRequest(url: url))
     }
 
-    private func fetchToken() {
+    private func fetchInitToken() {
         guard let handshake = handshake, let tokenSource = tokenSource else { return }
         tokenSource { result in
             DispatchQueue.main.async { handshake.onTokenResult(result) }
@@ -242,6 +245,19 @@ final class GamifyWidgetViewController: UIViewController {
             return dict
         }
         return nil
+    }
+}
+
+/// Forwards script messages without retaining the target, which WebKit would otherwise keep alive.
+private final class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
+    private weak var target: WKScriptMessageHandler?
+
+    init(_ target: WKScriptMessageHandler) {
+        self.target = target
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        target?.userContentController(userContentController, didReceive: message)
     }
 }
 
