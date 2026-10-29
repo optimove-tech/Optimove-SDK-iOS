@@ -6,6 +6,8 @@ enum OptimobileEvent: String, Codable {
     case ENGAGE_BEACON_ENTERED_PROXIMITY = "k.engage.beaconEnteredProximity"
     case ENGAGE_LOCATION_UPDATED = "k.engage.locationUpdated"
     case IN_APP_CONSENT_CHANGED = "k.inApp.statusUpdated"
+    case LIVE_ACTIVITY_PUSH_TO_START_TOKEN_REGISTERED = "k.liveActivity.pushToStartTokenRegistered"
+    case LIVE_ACTIVITY_STARTED = "k.liveActivity.started"
     case MESSAGE_DELETED_FROM_INBOX = "k.message.inbox.deleted"
     case OM_INTERCEPTED = "optimove.om.intercepted"
     case MESSAGE_DELIVERED = "k.message.delivered"

@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.13.0
+
+- Add Live Activities (iOS 18+). Call `enableLiveActivities(YourAttributes.self)` on the config builder after conforming the host `ActivityAttributes` type to `OptimoveLiveActivityAttributes` in the app target (not the widget). The SDK reports `k.liveActivity.pushToStartTokenRegistered` and `k.liveActivity.started` (the latter only when `optimoveActivityId` is set). ActivityKit is weakly linked.
+
 ## 6.12.1
 
 - Fix in-app and overlay messages ignoring the host app's supported orientations. The message window now uses the orientations of the host's top view controller at the time the message is shown, so an orientation-restricted app (e.g. landscape-only) no longer rotates while a message is displayed.

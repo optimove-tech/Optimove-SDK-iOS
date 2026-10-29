@@ -81,7 +81,8 @@ struct MockOptimoveConfig {
             optimobileConfig: nil,
             preferenceCenterConfig: nil,
             embeddedMessagingConfig: embeddedMessagingConfig,
-            authTokenProvider: nil
+            authTokenProvider: nil,
+            liveActivityRegistrations: []
         )
     }
 }
