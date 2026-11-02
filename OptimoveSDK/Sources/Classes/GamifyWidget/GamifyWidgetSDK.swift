@@ -32,13 +32,33 @@ public final class GamifyWidgetSDK {
         static let empty = TenantOptions(adactUrl: nil, loyaltyWidgetUrl: nil, tenantId: -1)
     }
 
+    /// Values passed to the deprecated `initialize(widgetUrl:adactUrl:)`.
+    struct LegacyOptions: Equatable {
+        var widgetUrl: String?
+        var adactUrl: String?
+
+        static let empty = LegacyOptions(widgetUrl: nil, adactUrl: nil)
+    }
+
     private static let lock = NSLock()
     private static var _tenantOptions = TenantOptions.empty
+    private static var _legacyOptions = LegacyOptions.empty
 
     internal static var tenantOptions: TenantOptions {
         lock.lock()
         defer { lock.unlock() }
         return _tenantOptions
+    }
+
+    internal static var legacyOptions: LegacyOptions {
+        lock.lock()
+        defer { lock.unlock() }
+        return _legacyOptions
+    }
+
+    /// The tenant-configured Adact host, falling back to the one passed to the deprecated `initialize`.
+    private static var resolvedAdactUrl: String? {
+        return tenantOptions.adactUrl ?? legacyOptions.adactUrl
     }
 
     internal static var environment = Environment.live
@@ -64,8 +84,44 @@ public final class GamifyWidgetSDK {
 
     /// Returns the configured Adact host with a trailing slash, or empty when unset.
     public static func getAdactUrl() -> String {
-        guard let adactUrl = tenantOptions.adactUrl else { return "" }
+        guard let adactUrl = resolvedAdactUrl else { return "" }
         return adactUrl + "/"
+    }
+
+    /// Stores a loyalty widget URL for `open(from:userId:token:)` and an Adact host used when the tenant
+    /// configuration has none.
+    @available(*, deprecated, message: "Both URLs now come from the tenant configuration; use openWidget(from:params:) and openAdactCampaign(from:params:) without calling initialize.")
+    public static func initialize(widgetUrl: String, adactUrl: String? = nil) {
+        let options = LegacyOptions(
+            widgetUrl: widgetUrl.isEmpty ? nil : widgetUrl,
+            adactUrl: normalizeBaseUrl(adactUrl)
+        )
+        lock.lock()
+        _legacyOptions = options
+        lock.unlock()
+    }
+
+    /// Opens the URL passed to `initialize(widgetUrl:adactUrl:)` as given, or the tenant-configured widget when
+    /// `initialize` was not called. `token` is ignored: when auth is enabled via `OptimoveConfigBuilder.enableAuth`,
+    /// a JWT is fetched from the `AuthTokenProvider` as for `openWidget(from:params:)`.
+    @available(*, deprecated, message: "Use openWidget(from:params:); tokens come from the AuthTokenProvider set with OptimoveConfigBuilder.enableAuth.")
+    public static func open(from viewController: UIViewController, userId: String? = nil, token: String? = nil) {
+        ensureMain { open_onMain(from: viewController, userId: userId) }
+    }
+
+    private static func open_onMain(from viewController: UIViewController, userId: String?) {
+        assertOnMainThread()
+        guard let widgetUrl = legacyOptions.widgetUrl else {
+            openWidget_onMain(from: viewController, params: OpenLoyaltyWidgetParams(userId: userId))
+            return
+        }
+        guard URL(string: widgetUrl)?.scheme?.lowercased() == "https" else {
+            Logger.error("GamifyWidgetSDK.open called with an invalid widgetUrl.")
+            return
+        }
+        let trimmedUserId = (userId ?? environment.currentUserId())?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let userId = trimmedUserId?.isEmpty == false ? trimmedUserId : nil
+        presentLoyaltyWidget(widgetUrl: widgetUrl, userId: userId, from: viewController)
     }
 
     /// Present the loyalty widget in a modal sheet.
@@ -91,6 +147,10 @@ public final class GamifyWidgetSDK {
             Logger.error("Cannot open the loyalty widget: \(describeMissingLoyaltyInputs(userId: userId))")
             return
         }
+        presentLoyaltyWidget(widgetUrl: widgetSrc, userId: userId, from: viewController)
+    }
+
+    private static func presentLoyaltyWidget(widgetUrl: String, userId: String?, from viewController: UIViewController) {
         if loyaltyViewController != nil {
             return
         }
@@ -98,7 +158,7 @@ public final class GamifyWidgetSDK {
         // Dismiss Adact first (if open), then present — avoids UIKit "presentation in progress" races.
         dismissOverlay(adactViewController, clearing: { adactViewController = nil }) {
             let vc = GamifyWidgetViewController(
-                widgetUrl: widgetSrc,
+                widgetUrl: widgetUrl,
                 userId: userId,
                 tokenSource: tokenSource(for: userId)
             )
@@ -188,7 +248,7 @@ public final class GamifyWidgetSDK {
     /// Builds `{adactUrl}/embedded/{campaignId}?cid=&customerIdToken=`.
     /// Returns empty string when `adactUrl` or `campaignId` is missing, or URL is not HTTPS.
     public static func buildAdactCampaignUrl(params: OpenAdactParams) -> String {
-        guard let adactUrl = tenantOptions.adactUrl, let campaignId = params.campaignId else {
+        guard let adactUrl = resolvedAdactUrl, let campaignId = params.campaignId else {
             return ""
         }
 
@@ -256,6 +316,7 @@ public final class GamifyWidgetSDK {
     internal static func resetForTesting(environment: Environment = .live) {
         lock.lock()
         _tenantOptions = .empty
+        _legacyOptions = .empty
         lock.unlock()
         self.environment = environment
     }

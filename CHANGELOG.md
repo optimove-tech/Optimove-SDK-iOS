@@ -1,10 +1,10 @@
 # Changelog
 
-## Unreleased
+## 6.13.0
 
 - Gamify: the optional `gamify` block of the tenant configuration (`adactUrl`, `loyaltyWidgetUrl`) is now parsed and applied, so neither URL is hardcoded by the host app.
 - Gamify: federated auth for the loyalty widget. New `GamifyWidgetSDK.openWidget(from:params:)` opens `{loyaltyWidgetUrl}/{tenantId}[/brand/{brand}]/{userId}`, defaulting to the identified SDK user. When `enableAuth()` is used, a JWT for that user is fetched from the `AuthTokenProvider` and passed in the widget's INIT message; if the token can't be fetched the widget closes instead of opening unauthenticated.
-- **Breaking:** removed `GamifyWidgetSDK.initialize(widgetUrl:adactUrl:)` and `open(from:userId:token:)`. Both URLs come from the tenant configuration and the token from the `AuthTokenProvider`; use `openWidget(from:params:)` for the loyalty widget, and `openAdactCampaign(from:params:)` needs no setup.
+- Deprecated `GamifyWidgetSDK.initialize(widgetUrl:adactUrl:)` and `open(from:userId:token:)`. Both URLs come from the tenant configuration and the token from the `AuthTokenProvider`; use `openWidget(from:params:)` for the loyalty widget, and `openAdactCampaign(from:params:)` needs no setup. Until removed, `open` opens the URL passed to `initialize` as given (or the tenant-configured widget if `initialize` was not called) and ignores its `token` argument; federated auth applies. An `adactUrl` passed to `initialize` is used only when the tenant configuration has none.
 
 ## 6.12.1
 

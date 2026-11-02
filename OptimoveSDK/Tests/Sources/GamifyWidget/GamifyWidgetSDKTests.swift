@@ -189,6 +189,31 @@ final class GamifyWidgetSDKTests: XCTestCase {
         )
     }
 
+    // MARK: Deprecated initialize
+
+    @available(*, deprecated)
+    func testDeprecatedInitializeStoresLegacyUrls() {
+        GamifyWidgetSDK.initialize(widgetUrl: widgetUrl + "/593/customer-1", adactUrl: "https://legacy.adact.me/")
+
+        XCTAssertEqual(GamifyWidgetSDK.legacyOptions, GamifyWidgetSDK.LegacyOptions(
+            widgetUrl: widgetUrl + "/593/customer-1",
+            adactUrl: "https://legacy.adact.me"
+        ))
+    }
+
+    @available(*, deprecated)
+    func testDeprecatedInitializeAdactUrlUsedOnlyWithoutTenantAdactUrl() {
+        GamifyWidgetSDK.initialize(widgetUrl: "", adactUrl: "https://legacy.adact.me/")
+        XCTAssertEqual(GamifyWidgetSDK.getAdactUrl(), "https://legacy.adact.me/")
+        XCTAssertEqual(
+            GamifyWidgetSDK.buildAdactCampaignUrl(params: OpenAdactParams(campaignId: 179)),
+            "https://legacy.adact.me/embedded/179"
+        )
+
+        applyConfig(adactUrl: "https://campaign.adact.me/")
+        XCTAssertEqual(GamifyWidgetSDK.getAdactUrl(), "https://campaign.adact.me/")
+    }
+
     func testBuildAdactCampaignUrlRejectsNonHttps() {
         applyConfig(adactUrl: "http://campaign.adact.me/")
         XCTAssertEqual(
