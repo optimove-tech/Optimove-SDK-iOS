@@ -15,6 +15,7 @@ class OverlayMessagingManager {
     private let urlBuilder: UrlBuilder
     private var interceptor: OverlayMessagingInterceptor?
     private let actionDispatcher = OverlayActionDispatcher(defaults: DefaultOverlayActionHandler())
+    private let lifecycle = OverlayLifecycleNotifier()
     private var presenter: OverlayMessagingPresenter?
     private var hidden = false
     // Prevents showing the same message twice if triggers fire in quick succession
@@ -34,6 +35,10 @@ class OverlayMessagingManager {
 
     func setActionHandler(_ handler: OverlayActionHandler?) {
         actionDispatcher.setOverrides(handler)
+    }
+
+    func setLifecycleListener(_ listener: OverlayLifecycleListener?) {
+        lifecycle.setListener(listener)
     }
 
     // MARK: - Visibility
@@ -163,14 +168,16 @@ class OverlayMessagingManager {
         
         if let presenter = presenter {
             presenter.showMessage(next)
-            return
+        } else {
+            presenter = OverlayMessagingPresenter(
+                message: next,
+                urlBuilder: urlBuilder,
+                delegate: self
+            )
         }
-        
-        presenter = OverlayMessagingPresenter(
-            message: next,
-            urlBuilder: urlBuilder,
-            delegate: self
-        )
+
+        // Fired after the presenter is in place so a listener calling hide() from onShown takes effect.
+        lifecycle.messagePresented(next)
     }
     
     // MARK: - Event tracking
@@ -197,6 +204,7 @@ extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
     func onMessageClosed(_ message: OverlayMessagingMessage) {
         if !displayQueue.isEmpty { displayQueue.removeFirst() }
         onSlotCleared(message.type)
+        lifecycle.messageClosed(message, failed: false)
         maybeShowNext()
     }
 
@@ -205,6 +213,9 @@ extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
     }
 
     func onAction(_ message: OverlayMessagingMessage, action: OverlayAction) {
+        if case .linkAction = action {
+            lifecycle.linkActionDispatched(message)
+        }
         actionDispatcher.dispatch(action, message: message)
     }
 
@@ -214,6 +225,7 @@ extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
         // Immediate messages are short-lived. In case of an error we dont want them to stay on queue and surface later
         if !displayQueue.isEmpty { displayQueue.removeFirst() }
         onSlotCleared(message.type)
+        lifecycle.messageClosed(message, failed: true)
         maybeShowNext()
     }
 }

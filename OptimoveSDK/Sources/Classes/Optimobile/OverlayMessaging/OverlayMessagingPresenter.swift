@@ -58,7 +58,12 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     
     private func initViews() {
         guard let url = try? urlBuilder.urlForService(.iar) else {
-            Logger.error("Failed to resolve IAR service URL, deferring overlay messaging presentation")
+            Logger.error("Failed to resolve IAR service URL, overlay messaging presentation failed")
+            // Report asynchronously: we are still inside init, before the delegate holds this presenter.
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.delegate?.onViewError(self.currentMessage)
+            }
             return
         }
         window = UIWindow(frame: UIScreen.main.bounds)

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add `OptimoveOverlayMessaging.setLifecycleListener(_:)` — register an `OverlayLifecycleListener` to observe overlays entering (`onShown`) and leaving (`onClosed`, with an `OverlayCloseReason` of `actioned`, `dismissed` or `error`) the screen. `onClosed` fires exactly once for every shown message, including on presentation failure, and `hide()` is not a close. This is an observer only, separate from `setActionHandler`; it cannot block or override a close.
+- Fix an overlay that failed to resolve the IAR URL staying in the queue forever and blocking later overlays. It is now treated as a presentation error.
+
 ## 6.12.1
 
 - Fix in-app and overlay messages ignoring the host app's supported orientations. The message window now uses the orientations of the host's top view controller at the time the message is shown, so an orientation-restricted app (e.g. landscape-only) no longer rotates while a message is displayed.
