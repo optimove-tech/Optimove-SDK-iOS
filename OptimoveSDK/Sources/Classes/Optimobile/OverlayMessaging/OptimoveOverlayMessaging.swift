@@ -115,9 +115,8 @@ public struct OverlayClosedInfo {
     public let reason: OverlayCloseReason
 }
 
-/// Observes overlays leaving the screen — e.g. to keep the host app's own popup queue in step with
-/// overlays. Purely an observer: unlike `OverlayActionHandler`, it cannot alter or block what the
-/// SDK does.
+/// Called when an overlay leaves the screen. Purely an observer: unlike `OverlayActionHandler`, it
+/// cannot alter or block what the SDK does.
 ///
 /// Fires once for every presented message, including when presentation fails (`.error`). It does
 /// not fire on `hide()`, for messages the interceptor defers or discards, or if the app is killed
