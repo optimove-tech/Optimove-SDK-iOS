@@ -4,6 +4,7 @@
 
 - Add `OptimoveOverlayMessaging.setLifecycleListener(_:)` — register an `OverlayLifecycleListener` to observe overlays entering (`onShown`) and leaving (`onClosed`, with an `OverlayCloseReason` of `actioned`, `dismissed` or `error`) the screen. `onClosed` fires exactly once for every shown message, including on presentation failure, and `hide()` is not a close. This is an observer only, separate from `setActionHandler`; it cannot block or override a close.
 - Fix an overlay that failed to resolve the IAR URL staying in the queue forever and blocking later overlays. It is now treated as a presentation error.
+- Fix a repeated close or error report for the same overlay (e.g. a web view load failure followed by a content process termination) dropping the next queued overlay before it was shown.
 
 ## 6.12.1
 
