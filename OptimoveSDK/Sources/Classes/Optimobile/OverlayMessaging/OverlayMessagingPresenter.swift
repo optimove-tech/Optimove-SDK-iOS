@@ -4,7 +4,8 @@ import UIKit
 import WebKit
 
 protocol OverlayMessagingPresenterDelegate: AnyObject {
-    func onMessageClosed(_ message: OverlayMessagingMessage)
+    /// `reason` is `.actioned` or `.dismissed`; failures go to `onViewError`.
+    func onMessageClosed(_ message: OverlayMessagingMessage, reason: OverlayCloseReason)
     func onEvents(_ message: OverlayMessagingMessage, events: [OverlayMessagingRendererEvent])
     func onViewError(_ message: OverlayMessagingMessage)
     func onAction(_ message: OverlayMessagingMessage, action: OverlayAction)
@@ -24,6 +25,7 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     private var contentController: WKUserContentController?
     
     private var currentMessage: OverlayMessagingMessage
+    private var currentActioned = false
     private weak var delegate: OverlayMessagingPresenterDelegate?
     private let urlBuilder: UrlBuilder
 
@@ -42,6 +44,7 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
     func showMessage(_ message: OverlayMessagingMessage) {
         guard message.id != currentMessage.id else { return }
         currentMessage = message
+        currentActioned = false
         sendCurrentMessageToClient()
     }
     
@@ -207,7 +210,7 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
         case "MESSAGE_OPENED":
             loadingSpinner?.stopAnimating()
         case "MESSAGE_CLOSED":
-            delegate?.onMessageClosed(currentMessage)
+            delegate?.onMessageClosed(currentMessage, reason: currentActioned ? .actioned : .dismissed)
         case "COMMAND":
             handleCommand(body["data"])
         case "PRESENTATION_ERROR":
@@ -279,6 +282,7 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
                       let urlString = actionData["url"] as? String
                 else { continue }
 
+                currentActioned = true
                 delegate?.onAction(currentMessage, action: .linkAction(LinkActionPayload(url: urlString)))
             default:
                 break

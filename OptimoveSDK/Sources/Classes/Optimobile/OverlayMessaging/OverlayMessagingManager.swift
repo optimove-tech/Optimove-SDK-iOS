@@ -15,7 +15,7 @@ class OverlayMessagingManager {
     private let urlBuilder: UrlBuilder
     private var interceptor: OverlayMessagingInterceptor?
     private let actionDispatcher = OverlayActionDispatcher(defaults: DefaultOverlayActionHandler())
-    private let lifecycle = OverlayLifecycleNotifier()
+    private var closedListener: OverlayClosedListener?
     private var presenter: OverlayMessagingPresenter?
     private var hidden = false
     // Prevents showing the same message twice if triggers fire in quick succession
@@ -37,8 +37,8 @@ class OverlayMessagingManager {
         actionDispatcher.setOverrides(handler)
     }
 
-    func setLifecycleListener(_ listener: OverlayLifecycleListener?) {
-        lifecycle.setListener(listener)
+    func setClosedListener(_ listener: OverlayClosedListener?) {
+        closedListener = listener
     }
 
     // MARK: - Visibility
@@ -168,16 +168,14 @@ class OverlayMessagingManager {
         
         if let presenter = presenter {
             presenter.showMessage(next)
-        } else {
-            presenter = OverlayMessagingPresenter(
-                message: next,
-                urlBuilder: urlBuilder,
-                delegate: self
-            )
+            return
         }
 
-        // Fired after the presenter is in place so a listener calling hide() from onShown takes effect.
-        lifecycle.messagePresented(next)
+        presenter = OverlayMessagingPresenter(
+            message: next,
+            urlBuilder: urlBuilder,
+            delegate: self
+        )
     }
     
     // MARK: - Event tracking
@@ -201,11 +199,11 @@ class OverlayMessagingManager {
 
 extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
     
-    func onMessageClosed(_ message: OverlayMessagingMessage) {
+    func onMessageClosed(_ message: OverlayMessagingMessage, reason: OverlayCloseReason) {
         guard isFrontOfQueue(message) else { return }
         displayQueue.removeFirst()
         onSlotCleared(message.type)
-        lifecycle.messageClosed(message, failed: false)
+        closedListener?(message, OverlayClosedInfo(reason: reason))
         maybeShowNext()
     }
 
@@ -214,9 +212,6 @@ extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
     }
 
     func onAction(_ message: OverlayMessagingMessage, action: OverlayAction) {
-        if case .linkAction = action {
-            lifecycle.linkActionDispatched(message)
-        }
         actionDispatcher.dispatch(action, message: message)
     }
 
@@ -228,7 +223,7 @@ extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
         // Immediate messages are short-lived. In case of an error we dont want them to stay on queue and surface later
         displayQueue.removeFirst()
         onSlotCleared(message.type)
-        lifecycle.messageClosed(message, failed: true)
+        closedListener?(message, OverlayClosedInfo(reason: .error))
         maybeShowNext()
     }
 
