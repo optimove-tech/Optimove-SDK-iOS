@@ -665,6 +665,7 @@ class InAppManager {
             }
 
             let message = InAppMessage(entity: items[0])
+            message.expiresAt = nil
             let tickles = NSOrderedSet(array: [withId])
             presenter.queueMessagesForPresentation(messages: [message], tickleIds: tickles)
         }
