@@ -543,12 +543,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
         let data = message.data as? [String: Any]
         
-        do {
-            interceptor.processMessage(data: data, decision: decision)
-        } catch {
-            Logger.error("Error in message interceptor: \(error.localizedDescription)")
-            decision.suppress()
-        }
+        interceptor.processMessage(data: data, decision: decision)
     }
 
     private func handleShowDecision(for message: InAppMessage) {
