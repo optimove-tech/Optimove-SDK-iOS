@@ -10,6 +10,7 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
     public let events: [String: EventsConfig]
     public let isEnableRealtime: Bool
     public let isSupportedAirship: Bool
+    public let gamify: TenantGamifyConfig?
 
     public init(
         tenantID: Int,
@@ -18,7 +19,8 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
         optitrack: OptitrackConfig,
         events: [String: EventsConfig],
         isEnableRealtime: Bool,
-        isSupportedAirship: Bool
+        isSupportedAirship: Bool,
+        gamify: TenantGamifyConfig? = nil
     ) {
         self.tenantID = tenantID
         self.logger = logger
@@ -27,6 +29,7 @@ public struct Configuration: Codable, TenantInfo, EventInfo {
         self.events = events
         self.isEnableRealtime = isEnableRealtime
         self.isSupportedAirship = isSupportedAirship
+        self.gamify = gamify
     }
 }
 

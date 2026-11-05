@@ -1,10 +1,16 @@
 # Changelog
 
-## 6.13.0
+## 6.14.0
 
 - Add `OptimoveOverlayMessaging.setClosedListener(_:)` — register an `OverlayClosedListener` closure that is called when an overlay leaves the screen. It fires once for every presented message with an `OverlayCloseReason`: `.actioned` (the user took a link), `.dismissed` (close button, backdrop tap) or `.error` (presentation failed). `hide()` is not a close, and messages the interceptor defers or discards never fire. This is an observer only, separate from `setActionHandler`; it cannot block or override a close.
 - Fix an overlay that failed to resolve the IAR URL staying in the queue forever and blocking later overlays. It is now treated as a presentation error.
 - Fix a repeated close or error report for the same overlay (e.g. a web view load failure followed by a content process termination) dropping the next queued overlay before it was shown.
+
+## 6.13.0
+
+- Gamify: the optional `gamify` block of the tenant configuration (`adactUrl`, `loyaltyWidgetUrl`) is now parsed and applied, so neither URL is hardcoded by the host app.
+- Gamify: federated auth for the loyalty widget. New `GamifyWidgetSDK.openWidget(from:params:)` opens `{loyaltyWidgetUrl}/{tenantId}[/brand/{brand}]/{userId}`, defaulting to the identified SDK user. When `enableAuth()` is used, a JWT for that user is fetched from the `AuthTokenProvider` and passed in the widget's INIT message; if the token can't be fetched the widget closes instead of opening unauthenticated.
+- Deprecated `GamifyWidgetSDK.initialize(widgetUrl:adactUrl:)` and `open(from:userId:token:)`. Both URLs come from the tenant configuration and the token from the `AuthTokenProvider`; use `openWidget(from:params:)` for the loyalty widget, and `openAdactCampaign(from:params:)` needs no setup. Until removed, `open` opens the URL passed to `initialize` as given (or the tenant-configured widget if `initialize` was not called) and ignores its `token` argument; federated auth applies. An `adactUrl` passed to `initialize` is used only when the tenant configuration has none.
 
 ## 6.12.1
 

@@ -98,6 +98,16 @@ typealias Logger = OptimoveCore.Logger
         return shared.config
     }
 
+    /// The identified customer ID, or nil for an anonymous visitor.
+    static func currentCustomerId() -> String? {
+        return shared.container.resolve { $0.storage().customerID } ?? nil
+    }
+
+    /// The auth manager when `enableAuth` was used, otherwise nil.
+    static func currentAuthManager() -> AuthManager? {
+        return shared.container.resolve { $0.authManager } ?? nil
+    }
+
     /// Set the credentials for the Optimove server. Intent to use as a step for the delayed initialization.
     private static func setCredentialsInternal(optimoveCredentials: String?, optimobileCredentials: String?, preferenceCenterCredentials: String? = nil, embeddedMessagingCredentials: String? = nil) {
         guard let currentConfig = shared.config else {
@@ -510,6 +520,11 @@ private extension Optimove {
             onStartEventGenerator.generate()
             let initializer = serviceLocator.initializer()
             initializer.initialize(with: configuration)
+            GamifyWidgetSDK.applyTenantConfiguration(
+                adactUrl: configuration.gamify?.adactUrl,
+                loyaltyWidgetUrl: configuration.gamify?.loyaltyWidgetUrl,
+                tenantId: configuration.tenantID
+            )
             RunningFlagsIndication.isInitializerRunning.toggle()
             RunningFlagsIndication.isSdkRunning.toggle()
         }
