@@ -114,6 +114,7 @@ public struct OptimobileConfig {
 
     let isOverlayMessagingEnabled: Bool
     let overlayMessagingSessionLengthMinutes: Int
+    let overlayMessagingDeferDelayMinutes: Int
 }
 
 public typealias Region = OptimobileConfig.Region
@@ -138,6 +139,7 @@ open class OptimoveConfigBuilder: NSObject {
     private var _authTokenProvider: AuthTokenProvider?
     private var _overlayMessagingSessionLengthHours: Int?
     private var _overlayMessagingSessionLengthMinutes: Int?
+    private var _overlayMessagingDeferDelayMinutes = 60
     private var _runtimeInfo: [String: AnyObject]?
     private var _sdkInfo: [String: AnyObject]?
     private var _isRelease: Bool?
@@ -188,6 +190,7 @@ open class OptimoveConfigBuilder: NSObject {
             _sdkInfo = optimobileConfig.sdkInfo
             _isRelease = optimobileConfig.isRelease
             _overlayMessagingSessionLengthMinutes = optimobileConfig.isOverlayMessagingEnabled ? optimobileConfig.overlayMessagingSessionLengthMinutes : nil
+            _overlayMessagingDeferDelayMinutes = optimobileConfig.overlayMessagingDeferDelayMinutes
         }
         _authTokenProvider = config.authTokenProvider
         features = config.features
@@ -263,18 +266,27 @@ open class OptimoveConfigBuilder: NSObject {
     }
 
     /// Enables Overlay Messaging.
-    /// - Parameter sessionLengthHours: Length of a session, in hours, before overlay triggers can fire again. Must be at least 1.
-    @discardableResult public func enableOverlayMessaging(sessionLengthHours: Int = 1) -> OptimoveConfigBuilder {
-        precondition(sessionLengthHours >= 1, "sessionLengthHours must be at least 1 hour.")
-        _overlayMessagingSessionLengthMinutes = sessionLengthHours * 60
-        return self
+    /// - Parameters:
+    ///   - sessionLengthHours: Length of a session, in hours. A session starts when a scheduled message is shown, and
+    ///     shows at most one. Must be at least 0; 0 turns the limit off.
+    ///   - deferDelayMinutes: How long scheduled messages are held back after one isn't shown (the interceptor
+    ///     deferred it or timed out, or it failed to render). Must be at least 1.
+    @discardableResult public func enableOverlayMessaging(sessionLengthHours: Int = 1, deferDelayMinutes: Int = 60) -> OptimoveConfigBuilder {
+        precondition(sessionLengthHours >= 0, "sessionLengthHours must be at least 0.")
+        return enableOverlayMessaging(sessionLengthMinutes: sessionLengthHours * 60, deferDelayMinutes: deferDelayMinutes)
     }
 
     /// Enables Overlay Messaging.
-    /// - Parameter sessionLengthMinutes: Length of a session, in minutes, before overlay triggers can fire again. Must be at least 15.
-    @discardableResult public func enableOverlayMessaging(sessionLengthMinutes: Int) -> OptimoveConfigBuilder {
-        precondition(sessionLengthMinutes >= 15, "sessionLengthMinutes must be at least 15 minutes.")
+    /// - Parameters:
+    ///   - sessionLengthMinutes: Length of a session, in minutes. A session starts when a scheduled message is shown,
+    ///     and shows at most one. Must be at least 0; 0 turns the limit off.
+    ///   - deferDelayMinutes: How long scheduled messages are held back after one isn't shown (the interceptor
+    ///     deferred it or timed out, or it failed to render). Must be at least 1.
+    @discardableResult public func enableOverlayMessaging(sessionLengthMinutes: Int, deferDelayMinutes: Int = 60) -> OptimoveConfigBuilder {
+        precondition(sessionLengthMinutes >= 0, "sessionLengthMinutes must be at least 0.")
+        precondition(deferDelayMinutes >= 1, "deferDelayMinutes must be at least 1.")
         _overlayMessagingSessionLengthMinutes = sessionLengthMinutes
+        _overlayMessagingDeferDelayMinutes = deferDelayMinutes
         return self
     }
 
@@ -413,7 +425,8 @@ open class OptimoveConfigBuilder: NSObject {
                     sdkInfo: _sdkInfo,
                     isRelease: _isRelease,
                     isOverlayMessagingEnabled: _overlayMessagingSessionLengthMinutes != nil,
-                    overlayMessagingSessionLengthMinutes: _overlayMessagingSessionLengthMinutes ?? 60
+                    overlayMessagingSessionLengthMinutes: _overlayMessagingSessionLengthMinutes ?? 60,
+                    overlayMessagingDeferDelayMinutes: _overlayMessagingDeferDelayMinutes
                 )
             }
             Logger.info("\(OptimobileConfig.self) building skipped.")
