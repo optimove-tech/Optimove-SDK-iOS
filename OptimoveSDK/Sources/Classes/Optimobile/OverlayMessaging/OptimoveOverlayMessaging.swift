@@ -7,13 +7,16 @@ public class OptimoveOverlayMessaging {
     private static var shared: OptimoveOverlayMessaging?
     
     private let manager: OverlayMessagingManager
-    private var sessionManager: OverlayMessagingSessionManager?
-    private let sessionLengthMinutes: Int
+    private let sessionManager: OverlayMessagingSessionManager
     private var initializationToken: NSObjectProtocol?
 
-    private init(sessionLengthMinutes: Int, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
-        self.sessionLengthMinutes = sessionLengthMinutes
-        self.manager = OverlayMessagingManager(httpClient: httpClient, urlBuilder: urlBuilder)
+    private init(sessionLengthMinutes: Int, deferDelayMinutes: Int, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
+        self.sessionManager = OverlayMessagingSessionManager(
+            sessionLengthMinutes: sessionLengthMinutes,
+            deferDelayMinutes: deferDelayMinutes,
+            listener: { OptimoveOverlayMessaging.shared?.manager.onTriggerReceived(.session) }
+        )
+        self.manager = OverlayMessagingManager(httpClient: httpClient, urlBuilder: urlBuilder, sessionManager: sessionManager)
     }
     
     // MARK: - Public API
@@ -33,7 +36,7 @@ public class OptimoveOverlayMessaging {
     }
 
     public static func resetSession() {
-        shared?.sessionManager?.resetSession()
+        ensureMain { shared?.sessionManager.reset() }
     }
 
     public static func hide() {
@@ -46,18 +49,29 @@ public class OptimoveOverlayMessaging {
     
     // MARK: - Internal
     
-    static func onPushTriggerReceived() {
+    static func onTriggeredSignalReceived() {
         shared?.manager.onTriggerReceived(.immediate)
+    }
+
+    /// A scheduled Signal: moves the next scheduled fetch earlier.
+    static func onScheduledSignalReceived(nextFetchInSeconds: Int64) {
+        shared?.sessionManager.onSignal(nextFetchInSeconds: nextFetchInSeconds)
+    }
+
+    /// A different user is associated, or none any more: ends the session and fetches for them.
+    static func onUserChanged() {
+        ensureMain { shared?.sessionManager.reset() }
     }
     
     static func initialize(config: OptimobileConfig, httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
-        shared = OptimoveOverlayMessaging(sessionLengthMinutes: config.overlayMessagingSessionLengthMinutes, httpClient: httpClient, urlBuilder: urlBuilder)
+        shared = OptimoveOverlayMessaging(sessionLengthMinutes: config.overlayMessagingSessionLengthMinutes,
+                                          deferDelayMinutes: config.overlayMessagingDeferDelayMinutes, httpClient: httpClient, urlBuilder: urlBuilder)
         
         shared?.initializationToken = NotificationCenter.default
             .addObserver(forName: .optimobileInializationFinished, object: nil, queue: nil) { _ in
                 DispatchQueue.main.async {
                     shared?.initializationToken = nil
-                    shared?.startSessionManager()
+                    shared?.sessionManager.start()
                 }
             }
     }
@@ -70,15 +84,6 @@ public class OptimoveOverlayMessaging {
         } else {
             DispatchQueue.main.async(execute: work)
         }
-    }
-
-    private func startSessionManager() {
-        sessionManager = OverlayMessagingSessionManager(
-            sessionLengthMinutes: sessionLengthMinutes,
-            listener: { [weak self] in
-                self?.manager.onTriggerReceived(.session)
-            }
-        )
     }
 }
 

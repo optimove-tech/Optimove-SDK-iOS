@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.15.0
+
+- Overlay messaging: scheduled messages show at their scheduled time. The SDK fetches when the server says the next scheduled message is due, and a silent push from Optimove can bring that fetch forward, instead of fetching once per session.
+- Overlay messaging: a session now starts when a scheduled message is shown, and allows one scheduled message per session length. Before, a session started on every return to the foreground once the previous one had ended, whether or not anything was shown.
+- Overlay messaging: the session length can be any length from 0 in `enableOverlayMessaging(sessionLengthHours:)` and `enableOverlayMessaging(sessionLengthMinutes:)`; 0 turns the limit off. The 1-hour and 15-minute minimums are gone.
+- Overlay messaging: new `deferDelayMinutes` parameter on both `enableOverlayMessaging` methods. When a scheduled message isn't shown (the interceptor defers it or times out, or it fails to render), scheduled messages are held back for this delay, 60 minutes by default and at least 1. A message due sooner ends the wait early.
+- Overlay messaging: signing out (`signOutUser()`) now starts a new session and fetches, as associating a user already did.
+- No breaking changes: existing calls, `resetSession()` and `MessageType.session` keep working.
+
 ## 6.14.0
 
 - Add `OptimoveOverlayMessaging.setClosedListener(_:)` — register an `OverlayClosedListener` closure that is called when an overlay leaves the screen. It fires once for every presented message with an `OverlayCloseReason`: `.actioned` (the user took a link), `.dismissed` (close button, backdrop tap) or `.error` (presentation failed). `hide()` is not a close, and messages the interceptor defers or discards never fire. This is an observer only, separate from `setActionHandler`; it cannot block or override a close.
