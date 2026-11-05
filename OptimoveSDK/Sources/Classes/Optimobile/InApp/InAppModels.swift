@@ -46,6 +46,7 @@ class InAppMessage: NSObject {
     public internal(set) var badgeConfig: NSDictionary?
     public internal(set) var inboxConfig: NSDictionary?
     public internal(set) var dismissedAt: NSDate?
+    public internal(set) var expiresAt: NSDate?
     public internal(set) var readAt: NSDate?
     public internal(set) var sentAt: NSDate?
 
@@ -57,8 +58,16 @@ class InAppMessage: NSObject {
         badgeConfig = entity.badgeConfig?.copy() as? NSDictionary
         inboxConfig = entity.inboxConfig?.copy() as? NSDictionary
         dismissedAt = entity.dismissedAt?.copy() as? NSDate
+        expiresAt = entity.expiresAt?.copy() as? NSDate
         readAt = entity.readAt?.copy() as? NSDate
         sentAt = entity.sentAt?.copy() as? NSDate
+    }
+
+    func isExpired() -> Bool {
+        guard let expiresAt = expiresAt as Date? else {
+            return false
+        }
+        return expiresAt.timeIntervalSinceNow <= 0
     }
 
     override func isEqual(_ object: Any?) -> Bool {

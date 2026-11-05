@@ -113,11 +113,15 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
         }
 
         for message in messages {
-            if messageQueue.contains(message) {
+            let existingIndex = messageQueue.index(of: message)
+            if existingIndex != NSNotFound {
+                (messageQueue[existingIndex] as! InAppMessage).expiresAt = message.expiresAt
                 continue
             }
             messageQueue.add(message)
         }
+
+        removeExpiredMessages()
 
         for tickleId in tickleIds {
             if pendingTickleIds.contains(tickleId) {
@@ -172,6 +176,8 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
     private func presentFromQueue_onMain() {
         assertOnMainThread()
 
+        removeExpiredMessages()
+
         if messageQueue.count == 0 || displayMode == .paused {
             self.destroyViews()
             return
@@ -209,6 +215,29 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
         messageQueue.removeObject(at: 0)
         cleanupMessageAndAdvance(message)
+    }
+
+    private func removeExpiredMessages() {
+        assertOnMainThread()
+
+        if interceptionInProgress {
+            return
+        }
+
+        let expired = messageQueue.compactMap { $0 as? InAppMessage }.filter { $0.isExpired() }
+        if expired.isEmpty {
+            return
+        }
+
+        messageQueue.removeObjects(in: expired)
+        for message in expired {
+            pendingTickleIds.remove(message.id)
+        }
+
+        if let shown = currentMessage, expired.contains(shown) {
+            destroyViews()
+            currentMessage = nil
+        }
     }
 
     func cancelCurrentPresentationQueue(waitForViewCleanup: Bool) {
@@ -514,12 +543,7 @@ final class InAppPresenter: NSObject, WKScriptMessageHandler, WKNavigationDelega
 
         let data = message.data as? [String: Any]
         
-        do {
-            interceptor.processMessage(data: data, decision: decision)
-        } catch {
-            Logger.error("Error in message interceptor: \(error.localizedDescription)")
-            decision.suppress()
-        }
+        interceptor.processMessage(data: data, decision: decision)
     }
 
     private func handleShowDecision(for message: InAppMessage) {

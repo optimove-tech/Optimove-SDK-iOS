@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.13.1
+
+- Fix: expired in-app messages could still be shown if they were queued for presentation before they expired (e.g. several "show immediately" messages arrive while the app is backgrounded, then the user returns past their expiry). Queued messages are now re-checked for expiry before each presentation, and an expired message still on screen is removed when the app becomes active. Messages opened from the inbox are unaffected.
+
 ## 6.13.0
 
 - Gamify: the optional `gamify` block of the tenant configuration (`adactUrl`, `loyaltyWidgetUrl`) is now parsed and applied, so neither URL is hardcoded by the host app.
