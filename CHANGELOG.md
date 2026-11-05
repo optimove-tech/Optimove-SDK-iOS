@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.14.0
+
+- Add `OptimoveOverlayMessaging.setClosedListener(_:)` — register an `OverlayClosedListener` closure that is called when an overlay leaves the screen. It fires once for every presented message with an `OverlayCloseReason`: `.actioned` (the user took a link), `.dismissed` (close button, backdrop tap) or `.error` (presentation failed). `hide()` is not a close, and messages the interceptor defers or discards never fire. This is an observer only, separate from `setActionHandler`; it cannot block or override a close.
+- Fix an overlay that failed to resolve the IAR URL staying in the queue forever and blocking later overlays. It is now treated as a presentation error.
+- Fix a repeated close or error report for the same overlay (e.g. a web view load failure followed by a content process termination) dropping the next queued overlay before it was shown.
+
 ## 6.13.0
 
 - Gamify: the optional `gamify` block of the tenant configuration (`adactUrl`, `loyaltyWidgetUrl`) is now parsed and applied, so neither URL is hardcoded by the host app.
