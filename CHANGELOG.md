@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.14.0
+
+- Add Live Activities (iOS 18+). Call `enableLiveActivities(YourAttributes.self)` on the config builder after conforming the host `ActivityAttributes` type to `OptimoveLiveActivityAttributes` in the app target (not the widget). The SDK reports `k.liveActivity.pushToStartTokenRegistered` and `k.liveActivity.started` (the latter only when `optimoveActivityId` is set). ActivityKit is weakly linked.
+
 ## 6.13.0
 
 - Gamify: the optional `gamify` block of the tenant configuration (`adactUrl`, `loyaltyWidgetUrl`) is now parsed and applied, so neither URL is hardcoded by the host app.
