@@ -87,6 +87,22 @@ public class PushNotification: NSObject {
 @available(iOS 10.0, *)
 public typealias OptimoveUNAuthorizationCheckedHandler = (UNAuthorizationStatus, Error?) -> Void
 
+/// The notification-permission surface the push registration code needs; a seam so tests can fake the system prompt.
+protocol PushPermissionCenter {
+    func authorizationStatus(_ completion: @escaping (UNAuthorizationStatus) -> Void)
+    func requestAuthorization(_ completion: @escaping (Bool, Error?) -> Void)
+}
+
+extension UNUserNotificationCenter: PushPermissionCenter {
+    func authorizationStatus(_ completion: @escaping (UNAuthorizationStatus) -> Void) {
+        getNotificationSettings { completion($0.authorizationStatus) }
+    }
+
+    func requestAuthorization(_ completion: @escaping (Bool, Error?) -> Void) {
+        requestAuthorization(options: [.alert, .badge, .sound], completionHandler: completion)
+    }
+}
+
 extension Optimobile {
     /**
      Helper method for requesting the device token with alert, badge and sound permissions.
@@ -114,48 +130,43 @@ extension Optimobile {
     }
     
     @available(iOS 10.0, *)
-    fileprivate static func requestToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
-        let center = UNUserNotificationCenter.current()
-        
-        let requestToken: () -> Void = {
-            DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
-            }
+    static func requestToken(
+        center: PushPermissionCenter = UNUserNotificationCenter.current(),
+        isInBackground: @escaping () -> Bool = { UIApplication.shared.applicationState == .background },
+        registerForRemoteNotifications: @escaping () -> Void = {
+            DispatchQueue.main.async { UIApplication.shared.registerForRemoteNotifications() }
+        },
+        _ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil
+    ) {
+        // A push token is registered whatever the permission outcome: the token is what lets silent pushes through.
+        let report: (UNAuthorizationStatus, Swift.Error?) -> Void = { status, error in
+            onAuthorizationStatus?(status, error)
+            registerForRemoteNotifications()
         }
-        
+
         let askPermission: () -> Void = {
             DispatchQueue.main.async {
-                if UIApplication.shared.applicationState == .background {
-                    onAuthorizationStatus?(.notDetermined,
-                                           NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Application not active, aborting push permission request"]) as Swift.Error)
+                if isInBackground() {
+                    report(.notDetermined,
+                           NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Application not active, aborting push permission request"]) as Swift.Error)
                     return
                 }
-                
-                center.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+
+                center.requestAuthorization { granted, error in
                     if let err = error {
-                        onAuthorizationStatus?(.notDetermined, err)
+                        report(.notDetermined, err)
                         return
                     }
-                    
-                    if !granted {
-                        onAuthorizationStatus?(.denied, nil)
-                        return
-                    }
-                    
-                    onAuthorizationStatus?(.authorized, nil)
-                    requestToken()
+
+                    report(granted ? .authorized : .denied, nil)
                 }
             }
         }
-        
-        center.getNotificationSettings { settings in
-            switch settings.authorizationStatus {
-            case .denied:
-                onAuthorizationStatus?(settings.authorizationStatus, nil)
-                return
-            case .authorized:
-                onAuthorizationStatus?(settings.authorizationStatus, nil)
-                requestToken()
+
+        center.authorizationStatus { status in
+            switch status {
+            case .denied, .authorized:
+                report(status, nil)
             default:
                 askPermission()
             }
