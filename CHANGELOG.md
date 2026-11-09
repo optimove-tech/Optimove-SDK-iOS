@@ -1,6 +1,6 @@
 # Changelog
 
-## 6.14.0
+## 6.15.0
 
 - Add `OptimoveOverlayMessaging.setClosedListener(_:)` — register an `OverlayClosedListener` closure that is called when an overlay leaves the screen. It fires once for every presented message with an `OverlayCloseReason`: `.actioned` (the user took a link), `.dismissed` (close button, backdrop tap) or `.error` (presentation failed). `hide()` is not a close, and messages the interceptor defers or discards never fire. This is an observer only, separate from `setActionHandler`; it cannot block or override a close.
 - Fix an overlay that failed to resolve the IAR URL staying in the queue forever and blocking later overlays. It is now treated as a presentation error.
