@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Push: the SDK now always registers a push token, whatever the notification permission (like the Android SDK), so silent pushes can reach users who haven't allowed notifications. `k.push.deviceRegistered` reports `areNotificationsEnabled`, and `k.push.notificationEnablementChanged` is sent on SDK start and on return to foreground when the permission changed. `pushUnregister()` is still a full opt-out.
+
 ## 6.15.0
 
 - Add `OptimoveOverlayMessaging.setClosedListener(_:)` — register an `OverlayClosedListener` closure that is called when an overlay leaves the screen. It fires once for every presented message with an `OverlayCloseReason`: `.actioned` (the user took a link), `.dismissed` (close button, backdrop tap) or `.error` (presentation failed). `hide()` is not a close, and messages the interceptor defers or discards never fire. This is an observer only, separate from `setActionHandler`; it cannot block or override a close.
