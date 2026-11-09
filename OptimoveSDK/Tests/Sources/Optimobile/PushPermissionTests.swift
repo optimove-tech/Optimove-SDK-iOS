@@ -1,5 +1,6 @@
 //  Copyright © 2026 Optimove. All rights reserved.
 
+import UIKit
 import UserNotifications
 import XCTest
 @testable import OptimoveSDK
@@ -35,10 +36,11 @@ private final class RecordedEvents {
 final class PushRegistrationFlagTests: XCTestCase {
     private func registeredFlag(for status: UNAuthorizationStatus) -> Any? {
         let recorded = RecordedEvents()
-        Optimobile.sendPushRegistration(["token": "abc"], center: FakePushPermissionCenter(status: status), track: recorded.track)
+        Optimobile.pushRegister(Data([0xAB, 0xCD]), deviceType: 1, iosTokenType: 1,
+                                center: FakePushPermissionCenter(status: status), track: recorded.track)
         XCTAssertEqual(recorded.events.count, 1)
         XCTAssertEqual(recorded.events.first?.0, .PUSH_DEVICE_REGISTER)
-        XCTAssertEqual(recorded.events.first?.1["token"] as? String, "abc")
+        XCTAssertEqual(recorded.events.first?.1["token"] as? String, "abcd")
         return recorded.events.first?.1["areNotificationsEnabled"]
     }
 
@@ -107,6 +109,30 @@ final class NotificationEnablementChangeTests: XCTestCase {
         XCTAssertEqual(recorded.events.count, 2)
         XCTAssertEqual(recorded.events.last?.1["notificationsEnabled"] as? Bool, false)
         XCTAssertEqual(KeyValPersistenceHelper.object(forKey: key) as? Bool, false)
+    }
+}
+
+/// AC-8 wiring: the check runs when the SDK starts (it may be configured after the first foreground) and on every foreground.
+final class NotificationEnablementWiringTests: XCTestCase {
+    private func makeHelper(onCheck: @escaping () -> Void) -> SessionHelper {
+        let helper = SessionHelper(sessionIdleTimeout: 1, trackForeground: {}, checkNotificationEnablement: onCheck)
+        helper.initialize()
+        return helper
+    }
+
+    func test_ac8_sdkInit_runsTheCheck() {
+        var checks = 0
+        _ = makeHelper { checks += 1 }
+        XCTAssertEqual(checks, 1)
+    }
+
+    func test_ac8_eachForeground_runsTheCheck() {
+        var checks = 0
+        let helper = makeHelper { checks += 1 }
+        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+        XCTAssertEqual(checks, 3, "init plus two foregrounds")
+        withExtendedLifetime(helper) {}
     }
 }
 

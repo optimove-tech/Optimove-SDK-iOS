@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Push: the SDK now always registers a push token, whatever the notification permission (like the Android SDK), so silent pushes can reach users who haven't allowed notifications. `k.push.deviceRegistered` reports `areNotificationsEnabled`, and `k.push.notificationEnablementChanged` is sent on SDK start and on return to foreground when the permission changed. `pushUnregister()` is still a full opt-out.
+- Push: the SDK now always registers a push token, whatever the notification permission (like the Android SDK), so silent pushes can reach users who haven't allowed notifications. `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)` therefore now fires for users who denied, or haven't yet granted, permission; apps that assume a token means permission should check it themselves. `k.push.deviceRegistered` reports `areNotificationsEnabled` (`true` for authorized, provisional and ephemeral; `false` for denied and not determined), and `k.push.notificationEnablementChanged` is sent on SDK start and on return to foreground when that state changed. `pushUnregister()` is still a full opt-out.
 
 ## 6.15.0
 

@@ -198,26 +198,23 @@ extension Optimobile {
      Parameters:
      - deviceToken: The push token returned by the device
      */
-    static func pushRegister(_ deviceToken: Data) {
-        let token = serializeDeviceToken(deviceToken)
-        let iosTokenType = getTokenType()
-        
-        let bundleId = Bundle.main.infoDictionary!["CFBundleIdentifier"] as Any
-        let parameters = ["token": token,
-                          "type": sharedInstance.pushNotificationDeviceType,
-                          "iosTokenType": iosTokenType,
-                          "bundleId": bundleId] as [String: Any]
-        
-        sendPushRegistration(parameters)
-    }
-
-    static func sendPushRegistration(
-        _ parameters: [String: Any],
+    static func pushRegister(
+        _ deviceToken: Data,
+        deviceType: Int = sharedInstance.pushNotificationDeviceType,
+        iosTokenType: Int = getTokenType(),
         center: PushPermissionCenter = UNUserNotificationCenter.current(),
         track: @escaping PushEventTracker = Optimobile.trackPushEvent
     ) {
+        let token = serializeDeviceToken(deviceToken)
+        let bundleId = Bundle.main.infoDictionary!["CFBundleIdentifier"] as Any
+
         center.authorizationStatus { status in
-            track(.PUSH_DEVICE_REGISTER, parameters.merging(["areNotificationsEnabled": notificationsEnabled(status)]) { $1 })
+            let parameters = ["token": token,
+                              "type": deviceType,
+                              "iosTokenType": iosTokenType,
+                              "bundleId": bundleId,
+                              "areNotificationsEnabled": notificationsEnabled(status)] as [String: Any]
+            track(.PUSH_DEVICE_REGISTER, parameters)
         }
     }
 
