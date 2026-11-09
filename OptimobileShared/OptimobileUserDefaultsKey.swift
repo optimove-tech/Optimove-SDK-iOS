@@ -10,6 +10,7 @@ enum OptimobileUserDefaultsKey: String {
     case BADGE_COUNT = "KumulosBadgeCount"
     case PENDING_NOTIFICATIONS = "KumulosPendingNotifications"
     case PENDING_ANALYTICS = "KumulosPendingAnalytics"
+    case NOTIFICATIONS_ENABLED = "OptimoveNotificationsEnabled"
 
     // exist only in standard defaults for app
     case MIGRATED_TO_GROUPS = "KumulosDidMigrateToAppGroups"

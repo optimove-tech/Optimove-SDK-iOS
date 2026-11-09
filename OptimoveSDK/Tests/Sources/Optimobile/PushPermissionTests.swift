@@ -23,6 +23,104 @@ final class FakePushPermissionCenter: PushPermissionCenter {
     }
 }
 
+private final class RecordedEvents {
+    private(set) var events: [(OptimobileEvent, [String: Any])] = []
+
+    var track: PushEventTracker {
+        { [self] event, properties in events.append((event, properties)) }
+    }
+}
+
+/// AC-7: `k.push.deviceRegistered` reports whether notifications are allowed.
+final class PushRegistrationFlagTests: XCTestCase {
+    private func registeredFlag(for status: UNAuthorizationStatus) -> Any? {
+        let recorded = RecordedEvents()
+        Optimobile.sendPushRegistration(["token": "abc"], center: FakePushPermissionCenter(status: status), track: recorded.track)
+        XCTAssertEqual(recorded.events.count, 1)
+        XCTAssertEqual(recorded.events.first?.0, .PUSH_DEVICE_REGISTER)
+        XCTAssertEqual(recorded.events.first?.1["token"] as? String, "abc")
+        return recorded.events.first?.1["areNotificationsEnabled"]
+    }
+
+    func test_ac7_enabledStatuses_reportTrue() {
+        var statuses: [UNAuthorizationStatus] = [.authorized, .provisional]
+        if #available(iOS 14.0, *) { statuses.append(.ephemeral) }
+        for status in statuses {
+            XCTAssertEqual(registeredFlag(for: status) as? Bool, true, "status \(status.rawValue)")
+        }
+    }
+
+    func test_ac7_disabledStatuses_reportFalse() {
+        for status: UNAuthorizationStatus in [.denied, .notDetermined] {
+            XCTAssertEqual(registeredFlag(for: status) as? Bool, false, "status \(status.rawValue)")
+        }
+    }
+}
+
+/// AC-8: a change in notification permission is reported once, on start and on each return to foreground.
+final class NotificationEnablementChangeTests: XCTestCase {
+    private let key = OptimobileUserDefaultsKey.NOTIFICATIONS_ENABLED.rawValue
+
+    override func setUp() {
+        super.setUp()
+        KeyValPersistenceHelper.removeObject(forKey: key)
+    }
+
+    override func tearDown() {
+        KeyValPersistenceHelper.removeObject(forKey: key)
+        super.tearDown()
+    }
+
+    private func check(_ status: UNAuthorizationStatus, recorded: RecordedEvents) {
+        Optimobile.reportNotificationEnablementIfChanged(center: FakePushPermissionCenter(status: status), track: recorded.track)
+    }
+
+    func test_ac8_firstCheckWhenEnabled_sendsEventAndPersists() {
+        let recorded = RecordedEvents()
+        check(.authorized, recorded: recorded)
+
+        XCTAssertEqual(recorded.events.count, 1)
+        XCTAssertEqual(recorded.events.first?.0, .PUSH_NOTIFICATION_ENABLEMENT_CHANGED)
+        XCTAssertEqual(recorded.events.first?.1["notificationsEnabled"] as? Bool, true)
+        XCTAssertEqual(KeyValPersistenceHelper.object(forKey: key) as? Bool, true)
+    }
+
+    func test_ac8_firstCheckWhenDisabled_sendsNothing() {
+        let recorded = RecordedEvents()
+        check(.denied, recorded: recorded)
+        XCTAssertTrue(recorded.events.isEmpty)
+    }
+
+    func test_ac8_unchanged_sendsNothing() {
+        let recorded = RecordedEvents()
+        check(.authorized, recorded: recorded)
+        check(.provisional, recorded: recorded)
+        XCTAssertEqual(recorded.events.count, 1)
+    }
+
+    func test_ac8_changeBackToDisabled_sendsFalseOnce() {
+        let recorded = RecordedEvents()
+        check(.authorized, recorded: recorded)
+        check(.denied, recorded: recorded)
+        check(.denied, recorded: recorded)
+
+        XCTAssertEqual(recorded.events.count, 2)
+        XCTAssertEqual(recorded.events.last?.1["notificationsEnabled"] as? Bool, false)
+        XCTAssertEqual(KeyValPersistenceHelper.object(forKey: key) as? Bool, false)
+    }
+}
+
+/// AC-9: `pushUnregister()` is still a full opt-out.
+final class PushUnregisterTests: XCTestCase {
+    func test_ac9_pushUnregister_sendsDeviceUnsubscribed() {
+        let recorded = RecordedEvents()
+        Optimobile.pushUnregister(track: recorded.track)
+
+        XCTAssertEqual(recorded.events.count, 1)
+        XCTAssertEqual(recorded.events.first?.0, .DEVICE_UNSUBSCRIBED)
+    }
+}
+
 /// AC-6: the SDK registers for remote notifications whatever the notification permission is.
 final class PushRegistrationAlwaysTests: XCTestCase {
     private func runRequestToken(

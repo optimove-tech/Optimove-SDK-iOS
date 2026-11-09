@@ -74,6 +74,8 @@ class SessionHelper {
     // MARK: App lifecycle delegates
 
     @objc private func appBecameActive() {
+        Optimobile.reportNotificationEnablementIfChanged()
+
         if startNewSession {
             Optimobile.trackEvent(eventType: OptimobileEvent.STATS_FOREGROUND, properties: nil)
             startNewSession = false

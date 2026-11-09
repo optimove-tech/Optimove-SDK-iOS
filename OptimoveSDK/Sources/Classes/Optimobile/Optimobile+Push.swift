@@ -87,6 +87,8 @@ public class PushNotification: NSObject {
 @available(iOS 10.0, *)
 public typealias OptimoveUNAuthorizationCheckedHandler = (UNAuthorizationStatus, Error?) -> Void
 
+typealias PushEventTracker = (OptimobileEvent, [String: Any]) -> Void
+
 /// The notification-permission surface the push registration code needs; a seam so tests can fake the system prompt.
 protocol PushPermissionCenter {
     func authorizationStatus(_ completion: @escaping (UNAuthorizationStatus) -> Void)
@@ -206,14 +208,57 @@ extension Optimobile {
                           "iosTokenType": iosTokenType,
                           "bundleId": bundleId] as [String: Any]
         
-        Optimobile.trackEvent(eventType: OptimobileEvent.PUSH_DEVICE_REGISTER, properties: parameters as [String: AnyObject], immediateFlush: true)
+        sendPushRegistration(parameters)
+    }
+
+    static func sendPushRegistration(
+        _ parameters: [String: Any],
+        center: PushPermissionCenter = UNUserNotificationCenter.current(),
+        track: @escaping PushEventTracker = Optimobile.trackPushEvent
+    ) {
+        center.authorizationStatus { status in
+            track(.PUSH_DEVICE_REGISTER, parameters.merging(["areNotificationsEnabled": notificationsEnabled(status)]) { $1 })
+        }
+    }
+
+    static func notificationsEnabled(_ status: UNAuthorizationStatus) -> Bool {
+        if status == .authorized || status == .provisional {
+            return true
+        }
+        if #available(iOS 14.0, *) {
+            return status == .ephemeral
+        }
+        return false
+    }
+
+    /// Sends `k.push.notificationEnablementChanged` when the permission differs from the last value reported
+    /// (initially false), so the backend learns about changes made in system settings.
+    static func reportNotificationEnablementIfChanged(
+        center: PushPermissionCenter = UNUserNotificationCenter.current(),
+        track: @escaping PushEventTracker = Optimobile.trackPushEvent
+    ) {
+        center.authorizationStatus { status in
+            let enabled = notificationsEnabled(status)
+            let key = OptimobileUserDefaultsKey.NOTIFICATIONS_ENABLED.rawValue
+            let persisted = KeyValPersistenceHelper.object(forKey: key) as? Bool ?? false
+            if enabled == persisted {
+                return
+            }
+
+            track(.PUSH_NOTIFICATION_ENABLEMENT_CHANGED, ["notificationsEnabled": enabled])
+            KeyValPersistenceHelper.set(enabled, forKey: key)
+        }
+    }
+
+    static func trackPushEvent(_ event: OptimobileEvent, _ properties: [String: Any]) {
+        Optimobile.trackEvent(eventType: event, properties: properties, immediateFlush: true)
     }
     
     /**
      Unsubscribe your device from the Optimobile Push service
      */
-    static func pushUnregister() {
-        Optimobile.trackEvent(eventType: OptimobileEvent.DEVICE_UNSUBSCRIBED, properties: [:], immediateFlush: true)
+    static func pushUnregister(track: PushEventTracker = Optimobile.trackPushEvent) {
+        track(.DEVICE_UNSUBSCRIBED, [:])
     }
     
     // MARK: Open handling
