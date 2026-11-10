@@ -97,6 +97,24 @@ public class PushNotification: NSObject {
 @available(iOS 10.0, *)
 public typealias OptimoveUNAuthorizationCheckedHandler = (UNAuthorizationStatus, Error?) -> Void
 
+typealias PushEventTracker = (OptimobileEvent, [String: Any]) -> Void
+
+/// The notification-permission surface the push registration code needs; a seam so tests can fake the system prompt.
+protocol PushPermissionCenter {
+    func authorizationStatus(_ completion: @escaping (UNAuthorizationStatus) -> Void)
+    func requestAuthorization(_ completion: @escaping (Bool, Error?) -> Void)
+}
+
+extension UNUserNotificationCenter: PushPermissionCenter {
+    func authorizationStatus(_ completion: @escaping (UNAuthorizationStatus) -> Void) {
+        getNotificationSettings { completion($0.authorizationStatus) }
+    }
+
+    func requestAuthorization(_ completion: @escaping (Bool, Error?) -> Void) {
+        requestAuthorization(options: [.alert, .badge, .sound], completionHandler: completion)
+    }
+}
+
 extension Optimobile {
     /**
      Helper method for requesting the device token with alert, badge and sound permissions.
@@ -124,48 +142,43 @@ extension Optimobile {
     }
     
     @available(iOS 10.0, *)
-    fileprivate static func requestToken(_ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil) {
-        let center = UNUserNotificationCenter.current()
-        
-        let requestToken: () -> Void = {
-            DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
-            }
+    static func requestToken(
+        center: PushPermissionCenter = UNUserNotificationCenter.current(),
+        isInBackground: @escaping () -> Bool = { UIApplication.shared.applicationState == .background },
+        registerForRemoteNotifications: @escaping () -> Void = {
+            DispatchQueue.main.async { UIApplication.shared.registerForRemoteNotifications() }
+        },
+        _ onAuthorizationStatus: OptimoveUNAuthorizationCheckedHandler? = nil
+    ) {
+        // A push token is registered whatever the permission outcome: the token is what lets silent pushes through.
+        let report: (UNAuthorizationStatus, Swift.Error?) -> Void = { status, error in
+            onAuthorizationStatus?(status, error)
+            registerForRemoteNotifications()
         }
-        
+
         let askPermission: () -> Void = {
             DispatchQueue.main.async {
-                if UIApplication.shared.applicationState == .background {
-                    onAuthorizationStatus?(.notDetermined,
-                                           NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Application not active, aborting push permission request"]) as Swift.Error)
+                if isInBackground() {
+                    report(.notDetermined,
+                           NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Application not active, aborting push permission request"]) as Swift.Error)
                     return
                 }
-                
-                center.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+
+                center.requestAuthorization { granted, error in
                     if let err = error {
-                        onAuthorizationStatus?(.notDetermined, err)
+                        report(.notDetermined, err)
                         return
                     }
-                    
-                    if !granted {
-                        onAuthorizationStatus?(.denied, nil)
-                        return
-                    }
-                    
-                    onAuthorizationStatus?(.authorized, nil)
-                    requestToken()
+
+                    report(granted ? .authorized : .denied, nil)
                 }
             }
         }
-        
-        center.getNotificationSettings { settings in
-            switch settings.authorizationStatus {
-            case .denied:
-                onAuthorizationStatus?(settings.authorizationStatus, nil)
-                return
-            case .authorized:
-                onAuthorizationStatus?(settings.authorizationStatus, nil)
-                requestToken()
+
+        center.authorizationStatus { status in
+            switch status {
+            case .denied, .authorized:
+                report(status, nil)
             default:
                 askPermission()
             }
@@ -195,24 +208,64 @@ extension Optimobile {
      Parameters:
      - deviceToken: The push token returned by the device
      */
-    static func pushRegister(_ deviceToken: Data) {
+    static func pushRegister(
+        _ deviceToken: Data,
+        deviceType: Int = sharedInstance.pushNotificationDeviceType,
+        iosTokenType: Int = getTokenType(),
+        center: PushPermissionCenter = UNUserNotificationCenter.current(),
+        track: @escaping PushEventTracker = Optimobile.trackPushEvent
+    ) {
         let token = serializeDeviceToken(deviceToken)
-        let iosTokenType = getTokenType()
-        
         let bundleId = Bundle.main.infoDictionary!["CFBundleIdentifier"] as Any
-        let parameters = ["token": token,
-                          "type": sharedInstance.pushNotificationDeviceType,
-                          "iosTokenType": iosTokenType,
-                          "bundleId": bundleId] as [String: Any]
-        
-        Optimobile.trackEvent(eventType: OptimobileEvent.PUSH_DEVICE_REGISTER, properties: parameters as [String: AnyObject], immediateFlush: true)
+
+        center.authorizationStatus { status in
+            let parameters = ["token": token,
+                              "type": deviceType,
+                              "iosTokenType": iosTokenType,
+                              "bundleId": bundleId,
+                              "areNotificationsEnabled": notificationsEnabled(status)] as [String: Any]
+            track(.PUSH_DEVICE_REGISTER, parameters)
+        }
+    }
+
+    static func notificationsEnabled(_ status: UNAuthorizationStatus) -> Bool {
+        if status == .authorized || status == .provisional {
+            return true
+        }
+        if #available(iOS 14.0, *) {
+            return status == .ephemeral
+        }
+        return false
+    }
+
+    /// Sends `k.push.notificationEnablementChanged` when the permission differs from the last value reported
+    /// (initially false), so the backend learns about changes made in system settings.
+    static func reportNotificationEnablementIfChanged(
+        center: PushPermissionCenter = UNUserNotificationCenter.current(),
+        track: @escaping PushEventTracker = Optimobile.trackPushEvent
+    ) {
+        center.authorizationStatus { status in
+            let enabled = notificationsEnabled(status)
+            let key = OptimobileUserDefaultsKey.NOTIFICATIONS_ENABLED.rawValue
+            let persisted = KeyValPersistenceHelper.object(forKey: key) as? Bool ?? false
+            if enabled == persisted {
+                return
+            }
+
+            track(.PUSH_NOTIFICATION_ENABLEMENT_CHANGED, ["notificationsEnabled": enabled])
+            KeyValPersistenceHelper.set(enabled, forKey: key)
+        }
+    }
+
+    static func trackPushEvent(_ event: OptimobileEvent, _ properties: [String: Any]) {
+        Optimobile.trackEvent(eventType: event, properties: properties, immediateFlush: true)
     }
     
     /**
      Unsubscribe your device from the Optimobile Push service
      */
-    static func pushUnregister() {
-        Optimobile.trackEvent(eventType: OptimobileEvent.DEVICE_UNSUBSCRIBED, properties: [:], immediateFlush: true)
+    static func pushUnregister(track: PushEventTracker = Optimobile.trackPushEvent) {
+        track(.DEVICE_UNSUBSCRIBED, [:])
     }
     
     // MARK: Open handling
@@ -341,7 +394,7 @@ extension Optimobile {
     
     // MARK: Token handling
     
-    fileprivate static func serializeDeviceToken(_ deviceToken: Data) -> String {
+    static func serializeDeviceToken(_ deviceToken: Data) -> String {
         var token = ""
         for i in 0 ..< deviceToken.count {
             token += String(format: "%02.2hhx", deviceToken[i] as CVarArg)
@@ -350,7 +403,7 @@ extension Optimobile {
         return token
     }
     
-    fileprivate static func getTokenType() -> Int {
+    static func getTokenType() -> Int {
         let releaseMode = MobileProvision.releaseMode()
         
         if let index = [
