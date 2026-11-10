@@ -1,11 +1,16 @@
 # Changelog
 
+
 ## 6.15.0
 
 - Push: the SDK now always registers a push token, whatever the notification permission (like the Android SDK), so silent pushes can reach users who haven't allowed notifications. `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)` therefore now fires for users who denied, or haven't yet granted, permission; apps that assume a token means permission should check it themselves. `k.push.deviceRegistered` reports `areNotificationsEnabled` (`true` for authorized, provisional and ephemeral; `false` for denied and not determined), and `k.push.notificationEnablementChanged` is sent on SDK start and on return to foreground when that state changed. `pushUnregister()` is still a full opt-out.
 - Add `OptimoveOverlayMessaging.setClosedListener(_:)` — register an `OverlayClosedListener` closure that is called when an overlay leaves the screen. It fires once for every presented message with an `OverlayCloseReason`: `.actioned` (the user took a link), `.dismissed` (close button, backdrop tap) or `.error` (presentation failed). `hide()` is not a close, and messages the interceptor defers or discards never fire. This is an observer only, separate from `setActionHandler`; it cannot block or override a close.
 - Fix an overlay that failed to resolve the IAR URL staying in the queue forever and blocking later overlays. It is now treated as a presentation error.
 - Fix a repeated close or error report for the same overlay (e.g. a web view load failure followed by a content process termination) dropping the next queued overlay before it was shown.
+
+## 6.14.0
+
+- Add Live Activities (iOS 18+). Call `enableLiveActivities(YourAttributes.self)` on the config builder after conforming the host `ActivityAttributes` type to `OptimoveLiveActivityAttributes` in the app target (not the widget). The SDK reports `k.liveActivity.pushToStartTokenRegistered` and `k.liveActivity.started` (the latter only when `optimoveActivityId` is set). ActivityKit is weakly linked.
 
 ## 6.13.0
 

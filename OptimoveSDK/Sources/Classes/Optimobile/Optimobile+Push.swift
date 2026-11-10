@@ -384,7 +384,7 @@ extension Optimobile {
     
     // MARK: Token handling
     
-    fileprivate static func serializeDeviceToken(_ deviceToken: Data) -> String {
+    static func serializeDeviceToken(_ deviceToken: Data) -> String {
         var token = ""
         for i in 0 ..< deviceToken.count {
             token += String(format: "%02.2hhx", deviceToken[i] as CVarArg)
@@ -393,7 +393,7 @@ extension Optimobile {
         return token
     }
     
-    fileprivate static func getTokenType() -> Int {
+    static func getTokenType() -> Int {
         let releaseMode = MobileProvision.releaseMode()
         
         if let index = [

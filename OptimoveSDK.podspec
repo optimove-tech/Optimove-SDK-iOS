@@ -19,4 +19,5 @@ Pod::Spec.new do |s|
   }
   s.dependency 'OptimoveCore', s.version.to_s
   s.frameworks = 'Foundation', 'UIKit', 'SystemConfiguration', 'UserNotifications', 'CoreData'
+  s.weak_frameworks = 'ActivityKit'
 end
