@@ -13,6 +13,7 @@ enum OptimobileEvent: String, Codable {
     case MESSAGE_OPENED = "k.message.opened"
     case MESSAGE_READ = "k.message.read"
     case PUSH_DEVICE_REGISTER = "k.push.deviceRegistered"
+    case PUSH_NOTIFICATION_ENABLEMENT_CHANGED = "k.push.notificationEnablementChanged"
     case STATS_ASSOCIATE_USER = "k.stats.userAssociated"
     case STATS_BACKGROUND = "k.bg"
     case STATS_CALL_HOME = "k.stats.installTracked"
