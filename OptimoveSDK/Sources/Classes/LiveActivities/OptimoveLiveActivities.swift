@@ -16,7 +16,7 @@ public enum OptimoveLiveActivityDetectionSource: String {
     case activityUpdates
 }
 
-/// Collects push-to-start tokens and reports Optimove-started Live Activities.
+/// Collects push-to-start tokens, reports Optimove-started Live Activities and ends duplicate tiles.
 public final class OptimoveLiveActivities {
     public static let shared = OptimoveLiveActivities()
 
@@ -25,6 +25,7 @@ public final class OptimoveLiveActivities {
     private var registrations: [OptimoveLiveActivityRegistration] = []
     private var tokensByAttributesType: [String: String] = [:]
     private var reportedActivityKeys: Set<String> = []
+    private var duplicateResolver = LiveActivityDuplicateResolver()
     private var observationCancellations: [() -> Void] = []
 
     private init() {}
@@ -174,6 +175,7 @@ public final class OptimoveLiveActivities {
                 )
 
                 for activity in existing {
+                    self?.endIfDuplicate(activity, attributesTypeName: attributesTypeName)
                     self?.handleActivity(
                         activityId: activity.id,
                         optimoveActivityId: activity.attributes.optimoveActivityId,
@@ -185,6 +187,7 @@ public final class OptimoveLiveActivities {
                 Logger.debug("Live Activities: observing activityUpdates for \(attributesTypeName).")
                 for await activity in Activity<Attributes>.activityUpdates {
                     if Task.isCancelled { break }
+                    self?.endIfDuplicate(activity, attributesTypeName: attributesTypeName)
                     self?.handleActivity(
                         activityId: activity.id,
                         optimoveActivityId: activity.attributes.optimoveActivityId,
@@ -194,6 +197,71 @@ public final class OptimoveLiveActivities {
                 }
                 Logger.warn("Live Activities: activityUpdates for \(attributesTypeName) ended.")
             }
+        }
+
+        /// Ends `activity` when another live tile has the same `optimoveActivityId`, keeping the first one seen.
+        /// iOS shows a second tile for a repeated push-to-start; this removes it once the app runs.
+        @available(iOS 18.0, *)
+        private func endIfDuplicate<Attributes: ActivityAttributes & OptimoveLiveActivityAttributes>(
+            _ activity: Activity<Attributes>,
+            attributesTypeName: String
+        ) {
+            guard let optimoveActivityId = activity.attributes.optimoveActivityId, !optimoveActivityId.isEmpty else {
+                return
+            }
+
+            let key = Self.activityDedupeKey(
+                attributesTypeName: attributesTypeName,
+                optimoveActivityId: optimoveActivityId
+            )
+
+            guard let keptActivityId = keptActivityIdIfDuplicate(
+                activity,
+                optimoveActivityId: optimoveActivityId,
+                key: key
+            ) else {
+                return
+            }
+
+            Logger.info("Live Activities: ending duplicate activity \(activity.id) (\(key)), keeping \(keptActivityId).")
+            let backgroundTask = LiveActivityBackgroundTask(name: "optimove.liveActivity.endDuplicate")
+
+            Task {
+                defer { backgroundTask.end() }
+                await activity.end(nil, dismissalPolicy: .immediate)
+                Logger.info("Live Activities: duplicate activity \(activity.id) is now \(activity.activityState).")
+            }
+        }
+
+        /// The tile kept for `key` when it is a different live tile than `activity`, otherwise nil.
+        @available(iOS 18.0, *)
+        private func keptActivityIdIfDuplicate<Attributes: ActivityAttributes & OptimoveLiveActivityAttributes>(
+            _ activity: Activity<Attributes>,
+            optimoveActivityId: String,
+            key: String
+        ) -> String? {
+            guard Self.isLive(activity.activityState) else { return nil }
+
+            let liveActivityIds = Set(
+                Activity<Attributes>.activities
+                    .filter { Self.isLive($0.activityState) && $0.attributes.optimoveActivityId == optimoveActivityId }
+                    .map(\.id)
+            )
+
+            lock.lock()
+            let keptActivityId = duplicateResolver.activityToKeep(
+                activityId: activity.id,
+                key: key,
+                liveActivityIds: liveActivityIds
+            )
+            lock.unlock()
+
+            return keptActivityId == activity.id ? nil : keptActivityId
+        }
+
+        @available(iOS 18.0, *)
+        private static func isLive(_ state: ActivityState) -> Bool {
+            state == .active || state == .stale
         }
     #endif
 
