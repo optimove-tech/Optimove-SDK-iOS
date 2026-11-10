@@ -10,6 +10,7 @@ import Foundation
 /// Conform in the app target, not the widget extension.
 public protocol OptimoveLiveActivityAttributes {
     /// Id stamped on the Optimove start payload. `nil` if Optimove did not start this activity.
+    /// The SDK ends extra live tiles that share an id, so never set it on a tile the app starts itself.
     var optimoveActivityId: String? { get }
 }
 

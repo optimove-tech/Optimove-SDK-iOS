@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.14.1
+
+- Live Activities: end duplicate tiles. iOS has no dedupe for push-to-start, so a repeated start for the same activity shows a second tile. When the app runs (it gets background time after a push-to-start, or at the next launch), the SDK ends any extra live tile with the same `optimoveActivityId`, keeping one. The duplicate can show briefly, and an alert on the repeated start still plays. `optimoveActivityId` must be unique per activity and must stay `nil` on tiles the host app starts itself.
+
 ## 6.14.0
 
 - Add Live Activities (iOS 18+). Call `enableLiveActivities(YourAttributes.self)` on the config builder after conforming the host `ActivityAttributes` type to `OptimoveLiveActivityAttributes` in the app target (not the widget). The SDK reports `k.liveActivity.pushToStartTokenRegistered` and `k.liveActivity.started` (the latter only when `optimoveActivityId` is set). ActivityKit is weakly linked.
