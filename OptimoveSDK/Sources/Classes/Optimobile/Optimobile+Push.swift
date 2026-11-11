@@ -404,6 +404,9 @@ extension Optimobile {
     }
     
     static func getTokenType() -> Int {
+#if targetEnvironment(simulator)
+        return 2 // sandbox APNs: simulator tokens are always sandbox
+#else
         let releaseMode = MobileProvision.releaseMode()
         
         if let index = [
@@ -415,6 +418,7 @@ extension Optimobile {
         }
         
         return Optimobile.sharedInstance.pushNotificationProductionTokenType
+#endif
     }
 }
 
