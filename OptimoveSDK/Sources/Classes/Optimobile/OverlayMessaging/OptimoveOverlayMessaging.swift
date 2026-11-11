@@ -26,6 +26,12 @@ public class OptimoveOverlayMessaging {
         shared?.manager.setActionHandler(handler)
     }
 
+    /// Register an observer for overlays leaving the screen. Pass `nil` to remove it. See
+    /// `OverlayClosedListener` for the delivery guarantees.
+    public static func setClosedListener(_ listener: OverlayClosedListener?) {
+        ensureMain { shared?.manager.setClosedListener(listener) }
+    }
+
     public static func resetSession() {
         shared?.sessionManager?.resetSession()
     }
@@ -91,6 +97,31 @@ public struct LinkActionPayload {
 public protocol OverlayActionHandler {
     func linkAction(message: OverlayMessagingMessage, payload: LinkActionPayload) throws
 }
+
+// MARK: - Closed listener
+
+/// Why an overlay message closed.
+public enum OverlayCloseReason {
+    /// The user took a link (the client's `linkAction`, or the SDK default, ran).
+    case actioned
+    /// The user closed the message without taking a link (close button, backdrop tap).
+    case dismissed
+    /// The message failed to present or the renderer errored while it was on screen.
+    case error
+}
+
+/// Details of an overlay close. New fields may be added in future SDK versions.
+public struct OverlayClosedInfo {
+    public let reason: OverlayCloseReason
+}
+
+/// Called when an overlay leaves the screen. Purely an observer: unlike `OverlayActionHandler`, it
+/// cannot alter or block what the SDK does.
+///
+/// Fires once for every presented message, including when presentation fails (`.error`). It does
+/// not fire on `hide()`, for messages the interceptor defers or discards, or if the app is killed
+/// while a message is presented. It runs on the main thread after the SDK has updated its queue.
+public typealias OverlayClosedListener = (_ message: OverlayMessagingMessage, _ info: OverlayClosedInfo) -> Void
 
 // MARK: - Interceptor protocols
 

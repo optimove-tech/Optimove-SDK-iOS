@@ -15,6 +15,7 @@ class OverlayMessagingManager {
     private let urlBuilder: UrlBuilder
     private var interceptor: OverlayMessagingInterceptor?
     private let actionDispatcher = OverlayActionDispatcher(defaults: DefaultOverlayActionHandler())
+    private var closedListener: OverlayClosedListener?
     private var presenter: OverlayMessagingPresenter?
     private var hidden = false
     // Prevents showing the same message twice if triggers fire in quick succession
@@ -34,6 +35,10 @@ class OverlayMessagingManager {
 
     func setActionHandler(_ handler: OverlayActionHandler?) {
         actionDispatcher.setOverrides(handler)
+    }
+
+    func setClosedListener(_ listener: OverlayClosedListener?) {
+        closedListener = listener
     }
 
     // MARK: - Visibility
@@ -165,7 +170,7 @@ class OverlayMessagingManager {
             presenter.showMessage(next)
             return
         }
-        
+
         presenter = OverlayMessagingPresenter(
             message: next,
             urlBuilder: urlBuilder,
@@ -194,9 +199,11 @@ class OverlayMessagingManager {
 
 extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
     
-    func onMessageClosed(_ message: OverlayMessagingMessage) {
-        if !displayQueue.isEmpty { displayQueue.removeFirst() }
+    func onMessageClosed(_ message: OverlayMessagingMessage, reason: OverlayCloseReason) {
+        guard isFrontOfQueue(message) else { return }
+        displayQueue.removeFirst()
         onSlotCleared(message.type)
+        closedListener?(message, OverlayClosedInfo(reason: reason))
         maybeShowNext()
     }
 
@@ -209,12 +216,22 @@ extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
     }
 
     func onViewError(_ message: OverlayMessagingMessage) {
+        // Checked before disposing: a stale error must not tear down the presenter now showing the next message.
+        guard isFrontOfQueue(message) else { return }
         presenter?.dispose()
         presenter = nil
         // Immediate messages are short-lived. In case of an error we dont want them to stay on queue and surface later
-        if !displayQueue.isEmpty { displayQueue.removeFirst() }
+        displayQueue.removeFirst()
         onSlotCleared(message.type)
+        closedListener?(message, OverlayClosedInfo(reason: .error))
         maybeShowNext()
+    }
+
+    /// A presenter can report more than one close or error for the same message (e.g. a navigation
+    /// failure followed by a web content process termination). Only the first one for the message
+    /// at the front of the queue counts; repeats would otherwise drop the next message and free its slot.
+    private func isFrontOfQueue(_ message: OverlayMessagingMessage) -> Bool {
+        displayQueue.first?.id == message.id
     }
 }
 
