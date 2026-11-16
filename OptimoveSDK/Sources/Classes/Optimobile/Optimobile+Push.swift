@@ -219,7 +219,10 @@ extension Optimobile {
     }
 
     static func notificationsEnabled(_ status: UNAuthorizationStatus) -> Bool {
-        if status == .authorized || status == .provisional {
+        if status == .authorized {
+            return true
+        }
+        if #available(iOS 12.0, *), status == .provisional {
             return true
         }
         if #available(iOS 14.0, *) {

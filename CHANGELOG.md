@@ -1,6 +1,10 @@
 # Changelog
 
 
+## 6.15.1
+
+- Fix the CocoaPods build of `OptimoveSDK` failing on `UNAuthorizationStatus.provisional` (iOS 11 deployment target). `OptimoveSDK` 6.15.0 was not published to CocoaPods; use 6.15.1.
+
 ## 6.15.0
 
 - Push: the SDK now always registers a push token, whatever the notification permission (like the Android SDK), so silent pushes can reach users who haven't allowed notifications. `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)` therefore now fires for users who denied, or haven't yet granted, permission; apps that assume a token means permission should check it themselves. `pushUnregister()` is still a full opt-out.
