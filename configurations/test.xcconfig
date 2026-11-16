@@ -1,5 +1,5 @@
 SCHEME="UnitTests"
 PROJECT="Optimove.xcodeproj"
 SDK="iphonesimulator"
-DESTANATION="platform=iOS Simulator,name=iPhone 15"
+DESTANATION="platform=iOS Simulator,name=iPhone 16"
 CONFIGURATION="Debug"

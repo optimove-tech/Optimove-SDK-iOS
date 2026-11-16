@@ -1,6 +1,6 @@
-XCODE ?= 15.2
+XCODE ?= 16.4
 
-export TEST_DESTINATION ?= platform=iOS Simulator,OS=17.7,name=iPhone 15
+export TEST_DESTINATION ?= platform=iOS Simulator,OS=18.5,name=iPhone 16
 export DEVELOPER_DIR = $(shell bash ./scripts/get-xcode-path.sh ${XCODE} $(XCODE_PATH))
 
 build_path = .build
