@@ -80,6 +80,10 @@ extension Optimobile {
 
         if currentUserId != nil, currentUserId != Optimobile.installId {
             getInstance().inAppManager.handleAssociatedUserChange()
+
+            if Optimobile.sharedInstance.config.isOverlayMessagingEnabled {
+                OptimoveOverlayMessaging.onUserChanged()
+            }
         }
     }
 
@@ -107,7 +111,7 @@ extension Optimobile {
             getInstance().inAppManager.handleAssociatedUserChange()
 
             if Optimobile.sharedInstance.config.isOverlayMessagingEnabled {
-                OptimoveOverlayMessaging.resetSession()
+                OptimoveOverlayMessaging.onUserChanged()
             }
         }
     }

@@ -2,16 +2,19 @@
 
 import Foundation
 
+/// Orchestrates the overlay lifecycle: fetch -> interceptor -> queue -> display.
+/// Scheduled (session) fetches are started by the session manager, which runs one at a time; each ends with exactly
+/// one `release` to it. Immediate fetches have their own slot here. Both feed the same presentation queue.
 class OverlayMessagingManager {
     
-    private static let sessionSlotCapacity = 1
     private static let immediateSlotCapacity = 1
     
-    private var sessionSlotCount = 0
     private var immediateSlotCount = 0
     
     private var displayQueue: [OverlayMessagingMessage] = []
     private let requestService: OverlayMessagingRequestService
+    private let sessionManager: OverlayMessagingSessionManager
+    private let trackEventImmediately: (String, [String: Any]?) -> Void
     private let urlBuilder: UrlBuilder
     private var interceptor: OverlayMessagingInterceptor?
     private let actionDispatcher = OverlayActionDispatcher(defaults: DefaultOverlayActionHandler())
@@ -22,9 +25,12 @@ class OverlayMessagingManager {
     // (after slot cleared but before backend state updates)
     private var seenMessageIds = Set<Int64>()
     
-    init(httpClient: KSHttpClient, urlBuilder: UrlBuilder) {
+    init(httpClient: KSHttpClient, urlBuilder: UrlBuilder, sessionManager: OverlayMessagingSessionManager,
+         trackEventImmediately: @escaping (String, [String: Any]?) -> Void = Optimobile.trackEventImmediately(eventType:properties:)) {
         requestService = OverlayMessagingRequestService(httpClient: httpClient)
         self.urlBuilder = urlBuilder
+        self.sessionManager = sessionManager
+        self.trackEventImmediately = trackEventImmediately
     }
     
     // MARK: - Interceptor
@@ -57,30 +63,39 @@ class OverlayMessagingManager {
     
     // MARK: - Triggers
     
+    /// A scheduled trigger only ever comes from the session manager, with its slot taken for us; an immediate one
+    /// takes the immediate slot here.
     func onTriggerReceived(_ type: OverlayMessagingMessage.MessageType) {
-        
         switch type {
         case .session:
-            guard sessionSlotCount < Self.sessionSlotCapacity else {
-                return
+            requestService.readScheduledMessage { result in
+                DispatchQueue.main.async {
+                    self.sessionManager.onFetchResult(nextFetchInSeconds: result.nextFetchInSeconds)
+                    self.onMessageLoaded(type: type, message: result.message)
+                }
             }
-            sessionSlotCount += 1
-            loadMessage(type)
         case .immediate:
             guard immediateSlotCount < Self.immediateSlotCapacity else {
                 return
             }
             immediateSlotCount += 1
-            loadMessage(type)
+            requestService.readOverlayMessage(type: type) { message in
+                DispatchQueue.main.async {
+                    self.onMessageLoaded(type: type, message: message)
+                }
+            }
         }
     }
     
     // MARK: - Slots
     
-    private func onSlotCleared(_ type: OverlayMessagingMessage.MessageType) {
+    /// Frees the slot of a message's type: for a scheduled one, the session manager's, saying how it ended and, if it
+    /// was displayed, which message, so a later display of it counts again.
+    private func release(_ type: OverlayMessagingMessage.MessageType, _ outcome: OverlayMessagingSessionManager.Outcome,
+                         displayedMessageId: Int64? = nil) {
         switch type {
         case .session:
-            sessionSlotCount = max(0, sessionSlotCount - 1)
+            sessionManager.release(outcome, displayedMessageId: displayedMessageId)
         case .immediate:
             immediateSlotCount = max(0, immediateSlotCount - 1)
         }
@@ -88,21 +103,13 @@ class OverlayMessagingManager {
     
     // MARK: - Loading
     
-    private func loadMessage(_ type: OverlayMessagingMessage.MessageType) {
-        requestService.readOverlayMessage(type: type) { message in
-            DispatchQueue.main.async {
-                self.onMessageLoaded(type: type, message: message)
-            }
-        }
-    }
-    
     private func onMessageLoaded(type: OverlayMessagingMessage.MessageType, message: OverlayMessagingMessage?) {
         guard let message = message else {
-            onSlotCleared(type)
+            release(type, .done)
             return
         }
         guard !seenMessageIds.contains(message.id) else {
-            onSlotCleared(type)
+            release(type, .deferred)
             return
         }
         seenMessageIds.insert(message.id)
@@ -135,24 +142,22 @@ class OverlayMessagingManager {
     }
     
     private func handleInterceptorOutcome(message: OverlayMessagingMessage, outcome: InterceptorOutcome) {
+        trackInterceptedEvent(messageId: message.id, outcome: outcome)
         switch outcome {
         case .show:
             displayQueue.append(message)
             maybeShowNext()
         case .deferred, .timeout:
             seenMessageIds.remove(message.id)
-            onSlotCleared(message.type)
+            release(message.type, .deferred)
         case .discard:
-            onSlotCleared(message.type)
+            // The server deletes the message when it gets this event; the session manager's settle delay gives it time
+            release(message.type, .done)
         }
-        trackInterceptedEvent(messageId: message.id, outcome: outcome)
     }
     
     private func trackInterceptedEvent(messageId: Int64, outcome: InterceptorOutcome) {
-        Optimobile.trackEventImmediately(
-            eventType: OptimobileEvent.OM_INTERCEPTED.rawValue,
-            properties: ["id": messageId, "outcome": outcome.eventValue]
-        )
+        trackEventImmediately(OptimobileEvent.OM_INTERCEPTED.rawValue, ["id": messageId, "outcome": outcome.eventValue])
     }
     
     // MARK: - Display
@@ -199,10 +204,16 @@ class OverlayMessagingManager {
 
 extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
     
+    func onMessageOpened(_ message: OverlayMessagingMessage) {
+        if message.type == .session {
+            sessionManager.onDisplayed(messageId: message.id)
+        }
+    }
+
     func onMessageClosed(_ message: OverlayMessagingMessage, reason: OverlayCloseReason) {
         guard isFrontOfQueue(message) else { return }
         displayQueue.removeFirst()
-        onSlotCleared(message.type)
+        release(message.type, .done, displayedMessageId: message.id)
         closedListener?(message, OverlayClosedInfo(reason: reason))
         maybeShowNext()
     }
@@ -222,7 +233,8 @@ extension OverlayMessagingManager: OverlayMessagingPresenterDelegate {
         presenter = nil
         // Immediate messages are short-lived. In case of an error we dont want them to stay on queue and surface later
         displayQueue.removeFirst()
-        onSlotCleared(message.type)
+        // Still on the server: fetching again at once would return it again
+        release(message.type, .deferred, displayedMessageId: message.id)
         closedListener?(message, OverlayClosedInfo(reason: .error))
         maybeShowNext()
     }

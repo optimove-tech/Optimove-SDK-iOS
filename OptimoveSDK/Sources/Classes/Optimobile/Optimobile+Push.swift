@@ -7,7 +7,8 @@ import UserNotifications
 
 public class PushNotification: NSObject {
     static let DeepLinkTypeInApp: Int = 1
-    static let DeepLinkTypeOverlayMessaging: Int = 2
+    static let DeepLinkTypeOverlayTriggered: Int = 2
+    static let DeepLinkTypeOverlayScheduledSignal: Int = 3
     
     public internal(set) var id: Int
     public internal(set) var aps: [AnyHashable: Any]
@@ -66,9 +67,18 @@ public class PushNotification: NSObject {
         }
     }
     
-    var isOverlayMessagingTrigger: Bool {
+    var isOverlayTriggeredSignal: Bool {
         guard let deepLink = data["k.deepLink"] as? [AnyHashable: Any] else { return false }
-        return deepLink["type"] as? Int == PushNotification.DeepLinkTypeOverlayMessaging
+        return deepLink["type"] as? Int == PushNotification.DeepLinkTypeOverlayTriggered
+    }
+
+    /// For a scheduled overlay Signal, when a scheduled message becomes due, in seconds from now; nil for any other
+    /// push, or a Signal without the value.
+    var overlayScheduledNextFetchInSeconds: Int64? {
+        guard let deepLink = data["k.deepLink"] as? [AnyHashable: Any],
+              deepLink["type"] as? Int == PushNotification.DeepLinkTypeOverlayScheduledSignal,
+              let signal = deepLink["data"] as? [AnyHashable: Any] else { return nil }
+        return (signal["nextFetchInSeconds"] as? NSNumber)?.int64Value
     }
     
     public func inAppDeepLink() -> [AnyHashable: Any]? {
@@ -577,6 +587,20 @@ class PushHelper {
         }
     }
     
+    private func maybeHandleOverlaySignal(_ notification: PushNotification) {
+        guard Optimobile.sharedInstance.config.isOverlayMessagingEnabled else { return }
+
+        if notification.isOverlayTriggeredSignal {
+            DispatchQueue.main.async {
+                OptimoveOverlayMessaging.onTriggeredSignalReceived()
+            }
+        } else if let nextFetchInSeconds = notification.overlayScheduledNextFetchInSeconds {
+            DispatchQueue.main.async {
+                OptimoveOverlayMessaging.onScheduledSignalReceived(nextFetchInSeconds: nextFetchInSeconds)
+            }
+        }
+    }
+
     private func trackPushDelivery(notification: PushNotification) {
         if notification.id == 0 {
             return
@@ -594,12 +618,7 @@ class PushHelper {
             self.setBadge(userInfo: userInfo)
             self.trackPushDelivery(notification: notification)
             
-            if notification.isOverlayMessagingTrigger,
-               Optimobile.sharedInstance.config.isOverlayMessagingEnabled {
-                DispatchQueue.main.async {
-                    OptimoveOverlayMessaging.onPushTriggerReceived()
-                }
-            }
+            self.maybeHandleOverlaySignal(notification)
             
             if existingDidReceive == nil, !hasInApp {
                 // Nothing to do

@@ -5,6 +5,7 @@ import WebKit
 
 protocol OverlayMessagingPresenterDelegate: AnyObject {
     /// `reason` is `.actioned` or `.dismissed`; failures go to `onViewError`.
+    func onMessageOpened(_ message: OverlayMessagingMessage)
     func onMessageClosed(_ message: OverlayMessagingMessage, reason: OverlayCloseReason)
     func onEvents(_ message: OverlayMessagingMessage, events: [OverlayMessagingRendererEvent])
     func onViewError(_ message: OverlayMessagingMessage)
@@ -209,6 +210,7 @@ final class OverlayMessagingPresenter: NSObject, WKScriptMessageHandler, WKNavig
             sendCurrentMessageToClient()
         case "MESSAGE_OPENED":
             loadingSpinner?.stopAnimating()
+            delegate?.onMessageOpened(currentMessage)
         case "MESSAGE_CLOSED":
             delegate?.onMessageClosed(currentMessage, reason: currentActioned ? .actioned : .dismissed)
         case "COMMAND":

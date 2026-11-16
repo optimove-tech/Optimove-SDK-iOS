@@ -49,4 +49,47 @@ final class OptimoveConfigBuilderTests: XCTestCase {
             XCTAssertEqual(try config.optimobileConfig?.urlBuilder.urlForService(service).absoluteString, urlsMap[service]!, "UrlBuilder should return the default URL for service \(service)")
         }
     }
+    // MARK: - Overlay messaging
+
+    func testOverlayMessagingIsOffByDefault() throws {
+        let config = optimoveConfigBuilder.build().optimobileConfig
+
+        XCTAssertEqual(config?.isOverlayMessagingEnabled, false)
+    }
+
+    func testOverlayMessagingDefaultsToAOneHourSessionAndAOneHourDeferDelay() throws {
+        let config = optimoveConfigBuilder.enableOverlayMessaging().build().optimobileConfig
+
+        XCTAssertEqual(config?.isOverlayMessagingEnabled, true)
+        XCTAssertEqual(config?.overlayMessagingSessionLengthMinutes, 60)
+        XCTAssertEqual(config?.overlayMessagingDeferDelayMinutes, 60)
+    }
+
+    func testOverlayMessagingSessionLengthInHours() throws {
+        let config = optimoveConfigBuilder.enableOverlayMessaging(sessionLengthHours: 3).build().optimobileConfig
+
+        XCTAssertEqual(config?.overlayMessagingSessionLengthMinutes, 180)
+    }
+
+    func testOverlayMessagingSessionLengthCanBe0() throws {
+        let hours = OptimoveConfigBuilder(features: [.optimobile]).enableOverlayMessaging(sessionLengthHours: 0).build()
+        let minutes = OptimoveConfigBuilder(features: [.optimobile]).enableOverlayMessaging(sessionLengthMinutes: 0).build()
+
+        XCTAssertEqual(hours.optimobileConfig?.overlayMessagingSessionLengthMinutes, 0)
+        XCTAssertEqual(minutes.optimobileConfig?.overlayMessagingSessionLengthMinutes, 0)
+    }
+
+    func testOverlayMessagingSessionLengthUnder15Minutes() throws {
+        let config = optimoveConfigBuilder.enableOverlayMessaging(sessionLengthMinutes: 5).build().optimobileConfig
+
+        XCTAssertEqual(config?.overlayMessagingSessionLengthMinutes, 5)
+    }
+
+    func testOverlayMessagingDeferDelay() throws {
+        let hours = OptimoveConfigBuilder(features: [.optimobile]).enableOverlayMessaging(sessionLengthHours: 1, deferDelayMinutes: 1).build()
+        let minutes = OptimoveConfigBuilder(features: [.optimobile]).enableOverlayMessaging(sessionLengthMinutes: 30, deferDelayMinutes: 90).build()
+
+        XCTAssertEqual(hours.optimobileConfig?.overlayMessagingDeferDelayMinutes, 1)
+        XCTAssertEqual(minutes.optimobileConfig?.overlayMessagingDeferDelayMinutes, 90)
+    }
 }
